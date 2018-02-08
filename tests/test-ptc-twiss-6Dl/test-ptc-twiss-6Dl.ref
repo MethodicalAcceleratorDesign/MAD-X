@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.01 18:01:14      +
+  + Execution date: 2018.02.08 17:48:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !tests for closed orbit search with totalpath=true
 
@@ -29,19 +29,7 @@ use, period=ALS;
 
 select,flag=twiss,clear;
 
-select, flag=twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2,
-
-                          re11,re12,re13,re14,re15,re16,
-
-                          re21,re22,re23,re24,re25,re26,
-
-                          re31,re32,re33,re34,re35,re36,
-
-                          re41,re42,re43,re44,re45,re46,
-
-                          re51,re52,re53,re54,re55,re56,
-
-                          re61,re62,re63,re64,re65,re66;
+select, flag=twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2;
 
 
 
@@ -57,7 +45,9 @@ create,table=orbitvsfreq,column=rffreq,
 
 	          orbit_t, orbit_pt,
 
-	          q1,q2;
+	          q1,q2,
+
+	          beta33min, beta33max;
 
 
 
@@ -67,9 +57,9 @@ rffreq0 = 1e-6 * clight / (196.8781358/328) ;
 
 
 
-rffreq_min =  rffreq0 - 5e-3;
+rffreq_min =  rffreq0 - 1e-3;
 
-rffreq_max =  rffreq0 + 5e-3;
+rffreq_max =  rffreq0 + 1e-3;
 
 
 
@@ -164,12 +154,13 @@ while(rffreq <= rffreq_max)
 
 
 
-   rffreq = rffreq + 5e-3;
+   rffreq = rffreq + 1e-3;
 
  
 
 }
 
+Determined SECTOR NMUL MAX :  2
  MAD-X Beam Parameters
                   Energy : 0.150000E+01
           Kinetic Energy : 0.149949E+01
@@ -191,57 +182,57 @@ while(rffreq <= rffreq_max)
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       196.8781358     0.001667931226           -1000000           -1000000 
+       196.8781358     0.001615478385           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000     0.001667815173        24.48561013        0.211325224 
+          -1000000     0.001615362332        24.87994547       0.2698411357 
 
                 q2                dq1                dq2                 qs 
-      0.2000295772                  0                  0   -9.274859957e-16 
+      0.2714509301                  0                  0    6.956186417e-17 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-      0.7927774519        12.45621734        1.362571056        22.34153608 
+      0.8173677187        12.25965819        1.349267115        22.43388826 
 
          beta11min          beta11max          beta12min          beta12max 
-      0.7927774519        12.45621734    1.197734848e-35     3.09053707e-33 
+      0.8173677187        12.25965819    3.545825395e-35    5.500936384e-33 
 
          beta13min          beta13max          beta21min          beta21max 
-   5.343130142e-07      0.01458806908    7.515378063e-35    1.470251371e-33 
+   6.627048631e-09      0.01485882209    3.788389192e-35    6.424009211e-34 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.362571056        22.34153608    5.314233729e-34    5.680186546e-28 
+       1.349267115        22.43388826    1.007896243e-33    1.225472219e-28 
 
          beta31min          beta31max          beta32min          beta32max 
-   3.023365505e-06      0.01340285245    6.734081948e-33    9.445664641e-33 
+   3.840890489e-08      0.01285800631    3.669049896e-33    5.983188217e-33 
 
          beta33min          beta33max           disp1min           disp1max 
-       70.09063893        72.79249763    -0.005864093361       0.2409656258 
+       70.19208011        72.85765828    -0.000656226818       0.2392468785 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1962117693        0.196216849   -6.524943491e-16     4.85587251e-16 
+     -0.1930190445       0.1930197229   -1.300556672e-15    1.356555109e-15 
 
           disp4min           disp4max             deltap            orbit_x 
-  -3.650746101e-16    3.440705354e-16                  0   -1.578443247e-05 
+  -7.408679685e-16    7.478981612e-16                  0   -4.355697984e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -5.059145711e-09                  0                  0     0.006086513405 
+   4.772815712e-11                  0                  0     0.001208188939 
 
            orbit_t             xcorms             ycorms            pxcorms 
-    -0.04993895456    0.0007147196235                  0    0.0006770741555 
+    -0.04994015642    0.0001413383835                  0    0.0001337018915 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        113.8160335     0.006086513405     0.001460107466 
+                 0        113.8151245     0.001208188939    0.0002888090648 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0     0.001182107296                  0        196.9300457 
+                 0    0.0002327410813                  0        196.9284701 
 
            ptcomax             xcomin             ycomin            pxcomin 
-    0.006086513405   -1.580142238e-05                  0    -0.001182093052 
+    0.001208188939   -4.371804488e-08                  0   -0.0002327409312 
 
            pycomin             tcomin            ptcomin 
-                 0      0.04993895456     0.006086513405 
-rffreq             =         499.450797 ;
-table( ptc_twiss_summary  orbit_pt ) =     0.006086513405 ;
+                 0      0.04994015642     0.001208188939 
+rffreq             =         499.454797 ;
+table( ptc_twiss_summary  orbit_pt ) =     0.001208188939 ;
 
 ++++++ table: ptc_twiss_summary
 
@@ -270,13 +261,13 @@ table( ptc_twiss_summary  orbit_pt ) =     0.006086513405 ;
    3.412435246e-08      0.01272208834    2.337419065e-33    5.275747165e-33 
 
          beta33min          beta33max           disp1min           disp1max 
-       69.52390355        72.15210234    -0.005864093361       0.2388148938 
+       69.52390355        72.15210234    -0.000656226818       0.2388148938 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1962117693       0.1922264921   -7.097663892e-16    7.074146473e-16 
+     -0.1930190445       0.1922264921   -1.300556672e-15    7.074146473e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -3.802661756e-16    3.890857252e-16                  0   -2.184359285e-08 
+  -7.408679685e-16    3.890857252e-16                  0   -2.184359285e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
   -9.430944837e-12                  0                  0   -3.651800452e-05 
@@ -301,57 +292,57 @@ table( ptc_twiss_summary  orbit_pt ) =   -3.651800452e-05 ;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       196.8781358     0.001530277276           -1000000           -1000000 
+       196.8781358     0.001588007426           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000     0.001530161223        25.56318337       0.3646002497 
+          -1000000     0.001587891373        25.09422198       0.3004246606 
 
                 q2                dq1                dq2                 qs 
-      0.3866198816                  0                  0   -6.437295136e-16 
+       0.308690276                  0                  0    -7.17704013e-17 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-      0.8568874903        11.98225313         1.32801152         22.6070463 
+      0.8301580892         12.1648658        1.342371958        22.48652309 
 
          beta11min          beta11max          beta12min          beta12max 
-      0.8568874903        11.98225313    8.138114385e-36    8.138289099e-34 
+      0.8301580892         12.1648658    4.779689207e-36    1.483810951e-33 
 
          beta13min          beta13max          beta21min          beta21max 
-   6.699697551e-07       0.0144343301    6.540388773e-38    2.000462864e-36 
+   5.339971663e-08      0.01471772069     2.21361024e-36     4.29988435e-35 
 
          beta22min          beta22max          beta23min          beta23max 
-        1.32801152         22.6070463    9.547581947e-34    8.575702385e-29 
+       1.342371958        22.48652309    1.832392497e-33    1.074441603e-29 
 
          beta31min          beta31max          beta32min          beta32max 
-   4.240799633e-06      0.01215609465    3.225007528e-33     6.13095503e-33 
+   3.173533734e-07      0.01260899247    1.931474442e-33     2.91975521e-33 
 
          beta33min          beta33max           disp1min           disp1max 
-         66.046073        68.48206793    -0.005864093361       0.2366242854 
+       68.84699856        71.43747635    -0.000656226818       0.2383820237 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1962117693       0.1892674937   -8.150870054e-16    7.658329627e-16 
+     -0.1930190445       0.1916345653   -1.300556672e-15    8.488740828e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -4.463347456e-16    4.457918733e-16                  0   -2.413409991e-05 
+  -7.408679685e-16    4.618321996e-16                  0   -1.591572608e-06 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -8.783907535e-09                  0                  0    -0.006428394227 
+  -6.177670609e-10                  0                  0    -0.001291939839 
 
            orbit_t             xcorms             ycorms            pxcorms 
-    -0.04994195917    0.0007477488896                  0    0.0007057827705 
+    -0.04994075734    0.0001508430697                  0    0.0001425888671 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        113.8137612     0.006428394227   -5.827783839e-06 
+                 0        113.8146701     0.001291939839   -3.909400234e-07 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0     0.001226195327                  0        196.9261069 
+                 0    0.0002479683172                  0        196.9276824 
 
            ptcomax             xcomin             ycomin            pxcomin 
-   -0.006428394227     -0.00152817024                  0    -0.001226173082 
+   -0.001291939839   -0.0003082550712                  0   -0.0002479669869 
 
            pycomin             tcomin            ptcomin 
-                 0      0.04994195917    -0.006428394227 
-rffreq             =         499.460797 ;
-table( ptc_twiss_summary  orbit_pt ) =    -0.006428394227 ;
+                 0      0.04994075734    -0.001291939839 
+rffreq             =         499.456797 ;
+table( ptc_twiss_summary  orbit_pt ) =    -0.001291939839 ;
 
 
 write, table=orbitvsfreq, file="orbitvsfreq.tfs";
