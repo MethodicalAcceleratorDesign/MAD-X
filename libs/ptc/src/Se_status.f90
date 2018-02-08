@@ -815,9 +815,12 @@ CONTAINS
 
 !          ENDDO
           lda_used=lda_old
-          call print_curv("Maxwellian_bend_for_ptc.txt",S_B_from_V)
-          call print_curv_elec("Maxwellian_bend_for_ptc_electric.txt",s_e)
+         
+          if (global_verbose ) then
+            call print_curv("Maxwellian_bend_for_ptc.txt",S_B_from_V)
+            call print_curv_elec("Maxwellian_bend_for_ptc_electric.txt",s_e)
       !    call print_curv_elec("Maxwellian_bend_mag_from_pot.txt",S_B_from_V)
+          endif
        endif
 
        firsttime_coef=.FALSE.
