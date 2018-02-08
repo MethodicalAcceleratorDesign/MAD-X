@@ -899,7 +899,11 @@ An \texttt{RFCAVITY} has eight real attributes and one integer attribute:
     of non-zero dispersion may not close as expected. Therefore, it is best
     to perform \texttt{TWISS} in 4D only, \textsl{i.e.} with cavities
     switched off. If 6D is needed one has to use the
-    \hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}} command.  
+    \hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}} command. 
+    Please refer to \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}} command,
+    in particular to \texttt{TIME} and \texttt{TOTALPATH} switches,
+    concerning RF behaviour of cavities in PTC.
+    
 \end{itemize}
 
 The \texttt{RFCAVITY} can also have attributes that only become active in 
@@ -999,7 +1003,14 @@ performed.
 Contrary to the regular multipole, where the dipole
 component has an effect on the reference orbit, an RF-Multipole that
 includes a dipole component does not bend the reference orbit.      
- 
+
+In PTC there must be at least one cavity with non-zero voltage,
+otherwise all RF elements, including RF multipoles, are disabled.
+Concerning RF behaviour of cavities in PTC
+please refer to \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}} command,
+in particular to \texttt{TIME} and \texttt{TOTALPATH} switches.
+
+
 \begin{madlist}
    \ttitem{VOLT} The peak voltage of the RF accelerating mode (DEFAULT: 0 MV).
    \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0) 

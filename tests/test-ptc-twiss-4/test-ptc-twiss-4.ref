@@ -313,7 +313,7 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                 -0                  0                  0                  0 
 
            pycorms             tcorms            ptcorms             xcomax 

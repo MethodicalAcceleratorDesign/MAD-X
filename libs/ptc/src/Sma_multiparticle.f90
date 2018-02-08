@@ -20,7 +20,7 @@ module ptc_multiparticle
   !  LOGICAL :: OLD_MOD=.TRUE.
 
   logical(lp),private, parameter :: dobb=.true.
-  logical(lp),private, parameter :: aperture_all_case0=.false.
+  logical(lp),private            :: aperture_all_case0=.false.
  ! type(probe) :: xsm,xsm0
   real(dp) :: xsm0t=0.0_dp,xsmt=0.0_dp
   !real(dp) :: unit_time =1.0e-3_dp
@@ -112,15 +112,6 @@ CONTAINS
 
     EL=>C%PARENT_FIBRE%MAG
     ELP=>C%PARENT_FIBRE%MAGP
-
-!    if( K%MODULATION .and. ASSOCIATED(EL%slow_ac2) .and. EL%slow_ac2 ) THEN
-!    
-!       V=zero
-!       DV=el%D_ac*XS%AC%X(2)
-!       !print*, "Skowron: ",EL%name," ", EL%KIND ," slow_ac ",EL%slow_ac, " ", EL%slow_ac2
-!       !print*, "Skowron: Fast Modulation V=",V," DV=",DV, " ", XS%AC%X
-!    elseif(K%MODULATION .and. EL%slow_ac) THEN
-!       DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
 
     IF(K%MODULATION) THEN
       n=el%slow_ac
@@ -842,12 +833,12 @@ ENDIF
        PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
 
- 
-
     IF(C%MAGP%MIS) THEN
        ou = ALWAYS_EXACTMIS   !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
+
+    
     ! The magnet frame of reference is located here implicitely before misalignments
     CALL DTILTD(C%MAGP%P%TILTD,2,X)
 
@@ -867,6 +858,7 @@ ENDIF
     ! The CHART frame of reference is located here implicitely
     b1=C%BETA0
     IF(PATCHE/=0.AND.PATCHE/=1.AND.PATCHE/=4) THEN
+
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
 !       IF(.NOT.ASSOCIATED(CN)) CN=>C
@@ -900,6 +892,7 @@ ENDIF
                X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp   ! 8/31/2016
              ENDIF               
     ENDIF
+    
 endif
  
 
@@ -1227,7 +1220,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     IF(.NOT.CHECK_STABLE) return
     !       CALL RESET_APERTURE_FLAG
     !    endif
-
+    
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then
        messageLOST="exceed absolute_aperture in TRACKP_NODE_SINGLE"
        lost_node=>t
@@ -1251,20 +1244,25 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     SELECT CASE(T%CAS)
     CASE(CASEP1)
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
-     if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
-TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAGP%p%dir  &
-*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
+       if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
+          TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==-1 .OR.  &
+             T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
           if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
-     endif
-        global_e= x(5)*el%p%p0c
+       endif
+          global_e= x(5)*el%p%p0c
     CASE(CASEP2)
-     if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
-TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAGP%p%dir  &
-*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
+    
+  
+       if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
+          TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1 .OR.  &
+                 T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
           if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
-     endif
+       endif
+
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
-        global_e= x(5)*el%p%p0c
+       global_e= x(5)*el%p%p0c
+
+  
     CASE(CASE1,CASE2)
 !       el=>T%PARENT_FIBRE%MAGP
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE.and.t%cas==case2) &
@@ -1333,6 +1331,7 @@ TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1.OR.T%PARENT_F
        END SELECT
         global_e= x(5)*el%p%p0c
     CASE(CASE0)
+
  !      el=>T%PARENT_FIBRE%MAGP
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
             call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
@@ -1446,6 +1445,7 @@ TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1.OR.T%PARENT_F
             call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
 
     case(CASET)
+
        if(associated(t%bb).and.dobb.and.do_beam_beam) then
 
           if(t%bb%patch) call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_true)
@@ -3074,6 +3074,76 @@ end subroutine survey_integration_node_p2
        ENDIF
     ENDIF
   END SUBROUTINE MIS_survey
+
+  subroutine set_aperture_all_case0(flag)
+    implicit none
+    logical flag 
+    
+    aperture_all_case0 = flag
+    
+  end subroutine set_aperture_all_case0
+
+!!!!!!!!!!!!!!!!!!!
+
+
+subroutine survey_integration_fibre_no_patch(p,b0,exi0)
+implicit none
+type(fibre), target :: p
+type(integration_node), pointer :: t
+integer i
+type(layout), pointer  :: r
+real(dp),intent(in):: b0(3),exi0(3,3) 
+real(dp) a0(3),ent0(3,3),ang(3)
+a0=b0
+ent0=exi0
+r=>p%parent_layout
+if(.not.associated(r%t)) then
+ call make_node_layout(r)
+ call survey(r)
+    CALL  allocate_node_frame( R)
+! call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
+endif
+if(.not.associated(p%t1%a))     CALL  allocate_node_frame( R)   !call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
+ 
+
+
+!t=>p%t1
+!call survey_integration_node_p1(t,a0,ent0)
+t=>t%next
+call survey_integration_fringe(t,a0,ent0)
+
+do i=1,p%mag%p%nst
+ t=>t%next
+ call survey_integration_node_case0(t,a0,ent0)
+enddo
+t=>t%next
+call survey_integration_fringe(t,a0,ent0)
+!t=>t%next
+!call survey_integration_node_p2(t,a0,ent0)
+
+ 
+!!! entrance chart
+ CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,p%chart%f%exi,ANG)
+p%chart%f%mid=p%chart%f%ent
+!write(6,*) p%mag%name
+!write(6,*) ang
+ang=ang/2
+p%chart%f%o=0.5_dp*(p%chart%f%a+p%chart%f%b)
+CALL GEO_ROT(p%chart%f%mid,ANG,1,basis=p%chart%f%ent)
+ 
+CALL COMPUTE_ENTRANCE_ANGLE(p%mag%p%f%ent,p%mag%p%f%exi,ANG)
+p%mag%p%f%mid=p%mag%p%f%ent
+ang=ang/2
+p%mag%p%f%o=0.5_dp*(p%mag%p%f%a+p%mag%p%f%b)
+CALL GEO_ROT(p%mag%p%f%mid,ANG,1,basis=p%mag%p%f%ent)
+p%magp%p%f%mid=p%mag%p%f%mid
+p%magp%p%f%o=p%mag%p%f%o
+
+ 
+! I am here 
+!etienne
+
+end subroutine survey_integration_fibre_no_patch
 
 
 end module ptc_multiparticle

@@ -9942,12 +9942,14 @@ end subroutine c_full_factorise
  subroutine c_stochastic_kick(m,ait,ki,eps)
 !#general:  stochastic kick
 !# This routine creates a random kick 
+!# It diagonalises the beam envelope kick by noting
+!# that this object is dual to Lie operators
     implicit none
     type(c_damap) , intent(inout) :: m
     real(dp), intent(out) :: ait(6,6),ki(6)
     real(dp), intent(in) :: eps
     integer i,j
-    real(dp) norm,f(6,6),s(6,6), at(6,6),ai(6,6)
+    real(dp) norm,normy,f(6,6),s(6,6), at(6,6),ai(6,6)
     real(dp) b(6,6),a(6,6),d(6,6)
     type(c_vector_field) vf
     type(c_damap) id
@@ -9980,18 +9982,24 @@ end subroutine c_full_factorise
     enddo
     enddo
 
-    norm=0
+
+!!!! In rings without errors and middle plane symmetry
+!!!  the y-part of the envelope is exactly zero
+!!! So I add a y-part to make sure that my normal form
+!!! does not crap out
+    normy=0
     do i=1,6
     do j=1,6
      yhere=i==3.or.i==4.or.j==3.or.j==4
-     if(yhere) norm=norm +abs(f(i,j))
+     if(yhere) normy=normy +abs(f(i,j))
     enddo
     enddo
  !   write(6,*) " norm y",norm
-    if(norm<eps) then
+    if((normy/10)/norm<eps) then
       f(3,3)=0.234567_dp*twopi 
       f(4,4)=0.234567_dp*twopi 
     endif
+!!!!!!!!!!!!!!!
      f=matmul(f,s)
     do i=1,6
     do j=1,6
@@ -10022,16 +10030,20 @@ end subroutine c_full_factorise
     enddo
 
 !  construct    z_i =ki(i) * r_i
-! then x= 
+! then x= Ait z  is the appropriate kick
+! in the original space. 
+! 
 
-
+ if(global_verbose)  then
+    write(6,*)" Stochastic kick"
     do i=1,6
     do j=1,6
-    if(d(i,j)/=0.d0) then
+    if(abs(d(i,j))>eps*norm) then
      write(6,*) i,j,d(i,j)
     endif
     enddo
     enddo
+endif
 
     ai=-matmul(matmul(s,at),s)
     ait=transpose(ai)

@@ -2915,12 +2915,14 @@ endif
  ele0%VOLT_FREQ_PHAS=0.0_dp
  ele0%B_SOL=0.0_dp
  
-   ele0%fint_hgap_h1_h2_va_vs(1)=f%fint
-   ele0%fint_hgap_h1_h2_va_vs(2)=f%hgap
-   ele0%fint_hgap_h1_h2_va_vs(3)=f%h1
-   ele0%fint_hgap_h1_h2_va_vs(4)=f%h2
-   ele0%fint_hgap_h1_h2_va_vs(5)=f%va
-   ele0%fint_hgap_h1_h2_va_vs(6)=f%vs
+   ele0%fint_hgap_h1_h2_va_vs(1)=f%fint(1)
+   ele0%fint_hgap_h1_h2_va_vs(2)=f%fint(2)
+   ele0%fint_hgap_h1_h2_va_vs(3)=f%hgap(1)
+   ele0%fint_hgap_h1_h2_va_vs(4)=f%hgap(2)
+   ele0%fint_hgap_h1_h2_va_vs(5)=f%h1
+   ele0%fint_hgap_h1_h2_va_vs(6)=f%h2
+   ele0%fint_hgap_h1_h2_va_vs(7)=f%va
+   ele0%fint_hgap_h1_h2_va_vs(8)=f%vs
 
 
    ele0%L=f%L
@@ -2994,12 +2996,14 @@ if(f%p%nmul>0) then
  f%bn(1:f%p%nmul)=ele0%bn(1:f%p%nmul)
 endif
 
-f%fint= ele0%fint_hgap_h1_h2_va_vs(1)
-f%hgap= ele0%fint_hgap_h1_h2_va_vs(2)
-f%h1  = ele0%fint_hgap_h1_h2_va_vs(3)
-f%h2  = ele0%fint_hgap_h1_h2_va_vs(4)
-f%va  = ele0%fint_hgap_h1_h2_va_vs(5)
-f%vs  = ele0%fint_hgap_h1_h2_va_vs(6)
+f%fint(1)= ele0%fint_hgap_h1_h2_va_vs(1)
+f%fint(2)=ele0%fint_hgap_h1_h2_va_vs(2)
+f%hgap(1)= ele0%fint_hgap_h1_h2_va_vs(3)
+f%hgap(2)= ele0%fint_hgap_h1_h2_va_vs(4)
+f%h1  = ele0%fint_hgap_h1_h2_va_vs(5)
+f%h2  = ele0%fint_hgap_h1_h2_va_vs(6)
+f%va  = ele0%fint_hgap_h1_h2_va_vs(7)
+f%vs  = ele0%fint_hgap_h1_h2_va_vs(8)
 
 
 if(f%kind==kind4.or.f%kind==kind21) then ! cavities

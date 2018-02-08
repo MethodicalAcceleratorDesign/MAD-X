@@ -1,0 +1,69 @@
+!MADX test for rf lag handling in PTC
+! to be compared with test-track-9 that does the same for MADX track
+option,-echo,-info;
+
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with mad -x version 8.51/02
+!-- translated to madx format ETDA 9 dec 2003
+
+
+!-- Define Carol Johnstone's FFAG lattice, and compute Twiss parameters at
+!   nominal momentum
+
+beam particle=posmuon, energy=16.3;
+
+sf: sextupole, l=0.01, k2=0;
+qf: quadrupole, l=0.15/2, k1=+1.3798;
+bd: sbend l=0.35, angle=2*pi/314, k1=-0.59135;
+d: drift, l=0.75;
+rfvolt:=0.1;
+rflag:=1/4;
+
+rf: rfcavity, l=1.5, volt=rfvolt, lag=rflag, freq=1e-6*clight/(6.5/4); !harm
+
+carol: line=(qf,d,rf,d,bd,d,rf,d,qf);
+
+use, period=carol;
+twiss save;
+
+title "Carol Johnstone's FFAG ring lattice 6 to 20 GeV - apr07k";
+c314: line=(314*carol);
+use, period=c314;
+makethin, sequence=c314,style=hybrid, makedipedge=false;
+use, period=c314;
+
+!track, onepass,  dump;
+! start, x=1e-6, px=0, y=1e-6, py=0, t=-0.407;
+! start, x=1e-6, px=0, y=1e-6, py=0, t=-0.5;
+! start, x=1e-6, px=0, y=1e-6, py=0, t=-0.75;
+! start, x=1e-6, px=0, y=1e-6, py=0, t=-1.0;
+! run, turns=100, ffile=1;
+!endtrack;
+!stop;
+
+select,flag=ptc_twiss,clear;
+select, flag=ptc_twiss, column=name,s,Energy,x,px,y,py,pt,t,
+                          beta11,beta22,beta33,mu1,mu2,mu3,disp1,disp2;
+
+ptc_create_universe;
+  ptc_create_layout, model=1, method=2, nst=5, exact=false, closed_layout=true;
+
+  ptc_setswitch, debuglevel=1, maxacceleration=false, exact_mis=true, time=true, totalpath=false, fringe=true, modulation=false;
+  
+  ptc_twiss, icase=6, no=2, closed_orbit=true, rmatrix, x=0, y=0, t=-0.3;
+  write, table=ptc_twiss, file="FFAG.ptc.twiss";
+  
+  ptc_start, x=1e-6, px=0, y=1e-6, py=0, t=-0.407;
+  ptc_start, x=1e-6, px=0, y=1e-6, py=0, t=-0.5;
+  ptc_start, x=1e-6, px=0, y=1e-6, py=0, t=-0.75;
+  ptc_start, x=1e-6, px=0, y=1e-6, py=0, t=-1.0;
+
+
+  ptc_track, icase=6, element_by_element,  dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6}, turns=100, ffile=1;
+
+  ptc_track_end;
+
+ptc_end;
+
+
+stop;

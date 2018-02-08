@@ -63,7 +63,7 @@ module Mad_like
      real(dp) T1,T2,B0
      real(dp) volt,freq0,harmon,lag,DELTA_E,BSOL
      real(dp) tilt
-     real(dp) FINT,hgap,h1,h2,X_COL,Y_COL
+     real(dp) FINT,hgap,FINT2,hgap2,h1,h2,X_COL,Y_COL
      real(dp) thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle,hf,vf,ls  ! highly illegal additions by frs
      CHARACTER(120) file
      CHARACTER(120) file_rev

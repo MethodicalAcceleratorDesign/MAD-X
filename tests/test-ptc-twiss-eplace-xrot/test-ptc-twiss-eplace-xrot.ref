@@ -140,7 +140,7 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                 -0      0.09455923562       0.7807040357      0.01064037426 
 
            pycorms             tcorms            ptcorms             xcomax 
