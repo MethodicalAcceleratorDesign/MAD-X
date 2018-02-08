@@ -41,6 +41,7 @@ orbit:   1.839784E-06  5.524609E-13  0.000000E+00  0.000000E+00  0.000000E+00  0
 makethin: style chosen : hybrid
 ++++++ warning: makethin: no selection list, slicing all to one thin lens.
 makethin: slicing sequence : c314
+Determined SECTOR NMUL MAX :  0
  MAD-X Beam Parameters
                   Energy : 0.163000E+02
           Kinetic Energy : 0.161943E+02

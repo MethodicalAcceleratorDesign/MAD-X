@@ -12,13 +12,7 @@ beam, particle = electron, energy = eg;
 use, period=ALS;
 
 select,flag=twiss,clear;
-select, flag=twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2,
-                          re11,re12,re13,re14,re15,re16,
-                          re21,re22,re23,re24,re25,re26,
-                          re31,re32,re33,re34,re35,re36,
-                          re41,re42,re43,re44,re45,re46,
-                          re51,re52,re53,re54,re55,re56,
-                          re61,re62,re63,re64,re65,re66;
+select, flag=twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2;
 
 
 create,table=orbitvsfreq,column=rffreq,
@@ -26,14 +20,14 @@ create,table=orbitvsfreq,column=rffreq,
                               orbit_x, orbit_px,
 	          orbit_y, orbit_py,
 	          orbit_t, orbit_pt,
-	          q1,q2, 
-	          beta33min,beta33max;
+	          q1,q2,
+	          beta33min, beta33max;
 
 ! set rf frequency at harmonic 328
 rffreq0 = 1e-6 * clight / (196.8781358/328) ;
 
-rffreq_min =  rffreq0 - 10e-3;
-rffreq_max =  rffreq0 + 10e-3;
+rffreq_min =  rffreq0 - 1e-3;
+rffreq_max =  rffreq0 + 1e-3;
 
 rffreq = rffreq_min;
 
@@ -80,7 +74,7 @@ while(rffreq <= rffreq_max)
 
    fill,table=orbitvsfreq;
 
-   rffreq = rffreq + 5e-3;
+   rffreq = rffreq + 1e-3;
  
 }
 

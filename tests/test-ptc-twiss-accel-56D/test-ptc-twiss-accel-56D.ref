@@ -63,6 +63,7 @@ select, flag=twiss, column=name,s,energy,
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  0
    ptc_create_layout,resplit,xbend, model=2, method=6, nst=PTCNSTEPS, exact=true, closed_layout=false;
 
  TWDISP: Unable to compute intial dispersion --- dispersion set to zero.

@@ -288,6 +288,15 @@ subroutine w_ptc_printframes(filename)
   use pointer_lattice
   implicit none
   integer filename(*)
+
+  if (ASSOCIATED(my_ering) .eqv. .false.) then
+     if (ASSOCIATED(m_u) .eqv. .false.) then
+          call aafail('w_ptc_printframes:','A PTC command without universe created. Program stops')
+          return
+     endif
+     my_ering => m_u%end
+  endif
+  
   call printframes(filename)
 end subroutine w_ptc_printframes
 

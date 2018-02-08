@@ -699,6 +699,7 @@ enter EMIT module
 
 PTC_CREATE_UNIVERSE;
 
+Determined SECTOR NMUL MAX :  0
 PTC_CREATE_LAYOUT,model=2,method=6,nst=1;
 
  MAD-X Beam Parameters

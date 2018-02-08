@@ -262,6 +262,7 @@ parameter: energy   double value:                100
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
 ptc_create_layout,model=2,method=6,nst=10,exact;
 
  MAD-X Beam Parameters
@@ -503,6 +504,7 @@ call, file = "../share/line_lattice/line.seq";
 ++++++ info: ygapsp3 redefined
 ++++++ info: ygapsp4 redefined
 ++++++ info: ygapsp5 redefined
+Determined SECTOR NMUL MAX :  2
  MAD-X Beam Parameters
                   Energy : 0.250000E+03
           Kinetic Energy : 0.249999E+03

@@ -252,6 +252,7 @@ parameter: energy   double value:                100
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
 ptc_create_layout,model=2,method=6,nst=10,exact;
 
  MAD-X Beam Parameters
@@ -422,6 +423,7 @@ select,flag=ptc_twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3;
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
 ptc_create_layout,model=2,method=6,nst=5,exact;
 
  MAD-X Beam Parameters

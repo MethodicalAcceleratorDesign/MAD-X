@@ -270,6 +270,7 @@ parameter: energy   double value:                100
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
 ptc_create_layout,model=2,method=6,nst=10,exact;
 
  MAD-X Beam Parameters
@@ -454,6 +455,7 @@ beam, particle = proton, energy =   eg        ,
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
 ptc_create_layout,model=2,method=6,nst=10,exact;
 
  MAD-X Beam Parameters
