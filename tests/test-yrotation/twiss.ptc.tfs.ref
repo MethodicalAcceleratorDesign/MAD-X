@@ -63,7 +63,7 @@
 @ ORBIT_Y          %le                   0
 @ ORBIT_PY         %le                   0
 @ ORBIT_PT         %le                   0
-@ ORBIT_-CT        %le                  -0
+@ ORBIT_T          %le                   0
 @ XCORMS           %le       0.00362446617
 @ PXCORMS          %le      0.002612230398
 @ YCORMS           %le                   0
@@ -84,8 +84,8 @@
 @ PTCOMAX          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.03.07 Linux 64"
-@ DATE             %08s "07/02/18"
-@ TIME             %08s "16.10.36"
+@ DATE             %08s "08/02/18"
+@ TIME             %08s "17.55.15"
 * NAME                                S                  X                 PX                  Y                 PY                 PT                  T 
 $ %s                                %le                %le                %le                %le                %le                %le                %le 
  "SEQ$START"                          0                  0                  0                  0                  0                  0                 -0

@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.07 15:25:04      +
+  + Execution date: 2018.02.08 17:56:48      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=3;
 
@@ -180,8 +180,8 @@ PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=xin, y=yin,
           orbit_px            orbit_y           orbit_py           orbit_pt 
              0.001              -0.01              0.002             0.0005 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
-                -0      0.01696583765     0.007824538195      0.00543632595 
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0      0.01696583765     0.007824538195      0.00543632595 
 
            pycorms             tcorms            ptcorms             xcomax 
     0.002508652417    9.140083385e-05             0.0005      0.02297804891 
