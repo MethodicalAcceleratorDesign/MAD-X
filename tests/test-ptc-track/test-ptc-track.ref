@@ -21,6 +21,7 @@
 
 option,-echo;
 
+Determined SECTOR NMUL MAX :  0
  MAD-X Beam Parameters
                   Energy : 0.120000E+00
           Kinetic Energy : 0.119489E+00
@@ -73,6 +74,7 @@ obs_points pro_ptc_setswitch Done
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
+Determined SECTOR NMUL MAX :  0
  MAD-X Beam Parameters
                   Energy : 0.120000E+00
           Kinetic Energy : 0.119489E+00

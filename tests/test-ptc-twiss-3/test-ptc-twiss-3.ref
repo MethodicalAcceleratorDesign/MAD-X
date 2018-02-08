@@ -76,6 +76,7 @@ parameter: r12   double value:                 -0
 parameter: r21   double value:                 -0
 parameter: r22   double value:                 -0
 parameter: energy   double value:                100
+Determined SECTOR NMUL MAX :  2
  MAD-X Beam Parameters
                   Energy : 0.100000E+03
           Kinetic Energy : 0.990617E+02

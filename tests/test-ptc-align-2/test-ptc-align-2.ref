@@ -79,6 +79,7 @@ select, flag=twiss, column=name,s,x,px,y,py, t, pt,
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
  ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
 
  MAD-X Beam Parameters

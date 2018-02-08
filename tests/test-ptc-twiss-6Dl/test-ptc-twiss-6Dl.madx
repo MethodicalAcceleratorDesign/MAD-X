@@ -26,8 +26,8 @@ create,table=orbitvsfreq,column=rffreq,
                               orbit_x, orbit_px,
 	          orbit_y, orbit_py,
 	          orbit_t, orbit_pt,
-	          q1,q2, 
-	          beta33min,beta33max;
+	          q1,q2,
+	          beta33min, beta33max;
 
 ! set rf frequency at harmonic 328
 rffreq0 = 1e-6 * clight / (196.8781358/328) ;
@@ -80,7 +80,7 @@ while(rffreq <= rffreq_max)
 
    fill,table=orbitvsfreq;
 
-   rffreq = rffreq + 5e-3;
+   rffreq = rffreq + 1e-3;
  
 }
 

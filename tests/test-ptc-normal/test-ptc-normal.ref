@@ -193,6 +193,7 @@ Assigned field errors to 1 elements
 
  ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  0
  ptc_create_layout,model=1,method=2,nst=5;!,exact;
 
  MAD-X Beam Parameters
