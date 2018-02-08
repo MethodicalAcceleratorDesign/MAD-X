@@ -570,8 +570,7 @@ contains
     character(48)           :: summary_table_name
     character(12)           :: tmfile='transfer.map'
     character(48)           :: charconv !routine
-    !real :: tstart, tfinish, tsum
-    !tsum = 0d0
+    
      
     if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
@@ -942,6 +941,7 @@ contains
         print*, "doTMtrack=false, theTransferMap stays as it was"  
       
     endif
+
 
 
     
@@ -1389,6 +1389,7 @@ contains
 !    call f90flush(20,my_false)
 
     if (getdebug() > 2) close(mf1)
+
      
     !****************************************************************************************
     !*********  E N D   O F   PTC_TWISS      ************************************************

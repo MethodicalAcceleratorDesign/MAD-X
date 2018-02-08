@@ -89,7 +89,9 @@ CONTAINS
   subroutine ptc_create_universe()
     implicit none
     real(kind(1d0)) get_value
+    integer maxnmul
 
+    
     piotr_freq=.true. ! flag introduced in PTC cavity tracking to have correct phasing with time=false
     
     call set_aperture_all_case0(.true.)
@@ -134,16 +136,34 @@ CONTAINS
 
     !    print*,">>ss1<< old sector_nmul",sector_nmul
 
-    sector_nmul = get_value('ptc_create_universe ','sector_nmul ')
+    
 
     !    print*,">>ss1<< new sector_nmul",sector_nmul
-
+    if (sector_nmul_max < 0) then
+       maxnmul = getmaxnmul()
+       
+       if (maxnmul < 0) then
+          call aafail('ptc_create_universe: ',&
+                      'Seems that no sequence is in currently in use. Aborting.')
+          return
+       endif
+       
+       sector_nmul_max = maxnmul
+       sector_nmul     = maxnmul
+    else
+       sector_nmul = get_value('ptc_create_universe ','sector_nmul ')     
+    endif
+    
+    
     if(sector_nmul_max.lt.sector_nmul) then
        call aafail('sector_nmul_max must be larger than sector_nmul: ',&
             'check your ptc_create_universe input')
     endif
 
     ! copy from Ss_fake_mad.f90:ptc_ini_no_append
+    
+    
+    
     allocate(m_u)
     call set_up_universe(m_u)
     allocate(m_t)
@@ -164,6 +184,8 @@ CONTAINS
   subroutine ptc_create_layout()
     implicit none
     real(kind(1d0)) get_value
+
+
 
     if(universe.le.0 .or. EXCEPTION.ne.0) then
        call fort_warn('return from ptc_create_layout: ',' no universe created')
@@ -192,6 +214,7 @@ CONTAINS
        default=default+time
        call setintstate(default)
     endif
+
 
   end subroutine ptc_create_layout
   !_________________________________________________________________
@@ -258,8 +281,11 @@ CONTAINS
     character(nlp) heli(100)
     integer mheli,helit,ihelit
     type(fibre), pointer :: p => null()
-
     double precision, parameter :: zero=0.d0
+    !real :: tstart, tfinish, tsum
+    !tsum = 0d0
+    !call cpu_time(tstart)
+
 
     !---------------------------------------------------------------
     !---------------------------------------------------------------
@@ -510,7 +536,9 @@ CONTAINS
     else
        nstd = nst0
     endif
-
+    
+    ord_max = -1
+    
     call zero_key(key)
 
     !j=j+1
@@ -786,7 +814,7 @@ CONTAINS
              call augment_count('errors_dipole ')
           endif
        endif
-    case(3) ! PTC accepts mults watch out sector_nmul defaulted to 4
+    case(3) ! PTC accepts mults watch out sector_nmul defaulted to 22
        
        if (getdebug()>2) print*,"Translating SBEND"
        if(l.eq.zero) then
@@ -797,6 +825,7 @@ CONTAINS
        key%magnet="sbend"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
+       
        
        if( (sector_nmul_max.lt.ord_max) .and. EXACT_MODEL) then
          
@@ -1469,20 +1498,22 @@ CONTAINS
        call aafail('ptc_input:','Element not implemented in PTC. Program stops')
     end select
 100 continue
-!    if(code.ne.14.and.code.ne.15.and.code.ne.16) then
+    
+    !apply BVK f;ag 
+    do i=1,NMAX
+       key%list%k(i)=bvk*key%list%k(i)
+       key%list%ks(i)=bvk*key%list%ks(i)
+    enddo
+    
+   ! if (ord_max > 0) then
+   !    key%list%nmul = ord_max
+   ! endif
 
-       do i=1,NMAX
-          key%list%k(i)=bvk*key%list%k(i)
-          key%list%ks(i)=bvk*key%list%ks(i)
-       enddo
-
-!    endif
     call create_fibre(my_ring%end,key,EXCEPTION) !in ../libs/ptc/src/Sp_keywords.f90
     
     if(code.eq.40 .or. code.eq.41 ) then
-     !save pointer to the AC dipole element for ramping in tracking
-     call addelementtoclock(my_ring%end,key%list%clockno_ac)
-     
+      !save pointer to the AC dipole element for ramping in tracking
+      call addelementtoclock(my_ring%end,key%list%clockno_ac)
     endif
     
     
@@ -1594,6 +1625,7 @@ CONTAINS
     REAL(dp) :: normal(0:maxmul), skew  (0:maxmul), &
          f_errors(0:maxferr), field(2,0:maxmul)
     INTEGER :: n_norm, n_skew, n_ferr ! number of terms in command line
+    INTEGER :: n_max
     INTEGER :: node_fd_errors ! function
     integer :: i, i_count, n_dim_mult_err, ord_max
 
@@ -1676,8 +1708,22 @@ CONTAINS
 
     n_dim_mult_err = max(n_norm, n_skew, n_ferr/2) !===========!
     if(n_dim_mult_err.ge.maxmul) n_dim_mult_err=maxmul-1       !
-    if(n_ferr.gt.0) then                                       !
-       do i_count=0,n_dim_mult_err                             !
+
+    n_max = -1                                 !
+    if(n_ferr.gt.0) then 
+       if (getdebug() > 2) then
+         print*,"Reading errors ", n_ferr
+       endif 
+       do i_count=n_dim_mult_err,0,-1                             !
+
+          if (getdebug() > 2) then
+            print*,"   >> error n ",i_count+1,"  kn = ", field(1,i_count), " ks = ", field(2,i_count)
+          endif                                  !
+
+          IF( (field(1,i_count)/=0.0_dp .or. field(2,i_count)/=0.0_dp) .and. (n_max < 0)) THEN
+            n_max = i_count+1
+          ENDIF
+
           if(l.ne.zero) then                                   !
              key%list%k(i_count+1)=key%list%k(i_count+1)+ &    !
                   field(1,i_count)/l                           !
@@ -1692,7 +1738,8 @@ CONTAINS
        enddo                                                   !
     endif !====================================================!
 
-
+    
+    ord_max=max(ord_max,n_max)
 
   END SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS
   !----------------------------------------------------------------
@@ -3449,5 +3496,72 @@ CONTAINS
 
   end subroutine acdipoleramping
 
+  !_________________________________________
+  ! returns max multipole order of bends
+  ! it is used to set 
+  function getmaxnmul()
+    use twtrrfi, only: maxferr
+    implicit none
+    integer getmaxnmul 
+    integer i,j, maxnmul, code, n_ferr, max_n_ferr
+    integer restart_sequ,advance_node,node_fd_errors
+    integer n_norm, n_skew
+    REAL(dp) :: tmp_0123(0:3)
+    REAL(dp) :: tmpmularr(0:maxferr), field(2,0:maxferr)
+    real(kind(1d0)) node_value
+    
+    getmaxnmul = -1
+    
+    j=restart_sequ() ! returns -1 if error, +1 if OK
+    
+    
+    do while (j .gt. 0)
+      code=node_value('mad8_type ')
+      !bend or rbend
+      if (code/=2 .and. code/=3 ) then 
+        j = advance_node()  !returns 1 if OK, 0 otherhise
+        cycle;
+      endif 
+
+      call get_node_vector('knl ',n_norm,tmpmularr) 
+      call get_node_vector('ksl ',n_skew,tmpmularr) 
+      
+      n_ferr = node_fd_errors(tmpmularr)
+      field = zero ! array to be zeroed.                          !
+      if (n_ferr .gt. 0) then                                     !
+         call dcopy(tmpmularr,field,n_ferr)                        !
+      endif                                                       !
+      
+      max_n_ferr = n_ferr/2
+      n_ferr = -1
+      do i=max_n_ferr,0,-1
+      !  print*,"magnet =",j," err_n ", i, " ", field(1,i),  field(2,i)
+        IF( (field(1,i)/=0.0_dp .or. field(2,i)/=0.0_dp) ) THEN
+          n_ferr = i+1
+          exit 
+        ENDIF
+      enddo
+      
+      
+      maxnmul = max(n_norm,n_skew)
+      maxnmul = max(n_ferr,maxnmul)
+      
+      if (maxnmul > getmaxnmul) getmaxnmul = maxnmul
+      
+     ! print*, "j=",j," ", getmaxnmul, maxnmul, n_norm,n_skew,n_ferr
+      
+      j = advance_node()
+      
+    enddo
+    
+    !
+    getmaxnmul = getmaxnmul + 1
+    
+    if (getdebug() > 0) then
+      write(6,'(a,i2)') "Determined SECTOR NMUL MAX : ", getmaxnmul
+    endif
+
+    
+  end  function getmaxnmul
 
 END MODULE madx_ptc_module
