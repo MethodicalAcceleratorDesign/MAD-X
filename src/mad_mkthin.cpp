@@ -1132,7 +1132,7 @@ static void place_thin_slice(const node* node, sequence* to_sequ, element* slice
     double at = node->at_value;
     expression* length_param_expr=my_get_param_expression(node->p_elem, "l"); // get expression or create new from constant
     expression* at_expr;
-    if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " sliced_elem=" << sliced_elem->name << " node->p_elem=" << node->p_elem->name << " length_param_expr " << my_dump_expression(length_param_expr) << " node->at_expr " << my_dump_expression(node->at_expr) << '\n';
+    if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " sliced_elem=" << sliced_elem->name << " node->p_elem=" << node->p_elem->name << " length_param_expr " << my_dump_expression(length_param_expr) << " node->at_expr " << my_dump_expression(node->at_expr) << " rel_shift=" << rel_shift << '\n';
     if( iMoreExpressions<1 ) at_expr = compound_expr(node->at_expr, at, "+",  NULL, my_get_expression_value(length_param_expr) *rel_shift );  // use length and shift values, no expressions
     else at_expr = compound_expr(node->at_expr, at, "+", scale_expr(length_param_expr,rel_shift),  0 ); // use length expression and rel_shift value, this also updates the value
     place_node_at(node,to_sequ,sliced_elem,at_expr);
@@ -1451,7 +1451,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   const int ipos_mx = name_list_pos("moreexpressions", nl);
   if( ipos_mx > -1 && nl->inform[ipos_mx])
     iMoreExpressions=pl->parameters[ipos_mx]->double_value;
-  else iMoreExpressions = 0; // default is 0 mad_dict.c
+  else iMoreExpressions = 1; // default is 1 mad_dict.c
   if (verbose_fl()) std::cout << "makethin iMoreExpressions flag ipos_mx=" << ipos_md << " iMoreExpressions=" << iMoreExpressions << '\n';
   
   if (slice_select->curr > 0)
