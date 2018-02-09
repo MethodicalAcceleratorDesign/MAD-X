@@ -1132,9 +1132,20 @@ static void place_thin_slice(const node* node, sequence* to_sequ, element* slice
     if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " iMoreExpressions=" << iMoreExpressions<< '\n';
     double at = node->at_value;
     expression* length_param_expr=my_get_param_expression(node->p_elem, "l"); // get expression or create new from constant
-    expression* at_expr;
+    expression* at_expr=nullptr;
     if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " sliced_elem=" << sliced_elem->name << " node->p_elem=" << node->p_elem->name << " length_param_expr " << my_dump_expression(length_param_expr) << " node->at_expr " << my_dump_expression(node->at_expr) << " rel_shift=" << rel_shift << '\n';
-    if( iMoreExpressions<1 ) at_expr = compound_expr(node->at_expr, at, "+",  NULL, my_get_expression_value(length_param_expr) *rel_shift );  // use length and shift values, no expressions
+    if( iMoreExpressions<1 )
+    {
+      // at_expr = compound_expr(node->at_expr, at, "+",  NULL, my_get_expression_value(length_param_expr) *rel_shift );  // use length and shift values, no expressions; failed to update the value
+      double at_shift=my_get_expression_value(length_param_expr) *rel_shift;
+      std::ostringstream ostr;
+      ostr << std::setprecision(17) << at + at_shift;
+      const char* expr_str=ostr.str().c_str();
+      expression* new_at_expr = new_expression(expr_str, nullptr);
+      at_expr = compound_expr(new_at_expr, at + at_shift, "+", nullptr,  0 ); // use compound_expr to get value updated
+      strcpy(at_expr->string,expr_str); // keep the string, avoid expression with  "+ ( 0 )"
+      if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " at=" << at << " at_shift=" << at_shift << " expr_str=" << expr_str << " at_expr=" << my_dump_expression(at_expr) << std::endl;
+    }
     else at_expr = compound_expr(node->at_expr, at, "+", scale_expr(length_param_expr,rel_shift),  0 ); // use length expression and rel_shift value, this also updates the value
     place_node_at(node,to_sequ,sliced_elem,at_expr);
   }
