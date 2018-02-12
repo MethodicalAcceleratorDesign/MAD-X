@@ -280,9 +280,9 @@ module definition
 
   !@3 ---------------------------------------------</br>
   include "a_def_frame_patch_chart.inc"
-  include "a_def_all_kind.inc"
   include "a_def_sagan.inc"
   include "a_def_element_fibre_layout.inc"
+  include "a_def_all_kind.inc"
   !@3 ---------------------------------------------</br>
   type(fibre), pointer :: lost_fibre=>null()
   type(integration_node), pointer :: lost_node=>null()
