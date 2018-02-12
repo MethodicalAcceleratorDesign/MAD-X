@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS = -std=c99 -m$(ARCH) -O$(NOPT)
+LDFLAGS = -m$(ARCH) -O$(NOPT)
 LDLIBS  =
 
 #

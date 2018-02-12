@@ -32,7 +32,7 @@ CPPFLAGS += -D_CLANGXX
 # compiler
 #
 
-CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++11 -Wall -W -Wextra -pedantic -c
+CXXFLAGS = -std=c++11 -m$(ARCH) -O$(NOPT) -Wall -W -Wextra -pedantic -c
 
 #
 # options flags
