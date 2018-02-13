@@ -241,6 +241,7 @@ match2_disasambleconstraint(struct in_cmd* cmd)
             match2_setconstrinrange(nodes,w, par->name,s,par->min_expr->string);
           }
           if (par->c_type == 1) break;
+          __attribute__ ((fallthrough));
         case 2: /* maximum */
           s = '<';
           if (par->max_expr == NULL)

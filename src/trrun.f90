@@ -917,7 +917,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   double precision :: f_errors(0:maxferr)
   double precision :: field(2,0:maxmul)
   !double precision :: vals(2,0:maxmul)
-  double precision :: normal(0:maxmul), skew(0:maxmul)
+  double precision :: normal(0:maxmul), skew(0:maxmul), an
   double precision, save :: ordinv(maxmul), const
   double precision :: bvk, node_value, ttt
   double precision :: npeak(100), nlag(100), ntune(100), temp, noise
@@ -949,6 +949,11 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
 
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
+  !---- Angle (no bvk in track)
+  an = node_value('angle ')
+  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
+
+  !----
   if (noise .eq. 1)   then
      nn1 = name_len
      noisemax = node_value('noisemax ')
@@ -3157,16 +3162,17 @@ subroutine trsol(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: bet0, bet
+  double precision :: bet0
   double precision :: sk, skl, cosTh, sinTh, Q, R, Z
   double precision :: xf, yf, pxf, pyf, sigf, psigf, bvk
   double precision :: onedp, fpsig, fppsig
 
   double precision :: get_value, node_value
 
-  double precision :: omega, length, length_
+  double precision :: omega, length
   double precision :: x_, y_, z_, px_, py_, pt_
-  
+  double precision :: bet, length_
+
   !---- Initialize.
   bet0 = get_value('probe ','beta ')
 
@@ -3175,9 +3181,9 @@ subroutine trsol(track,ktrack)
   bvk = node_value('other_bv ')
   sk  = bvk * node_value('ks ') / two
   length = node_value('l ')
-  
+
   if (length.eq.zero) then
-     
+
      skl = bvk * node_value('ksi ') / two
 
      !---- Loop over particles
@@ -3227,22 +3233,23 @@ subroutine trsol(track,ktrack)
 
            ! set up constants
            onedp = sqrt(one + two*pt_/bet0 + pt_**2);
-           bet = onedp / (one/bet0 + pt_);
 
            ! set up constants
            cosTh = cos(two*skl/onedp)
            sinTh = sin(two*skl/onedp)
            omega = sk/onedp;
-
+           
            ! total path length traveled by the particle
+           bet = onedp / (one/bet0 + pt_);
            length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
                 two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
-
+           
            track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
            track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
            track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
            track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
            track(5,i) = z_ + length/bet0 - length_/bet;
+
         enddo
      else
         call ttdrf(length,track,ktrack);
@@ -4547,9 +4554,9 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length * (one + h*x) * (one - tan(e1)*x), curv, rfac, deltas);
+           call trphot(length * (one + h*x) - two * tan(e1)*x, curv, rfac, deltas);
         else
-           rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+           rfac = (arad * gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e1)*x)
         endif
         if (damp) then
            px = px - rfac * (one + pt) * px
@@ -4577,9 +4584,9 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length * (one + h*x) * (one - tan(e2)*x), curv, rfac, deltas);
+           call trphot(length * (one + h*x) - two * tan(e2)*x, curv, rfac, deltas);
         else
-           rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
+           rfac = (arad * gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e2)*x)
         endif
         if (damp) then
            px = px - rfac * (one + pt) * px
@@ -4714,6 +4721,7 @@ subroutine trphot(el,curv,rfac,deltap)
 
   !---- AMEAN is the average number of photons emitted.,
   !     NPHOT is the integer number generated from Poisson's law.
+  !-AL- AMEAN implicitly takes el / 2 (half the element length)
   amean = five * sqrt(three) / (twelve * hbar * clight) * abs(arad * pc * (one+deltap) * el * curv)
   ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
   sumxi = zero
@@ -4721,7 +4729,7 @@ subroutine trphot(el,curv,rfac,deltap)
      print *,"More than 0.3 photons emitted in element."
      print *,"You might want to consider increasing the number of slices to reduce this number."
   endif
-     
+
   if (amean .gt. zero) then
      call dpoissn(amean, nphot, ierror)
 

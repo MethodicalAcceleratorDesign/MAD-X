@@ -514,6 +514,10 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         NORMAL(0:maxmul) = zero ; call get_node_vector('knl ',nn,normal)
         SKEW(0:maxmul) = zero   ; call get_node_vector('ksl ',ns,skew)
 
+        !---- Angle (bvk applied later)
+        an = node_value('angle ')
+        if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
+
         !---- Other components and errors.
         nord = 0
         do i = 0, max(nn, ns, n_ferr/2-1)

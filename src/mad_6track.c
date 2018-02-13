@@ -2311,7 +2311,7 @@ pre_multipole(struct c6t_element* el) /* pre-process multipoles */
     if (++last_nzero > el->nf_err)
     {
       if (el->p_fd_err != NULL) strcpy(tmp_name, el->p_fd_err->key);
-      else  sprintf(tmp_name,"%s_arfa", el->name);
+      else  snprintf(tmp_name, sizeof tmp_name, "%.42s_arfa", el->name);
       el->nf_err = last_nzero;
       el->p_fd_err = make_obj(tmp_name, 0, el->nf_err, 0, 0);
     }
@@ -2359,7 +2359,7 @@ pro_elem(struct node* cnode)
   current_element->occ_cnt = cnode->occ_cnt;
   if (cnode->occ_cnt > 1)  /* add occurence count to name */
   {
-    sprintf(t_key, "%s+%d", current_element->name,cnode->occ_cnt);
+    snprintf(t_key, sizeof t_key, "%.45s+%d", current_element->name,cnode->occ_cnt);
     strcpy(current_element->name, t_key);
   }
   current_element->position = cnode->position;
