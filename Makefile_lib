@@ -22,18 +22,19 @@ ifeq ($(ONLINE),yes)
 LIBS += -Llib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
 endif
 
+# Libraries on Linux
+
+ifeq ($(OSTYPE),Linux)
+LIBS   += $(if $(call eq,$(ARCH),32),$(call libdir,/usr/lib),) -lpthread -lX11
+LDLIBS += -lstdc++ -lm
+endif
+
 # Garbage Collector
 
 ifeq ($(USEGC),yes)
 LIBS += -Llibs$/gc -lgc-$(OSNAME)$(ARCH)$(if $(findstring -intel,$@),-intel,-gnu)
 endif
 
-# Libraries on Linux
-
-ifeq ($(OSTYPE),Linux)
-LIBS   += $(if $(call eq,$(ARCH),32),$(call libdir,/usr/lib),) -lX11
-LDLIBS += -lstdc++ -lm
-endif
 
 # Libraries on MacOSX
 

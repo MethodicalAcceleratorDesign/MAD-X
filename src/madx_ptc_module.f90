@@ -3503,12 +3503,14 @@ CONTAINS
     use twtrrfi, only: maxferr
     implicit none
     integer getmaxnmul 
-    integer i,j, maxnmul, code, n_ferr, max_n_ferr
+    integer i,j, maxnmul, maxk, code, n_ferr, max_n_ferr
     integer restart_sequ,advance_node,node_fd_errors
     integer n_norm, n_skew
-    REAL(dp) :: tmp_0123(0:3)
+    REAL(dp) :: tmp_0123(0:3), v
     REAL(dp) :: tmpmularr(0:maxferr), field(2,0:maxferr)
     real(kind(1d0)) node_value
+    character (len = 3), dimension(3) :: kns = (/'k1 ','k2 ','k3 ' /)
+    character (len = 4), dimension(3) :: kss = (/'k1s ','k2s ','k3s ' /)
     
     getmaxnmul = -1
     
@@ -3522,7 +3524,24 @@ CONTAINS
         j = advance_node()  !returns 1 if OK, 0 otherhise
         cycle;
       endif 
+      
+      maxk = 0
+      do i=3,1,-1
+        v = node_value(kns(i))
+        if (v .ne. zero ) then
+          maxk = i
+          exit
+        endif
 
+        v = node_value(kss(i))
+        if (v .ne. zero ) then
+          maxk = i
+          exit
+        endif
+         
+      enddo
+      
+      
       call get_node_vector('knl ',n_norm,tmpmularr) 
       call get_node_vector('ksl ',n_skew,tmpmularr) 
       
@@ -3543,12 +3562,15 @@ CONTAINS
       enddo
       
       
-      maxnmul = max(n_norm,n_skew)
-      maxnmul = max(n_ferr,maxnmul)
+      maxnmul = max(n_norm,n_skew)  ! max order between  knl and kns
+      maxnmul = max(maxk,  maxnmul) ! max between the above and defined with k1,k2,k3, k1s,k2s,k3s
+      maxnmul = max(n_ferr,maxnmul) ! max between the above and the errors
       
       if (maxnmul > getmaxnmul) getmaxnmul = maxnmul
-      
-     ! print*, "j=",j," ", getmaxnmul, maxnmul, n_norm,n_skew,n_ferr
+      if (getdebug() > 2) then
+         print*, "j   getmaxnmul   maxnmul  maxk  n_norm  n_skew  n_ferr"
+         print*, j,getmaxnmul, maxnmul, maxk, n_norm,n_skew,n_ferr
+      endif
       
       j = advance_node()
       
