@@ -312,6 +312,26 @@ type info
    real(dp), pointer:: m(:,:)  => null()
 END type info
 
+TYPE INTEGRATION_NODE
+   INTEGER, POINTER :: pos_in_fibre => null(), CAS  => null()
+   INTEGER, POINTER ::  pos => null(),lost  => null()
+   real(dp), POINTER :: S(:)  => null()
+   real(dp), POINTER :: ds_ac  => null()
+   real(dp), POINTER :: ref(:)  => null()
+   real(dp), pointer :: ent(:,:),a(:)  => null()
+   real(dp), pointer :: exi(:,:),b(:)  => null()
+   real(dp), POINTER :: delta_rad_in  => null()
+   real(dp), POINTER :: delta_rad_out  => null()
+   INTEGER, POINTER :: TEAPOT_LIKE  => null()
+   TYPE (INTEGRATION_NODE), POINTER :: NEXT  => null()
+   TYPE (INTEGRATION_NODE), POINTER :: PREVIOUS  => null()
+   TYPE (NODE_LAYOUT), POINTER :: PARENT_NODE_LAYOUT  => null()
+   TYPE(FIBRE), POINTER :: PARENT_FIBRE  => null()
+   !   TYPE(EXTRA_WORK), POINTER :: WORK
+   TYPE(BEAM_BEAM_NODE), POINTER :: BB  => null()
+!   TYPE(tree_element), POINTER :: T
+END TYPE INTEGRATION_NODE
+
 TYPE FIBRE
    !  BELOW ARE THE DATA CARRIED BY THE NODE
    INTEGER,POINTER ::DIR => null()
@@ -339,6 +359,8 @@ TYPE FIBRE
    INTEGER,POINTER :: loc => null()
 
 END TYPE FIBRE
+
+
 
 TYPE LAYOUT
    CHARACTER(120), POINTER ::  NAME  => null()! IDENTIFICATION
@@ -384,25 +406,6 @@ TYPE MAD_UNIVERSE             ! THE MOTHER OF ALL STRUCTURES
 END TYPE MAD_UNIVERSE
 
 
-TYPE INTEGRATION_NODE
-   INTEGER, POINTER :: pos_in_fibre => null(), CAS  => null()
-   INTEGER, POINTER ::  pos => null(),lost  => null()
-   real(dp), POINTER :: S(:)  => null()
-   real(dp), POINTER :: ds_ac  => null()
-   real(dp), POINTER :: ref(:)  => null()
-   real(dp), pointer :: ent(:,:),a(:)  => null()
-   real(dp), pointer :: exi(:,:),b(:)  => null()
-   real(dp), POINTER :: delta_rad_in  => null()
-   real(dp), POINTER :: delta_rad_out  => null()
-   INTEGER, POINTER :: TEAPOT_LIKE  => null()
-   TYPE (INTEGRATION_NODE), POINTER :: NEXT  => null()
-   TYPE (INTEGRATION_NODE), POINTER :: PREVIOUS  => null()
-   TYPE (NODE_LAYOUT), POINTER :: PARENT_NODE_LAYOUT  => null()
-   TYPE(FIBRE), POINTER :: PARENT_FIBRE  => null()
-   !   TYPE(EXTRA_WORK), POINTER :: WORK
-   TYPE(BEAM_BEAM_NODE), POINTER :: BB  => null()
-!   TYPE(tree_element), POINTER :: T
-END TYPE INTEGRATION_NODE
 
 TYPE BEAM_LOCATION
    TYPE (INTEGRATION_NODE), POINTER :: NODE  => null()
