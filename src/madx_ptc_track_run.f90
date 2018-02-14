@@ -302,7 +302,17 @@ CONTAINS
     endif
 
     ! Closed_orbit_at_START:
-    IF(closed_orbit) CALL Find_Closed_Orbit   ! Calculates x_coord_co(1:6)
+    IF(closed_orbit) then 
+      CALL Find_Closed_Orbit   ! Calculates x_coord_co(1:6)
+
+      if ( .not. check_stable) then
+         write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
+         call fort_warn('ptc_track: ',whymsg(:len_trim(whymsg)))
+         call seterrorflag(10,"ptc_track ",whymsg);
+         return
+      endif
+      
+    endif
 
     ! needed to transfrom coordinates in case closed_orbit=true AND element_by_element=false
     Normal_forms: IF(closed_orbit) THEN  !-----------------------!
@@ -802,6 +812,7 @@ CONTAINS
     SUBROUTINE Find_Closed_Orbit
       ! USE madx_ptc_module, ONLY: dp, zero, find_orbit, my_ring,default
       implicit none
+      logical isstochastic
       !
       !====================================================================!
       !   initialize the closed orbit coordinates                          !
@@ -825,17 +836,33 @@ CONTAINS
          print *, " if(icase.eq.5) ,x_coord_co(5)=deltap" !                !
          print *, "  ,x_coord_co(5),deltap=", &           !                !
               x_coord_co(5),deltap                        !                !
+         global_verbose = .true. 
       end if !--------------------------------------------!                !
       !                                                                    !
       if(closed_orbit) then !------------------------------------!         !
+         
+         ! temporarly disbale stochastic, otherwise the search is doomed to fail
+         isstochastic = MYSTATE%stochastic
+         MYSTATE%stochastic = .false. 
+         
          CALL FIND_ORBIT_x(my_ring,x_coord_co,MYSTATE,c_1d_7,fibre1=1)     !
          !         call find_orbit(my_ring,x_coord_co,1,MYSTATE,c_1d_7)    !
+
+         if ( .not. check_stable) then
+            ! the routine which calls this function should also 
+            ! check the flag and report the eventual error
+            return
+         endif
+         
+         MYSTATE%stochastic = isstochastic
+         
          print*,"===== ptc_track ============================"   !         !
          CALL write_closed_orbit(nvariables,x_coord_co)           !         !
          print*,"============================================"   !         !
       endif  !---------------------------------------------------!         !
       !                                                                    !
       if (ptc_track_debug) then
+          global_verbose = .false.
           print*,"After closed_orbit"; print *;                            !
       endif                                                                !
       !                                                                    !
