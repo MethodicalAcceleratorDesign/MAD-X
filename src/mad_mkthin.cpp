@@ -335,7 +335,10 @@ static std::string my_dump_command_parameter(const command_parameter* cp) // dum
         break;
       case k_cstring_array: // string array
         dump_char_p_array(cp->m_string);
-        __attribute__((fallthrough));
+        #if defined (__GNUC_MINOR__)&&2093<=(__GNUC__*1000+__GNUC_MINOR__)
+          __attribute__((fallthrough));
+        #endif
+        
       case '?':
         ostr << " cp->type=" << cp->type << " no info dump implemented so far" << '\n';
     }
