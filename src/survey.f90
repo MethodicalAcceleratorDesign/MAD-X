@@ -76,7 +76,8 @@ subroutine survey
      code = node_value('mad8_type ')
      !if (code.eq.39) code=15 ! 2015-Aug-06  21:50:12  ghislain: not required here
      !if (code.eq.38) code=24
-      !**** el is the arc length for all bends  ********
+     !**** el is the arc length for all bends  ********
+     ! LD: 2018.02.01, survey should consider rbarc...
      el = node_value('l ')
      call suelem(el, ve, we, tilt)
      suml = suml + el
@@ -254,13 +255,12 @@ subroutine suelem(el, ve, we, tilt)
      case (code_multipole) !---- MULTIPOLE (thin, no length)
         ! Must stay compatible with SBEND (makethin!), i.e. ignore ks0l
         ! LD 2017.11.20, attempt to add angle attribute precedence,
-        ! require more work on twiss, track, emit and makethin...
-!       angle = node_value('angle ')
-!       if (angle .eq. 1d20) then
+        angle = node_value('angle ')
+        if (angle .eq. 0) then
           normal(0) = 0
           call get_node_vector('knl ', nn, normal)
           angle = normal(0)
-!       endif
+        endif
 
         angle = angle * bv
         cospsi = cos(tilt);  sinpsi = sin(tilt)
@@ -298,12 +298,12 @@ subroutine suelem(el, ve, we, tilt)
         we(3,2) =  sin(dy)
         we(2,3) = -sin(dy)
         we(3,3) =  cos(dy)
-     case(code_translation) !  Translation of the reference system.  
+     case(code_translation) !  Translation of the reference system.
         x_t = node_value('x ')
         y_t = node_value('y ')
         ve(1) = -x_t
         ve(2) = -y_t
-        
+
 
      case default
        ! all straight elements and catch all; use default VE and WE

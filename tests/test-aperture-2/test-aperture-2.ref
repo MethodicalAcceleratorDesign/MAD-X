@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:00:29      +
+  + Execution date: 2018.02.13 23:27:02      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs" ;
 
@@ -75,28 +75,28 @@ twiss, sequence=lhcb1, file="twiss-table.out";
 
 enter Twiss module
   
-iteration:   1 error:   2.348867E-03 deltap:   0.000000E+00
-orbit:  -2.024091E-03  6.263101E-07  1.934669E-06  1.728349E-04  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.348862E-03 deltap:   0.000000E+00
+orbit:  -2.024094E-03  6.256173E-07  1.934724E-06  1.728349E-04  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   3.537435E-05 deltap:   0.000000E+00
-orbit:  -2.000002E-03 -1.655643E-10 -2.253537E-09  1.700004E-04  0.000000E+00  0.000000E+00
+iteration:   2 error:   3.537448E-05 deltap:   0.000000E+00
+orbit:  -2.000005E-03 -8.659514E-10 -2.253555E-09  1.700004E-04  0.000000E+00  0.000000E+00
   
-iteration:   3 error:   7.118363E-09 deltap:   0.000000E+00
-orbit:  -2.000000E-03  1.739121E-11  3.774391E-11  1.700000E-04  0.000000E+00  0.000000E+00
+iteration:   3 error:   7.118390E-09 deltap:   0.000000E+00
+orbit:  -2.000002E-03 -6.829939E-10  3.774261E-11  1.700000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003216328248        55.75962155 
+        26658.8832                 -0    0.0003216328246        55.75962157 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000058        2.011344842        595.1194952        2.815212581 
+       64.28000058         2.01134495        595.1194704        2.815212715 
 
              dxrms             xcomax             xcorms                 q2 
-       1.397100393     0.008477892722    0.0007074565743        59.31000016 
+       1.397100387     0.008477874214    0.0007074557983        59.31000015 
 
                dq2            betymax              dymax              dyrms 
-       2.011703321        609.5259354       0.1894286681      0.05700765142 
+       2.011703352        609.5259704       0.1894286768      0.05700765289 
 
             ycomax             ycorms             deltap            synch_1 
     0.008499924148    0.0007137266055                  0                  0 
@@ -112,6 +112,7 @@ orbit:  -2.000000E-03  1.739121E-11  3.774391E-11  1.700000E-04  0.000000E+00  0
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
 ptc_create_layout, model=2, method=2, nst=2, exact;
 
  MAD-X Beam Parameters
@@ -133,7 +134,7 @@ ptc_create_layout, model=2, method=2, nst=2, exact;
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After    end:    1.2170347930495041E-004   2.9337307977728667E-014  -7.9690752521344166E-005
- HARMONIC NUMBER defined in the ring:        35640
+ HARMONIC NUMBER defined in the ring:    35640.000000000000     
 
 
 select, flag=ptc_twiss, column=name,s,betx,bety,x,px,y,py,apertype,on_elem, class=rcollimator;
@@ -176,46 +177,46 @@ ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
       0.3100006055                  0                  0                 -0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-        9.99999276        595.1202013        9.999993276        609.5257296 
+       9.999992763        595.1202013        9.999993275        609.5257297 
 
          beta11min          beta11max          beta12min          beta12max 
-        9.99999276        595.1202013    1.661448473e-11    1.037287594e-09 
+       9.999992763        595.1202013    1.661448499e-11    1.037287609e-09 
 
          beta13min          beta13max          beta21min          beta21max 
-                 0                  0    1.550393759e-11    1.201026546e-09 
+                 0                  0    1.550393786e-11    1.201026563e-09 
 
          beta22min          beta22max          beta23min          beta23max 
-       9.999993276        609.5257296                  0                  0 
+       9.999993275        609.5257297                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -2.745599294        2.816160182 
+                 0                  0       -2.745599295        2.816160181 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.04812295788      0.05033575195      -0.1856647973       0.1450794052 
+    -0.04812295791      0.05033575196      -0.1856647974       0.1450794052 
 
           disp4min           disp4max             deltap            orbit_x 
-   -0.005458852055     0.004780211494                  0     -0.00199999905 
+   -0.005458852055     0.004780211494                  0     -0.00199999904 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -4.932478543e-12   -6.470081759e-10    0.0001700000459                  0 
+  -5.322838277e-12   -6.470081814e-10    0.0001700000459                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    0.0007074564944     0.000713726789    2.376320075e-05 
+                 0    0.0007074564943     0.000713726789     2.37632008e-05 
 
            pycorms             tcorms            ptcorms             xcomax 
-   2.414012503e-05    6.321234625e-06                  0     0.007390738654 
+   2.414012503e-05    6.321234722e-06                  0     0.007390738792 
 
             ycomax            pxcomax            pycomax             tcomax 
-    0.008056958782    0.0004263339881    0.0004558719032    1.067998014e-05 
+    0.008056958782    0.0004263339832    0.0004558719032    1.067998072e-05 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0    -0.008477889721    -0.008499924562   -0.0004558717315 
+                 0    -0.008477889827    -0.008499924562   -0.0004558717377 
 
            pycomin             tcomin            ptcomin 
-  -0.0003912272041   -1.013617431e-05                  0 
+  -0.0003912272041    -1.01361741e-05                  0 
 
 
 ptc_end;

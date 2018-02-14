@@ -15,6 +15,7 @@
 
 option,-echo;
 
+Determined SECTOR NMUL MAX :  0
  MAD-X Beam Parameters
                   Energy : 0.200000E-01
           Kinetic Energy : 0.194890E-01

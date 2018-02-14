@@ -178,6 +178,7 @@ PTC\_TRACK, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\
             \>MAXAPER=real\_array, \\
             \>NORM\_NO=integer, NORM\_OUT=logical, \\
             \>FILE[=string], EXTENSION=string, FFILE=integer, \\
+            \>X=real, PX=real, Y=real, PY=real, T=real, PT=real, \\
             \>RADIATION=logical, RADIATION\_MODEL1=logical, \\
             \>RADIATION\_ENERGY\_LOSS=logical, \\
             \>RADIATION\_QUAD=logical, \\
@@ -285,6 +286,9 @@ The attributes are:
 
    \ttitem{FFILE} defines the periodicity \texttt{n} of the printout:
    coordinates are printed every n turns. \\ (Default: 1)
+
+   \ttitem{X, PX, Y, PY, T, PT} the initial
+   \hyperref[subsec:tables-canon]{canonical} coordinates for the closed orbit search. \\ (Default: 0.0) \\
 
    \ttitem{RADIATION}\label{opt:radiation} a logical flag to turn on
      the synchrotron radiation calculated by an internal procedure of

@@ -90,14 +90,25 @@ The attributes are:
    sector bends defining up to which order Maxwell's equation are solved
    (see \cite{forest2002}~page~76-77). 
    The value of \texttt{SECTOR\_NMUL\_MAX} must not be smaller than
-   \texttt{SECTOR\_NMUL} otherwise \madx stops with an error. \\ (Default:~10)
+   \texttt{SECTOR\_NMUL} otherwise \madx stops with an error. 
+   If a negative value is passed than it is identified automatically
+   by scanning the currently selected sequence.
+   \\ (Default:~-1)
 
    \ttitem{SECTOR\_NMUL} a global variable in PTC needed for exact
    sector bends defining up to which order the multipole are included in
    solving Maxwell's equation up to order \texttt{SECTOR\_NMUL\_MAX}. 
    Multipoles of order N with N $>$ \texttt{SECTOR\_NMUL} and N $\leq$ 
-   \texttt{SECTOR\_NMUL\_MAX} are treated similar to \textit{SixTrack}. \\ 
-   (Default:~10)  
+   \texttt{SECTOR\_NMUL\_MAX} are treated similar to \textit{SixTrack}. 
+   If a negative value of \\ 
+   \texttt{SECTOR\_NMUL\_MAX} is passed than it is also identified automatically.
+   However, if multipolar parameters of the bends are to be modified inside the PTC universe, 
+   for example with \texttt{PTC\_READ\_ERRORS}, 
+   than this parameter needs to be set to a corresponding value.
+   Please note that using large values (above 10) slows down the computations,
+   so the smallest required value should be used. 
+   \\ 
+   (Default:-1)  
 
    \ttitem{NTPSA} invokes the Differential Algebra (DA) package
    written in C++ and kindly provided by Lingyun Yang (lyyang@lbl.gov). \\ 
@@ -221,23 +232,22 @@ The \texttt{PTC\_SETSWITCH} command allows to set some global \ptc states and to
 
 \madbox{
 	PTC\_SETSWITCH, \=DEBUGLEVEL=integer, \\
-	\>MAXACCELERATION=logical,\\
 	\>EXACT\_MIS=logical,\\
 	\>TOTALPATH=logical,\\
 	\>RADIATION=logical,\\
 	\>ENVELOPE=logical,\\
+	\>STOCHASTIC=logical,\\
+	\>MODULATION=logical,\\
 	\>FRINGE=logical,\\
-	\>TIME=logical;
+	\>TIME=logical,\\
+	\>SEED=integer,\\
+	\>MAXACCELERATION=logical;
 }
 
 The command parameters and switches are:
 \begin{madlist}
 	\ttitem{DEBUGLEVEL} (Default: 1)\\
 	Sets the level of debugging printout: 0 prints none, 4 prints everything   
-	
-	\ttitem{MAXACCELERATION} (Default: true)\\
-	Switch to set cavities phases so the reference orbit is always on
-	the crest, i.e. gains max energy    
 	
 	\ttitem{EXACT\_MIS} (Default: false)\\
 	Switch ensures exact misalignment treatment.   
@@ -279,7 +289,7 @@ The command parameters and switches are:
 	The emission is calculated during map tracking therefore 
 	\texttt{PTC\_TWISS} or \texttt{PTC\_NORMAL} 
 	needs to be invoked before launching the tracking 
-	(also with \ttitem{RADIATION}, \ttitem{ENVELOPE} and \ttitem{STOCHASTIC} set to true). 
+	(also with \texttt{RADIATION}, \texttt{ENVELOPE} and \texttt{STOCHASTIC} set to true). 
 	Every tracked ray will receive the same stochastic kicks.
 
 	\ttitem{MODULATION} (Default: false)\\    
@@ -318,12 +328,21 @@ The command parameters and switches are:
 
 	\textbf{Note:} at small energy ($\beta_0 << 1$),
 	momentum-dependent variables like dispersion will depend  strongly on
-	the choice of  the logical input variable \ttitem{TIME}.  In fact, the
+	the choice of  the logical input variable \texttt{TIME}. In fact, the
 	derivative ($\frac{\partial}{\partial \delta_p}$)  and
 	($\frac{\partial}{\partial p_t}$)  are different by the
 	factor $\beta_0$. One would  therefore typically  choose
-	the option \ttitem{TIME=false},  which sets the fifth variable to
+	the option \texttt{TIME=false},  which sets the fifth variable to
 	the relative momentum deviation $\delta_p$.
+
+	
+	\ttitem{SEED} (Default: 123456789)\\
+	Sets the seed of PTC random number generator,
+	which is independent from the MADX generators. 
+	
+	\ttitem{MAXACCELERATION} (Default: true)\\
+	Switch to set cavities phases so the reference orbit is always on
+	the crest, i.e. gains max energy.
 
 	
 \end{madlist}
@@ -381,6 +400,11 @@ The only attribute is
    existing errors, ie multipole components already present.\\
    (Default:~false)  
 \end{madlist}
+
+\textbf{Note:}\\
+  For calculations with exact flag set to true, 
+  \texttt{SECTOR\_NMUL} parameter of \texttt{PTC\_CREATE\_UNIVERSE} 
+  needs to be set to a value bigger than the highest order of an error in bending magnets.
 
 \textbf{Note:}\\
 Because of the way the table is read in memory, a warning will always be
