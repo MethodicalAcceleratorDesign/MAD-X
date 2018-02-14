@@ -747,6 +747,9 @@ const char *const_command_def =
 "ffile    = [i, 1], "
 "rootntuple = [l, false, true], "/*writes all the tracks in ROOT NTuple -> works only if program is dynamically linked and RPLOT plugin is present */
 "maxaper= [r, {0.1, 0.01, 0.1, 0.01, 1., 0.1}], "
+"x        = [r, 0], px       = [r, 0],         " /*initial guess for closed orbit search*/
+"y        = [r, 0], py       = [r, 0],         "
+"t        = [r, 0], pt       = [r, 0],         "
 "norm_out = [l, false, true], "
 "norm_no  = [i, 1]; "
 " "
