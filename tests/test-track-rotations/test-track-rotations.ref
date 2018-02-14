@@ -1,0 +1,212 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.02.08 17:56:48      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+circum=3;
+
+beam, particle=proton, energy = 5500;
+
+ang=0.005;
+
+!qf: QUADRUPOLE, L:=1,K1:=0.1;
+
+qf:  MULTIPOLE, KNL={0.00, 0.001};
+
+roty: YROTATION, angle=ang;
+
+mroty: XROTATION, angle=-ang;
+
+rotyMarker: MARKER;
+
+mrotxMarker: MARKER;
+
+after:Marker;
+
+
+
+
+
+xin=0.01;
+
+yin=-0.01;
+
+xpin=0.001;
+
+ypin=0.002;
+
+ptin = 0.0005;
+
+
+
+
+
+seq: sequence, refer=center, l=circum;
+
+roty:roty, at=1.000;
+
+qf: qf at=1.5;
+
+mroty:mroty, at=2.000;
+
+after:after, at=2.5;
+
+endsequence;
+
+
+
+
+
+use, sequence=seq;
+
+
+
+TRACK, file = "trackFile.out",ONEPASS, ONETABLE;
+
+enter TRACK module
+one pass is on
+OBSERVE, PLACE="after";
+
+START,  x=xin, y=yin, t=0.0, pt=ptin, px=xpin, py=ypin;
+
+run, turns=1;
+
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0               0.01              0.001 
+         1          1      0.02297804891      0.00598845468 
+
+                 y                 py                  t                 pt 
+             -0.01              0.002                  0             0.0005 
+   -0.009013327885    -0.003009405898   -0.0001299069037             0.0005 
+
+                 s                  e 
+                 0                  0 
+                 3                  0 
+
+
+
+
+seq_ptc: sequence, refer=center, l=circum;
+
+rotxMarker:rotyMarker, at=1.000;
+
+qf: qf at=1.5;
+
+mrotxMarker:mrotxMarker, at=2.000;
+
+after:after, at=2.5;
+
+endsequence;
+
+
+
+
+
+use, sequence=seq_ptc;
+
+ptc_create_universe;
+
+ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+
+ MAD-X Beam Parameters
+                  Energy : 0.550000E+04
+          Kinetic Energy : 0.549906E+04
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.550000E+04
+ Setting MADx with 
+     energy           5500.0000000000000     
+     method                   6
+     Num. of steps            5
+     charge           1.0000000000000000     
+  Length of machine:    3.0000000000000000     
+ The machine is a LINE
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        3.0000000000000000     
+
+
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
+
+ptc_eplacement, range=rotxMarker, phi=ang, psi=0, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+
+ptc_eplacement, range=mrotxMarker, phi=0, psi=0, theta=-ang,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+
+PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=xin, y=yin, px=xpin, py=ypin, t=0.0, pt=ptin;
+
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+                 3           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000      0.04642161408 
+
+                q2                dq1                dq2                 qs 
+     0.04635606852           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+                10        10.86914606                 10        10.93149952 
+
+         beta11min          beta11max          beta12min          beta12max 
+                10        10.86914605                  0    9.677576926e-09 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0    8.843444041e-07                  0    1.127172248e-09 
+
+         beta22min          beta22max          beta23min          beta23max 
+                10        10.93149952                  0    3.586022041e-06 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0    0.0002813800749                  0    0.0002585980545 
+
+         beta33min          beta33max           disp1min           disp1max 
+        10.0100025         10.0100025   -0.0009401608654                  0 
+
+          disp2min           disp2max           disp3min           disp3max 
+                 0     0.001581214836    -0.001893206255                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+   -0.001581668786                  0                  0               0.01 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+             0.001              -0.01              0.002             0.0005 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0      0.01696583765     0.007824538195      0.00543632595 
+
+           pycorms             tcorms            ptcorms             xcomax 
+    0.002508652417    9.140083385e-05             0.0005      0.02297804891 
+
+            ycomax            pxcomax            pycomax             tcomax 
+   -0.006005343196     0.006002454163              0.002                 -0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+            0.0005               0.01              -0.01              0.001 
+
+           pycomin             tcomin            ptcomin 
+   -0.003009405898   -0.0001299069479             0.0005 
+write, table=twiss, file="twiss.ptc.tfs";
+
+
+
+ptc_end;
+
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

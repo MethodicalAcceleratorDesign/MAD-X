@@ -1,0 +1,56 @@
+circum=3;
+beam, particle=proton, energy = 5500;
+ang=0.005;
+!qf: QUADRUPOLE, L:=1,K1:=0.1;
+qf:  MULTIPOLE, KNL={0.00, 0.001};
+roty: YROTATION, angle=ang;
+mroty: XROTATION, angle=-ang;
+rotyMarker: MARKER;
+mrotxMarker: MARKER;
+after:Marker;
+
+
+xin=0.01;
+yin=-0.01;
+xpin=0.001;
+ypin=0.002;
+ptin = 0.0005;
+
+
+seq: sequence, refer=center, l=circum;
+roty:roty, at=1.000;
+qf: qf at=1.5;
+mroty:mroty, at=2.000;
+after:after, at=2.5;
+endsequence;
+
+
+use, sequence=seq;
+
+TRACK, file = "trackFile.out",ONEPASS, ONETABLE;
+OBSERVE, PLACE="after";
+START,  x=xin, y=yin, t=0.0, pt=ptin, px=xpin, py=ypin;
+run, turns=1;
+
+
+seq_ptc: sequence, refer=center, l=circum;
+rotxMarker:rotyMarker, at=1.000;
+qf: qf at=1.5;
+mrotxMarker:mrotxMarker, at=2.000;
+after:after, at=2.5;
+endsequence;
+
+
+use, sequence=seq_ptc;
+ptc_create_universe;
+ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
+ptc_eplacement, range=rotxMarker, phi=ang, psi=0, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+ptc_eplacement, range=mrotxMarker, phi=0, psi=0, theta=-ang,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=xin, y=yin, px=xpin, py=ypin, t=0.0, pt=ptin;
+write, table=twiss, file="twiss.ptc.tfs";
+
+ptc_end;
+
+stop;

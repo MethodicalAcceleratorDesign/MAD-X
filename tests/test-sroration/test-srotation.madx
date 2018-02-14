@@ -1,0 +1,62 @@
+circum=3;
+beam, particle=proton, energy = 5500;
+ang=0.005;
+qf: QUADRUPOLE, L:=1,K1:=0.1;
+!qf:  MULTIPOLE, KNL={0.00, 0.001};
+rotx: SROTATION, angle=ang;
+mrotx: SROTATION, angle=-ang;
+
+rotxMarker: MARKER;
+mrotxMarker: MARKER;
+
+xin = 0.01;
+yin = 0;
+xpin =0;
+ypin = 0;
+
+!Defines the sequence where rotation is done outside the element. 
+seq: sequence, refer=center, l=circum;
+rotx:rotx, at=1.000;
+qf: qf at=1.5;
+mrotx:mrotx, at=2.000;
+endsequence;
+
+
+use, sequence=seq;
+select, flag=twiss, column=name, s, x,px, y, py, PT, T;
+twiss,X=xin,Y=yin, BETX=1, BETY=1, file="xrotation.twiss";
+SURVEY, SEQUENCE=seq, FILE= survey.out, x0=xin;
+
+seq_notrans: sequence, refer=center, l=circum;
+qf: qf at=1.5;
+endsequence;
+
+use, sequence=seq_notrans;
+SELECT, FLAG=ERROR, range = qf;
+EALIGN, DPSI=-ang;
+
+select, flag=twiss, column=name, s, x,px, y, py, PT, T;
+twiss,X=xin,Y=yin, BETX=1, BETY=1, file="elementRot.twiss";
+
+seq_ptc: sequence, refer=center, l=circum;
+rotxMarker:rotxMarker, at=1.000;
+qf: qf at=1.5;
+mrotxMarker:mrotxMarker, at=2.000;
+endsequence;
+
+use, sequence=seq_ptc;
+select, flag=twiss, column=name, s, x,px, y, py, PT, T;
+
+ptc_create_universe;
+ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
+ptc_eplacement, range=rotxMarker, phi=0, psi=ang, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+ptc_eplacement, range=mrotxMarker, phi=0, psi=-ang, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=xin, y=yin, px=xpin, py=ypin, t=0.0, pt=0.0;
+write, table=twiss, file="twiss.ptc.tfs";
+!PTC_PRINTFRAMES, FILE="ptc_survey.out", FORMAT=rootmacro;
+PTC_PRINTFRAMES, FILE="ptc_survey.out", FORMAT=text;
+ptc_end;
+
+stop;
