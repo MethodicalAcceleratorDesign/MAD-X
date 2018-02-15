@@ -375,7 +375,7 @@ CONTAINS
        print *,'The line <MY_RING> consists of <MY_RING%n>=', MY_RING%n, ' nodes'
        print *, "Number of observation points max_obs =", max_obs
     END IF debug_print_1
-
+    if (rplot) call rplotstartcoord()
     loop_over_turns: do i_th_turn=1,turns ! ================loop over turn =======!
        debug_print_2: IF (ptc_track_debug) then                                   !
           print *; print*, 'start ',i_th_turn, '-th turn  '                       !
@@ -905,7 +905,27 @@ CONTAINS
     !=============================================================================
 
     !=============================================================================
+    SUBROUTINE  rplotstartcoord()
+      implicit none
+      integer j
+      
+      
+      DO j=1, jmax_numb_particl_at_i_th_turn  
+        
+        !x_coord_incl_co(:,j)
 
+        call plottrack(j, 1, i_th_turn, & 
+                          x_coord_incl_co(1,j), &
+                          x_coord_incl_co(2,j), &
+                          x_coord_incl_co(3,j), &
+                          x_coord_incl_co(4,j), &
+                          x_coord_incl_co(5,j), &
+	      sqrt(MY_RING%end%mag%p%p0c**2 + (MY_RING%end%mass)**2), &
+	      x_coord_incl_co(6,j))
+       
+      enddo
+      
+    END SUBROUTINE  rplotstartcoord
     !=============================================================================
     SUBROUTINE   ffile_and_segm_for_switch
       ! copy a fragment from trrun.f
@@ -1575,7 +1595,7 @@ CONTAINS
 
                if_ptc_track_unstable: IF (flag_index_ptc_aperture==0) then ! ========!           +  ^ !
                   if (rplot) then
-	  call plottrack(j_th_partic, i_current_elem+1, i_th_turn, & 
+	  call plottrack(j_th_partic, i_current_elem, i_th_turn, & 
                                               current_x_coord_incl_co(1), &
                                               current_x_coord_incl_co(2), &
                                               current_x_coord_incl_co(3), &
