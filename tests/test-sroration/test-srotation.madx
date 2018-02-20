@@ -4,8 +4,8 @@ ang=0.005;
 qf: QUADRUPOLE, L:=1,K1:=0.1;
 !qf:  MULTIPOLE, KNL={0.00, 0.001};
 rotx: SROTATION, angle=ang;
-mrotx: SROTATION, angle=ang;
-tra: TRANSLATION, X=0.02;
+mrotx: SROTATION, angle=-ang;
+
 rotxMarker: MARKER;
 mrotxMarker: MARKER;
 
@@ -16,7 +16,6 @@ ypin = 0;
 
 !Defines the sequence where rotation is done outside the element. 
 seq: sequence, refer=center, l=circum;
-tra:tra, at=0.5;
 rotx:rotx, at=1.000;
 qf: qf at=1.5;
 mrotx:mrotx, at=2.000;
