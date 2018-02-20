@@ -518,23 +518,16 @@ subroutine pefill(ierr)
            if (proc_flag(1,l) .eq. 1) then ! case of rbetx or rbety
               qvval(nqval(l),l) = sqrt(abs(qvval(nqval(l),l)))
            endif
-        elseif (itbv .eq. 0 .or. &
-                currpos - qhval(nqval(l),l) .gt. mystep   .or. &
-                (marker_plot)) then
+        else
            nqval(l) = nqval(l) + 1
            qhval(nqval(l),l) = currpos
            k = double_from_table_row(tabname, sname(l), j, d_val)
            k = p(l)
            qvval(nqval(l),l) = d_val
-            if (proc_flag(1,l) .eq. 1) then ! case of rbetx or rebty
+           if (proc_flag(1,l) .eq. 1) then ! case of rbetx or rebty
               qvval(nqval(l),l) = sqrt(abs(qvval(nqval(l),l)))
-            endif
-        elseif (currpos - qhval(nqval(l),l) .lt. mystep .and. .not. marker_plot) then
-          call fort_warn('PLOT: ','Not all points are included in the plot. &
-            Use option MARKER_PLOT if you wish to include all points')
+           endif
         endif
-        
-
      enddo
 
      k = advance_node()
