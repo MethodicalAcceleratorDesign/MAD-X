@@ -1265,7 +1265,8 @@ out_table(const char* tname, struct table* t, const char* filename)
     set_selected_columns(t, scl);
     set_selected_rows(t, scl, dscl);
   }
-  write_table(t, filename);
+  if (filename)
+    write_table(t, filename);
 }
 
 struct table*
