@@ -55,6 +55,8 @@ set_target_properties(madx PROPERTIES LINKER_LANGUAGE Fortran)
 
 # set library version:
 set_target_properties(madx     PROPERTIES VERSION ${MADX_VERSION})
+set_target_properties(madx     PROPERTIES CXX_STANDARD 11)
+
 
 # adding an executable:
 if(MADX_BUNDLE)
