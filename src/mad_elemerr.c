@@ -585,6 +585,7 @@ error_efcomp(struct in_cmd* cmd)
 
       } else if (strcmp(nextnode->base_name,"sbend") == 0) {
 	      double nvec0 = node_value("k0");
+        if (nvec0 == 0.0) nvec0 = node_value("angle")/nlength;
 	      if (opt_debug) {
 	        fprintf(prt_file, "original field0 is %f\n",nvec0);
 	        fprintf(prt_file, "====0====>>> %d %f %f \n\n",order,nvec0,nlength);
@@ -594,6 +595,7 @@ error_efcomp(struct in_cmd* cmd)
 
       } else if (strcmp(nextnode->base_name,"rbend") == 0) {
 	      double nvec0 = node_value("k0");
+        if (nvec0 == 0.0) nvec0 = node_value("angle")/nlength;
 	      if (opt_debug) {
 	        fprintf(prt_file, "original field0 is %f\n",nvec0);
 	        fprintf(prt_file, "====0====>>> %d %f %f \n\n",order,nvec0,nlength);
