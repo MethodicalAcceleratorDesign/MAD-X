@@ -18,6 +18,7 @@ pro_survey(struct in_cmd* cmd)
   if (debuglevel > 1) fprintf(prt_file, "enter Survey module\n");
 //  LD: why is Survey blocking the RBARC option?
 //  RBARC is used by el_par_value in mad_elem.c
+
 //  keep = get_option("rbarc");
 //  set_option("rbarc", &iarc);
   w_file = command_par_string_user2("file", current_survey, &filename);
