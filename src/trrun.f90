@@ -4340,16 +4340,16 @@ subroutine tttquad(track, ktrack)
   double precision :: track(6,*)
   integer :: ktrack
 
-  double precision :: k1, k1s, length, kk0
+  double precision :: k1, k1s, length
   double precision :: x, px, y, py, z, pt
   double precision :: delta_plus_1
   double precision :: ct, st
+  double precision :: tilt
   double precision :: tmp
 
   double precision :: hx, hy, rfac, gamma, curv
   double precision :: rpx1, rpy1, rpt1
   double precision :: rpx2, rpy2, rpt2
-  logical :: skew
   integer :: jtrk
 
   double precision, external :: node_value
@@ -4357,27 +4357,33 @@ subroutine tttquad(track, ktrack)
 
   double precision, external :: get_value
 
+  double precision :: f_errors(0:maxferr)
+  integer, external :: node_fd_errors
+  integer :: n_ferr
+
   gamma   = get_value('probe ','gamma ')
 
   !---- Read-in the parameters
-  k1 = node_value('k1 ');
-  k1s = node_value('k1s ');
   length = node_value('l ');
+  tilt = node_value('tilt ');
 
-  if (k1.eq.zero .and. k1s.eq.zero) then
+  f_errors = zero
+  n_ferr = node_fd_errors(f_errors)
+  k1  = node_value('k1 ')  + f_errors(2)/length
+  k1s = node_value('k1s ') + f_errors(3)/length
+
+  if (k1s.ne.zero) then
+     tilt = -atan2(k1s, k1)/two + tilt
+     k1 = sqrt(k1**2 + k1s**2)
+  else
+     tilt = zero
+  endif
+  
+  if (k1.eq.zero) then
      call ttdrf(length,track,ktrack);
      return
-  else if (k1.ne.zero .and. k1s.ne.zero) then
-     call fort_warn('trrun: ','a quadrupole cannot have *both* K1 and K1S different from zero!');
-     return
   endif
-
-  if (k1s .ne. zero) then
-     kk0 = k1s; skew = .true.
-  else
-     kk0 = k1;  skew = .false.
-  endif
-
+  
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1, ktrack
      !---- The particle position
@@ -4388,10 +4394,10 @@ subroutine tttquad(track, ktrack)
      z  = track(5,jtrk);
      pt = track(6,jtrk);
 
-     !---- If SKEW rotates by -45 degrees
-     if (skew) then
-        ct =  sqrt2 / two
-        st = -sqrt2 / two
+     !---  rotate orbit before entry
+     if (tilt .ne. zero)  then
+        st = sin(tilt)
+        ct = cos(tilt)
         tmp = x
         x = ct * tmp + st * y
         y = ct * y   - st * tmp
@@ -4405,8 +4411,8 @@ subroutine tttquad(track, ktrack)
 
      !---- Radiation effects at entrance
      if (radiate) then
-        hx = (-kk0*x) / delta_plus_1;
-        hy = ( kk0*y) / delta_plus_1;
+        hx = (-k1*x) / delta_plus_1;
+        hy = ( k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
            call trphot(length,curv,rfac,deltas)
@@ -4429,12 +4435,12 @@ subroutine tttquad(track, ktrack)
         endif
      endif
 
-     call ttcfd(x, px, y, py, z, pt, 0d0, 0d0, kk0, length);
+     call ttcfd(x, px, y, py, z, pt, 0d0, 0d0, k1, length);
 
      !---- Radiation effects at exit
      if (radiate) then
-        hx = (-kk0*x) / delta_plus_1;
-        hy = ( kk0*y) / delta_plus_1;
+        hx = (-k1*x) / delta_plus_1;
+        hy = ( k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
            call trphot(length,curv,rfac,deltas)
@@ -4457,16 +4463,14 @@ subroutine tttquad(track, ktrack)
         endif
      endif
 
-     !---- If SKEW rotates by +45 degrees
-     if (skew) then
-        ct = sqrt2 / two
-        st = sqrt2 / two
+     !---  rotate orbit at exit
+     if (tilt .ne. zero)  then
         tmp = x
-        x = ct * tmp + st * y
-        y = ct * y   - st * tmp
+        x = ct * tmp - st * y
+        y = ct * y   + st * tmp
         tmp = px
-        px = ct * tmp + st * py
-        py = ct * py  - st * tmp
+        px = ct * tmp - st * py
+        py = ct * py  + st * tmp
      endif
 
      !---- Applies the kick
@@ -4509,6 +4513,9 @@ subroutine tttdipole(track, ktrack)
   double precision :: rpx2, rpy2, rpt2
 
   double precision, external :: node_value, get_value
+  double precision :: f_errors(0:maxferr)
+  integer, external :: node_fd_errors
+  integer :: n_ferr
 
   arad    = get_value('probe ','arad ')
   gamma   = get_value('probe ','gamma ')
@@ -4522,18 +4529,23 @@ subroutine tttdipole(track, ktrack)
   hgap  = node_value('hgap ')
   fint  = node_value('fint ')
   fintx = node_value('fintx ')
-
-  !---- Apply entrance dipole edge effect
-  if (node_value('kill_ent_fringe ') .eq. zero) &
-       call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, zero)
-
-  !---- Read-in the parameters
   length = node_value('l ');
   angle = node_value('angle ');
   rho = abs(length/angle);
   h = angle/length;
   k0 = h;
   k1 = node_value('k1 ');
+
+  !---- Apply errors
+  f_errors = zero
+  n_ferr = node_fd_errors(f_errors)
+  if (k0.ne.0) f_errors(0) = f_errors(0) + k0*length - angle;
+  k0 = k0 + f_errors(0) / length ! dipole term
+  k1 = k1 + f_errors(2) / length ! quad term 
+  
+  !---- Apply entrance dipole edge effect
+  if (node_value('kill_ent_fringe ') .eq. zero) &
+       call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, zero)
 
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
