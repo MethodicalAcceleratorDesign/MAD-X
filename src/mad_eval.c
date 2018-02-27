@@ -207,7 +207,8 @@ act_special(int type, char* statement)
   {
     case 1:  /* if */
       pro->buffers[level]->flag = 0;
-      __attribute__ ((fallthrough));
+      /* FALLTHRU */
+
     case 3:  /* else if */
       if (pro->buffers[level]->flag < 0)
       {

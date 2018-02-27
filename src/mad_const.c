@@ -38,7 +38,8 @@ make_constraint(int find_npos, struct command_parameter* par)
         new->ex_c_min = par->min_expr;
       }
       if (par->c_type == 1) break;
-      __attribute__ ((fallthrough));
+      /* FALLTHRU */
+
     case 2: /* maximum */
       if (par->max_expr == NULL) new->c_max = par->c_max;
       else
