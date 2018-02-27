@@ -1287,11 +1287,6 @@ CONTAINS
             !                                                                                !   !
             call PRODUCE_APERTURE_FLAG(flag_index_ptc_aperture)                              !   !
             !                                                                                !   !
-!            if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX !   !
-!            if (ptc_track_debug) then                                                 !XXXX !   !
-!                 print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX !   !
-!            endif                                                                           !   !
-            !                                                                                !   !
             if(flag_index_ptc_aperture/=0) c_%watch_user=.false.                             !   !
             !                                                                                !   !
             if (ptc_track_debug) then                                                        !   !
@@ -1331,10 +1326,6 @@ CONTAINS
               if (abs(current_x_coord_incl_co(6)).ge.maxaper(6)) flag_index_ptc_aperture = 53!   !
             endif 
 
-            if (ptc_track_debug) then                                                 !XXXX  !   !
-                 print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX  !   !
-            endif                                                                            !   !
-            
             !                                                                                !   !
             if_ptc_track_unstable: IF (flag_index_ptc_aperture==0) then ! =========!         +   ^
               if (rplot) then
@@ -1703,7 +1694,10 @@ CONTAINS
                if (ptc_track_debug) THEN !+++debug print+++++++!                  !    #              *
                   Print *,'obs.No=',number_observation_point   !                  !    #              *
                   Print *,'CO=', x_coord_co_temp               !                  !    #              *
-                  Print *,'x_coord_incl_co=', x_coord_incl_co  !                  !    #              *
+                  
+                  do j_th_partic=1, jmax_numb_particl_at_i_th_turn                              !     *      
+                    Print *,'x_coord_incl_co(',j_th_partic,')=', x_coord_incl_co(:,j_th_partic) !     *
+                  enddo
                endif !+++++++++++++++++++++++++++++++++++++++++!                  !    #              *
                !                                                                  !    #              *
                
@@ -3127,11 +3121,6 @@ CONTAINS
       REAL(dp), INTENT(OUT) :: X_MAD(6)
 
       X_MAD(1:4)=X_PTC(1:4) ! for transverse
-
-      if (ptc_track_debug) then
-          print *, &
-           'Coord_PTC_to_MAD icase_ptc=', icase_ptc, ' mytime=', mytime
-      endif
 
       IF (nvariables.gt.5) THEN
          X_MAD(5)=X_PTC(6); 
