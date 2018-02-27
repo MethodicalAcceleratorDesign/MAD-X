@@ -650,8 +650,8 @@ assign_att(void)
 static void
 att_aperture(struct c6t_element* el)
 {
-  el->out_1 = 3;
-  el->out_2 = 1e-8;
+  el->out_1 = 0;
+  el->out_2 = 0.0;
   el->out_3 = 0.0;
   el->out_4 = 0.0;
 }

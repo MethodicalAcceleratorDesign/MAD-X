@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.08 17:56:48      +
+  + Execution date: 2018.02.15 09:43:00      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=3;
 
@@ -111,6 +111,7 @@ use, sequence=seq_ptc;
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  0
 ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
 
  MAD-X Beam Parameters
