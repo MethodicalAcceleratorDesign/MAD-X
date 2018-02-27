@@ -377,7 +377,7 @@ static void correct_setcorr(struct in_cmd* cmd) {
       printf("No table name requested\n");
       printf("Use default name\n");
     }
-    strcpy(namtab, "corr");
+    namtab = "corr";
   }
 
   i = 1;
