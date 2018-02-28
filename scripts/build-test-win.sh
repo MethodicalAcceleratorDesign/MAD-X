@@ -110,6 +110,19 @@ set_env 64
 make all-win64-gnu
 check_error "make all-win64-gnu failed" "no-exit"
 
+if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
+  icc      --version
+  ifort    --version
+
+  make all-win32-intel
+  check_error "make all-win32-intel failed" "no-exit"
+
+  make all-win64-intel
+  check_error "make all-win64-intel failed" "no-exit"
+else
+  echo "Intel compilers not found, skipped."
+fi
+
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
 check_error "make infobindep failed" "no-exit"
@@ -124,6 +137,18 @@ if [ "$1" = "notest" ] ; then
   echo "Skipped (explicit request)."
 else
   echo ""
+
+if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
+  echo -e "\n===== Testing madx-win32-intel ====="
+  make madx-win32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
+  check_error "make tests-all for madx-win32-intel failed" "no-exit"
+
+  echo -e "\n===== Testing madx-win64-intel ====="
+  make madx-win64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
+  check_error "make tests-all for madx-win64-intel failed" "no-exit"
+else
+  echo "Intel compilers not found, skipped."
+fi
 
   echo -e "\n===== Testing madx-win32-gnu ====="
   make madx-win32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
