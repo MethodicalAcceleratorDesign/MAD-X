@@ -352,7 +352,7 @@ static void correct_setcorr(struct in_cmd* cmd) {
   char nname[NAME_L];
   char slnname[NAME_L];
 
-  char* namtab;
+  const char* namtab;
 
   double xnew, ynew;
 
