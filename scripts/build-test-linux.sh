@@ -96,6 +96,10 @@ check_error "make all-linux64-gnu failed" "no-exit"
 
 echo -e "\n===== Intel build ====="
 
+if [ "`which compilervars.sh`" != "" ] ; then
+  source compilervars.sh intel64
+fi
+
 if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
   source compilervars.sh ia32
   icc      -V
