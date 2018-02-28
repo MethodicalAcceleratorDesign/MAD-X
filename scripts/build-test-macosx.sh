@@ -95,14 +95,19 @@ make all-macosx64-gnu
 check_error "make all-macosx64-gnu failed" "no-exit"
 
 echo -e "\n===== Intel build ====="
-icc      --version
-ifort    --version
 
-make all-macosx32-intel
-check_error "make all-macosx32-intel failed" "no-exit"
+if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
+  icc      --version
+  ifort    --version
 
-make all-macosx64-intel
-check_error "make all-macosx64-intel failed" "no-exit"
+  make all-macosx32-intel
+  check_error "make all-macosx32-intel failed" "no-exit"
+
+  make all-macosx64-intel
+  check_error "make all-macosx64-intel failed" "no-exit"
+else
+  echo "Intel compilers not found, skipped."
+fi
 
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
@@ -119,6 +124,7 @@ if [ "$1" = "notest" ] ; then
 else
   echo ""
 
+if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
   echo -e "\n===== Testing madx-macosx32-intel ====="
   make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
   check_error "make tests-all for madx-macosx32-intel failed" "no-exit"
@@ -126,6 +132,9 @@ else
   echo -e "\n===== Testing madx-macosx64-intel ====="
   make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
   check_error "make tests-all for madx-macosx64-intel failed" "no-exit"
+else
+  echo "Intel compilers not found, skipped."
+fi
 
   echo -e "\n===== Testing madx-macosx32-gnu ====="
   make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
