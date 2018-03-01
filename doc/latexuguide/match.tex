@@ -41,7 +41,6 @@ can also be issued during matching.
 \item Define Constraint
   \begin{itemize}
   \item \hyperref[sec:constraint]{\texttt{CONSTRAINT}}: Simple Constraint 
-  \item \hyperref[sec:userconstraint]{\texttt{CONSTRAINT}}: User Defined Variables 
   \item \hyperref[sec:weight]{\texttt{WEIGHT}}: Matching Weights
   \item \hyperref[sec:global]{\texttt{GLOBAL}}: Global Constraints
   \item \hyperref[sec:gweight]{\texttt{GWEIGHT}}: Weights for Global Constraints
@@ -226,8 +225,7 @@ initial conditions the matching module will work in the
 \section{SLOW attribute}
 
 The \texttt{SLOW} logical flag enforces the old and slow matching procedure
-which allows to use the special columns \texttt{mvar1, ..., mvar4}, if they
-are added to the twiss table.
+which allows to use the special columns.
 
 Recently a number of parameter, like \texttt{RE56}, have been added to the
 list of parameters that can be matched. 
@@ -445,38 +443,6 @@ In the above example the phases (\texttt{MUX, MUY}) are overridden by the
 numerical values specified via \texttt{MUX=real} and \texttt{MUY=real}.
 Normally \hyperref[sec:range]{\texttt{RANGE}} refers to a single position.
 
-\section{User Defined Matching Constraints}
-\label{sec:userconstraint}
-
-In addition to the nominal \hyperref[chap:twiss]{\texttt{TWISS}} variables, 
-the user can define a limited set of 'user-defined' variables in the
-constraint statement.
-This allows, for example, the matching of the normalized dispersion or the
-mechanical aperture. The \texttt{MATCH} module allows four user defined
-variables called: \texttt{MVAR1, MVAR2, MVAR3} and \texttt{MVAR4}. 
-The variables can be defined according to the general variable
-declaration rules of \hyperref[sec:defer]{deferred expressions}.
-For example, in order to match the normalized dispersion at a certain
-location in the sequence one would first define a variable:
-
-\madxmp{
-MVAR1 := table(twiss,dx)/sqrt(table(twiss,betx));
-}
-
-After that the user has to select the variable for output in the TWISS
-statement (see details in the \hyperref[chap:twiss]{TWISS module} and 
-\hyperref[sec:select]{SELECT} statement):
-\madxmp{
-SELECT, FLAG=twiss, CLEAR; \\
-SELECT, FLAG=twiss, COLUMN=keyword, name, s, betx, dx, mvar1; \\
-TWISS, SEQUENCE=seqname, FILE=twissfile;
-}
-
-The variable can now be referenced like any other \texttt{TWISS} variable
-in the constraint command:
-\madxmp{
-CONSTRAINT, SEQUENCE=seqname, RANGE=range, MVAR1=targetvalue;
-}
 
 \section{GLOBAL}
 \label{sec:global}
@@ -575,7 +541,6 @@ Default values for matching weights are given in the table below.
     WY     &   1.0  & PHIY   &   1.0  & DMUY   &   1.0  \\ 
     DDX    &   1.0  & DDPX   &   1.0  &  & \\
     DDY    &   1.0  & DDPY   &   1.0  &  & \\ 
-    MVAR\textit{i}  &  10.0  & & & & \\
     Q1     &  10.0  & DQ1    &   1.0  &  & \\ %& DDQ1    &  0.1  \\
     Q2     &  10.0  & DQ2    &   1.0  &  & \\ %& DDQ2    &  0.1  \\
     %      DQ1DE1 &    ??  & DQ2DE2 &    ??  & DQ1DE2  &   ??  \\
