@@ -1,0 +1,112 @@
+TITLE,'TRANSLINE_2+4 type';
+OPTION,-ECHO,info,warn;
+OPTION, RBARC=FALSE;
+!---------------------------------------------------------------!
+BEAM, PARTICLE=PROTON, PC=0.729, EX=1.5E-06, EY=3.E-06; 
+DEG:=PI/180.0; 
+!---------------------------------------------------------------!
+Q11 : QUADRUPOLE,   L=0.20,   K1:= KQ11;    KQ11=6.23173e+000  ;
+Q12 : QUADRUPOLE,   L=0.20,   K1:= KQ12;    KQ12=-7.35812e+000 ;
+Q13 : QUADRUPOLE,   L=0.20,   K1:= KQ13;    KQ13=-1.06339e+001 ;
+Q14 : QUADRUPOLE,   L=0.20,   K1:= KQ14;    KQ14=1.40815e+001  ;
+Q15 : QUADRUPOLE,   L=0.20,   K1:= KQ15;    KQ15=-6.66898e+000 ;
+Q16 : QUADRUPOLE,   L=0.20,   K1:= KQ16;    KQ16=-7.14427e-001 ;
+B11:sbend,L=0.75,  Angle=-30.0*DEG,K1:=KB11;KB11=-3.62391e-001 ;
+B12:sbend,L=0.75,  Angle=-30.0*DEG,K1:=KB12;KB12=2.12248e+000  ;
+B21:sbend,L=0.9375,Angle=37.5*DEG, K1:=KB21;KB21=1.90026e+000  ;
+B22:sbend,L=0.9375,Angle=37.5*DEG, K1:=KB22;KB22=-2.03093e+000 ;
+B23:sbend,L=0.9375,Angle=37.5*DEG, K1:=KB23;KB23=1.45520e+000  ;
+B24:sbend,L=0.9375,Angle=37.5*DEG, K1:=KB24;KB24=-7.67690e-001 ;
+!---------------------------------------------------------------!
+D00 : DRIFT, L = 0.00 ;
+D01 : DRIFT, L = 0.35 ;
+D02 : DRIFT, L = 0.05 ;
+D03 : DRIFT, L = 3.80 ;
+D04 : DRIFT, L = 1.00 ;
+D05 : DRIFT, L = 1.40 ;
+D06 : DRIFT, L = 0.75 ;
+D12 : DRIFT, L= 0.20  ;
+D13 : DRIFT, L= 0.15  ;
+D14 : DRIFT, L= 0.4   ;
+D15 : DRIFT, L= 0.3   ;
+D16 : DRIFT, L= 1.0   ;
+D17 : DRIFT, L= 0.25  ;
+D18 : DRIFT, L= 0.9   ;
+D19 : DRIFT, L= 0.14  ;
+D11 : DRIFT, L= 0.05  ;
+D10 : DRIFT, L= 0.1   ;
+D20 : DRIFT, L= 0.02  ;
+D21 : DRIFT, L= 0.01  ;
+D1  : DRIFT, L= 0.005 ;
+!-----------------------------------------------------------------!
+PSTN  : MARKER ;
+PSTN1 : MARKER ;
+PSTN2 : MARKER ;
+PSTN3 : MARKER ;
+M1: MARKER     ;
+M2: MARKER     ;
+M3: MARKER     ;
+M4: MARKER     ;
+M5: MARKER     ;
+!---------------------------------------------------------------!
+trans:LINE=(D00,D17,Q11,D10,D20,D10,D10,D20,
+            Q12,D15,D20,D20,D20,B11,B12,D15,
+            D10,Q13,PSTN1,D12,D13,Q14,D17,
+            D13,Q15,D12,D13,Q16,PSTN3,M1,D15,
+            D10,B21,M2,D1,B22,M3,D1,PSTN,B23,M4,D1,
+            B24,M5,D12,D16,PSTN2,D16,D12); 
+USE,SEQUENCE=trans;
+!---------------------------------------------------------------!
+upp= 15.0; 
+low=-15.0; 
+upp_b= 2.5; 
+low_b=-2.5; 
+bx=6.0; 
+by=3.0; 
+ax=0.0;
+ay=0.0;
+DELTAP=0.000; 
+!---------------------------------------------------------------!
+DELTAP:=0.003; 
+BEAM_EX:=1.5E-06;
+BEAM_EY:=3.0E-06;
+BETX1:=TABLE(TWISS,BETX);
+BETY1:=TABLE(TWISS,BETY);
+DX1：=TABLE(TWISS,DX);
+MVAR1:=SQRT(BEAM_EX*BETX1+(DX1*DELTAP)^2); ! BEAMX
+MVAR2:=SQRT(BEAM_EY*BETY1); ! BEAMY
+select,flag=twiss,clear;
+select,flag=twiss,column=name,betx,alfx,mux,dx,dpx,bety,alfy,MVAR1,MVAR2;
+twiss,sequence=trans,BETX=bx,BETY=by,ALFX=ax,ALFY=ay,dx=0,dpx=0,DELTAP=0;
+
+
+match,sequence=trans,BETX=bx,BETY=by,ALFX=ax,ALFY=ay,dx=0,dpx=0,slow;
+
+weight,betx=1000,bety=1000,alfx=1000,alfy=1000,dx=1000,dpx=1000,mux=1000,muy=1000,MVAR1=1000,MVAR2=1000;
+
+VARY, NAME=KQ11, step=1E-6, lower=low,upper=upp;
+VARY, NAME=KQ12, step=1E-6, lower=low,upper=upp;
+VARY, NAME=KQ13, step=1E-6, lower=low,upper=upp;
+VARY, NAME=KQ14, step=1E-6, lower=low,upper=upp;
+VARY, NAME=KQ15, step=1E-6, lower=low,upper=upp;
+VARY, NAME=KQ16, step=1E-6, lower=low,upper=upp;
+VARY, NAME=KB11, STEP=1E-6, LOWER=low_b, UPPER=UPP_b;
+VARY, NAME=KB12, STEP=1E-6, LOWER=low_b, UPPER=UPP_b;
+VARY, NAME=KB21, STEP=1E-6, LOWER=low_b, UPPER=UPP_b;
+VARY, NAME=KB22, STEP=1E-6, LOWER=low_b, UPPER=UPP_b;
+VARY, NAME=KB23, STEP=1E-6, LOWER=low_b, UPPER=UPP_b;
+VARY, NAME=KB24, STEP=1E-6, LOWER=low_b, UPPER=UPP_b;
+
+constraint,sequence=trans, range=#S/#E, betx<10.0, bety<10.0;   
+CONSTRAINT,sequence=trans,range=PSTN2,MUX=1.50,MUY=1.0 ;
+constraint,sequence=trans,range=PSTN2,BETX=6.0,BETY=3.0,ALFX=0,ALFY=0,dx=0,dpx=0 ; 
+constraint,sequence=trans, range=M1/M5,mvar1<0.01,mvar2<0.002 ;
+
+lmdif,calls=100000;
+jacobian,calls=100,tolerance=1e-15;
+endmatch;
+!---------------------------------------------------------------!
+select,flag=twiss,clear;
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,bety,alfy,MVAR1,MVAR2;
+twiss,BETX=bx,BETY=by,ALFX=ax,ALFY=ay,dx=0,dpx=0,DELTAP=0.00,chrom,save,file=line_out.txt;
+
