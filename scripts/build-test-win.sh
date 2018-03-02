@@ -102,9 +102,9 @@ gcc      --version
 g++      --version
 gfortran --version
 
-set_env 32
-make all-win32-gnu
-check_error "make all-win32-gnu failed" "no-exit"
+#set_env 32
+#make all-win32-gnu
+#check_error "make all-win32-gnu failed" "no-exit"
 
 set_env 64
 make all-win64-gnu
@@ -114,8 +114,8 @@ if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
   icc      --version
   ifort    --version
 
-  make all-win32-intel
-  check_error "make all-win32-intel failed" "no-exit"
+#  make all-win32-intel
+#  check_error "make all-win32-intel failed" "no-exit"
 
   make all-win64-intel
   check_error "make all-win64-intel failed" "no-exit"
@@ -139,9 +139,9 @@ else
   echo ""
 
 if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
-  echo -e "\n===== Testing madx-win32-intel ====="
-  make madx-win32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
-  check_error "make tests-all for madx-win32-intel failed" "no-exit"
+#  echo -e "\n===== Testing madx-win32-intel ====="
+#  make madx-win32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
+#  check_error "make tests-all for madx-win32-intel failed" "no-exit"
 
   echo -e "\n===== Testing madx-win64-intel ====="
   make madx-win64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
@@ -150,9 +150,9 @@ else
   echo "Intel compilers not found, skipped."
 fi
 
-  echo -e "\n===== Testing madx-win32-gnu ====="
-  make madx-win32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
-  check_error "make tests-all for madx-win32-gnu failed" "no-exit"
+#  echo -e "\n===== Testing madx-win32-gnu ====="
+#  make madx-win32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
+#  check_error "make tests-all for madx-win32-gnu failed" "no-exit"
 
   echo -e "\n===== Testing madx-win64-gnu ====="
   make madx-win64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
@@ -160,7 +160,8 @@ fi
 fi
 
 # restore the default version
-make madx-win32-gnu > /dev/null && make madx-win64-gnu > /dev/null
+#make madx-win32-gnu > /dev/null && \
+make madx-win64-gnu > /dev/null
 check_error "unable to restore the default version" "no-exit"
 
 # date & end marker

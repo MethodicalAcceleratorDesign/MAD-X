@@ -88,8 +88,8 @@ gcc      --version
 g++      --version
 gfortran --version
 
-make all-linux32-gnu
-check_error "make all-linux32-gnu failed" "no-exit"
+#make all-linux32-gnu
+#check_error "make all-linux32-gnu failed" "no-exit"
 
 make all-linux64-gnu
 check_error "make all-linux64-gnu failed" "no-exit"
@@ -101,15 +101,17 @@ if [ "`which compilervars.sh`" != "" ] ; then
 fi
 
 if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
-  source compilervars.sh ia32
-  icc      -V
-  ifort    -V
-  make all-linux32-intel
-  check_error "make all-linux32-intel failed" "no-exit"
+#  source compilervars.sh ia32
+#  icc      -V
+#  ifort    -V
+#
+#  make all-linux32-intel
+#  check_error "make all-linux32-intel failed" "no-exit"
 
   source compilervars.sh intel64
   icc      -V
   ifort    -V
+
   make all-linux64-intel
   check_error "make all-linux64-intel failed" "no-exit"
 else
@@ -132,9 +134,9 @@ else
   echo ""
 
 if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
-  echo -e "\n===== Testing madx-linux32-intel ====="
-  make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
-  check_error "make tests-all for madx-linux32-intel failed" "no-exit"
+#  echo -e "\n===== Testing madx-linux32-intel ====="
+#  make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
+#  check_error "make tests-all for madx-linux32-intel failed" "no-exit"
 
   echo -e "\n===== Testing madx-linux64-intel ====="
   make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
@@ -143,9 +145,9 @@ else
   echo "Intel compilers not found, skipped."
 fi
 
-  echo -e "\n===== Testing madx-linux32-gnu ====="
-  make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
-  check_error "make tests-all for madx-linux32-gnu failed" "no-exit"
+#  echo -e "\n===== Testing madx-linux32-gnu ====="
+#  make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
+#  check_error "make tests-all for madx-linux32-gnu failed" "no-exit"
 
   echo -e "\n===== Testing madx-linux64-gnu ====="
   make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
@@ -153,7 +155,8 @@ fi
 fi
 
 # restore the default version
-make madx-linux32-gnu > /dev/null && make madx-linux64-gnu > /dev/null
+#make madx-linux32-gnu > /dev/null && \
+make madx-linux64-gnu > /dev/null
 check_error "unable to restore the default version" "no-exit"
 
 # date & end marker
