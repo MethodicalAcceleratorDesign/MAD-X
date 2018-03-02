@@ -88,13 +88,13 @@ echo -e "\n===== Release number ====="
 cat VERSION
 
 echo -e "\n===== Gnu build ====="
-source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/i686-slc6/setup.sh
-gcc      --version
-g++      --version
-gfortran --version
+#source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/i686-slc6/setup.sh
+#gcc      --version
+#g++      --version
+#gfortran --version
 
-make all-linux32-gnu
-check_error "make all-linux32-gnu failed" "no-exit"
+#make all-linux32-gnu
+#check_error "make all-linux32-gnu failed" "no-exit"
 
 source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/x86_64-slc6/setup.sh
 gcc      --version
@@ -111,12 +111,12 @@ if [ -f "/cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh" ] ; then
 fi
 
 if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
-  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh ia32
-  icc      --version
-  ifort    --version
-
-  make all-linux32-intel
-  check_error "make all-linux32-intel failed" "no-exit"
+#  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh ia32
+#  icc      --version
+#  ifort    --version
+#
+#  make all-linux32-intel
+#  check_error "make all-linux32-intel failed" "no-exit"
 
   source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh intel64
   icc      --version
@@ -167,9 +167,9 @@ else
   echo ""
 
 if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
-  echo -e "\n===== Testing madx-linux32-intel ====="
-  make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
-  check_error "make tests-all for madx-linux32-intel failed"  "no-exit"
+#  echo -e "\n===== Testing madx-linux32-intel ====="
+#  make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
+#  check_error "make tests-all for madx-linux32-intel failed"  "no-exit"
 
   echo -e "\n===== Testing madx-linux64-intel ====="
   make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
@@ -178,9 +178,9 @@ else
   echo "Intel compilers not found, skipped."
 fi
 
-  echo -e "\n===== Testing madx-linux32-gnu ====="
-  make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
-  check_error "make tests-all for madx-linux32-gnu failed"  "no-exit"
+#  echo -e "\n===== Testing madx-linux32-gnu ====="
+#  make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
+#  check_error "make tests-all for madx-linux32-gnu failed"  "no-exit"
 
   echo -e "\n===== Testing madx-linux64-gnu ====="
   make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
@@ -188,7 +188,8 @@ fi
 fi
 
 # restore the default version
-make madx-linux32-gnu > /dev/null && make madx-linux64-gnu > /dev/null
+#make madx-linux32-gnu > /dev/null && \
+make madx-linux64-gnu > /dev/null
 check_error "unable to restore the default version" "no-exit"
 
 # date & end marker

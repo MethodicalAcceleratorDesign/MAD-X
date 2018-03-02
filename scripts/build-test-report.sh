@@ -141,9 +141,9 @@ build_test_binary ()
     rm -f numdiff-${arch}64-gnu* numdiff-${arch}32-gnu*
     # retrieve binaries for download of last builds
     scp -q -p "${src}madx-nightly/madx-${arch}64-*" .
-    scp -q -p "${src}madx-nightly/madx-${arch}32-*" .
+    #scp -q -p "${src}madx-nightly/madx-${arch}32-*" .
     scp -q -p "${src}madx-nightly/numdiff-${arch}64-*" .
-    scp -q -p "${src}madx-nightly/numdiff-${arch}32-*" .
+    #scp -q -p "${src}madx-nightly/numdiff-${arch}32-*" .
   done
 }
 
