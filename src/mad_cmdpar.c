@@ -15,7 +15,8 @@ clone_command_parameter(const struct command_parameter* p)
       clone->c_max = p->c_max;
       clone->min_expr = clone_expression(p->min_expr);
       clone->max_expr = clone_expression(p->max_expr);
-      __attribute__ ((fallthrough));
+      /* FALLTHRU */
+
     case 0: // logical (not supported...)
     case 1: // integer (not supported...)
     case 2: // double

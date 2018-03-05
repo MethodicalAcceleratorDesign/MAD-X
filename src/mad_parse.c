@@ -173,7 +173,8 @@ pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
           {
             outbuf->c[cout++] = c; break;
           }
-          __attribute__ ((fallthrough));
+          /* FALLTHRU */
+
         case '+':
           if (left_b > 0)
           {
@@ -216,7 +217,8 @@ pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
         case ')':
           rb_level--;
           if (fill_flag && cpnb == '(') outbuf->c[cout++] = '0';
-          __attribute__ ((fallthrough));
+          /* FALLTHRU */
+
         case '<':
         case ':':
         case '*':

@@ -38,7 +38,8 @@ make_constraint(int find_npos, struct command_parameter* par)
         new->ex_c_min = par->min_expr;
       }
       if (par->c_type == 1) break;
-      __attribute__ ((fallthrough));
+      /* FALLTHRU */
+
     case 2: /* maximum */
       if (par->max_expr == NULL) new->c_max = par->c_max;
       else
@@ -170,7 +171,7 @@ fill_constraint_list(int type /* 1 node, 2 global */,
   struct command_parameter_list* pl = cd->par;
   struct name_list* nl = cd->par_names;
   struct constraint* l_cons;
-  int j, find_npos = type == 1 && !get_option("slow");
+  int j, find_npos = type == 1 && !get_option("slow_match");
   struct command* weights = type == 1 ? current_weight : current_gweight;
   double weight = command_par_value("weight", cd);
   int use_weight = par_present("weight", cd);
