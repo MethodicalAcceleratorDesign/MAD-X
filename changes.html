@@ -11,6 +11,92 @@
 <p><a class=home href="http://cern.ch/madx" onclick="target='_top'">[home]</a>
 <h1>Changes</h1>
 <hr class="h1">
+<!-- -------- -->
+<h3>MAD-X release 5.04.00? (2018.03.02)</h3>
+<h4>Bug Fixes</h4>
+
+<ul>
+<li> Fix consistency in RF-multipole kick phase when exported to SixTrack
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/505">#505</a>. (Tobias)
+<li> Fix elseparator. Before a horizontal field gave a vertical kick in twiss
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/509">#509</a>. (Tobias)
+<li> Sign changed in survey for s-rotation.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/573">#573</a>. (Tobias)
+<li> Fix the replace command that changed type of other elements.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/599">#599</a>. (Tobias)
+<li> Fix type and length of aperture elements name in sixtrack export
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/552">#552</a>. (Veronika, James)
+<li> Fix the difference of output for VALUE command depending on compiler.
+        <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/531">#531</a>. (Piotr)
+<li> Ptc_track with element_by_element=false, before it was crashing in some cases (Piotr)
+<li> Sign of rfcavity LAG was swapped in PTC
+      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/545">#539</a>. (Piotr)
+<li> Sign of T of closed orbit in summary table was swapped
+      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/545">#539</a>. (Piotr)
+<li> Removed absolute limit for T coordinate in ptc_tracking
+    <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/548">#548</a>. (Piotr)
+<li> Fixed ptc_align
+    <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/545">#545</a>. (Piotr)
+<li> 6D closed orbit search with TOTALPATH=true
+    <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/551">#551</a>. (Piotr)
+<li> Disabling STOCHASTIC switch during closed orbit search (was always failing)
+    <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/565">#565</a>. (Piotr)
+<li> Fixed the calculation of energy loss due to quantum synchrotron radiation emission. (Andrea)
+<li> Fix aperture plot
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/490">#490</a>. (Thomas)
+<li> Fixing the unified atomic mass
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/518">#518</a>. (Laurent, Thomas)
+<li> Fix plotting of two points with the same x-value.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/583">#573</a>. (Tobias)
+<li> Fix SURVEY to be aware of the RBARC option
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/564">#564</a>. (Laurent)
+</ul>
+
+<h4>Added features/checks/functionalities</h4>
+
+<ul>
+<li> Thick 6d SOLENOID tracking implemented in TRACK
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/495">#495</a>
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/495">#564</a>. (Andrea)
+<li> The TRANSLATION element implemented
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/515">#515</a>. (Tobias)
+<li> SECTORPURE option implemented for sectormaps
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/518">#518</a>. (Tobias)
+<li> Thick attribute for SOLENOID implemented in MAKETHIN
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/547">#547</a>. (Helmuth)
+<li> XROTATION and YROTATION implemented.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/569">#569</a>. (Laurent, Tobias)
+<li> Field errors added to thick SBENDs and QUADRUPOLEs in TRACK
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/583">#583</a>. (Andrea)
+<li> Switch to C++11 (Laurent, Piotr, Thomas)
+<li> MULTIPOLEs and SBENDs support k0l != angle in SURVEY, TRACK, TWISS and EMIT
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/564">#564</a>. (Laurent)
+<li> Implemented new thick map for combined-function SBEND (and QUADRUPOLE) with h, k0, and k1 handled independently
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/471">#471</a>. (Andrea)
+<li> Name mangling in SixTrack export to uniquely compress names longer than 16 characters. (Andrea)
+<li> PTC_CREATE_LAYOUT now stops if a not supported aperture is found in any element. (Piotr)
+<li> Added AC dipole in PTC_TRACK and PTC_TRACKLINE (Piotr)
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/531">#531</a>. (Piotr)
+<li>  Implemented roll errors of thin dipoles (EALIGN in thin lattice are very approximative)
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/549">#549</a>. (Piotr)
+<li> Orbit_-cT renamed to orbit_t to allow access and use within expressions
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/548">#548</a>. (Piotr)
+<li> PTC_SETSWITCH modifies only the parameters explicitly defined by the user (no more default update)
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/548">#548</a>. (Piotr)
+<li> Added seed option in PTC_SETSWITCH to set random number generator seed of PTC
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/548">#548</a>. (Piotr)
+<li> Added option TRACKRDTS in PTC_TWISS to produce table TWISSRDT with Resonance Driving Terms (order >=3)
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/548">#548</a>. (Piotr)
+<li> Automatic determination of SECTOR_NMUL parameter, speeds up calculations with exact Hamiltonian (EXACT=true) by factor 3
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/559">#559</a>. (Piotr)
+<li> Updated PTC version
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/537">#537</a>. (Piotr)
+<li> Review of coupling calculation in MAD-X,
+     <a target="_blank" href="http://indico.cern.ch/event/672801/contributions/2752703/attachments/1546876/2461487/ld_20171025-HSS.pdf">slides part 1</a> and
+     <a target="_blank" href="http://indico.cern.ch/event/679893/contributions/2784750/attachments/1562906/2461471/ld_20171122-HSS.pdf">part 2</a>. (Laurent)
+<li> Review of SOLENOID maps and YROTATION maps for tilted solenoid-antisolenoid of FCC-ee,
+     <a target="_blank" href="http://indico.cern.ch/event/668069/contributions/2731465/attachments/1530750/2399429/ld_20170927-HSS.pdf">slides</a>. (Laurent, Tobias)
+</ul>
 
 <!-- -------- -->
 <h3>MAD-X release 5.03.07 (2017.10.20)</h3>
