@@ -1,0 +1,24 @@
+
+ option, echo, info, warn;
+ bthin :   multipole, knl={0,0.001};
+ a: sbend, l=4.0;
+ b: sbend, l=4.0;
+ c: sbend, l=2.0;
+
+ myseq: sequence, l=50;
+ a, at=10.0;
+ b, at=20.0;
+ endsequence;
+
+
+seqedit,  sequence=myseq;
+replace,  element=b, by=bthin;
+endedit;
+
+beam;
+use, sequence=myseq;
+
+select,flag=twiss, column=s, name,keyword,betx, bety;
+ twiss, BETX=1,BETY=1, file="twiss.out";
+
+stop;

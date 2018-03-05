@@ -720,9 +720,8 @@ replace_one(struct node* node, struct element* el)
   add_to_node_list(node, 0, edit_sequ->nodes);
   node->p_elem = el;
 
-  /*node->base_name = el->base_type->name;*/
-  strcpy(node->base_name, el->base_type->name);
-
+  node->base_name = el->base_type->name;
+  //strcpy(node->base_name, el->base_type->name);
   node->length = el->length;
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, edit_sequ->cavities) == NULL)
