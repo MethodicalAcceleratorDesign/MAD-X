@@ -857,7 +857,7 @@ decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
         for (j = i; j < number; j++)
           if (name_list_pos(alias(toks[j]), cmd->cmd_def->par_names) >= 0) break;
 //        dirty quick fix for ticket #165
-//        if (*toks[j-1] == ',') j--;
+          if (*toks[j-1] == '-') j--;
           while (*toks[j-1] == ',') j--;
         tot_end = j - 1;
         clp->string = permbuff(noquote(join(&toks[i], j - i)));
