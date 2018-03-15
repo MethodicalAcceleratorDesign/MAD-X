@@ -634,7 +634,7 @@ make_sequ_from_line(char* name)
   current_sequ = new_sequence(name, 0); /* node positions = centre */
   old_sequ = find_sequence(name, sequences);
   add_to_sequ_list(current_sequ, sequences);
-  if (old_sequ) old_sequ = delete_sequence(old_sequ);
+  if (old_sequ) delete_sequence(old_sequ);
   if (current_sequ->cavities != NULL)  current_sequ->cavities->curr = 0;
   else current_sequ->cavities = new_el_list(100);
   if (occ_list == NULL)
@@ -1487,7 +1487,7 @@ new_sequ_node(struct sequence* sequ, int occ_cnt)
   return p;
 }
 
-struct sequence*
+void
 delete_sequence(struct sequence* sequ)
 {
   const char *rout_name = "delete_sequence";
@@ -1506,7 +1506,6 @@ delete_sequence(struct sequence* sequ)
   sequ->start = delete_node_ring(sequ->start);
   if (sequ->cavities) sequ->cavities = delete_el_list(sequ->cavities);
   myfree(rout_name, sequ);
-  return NULL;
 }
 
 void
@@ -1572,7 +1571,7 @@ enter_sequence(struct in_cmd* cmd)
       // sequence exists already; delete the old one
       /*printf("enter_sequence: removing %s\n", sequences->sequs[pos]->name);*/
       remove_from_sequ_list(sequences->sequs[pos], sequences);
-      sequences->sequs[pos] = delete_sequence(sequences->sequs[pos]);
+      delete_sequence(sequences->sequs[pos]);
     }
 
     current_sequ = new_sequence(toks[aux_pos], k);

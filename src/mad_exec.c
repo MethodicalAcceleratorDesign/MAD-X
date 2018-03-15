@@ -12,7 +12,7 @@ exec_delete_sequ(const char* name)
       current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
       current_sequ->orbits = delete_vector_list(current_sequ->orbits);
     }
-    sequences->sequs[spos] = delete_sequence(current_sequ);
+    delete_sequence(current_sequ);
     current_sequ = keep;
   }
   else warning("sequence to be deleted does not exist:", name);
