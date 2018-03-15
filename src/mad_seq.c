@@ -1570,7 +1570,6 @@ enter_sequence(struct in_cmd* cmd)
     if ((pos = name_list_pos(toks[aux_pos], sequences->list)) >= 0) {
       // sequence exists already; delete the old one
       /*printf("enter_sequence: removing %s\n", sequences->sequs[pos]->name);*/
-      remove_from_sequ_list(sequences->sequs[pos], sequences);
       delete_sequence(sequences->sequs[pos]);
     }
 

@@ -7,11 +7,6 @@ exec_delete_sequ(const char* name)
   int spos;
   if ((spos = name_list_pos(name, sequences->list)) >= 0) {
     current_sequ = sequences->sequs[spos];
-    if (current_sequ->ex_start != NULL) { /* delete expanded */
-      current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
-      current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
-      current_sequ->orbits = delete_vector_list(current_sequ->orbits);
-    }
     delete_sequence(current_sequ);
     current_sequ = keep;
   }
