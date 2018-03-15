@@ -3,15 +3,11 @@
 static void
 exec_delete_sequ(const char* name)
 {
-  struct sequence* keep = current_sequ;
-  int spos;
-  if ((spos = name_list_pos(name, sequences->list)) >= 0) {
-    current_sequ = sequences->sequs[spos];
-    delete_sequence(current_sequ);
-    current_sequ = keep;
+  struct sequence* sequ = find_sequence(name, sequences);
+  if (sequ) {
+    delete_sequence(sequ);
   }
   else warning("sequence to be deleted does not exist:", name);
-  return;
 }
 
 void

@@ -618,7 +618,6 @@ make_sequ_from_line(char* name)
 {
   char** tmp = NULL;
   int pos = name_list_pos(name, line_list->list);
-  struct sequence* old_sequ = NULL;
   struct macro* line;
   int mpos = name_list_pos("marker", defined_commands->list);
   struct command* clone = clone_command(defined_commands->commands[mpos]);
@@ -632,9 +631,8 @@ make_sequ_from_line(char* name)
   expand_line(line_buffer); /* act on '-' and rep. count */
 
   current_sequ = new_sequence(name, 0); /* node positions = centre */
-  old_sequ = find_sequence(name, sequences);
+  delete_sequence(find_sequence(name, sequences));
   add_to_sequ_list(current_sequ, sequences);
-  if (old_sequ) delete_sequence(old_sequ);
   if (current_sequ->cavities != NULL)  current_sequ->cavities->curr = 0;
   else current_sequ->cavities = new_el_list(100);
   if (occ_list == NULL)
@@ -1491,7 +1489,7 @@ void
 delete_sequence(struct sequence* sequ)
 {
   const char *rout_name = "delete_sequence";
-  struct sequence* seq;
+  if (!sequ) return;
   if (sequ->ex_start != NULL)
   {
     sequ->ex_nodes = delete_node_list(sequ->ex_nodes);
@@ -1499,8 +1497,8 @@ delete_sequence(struct sequence* sequ)
     sequ->orbits = delete_vector_list(sequ->orbits);
     myfree(rout_name, sequ->all_nodes);
   }
-  if ((seq = find_sequence(sequ->name, sequences)))
-    remove_from_sequ_list(seq, sequences);
+  if (sequ == find_sequence(sequ->name, sequences))
+    remove_from_sequ_list(sequ, sequences);
   if (sequ->l_expr) sequ->l_expr = delete_expression(sequ->l_expr);
   sequ->nodes = delete_node_list(sequ->nodes);
   sequ->start = delete_node_ring(sequ->start);
@@ -1567,11 +1565,7 @@ enter_sequence(struct in_cmd* cmd)
       }
     }
 
-    if ((pos = name_list_pos(toks[aux_pos], sequences->list)) >= 0) {
-      // sequence exists already; delete the old one
-      /*printf("enter_sequence: removing %s\n", sequences->sequs[pos]->name);*/
-      delete_sequence(sequences->sequs[pos]);
-    }
+    delete_sequence(find_sequence(toks[aux_pos], sequences));
 
     current_sequ = new_sequence(toks[aux_pos], k);
     add_to_sequ_list(current_sequ, sequences);
