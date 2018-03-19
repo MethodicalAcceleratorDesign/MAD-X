@@ -939,7 +939,7 @@ pro_twiss(void)
     seterrorflag(1,"pro_twiss","TWISS failed");
     warning("Twiss failed: ", "MAD-X continues");
   } else {
-    if (get_option("twiss_sector"))
+    if (get_option("twiss_sector") && 0 != strcmp("", sector_name))
       out_table( sector_table_name, twiss_sector_table, sector_name );
     if (get_option("twiss_print"))
       print_table(summ_table);
