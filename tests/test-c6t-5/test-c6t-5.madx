@@ -77,7 +77,7 @@ R52LOC.BIM:=R22LOC.BIM*R16LOC.BIM-R12LOC.BIM*R26LOC.BIM;
 
 !show, MATLOC.BIM ;
 seqedit,sequence=seq;
-install, element=MATLOC.BIM, at = markLOC.BIM;
+install, element=MATLOC.BIM, at = 0.7 * lcell+3*lcell;
 remove, element=markLOC.BIM;
 endedit;
 
