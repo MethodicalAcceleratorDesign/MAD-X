@@ -3124,7 +3124,6 @@ write_f3_matrix(void)
 
  
   beta= get_value("beam ","beta ");
-  printf("%f", beta);
  
   if (!f3) f3 = fopen("fc.3", "w");
 
