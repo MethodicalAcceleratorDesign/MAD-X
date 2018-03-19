@@ -3,7 +3,7 @@
   +     MAD-X 5.04.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2018.03.02               +
-  + Execution date: 2018.03.19 13:30:24      +
+  + Execution date: 2018.03.19 13:49:03      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=120.;
 
@@ -236,7 +236,7 @@ R52LOC.BIM:=R22LOC.BIM*R16LOC.BIM-R12LOC.BIM*R26LOC.BIM;
 
 seqedit,sequence=seq;
 
-install, element=MATLOC.BIM, at = markLOC.BIM;
+install, element=MATLOC.BIM, at = 0.7 * lcell+3*lcell;
 
 remove, element=markLOC.BIM;
 
@@ -262,34 +262,34 @@ twiss, file="afterTrom.twiss";
 
 enter Twiss module
   
-iteration:   1 error:   9.090304E-02 deltap:   0.000000E+00
-orbit:   1.848109E-03  1.863633E-04  1.092677E-01 -4.742899E-03 -9.421533E-04 -7.079898E-05
+iteration:   1 error:   1.529813E-01 deltap:   0.000000E+00
+orbit:   2.903345E-03  1.359622E-04  9.670465E-02 -8.783003E-03 -1.179661E-03  9.192434E-06
   
-iteration:   2 error:   8.530176E-03 deltap:   0.000000E+00
-orbit:   1.844011E-03  1.863815E-04  1.092829E-01 -4.731875E-03 -6.400554E-04  1.819489E-04
+iteration:   2 error:   5.119056E-03 deltap:   0.000000E+00
+orbit:   2.907153E-03  1.362660E-04  9.678024E-02 -8.782199E-03 -7.342620E-04  1.608800E-04
   
-iteration:   3 error:   3.669072E-06 deltap:   0.000000E+00
-orbit:   1.844006E-03  1.863815E-04  1.092831E-01 -4.731872E-03 -6.407314E-04  1.820578E-04
+iteration:   3 error:   1.320211E-06 deltap:   0.000000E+00
+orbit:   2.907156E-03  1.362662E-04  9.678030E-02 -8.782200E-03 -7.344539E-04  1.609192E-04
   
-iteration:   4 error:   7.234648E-13 deltap:   0.000000E+00
-orbit:   1.844006E-03  1.863815E-04  1.092831E-01 -4.731872E-03 -6.407314E-04  1.820578E-04
+iteration:   4 error:   9.048643E-14 deltap:   0.000000E+00
+orbit:   2.907156E-03  1.362662E-04  9.678030E-02 -8.782200E-03 -7.344539E-04  1.609192E-04
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-               120    0.0006407313762    0.0008337855543        34.63162074 
+               120    0.0007344539463     0.000805030598        35.24469903 
 
                 q1                dq1            betxmax              dxmax 
-       1.416890016       -3.086474036        107.2654242      0.02698166058 
+       1.346613813       -1.564759784        34.08793922       0.0293352885 
 
              dxrms             xcomax             xcorms                 q2 
-     0.01181724804     0.003044969894     0.001564436705        1.338126798 
+     0.01824923054     0.002907156139     0.001728796459         1.30055717 
 
                dq2            betymax              dymax              dyrms 
-      -1.969744197        61.11750854        1.279100951       0.6410201932 
+      -1.566810637        33.53118674        1.113099445       0.5591484967 
 
             ycomax             ycorms             deltap            synch_1 
-      0.2144618678       0.1259195532                  0                  0 
+       0.190476743       0.1108253658                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -308,7 +308,7 @@ Reference radius set to : 1.000000
 
 total block length: 120.000000
 
-c6t terminated - total number of elements: 31
+c6t terminated - total number of elements: 32
                     field errors    MAD-X: 0
                     field errors SixTrack: 0
                  alignment errors   MAD-X: 0
