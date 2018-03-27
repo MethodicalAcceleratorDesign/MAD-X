@@ -276,6 +276,7 @@ const char *const_command_def =
 "rbarc      = [l, true, true], "
 "rand       = [s, default, best], "
 "randid     = [i, 0, 1], "
+"synrad     = [i, 2, 2], "       /* ld */
 "cfsbend    = [l, true, true], " /* combined function sbend */
 "thin_foc   = [l, true, true], "
 "sympl      = [l, true, true], "
