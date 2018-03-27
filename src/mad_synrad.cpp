@@ -4,8 +4,6 @@
 
 #include <cmath>
 
-extern "C" {
-
 inline double Chebyshev(double a,double b,const double c[],int m,double x)
 {
   double y;
@@ -20,7 +18,7 @@ inline double Chebyshev(double a,double b,const double c[],int m,double x)
   return y*d-dd+0.5*c[0];
 }
 
-double invsynfracint_(double *fortx)
+extern "C" double invsynfracint_(double *fortx)
 {
   double x=fortx[0];
   // from 0 to 0.7
@@ -70,7 +68,7 @@ double invsynfracint_(double *fortx)
     -2.15969415476814981374e-10,5.69472105972525594811e-11,-1.48844799572430829499e-11,3.84901514438304484973e-12,
     -9.82222575944247161834e-13,2.46468329208292208183e-13,-6.04953826265982691612e-14,1.44055805710671611984e-14,
     -3.28200813577388740722e-15,6.96566359173765367675e-16,-1.294122794852896275e-16};
-  
+
   if(x<aa2)      return x*x*x*Chebyshev(aa1,aa2,cheb1,ncheb1,x);
   else if(x<aa3) return       Chebyshev(aa2,aa3,cheb2,ncheb2,x);
   else if(x<1-0.0000841363)
@@ -83,7 +81,5 @@ double invsynfracint_(double *fortx)
     double y=-log(1-x);
     return y*Chebyshev(aa5,aa6,cheb4,ncheb4,y);
   }
-}
-
 }
 
