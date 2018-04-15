@@ -3116,8 +3116,15 @@ write_f3_aux(void)
 static void
 write_f3_matrix(void)
 {
-  int i, i_max = 43;
+  int i, i_max = 43, dim=6;
   current_element = first_in_sequ;
+  
+  
+  double beta, value;
+
+ 
+  beta= get_value("beam ","beta ");
+ 
   if (!f3) f3 = fopen("fc.3", "w");
 
   while (current_element != NULL)
@@ -3126,9 +3133,26 @@ write_f3_matrix(void)
     {
       fprintf(f3,"TROM\n");
       fprintf(f3,"%-16s\n",current_element->name);
-
+    
       for (i = 1; i < i_max; i++) {
-        fprintf(f3,"%23.15e", current_element->value[i]);
+        value=current_element->value[i];
+        // The if statemenst are to go from pt to psigma and from t to sigma.     
+        if((i+1)%dim==0){
+          value=value/beta;
+        }
+        if(i%dim==0){
+          value=value*beta;
+        }
+        if(i>(dim+24) && i <(31+dim)){
+          value = value*beta;
+        }
+        if(i>(dim+30) && i < (37+dim)){
+          value = value/beta;
+        }
+        
+    
+
+        fprintf(f3,"%23.15e", value);
         if (i%3 == 0) fprintf(f3,"\n");
       }
 
