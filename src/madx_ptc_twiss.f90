@@ -556,6 +556,7 @@ contains
     logical(lp)             :: ring_parameters  !! forces isRing variable to true, i.e. calclulation of closed solution
     logical(lp)             :: doNormal         !! do normal form analysis
     logical(lp)             :: doRDTtracking    !! 
+    logical(lp)             :: isstochastic  !! tempurary veriable used in switching off stochastic in closed orbit search
     type(c_damap)           :: AscriptInPhasor, dummyMap  !! maps for RDTs calculations
     type(c_vector_field)    :: vectorField                !! defined here to avoid every step alloc and kill
     type(c_taylor)          :: theRDTs                    !!
@@ -748,12 +749,17 @@ contains
          print*, "Init orbit ", orbit
          call print(default,6)
        endif
-       
+
+       ! disable stochastic for closed orbit seach       
+       isstochastic = default%stochastic
+       default%stochastic = .false. 
        
        current=>my_ring%start
        !global_verbose = .true.
        call FIND_ORBIT_x(orbit,default,c_1d_8,fibre1=current)
        !global_verbose = .false.
+       
+       default%stochastic = isstochastic
        
        if ( .not. check_stable) then
           write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
@@ -2108,7 +2114,9 @@ contains
       integer     :: ind(10), i, mynres, order,rrr
       character(len=18):: nick
         
-        AscriptInPhasor=A_script_probe%x
+        dummyMap=A_script_probe%x
+        call c_canonise(dummyMap,AscriptInPhasor)
+        
         AscriptInPhasor=to_phasor() * AscriptInPhasor * from_phasor()
         call c_factor_map(AscriptInPhasor,dummyMap,vectorField,0) 
 

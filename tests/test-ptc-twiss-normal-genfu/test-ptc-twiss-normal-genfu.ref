@@ -347,13 +347,13 @@ h3000_re-hh3000_re =    1.834771152e-06 ;
 
   value, table(twissrdt,QF[2],GNFC_3_0_0_0_0_0);
 
-table( twissrdt qf [ 2  ]  gnfc_3_0_0_0_0_0 ) =   -0.0002366862262 ;
-  value, table(twissrdt,QF[2],GNFC_3_0_0_0_0_0);
+table( twissrdt qf [ 2  ]  gnfc_3_0_0_0_0_0 ) =    0.0008587662624 ;
+  value, table(twissrdt,QF[2],GNFS_3_0_0_0_0_0);
 
-table( twissrdt qf [ 2  ]  gnfc_3_0_0_0_0_0 ) =   -0.0002366862262 ;
-  value, table(twissrdt,QF[2],GNFC_3_0_0_0_0_0);
+table( twissrdt qf [ 2  ]  gnfs_3_0_0_0_0_0 ) =   -7.478208299e-05 ;
+  value, table(twissrdt,QF[2],GNFA_3_0_0_0_0_0);
 
-table( twissrdt qf [ 2  ]  gnfc_3_0_0_0_0_0 ) =   -0.0002366862262 ;
+table( twissrdt qf [ 2  ]  gnfa_3_0_0_0_0_0 ) =    0.0008620161561 ;
   
 
  ! to plot the RDTs

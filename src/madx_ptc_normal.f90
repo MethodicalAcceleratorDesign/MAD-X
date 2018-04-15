@@ -40,6 +40,7 @@ contains
     integer :: indexa(4)
     integer :: row_haml(101)
     integer :: index1(1000,2)
+    logical(lp)    :: isstochastic  !! tempurary veriable used in switching off stochastic in closed orbit search
     real(kind(1d0)) get_value,val_ptc,tmp
     character(len = 16) name_var
     type(probe_8) theTransferMap
@@ -110,7 +111,21 @@ contains
        x(6)=get_value('ptc_normal ','t ')
        x(5)=x(5)+get_value('ptc_normal ','pt ')
 
+       ! disable stochastic for closed orbit seach       
+       isstochastic = default%stochastic
+       default%stochastic = .false. 
+
        call find_orbit(my_ring,x,1,default,c_1d_7)
+
+       default%stochastic = isstochastic
+
+       if ( .not. check_stable) then
+          write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
+          call fort_warn('ptc_normal: ',whymsg(:len_trim(whymsg)))
+          call seterrorflag(10,"ptc_normal ",whymsg);
+          return
+       endif
+
        CALL write_closed_orbit(icase,x)
     endif
 

@@ -107,8 +107,8 @@ ptc_create_universe;
   
   ! the values at 2nd QF quad
   value, table(twissrdt,QF[2],GNFC_3_0_0_0_0_0);
-  value, table(twissrdt,QF[2],GNFC_3_0_0_0_0_0);
-  value, table(twissrdt,QF[2],GNFC_3_0_0_0_0_0);
+  value, table(twissrdt,QF[2],GNFS_3_0_0_0_0_0);
+  value, table(twissrdt,QF[2],GNFA_3_0_0_0_0_0);
   
  ! to plot the RDTs
  ! plot, colour=100,table=twissrdt, haxis=s,vaxis=gnfa_3_0_0_0_0_0,gnfc_3_0_0_0_0_0,gnfs_3_0_0_0_0_0;
