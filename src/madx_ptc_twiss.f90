@@ -2112,13 +2112,10 @@ contains
       complex(dp)   :: c_val
       real(dp)    :: im_val, re_val, d_val,  eps=1e-6
       integer     :: ind(10), i, mynres, order,rrr
-      type(c_damap) :: amap
       character(len=18):: nick
         
-        call alloc(amap)
-        amap=A_script_probe%x
-        call c_canonise(amap,AscriptInPhasor)
-        call kill(amap)
+        dummyMap=A_script_probe%x
+        call c_canonise(dummyMap,AscriptInPhasor)
         
         AscriptInPhasor=to_phasor() * AscriptInPhasor * from_phasor()
         call c_factor_map(AscriptInPhasor,dummyMap,vectorField,0) 
