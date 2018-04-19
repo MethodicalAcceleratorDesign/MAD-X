@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:35:13      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:02:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -270,6 +270,7 @@ parameter: energy   double value:                100
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
 ptc_create_layout,model=2,method=6,nst=10,exact;
 
  MAD-X Beam Parameters
@@ -282,13 +283,13 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
      method                   6
      Num. of steps           10
      charge           1.0000000000000000     
-  Length of machine:    534.59999999999991     
+  Length of machine:    534.59999999999957     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
+ After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
 ptc_align;
 
 
@@ -360,16 +361,16 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
                  0                  0                  0    0.0003260716069 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596346496e-06                  0                  0                  0 
+   2.596346497e-06                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                 -0    0.0002136648539                  0    3.396649362e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0    0.0003315824915 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0     5.31027159e-06                  0                 -0 
+                 0    5.310271591e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0    -0.000152545601                  0   -6.256318909e-06 
@@ -402,7 +403,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607158926246916E-004   2.5963462593228193E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    3.2607158926246932E-004   2.5963462593228163E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 
 x_end  = table(map_table,c1_000000,coef);
@@ -457,6 +458,7 @@ call, file = "../share/line_lattice/line.seq";
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
 ptc_create_layout,model=2,method=6,nst=10,exact;
 
  MAD-X Beam Parameters
@@ -469,13 +471,13 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
      method                   6
      Num. of steps           10
      charge           1.0000000000000000     
-  Length of machine:    534.59999999999991     
+  Length of machine:    534.59999999999957     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
+ After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
 ptc_align;
 
                                     
@@ -552,7 +554,7 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line;
           orbit_px            orbit_y           orbit_py           orbit_pt 
    2.596345499e-06                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                  0    0.0002136648272                  0    3.396648862e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
@@ -632,7 +634,7 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line.orbit0, ignore_
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                  0    0.0003246756919                  0    6.322659082e-06 
 
            pycorms             tcorms            ptcorms             xcomax 

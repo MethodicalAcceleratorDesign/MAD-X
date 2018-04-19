@@ -26,7 +26,7 @@ module polymorphic_complextaylor
   private cpmulsc,cpscmul,cpaddsc,cpscadd,cpsubsc,cpscsub ,cpdivsc,cpscdiv
   private div,cdivsc,cscdiv,ddivsc,dscdiv,divsc,scdiv,idivsc,iscdiv
   private POW,POWR,POWR8
-  private dexpt,dcost,dsint,dlogt,dsqrtt,abst
+  private dexpt,dcost,dsint,dlogt,dsqrtt,abst,CONJGT
   PRIVATE dimagt,drealt,dcmplxt,GETint,GETORDER,CUTORDER,getchar,GETCHARnd2,GETintnd2
   !
   private asscp
@@ -894,6 +894,9 @@ module polymorphic_complextaylor
      MODULE PROCEDURE polymorpht
   END INTERFACE
 
+  INTERFACE CONJG
+     MODULE PROCEDURE CONJGT
+  END INTERFACE
 
   ! i/o
 
@@ -1436,10 +1439,14 @@ contains
 
   END SUBROUTINE allocpolyn
 
-  SUBROUTINE  printpoly(S2,i)
+  SUBROUTINE  printpoly(S2,mf)
     implicit none
     type (double_complex),INTENT(INOUT)::S2
-    integer i,ipause,mypauses
+    integer ipause,mypauses
+    integer,optional :: mf
+    integer i
+    i=6
+    if(present(mf)) i=mf
 
     if(s2%kind/=0) then
 
@@ -1992,6 +1999,7 @@ contains
        ! call !write_e(0)
     end select
   END FUNCTION dcmplxt
+
 
   SUBROUTINE  complexEQUAL(S2,S1)
     implicit none
@@ -4162,7 +4170,8 @@ contains
        !w_p%fc='((1X,A72,/,1x,a72))'
        !w_p%fi='(1((1X,i4)))'
          write(6,*) " trouble in cpscmul"
-         write(6,*) "s1%kind "
+         write(6,*) "s1%kind ",s1%kind
+         read(5,*) localmaster
        !w_p=(/s1%kind/)
        ! call !write_e(0)
     end select
@@ -5198,6 +5207,44 @@ contains
        ! call !write_e(0)
     end select
   END FUNCTION dexpt
+
+  FUNCTION CONJGT( S1 )
+    implicit none
+    TYPE (double_complex) CONJGT
+    TYPE (double_complex), INTENT (IN) :: S1
+    integer localmaster
+
+    select case(s1%kind)
+    case(m1)
+       CONJGT%r=CONJG(s1%r)
+       CONJGT%kind=1
+    case(m2)
+       localmaster=master
+       call ass(CONJGT)
+       CONJGT%t= CONJG(s1%t)
+       master=localmaster
+    case(m3)
+       if(knob) then
+          localmaster=master
+          call ass(CONJGT)
+          call varck1(s1)
+          CONJGT%t= CONJG(varc1)
+          master=localmaster
+       else
+          CONJGT%r=CONJG(s1%r)
+          CONJGT%kind=1
+       endif
+    case default
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(1((1X,i4)))'
+         write(6,*) " trouble in CONJGT"
+         write(6,*) "s1%kind "
+       !w_p=(/s1%kind/)
+       ! call !write_e(0)
+    end select
+  END FUNCTION CONJGT
 
   FUNCTION dcost( S1 )
     implicit none

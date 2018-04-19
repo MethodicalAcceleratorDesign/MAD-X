@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:39:41      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:07:11      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -806,6 +806,7 @@ select, flag=twiss, column=name,s,beta11,beta22,alfa11,alfa22,mu1,mu2,disp1,disp
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
   ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
 
  MAD-X Beam Parameters
@@ -824,7 +825,7 @@ ptc_create_universe;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
+ After    end:    9.2703622556200571E-015   0.0000000000000000       -7.5495165674510645E-015
 
 
 
@@ -846,7 +847,7 @@ ptc_create_universe;
        78.54370266       0.1241077849           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.6258930446        2.838575748       0.8200596224 
+          -1000000      -0.6258930445        2.838575748       0.8200596224 
 
                 q2                dq1                dq2                 qs 
       0.7198292883       -2.176620133        -4.74110766                  0 
@@ -878,7 +879,7 @@ ptc_create_universe;
           orbit_px            orbit_y           orbit_py           orbit_pt 
    2.546139122e-09                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                 -0    1.168573391e-08                  0    3.059593852e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
@@ -944,7 +945,7 @@ ptc_create_universe;
           orbit_px            orbit_y           orbit_py           orbit_pt 
    2.546139617e-09                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                  0    1.168573429e-08                  0    3.059593993e-09 
 
            pycorms             tcorms            ptcorms             xcomax 

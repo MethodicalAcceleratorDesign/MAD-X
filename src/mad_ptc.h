@@ -38,6 +38,7 @@ void  pro_ptc_enforce6d(struct in_cmd*);
 void  pro_ptc_trackline(struct in_cmd*);
 void  ptc_putbeambeam(struct in_cmd*);
 
+
 void  augmentcountmomtabs(double* s);
 
 #endif // MAD_PTC_H

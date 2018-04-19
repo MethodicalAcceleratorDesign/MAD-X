@@ -12,7 +12,7 @@ module madx_keywords
   type(tree_element), private, allocatable :: t_e(:),t_ax(:),t_ay(:)
   real(dp), private :: a_(3),ent_(3,3), b_(3),exi_(3,3)
   logical :: old_name_vorname = .false.
-
+  logical :: readingmaps = .true.
   type keywords
      character*20 magnet
      character*20 model
@@ -177,6 +177,8 @@ contains
     SELECT CASE(magnet(1:IL))
     CASE("DRIFT          ")
        BLANK=DRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
+    CASE("SUPERDRIFT     ")
+       BLANK=SUPERDRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
     CASE("SOLENOID       ")
        if(sixtrack_compatible) stop 1
        if(KEY%LIST%L/=0.0_dp) then
@@ -294,20 +296,13 @@ contains
     CASE("PANCAKE        ")
        if(sixtrack_compatible) stop 13
        BLANK=pancake(KEY%LIST%NAME,KEY%LIST%file)
+    CASE("ABELL_DRAGT    ")
+       if(sixtrack_compatible) stop 13
+       BLANK=abell_dragt(KEY%LIST%NAME,LIST=KEY%LIST)
     CASE("INTERNALPANCAKE")
        if(sixtrack_compatible) stop 13
        BLANK=pancake(KEY%LIST%NAME,br=br)
-       !    CASE("TAYLORMAP      ")
-       !       IF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev/=' ') THEN
-       !          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE=KEY%LIST%file,FILE_REV=KEY%LIST%file_REV,t=tilt.is.KEY%tiltd)
-       !       ELSEIF(KEY%LIST%file/=' '.and.KEY%LIST%file_rev==' ') THEN
-       !          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE=KEY%LIST%file,t=tilt.is.KEY%tiltd)
-       !       ELSEIF(KEY%LIST%file==' '.and.KEY%LIST%file_rev/=' ') THEN
-       !          BLANK=TAYLOR_MAP(KEY%LIST%NAME,FILE_REV=KEY%LIST%file_REV,t=tilt.is.KEY%tiltd)
-       !       ELSE
-       !          BLANK=TAYLOR_MAP(KEY%LIST%NAME,t=tilt.is.KEY%tiltd)
-       !       ENDIF
-       ! BLANK%bend_fringe=key%list%bend_fringe
+
     CASE DEFAULT
        WRITE(6,*) " "
        WRITE(6,*) " THE MAGNET"
@@ -772,6 +767,7 @@ nmark=0
        WRITE(LINE,*) M%B_D,M%B_ANG,"  b_d, b_ang "
        WRITE(MF,'(A255)') LINE
        WRITE(MF,*) M%A_T,M%B_T,"  time patches a_t and b_t "
+       WRITE(MF,*) M%A_L,M%B_L,"  patch length patches a_t and b_t "
        WRITE(MF,*) " >>>>>>>>>>>>>>>>>>  END  <<<<<<<<<<<<<<<<<<"
     else
        WRITE(MF,*) " NO PATCH "
@@ -790,7 +786,9 @@ nmark=0
        READ(MF,*) M%A_X1,M%A_X2,M%B_X1,M%B_X2
        READ(MF,*) M%A_D,M%A_ANG
        READ(MF,*) M%B_D,M%B_ANG
-       READ(MF,*) M%A_T,M%B_T
+       READ(MF,*) M%A_T,M%B_T !M%A_L,M%B_L
+M%A_L=M%A_T
+M%B_L=M%B_T
        READ(MF,*) LINE
     endif
 
@@ -958,7 +956,7 @@ nmark=0
 
 
     call kanalnummer(mf)
-    open(unit=mf,file=filename)
+    open(unit=mf,file=filename,recl=200)
 
     nst=2*el%p%nst+1
 
@@ -1028,13 +1026,14 @@ nmark=0
   subroutine read_undu_R(el,mf)
     implicit none
     type(undu_R), pointer :: el
-    integer mf,n,i
+    integer mf,n,i,ne
     character*255 line
     real(dp) offset
 
     read(mf,'(a255)') line
     read(mf,*) n,offset
-    call INIT_SAGAN_POINTERS(EL,N)
+    ne=n
+    call POINTERS_W(EL,N,ne)
     el%offset=offset
     do i=1,n
        read(mf,*) el%a(i),el%f(i),EL%FORM(i),EL%K(1:3,i)
@@ -2060,7 +2059,7 @@ if(present(last)) fin=last
 !goto 1
 if(present(com)) comt=com
 call kanalnummer(mf)
-open(unit=mf,file=filename,position=comt) !comt could be append for a complex universe 
+open(unit=mf,file=filename,position=comt,recl=200) !comt could be append for a complex universe 
 
    write(mf,'(a120)') ring%name                        ! Sagan depedent line
    write(mf,*) highest_fringe  , " highest fringe "    !  Sagan depedent line DO NOT CHANGE
@@ -2312,7 +2311,7 @@ endif
 enddo
 
 call kanalnummer(mf)
-open(unit=mf,file=filename,position='APPEND')
+open(unit=mf,file=filename,position='APPEND',recl=200)
 write(MF,*) k, " siamese in the universe "
 
 
@@ -2539,7 +2538,7 @@ do while(.true.)
   read(mf,NML=patchname,end=999)    ! patch read if present
  endif
 
-if(ele0%slowac_recut_even_electric_MIS(5)) then
+if(ele0%recut_even_electric_MIS(4)) then
  call zero_CHART0
  read(mf,NML=CHARTname)  ! reading misalignment
 endif
@@ -2603,7 +2602,7 @@ ENDIF
        !s22%PATCH%patch=fib0%patch
       call patch_patch0(s22%patch,my_false)
     endif
-   if(ele0%slowac_recut_even_electric_MIS(5)) call CHART_CHART0(s22%chart,my_false)
+   if(ele0%recut_even_electric_MIS(4)) call CHART_CHART0(s22%chart,my_false)
 
 
 
@@ -2663,7 +2662,8 @@ end subroutine read_lattice
      read(mf,NML=sol50name)
     case(kind10)
       read(mf,NML=tp100name)
-
+    case(kindabell)
+      read(mf,NML=ab0name)
     case(kind16,kind20)
 
      read(mf,NML=k160name)
@@ -2749,6 +2749,8 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  patch0%B_ANG=f%B_ANG
  patch0%A_T=f%A_T
  patch0%B_T=f%B_T
+ patch0%A_L=f%A_L
+ patch0%B_L=f%B_L
  patch0%ENERGY=f%ENERGY
  patch0%TIME=f%TIME
  patch0%geometry=f%patch
@@ -2772,6 +2774,8 @@ f%B_X2= patch0%B_X2
  f%B_ANG=patch0%B_ANG
  f%A_T=patch0%A_T
  f%B_T=patch0%B_T
+ f%A_L=patch0%A_L
+ f%B_L=patch0%B_L
  f%ENERGY=patch0%ENERGY
  f%TIME=patch0%TIME
  f%patch=patch0%geometry
@@ -2911,12 +2915,14 @@ endif
  ele0%VOLT_FREQ_PHAS=0.0_dp
  ele0%B_SOL=0.0_dp
  
-   ele0%fint_hgap_h1_h2_va_vs(1)=f%fint
-   ele0%fint_hgap_h1_h2_va_vs(2)=f%hgap
-   ele0%fint_hgap_h1_h2_va_vs(3)=f%h1
-   ele0%fint_hgap_h1_h2_va_vs(4)=f%h2
-   ele0%fint_hgap_h1_h2_va_vs(5)=f%va
-   ele0%fint_hgap_h1_h2_va_vs(6)=f%vs
+   ele0%fint_hgap_h1_h2_va_vs(1)=f%fint(1)
+   ele0%fint_hgap_h1_h2_va_vs(2)=f%fint(2)
+   ele0%fint_hgap_h1_h2_va_vs(3)=f%hgap(1)
+   ele0%fint_hgap_h1_h2_va_vs(4)=f%hgap(2)
+   ele0%fint_hgap_h1_h2_va_vs(5)=f%h1
+   ele0%fint_hgap_h1_h2_va_vs(6)=f%h2
+   ele0%fint_hgap_h1_h2_va_vs(7)=f%va
+   ele0%fint_hgap_h1_h2_va_vs(8)=f%vs
 
 
    ele0%L=f%L
@@ -2928,19 +2934,23 @@ endif
  if(associated(f%THIN)) ele0%THIN=f%THIN
 
 
-ele0%slowac_recut_even_electric_MIS(1) = f%slow_ac
-ele0%slowac_recut_even_electric_MIS(2) = f%recut
-ele0%slowac_recut_even_electric_MIS(3) = f%even
-ele0%slowac_recut_even_electric_MIS(4) = f%electric
-ele0%slowac_recut_even_electric_MIS(5) = f%MIS
- ele0%usebf_skipptcbf_do1bf(1)=f%useb
- ele0%usebf_skipptcbf_do1bf(2)=f%usef 
- ele0%usebf_skipptcbf_do1bf(3)=f%skip_ptc_b 
- ele0%usebf_skipptcbf_do1bf(4)=f%skip_ptc_f 
- ele0%usebf_skipptcbf_do1bf(5)=f%do1mapb 
- ele0%usebf_skipptcbf_do1bf(6)=f%do1mapf
- ele0%filef=f%filef
- ele0%fileb=f%fileb
+ele0%slow_ac= f%slow_ac
+ele0%recut_even_electric_MIS(1) = f%recut
+ele0%recut_even_electric_MIS(2) = f%even
+ele0%recut_even_electric_MIS(3) = f%electric
+ele0%recut_even_electric_MIS(4) = f%MIS
+ ele0%usebf_do1bf(1)=f%useb
+ ele0%usebf_do1bf(2)=f%usef 
+ ele0%skipptcbf(1)=f%skip_ptc_b 
+ ele0%skipptcbf(2)=f%skip_ptc_f 
+ ele0%usebf_do1bf(3)=f%do1mapb 
+ ele0%usebf_do1bf(4)=f%do1mapf
+ ele0%filef=trim(f%filef)
+ ele0%fileb=TRIM(f%fileb)
+ 
+
+
+
 if(associated(f%forward)) then
 
   if(present(mf)) then
@@ -2950,7 +2960,6 @@ if(associated(f%forward)) then
  endif
 endif
 if(associated(f%backward)) then
- ele0%fileb=f%fileb
  if(present(mf)) then
    call kanalnummer(inf,f%fileb)
     call print_tree_elements(f%backward,inf)
@@ -2987,12 +2996,14 @@ if(f%p%nmul>0) then
  f%bn(1:f%p%nmul)=ele0%bn(1:f%p%nmul)
 endif
 
-f%fint= ele0%fint_hgap_h1_h2_va_vs(1)
-f%hgap= ele0%fint_hgap_h1_h2_va_vs(2)
-f%h1  = ele0%fint_hgap_h1_h2_va_vs(3)
-f%h2  = ele0%fint_hgap_h1_h2_va_vs(4)
-f%va  = ele0%fint_hgap_h1_h2_va_vs(5)
-f%vs  = ele0%fint_hgap_h1_h2_va_vs(6)
+f%fint(1)= ele0%fint_hgap_h1_h2_va_vs(1)
+f%fint(2)=ele0%fint_hgap_h1_h2_va_vs(2)
+f%hgap(1)= ele0%fint_hgap_h1_h2_va_vs(3)
+f%hgap(2)= ele0%fint_hgap_h1_h2_va_vs(4)
+f%h1  = ele0%fint_hgap_h1_h2_va_vs(5)
+f%h2  = ele0%fint_hgap_h1_h2_va_vs(6)
+f%va  = ele0%fint_hgap_h1_h2_va_vs(7)
+f%vs  = ele0%fint_hgap_h1_h2_va_vs(8)
 
 
 if(f%kind==kind4.or.f%kind==kind21) then ! cavities
@@ -3020,26 +3031,28 @@ endif
        f%PHAS=ele0%VOLT_FREQ_PHAS(3)
     endif
 
- f%slow_ac = ele0%slowac_recut_even_electric_MIS(1)
- f%recut = ele0%slowac_recut_even_electric_MIS(2)
- f%even = ele0%slowac_recut_even_electric_MIS(3)
- f%electric = ele0%slowac_recut_even_electric_MIS(4)
- f%MIS = ele0%slowac_recut_even_electric_MIS(5)
+ f%slow_ac = ele0%slow_ac
+ f%recut = ele0%recut_even_electric_MIS(1)
+ f%even = ele0%recut_even_electric_MIS(2)
+ f%electric = ele0%recut_even_electric_MIS(3)
+ f%MIS = ele0%recut_even_electric_MIS(4)
  solve_electric=f%electric
    F%L=ele0%L
 
 
 
+!     logical(lp) usebf_do1bf(4)!
+!	 integer skipptcbf(2)
 
-
- f%useb=ele0%usebf_skipptcbf_do1bf(1)
- f%usef=ele0%usebf_skipptcbf_do1bf(2)
- f%skip_ptc_b=ele0%usebf_skipptcbf_do1bf(3)
- f%skip_ptc_f=ele0%usebf_skipptcbf_do1bf(4)
- f%do1mapb=ele0%usebf_skipptcbf_do1bf(5) 
- f%do1mapf=ele0%usebf_skipptcbf_do1bf(6)
-
-if(ele0%filef/=' ') then
+ f%useb=ele0%usebf_do1bf(1)
+ f%usef=ele0%usebf_do1bf(2)
+ f%skip_ptc_b=ele0%skipptcbf(1)
+ f%skip_ptc_f=ele0%skipptcbf(2)
+ f%do1mapb=ele0%usebf_do1bf(3) 
+ f%do1mapf=ele0%usebf_do1bf(4)
+ f%fileb= ele0%fileb
+ f%filef= ele0%filef
+if(ele0%filef/=' '.and.readingmaps) then
  if(.not.associated(f%forward)) then 
   allocate(f%forward(3))
  endif
@@ -3056,7 +3069,7 @@ if(ele0%filef/=' ') then
 close(inf)
 endif
 
-if(ele0%fileb/=' ') then
+if(ele0%fileb/=' '.and.readingmaps) then
  if(.not.associated(f%backward)) then 
   allocate(f%backward(3))
  endif
@@ -3104,6 +3117,8 @@ end subroutine el_el0
         call sol5_sol50(EL,dir,mf)
     case(kind10)
         call tp10_tp100(EL,dir,mf)
+    case(kindabell)
+        call ab_ab0(EL,dir,mf)
 
     case(kind16,kind20)
         call k16_k160(EL,dir,mf)
@@ -3220,25 +3235,51 @@ implicit none
 type(element), target :: f
 logical(lp),optional ::  dir
 integer,optional :: mf
-integer n
-
+integer n,ne
+n=0
+ne=0
 if(present(dir)) then
 if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
 
- wig0%n=size(f%wi%w%a)
- n=wig0%n
+
  wig0%internal=F%wi%internal
  wig0%offset=F%wi%w%offset
+ wig0%ex=f%wi%w%ex
+ wig0%ey=f%wi%w%ey
+wig0%n=0
+ if(associated(f%wi%w%a)) wig0%n=size(f%wi%w%a)
+ n=wig0%n
 wig0%a=0.0_dp
 wig0%f=0.0_dp
 wig0%form=0.0_dp
 wig0%k=0.0_dp
-wig0%a(1:n)=f%wi%w%a(1:n)
-wig0%f(1:n)=f%wi%w%f(1:n)
-wig0%form(1:n)=f%wi%w%form(1:n)
-wig0%k(1:3,1:n)=f%wi%w%k(1:3,1:n)
-wig0%ex=f%wi%w%ex
-wig0%ey=f%wi%w%ey
+if(n>0) then
+ wig0%a(1:n)=f%wi%w%a(1:n)
+ wig0%f(1:n)=f%wi%w%f(1:n)
+ wig0%form(1:n)=f%wi%w%form(1:n)
+ wig0%k(1:3,1:n)=f%wi%w%k(1:3,1:n)
+else
+ wig0%a(1:n)=0
+ wig0%f(1:n)=0
+ wig0%form(1:n)=0
+ wig0%k(1:3,1:n)=0
+endif
+
+wig0%ne=0
+ if(associated(f%wi%w%ae)) wig0%ne=size(f%wi%w%ae)
+ ne=wig0%ne
+if(ne>0) then
+ wig0%ae(1:ne)=f%wi%w%ae(1:ne)
+ wig0%fe(1:ne)=f%wi%w%fe(1:ne)
+ wig0%forme(1:ne)=f%wi%w%forme(1:ne)
+ wig0%ke(1:3,1:ne)=f%wi%w%ke(1:3,1:ne)
+else
+ wig0%ae(1:ne)=0
+ wig0%fe(1:ne)=0
+ wig0%forme(1:ne)=0
+ wig0%ke(1:3,1:ne)=0
+endif
+
     if(present(mf)) then
      write(mf,NML=wigname)
     endif   
@@ -3250,15 +3291,27 @@ wig0%ey=f%wi%w%ey
     if(.not.associated(f%wi%internal)) allocate(f%wi%internal(6))
   F%wi%internal=wig0%internal 
   N=wig0%N
-    call INIT_SAGAN_POINTERS(f%wi%w,N)
+  ne=wig0%Ne
+
+    call pointers_w(f%wi%w,N,ne)
 
  F%wi%w%offset=wig0%offset
+ F%wi%w%ex=wig0%ex
+ F%wi%w%ey=wig0%ey
+
+if(n>0) then
  F%wi%w%a(1:N)=wig0%a(1:N)
  F%wi%w%f(1:N)=wig0%f(1:N)
  F%wi%w%form(1:N)=wig0%form(1:N)
  F%wi%w%k(1:3,1:N)=wig0%k(1:3,1:N)
- F%wi%w%ex=wig0%ex
- F%wi%w%ey=wig0%ey
+endif
+
+if(ne>0) then
+ F%wi%w%ae(1:Ne)=wig0%ae(1:Ne)
+ F%wi%w%fe(1:Ne)=wig0%fe(1:Ne)
+ F%wi%w%forme(1:Ne)=wig0%forme(1:Ne)
+ F%wi%w%ke(1:3,1:Ne)=wig0%ke(1:3,1:Ne)
+endif
 
 endif
 endif
@@ -3427,6 +3480,75 @@ endif
 endif
 end subroutine tp10_tp100
 
+
+subroutine  ab_ab0(f,dir,mf)
+implicit none
+type(element), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+ 
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+
+ ab0%N_m=0 
+ ab0%dz_t_te=0 
+ ab0%b=0 
+ ab0%e=0 
+ ab0%scale_angc_xc_vc_dc_hc=0 
+ 
+ ab0%n_m(1)= F%ab%n
+ ab0%n_m(2)= F%ab%m
+ ab0%b(1:ab0%n_m(2) ,1:ab0%n_m(2))= F%ab%b
+ ab0%dz_t_te(2*ab0%n_m(2)+3:3*ab0%n_m(2)+3)=F%ab%te
+ab0%dz_t_te(ab0%n_m(2)+2:2*ab0%n_m(2)+2)= F%ab%t
+ab0%dz_t_te(1:ab0%n_m(2)+1)= F%ab%dz
+ab0%scale_angc_xc_vc_dc_hc(1)=F%ab%SCALE 
+ ab0%scale_angc_xc_vc_dc_hc(2)=F%ab%angc
+ ab0%scale_angc_xc_vc_dc_hc(3)=F%ab%xc
+ ab0%scale_angc_xc_vc_dc_hc(4)=F%ab%vc
+ ab0%scale_angc_xc_vc_dc_hc(5)=F%ab%dc
+ ab0%scale_angc_xc_vc_dc_hc(6)=F%ab%hc
+ 
+
+! if(f%electric) then
+!  tp100%ae(1:size(F%tp10%ae))=F%tp10%ae
+!  tp100%be(1:size(F%tp10%be))=F%tp10%be
+! endif
+
+     if(present(mf)) then
+     write(mf,NML=ab0name)
+    endif   
+ 
+ else
+    if(present(mf)) then
+     read(mf,NML=ab0name)
+    endif  
+   n_abell=ab0%n_m(1) 
+   m_abell=ab0%n_m(2)
+   CALL SETFAMILY(f)
+ !if(f%electric) then
+ ! F%tp10%ae=tp100%ae(1:sector_nmul_max) 
+ ! F%tp10%be=tp100%be(1:sector_nmul_max)
+ ! call GETAEBE(f%TP10)
+ !endif
+ F%ab%n=ab0%n_m(1) 
+ F%ab%m=ab0%n_m(2) 
+ F%ab%b=ab0%b(1:ab0%n_m(2) ,1:ab0%n_m(2))
+ F%ab%te=ab0%dz_t_te(2*ab0%n_m(2)+3:3*ab0%n_m(2)+3)
+ F%ab%t=ab0%dz_t_te(ab0%n_m(2)+2:2*ab0%n_m(2)+2)
+ F%ab%dz=ab0%dz_t_te(1:ab0%n_m(2)+1)
+F%ab%SCALE= ab0%scale_angc_xc_vc_dc_hc(1)
+F%ab%angc= ab0%scale_angc_xc_vc_dc_hc(2)
+F%ab%xc= ab0%scale_angc_xc_vc_dc_hc(3)
+F%ab%vc= ab0%scale_angc_xc_vc_dc_hc(4)
+F%ab%dc= ab0%scale_angc_xc_vc_dc_hc(5)
+F%ab%hc= ab0%scale_angc_xc_vc_dc_hc(6)
+ 
+endif
+endif
+end subroutine ab_ab0
+
 subroutine  k16_k160(f,dir,mf)
 implicit none
 type(element), target :: f
@@ -3550,8 +3672,7 @@ comt='REWIND'
 if(present(com)) comt=com
 
 call kanalnummer(mf)
-open(unit=mf,file=filename,position=comt)
-
+open(unit=mf,file=filename,position=comt,recl=4000)
 
 call TIE_MAD_UNIVERSE(ud)
 
@@ -3863,10 +3984,16 @@ implicit none
     ele0%VOLT_FREQ_PHAS=0
     ele0%THIN=.false. 
     ele0%fint_hgap_h1_h2_va_vs=0
-	ele0%slowac_recut_even_electric_MIS=.false.
-    ele0%usebf_skipptcbf_do1bf=.false.
+	ele0%recut_even_electric_MIS=.false.
+    ele0%slow_ac=0
+    ele0%usebf_do1bf=.false.
+    ele0%skipptcbf=0
     ele0%filef=' '
     ele0%fileb=' '
+
+
+!     logical(lp) usebf_do1bf(4)!
+!	 integer skipptcbf(2)
 
 end subroutine zero_ele0
 
@@ -3908,6 +4035,8 @@ implicit none
      patch0%B_ANG=0 
      patch0%A_T=0
      patch0%B_T=0
+     patch0%A_L=0
+     patch0%B_L=0
      patch0%ENERGY=0
      patch0%TIME=0
      patch0%GEOMETRY=0

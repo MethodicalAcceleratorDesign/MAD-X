@@ -45,10 +45,9 @@ ptc_create_universe;
   !!!!!       T I M E   T R U E ,   T O T P A T H  F A L S E
   ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
 
-
+  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal, writetmap, trackrdts;
   
-  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal, writetmap;
-  
+  write, table="twissrdt",file="twissrdt.tfs";
   write, table=twiss, file="ptc.twiss";
   write, table=ptc_twiss_summary, file="ptc.summ.twiss";
   write, table=nonlin, file="ptc.nonlin";
@@ -105,6 +104,14 @@ ptc_create_universe;
   hh3000_re = table(nonlin, HAMC_3_0_0_0_0_0, value);
   value, h3000_re, hh3000_re, h3000_re - hh3000_re;
 
-
+  
+  ! the values at 2nd QF quad
+  value, table(twissrdt,QF[2],GNFC_3_0_0_0_0_0);
+  value, table(twissrdt,QF[2],GNFS_3_0_0_0_0_0);
+  value, table(twissrdt,QF[2],GNFA_3_0_0_0_0_0);
+  
+ ! to plot the RDTs
+ ! plot, colour=100,table=twissrdt, haxis=s,vaxis=gnfa_3_0_0_0_0_0,gnfc_3_0_0_0_0_0,gnfs_3_0_0_0_0_0;
+  
 ptc_end;
 

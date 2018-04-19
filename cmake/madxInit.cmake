@@ -9,11 +9,14 @@
 
 if ( MADX_FORCE_32 OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4 )
     set(IS32BIT TRUE)
+    set(ARCH 32)
 elseif (${CMAKE_SIZEOF_VOID_P} EQUAL 8)
     set(IS32BIT FALSE)
+    set(ARCH 64)
 else()
     message(WARNING "Could not determine 32/64bit, assuming 32bit")
     set(IS32BIT TRUE)
+    set(ARCH 32)
 endif()
 
 # project version
@@ -34,13 +37,6 @@ string(REGEX REPLACE "VERSION_DATE += *" "" VERSION_DATE  ${VERSION_DATE})
 message(STATUS "Mad-X version: ${MADX_VERSION}")
 message(STATUS "Version num: ${VERSION_NUM}")
 message(STATUS "Version date: ${VERSION_DATE}")
-
-# Append _dev/-dev to binary/package name
-if(NOT MADX_PATCH_LEVEL EQUAL 00)
-    message(STATUS "Building a development version")
-    set (BINARY_POSTFIX "_dev")
-    set (PKG_POSTFIX "-dev")
-endif()
 
 # add 32 to the name for 32bit binaries..
 if(IS32BIT)

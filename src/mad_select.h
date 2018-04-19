@@ -18,9 +18,10 @@ struct element;
 
 void  store_select(struct in_cmd*);
 void  store_deselect(struct in_cmd*);
-int   pass_select(char* name, struct command*);             // deprecated
-int   pass_select_list(char* name, struct command_list*);   // deprecated
+int   pass_select(const char* name, struct command*);                   // deprecated
+int   pass_select_str(const char* name, struct command*);               // not for elements!
 int   pass_select_el(struct element* el, struct command*);
+int   pass_select_list_str(const char* name, struct command_list*);     // not for elements!
 int   pass_select_list_el(struct element* el, struct command_list*);
 void  get_select_t_ranges(struct command_list* select, struct command_list* deselect, struct table*);
 int   get_select_ranges(struct sequence* sequ, struct command_list* select, struct node_list* s_ranges);

@@ -264,7 +264,6 @@ struct object
 /*#define FIELD_MAX 40*/        /* field error array length */
 #define KEY_LENGTH 48       /* from DOOM */
 #define MM_KEEP 2           /* no. of element name starts to keep */
-#define N_TYPES 39          /* no. of valid element types */
 #define MULTI_MAX 24        /* element array length for multipoles */
 #define NT34 5              /* no. of element types in special fort.34 */
 #define LINES_MAX 3         /* structure output line max. names */
@@ -382,8 +381,6 @@ static int my_table_row(struct table*, char*);
 /* routines used from makethin.c */
 static struct li_list types;
 
-static struct type_info* t_info[N_TYPES];
-
 static struct block   *first_block; //, *last_block; not used
 static struct block*   prev_block;
 static struct block*   current_block = NULL;
@@ -401,7 +398,7 @@ static struct object *p_err_zero;  /* pointer to error object with all zeroes */
 
 static int last_row = 0;
 
-static char el_info[N_TYPES][60] = /* see type_info definition */
+static char el_info[][60] = /* see type_info definition */
 /*           l=0 l>0,normal l>0,skew ->drift make_k*l split */
 {"aperture     2       2       2       0       0       0",
  "beambeam     2       2       2       0       0       0",
@@ -411,7 +408,6 @@ static char el_info[N_TYPES][60] = /* see type_info definition */
  "decapole     2       2       2       0       1       2",
  "ecollimator  2       1       1       0       0       0",
  "elseparator  0       1       1       1       0       0",
- "gbend        1       1       1       2       1       1",
  "hkicker      5       5       5       1       0       3",
  "hmonitor     0       1       1       1       0       0",
  "instrument   0       1       1       1       0       0",
@@ -443,6 +439,11 @@ static char el_info[N_TYPES][60] = /* see type_info definition */
  "rfsextupole  2       0       2       0       0       2",
  "rfoctupole   2       0       2       0       0       2"
 };
+
+/* no. of valid element types */
+enum { N_TYPES = sizeof el_info / sizeof *el_info };
+
+static struct type_info* t_info[N_TYPES];
 
 static char mpole_names[][16] = {"dipole", "quadrupole", "sextupole",
                           "octupole", "decapole", "multipole"};
@@ -649,8 +650,8 @@ assign_att(void)
 static void
 att_aperture(struct c6t_element* el)
 {
-  el->out_1 = 3;
-  el->out_2 = 1e-8;
+  el->out_1 = 0;
+  el->out_2 = 0.0;
   el->out_3 = 0.0;
   el->out_4 = 0.0;
 }
@@ -666,8 +667,8 @@ att_beambeam(struct c6t_element* el)
     warning("c6t: beambeam element not found in twiss table","");
   }
   el->out_1 = 20;
-  el->out_2 = c1p3*(el->value[12] - beamx);
-  el->out_3 = c1p3*(el->value[13] - beamy);
+  el->out_2 = - c1p3*(el->value[12] - beamx);
+  el->out_3 = - c1p3*(el->value[13] - beamy);
   el->out_4 = el->value[16];
   el->out_5 = pow(c1p3*el->value[14], 2);
   el->out_6 = pow(c1p3*el->value[15], 2);
@@ -2310,7 +2311,7 @@ pre_multipole(struct c6t_element* el) /* pre-process multipoles */
     if (++last_nzero > el->nf_err)
     {
       if (el->p_fd_err != NULL) strcpy(tmp_name, el->p_fd_err->key);
-      else  sprintf(tmp_name,"%s_arfa", el->name);
+      else  snprintf(tmp_name, sizeof tmp_name, "%.42s_arfa", el->name);
       el->nf_err = last_nzero;
       el->p_fd_err = make_obj(tmp_name, 0, el->nf_err, 0, 0);
     }
@@ -2358,7 +2359,7 @@ pro_elem(struct node* cnode)
   current_element->occ_cnt = cnode->occ_cnt;
   if (cnode->occ_cnt > 1)  /* add occurence count to name */
   {
-    sprintf(t_key, "%s+%d", current_element->name,cnode->occ_cnt);
+    snprintf(t_key, sizeof t_key, "%.45s+%d", current_element->name,cnode->occ_cnt);
     strcpy(current_element->name, t_key);
   }
   current_element->position = cnode->position;
@@ -2780,7 +2781,7 @@ static void write_rfmultipole(struct c6t_element* el)
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[0])>eps_9) {
-    double lag = 0.25-el->value[19];
+    double lag = -0.25-el->value[19];
     double pc0 = get_value("beam", "pc"); // GeV/c
     el->out_1 = -23; // ID
     el->out_2 = ksl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
@@ -3115,8 +3116,15 @@ write_f3_aux(void)
 static void
 write_f3_matrix(void)
 {
-  int i, i_max = 43;
+  int i, i_max = 43, dim=6;
   current_element = first_in_sequ;
+  
+  
+  double beta, value;
+
+ 
+  beta= get_value("beam ","beta ");
+ 
   if (!f3) f3 = fopen("fc.3", "w");
 
   while (current_element != NULL)
@@ -3125,9 +3133,26 @@ write_f3_matrix(void)
     {
       fprintf(f3,"TROM\n");
       fprintf(f3,"%-16s\n",current_element->name);
-
+    
       for (i = 1; i < i_max; i++) {
-        fprintf(f3,"%23.15e", current_element->value[i]);
+        value=current_element->value[i];
+        // The if statemenst are to go from pt to psigma and from t to sigma.     
+        if((i+1)%dim==0){
+          value=value/beta;
+        }
+        if(i%dim==0){
+          value=value*beta;
+        }
+        if(i>(dim+24) && i <(31+dim)){
+          value = value*beta;
+        }
+        if(i>(dim+30) && i < (37+dim)){
+          value = value/beta;
+        }
+        
+    
+
+        fprintf(f3,"%23.15e", value);
         if (i%3 == 0) fprintf(f3,"\n");
       }
 
@@ -3277,7 +3302,7 @@ write_struct(void)
     {
       fprintf(f2,"\n"); lc = 1;
     }
-    fprintf(f2, "%-18s", name);
+    fprintf(f2, "%-17s ", name);
     p = p->next;
   }
   if (lc > 0)

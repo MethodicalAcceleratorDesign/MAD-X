@@ -14,9 +14,11 @@ module madx_ptc_intstate_module
   public                            :: getenforce6D
   public                            :: setenforce6D
   public                            :: ptc_setdebuglevel
+  public                            :: ptc_setseed
   public                            :: ptc_setaccel_method
   public                            :: ptc_setexactmis
   public                            :: ptc_setradiation
+  public                            :: ptc_setmodulation
   public                            :: ptc_settotalpath
   public                            :: ptc_settime
   public                            :: ptc_setnocavity
@@ -121,6 +123,22 @@ contains
   end subroutine ptc_setdebuglevel
   !____________________________________________________________________________________________
 
+
+  subroutine ptc_setseed(seed)
+    USE gauss_dis
+    implicit none
+    integer     :: seed
+
+    if (getdebug() > 0) then
+        print *, "Setting seed to", seed
+    end if
+    
+     CALL gaussian_seed(seed)
+
+  end subroutine ptc_setseed
+
+  !____________________________________________________________________________________________
+
   subroutine setenforce6D(flag)
     implicit none
     integer     :: flag
@@ -206,6 +224,28 @@ contains
     call update_states
     if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setradiation
+  !____________________________________________________________________________________________
+
+  subroutine ptc_setmodulation(flag)
+    implicit none
+    integer    :: flag
+
+
+    if (flag == 1) then
+       if (getdebug() > 1) then
+           print *, "Switching ON modulation"
+       end if
+       intstate = intstate + modulation0 
+    else
+       if (getdebug() > 1) then
+           print *, "Switching OFF modulation"
+       end if
+       intstate = intstate - modulation0 
+    endif
+    default = intstate
+    call update_states
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
+  end subroutine ptc_setmodulation
   !____________________________________________________________________________________________
 
   subroutine ptc_setstochastic(flag)

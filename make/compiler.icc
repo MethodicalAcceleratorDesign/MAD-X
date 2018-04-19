@@ -42,7 +42,7 @@ CDEP = $(CC) -MM
 # compiler
 #
 
-CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -Wcheck -Wp64 -c
+CFLAGS = -std=c99 -m$(ARCH) -O$(NOPT) -Wall -Wcheck -Wp64 -c
 
 #
 # diagnostics
@@ -94,7 +94,7 @@ CXXDEP = $(CXX) -MM
 # compiler
 #
 
-CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++98 -Wall -Wcheck -Wp64 -c
+CXXFLAGS = -std=c++11 -m$(ARCH) -O$(NOPT) -Wall -Wcheck -Wp64 -c
 
 #
 # diagnostics

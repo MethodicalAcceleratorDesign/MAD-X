@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:34:54      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.02.08 16:39:53      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test case for coupling calculations
 
@@ -229,6 +229,7 @@ use, period=t_insertion.a;
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
 ptc_create_layout,model=2,method=6,nst=1,exact;
 
  MAD-X Beam Parameters
@@ -284,7 +285,7 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
           -1000000    4.357163553e-05        151.4823115       0.3113833114 
 
                 q2                dq1                dq2                 qs 
-       0.811467693      -0.8460403322      -0.8505154212                  0 
+       0.811467693      -0.8460403281      -0.8505154254                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
     0.006027089961        15.30834683     0.006336267376        27.21066157 
@@ -313,8 +314,8 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
-                -0                  0                  0                  0 
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0                  0                  0                  0 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0                  0 

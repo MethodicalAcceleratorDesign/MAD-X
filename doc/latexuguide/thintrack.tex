@@ -184,6 +184,7 @@ The attributes of the TRACK command are:
   respect to the reference orbit. \\  
   With \texttt{ONEPASS=false}, the closed orbit is calculated and the particle
   coordinates are given with respect to the closed orbit coordinates.\\
+  This flag affects the behavior of the \hyperref[sec:option]{\texttt{BBORBIT}} flag. \\
   The name of this attribute is misleading but was kept for backwards
   compatibility.  \\ 
   (Default:~false)
@@ -192,7 +193,10 @@ The attributes of the TRACK command are:
   and flag \texttt{RADIATE} in the \texttt{BEAM} command). \\ (Default:~false)
 
   \ttitem{QUANTUM} flag to introduce quantum excitation via random
-  number generator and tables for photon emission. \\ (Default:~false)
+  number generator and tables look-up (\texttt{SYNRAD} $=1$, see ref. \cite{roy1990}) or polynomial
+  interpolation (\texttt{SYNRAD} $=2$, see ref. \cite{hbu2007}) for photon emission.
+  The choice of the generator can be selected via the command
+  \hyperref[sec:option]{\texttt{OPTION}} attribute \texttt{SYNRAD}. \\ (Default:~2)
 
   \ttitem{SEED} If \texttt{QUANTUM} is true, it selects a particular sequence of random values. 
 A \texttt{SEED} value is an integer in the range [0...999999999] (default:
@@ -428,6 +432,9 @@ The \texttt{RUN} command has three attributes:
    \texttt{FFILE=n} will print coordinates every n-th turn only. 
 
    \ttitem{KEEPTRACK} a logical flag to keep data from previous tracking and append new results to tables. (Default:~false)
+
+   \ttitem{TRACK\_HARMON} is used to calculate the maximum time difference before a particle is considered lost ($t_{max}$). 
+    $t_{max} =\frac{C}{h_{track}*\beta}$ where $h_{track}$=TRACK\_HARMON and $C$ is the total length of the machine.  (Default: 1)
 \end{madlist}
 
 

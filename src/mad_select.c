@@ -62,7 +62,7 @@ fetch_node_select(struct select_iter* it, struct node** node, struct sequence** 
       it->range_end = it->sequ->ex_end;
     }
 
-    if (!it->node && it->sequs && it->i_seq != it->sequs->curr) {
+    if (!it->node && it->sequs && 1+it->i_seq < it->sequs->curr) {
       it->sequ = it->sequs->sequs[++it->i_seq];
       continue;
     }
@@ -99,62 +99,63 @@ get_select_ex_ranges(struct sequence* sequ, struct command_list* select, struct 
 
 // public interface
 
+static int _pass_select_pat(const char* name, struct command* sc);
+
 int
-pass_select(char* name, struct command* sc)
+pass_select(const char* name, struct command* sc)
   /* checks name against class (if element) and pattern that may
      (but need not) be contained in command sc;
      0: does not pass, 1: passes */
   /* Don't use for selecting elements. It may not find all elements. */
 {
   struct element* el = find_element(strip(name), element_list);
-  return pass_select_el(el, sc);
+  return el ? pass_select_el(el, sc) : pass_select_str(name, sc);
 }
-
 
 int
 pass_select_el(struct element* el, struct command* sc)
-  /* checks name against class (if element) and pattern that may
+  /* checks element against class and pattern that may
      (but need not) be contained in command sc;
      0: does not pass, 1: passes */
   /* Should use this function in favor of `pass_select` where possible. It
      works for all elements and is faster if knowing the element in advance. */
 {
-  struct name_list* nl = sc->par_names;
-  struct command_parameter_list* pl = sc->par;
-  int pos, in = 0, any = 0;
-  char *class, *pattern;
+  char* class = command_par_string_user("class", sc);
+  if (class && !belongs_to_class(el, class))
+    return 0;
+  return _pass_select_pat(el->name, sc);
+}
 
-  pos = name_list_pos("class", nl);
-  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-  {
-    if (el != NULL)
-    {
-      class = pl->parameters[pos]->string;
-      in = belongs_to_class(el, class);
-      if (in == 0) return 0;
-    }
-  }
-  any = in = 0;
-  pos = name_list_pos("pattern", nl);
-  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-  {
-    any = 1;
-    pattern = stolower(pl->parameters[pos]->string);
-    if(myregex(pattern, strip(el->name)) == 0)  in = 1;
-  }
-  if (any == 0) return 1;
-  else return in;
+int pass_select_str(const char* name, struct command* sc)
+{
+  /* checks name against pattern that may
+     (but need not) be contained in command sc;
+     considers only SELECT commands *without CLASS*!
+     0: does not pass, 1: passes */
+  // if the command has CLASS attribute, it is supposed to match elements:
+  if (par_present("class", sc))  /* parameter has been read */
+    return 0;
+  return _pass_select_pat(name, sc);
+}
+
+int _pass_select_pat(const char* name, struct command* sc)
+  /* used internally. */
+{
+  char* pattern = command_par_string_user("pattern", sc);
+  return !pattern || myregex(stolower(pattern), strip(name)) == 0;
 }
 
 int
-pass_select_list(char* name, struct command_list* cl)
+pass_select_list_str(const char* name, struct command_list* cl)
   /* returns 0 (does not pass) or 1 (passes) for a list of selects */
-  /* Don't use for selecting elements. It may not find all elements. */
+  /* Don't use for selecting elements! It may not find all elements. */
 {
-  struct element* el = find_element(strip(name), element_list);
-  return pass_select_list_el(el, cl);
+  for (int i = 0; i < cl->curr; i++) {
+    if (pass_select_str(name, cl->commands[i]))
+        return 1;
+  }
+  return cl->curr == 0;
 }
-
 
 int
 pass_select_list_el(struct element* el, struct command_list* cl)
@@ -162,34 +163,26 @@ pass_select_list_el(struct element* el, struct command_list* cl)
   /* Should use this function in favor of `pass_select_list` where possible. It
      works for all elements and is faster if knowing the element in advance. */
 {
-  int i, ret = 0;
-  if (cl->curr == 0)  return 1;
-  for (i = 0; i < cl->curr; i++)
-  {
-    if ((ret = pass_select_el(el, cl->commands[i]))) break;
+  for (int i = 0; i < cl->curr; i++) {
+    if (pass_select_el(el, cl->commands[i]))
+        return 1;
   }
-  return ret;
+  return cl->curr == 0;
 }
 
 int
 get_select_ranges(struct sequence* sequ, struct command_list* select, struct node_list* s_ranges)
   /* makes a list of nodes of a sequence that pass the range selection */
 {
-  struct name_list* nl;
-  struct command_parameter_list* pl;
   char* name;
   char full_range[] = "#s/#e";
-  int i, pos; //, k // not used
+  int i; //, k // not used
   struct node* c_node;
   struct node* nodes[2];
   for (i = 0; i < select->curr; i++)
   {
-    nl = select->commands[i]->par_names;
-    pl = select->commands[i]->par;
-    pos = name_list_pos("range", nl);
-    if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-      name = pl->parameters[pos]->string;
-    else name = full_range;
+    name = command_par_string_user("range", select->commands[i]);
+    if (!name) name = full_range;
     if (get_range(name, sequ, nodes) > 0) // (k = not used
     {
       c_node = nodes[0];
@@ -210,19 +203,15 @@ get_select_t_ranges(struct command_list* select, struct command_list* deselect, 
      subsequent deselection */
 {
   int rows[2];
-  struct name_list* nl;
-  struct command_parameter_list* pl;
-  int i, pos;
+  int i;
   s_range->curr = 0; e_range->curr = 0;
   if (select != NULL)
   {
     for (i = 0; i < select->curr; i++)
     {
-      nl = select->commands[i]->par_names;
-      pl = select->commands[i]->par;
-      pos = name_list_pos("range", nl);
-      if (pos > -1 && nl->inform[pos]  /* parameter has been read */
-          && get_table_range(pl->parameters[pos]->string, t, rows)
+      const char* range = command_par_string_user("range", select->commands[i]);
+      if (range
+          && get_table_range(range, t, rows)
           && (rows[0] <= rows[1]))
       {
         if (s_range->max == s_range->curr) grow_int_array(s_range);
@@ -243,11 +232,9 @@ get_select_t_ranges(struct command_list* select, struct command_list* deselect, 
   {
     for (i = 0; i < deselect->curr; i++)
     {
-      nl = deselect->commands[i]->par_names;
-      pl = deselect->commands[i]->par;
-      pos = name_list_pos("range", nl);
-      if (pos > -1 && nl->inform[pos]  /* parameter has been read */
-          && get_table_range(pl->parameters[pos]->string, t, rows)
+      const char* range = command_par_string_user("range", deselect->commands[i]);
+      if (range
+          && get_table_range(range, t, rows)
           && (rows[0] <= rows[1]))
       {
         if (sd_range->max == sd_range->curr) grow_int_array(sd_range);
@@ -352,18 +339,12 @@ get_range(const char* range, struct sequence* sequ, struct node** nodes)
 }
 
 static int
-par_defined(const char* str, const char* none)
-{
-  return str && strcmp(str, "") != 0 && strcmp(str, none) != 0;
-}
-
-static int
 has_filter_condition(struct command* cmd)
 {
-  return par_defined(command_par_string("sequence", cmd), none)
-      || par_defined(command_par_string("range",    cmd), "#s/#e")
-      || par_defined(command_par_string("class",    cmd), none)
-      || par_defined(command_par_string("pattern",  cmd), "any");
+  return par_present("sequence", cmd)
+      || par_present("range",    cmd)
+      || par_present("class",    cmd)
+      || par_present("pattern",  cmd);
 }
 
 static int
@@ -391,13 +372,9 @@ store_select_command(struct in_cmd* cmd, struct command_list** plist, const char
 void
 store_deselect(struct in_cmd* cmd)
 {
-  char* flag_name;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct command_list* dscl;
-  int pos = name_list_pos("flag", nl);
-  if (nl->inform[pos] == 0 ||
-      (flag_name = pl->parameters[pos]->string) == NULL)
+  char* flag_name = command_par_string_user("flag", cmd->clone);
+  if (!flag_name)
   {
     warning("no FLAG specified", "ignored");
     return;
@@ -450,13 +427,9 @@ store_select(struct in_cmd* cmd)
   char *sdds_pattern;
   char sdum[1000];
 #endif
-  char* flag_name;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct command_list* scl;
-  int pos = name_list_pos("flag", nl);
-  if (nl->inform[pos] == 0 ||
-      (flag_name = pl->parameters[pos]->string) == NULL)
+  char* flag_name = command_par_string_user("flag", cmd->clone);
+  if (!flag_name)
   {
     warning("no FLAG specified", "ignored");
     return;

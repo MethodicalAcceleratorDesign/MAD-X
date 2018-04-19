@@ -79,7 +79,7 @@ export_el_par_8(struct command_parameter* par, char* string)
   /* exports an element parameter in mad-8 format */
 {
   int i, k, last, vtilt = 0;
-  char num[2*NAME_L], tmp[8], tmpt[8];
+  char num[2*NAME_L], tmp[16], tmpt[16];
   switch(par->type)
   {
     case 0:
@@ -160,14 +160,12 @@ static void
 enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
   /* enters an element in a sequence */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int i, pos, k = 1;
+  int i, k = 1;
   double at;
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, current_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, current_sequ->cavities, 0);
-  if (nl->inform[name_list_pos("at", nl)] == 0)
+  if (!par_present("at", cmd->clone))
     fatal_error("element reference without 'at':",
                 join(cmd->tok_list->p, cmd->tok_list->curr));
   at = command_par_value("at", cmd->clone);
@@ -179,9 +177,9 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
   make_elem_node(el, k);
   current_node->at_value = at;
   current_node->at_expr = command_par_expr("at", cmd->clone);
-  pos = name_list_pos("from", nl);
-  if (nl->inform[pos])
-    current_node->from_name = permbuff(pl->parameters[pos]->string);
+  const char* from = command_par_string_user("from", cmd->clone);
+  if (from)
+    current_node->from_name = permbuff(from);
 }
 
 static int
@@ -600,8 +598,8 @@ el_par_value(const char* par, const struct element* el)
     else if (!strcmp(par, "k0s")  ) val = command_par_value("k0s" , el->def);
     else if (!strcmp(par, "l")    )
     {
-      if (fact != zero && get_option("rbarc") && angle != zero)
-        val = l * angle / (two * sin(angle/two));
+      if (fact != zero && get_option("rbarc") && fabs(angle) > 1e-8)
+        val = l * angle / (two * sin(angle/two)); // l_arc = l_cord / sinc(angle/2)
       else val = l;
     }
     else if (strcmp(par, "e1") == 0)
@@ -681,14 +679,11 @@ el_par_vector(int* total, double* vect)
 struct command_parameter*
 return_param(const char* par, const struct element* elem)
 {
-  int index;
   /* don't return base type definitions */
   if (elem==elem->parent) return NULL;
 
-  if ((index = name_list_pos(par,elem->def->par_names))>-1
-      && elem->def->par_names->inform[index] > 0)
-    return elem->def->par->parameters[index];
-  return NULL;
+  struct command_parameter* cp;
+  return command_par(par, elem->def, &cp) ? cp : NULL;
 }
 
 /* returns parameter if it has been modified, otherwise NULL  - recursively */
@@ -718,12 +713,11 @@ void
 enter_element(struct in_cmd* cmd)
   /* enters an element in the list (and the sequence if applicable) */
 {
-  struct name_list* nl;
 //  struct command_parameter_list* pl; // not used
   char** toks = cmd->tok_list->p;
   struct element *el, *parent;
   struct command* comm;
-  int pos, flag = 0, k = cmd->type == 1 ? 2 : 0;
+  int flag = 0, k = cmd->type == 1 ? 2 : 0;
   if ((parent = find_element(toks[k], element_list)) == NULL)
   {
     fatal_error("unknown class type:", toks[k]);
@@ -742,13 +736,12 @@ enter_element(struct in_cmd* cmd)
       el->def_type = sequ_is_on;
       flag = 1; /* new element - definition only once in sequence allowed */
     }
-    nl = cmd->clone->par_names;
     // pl = cmd->clone->par; // not used
-    if (el != parent && (pos = name_list_pos("bv", nl)) > -1)
+    if (el != parent)
     {
-      if (nl->inform[pos]) el->bv = command_par_value("bv", cmd->clone);
+      if (par_present("bv", cmd->clone)) el->bv = command_par_value("bv", cmd->clone);
       else if ((comm = find_command(el->parent->name, defined_commands))
-               != NULL && (pos = name_list_pos("bv", comm->par_names)) > -1)
+              && par_present("bv", comm))
         el->bv = command_par_value("bv", comm);
       else el->bv = parent->bv;
     }

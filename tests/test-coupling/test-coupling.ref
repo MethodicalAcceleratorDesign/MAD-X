@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.06  (64 bit, Linux)       +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.05.29               +
-  + Execution date: 2017.08.30 16:18:34      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:08:54      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=60.;
 
@@ -13,9 +13,9 @@ f=lcell/sin(pi/4)/4;
 
 k=1.0/f;
 
-sk=0.1;
+sk=0.01;
 
-qf: multipole, knl={0, k};
+qf: multipole, knl={0, 0.99*k};
 
 qd: multipole, knl={0, -k};
 
@@ -78,13 +78,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                 60                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-       0.807513364       -1.361150506        72.99895655                  0 
+       0.736421338        -0.94304374        34.28881416                  0 
 
              dxrms             xcomax             xcorms                 q2 
-                 0                  0                  0        0.692486636 
+                 0                  0                  0       0.7539903979 
 
                dq2            betymax              dymax              dyrms 
-      -1.361150506        93.46276031                  0                  0 
+     -0.9554965841        35.32832483                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 

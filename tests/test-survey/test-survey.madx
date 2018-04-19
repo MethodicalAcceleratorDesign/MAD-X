@@ -9,7 +9,7 @@ seqend: marker;  ! bending radius = 19.098593
 midseq: marker;
 
 musr : SEQUENCE, REFER=CENTRE ,l=120;
-dip1 : dip, at=5;  
+dip1 : dip, at=5;
 dip2 : dip, at=5+10;
 dip3 : dip, at=5+20;
 dip4 : dip, at=5+30;
@@ -40,3 +40,4 @@ select,flag=survey,clear;
 select,flag=survey,column=name,keyword,l,angle,x,z,theta;
 survey,psi0=0.0,file="test-survey_2.tfs";
 stop;
+

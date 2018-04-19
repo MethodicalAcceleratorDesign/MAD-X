@@ -51,7 +51,9 @@ module definition
   integer, target :: nb_ =0   ! global group index
   integer, parameter :: ndim2t=10   ! maximum complex size
   integer, parameter :: wiggler_suntao=24
+  real(dp) :: global_e =0
   integer :: bmadparser = 0
+  integer,parameter :: nacmax = 3
   logical :: tangent = .false.,force_rescale=.false.   ! force_rescale for vorname=HELICAL see fibre_work routine
   TYPE sub_taylor
      INTEGER j(lnv)
@@ -278,9 +280,9 @@ module definition
 
   !@3 ---------------------------------------------</br>
   include "a_def_frame_patch_chart.inc"
-  include "a_def_all_kind.inc"
   include "a_def_sagan.inc"
   include "a_def_element_fibre_layout.inc"
+  include "a_def_all_kind.inc"
   !@3 ---------------------------------------------</br>
   type(fibre), pointer :: lost_fibre=>null()
   type(integration_node), pointer :: lost_node=>null()
@@ -299,20 +301,24 @@ module definition
   !@3 ---------------------------------------------</br>
   type probe
      real(dp) x(6)
-     type(rf_phasor) AC
+     type(rf_phasor)  AC(nacmax)
+     integer:: nac=0
      type(spinor) s(3)
      logical u
      type(integration_node),pointer :: last_node=>null()
+      real(dp) e
   end type probe
   !@3 ---------------------------------------------</br>
   type probe_8
      type(real_8) x(6)     ! Polymorphic orbital ray
-     type(rf_phasor_8) AC  ! Modulation of magnet
+     type(rf_phasor_8)  ac(nacmax)  ! Modulation of magnet
+     integer:: nac=0 !  number of modulated clocks <=nacmax
      real(dp) E_ij(6,6)   !  Envelope for stochastic radiation
      type(spinor_8) s(3)   ! Polymorphic spin s(1:3)
      !   stuff for exception
      logical u
      type(integration_node),pointer :: last_node=>null()
+      real(dp) e
   end type probe_8
   !@3 ---------------------------------------------</br>
   type TEMPORAL_PROBE
@@ -335,6 +341,7 @@ module definition
   TYPE C_taylor
      INTEGER I !@1  integer I is a pointer to the complexified Berz package
   END TYPE C_taylor
+  type(c_taylor),pointer :: dx_(:)=>null()
   !@3 ---------------------------------------------</br>
   type c_dascratch
      type(c_taylor), pointer :: t
@@ -362,7 +369,10 @@ module definition
   end type c_spinor
   !@3 ---------------------------------------------</br>
 
-
+type c_yu_w
+ type (c_taylor),pointer :: w(:,:)=> null() !@1 orbital part of the map 
+ integer :: n=0 !@1 of non zero w
+end type c_yu_w
 
 type c_damap
  type (c_taylor) v(lnv) !@1 orbital part of the map 
@@ -534,12 +544,13 @@ contains
     IF((X<0.0_dp).AND.c_%ROOT_CHECK) THEN
        ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Root undefined "
+       messagelost="h_definition.f90 root : negative argument "
     ELSEIF(X>=0.0_dp) THEN
        ROOT=SQRT(X)
     ELSE      !  IF X IS NOT A NUMBER
        ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 root : NaN argument "
     ENDIF
 
   END FUNCTION ROOT
@@ -554,12 +565,13 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCSIN=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Arcsin undefined "
+       messagelost="h_definition.f90 arcsin : abs(x)>1 "
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCSIN=ASIN(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCSIN=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 arcsin : x is NaN "
     ENDIF
 
   END FUNCTION ARCSIN
@@ -574,12 +586,13 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCCOS=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Arccos undefined "
+       messagelost="h_definition.f90 arccos : abs(x)>1 "
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCCOS=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCCOS=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 arccos : x is NaN "
     ENDIF
 
   END FUNCTION ARCCOS
@@ -595,7 +608,7 @@ contains
     IF(X<=0.0_dp.AND.c_%ROOT_CHECK) THEN
        LOGE=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Log undefined "
+       messagelost="h_definition.f90 loge : negative argument "
     ELSE
        LOGE=LOG(X)
     ENDIF
@@ -615,12 +628,13 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        COSEH=1.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Coseh undefined "
+       messagelost="h_definition.f90 coseh : abs(x)>hyperbolic_aperture "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        COSEH=COSH(X)
     ELSE      !  IF X IS NOT A NUMBER
        COSEH=1.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 coseh : x is NaN "
     ENDIF
 
   END FUNCTION COSEH
@@ -636,12 +650,13 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        SINEH=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Sineh undefined "
+       messagelost="h_definition.f90 sineh : abs(x)>hyperbolic_aperture "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        SINEH=SINH(X)
     ELSE      !  IF X IS NOT A NUMBER
        SINEH=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 sineh : x is NaN "
     ENDIF
 
   END FUNCTION SINEH
@@ -657,12 +672,13 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        arctan=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Arctan undefined "
+       messagelost="h_definition.f90 arctan : abs(x)>hyperbolic_aperture "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        arctan=atan(X)
     ELSE      !  IF X IS NOT A NUMBER
        arctan=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 arctan : x is NaN "
     ENDIF
 
   END FUNCTION arctan

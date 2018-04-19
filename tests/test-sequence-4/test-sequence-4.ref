@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.04  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.04.12               +
-  + Execution date: 2017.04.19 16:40:21      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.02.13 23:30:27      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -180,7 +180,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
          6911.5038                 -0     0.001928024863        22.77422909 
 
                 q1                dq1            betxmax              dxmax 
-       26.12999969    -0.001155831315        103.5088351        4.769309974 
+       26.12999969    -0.001155831316        103.5088351        4.769309974 
 
              dxrms             xcomax             xcorms                 q2 
        2.299396138                  0                  0        26.17999991 
@@ -2641,20 +2641,20 @@ enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
  Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
 Twiss pre-init: adjusting probe and oneturnmat (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421662983691988
-  parameters: freq0=  0.0788970808426826681, alfa= 0.00064233277215994429
-              beta=   0.999997826292276071, gamma=    479.606062155549807, dtbyds=                      0
-Twiss pre-init: iteration 1, delta ds = -2.42421663e+00 (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421662983691988
-  parameters: freq0=  0.0788970808426826681, alfa= 0.00064233277215994429
-              beta=   0.999997826292276071, gamma=    479.606062155549807, dtbyds=                      0
-Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
+updating probe_beam for deltap=0 => ds=   -2.42421657971287319
+  parameters: freq0=   0.078897080842682682, alfa=0.000642332758968173372
+              beta=   0.999997826292276182, gamma=     479.60606218519689, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.42421658e+00 (fix point)
+updating probe_beam for deltap=0 => ds=   -2.42421657971287274
+  parameters: freq0=   0.078897080842682682, alfa=0.000642332758968173264
+              beta=   0.999997826292276182, gamma=     479.60606218519689, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = 4.44089210e-16 (fix point)
  
  Global parameters for protons, radiate = F:
 
  C                3799.783251 m          f0             0.07889708084 MHz
- T0               12.67474017 musecs     alfa         0.0006423327722 
- eta          0.0006379853614            gamma(tr)        39.45662731 
+ T0               12.67474017 musecs     alfa          0.000642332759 
+ eta          0.0006379853482            gamma(tr)        39.45662772 
  Bcurrent                   0 A/bunch    Kbunch             1 
  Npart                      0 /bunch     Energy           450.0009782 GeV 
  gamma            479.6060622            beta            0.9999978263
@@ -2662,7 +2662,7 @@ Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:    -6.835225E-06  2.632486E-07 -4.259852E-06 -3.205230E-08  2.989533E-06  0.000000E+00
 
 ++++++ table: summ
 
@@ -2670,16 +2670,16 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
        3799.783252                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-       14.33500735                  0        626.1579567        4.748542549 
+       14.33500733                  0        626.1579437        4.748542549 
 
              dxrms             xcomax             xcorms                 q2 
-       1.699602728                  0                  0        14.77912116 
+       1.699576842    1.611025068e-05     4.50852159e-06        14.77912116 
 
                dq2            betymax              dymax              dyrms 
-                 0        7134.663099        3.952615488       0.5091838334 
+                 0        7134.664267        3.952627294       0.5091833633 
 
             ycomax             ycorms             deltap            synch_1 
-                 0                  0                  0                  0 
+   1.158388075e-05    3.748085699e-06                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 

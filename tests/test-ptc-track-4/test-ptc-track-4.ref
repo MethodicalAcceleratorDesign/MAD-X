@@ -1,0 +1,178 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.01.26 12:10:59      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+!TITLE,' Example 4 for MAD-X with PTC_TRACK;
+
+! Testing:
+
+!   mode element_by_element=false 
+
+!   closed_orbit=true with
+
+!   with defined observation points
+
+!   non-zero closed orbit
+
+!   norm_no different from default
+
+
+
+
+
+ eg   :=  100;
+
+ bg   :=  eg/pmass;
+
+ en   := 3.75e-06;
+
+ epsx := en/bg;
+
+ epsy := en/bg;
+
+beam, particle = proton, energy =   eg        , 
+
+                         sigt=      0.077     , 
+
+                         sige=      1.1e-4    , 
+
+                         npart=     1.05e11   , 
+
+                         exn=4*en,  eyn=4*en  , 
+
+                         kbunch = 10,
+
+                         et = 0.002, bv = 1,
+
+                         ex=epsx,   ey=epsy;
+
+value,epsx,epsy;
+
+epsx               =    3.518520305e-08 ;
+epsy               =    3.518520305e-08 ;
+option,-echo;
+
+
+
+!activate one corrector to get a non-zero closed orbit
+
+acbh1 = 1.e-6;
+
+
+
+use,period=fivecell;
+
+
+
+ptc_create_universe;
+
+Determined SECTOR NMUL MAX :  2
+ptc_create_layout,model=2,method=6,nst=10,exact;
+
+ MAD-X Beam Parameters
+                  Energy : 0.100000E+03
+          Kinetic Energy : 0.990617E+02
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.999956E+02
+ Setting MADx with 
+     energy           100.00000000000000     
+     method                   6
+     Num. of steps           10
+     charge           1.0000000000000000     
+  Length of machine:    534.59999999999968     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467102171        2.5811541980762600E-017   532.53346053179223     
+
+
+ptc_setswitch, debuglevel=1, time=true, totalpath=false;
+
+ Setting debug level to           1
+maxaccel is not present (keeping current value)
+exact_mis is not present (keeping current value)
+radiation is not present (keeping current value)
+modulation is not present (keeping current value)
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
+fringe is not present (keeping current value)
+totalpath is found and its value is 0.000000
+time is found and its value is 1.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
+obs_points pro_ptc_setswitch Done
+
+
+ptc_observe, place=bb;
+
+obs_points: 2 
+
+
+ptc_start, x= 1e-4, px=0, y=3e-3, py=0, t= 0;
+
+
+
+ptc_track, icase=56,closed_orbit, turns=10, file="tfv9", norm_no=3; 
+
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps     10
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ ===== ptc_track ============================
+ Closed orbit:    8.7365645974933986E-005   7.0629628668029482E-007   2.5683576653149827E-006  -3.3520417984914773E-008  -0.0000000000000000        0.0000000000000000     
+ ============================================
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0             0.0001                  0 
+         1         10    0.0002211598671   -1.117696988e-05 
+
+                 y                 py                  t                 pt 
+             0.003                  0                 -0                  0 
+    -0.00311225314    3.256795643e-05   -4.039167912e-05                  0 
+
+                 s                  e 
+                 0                100 
+                 0                100 
+
+
+
+
+ptc_track_end;
+
+ptc_end;
+
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

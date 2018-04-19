@@ -45,7 +45,7 @@ get_val_num(char* in_string, int start, int end)
 
 char*
 v_format(const char* string)
-  /* copies string to gloval variable var_form
+  /* copies string to global variable var_form
      replacing  %S, %I, and %F by the user defined formats;
      %NF and %NI are replaced by the field lengths (!) of the defined formats */
 {
@@ -173,6 +173,8 @@ pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
           {
             outbuf->c[cout++] = c; break;
           }
+          /* FALLTHRU */
+
         case '+':
           if (left_b > 0)
           {
@@ -215,6 +217,8 @@ pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
         case ')':
           rb_level--;
           if (fill_flag && cpnb == '(') outbuf->c[cout++] = '0';
+          /* FALLTHRU */
+
         case '<':
         case ':':
         case '*':

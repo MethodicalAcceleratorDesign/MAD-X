@@ -1,0 +1,41 @@
+option, -debug, -echo;
+
+title, "thick-solenoid tracking test";
+
+L_sol := 10.;
+Ks_sol := 0.2;
+
+sol1: solenoid, l=L_sol, KS=Ks_sol, KSI=Ks_sol*L_sol;
+sol2: solenoid, l=L_sol, KS=-Ks_sol, KSI=-Ks_sol*L_sol;
+
+myseq: sequence, l=2*L_sol;
+sol1, at:= L_sol/2;
+sol2, at:= L_sol+L_sol/2;
+endsequence;
+
+beam,energy=1; !
+use, sequence=myseq;
+
+track, onepass, dump, file= "madx-thick";
+start, x=1e-3, y=0, px=0, py=0, t=0, pt=-1e-3;
+start, x=1e-3, y=0, px=0, py=0, t=0, pt=0.0;
+start, x=1e-3, y=0, px=0, py=0, t=0, pt=1e-3;
+run, turns=1;
+endtrack;
+
+use, sequence=myseq;
+select, flag=makethin, class=solenoid, thick=false, slice=50;
+makethin, sequence=myseq, style=teapot;
+
+!save, sequence= myseq,file= "myseq_thin.seq";
+!call, file= "myseq_thin.seq";
+
+use, sequence=myseq;
+track, onepass, dump, file= "madx-thin";
+start, x=1e-3, y=0, px=0, py=0, t=0, pt=-1e-3;
+start, x=1e-3, y=0, px=0, py=0, t=0, pt=0.0;
+start, x=1e-3, y=0, px=0, py=0, t=0, pt=1e-3;
+run, turns=1;
+endtrack;
+stop;
+

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:39:49      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:07:32      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example file showing the usage of PTC_SETSWITCH command 
 
@@ -21,6 +21,7 @@
 
 option,-echo;
 
+Determined SECTOR NMUL MAX :  0
  MAD-X Beam Parameters
                   Energy : 0.200000E-01
           Kinetic Energy : 0.194890E-01

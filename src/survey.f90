@@ -76,7 +76,8 @@ subroutine survey
      code = node_value('mad8_type ')
      !if (code.eq.39) code=15 ! 2015-Aug-06  21:50:12  ghislain: not required here
      !if (code.eq.38) code=24
-      !**** el is the arc length for all bends  ********
+     !**** el is the arc length for all bends  ********
+     ! LD: 2018.02.01, rbarc is computed by node_value (if needed)...
      el = node_value('l ')
      call suelem(el, ve, we, tilt)
      suml = suml + el
@@ -205,13 +206,12 @@ subroutine suelem(el, ve, we, tilt)
   double precision, intent(OUT) :: ve(3), we(3,3), tilt
 
   integer :: code, nn, ns
-  double precision :: angle, cospsi, costhe, sinpsi, sinthe,  ds, dx, bv
+  double precision :: angle, cospsi, costhe, sinpsi, sinthe, ds, dx, dy, bv,x_t,y_t
   double precision :: normal(0:maxmul), skew(0:maxmul)
 
   double precision, external :: node_value
 
   !---- Branch on subprocess code.
-  tilt = zero
   angle = zero
   dx = zero
   ds = zero
@@ -221,13 +221,13 @@ subroutine suelem(el, ve, we, tilt)
 
   code = node_value('mad8_type ')
   bv   = node_value('other_bv ')
+  tilt = node_value('tilt ') * bv
 
   select case (code)
 
-     case (code_rbend, code_sbend, code_gbend) !---- RBEND, SBEND, GBEND
+     case (code_rbend, code_sbend) !---- RBEND, SBEND
         angle = node_value('angle ') * bv
         if (abs(angle) .ge. 1d-13) then
-           tilt =  node_value('tilt ') * bv
            dx = el * (cos(angle)-one)/angle
            ds = el * sin(angle)/angle
         else
@@ -253,19 +253,16 @@ subroutine suelem(el, ve, we, tilt)
 
 
      case (code_multipole) !---- MULTIPOLE (thin, no length)
-        ! introduced  17.09.02 / AV, extended LD 2014.10.15
-        !---- waste of CPU cycles removed
-        normal(0) = zero ; call get_node_vector('knl ', nn, normal)
-        skew(0) = zero   ; call get_node_vector('ksl ', ns, skew)
-        ! ks0l processing added (LD 15.10.2014)
-        if (nn.ne.0 .or. ns.ne.0) then
-           angle = sqrt(normal(0)**2 + skew(0)**2) * bv
+        ! Must stay compatible with SBEND (makethin!), i.e. ignore ks0l
+        ! LD 2017.11.20, attempt to add angle attribute precedence,
+        angle = node_value('angle ')
+        if (angle .eq. 0) then
+          normal(0) = 0
+          call get_node_vector('knl ', nn, normal)
+          angle = normal(0)
         endif
 
-        if (abs(angle) .gt. 1d-13) then
-           tilt = (node_value('tilt ') - atan2(skew(0),normal(0))) * bv
-        endif
-
+        angle = angle * bv
         cospsi = cos(tilt);  sinpsi = sin(tilt)
         costhe = cos(angle); sinthe = sin(angle)
 
@@ -281,36 +278,35 @@ subroutine suelem(el, ve, we, tilt)
         we(2,3) = - we(3,2)
         we(3,3) = costhe
 
-
      case (code_srotation) !---- Rotation around S-axis. SPECIAL CASE
         tilt = node_value('angle ') * bv
         we(1,1) =  cos(tilt)
-        we(2,1) =  sin(tilt)
-        we(3,1) = zero
-        we(1,2) = -sin(tilt)
-        we(2,2) = cos(tilt)
-        we(3,2) = zero
-        we(1,3) = zero
-        we(2,3) = zero
-        we(3,3) = one
+        we(2,1) = -sin(tilt) !should be - according to convention in MAD8 PhysG. or MADX manual?
+        we(1,2) =  sin(tilt) !should be + according to convention in MAD8 PhysG. or MADX manual?
+        we(2,2) =  cos(tilt)
 
      case (code_yrotation) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
         dx = node_value('angle ') * bv
-        we(1,1) = cos(dx)
-        we(2,1) = zero
-        we(3,1) = sin(dx)
-        we(1,2) = zero
-        we(2,2) = zero
-        we(3,2) = one
-        we(1,3) = -sin(dx)
-        we(2,3) = zero
-        we(3,3) = cos(dx)
+        we(1,1) =  cos(dx)
+        we(3,1) =  sin(dx)
+        we(1,3) =  -sin(dx)
+        we(3,3) =  cos(dx)
+
+     case (code_xrotation) !---- Rotation around X-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
+        dy = node_value('angle ') * bv
+        we(2,2) =  cos(dy)
+        we(3,2) =  sin(dy)
+        we(2,3) = -sin(dy)
+        we(3,3) =  cos(dy)
+     case(code_translation) !  Translation of the reference system.
+        x_t = node_value('x ')
+        y_t = node_value('y ')
+        ve(1) = -x_t
+        ve(2) = -y_t
 
 
-     case default ! all straight elements and catch all; use default VE and WE
-        !---- get tilt attribute
-        !---- checked to work also for elements without this attribute (FT 17.2.05)
-        tilt =  node_value('tilt ') * bv
+     case default
+       ! all straight elements and catch all; use default VE and WE
 
      end select
 

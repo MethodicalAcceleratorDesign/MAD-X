@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %35s "Triplet lattice for gantry - dec17i"
-@ ORIGIN           %17s "5.03.00 Darwin 64"
-@ DATE             %08s "30/03/17"
-@ TIME             %08s "14.29.30"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "14/12/17"
+@ TIME             %08s "17.56.54"
 * NAME                                S               BETX               ALFX                MUX                 DX                DPX                  X                 PX               BETY               ALFY                MUY                 DY                DPY                  Y                 PY                  T                 PT               ALFA 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "GANTRY$END"               23.30217314       0.4467235597       0.7231963951        4.696800831       0.5077073753     -0.09393917737    -0.002077855285     -0.03853374364        5.986161395      -0.4703396224        2.728259712                  0                  0                  0                  0     -0.03031706178                  0    -0.006603708662

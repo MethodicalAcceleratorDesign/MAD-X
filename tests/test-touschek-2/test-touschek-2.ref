@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:39:59      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.02.13 23:42:11      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -62,44 +62,44 @@ twiss, chrom, table;
 enter Twiss module
   
 iteration:   1 error:   1.738046E-03 deltap:   1.000000E-06
-orbit:  -6.431373E-06 -6.588364E-08 -2.089444E-06  1.698349E-04  8.711918E-06  8.992262E-07
+orbit:  -6.433706E-06 -6.658353E-08 -2.089433E-06  1.698349E-04  8.711932E-06  8.992149E-07
   
-iteration:   2 error:   6.902366E-06 deltap:   1.000000E-06
-orbit:  -1.827675E-08  7.228384E-10  3.485285E-08  1.699968E-04  9.294845E-06  1.465506E-06
+iteration:   2 error:   6.902394E-06 deltap:   1.000000E-06
+orbit:  -2.059069E-08  2.245029E-11  3.485269E-08  1.699968E-04  9.294858E-06  1.465495E-06
   
-iteration:   3 error:   1.327537E-10 deltap:   1.000000E-06
-orbit:  -1.818754E-08  7.314667E-10  3.474850E-08  1.699968E-04  9.294866E-06  1.465513E-06
+iteration:   3 error:   1.327492E-10 deltap:   1.000000E-06
+orbit:  -2.050147E-08  3.107855E-11  3.474834E-08  1.699968E-04  9.294879E-06  1.465501E-06
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
 iteration:   1 error:   1.738108E-03 deltap:   0.000000E+00
-orbit:  -6.424029E-06 -6.614752E-08 -2.103007E-06  1.698363E-04  8.669527E-06  9.126159E-07
+orbit:  -6.426361E-06 -6.684741E-08 -2.102996E-06  1.698363E-04  8.669541E-06  9.126046E-07
   
-iteration:   2 error:   6.902453E-06 deltap:   0.000000E+00
-orbit:  -1.089125E-08  4.399425E-10  2.093736E-08  1.699982E-04  9.252385E-06  1.478907E-06
+iteration:   2 error:   6.902481E-06 deltap:   0.000000E+00
+orbit:  -1.320522E-08 -2.604461E-10  2.093720E-08  1.699982E-04  9.252398E-06  1.478896E-06
   
-iteration:   3 error:   1.327558E-10 deltap:   0.000000E+00
-orbit:  -1.080206E-08  4.485705E-10  2.083302E-08  1.699982E-04  9.252406E-06  1.478913E-06
+iteration:   3 error:   1.327513E-10 deltap:   0.000000E+00
+orbit:  -1.311603E-08 -2.518181E-10  2.083286E-08  1.699982E-04  9.252419E-06  1.478902E-06
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832    -9.25240598e-06    0.0003217284403        55.75133525 
+        26658.8832   -9.252419159e-06    0.0003217284401        55.75133527 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000354         1.98499518        595.1004272        2.840300983 
+       64.28000354         1.98499535        595.1004025        2.840301118 
 
              dxrms             xcomax             xcorms                 q2 
-        1.39723574     0.008477929599    0.0006662814745        59.31000313 
+       1.397235735     0.008477911091    0.0006662807021        59.31000312 
 
                dq2            betymax              dymax              dyrms 
-       1.980141896        609.5283497       0.1889452564       0.0567110234 
+       1.980142009        609.5283847       0.1889452673      0.05671102555 
 
             ycomax             ycorms             deltap            synch_1 
-    0.008499886944    0.0006743412007                  0        8.574427658 
+    0.008499886944    0.0006743412008                  0        8.574427655 
 
            synch_2            synch_3            synch_4            synch_5 
-    0.002244883795     7.99769003e-07     1.09064177e-06    2.114259357e-08 
+    0.002244883795     7.99769003e-07    1.090641769e-06    2.114259331e-08 
 
             nflips 
                  0 
@@ -116,33 +116,33 @@ touschek, tolerance=1.e-7, file="touschek_e.dat";
  
  particle proton
  charge      1.0000000000000000     
- gammas      479.60501963214807     
- gamma       479.60501963214807     
+ gammas      479.60501966179515     
+ gamma       479.60501966179515     
  energy      450.00000000000000     
- mass       0.93827208135800000     
+ mass       0.93827208129999995     
  Ex          7.8199999999999999E-009
  Ey          7.8199999999999999E-009
  Et          5.3019999999999997E-005
- sigt       0.11234064029785812     
- sige        4.7195743107234970E-004
- parnum      115000000000.00000     
+ sigt       0.11234064029788982     
+ sige        4.7195743107221645E-004
+ parnum      115000000000.00002     
  circ        26658.883200000000     
- currnt      2.0719777790435535E-004
- betas      0.99999782628282596     
- beta       0.99999782628282596     
+ currnt      2.0719777789168184E-004
+ betas      0.99999782628282630     
+ beta       0.99999782628282630     
  clight      299792458.00000000     
- arad        1.5346982649201416E-018
- alfa        3.2172859746670970E-004
- freq0       1.1245475066861969E-002
+ arad        1.5346982649211379E-018
+ alfa        3.2172859746653026E-004
+ freq0       1.1245475066861970E-002
  kbunch              1
  deltap      0.0000000000000000     
  
   TOUSCHEK will use optical functions at entrance and end of element
   
- Energy radiated per turn     1.1402142101402143E-007 [MeV]
- Touschek Inverse Lifetime    5.3026765214402214E-008 [seconds-1]
- Touschek Lifetime            18858400.959528968      [seconds]   
-                              5238.4447109802686      [hours]
+ Energy radiated per turn     1.1402142103524055E-007 [MeV]
+ Touschek Inverse Lifetime    5.3026765181565916E-008 [seconds-1]
+ Touschek Lifetime            18858400.971206844      [seconds]   
+                              5238.4447142241233      [hours]
 
 
 !--- repeat calculation with Twiss functions calculated at centre of elements 
@@ -179,44 +179,44 @@ twiss, chrom, table, centre;
 enter Twiss module
   
 iteration:   1 error:   1.738046E-03 deltap:   1.000000E-06
-orbit:  -6.431373E-06 -6.588364E-08 -2.089444E-06  1.698349E-04  8.711918E-06  8.992262E-07
+orbit:  -6.433706E-06 -6.658353E-08 -2.089433E-06  1.698349E-04  8.711932E-06  8.992149E-07
   
-iteration:   2 error:   6.902366E-06 deltap:   1.000000E-06
-orbit:  -1.827675E-08  7.228384E-10  3.485285E-08  1.699968E-04  9.294845E-06  1.465506E-06
+iteration:   2 error:   6.902394E-06 deltap:   1.000000E-06
+orbit:  -2.059069E-08  2.245029E-11  3.485269E-08  1.699968E-04  9.294858E-06  1.465495E-06
   
-iteration:   3 error:   1.327537E-10 deltap:   1.000000E-06
-orbit:  -1.818754E-08  7.314667E-10  3.474850E-08  1.699968E-04  9.294866E-06  1.465513E-06
+iteration:   3 error:   1.327492E-10 deltap:   1.000000E-06
+orbit:  -2.050147E-08  3.107855E-11  3.474834E-08  1.699968E-04  9.294879E-06  1.465501E-06
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
 iteration:   1 error:   1.738108E-03 deltap:   0.000000E+00
-orbit:  -6.424029E-06 -6.614752E-08 -2.103007E-06  1.698363E-04  8.669527E-06  9.126159E-07
+orbit:  -6.426361E-06 -6.684741E-08 -2.102996E-06  1.698363E-04  8.669541E-06  9.126046E-07
   
-iteration:   2 error:   6.902453E-06 deltap:   0.000000E+00
-orbit:  -1.089125E-08  4.399425E-10  2.093736E-08  1.699982E-04  9.252385E-06  1.478907E-06
+iteration:   2 error:   6.902481E-06 deltap:   0.000000E+00
+orbit:  -1.320522E-08 -2.604461E-10  2.093720E-08  1.699982E-04  9.252398E-06  1.478896E-06
   
-iteration:   3 error:   1.327558E-10 deltap:   0.000000E+00
-orbit:  -1.080206E-08  4.485705E-10  2.083302E-08  1.699982E-04  9.252406E-06  1.478913E-06
+iteration:   3 error:   1.327513E-10 deltap:   0.000000E+00
+orbit:  -1.311603E-08 -2.518181E-10  2.083286E-08  1.699982E-04  9.252419E-06  1.478902E-06
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832    -9.25240598e-06    0.0003217284403        55.75133525 
+        26658.8832   -9.252419159e-06    0.0003217284401        55.75133527 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000354        1.984994952        604.4249425        2.840300983 
+       64.28000354         1.98499535        604.4249174        2.840301118 
 
              dxrms             xcomax             xcorms                 q2 
-        1.39723574     0.008477929599    0.0006662814745        59.31000313 
+       1.397235735     0.008477911091    0.0006662807021        59.31000312 
 
                dq2            betymax              dymax              dyrms 
-       1.980140865        614.3195463       0.1889452564       0.0567110234 
+       1.980142009        614.3195138       0.1889452673      0.05671102555 
 
             ycomax             ycorms             deltap            synch_1 
-    0.008499886944    0.0006743412007                  0        8.574427658 
+    0.008499886944    0.0006743412008                  0        8.574427655 
 
            synch_2            synch_3            synch_4            synch_5 
-    0.002244883795     7.99769003e-07     1.09064177e-06    2.114259357e-08 
+    0.002244883795     7.99769003e-07    1.090641769e-06    2.114259331e-08 
 
             nflips 
                  0 
@@ -231,33 +231,33 @@ touschek,tolerance=1.e-7,file="touschek_c.dat";
  
  particle proton
  charge      1.0000000000000000     
- gammas      479.60501963214807     
- gamma       479.60501963214807     
+ gammas      479.60501966179515     
+ gamma       479.60501966179515     
  energy      450.00000000000000     
- mass       0.93827208135800000     
+ mass       0.93827208129999995     
  Ex          7.8199999999999999E-009
  Ey          7.8199999999999999E-009
  Et          5.3019999999999997E-005
- sigt       0.11234064029785812     
- sige        4.7195743107234970E-004
- parnum      115000000000.00000     
+ sigt       0.11234064029788982     
+ sige        4.7195743107221645E-004
+ parnum      115000000000.00002     
  circ        26658.883200000000     
- currnt      2.0719777790435535E-004
- betas      0.99999782628282596     
- beta       0.99999782628282596     
+ currnt      2.0719777789168184E-004
+ betas      0.99999782628282630     
+ beta       0.99999782628282630     
  clight      299792458.00000000     
- arad        1.5346982649201416E-018
- alfa        3.2172859746670970E-004
- freq0       1.1245475066861969E-002
+ arad        1.5346982649211379E-018
+ alfa        3.2172859746653026E-004
+ freq0       1.1245475066861970E-002
  kbunch              1
  deltap      0.0000000000000000     
  
   TOUSCHEK will use optical functions at center of elements.
   
- Energy radiated per turn     1.1402142101402143E-007 [MeV]
- Touschek Inverse Lifetime    5.3100897641881392E-008 [seconds-1]
- Touschek Lifetime            18832073.362377334      [seconds]   
-                              5231.1314895492596      [hours]
+ Energy radiated per turn     1.1402142103524055E-007 [MeV]
+ Touschek Inverse Lifetime    5.3100897618139105E-008 [seconds-1]
+ Touschek Lifetime            18832073.370797466      [seconds]   
+                              5231.1314918881853      [hours]
 
   Number of warnings: 4
 0 in C and 4 in Fortran

@@ -220,7 +220,7 @@ parameters must be  used:
      \texttt{TARGET} table
      are assumed to be computed by \mad with a previous \texttt{TWISS}
      command. When set to true, that option allows to use twiss tables
-     imported from an external file (with the \texttt{READMYTABLE} command), for
+     imported from an external file (with the \texttt{READTABLE} command), for
      example to use measured BPM data. In that case, the imported twiss
      table is allowed to contain coordinate data only at the location of
      the monitors.  
@@ -240,7 +240,7 @@ Example of use of \texttt{CORRECT} to reproduce a measured orbit:
 twiss, table=twiss_ref;
 
 ! The bpm.tsv is a reduced Twiss file containing only lines for the BPMs
-readmytable, file="bpm.tsv", table="twiss_bpm";
+readtable, file="bpm.tsv", table="twiss_bpm";
 
 ! correct orbit using external measurements
 correct, flag=ring, mode=micado, ncorr=5, cond=1 ,plane=x, extern,

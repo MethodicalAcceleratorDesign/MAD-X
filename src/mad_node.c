@@ -215,7 +215,6 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
 
 
     if (p->p_sequ == NULL){ // simple element, not a subsequence
-      p->share = top_sequ->share;
       add_to_node_list(p, 0, top_sequ->ex_nodes);
     }
 
@@ -633,12 +632,11 @@ advance_to_pos(char* table, int* t_pos)
   /* advances current_node to node at t_pos in table */
 {
   struct table* t;
-  int pos, cnt = 0, ret = 0;
+  int cnt = 0, ret = 0;
   mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
+  if ((t = find_table(c_dum->c)))
   {
     ret = 1;
-    t = table_register->tables[pos];
     if (t->origin == 1)  return 1; /* table is read, has no node pointers */
     while (current_node)
     {
@@ -722,9 +720,8 @@ replace_one(struct node* node, struct element* el)
   add_to_node_list(node, 0, edit_sequ->nodes);
   node->p_elem = el;
 
-  /*node->base_name = el->base_type->name;*/
-  strcpy(node->base_name, el->base_type->name);
-
+  node->base_name = el->base_type->name;
+  //strcpy(node->base_name, el->base_type->name);
   node->length = el->length;
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, edit_sequ->cavities) == NULL)

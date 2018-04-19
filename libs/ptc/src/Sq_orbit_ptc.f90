@@ -486,7 +486,7 @@ contains
        endif
 
        if(RAMP.and.first_particle) then !modulate
-          if(t%parent_fibre%mag%slow_ac.and.t%cas==CASEP1) CALL do_ramping_r(T,x_orbit_sync(6),STATE0) !modulate
+          if(t%parent_fibre%mag%slow_ac/=0.and.t%cas==CASEP1) CALL do_ramping_r(T,x_orbit_sync(6),STATE0) !modulate
        endif !modulate
 
        if(u) exit
@@ -1066,7 +1066,7 @@ contains
 
 
        DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
-          IF(T%PARENT_FIBRE%MAG%slow_ac) THEN
+          IF(T%PARENT_FIBRE%MAG%slow_ac/=0) THEN
              !         if(old_mod) then
              !          CALL restore_ANBN(T%PARENT_FIBRE%MAG,T%PARENT_FIBRE%MAGP,1)
              !         else

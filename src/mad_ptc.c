@@ -1,5 +1,8 @@
 #include "madx.h"
 
+void  makerdtstwisstable(void);
+void printpoly(int*, int );
+
 static void
 fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   /* puts beam parameters etc. at start of twiss table */
@@ -30,7 +33,7 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
 		 "disp2min","disp2max",
 		 "disp3min","disp3max",
 		 "disp4min","disp4max",
-		 "orbit_x", "orbit_px","orbit_y","orbit_py","orbit_pt","orbit_-cT",
+		 "orbit_x", "orbit_px","orbit_y","orbit_py","orbit_pt","orbit_t",
 		 "xcorms",  "pxcorms","ycorms","pycorms","tcorms","ptcorms",
 		 "xcomin",  "xcomax",
 		 "pxcomin", "pxcomax",
@@ -131,18 +134,11 @@ pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, 
   {
     return -1; /*This means that table name was not specified at all*/
   }
-  pos = name_list_pos(tablename, table_register->names);
-  if (pos < 0)
+  aTable = find_table(tablename);
+  if (!aTable)
   {
     printf("mad_ptc.c: pro_ptc_select: table <<%s>> does not exist: Create table first\n",tablename);
     return 3;
-  }
-
-  aTable = table_register->tables[pos];
-  if (aTable == 0x0)
-  {
-    printf("mad_ptc.c: pro_ptc_select: table <<%s>> is NULL: \n",tablename);
-    return 4;
   }
 
 
@@ -183,16 +179,8 @@ minimum_acceptable_order(void)
 int
 select_ptc_idx(void)
 {
-  struct table* t;
-  int pos;
-
-  if ((pos = name_list_pos("normal_results", table_register->names)) > -1)
-  {
-    t = table_register->tables[pos];
-    return t->curr;
-  }
-  else
-    return pos;
+  struct table* t = find_table("normal_results");;
+  return t ? t->curr : -1;
 }
 
 void
@@ -233,13 +221,10 @@ ptc_track_end(void)
 void
 ptc_track_observe(struct in_cmd* cmd)
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct node* nodes[2];
-  int pos;
 
-  pos = name_list_pos("place", nl);
-  if (get_ex_range(pl->parameters[pos]->string, current_sequ, nodes))
+  const char* place = command_par_string("place", cmd->clone);
+  if (get_ex_range(place, current_sequ, nodes))
   {
     nodes[0]->obs_point = ++curr_obs_points;
     printf("obs_points: %d \n",curr_obs_points);
@@ -282,8 +267,6 @@ pro_ptc_twiss(void)
   /* controls ptc_twiss module */
 {
   struct command* keep_beam = current_beam;
-  struct name_list* nl = current_twiss->par_names;
-  struct command_parameter_list* pl = current_twiss->par;
   struct int_array* tarr;
   int ptc_twiss_summary = 0 ; /* set to 1 when a summary-table is filled-in */
   struct int_array* summary_tarr; /* to pass summary-table name to Fortran */
@@ -291,7 +274,7 @@ pro_ptc_twiss(void)
   double ptc_deltap;
   const char *table_name = NULL, *summary_table_name = NULL;
   char *filename = NULL, *summary_filename = NULL; /* for summary table */
-  int j, pos, w_file,beta_def;
+  int j, w_file,beta_def;
   int w_file_summary; /* toggle to write the summary table into a file */
   struct table* nonlin_table = 0;
   
@@ -302,14 +285,15 @@ pro_ptc_twiss(void)
   use_range[0] = current_sequ->range_start;
   use_range[1] = current_sequ->range_end;
 
-  if ((pos = name_list_pos("range", nl)) > -1 && nl->inform[pos])
+  char* range = command_par_string_user("range", current_twiss);
+  if (range)
   {
-    if (get_sub_range(pl->parameters[pos]->string, current_sequ, nodes))
+    if (get_sub_range(range, current_sequ, nodes))
     {
       current_sequ->range_start = nodes[0];
       current_sequ->range_end = nodes[1];
     }
-    else warning("illegal range ignored:", pl->parameters[pos]->string);
+    else warning("illegal range ignored:", range);
   }
   for (j = 0; j < current_sequ->n_nodes; j++)
   {
@@ -319,60 +303,27 @@ pro_ptc_twiss(void)
   if (attach_beam(current_sequ) == 0)
     fatal_error("PTC_TWISS - sequence without beam:", current_sequ->name);
 
-  pos = name_list_pos("table", nl);
-  if(nl->inform[pos]) /* table name specified - overrides save */
-  {
-    table_name = pl->parameters[pos]->string;
-    if (table_name == NULL)
-    {
-      table_name = pl->parameters[pos]->call_def->string;
-    }
-  }
-  else
-  {
-    /*strcpy(table_name,"ptc_twiss");*/
+  table_name = command_par_string_user("table", current_twiss);
+  if(!table_name)
     table_name = "ptc_twiss";
-  }
 
   /* --- */
   /* do the same as above for the table holding summary data after one-turn */
-  pos = name_list_pos("summary_table",nl);
-  if (nl->inform[pos]){ /* summary-table's name specified */
-    summary_table_name = pl->parameters[pos]->string;
-    if (summary_table_name == NULL){
-      summary_table_name = pl->parameters[pos]->call_def->string;
-    }
-  }
-  else {
+  summary_table_name = command_par_string_user("summary_table", current_twiss);
+  if (!summary_table_name)
     summary_table_name = "ptc_twiss_summary";
-  }
+
   /* --- */
 
-  pos = name_list_pos("file", nl);
-  if (nl->inform[pos])
-  {
-    if ((filename = pl->parameters[pos]->string) == NULL)
-    {
-      if (pl->parameters[pos]->call_def != NULL)
-        filename = pl->parameters[pos]->call_def->string;
-    }
-    if (filename == NULL) filename = permbuff("dummy");
-    w_file = 1;
-  }
-  else w_file = 0;
+  w_file = command_par_string_user2("file", current_twiss, &filename);
+  if (w_file && !filename)                      // TG: should be impossible?
+    filename = permbuff("dummy");
 
   /* --- */
   /* do the same as above for the file to hold the summary-table */
-  pos = name_list_pos("summary_file",nl);
-  if (nl->inform[pos]){
-    if ((summary_filename = pl->parameters[pos]->string) == NULL){
-      if (pl->parameters[pos]->call_def != NULL)
-        summary_filename = pl->parameters[pos]->call_def->string;
-    }
-    if (summary_filename == NULL) summary_filename = permbuff("dummy");
-    w_file_summary = 1;
-  }
-  else w_file_summary = 0;
+  w_file_summary = command_par_string_user2("summary_file", current_twiss, &summary_filename);
+  if (w_file_summary && !summary_filename)      // TG: should be impossible?
+    summary_filename = permbuff("dummy");
 
   /*
     end of command decoding
@@ -412,9 +363,16 @@ pro_ptc_twiss(void)
   current_sequ->tw_table = twiss_table;
   twiss_table->org_sequ = current_sequ;
   twiss_table->curr= 0;
+  
+  
   current_node = current_sequ->ex_start;
   /* w_ptc_twiss_(tarr->i); */
 
+  
+  if (command_par_value("trackrdts",current_twiss) != 0)
+   {
+     makerdtstwisstable();
+   }
   /* --- */
   /* create additional table to hold summary data after one-turn */
   /* such as momentum compaction factor, tune and chromaticities */
@@ -473,7 +431,7 @@ pro_ptc_create_layout(void)
   probe_beam = clone_command(current_beam);
   adjust_probe_fp(0);
 
-  if (name_list_pos("errors_dipole", table_register->names) <= -1) // (pos = not used
+  if (!table_exists("errors_dipole"))
   {
     errors_dipole = make_table("errors_dipole", "efield", efield_table_cols,
                                efield_table_types, 10000);
@@ -484,7 +442,7 @@ pro_ptc_create_layout(void)
     reset_count("errors_dipole");
   }
 
-  if (name_list_pos("errors_field", table_register->names) <= -1) // (pos = not used
+  if (!table_exists("errors_field"))
   {
     errors_field = make_table("errors_field", "efield", efield_table_cols,
                               efield_table_types, 10000);
@@ -495,7 +453,7 @@ pro_ptc_create_layout(void)
     reset_count("errors_field");
   }
 
-  if (name_list_pos("errors_total", table_register->names) <= -1) // (pos = not used
+  if (!table_exists("errors_total"))
   {
     errors_total = make_table("errors_total", "efield", efield_table_cols,
                               efield_table_types, 10000);
@@ -554,18 +512,14 @@ void
 select_ptc_normal(struct in_cmd* cmd)
   /* sets up all columns of the table normal_results except the last one (value) */
 {
-  struct name_list* nl;
-  struct command_parameter_list* pl;
   struct table* t;
-  int pos;
+  struct command_parameter* cp;
   int i, j, jj, curr;
   int skew, mynorder,myn1,myn2,mynres,indexa[4][1000];
   char* order_list;
   int min_req_order;
   double order[4],n1,n2,n3,n4;
 
-  nl = this_cmd->clone->par_names;
-  pl = this_cmd->clone->par;
   if (log_val("clear", cmd->clone))
   {
     min_order = 1;
@@ -573,10 +527,10 @@ select_ptc_normal(struct in_cmd* cmd)
     mynres = 0;
     skew = 0;
     reset_count("normal_results");
-/*    if ((pos = name_list_pos("normal_results", table_register->names)) > -1) delete_table(table_register->tables[pos]);*/
+/*    if (t = find_table("normal_results")) delete_table(t);*/
     return;
   }
-  if ((pos = name_list_pos("normal_results", table_register->names)) <= -1)
+  if (!(t = find_table("normal_results")))
   {
     /* initialise table */
     normal_results = make_table("normal_results", "normal_res", normal_res_cols,
@@ -584,11 +538,10 @@ select_ptc_normal(struct in_cmd* cmd)
     normal_results->dynamic = 1;
     add_to_table_list(normal_results, table_register);
     reset_count("normal_results");
-    pos = name_list_pos("normal_results", table_register->names);
+    t = find_table("normal_results");
     min_order = 1;
     min_req_order = 1;
   }
-  t = table_register->tables[pos];
 
   /* initialise order array */
   order[0] = zero;
@@ -601,15 +554,14 @@ select_ptc_normal(struct in_cmd* cmd)
   {
     /* Treat each ptc variable */
 
-    pos = name_list_pos(names[j], nl);
-    if (pos > -1 && nl->inform[pos])
+    if (command_par(names[j], this_cmd->clone, &cp))
     {
-      curr = pl->parameters[pos]->m_string->curr;
+      curr = cp->m_string->curr;
       if (curr > 4)
         printf("Too many values for the attribute %s. Only the first four are retained.\n",names[j]);
       for (i = 0; i < curr; i++)
       {
-        order_list = pl->parameters[pos]->m_string->p[i];
+        order_list = cp->m_string->p[i];
         order[i] = atoi(order_list);
       }
 
@@ -737,9 +689,7 @@ pro_ptc_trackline(struct in_cmd* cmd)
   /*Does PTC tracking taking to the account acceleration */
   /*it is basically wrapper to subroutine ptc_trackline() in madx_ptc_trackline.f90*/
 
-  int pos, one;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
+  int one = 1;
   int parexist = -1;
   double value = 0;
   int ivalue = 0;
@@ -748,42 +698,16 @@ pro_ptc_trackline(struct in_cmd* cmd)
 
   if (attach_beam(current_sequ) == 0)
     fatal_error("PTC_TRACKLINE - sequence without beam:", current_sequ->name);
-  
 
-  pos = name_list_pos("file", nl);
-
-  if (nl->inform[pos])
-  {
+  if (command_par_string_or_calldef("file", cmd->clone, &track_filename))
     set_option("track_dump", &one);
-  }
-
-  if ((track_filename = pl->parameters[pos]->string) == NULL)
-  {
-    if (pl->parameters[pos]->call_def != NULL)
-    {
-      track_filename = pl->parameters[pos]->call_def->string;
-    }
-    else
-    {
-      track_filename = permbuff("dummy");
-    }
-  }
+  if (!track_filename)
+    track_filename = permbuff("dummy");
   track_filename = permbuff(track_filename);
-  track_fileext = NULL;
-  pos = name_list_pos("extension", nl);
 
-  if ((track_fileext = pl->parameters[pos]->string) == NULL)
-  {
-    if (pl->parameters[pos]->call_def != NULL)
-    {
-      track_fileext = pl->parameters[pos]->call_def->string;
-    }
-    if (track_fileext == NULL)
-    {
-      track_fileext = permbuff("\0");
-    }
-  }
-
+  command_par_string_or_calldef("extension", cmd->clone, &track_fileext);
+  if (!track_fileext)
+    track_fileext = permbuff("\0");
   track_fileext = permbuff(track_fileext);
 
   if (command_par_value("everystep",cmd->clone) != 0)
@@ -875,6 +799,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
   int i;
   double switchvalue;
   struct name_list* nl;
+  int found;
 
   if (cmd == 0x0)
   {
@@ -899,135 +824,163 @@ pro_ptc_setswitch(struct in_cmd* cmd)
   /*DEBUG DEBUG LEVEL*/
   if ( name_list_pos("debuglevel", nl) >=0 )
   {
-    command_par_value2("debuglevel", cmd->clone, &switchvalue);
+    found = command_par_value2("debuglevel", cmd->clone, &switchvalue);
     debuglevel = (int)switchvalue;
     w_ptc_setdebuglevel_(&debuglevel);
   }
   else
   {
-    printf("debuglevel is not present\n");
+    printf("debuglevel is not present (keeping current value)\n");
   }
 
 
   /*ACCELERATION SWITCH*/
-  if ( name_list_pos("maxacceleration", nl) >=0 )
-  {
-    command_par_value2("maxacceleration", cmd->clone, &switchvalue);
-    if (debuglevel > 0) printf("maxaccel is found and its value is %f\n", switchvalue);
-    i = (int)switchvalue;
-    w_ptc_setaccel_method_(&i);
-  }
+  found = command_par_value_user2("maxacceleration", cmd->clone, &switchvalue);
+  if (found)
+   {
+     if (debuglevel > 0) printf("maxaccel is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_setaccel_method_(&i);
+   }
   else
-  {
-    if (debuglevel > 0) printf("maxaccel is not present\n");
-  }
+   {
+     if (debuglevel > 0) printf("maxaccel is not present (keeping current value)\n");
+   }  
 
   /*EXACT_MIS SWITCH*/
-  if ( name_list_pos("exact_mis", nl) >=0 )
-  {
-    command_par_value2("exact_mis", cmd->clone, &switchvalue);
-    if (debuglevel > 0) printf("exact_mis is found and its value is %f\n", switchvalue);
-    i = (int)switchvalue;
-    w_ptc_setexactmis_(&i);
-  }
+  found = command_par_value_user2("exact_mis", cmd->clone, &switchvalue);
+  if (found)
+   {
+     if (debuglevel > 0) printf("exact_mis is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_setexactmis_(&i);
+   }
   else
-  {
-    if (debuglevel > 0)  printf("exact_mis is not present\n");
-  }
+   {
+     if (debuglevel > 0)  printf("exact_mis is not present (keeping current value)\n");
+   }
 
 
   /*radiation SWITCH*/
-  if ( name_list_pos("radiation", nl) >=0 )
-  {
-    command_par_value2("radiation", cmd->clone, &switchvalue);
+  found = command_par_value_user2("radiation", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("radiation is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setradiation_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("radiation is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("radiation is not present (keeping current value)\n");
+   }
+
+
+  /*modulation SWITCH*/
+  found = command_par_value_user2("modulation", cmd->clone, &switchvalue);
+  if (found)
+   {
+    if (debuglevel > 0) printf("modulation is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setmodulation_(&i);
+   }
+  else
+   {
+    if (debuglevel > 0) printf("modulation is not present (keeping current value)\n");
+   }
 
   /*stochastic SWITCH*/
-  if ( name_list_pos("stochastic", nl) >=0 )
-  {
-    command_par_value2("stochastic", cmd->clone, &switchvalue);
+  found = command_par_value_user2("stochastic", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("stochastic is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setstochastic_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("stochastic is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("stochastic is not present (keeping current value)\n");
+   }
 
   /*envelope SWITCH*/
-  if ( name_list_pos("envelope", nl) >=0 )
-  {
-    command_par_value2("envelope", cmd->clone, &switchvalue);
+  found = command_par_value_user2("envelope", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("envelope is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setenvelope_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("envelope is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("envelope is not present (keeping current value)\n");
+   }
 
   /*fringe SWITCH*/
-  if ( name_list_pos("fringe", nl) >=0 )
-  {
-    command_par_value2("fringe", cmd->clone, &switchvalue);
+  found = command_par_value_user2("fringe", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("fringe is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setfringe_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("fringe is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("fringe is not present (keeping current value)\n");
+   }
 
 
   /*totalpath SWITCH*/
-  if ( name_list_pos("totalpath", nl) >=0 )
-  {
-    command_par_value2("totalpath", cmd->clone, &switchvalue);
+  found = command_par_value_user2("totalpath", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("totalpath is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_settotalpath_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("totalpath is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("totalpath is not present (keeping current value)\n");
+   }
 
 
   /*TIME SWITCH*/
-  if ( name_list_pos("time", nl) >=0 )
-  {
-    command_par_value2("time", cmd->clone, &switchvalue);
+  found = command_par_value_user2("time", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("time is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_settime_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("time is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("time is not present (keeping current value)\n");
+   }
 
   /*NOCAVITY SWITCH*/
-  if ( name_list_pos("nocavity", nl) >=0 )
-  {
-    command_par_value2("nocavity", cmd->clone, &switchvalue);
+  found = command_par_value_user2("nocavity", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("nocavity is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setnocavity_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("nocavity is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("nocavity is not present (keeping current value)\n");
+   }
+
+  /*SEED SETTING*/
+  found = command_par_value_user2("seed", cmd->clone, &switchvalue);
+  if (found)
+   {
+    if (debuglevel > 0) printf("seed is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setseed_(&i);
+   }
+  else
+   {
+    if (debuglevel > 0) printf("seed is not present (keeping current value)\n");
+   }
+
 
   if (debuglevel > 0) printf("obs_points pro_ptc_setswitch Done\n");
 }
@@ -1176,64 +1129,45 @@ pro_ptc_eplacement(struct in_cmd* cmd)
 {/*
    Sets a parameter
  */
-  struct command_parameter_list* c_parameters= cmd->clone->par;
-  struct name_list*              c_parnames  = cmd->clone->par_names;
   int                            pos         = 0;
   int                            k         = 0;
   struct node*                   nodes[2]={0x0,0x0};
   struct node*                   anode=0x0;
   char*                          element;
-  int                            refframe=0;/*0 global, 1 current position, 2 end face if the previous element*/
+  int                            refframe=-1;/*0 global, 1 current position, 2 end face if the previous element*/
 
-
-  pos   = name_list_pos("refframe", c_parnames);
-  if (pos < 0)
-  {
-    printf("mad_ptc.c: pro_ptc_eplacement: refframe parameter does not exist.\n");
-    return;
-  }
-
-  if ( c_parnames->inform[pos] != 0 )
+  char* s_refframe = command_par_string_user("refframe", cmd->clone);
+  if (s_refframe)
   {
     /*if it is zero it is not specified*/
+    /*printf("refframe is %s.\n", s_refframe );*/
 
-    if ( c_parameters->parameters[pos]->string == 0x0 )
+    if ( strcmp(s_refframe,"current")  == 0 )
+     {
+       refframe = 1;
+     }
+
+    if ( strcmp(s_refframe,"previouselement") == 0 )
+     {
+       refframe = 2;
+     }
+
+    if (refframe < 0)
+     {
+       warning("mad_ptc.c: pro_ptc_eplacement: did not recognize string describing refframe, using default  ", s_refframe);
+       refframe = 0;
+     }
+    
+  }
+    else
     {
       warning("mad_ptc.c: pro_ptc_eplacement: string describing refframe is null: ", "using default");
       refframe = 0;
     }
-    else
-    {
-      /*printf("refframe is %s.\n", c_parameters->parameters[pos]->string );*/
+  
 
-      if ( strcmp(c_parameters->parameters[pos]->string,"current")  == 0 )
-      {
-        refframe = 1;
-      }
-
-      if ( strcmp(c_parameters->parameters[pos]->string,"previouselement") == 0 )
-      {
-        refframe = 2;
-      }
-    }
-  }
-
-
-  pos   = name_list_pos("range", c_parnames);
-  if (pos < 0)
-  {
-    printf("mad_ptc.c: pro_ptc_eplacement: range parameter does not exist.\n");
-    return;
-  }
-
-  if ( c_parnames->inform[pos] == 0 )
-  {
-    printf("mad_ptc.c: pro_ptc_eplacement: inform for range is 0.\n");
-    return;
-  }
-
-  element  = c_parameters->parameters[pos]->string;
-  if ( element == 0x0 )
+  element = command_par_string_user("range", cmd->clone);
+  if ( !element )
   {
     warning("mad_ptc.c: pro_ptc_eplacement: no element name: ", "ignored");
     return;
@@ -1437,31 +1371,14 @@ pro_ptc_setfieldcomp(struct in_cmd* cmd)
 {/*
    Sets a parameter value
  */
-  struct command_parameter_list* c_parameters= cmd->clone->par;
-  struct name_list*              c_parnames  = cmd->clone->par_names;
   int                            pos         = 0;
   int                            k         = 0;
   struct node*                   nodes[2]={0x0,0x0};
   struct node*                   anode=0x0;
   char*                          element;
 
-
-
-  pos   = name_list_pos("element", c_parnames);
-  if (pos < 0)
-  {
-    printf("mad_ptc.c: pro_ptc_setfieldcomp: range parameter does not exist.\n");
-    return;
-  }
-
-  if ( c_parnames->inform[pos] == 0 )
-  {
-    printf("mad_ptc.c: pro_ptc_setfieldcomp: inform for range is 0.\n");
-    return;
-  }
-
-  element  = c_parameters->parameters[pos]->string;
-  if ( element == 0x0 )
+  element  = command_par_string_user("element", cmd->clone);
+  if ( !element )
   {
     warning("mad_ptc.c: pro_ptc_setfieldcomp: no element name: ", "ignored");
     return;
@@ -1597,6 +1514,7 @@ pro_ptc_select_moment(struct in_cmd* cmd)
   struct int_array*              mdefIA      = 0x0;
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
+  struct command_parameter*      cp;
   int                            parametric = 0;
   int                            int_arr[100];
 
@@ -1632,13 +1550,13 @@ pro_ptc_select_moment(struct in_cmd* cmd)
     return 1;
   }
 
-  if (c_parnames->inform[pos])
+  if (command_par("moment_s", cmd->clone, &cp))
   {
-    for (j = 0; j < c_parameters->parameters[pos]->m_string->curr; j++)
+    for (j = 0; j < cp->m_string->curr; j++)
     {
       strcpy(colname,"mu000000");
 
-      mdefin = c_parameters->parameters[pos]->m_string->p[j];
+      mdefin = cp->m_string->p[j];
 
       /*printf("String no %d is %s\n", j, mdefin);*/
 
@@ -1891,9 +1809,7 @@ pro_ptc_open_gino(struct in_cmd* cmd)
 void
 pro_ptc_track(struct in_cmd* cmd)
 {
-  int k=0, pos, one = 1;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
+  int k=0, one = 1;
 /*  const char *rout_name = "ptc_track"; */
   int npart = stored_track_start->curr;
   struct table* t;
@@ -1931,23 +1847,15 @@ pro_ptc_track(struct in_cmd* cmd)
   set_variable("track_deltap", &track_deltap);
   if(track_deltap != 0) fprintf(prt_file, v_format("track_deltap: %F\n"),
                                 track_deltap);
-  pos = name_list_pos("file", nl);
-  if (nl->inform[pos]) set_option("track_dump", &one);
-  if ((track_filename = pl->parameters[pos]->string) == NULL)
-  {
-    if (pl->parameters[pos]->call_def != NULL)
-      track_filename = pl->parameters[pos]->call_def->string;
-    else track_filename = permbuff("dummy");
-  }
+
+  if (command_par_string_or_calldef("file", cmd->clone, &track_filename))
+      set_option("track_dump", &one);
+  if (!track_filename) track_filename = permbuff("dummy");
   track_filename = permbuff(track_filename);
-  track_fileext = NULL;
-  pos = name_list_pos("extension", nl);
-  if ((track_fileext = pl->parameters[pos]->string) == NULL)
-  {
-    if (pl->parameters[pos]->call_def != NULL)
-      track_fileext = pl->parameters[pos]->call_def->string;
-    if (track_fileext == NULL)  track_fileext = permbuff("\0");
-  }
+
+  command_par_string_or_calldef("extension", cmd->clone, &track_fileext);
+  if (!track_fileext)
+    track_fileext = permbuff("\0");
   track_fileext = permbuff(track_fileext);
 
   if (npart == 0)
@@ -1966,7 +1874,7 @@ pro_ptc_track(struct in_cmd* cmd)
    }
   
   w_ptc_track_(&curr_obs_points);
-  t = table_register->tables[name_list_pos("tracksumm", table_register->names)];
+  t = find_table("tracksumm");
   if (get_option("info"))  print_table(t);
   if (get_option("track_dump")) track_tables_dump();
   
@@ -1975,4 +1883,63 @@ pro_ptc_track(struct in_cmd* cmd)
     fprintf(prt_file, "\n*****  end of ptc_run  *****\n");
   }  
 }
+/*_______________________________________________________*/
 
+void printpoly(int p[6], int dim )
+{
+ int i;
+ 
+ printf("f"); /*icase*/
+ 
+ for (i=0; i<dim; i++)
+  {
+    printf("%1d",p[i]); /*icase*/
+  }
+
+ printf("\n");
+
+}
+
+/*_______________________________________________________*/
+void makerdtstwisstable()
+{
+  int i;
+
+  struct table* rdts_table;
+  char** table_cols;
+  int*  table_type;
+  
+  
+  table_cols = mymalloc_atomic("",9*sizeof(char*));
+  table_type = mymalloc_atomic("",9*sizeof(int));
+  
+  for (i=0; i<9; i++)
+  {   
+    table_cols[i] = mymalloc_atomic("",10*sizeof(char));
+    table_type[i] = 2;
+  }  
+  table_type[0] = 3;
+
+  strcpy(table_cols[0], "name");
+  strcpy(table_cols[1], "s"); /*can not be s becuase it will not plot than*/
+  strcpy(table_cols[2], "k1l"); 
+  strcpy(table_cols[3], "k1sl"); 
+  strcpy(table_cols[4], "k2l"); 
+  strcpy(table_cols[5], "k2sl"); 
+  strcpy(table_cols[6], "k3l"); 
+  strcpy(table_cols[7], "k3sl"); 
+  strcpy(table_cols[8], " ");
+
+  
+  char name[] = "twissrdt";
+
+  rdts_table = make_table2(name, name, table_cols,
+                           table_type, current_sequ->n_nodes);
+
+  rdts_table->dynamic = 1;
+  add_to_table_list(rdts_table, table_register);
+  rdts_table->org_sequ = current_sequ;
+  rdts_table->curr= 0;
+  
+  
+}

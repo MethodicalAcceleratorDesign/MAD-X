@@ -518,9 +518,7 @@ subroutine pefill(ierr)
            if (proc_flag(1,l) .eq. 1) then ! case of rbetx or rbety
               qvval(nqval(l),l) = sqrt(abs(qvval(nqval(l),l)))
            endif
-        elseif (itbv .eq. 0 .or. &
-                currpos - qhval(nqval(l),l) .gt. mystep   .or. &
-                (marker_plot .and. currtyp .eq. 25)) then
+        else
            nqval(l) = nqval(l) + 1
            qhval(nqval(l),l) = currpos
            k = double_from_table_row(tabname, sname(l), j, d_val)

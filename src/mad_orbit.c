@@ -352,7 +352,7 @@ static void correct_setcorr(struct in_cmd* cmd) {
   char nname[NAME_L];
   char slnname[NAME_L];
 
-  char* namtab;
+  const char* namtab;
 
   double xnew, ynew;
 
@@ -365,7 +365,7 @@ static void correct_setcorr(struct in_cmd* cmd) {
 
   if ((namtab = command_par_string("table", cmd->clone)) != NULL ) {
     printf("Want to use named table: %s\n", namtab);
-    if (name_list_pos(namtab, table_register->names) > -1) {
+    if (table_exists(namtab)) {
       printf("The table ==> %s <=== was found \n", namtab);
     } else {
       /* fatal_error("Corrector table requested, but not existing:",namtab); */
@@ -377,7 +377,7 @@ static void correct_setcorr(struct in_cmd* cmd) {
       printf("No table name requested\n");
       printf("Use default name\n");
     }
-    strcpy(namtab, "corr");
+    namtab = "corr";
   }
 
   i = 1;
@@ -802,7 +802,6 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
   char* orbtab1;
   char* orbtab2;
 
-  int t1, t2;
   int ebl1, ebl2;
 
   int j, k;
@@ -823,9 +822,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
   /* Get access to tables, for orbit and model the default is twiss_table */
   if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) != NULL ) {
     printf("Want to use orbit from: %s\n", orbtab1);
-    if ((t1 = name_list_pos(orbtab1, table_register->names)) > -1) {
-      b1 = table_register->tables[t1];
-    } else {
+    if (!(b1 = find_table(orbtab1))) {
       fatal_error("Beam 1 ORBIT table requested, but not provided:", orbtab1);
     }
   } else {
@@ -834,9 +831,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 
   if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) != NULL ) {
     printf("Want to use orbit from: %s\n", orbtab2);
-    if ((t2 = name_list_pos(orbtab2, table_register->names)) > -1) {
-      b2 = table_register->tables[t2];
-    } else {
+    if (!(b2 = find_table(orbtab2))) {
       fatal_error("Beam 2 ORBIT table requested, but not provided:", orbtab2);
     }
   } else {
@@ -1086,9 +1081,6 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 }
 
 static int pro_correct2_getorbit(struct in_cmd* cmd) {
-  struct name_list* nl;
-  int pos;
-
   struct id_mic2 *m; /* access to tables for monitors and correctors */
   double **da1;
   double **da2;
@@ -1103,8 +1095,6 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
 
   da1 = twiss_table_beam1->d_cols;
   da2 = twiss_table_beam2->d_cols;
-
-  nl = cmd->clone->par_names;
 
   m = correct_orbit12->mon_table;
 
@@ -1140,8 +1130,7 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
       fatal_error("Unforeseen case in pro_correct2_getorbit", ", MAD-X terminates ");
     }
 
-    pos = name_list_pos("monon", nl);
-    if (nl->inform[pos] > 0) {
+    if (par_present("monon", cmd->clone)) {
       xlimit = command_par_value("monon", cmd->clone);
       if (frndm() > xlimit) {
 	m->enable = 0;
@@ -1852,9 +1841,8 @@ static void correct_correct(struct in_cmd* cmd)
 #if 0 // not used...
 static void pro_correct_option(struct in_cmd* cmd)
 {
-  struct name_list* nl = cmd->clone->par_names;
   int i;
-  int val, pos, seed;
+  int val, seed;
 
   int debug = get_option("debug");
 
@@ -1865,13 +1853,10 @@ static void pro_correct_option(struct in_cmd* cmd)
     }
   }
 
-  if ((pos = name_list_pos("seed", nl)) > -1)
+  if (par_present("seed", cmd->clone))
     {
-      if (nl->inform[pos])
-  {
     seed = command_par_value("seed", cmd->clone);
     init55(seed);
-  }
     }
 
   val = command_par_value("print", cmd->clone);
@@ -1929,7 +1914,6 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
   char* modtab;
 
   int j;
-  int pps, ppt;
 
   int cntm = { 0 };
   int cntc = { 0 };
@@ -1948,9 +1932,7 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 
   if ((orbtab = command_par_string("orbit", cmd->clone)) != NULL ) {
     printf("Want to use orbit from: %s\n", orbtab);
-    if ((pps = name_list_pos(orbtab, table_register->names)) > -1) {
-      orbin_table = table_register->tables[pps];
-    } else {
+    if (!(orbin_table = find_table(orbtab))) {
       fatal_error("ORBIT table for correction requested, but not provided:", orbtab);
     }
   } else { // the orbit table is the twiss table
@@ -1965,9 +1947,7 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 
   if ((tartab = command_par_string("target", cmd->clone)) != NULL ) {
     printf("Want to use target orbit from: %s\n", tartab);
-    if ((ppt = name_list_pos(tartab, table_register->names)) > -1) {
-      target_table = table_register->tables[ppt];
-    } else {
+    if (!(target_table = find_table(tartab))) {
       fatal_error("TARGET table for correction requested, but not provided:", tartab);
     }
   } else {
@@ -1977,9 +1957,7 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 
   if ((modtab = command_par_string("model", cmd->clone)) != NULL ) {
     printf("Want to use model orbit from: %s\n", modtab);
-    if ((ppt = name_list_pos(modtab, table_register->names)) > -1) {
-      model_table = table_register->tables[ppt];
-    } else {
+    if (!(model_table = find_table(modtab))) {
       fatal_error("MODEL table for correction requested, but not provided:", modtab);
     }
   } else {
@@ -2088,9 +2066,6 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 }
 
 static int pro_correct_getorbit(struct in_cmd* cmd) {
-  struct name_list* nl;
-
-  int pos;
   struct id_mic *m; /* access to tables for monitors and correctors */
   struct table *ttb;
   struct table *tar = NULL;
@@ -2116,8 +2091,6 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
     tar = target_table;
     da2 = tar->d_cols;
   }
-
-  nl = cmd->clone->par_names;
 
   m = correct_orbit->mon_table;
 
@@ -2170,8 +2143,7 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
     }
 
     /* monon=xlimit determines the fraction of available monitors */
-    pos = name_list_pos("monon", nl);
-    if (nl->inform[pos] > 0) {
+    if (par_present("monon", cmd->clone)) {
       xlimit = command_par_value("monon", cmd->clone);
       if (frndm() > xlimit) {
 	m->enable = 0;
@@ -2180,8 +2152,7 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
     }
 
     /* scaling error should come first, monitor alignment not scaled ... */
-    pos = name_list_pos("monscale", nl);
-    if (nl->inform[pos] > 0) {
+    if (par_present("monscale", cmd->clone)) {
       if ((command_par_value("monscale", cmd->clone)) == 1) {
 	if (m->p_node->p_al_err != NULL ) {
 	  if (debug) {
@@ -2195,8 +2166,7 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
     }
 
     /* monitor misalignment after all other reading manipulations ! */
-    pos = name_list_pos("monerror", nl);
-    if (nl->inform[pos] > 0) {
+    if (par_present("monerror", cmd->clone)) {
       if ((command_par_value("monerror", cmd->clone)) == 1) {
 	if (m->p_node->p_al_err != NULL ) {
 	  if (debug) {
@@ -2224,10 +2194,8 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
 }
 
 static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
-  struct name_list* nl;
   int j;
 
-  int pos;
   struct id_mic *m; /* access to tables for monitors and correctors */
   struct table *ttb;
   struct table *tar = NULL;
@@ -2267,8 +2235,6 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
     tar = target_table;
     da2 = tar->d_cols;
   }
-
-  nl = cmd->clone->par_names;
 
   m = correct_orbit->mon_table;
 
@@ -2407,8 +2373,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
       }
 
       /* monon=xlimit determines the fraction of available monitors */
-      pos = name_list_pos("monon", nl);
-      if (nl->inform[pos] > 0) {
+      if (par_present("monon", cmd->clone)) {
         xlimit = command_par_value("monon", cmd->clone);
         if (frndm() > xlimit) {
           m->enable = 0;
@@ -2417,8 +2382,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
       }
 
       /* scaling error should come first, monitor alignment not scaled ... */
-      pos = name_list_pos("monscale", nl);
-      if (nl->inform[pos] > 0) {
+      if (par_present("monscale", cmd->clone)) {
         if ((command_par_value("monscale", cmd->clone)) == 1) {
           if (m->p_node->p_al_err != NULL ) {
 
@@ -2434,8 +2398,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
       }
 
       /* monitor misalignment after all other reading manipulations ! */
-      pos = name_list_pos("monerror", nl);
-      if (nl->inform[pos] > 0) {
+      if (par_present("monerror", cmd->clone)) {
         if ((command_par_value("monerror", cmd->clone)) == 1) {
           if (m->p_node->p_al_err != NULL ) {
 
@@ -3138,8 +3101,7 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
 }
 
 static void correct_option(struct in_cmd* cmd) {
-  struct name_list* nl = cmd->clone->par_names;
-  int i, pos;
+  int i;
 
   int debug = get_option("debug");
 
@@ -3150,11 +3112,9 @@ static void correct_option(struct in_cmd* cmd) {
     }
   }
 
-  if ((pos = name_list_pos("seed", nl)) > -1) {
-    if (nl->inform[pos]) {
+  if (par_present("seed", cmd->clone)) {
       int seed = command_par_value("seed", cmd->clone);
       init55(seed);
-    }
   }
 
   print_correct_opt = command_par_value("print", cmd->clone);
@@ -3213,13 +3173,12 @@ static void correct_usemonitor(struct in_cmd* cmd) {
 // public interface
 
 void store_orbit(struct command* comm, double* orbit) {
-  struct name_list* nl = comm->par_names;
-  if (nl->inform[name_list_pos("x",  nl)]) orbit[0] = command_par_value("x",  comm);
-  if (nl->inform[name_list_pos("px", nl)]) orbit[1] = command_par_value("px", comm);
-  if (nl->inform[name_list_pos("y",  nl)]) orbit[2] = command_par_value("y",  comm);
-  if (nl->inform[name_list_pos("py", nl)]) orbit[3] = command_par_value("py", comm);
-  if (nl->inform[name_list_pos("t",  nl)]) orbit[4] = command_par_value("t",  comm);
-  if (nl->inform[name_list_pos("pt", nl)]) orbit[5] = command_par_value("pt", comm);
+  if (par_present("x",  comm)) orbit[0] = command_par_value("x",  comm);
+  if (par_present("px", comm)) orbit[1] = command_par_value("px", comm);
+  if (par_present("y",  comm)) orbit[2] = command_par_value("y",  comm);
+  if (par_present("py", comm)) orbit[3] = command_par_value("py", comm);
+  if (par_present("t",  comm)) orbit[4] = command_par_value("t",  comm);
+  if (par_present("pt", comm)) orbit[5] = command_par_value("pt", comm);
 }
 
 void pro_correct(struct in_cmd* cmd) {
@@ -3228,7 +3187,7 @@ void pro_correct(struct in_cmd* cmd) {
   else if (strcmp(cmd->tok_list->p[0], "usemonitor") == 0) correct_usemonitor(cmd);
   else if (strcmp(cmd->tok_list->p[0], "getorbit") == 0)   correct_getorbit(cmd); // FIXME obsolete command; should be flagged and not call anything...
   else if (strcmp(cmd->tok_list->p[0], "putorbit") == 0)   correct_putorbit(cmd); // FIXME obsolete command; should be flagged and not call anything...
-  else if (strcmp(cmd->tok_list->p[0], "readmytable") == 0) read_my_table(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "readmytable") == 0) read_table(cmd);
   else if (strcmp(cmd->tok_list->p[0], "readcorr") == 0)   correct_readcorr(cmd); //FIXME not documented
   else if (strcmp(cmd->tok_list->p[0], "setcorr") == 0)    correct_setcorr(cmd); // FIXME not documented
   // else if (strcmp(cmd->tok_list->p[0], "prtcorr") == 0)    correct_prtcorr(cmd); // FIXME not documented

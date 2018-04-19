@@ -21,7 +21,7 @@ grow_constraint_list(struct constraint_list* p)
 }
 
 static struct constraint*
-make_constraint(int type, int find_npos, struct command_parameter* par)
+make_constraint(int find_npos, struct command_parameter* par)
   /* makes + stores a constraint from command parameter */
 {
   struct constraint* new = new_constraint(par->c_type);
@@ -38,6 +38,8 @@ make_constraint(int type, int find_npos, struct command_parameter* par)
         new->ex_c_min = par->min_expr;
       }
       if (par->c_type == 1) break;
+      /* FALLTHRU */
+
     case 2: /* maximum */
       if (par->max_expr == NULL) new->c_max = par->c_max;
       else
@@ -54,8 +56,6 @@ make_constraint(int type, int find_npos, struct command_parameter* par)
         new->ex_value = par->expr;
       }
   }
-  if (type == 1) new->weight = command_par_value(new->name, current_weight);
-  else           new->weight = command_par_value(new->name, current_gweight);
 
   new->n_pos = find_npos ? next_constr_namepos(new->name) : 0;
   if (find_npos && new->n_pos == 0) {
@@ -171,12 +171,17 @@ fill_constraint_list(int type /* 1 node, 2 global */,
   struct command_parameter_list* pl = cd->par;
   struct name_list* nl = cd->par_names;
   struct constraint* l_cons;
-  int j, find_npos = type == 1 && !get_option("slow");
+  int j, find_npos = type == 1 && !get_option("slow_match");
+  struct command* weights = type == 1 ? current_weight : current_gweight;
+  double weight = command_par_value("weight", cd);
+  int use_weight = par_present("weight", cd);
   for (j = 0; j < pl->curr; j++)
   {
     if (nl->inform[j] && pl->parameters[j]->type == 4)
     {
-      l_cons = make_constraint(type, find_npos, pl->parameters[j]);
+      l_cons = make_constraint(find_npos, pl->parameters[j]);
+      if (use_weight) l_cons->weight = weight;
+      else            l_cons->weight = command_par_value(l_cons->name, weights);
       add_to_constraint_list(l_cons, cl);
     }
   }

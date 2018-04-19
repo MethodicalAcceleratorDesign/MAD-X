@@ -145,7 +145,7 @@ CONTAINS
     !  his survey would have to be "caught" in this interface
 
     SELECT CASE(EL%KIND)
-    case(kind0:kind22,KINDWIGGLER,kindpa,kindsuperdrift)
+    case(kind0:kind22,KINDWIGGLER,kindpa,kindsuperdrift,kindabell)
        call SURVEY_chart(C,el%p,dir,magnetframe,E_IN)
 
        !    case(kind23)
@@ -951,8 +951,8 @@ CONTAINS
        !          S2%MAG%R(I)=S1(3+I); S2%MAGP%R(I)=S1(3+I);
        !       ENDDO
        DO I=1,3
-          D(I)=S1(I);   D(I)=S1(I);
-          R(I)=S1(3+I); R(I)=S1(3+I);
+          D(I)=S1(I);   !D(I)=S1(I);
+          R(I)=S1(3+I); !R(I)=S1(3+I);
        ENDDO
        S2%CHART%D_IN=0.0_dp;S2%CHART%D_OUT=0.0_dp;
        S2%CHART%ANG_IN=0.0_dp;S2%CHART%ANG_OUT=0.0_dp;
@@ -986,7 +986,10 @@ CONTAINS
        CALL ROTATE_FRAME(F,OMEGAT,ANGLE,1,BASIS=BASIST)
 
        IF(PRESENT(BASIS)) THEN   ! MUST ROTATE THAT FRAME AS WELL FOR CONSISTENCY IN DEFINITION WHAT A MISALIGNMENT IS IN PTC
-          CALL   GEO_ROT(BASIST,ANGLE,1)
+!          CALL   GEO_ROT(BASIST,ANGLE,1)
+           e1=basist
+          CALL   GEO_ROT(BASIST,e2,ANGLE,e1)   ! 2018 correction: agrees with successive rotations followed by rotations
+           basist=e2
        ELSE
           BASIST=F%MID    ! ALREADY ROTATED
        ENDIF
@@ -1048,42 +1051,61 @@ CONTAINS
 
   END SUBROUTINE MISALIGN_FIBRE
 
+
   SUBROUTINE  MAD_MISALIGN_FIBRE(S2,S1) ! MISALIGNS FULL FIBRE; FILLS IN CHART AND MAGNET_CHART
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: S1(6)
     TYPE(FIBRE),target,INTENT(INOUT):: S2
     REAL(DP) ENT(3,3),ENT1(3,3),ENT2(3,3),T(3),MAD_ANGLE(3),T_GLOBAL(3),ANGLE(3),MIS(6)
+    real(dp) r1(3,3),r2(3,3),r3(3,3)
     ent=S2%CHART%F%ent
     T(1)=S1(1);T(2)=S1(2);T(3)=S1(3);
     MAD_ANGLE(1)=-S1(4)
     MAD_ANGLE(2)=-S1(5)
     MAD_ANGLE(3)=S1(6)
 
-    CALL CHANGE_BASIS(T,ENT,T_GLOBAL,GLOBAL_FRAME)
-    ANGLE=0.0_dp; ANGLE(3)=MAD_ANGLE(3)
-    ent1=ent
-    ent2=ent
-    CALL GEO_ROT(ENT1,ENT,ANGLE,ENT2)
+
+
     ANGLE=0.0_dp; ANGLE(1)=MAD_ANGLE(1)
     ent1=ent
     ent2=ent
     CALL GEO_ROT(ENT1,ENT,ANGLE,ENT2)
+ 
     ANGLE=0.0_dp; ANGLE(2)=MAD_ANGLE(2)
     ent1=ent
     ent2=ent
     CALL GEO_ROT(ENT1,ENT,ANGLE,ENT2)
 
-    CALL CHANGE_BASIS(T_GLOBAL,GLOBAL_FRAME,T,ENT)
+    ANGLE=0.0_dp; ANGLE(3)=MAD_ANGLE(3)
+    ent1=ent
+    ent2=ent
+    CALL GEO_ROT(ENT1,ENT,ANGLE,ENT2)
+    
+
+
+
+
     CALL COMPUTE_ENTRANCE_ANGLE(S2%CHART%F%ent,ENT,ANGLE)
-    MIS(1:3)=T
+
+ 
+     ent1=S2%CHART%F%ent
+     ent2=ent
+     CALL CHANGE_BASIS(T,ENT1,T_GLOBAL,ent2)
+
+ 
+
+    MIS(1:3)=T_GLOBAL
     MIS(4:6)=ANGLE
 
     ENT=S2%CHART%F%ent
     T=S2%CHART%F%A
-    call MISALIGN_SIAMESE(S2,MIS,T,ENT)
-    !    call MISALIGN_FIBRE(S2,MIS,S2%CHART%F%A,S2%CHART%F%ent)
+
+        call MISALIGN_FIBRE(S2,MIS,T,ENT)
 
   END SUBROUTINE MAD_MISALIGN_FIBRE
+
+
+
 
   ! NEW ROUTINES TO CHANGE LAYOUT using only magnets!!!!
 

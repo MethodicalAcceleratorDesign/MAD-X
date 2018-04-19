@@ -133,6 +133,7 @@
 #define double_to_table_row double_to_table_row_
 #define string_to_table_row string_to_table_row_
 #define double_to_table_curr double_to_table_curr_ // **
+#define double_to_table_curr2 double_to_table_curr2_ // **
 #define vector_to_table_curr vector_to_table_curr_
 #define string_to_table_curr string_to_table_curr_
 #define comment_to_table_curr comment_to_table_curr_
@@ -306,6 +307,7 @@ void w_ptc_refreshtables_(void);
 void w_ptc_script_(F_INTEGER scriptname);
 void w_ptc_setaccel_method_(F_INTEGER method);
 void w_ptc_setdebuglevel_(F_INTEGER level);
+void w_ptc_setseed_(F_INTEGER level);
 void w_ptc_setstochastic_(F_INTEGER method);
 void w_ptc_setfieldcomp_(F_INTEGER fibreidx);
 void w_ptc_setexactmis_(F_INTEGER method);
@@ -314,6 +316,7 @@ void w_ptc_setfringe_(F_INTEGER method);
 void w_ptc_setknobvalue_(F_INTEGER fible);
 void w_ptc_setnocavity_(F_INTEGER method);
 void w_ptc_setradiation_(F_INTEGER method);
+void w_ptc_setmodulation_(F_INTEGER method);
 void w_ptc_settime_(F_INTEGER method);
 void w_ptc_settotalpath_(F_INTEGER method);
 void w_ptc_track_(F_INTEGER max_obs);

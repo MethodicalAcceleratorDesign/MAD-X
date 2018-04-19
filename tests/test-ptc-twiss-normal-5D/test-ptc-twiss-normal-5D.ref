@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:39:10      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.01.09 14:25:20      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -805,6 +805,7 @@ select, flag=ptc_twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
   ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
 
  MAD-X Beam Parameters
@@ -823,7 +824,7 @@ ptc_create_universe;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -6.2727600891321345E-015   4.2732595235822215E-031   8.4376949871511897E-015
+ After    end:    9.2703622556200571E-015   4.2732595235822136E-031  -7.5495165674510645E-015
   
 
 !  ptc_knob, element=QFN24,   kn=0,1, exactmatch=false;
@@ -847,7 +848,7 @@ ptc_create_universe;
        78.54370266       0.1241077846           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.6258930448         2.83857575       0.8215130809 
+          -1000000      -0.6258930447         2.83857575       0.8215130809 
 
                 q2                dq1                dq2                 qs 
       0.7214355408       -2.255280125       -4.867432606                  0 
@@ -868,31 +869,31 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -10.30211155    0.0006326813081 
+                 0                  0       -10.30211155    0.0006326813082 
 
           disp2min           disp2max           disp3min           disp3max 
-      -4.543122633        4.543122633   -0.0001805311847    0.0001805311847 
+      -4.543122633        4.543122633   -0.0001805311848    0.0001805311847 
 
           disp4min           disp4max             deltap            orbit_x 
-  -5.941120878e-05    7.741614594e-05                  0    1.068886075e-08 
+  -5.941120877e-05    7.741614593e-05                  0    1.068886093e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546154971e-09    -5.41250027e-14   -4.159052682e-14                  0 
+      2.546155e-09   -5.410652317e-14   -4.158891311e-14                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
-                -0    1.168576733e-08    2.107776439e-13    3.059602803e-09 
+           orbit_t             xcorms             ycorms            pxcorms 
+                -0    1.168576752e-08    2.108087748e-13     3.05960286e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-   7.782430328e-14                  0                  0    2.508655819e-08 
+   7.783652795e-14                  0                  0    2.508655852e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-   4.396497859e-13    1.106290638e-08    1.446368374e-13                 -0 
+   4.397728352e-13    1.106290661e-08    1.446670878e-13                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.538878356e-12   -4.392301789e-13   -1.106290751e-08 
+                 0    -1.53932902e-12   -4.392731378e-13   -1.106290766e-08 
 
            pycomin             tcomin            ptcomin 
-  -1.884531382e-13                 -0                  0 
+  -1.884781284e-13                 -0                  0 
 !  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
 
   
@@ -919,7 +920,7 @@ ptc_create_universe;
 
   ptc_normal,closed_orbit,normal,maptable,icase=5,no=4;
 
- Closed orbit:    1.0688863319111930E-008   2.5461543382882203E-009  -5.3416325509791692E-014  -4.1437484112607461E-014   0.0000000000000000     
+ Closed orbit:    1.0688863319111935E-008   2.5461543382882211E-009  -5.3416325507292341E-014  -4.1437484112250240E-014   0.0000000000000000     
 
 
   write, table=normal_results,file="ptc_normal_results.tfs"; 

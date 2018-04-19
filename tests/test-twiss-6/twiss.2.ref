@@ -24,15 +24,15 @@
 @ DQ1              %le        0.4063753269
 @ DQ2              %le         1.032676465
 @ DXMAX            %le         2.598063473
-@ DYMAX            %le     3.698203196e-07
+@ DYMAX            %le     3.698203193e-07
 @ XCOMAX           %le      0.002643348562
-@ YCOMAX           %le     7.947370568e-08
+@ YCOMAX           %le     7.947370567e-08
 @ BETXMAX          %le         184.2538246
 @ BETYMAX          %le         185.6362163
 @ XCORMS           %le        0.0016093582
 @ YCORMS           %le     4.492681364e-08
 @ DXRMS            %le         1.624119207
-@ DYRMS            %le      1.93037958e-07
+@ DYRMS            %le     1.930379579e-07
 @ DELTAP           %le                   0
 @ SYNCH_1          %le                   0
 @ SYNCH_2          %le                   0
@@ -40,10 +40,10 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.03.00 Darwin 64"
-@ DATE             %08s "30/03/17"
-@ TIME             %08s "14.29.24"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "14/12/17"
+@ TIME             %08s "17.56.47"
 * NAME                                X                 PX                  Y                 PY 
 $ %s                                %le                %le                %le                %le 
- "FIVECELL$START"        0.002578232586    3.848898961e-05   -2.257435417e-08   -3.834449974e-10
- "FIVECELL$END"          0.002578232586    3.848898961e-05    -2.25743542e-08   -3.834449979e-10
+ "FIVECELL$START"        0.002578232586    3.848898961e-05   -2.257435415e-08   -3.834449985e-10
+ "FIVECELL$END"          0.002578232586    3.848898961e-05   -2.257435418e-08    -3.83444999e-10

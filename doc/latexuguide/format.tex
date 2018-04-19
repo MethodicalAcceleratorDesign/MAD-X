@@ -352,7 +352,7 @@ random generator use the \hyperref[sec:eoption]{\texttt{EOPTION}} or  \hyperref[
 
 The command  \hyperref[sec:option]{\texttt{OPTION}} has two attributes to control the new random generator of MAD-X. The attribute \texttt{RAND} can take the value \texttt{default} (for backward compatibility) or \texttt{best} for the new generator. The latter supports 10 multiple independent generators numbered from 1 to 10, and can be selected with the attribute \texttt{RANDID=id} in combination to \texttt{RAND}. If \texttt{RANDID} is not specified and \texttt{RAND=best}, then the last \texttt{id} set is used (init: 1). The user can switch between the 10 independent generators at will to use different streams for the next generated random numbers. When a new seed is set through to command \hyperref[sec:eoption]{\texttt{EOPTION}},  \hyperref[sec:coption]{\texttt{COPTION}} or \hyperref[sec:track]{\texttt{TRACK}}, it will only affect the currently selected stream. The special initial seed for the \texttt{best} generator can be restored by using the value zero instead of the commands default 123456789. 
 
-The following example displays the first 10 random numbers of the 10 streams of the \texttt{best} generator, using the intial seed.
+The following example displays the first 10 random numbers of the 10 streams of the \texttt{best} generator, using the default initial seed.
 
 \begin{verbatim}
 option, -info;

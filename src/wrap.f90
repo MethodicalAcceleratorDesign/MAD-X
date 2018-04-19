@@ -109,6 +109,13 @@ subroutine w_ptc_setdebuglevel(level)
   call ptc_setdebuglevel(level)
 end subroutine w_ptc_setdebuglevel
 
+subroutine w_ptc_setseed(seed)
+  use madx_ptc_intstate_module
+  implicit none
+  integer seed
+  call ptc_setseed(seed)
+end subroutine w_ptc_setseed
+
 subroutine w_ptc_enforce6D(level)
   use madx_ptc_intstate_module
   implicit none
@@ -136,6 +143,14 @@ subroutine w_ptc_setradiation(method)
   integer method
   call ptc_setradiation(method)
 end subroutine w_ptc_setradiation
+
+subroutine w_ptc_setmodulation(method)
+  use precision_constants
+  use madx_ptc_intstate_module
+  implicit none
+  integer method
+  call ptc_setmodulation(method)
+end subroutine w_ptc_setmodulation
 
 subroutine w_ptc_setexactmis(method)
   use precision_constants
@@ -273,6 +288,15 @@ subroutine w_ptc_printframes(filename)
   use pointer_lattice
   implicit none
   integer filename(*)
+
+  if (ASSOCIATED(my_ering) .eqv. .false.) then
+     if (ASSOCIATED(m_u) .eqv. .false.) then
+          call aafail('w_ptc_printframes:','A PTC command without universe created. Program stops')
+          return
+     endif
+     my_ering => m_u%end
+  endif
+  
   call printframes(filename)
 end subroutine w_ptc_printframes
 
