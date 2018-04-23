@@ -25,9 +25,9 @@ apply a matching constraint.
 label: DRIFT, L=real;
 }
 
-A drift space has one real attribute: 
+A drift space has one real attribute:
 \begin{madlist}
-   \ttitem{L} The drift length (Default: 0 m) 
+   \ttitem{L} The drift length (Default: 0 m)
 \end{madlist}
 
 \textbf{Example:}
@@ -38,28 +38,28 @@ DR2: \> DRIFT, \> L=DR1->L;
 The length of DR2 is always equal to the length of DR1.
 
 The \hyperref[subsec:local-straight]{straight reference system} for a drift
-space is a Cartesian coordinate system.   
+space is a Cartesian coordinate system.
 
 
 \section{Bending Magnet}
 \ttindex{bend}
 \label{sec:bend}
 Two different type keywords are recognised for bending magnets, they are
-distinguished only by the reference system used:  
+distinguished only by the reference system used:
 \begin{madlist}
   \ttitem{SBEND}\label{bend-sbend} is a sector bending magnet. \\
   The planes of the pole faces intersect at the centre of curvature of
-  the curved \hyperref[subsec:local-rbend]{sbend reference system}.  
-  \ttitem{RBEND}\label{bend-rbend} is a specific case of SBEND. \\ 
-  The pole faces are parallel. The reference system is the curved  
+  the curved \hyperref[subsec:local-rbend]{sbend reference system}.
+  \ttitem{RBEND}\label{bend-rbend} is a specific case of SBEND. \\
+  The pole faces are parallel. The reference system is the curved
   \hyperref[subsec:local-rbend]{rbend reference system}.
 \end{madlist}
 
-Bendig magnets are defined by the statements: 
+Bendig magnets are defined by the statements:
 \madbox{
 label: SBEND, \= L=real, ANGLE=real, TILT=real, \\
               \> K0=real, K1=real, K2=real, K1S=real,\\
-              \> E1=real, E2=real, FINT=real, FINTX=real,\\ 
+              \> E1=real, E2=real, FINT=real, FINTX=real,\\
               \> HGAP=real, H1=real, H2=real,\\
               \> THICK=logical;\\
               \> \\
@@ -75,96 +75,88 @@ label: RBEND, \> L=real, ANGLE=real, TILT=real, \\
 Bending magnets have the following attributes:
 \begin{madlist}
    \ttitem{L} The length of the magnet (default: 0 m). \\
-   For sector bends the declared length is the arc length 
+   For sector bends the declared length is the arc length
    of the reference orbit. \\
    For rectangular bends the declared length is normally the length of a
    straight line joining the entry and exit points, as in the
-   Figure. \\ 
+   Figure. \\
    Internally \madx only uses the arc length of the reference orbit for
-   both bend types.\\ 
+   both bend types.\\
    \textbf{In order to define \texttt{RBEND}'s with a declared length equal to the
      arc length of the reference orbit, the option \texttt{RBARC} must be
-     previously set to FALSE in \madx with \texttt{Option, RBARC=false;}} 
-   
-   \ttitem{ANGLE} The bend angle (default: 0 rad). \\ 
+     previously set to FALSE in \madx with \texttt{Option, RBARC=false;}}
+
+   \ttitem{ANGLE} The bend angle (default: 0 rad). \\
    A positive bend angle represents a bend to the right, i.e. towards
    negative \textit{x} values. Please notice that \texttt{ANGLE} is used to
-   define bend strength, \texttt{K0}. To define the roll angle use \texttt{TILT}. 
-   
+   define bend strength, \texttt{K0}. To define the roll angle use \texttt{TILT}.
+
    \ttitem{ADD\_ANGLE} An array of (maximum 5) bending angles for
    multiple passes. See \texttt{ADD\_PASS} option of the
    \hyperref[chap:sequence]{\texttt{SEQUENCE}} command. This is only
    allowed for \texttt{RBEND} elements and is ignored for \texttt{SBEND}
    elements.
- 
+
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
-   rad, i.e. a horizontal bend). \\ 
-   A positive angle represents a clockwise rotation. \\ 
+   rad, i.e. a horizontal bend). \\
+   A positive angle represents a clockwise rotation. \\
    An attribute \texttt{TILT=pi/2} turns a horizontal into a vertical
    bend, and a positive \texttt{ANGLE} then denotes a downwards
-   deflection. 
+   deflection.
 
    \ttitem{K1} The quadrupole coefficient (Default: 0 m$^{-2}$)\\
      $K_1 = (1/B\rho) (\partial B_y / \partial x)$. \\
-   A positive quadrupole strength implies horizontal focussing of particles, 
-   irrespective of their charge. K1 is taken into account in thick bend transfer map. 
-   Only K0 and K1 are considered for think transfer map, not any other strengths (like K2, K1S). 
-   % positively charged particles.  % Ghislain: sera changé dans le futur! 
+   A positive quadrupole strength implies horizontal focussing of particles,
+   irrespective of their charge. K1 is taken into account in thick bend transfer map.
+   Only K0 and K1 are considered for think transfer map, not any other strengths (like K2, K1S).
+   % positively charged particles.  % Ghislain: sera changé dans le futur!
 
-   \ttitem{E1} The rotation angle for the entrance pole face (Default: 0 rad). 
+   \ttitem{E1} The rotation angle for the entrance pole face (Default: 0 rad).
    \ttitem{E2} The rotation angle for the exit pole face (Default: 0 rad). \\
    The pole face rotation angles are referred to the magnet model for
    \hyperref[F-RBND]{rectangular bend} and \hyperref[F-SBND]{sector
-     bend} respectively. \\ 
-   \texttt{E1} and \texttt{E2} are positive if they reduce the length of the
-   side of the bend that is further away from the centre of
-   curvature. \\
-   \texttt{E1} and \texttt{E2} must be specified as positive to give an
-   \texttt{SBEND} parallel faces, i.e. turning it into an
-   \texttt{RBEND}. \texttt{E1} and \texttt{E2} must be negative to give
-   an \texttt{RBEND} faces whose planes intersect at the centrer of
-   curvature, ie turning it into an \texttt{SBEND}.   
+     bend} respectively. If \texttt{E1} and \texttt{E2} are of the same sign as the bending angle, they reduce the external length (i.e. opposite to the centre of curvature) of the magnet. \texttt{E1} and \texttt{E2} must be specified as half of the bending angle of the magnet to get a \texttt{SBEND} with parallel faces, i.e. turning it into a \texttt{RBEND}. \texttt{E1} and \texttt{E2} must be specified as {\it minus} half of the bending angle of the magnet to get a \texttt{RBEND} with sector faces, i.e. turning it into a \texttt{SBEND}.
 
    \ttitem{FINT} The fringe field integral at entrance and exit of the
-   bend. (Default:  0). 
+   bend. (Default:  0).
    \ttitem{FINTX} If defined and positive, the fringe field integral at
    the exit of the element, overriding \texttt{FINT} for the
-   exit. (Default: =\texttt{FINT}) \\  
+   exit. (Default: =\texttt{FINT}) \\
    This allows to set different fringe field integrals at entrance
-   (\texttt{FINT}) and exit (\texttt{FINTX}) of the element.  
+   (\texttt{FINT}) and exit (\texttt{FINTX}) of the element.
 
-   \ttitem{HGAP} The half gap of the magnet (default: 0 m). 
+   \ttitem{HGAP} The half gap of the magnet (default: 0 m).
 
-   \ttitem{K2} The sextupole coefficient. (Default: 0 m$^{-3}$) \\ 
-   $K_2 = (1/B\rho) (\partial^2 B_y / \partial x^2)$. Please note that \texttt{K2} 
+   \ttitem{K2} The sextupole coefficient. (Default: 0 m$^{-3}$) \\
+   $K_2 = (1/B\rho) (\partial^2 B_y / \partial x^2)$. Please note that \texttt{K2}
    is not taken into account for bend transfer map.
 
-  \ttitem{K1S} The skew quadrupole coefficient 
-   $K_{s} = 1/(2 B \rho) (\partial B_x / \partial x - \partial B_y / \partial y)$\\  
+  \ttitem{K1S} The skew quadrupole coefficient
+   $K_{s} = 1/(2 B \rho) (\partial B_x / \partial x - \partial B_y / \partial y)$\\
     where (x,y) is a coordinate system rotated by $-45^\circ$ around s
     with respect to the normal one. The default is 0 m$^{-2}$. A
-    positive skew quadrupole strength implies \textsl{defocussing}, 
-    irrespective of the charge of the particles,  
+    positive skew quadrupole strength implies \textsl{defocussing},
+    irrespective of the charge of the particles,
     in the (x,s) plane rotated by $45^\circ$
-    around \textit{s} (particles in this plane have \texttt{x = y $>$ 0}). 
+    around \textit{s} (particles in this plane have \texttt{x = y $>$ 0}).
     Please note that \texttt{K1S} is not taken into account for bend transfer map.
-   \ttitem{H1}The curvature of the entrance pole face. 
-   (Default: 0 m$^{-1}$).   
+   \ttitem{H1}The curvature of the entrance pole face.
+   (Default: 0 m$^{-1}$).
    \ttitem{H2} The curvature of the exit pole face. (Default: 0 m$^{-1}$) \\
    A positive pole face curvature induces a negative sextupole
    component; i.e. for positive \texttt{H1} and \texttt{H2} the centres
-   of curvature of the pole faces are placed inside the magnet. 
+   of curvature of the pole faces are placed inside the magnet.
 
    \ttitem{K0} Please take note that $K_0$ and $K_0S$ are left in the
    data base but are no longer used for the MAP of the bends,
    instead \texttt{ANGLE} and \texttt{TILT} are used exclusively. \\
    However, \texttt{K0} is assignment of \textbf{relative} field errors to a bending magnet because
    \texttt{K0} is used for the normalization instead of the
-   \texttt{ANGLE}. (see \hyperref[sec:efcomp]{\texttt{EFCOMP}}).\\ 
+   \texttt{ANGLE}. (see \hyperref[sec:efcomp]{\texttt{EFCOMP}}).\\
    With $K_0 = (1 / B \rho) B_y$, one gets \texttt{K0 = ANGLE / arclength}.
 
 
-   \ttitem{THICK} If this logical flag is set to true the bending 
+   \ttitem{THICK} If this logical flag is set to true the bending
    magnet is tracked through as a thick-element, instead of being
    converted into thin-lenses. \\
    (Default: false)
@@ -186,14 +178,14 @@ The quantities \texttt{FINT} and \texttt{HGAP} specify the finite extent
 of the fringe fields as defined in SLAC-75 \cite{slac75}:
 \begin{equation}
 \mathrm{FINT}=\int_{-\infty}^\infty \frac{B_y(s)(B_0-B_y(s))}{g \cdot
-  B_0^2}\,\mathrm{d}s ,\quad\quad g=2\cdot \mathrm{HGAP}. 
+  B_0^2}\,\mathrm{d}s ,\quad\quad g=2\cdot \mathrm{HGAP}.
 \end{equation}
 
 The default values of zero corresponds to the hard-edge approximation,
 i.e. a rectangular field distribution. For other approximations, enter
 the correct value of the half gap, and one of the following values for
-\texttt{FINT}: 
- 
+\texttt{FINT}:
+
 \begin{center}
   \begin{tabular}{l l}
     Linear Field drop-off                   &  1/6 \\
@@ -205,13 +197,13 @@ the correct value of the half gap, and one of the following values for
 
 
 Entering the keyword \texttt{FINT} alone sets the integral to 0.5, which is a
-reasonable average of the above values.  
+reasonable average of the above values.
 
 Note also that the possibility to specify both \texttt{FINT} and
 \texttt{FINTX} allows one to set different values at entrance and exit
-of a bend element. \\  
+of a bend element. \\
 This can be particularly useful to set the fringe field integral to zero
-on one side only, \textsl{e.g.} when slicing a dipole.  
+on one side only, \textsl{e.g.} when slicing a dipole.
 
 
 \textbf{\underline {Examples:}}
@@ -234,39 +226,39 @@ introduced in order to make it possible to track trajectories in the
 presence of dipoles with pole face angles. Only linear terms are
 considered since the higher order terms would make the tracking
 non-symplectic. The transformation of the machine elements into thin
-lenses leaves dipole edge (\texttt{DIPEDGE}) elements untouched and splits 
-correctly the \texttt{SBEND}'s.  
+lenses leaves dipole edge (\texttt{DIPEDGE}) elements untouched and splits
+correctly the \texttt{SBEND}'s.
 
-It does not make sense to use a \texttt{DIPEDGE} alone. 
-It can be specified at the entrance and the exit of a \texttt{SBEND}. 
-A dipole edge element is defined by the command:  
+It does not make sense to use a \texttt{DIPEDGE} alone.
+It can be specified at the entrance and the exit of a \texttt{SBEND}.
+A dipole edge element is defined by the command:
 \madbox{
   label: DIPEDGE, \= H=real, E1=real, FINT=real, \\
-                  \> HGAP=real, TILT=real; 
+                  \> HGAP=real, TILT=real;
 }
 
-A \texttt{DIPEDGE} has zero length and five attributes. 
+A \texttt{DIPEDGE} has zero length and five attributes.
 \begin{madlist}
    \ttitem{H} Is angle/length or 1/rho (default: 0 m$^{-1}$ - for the
      default the dipedge element has no effect). (must be equal to that
-     of the associated \texttt{SBEND})  
+     of the associated \texttt{SBEND})
    \ttitem{E1} The rotation angle for the pole face. The sign convention is
      as for a \hyperref[bend-sbend]{\texttt{SBEND}} bending magnet. Note that it is
-     different for an entrance and an exit. (default: 0 rad).  
+     different for an entrance and an exit. (default: 0 rad).
    \ttitem{FINT} field integral as for \texttt{SBEND}
      \hyperref[F-SBND]{sector bend}. Note that each
      \texttt{DIPEDGE} has its own \texttt{FINT}, so that specifying
-     \texttt{FINTX} is no longer necessary.   
+     \texttt{FINTX} is no longer necessary.
    \ttitem{HGAP} half gap height of the associated \hyperref[bend-sbend]{\texttt{SBEND}}
-     bending magnet.   
+     bending magnet.
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad, \textsl{i.e.} a horizontal bend). A positive angle represents a
-     clockwise rotation.  
+     clockwise rotation.
 \end{madlist}
 
 
 
-%  Changed by: Andrea Latina, 6-May-2013 
+%  Changed by: Andrea Latina, 6-May-2013
 \section{Quadrupole}
 \ttindex{quadrupole}
 \label{sec:quadrupole}
@@ -277,33 +269,33 @@ label: QUADRUPOLE, \= L=real, K1=real, K1S=real, TILT=real,\\
 }
 
 
-A \texttt{QUADRUPOLE} has five attributes:     
+A \texttt{QUADRUPOLE} has five attributes:
 \begin{madlist}
-   \ttitem{L} The quadrupole length (default: 0 m). 
-   \ttitem{K1} The normal quadrupole coefficient:        
-     $K_1 = 1/(B \rho) (\partial B_y / \partial x)$.\\ 
+   \ttitem{L} The quadrupole length (default: 0 m).
+   \ttitem{K1} The normal quadrupole coefficient:
+     $K_1 = 1/(B \rho) (\partial B_y / \partial x)$.\\
      The default is 0 m$^{-2}$. A positive normal quadrupole strength
      implies horizontal focussing, irrespective of the charge of the particles.
-     % of positively charged particles.  
-   \ttitem{K1S} The skew quadrupole coefficient 
-     $K_{1s} = 1/(2 B \rho) (\partial B_x / \partial x - \partial B_y / \partial y)$\\  
+     % of positively charged particles.
+   \ttitem{K1S} The skew quadrupole coefficient
+     $K_{1s} = 1/(2 B \rho) (\partial B_x / \partial x - \partial B_y / \partial y)$\\
      where (x,y) is now a coordinate system rotated by $-45^\circ$ around s
      with respect to the normal one. The default is 0 m$^{-2}$. A
-     positive skew quadrupole strength implies \textsl{defocussing}, 
-     irrespective of the charge of the particles,  
-     % of positively charged particles 
+     positive skew quadrupole strength implies \textsl{defocussing},
+     irrespective of the charge of the particles,
+     % of positively charged particles
      in the (x,s) plane rotated by $45^\circ$
-     around \textit{s} (particles in this plane have \texttt{x = y $>$ 0}). 
+     around \textit{s} (particles in this plane have \texttt{x = y $>$ 0}).
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad, i.e. a normal quadrupole). A positive angle represents a
      clockwise rotation. A \texttt{TILT=pi/4} turns a positive normal quadrupole
-     into a negative skew quadrupole.          
+     into a negative skew quadrupole.
 
    \textbf{Please note that contrary to \madeight one has to
      specify the desired TILT angle, otherwise it is taken as
      0 rad. This was needed to avoid the confusion in \madeight
      about the actual meaning of the \texttt{TILT} attribute for
-     various elements.} 
+     various elements.}
 
     \ttitem{THICK} If this logical flag is set to true the quadrupole
     is tracked through as a thick-element, instead of being
@@ -316,14 +308,14 @@ A \texttt{QUADRUPOLE} has five attributes:
   the bench, while the TILT attribute can be considered as a
   tilt alignment error in the machine. In fact, a positive
   $K_1$ with a \texttt{TILT = 0} is equivalent to a positive $K_{1s}$
-  with \texttt{TILT = +$\pi/4$ }} 
+  with \texttt{TILT = +$\pi/4$ }}
 
-Example: 
+Example:
 \madxmp{QF: QUADRUPOLE, L=1.5, K1=0.001, THICK=true;}
 
-%irina 
+%irina
 \textbf{Note:} Quadrupoles doesn't carry any attributes of the other orders magnets,
- for example, bend($K_0$) or sextupole($K_2$).In case these have to be considered 
+ for example, bend($K_0$) or sextupole($K_2$).In case these have to be considered
  in the element, please use multipole as a type of an element.
 
 
@@ -342,50 +334,50 @@ a quadrupole is a Cartesian coordinate system.
 label: SEXTUPOLE, L=real, K2=real, K2S=real, TILT=real;
 }
 
-A \texttt{SEXTUPOLE} has four real attributes: 
+A \texttt{SEXTUPOLE} has four real attributes:
 \begin{madlist}
-    \ttitem{L} The sextupole length (default: 0 m). 
+    \ttitem{L} The sextupole length (default: 0 m).
     \ttitem{K2} The normal sextupole coefficient $K_2 = \frac{1}{B \rho}
-      (\partial^2 B_y / \partial x^2)$. \\       
-      (default: 0 m$^{-3}$). 
-    \ttitem{K2S} The skew sextupole coefficient 
+      (\partial^2 B_y / \partial x^2)$. \\
+      (default: 0 m$^{-3}$).
+    \ttitem{K2S} The skew sextupole coefficient
       $K_{2S} = \frac{1}{B \rho} (\partial^2 B_x / \partial x^2)$ \\
 %% 2013-Jul-05  17:58:30  ghislain: error reported by Christian Carli
 %      \textit{K}$_{2S}$ = 1/(2 \textit{B} rho)
 %      ($\partial$$^2$\textit{B$_x$}/$\partial$ \textit{x}$^2$ -
-%      $\partial$$^2$\textit{B$_y$}/$\partial$ \textit{y}$^2$).   
+%      $\partial$$^2$\textit{B$_y$}/$\partial$ \textit{y}$^2$).
       where (x,y) is now a coordinate system rotated by $-30^\circ$ around s with
       respect to the normal one. (default: 0 m$^{-3}$). A positive skew
-      sextupole strength implies \textsl{defocussing} (!) 
+      sextupole strength implies \textsl{defocussing} (!)
       irrespective of the charge of the particles,
-      % of positively charged particles 
+      % of positively charged particles
       in the (x,s) plane rotated by $30^\circ$ around s (particles in
-      this plane have $x > 0$, $y > 0$).  
+      this plane have $x > 0$, $y > 0$).
 
     \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
       rad, i.e. a normal sextupole). A positive angle represents a
-      clockwise rotation. A \texttt{TILT = pi/6} turns a positive normal 
+      clockwise rotation. A \texttt{TILT = pi/6} turns a positive normal
       sextupole into a negative skew sextupole.
-      
+
       \textbf{Please note that contrary to \madeight one has to specify the
         desired \texttt{TILT} angle, otherwise it is taken as
         0~rad. This was needed to avoid the confusion in \madeight about
         the actual meaning of the \texttt{TILT} attribute for various
-        elements.}  
+        elements.}
 \end{madlist}
 
 \textbf{Note also that $K_2$ or $K_{2s}$ can be considered as the normal
   or skew sextupole components of the magnet on the bench, while the
   \texttt{TILT} attribute can be considered as an tilt alignment error in the
   machine. In fact, a positive $K_2$ with a $\mathtt{TILT} = 0$ is equivalent to a
-  positive $K_{2s}$ with positive $\mathtt{TILT} = \pi/6$.} 
+  positive $K_{2s}$ with positive $\mathtt{TILT} = \pi/6$.}
 
-Example: 
+Example:
 \madxmp{S: SEXTUPOLE, L=0.4, K2=0.00134;}
 
-%irina 
+%irina
 \textbf{Note:} Sextupole doesn't carry any attributes of other orders magnets,
-for example, bend($K_0$) or quadrupole($K_1, K1_S$). In case these have to be 
+for example, bend($K_0$) or quadrupole($K_1, K1_S$). In case these have to be
 considered in the element, please use multipole as a type of an element.
 
 
@@ -393,7 +385,7 @@ considered in the element, please use multipole as a type of an element.
 are useful for \ptc and are defined in \ref{sec:add-option-PTC}.
 
 The \hyperref[subsec:local-straight]{straight reference system} for a
-sextupole is a Cartesian coordinate system.   
+sextupole is a Cartesian coordinate system.
 
 
 \section{Octupole}
@@ -404,31 +396,31 @@ sextupole is a Cartesian coordinate system.
 label: OCTUPOLE, L=real, K3=real, K3S=real, TILT=real;
 }
 
-An \texttt{OCTUPOLE} has four real attributes: 
+An \texttt{OCTUPOLE} has four real attributes:
 \begin{madlist}
-   \ttitem{L} The octupole length (default: 0 m). 
+   \ttitem{L} The octupole length (default: 0 m).
 
-   \ttitem{K3} The normal octupole coefficient 
-     $K_3 = \frac{1}{B \rho} (\partial^3B_y / \partial x^3)$ \\ 
-     (default:  0 m$^{-4}$). 
+   \ttitem{K3} The normal octupole coefficient
+     $K_3 = \frac{1}{B \rho} (\partial^3B_y / \partial x^3)$ \\
+     (default:  0 m$^{-4}$).
 
-   \ttitem{K3S} The skew octupole coefficient 
+   \ttitem{K3S} The skew octupole coefficient
 %% 2013-Jul-05  18:00:59  ghislain: to be checked wrt error reported on
-%% K2S for sextupoles 
+%% K2S for sextupoles
      $K_{3S} = \frac{1}{2 B\rho} (\partial^3B_x/\partial x^3 -
    \partial^3B_y/\partial y^3)$ \\
      where (x,y) is now a coordinate system rotated by -22.5$^o$ around
      s with respect to the normal one. (default: 0 m$^{-4}$). A positive
-     skew octupole strength implies \textsl{defocussing} (!) 
+     skew octupole strength implies \textsl{defocussing} (!)
      irrespective of the charge of the particles,
-     % of positively charged particles 
+     % of positively charged particles
      in the (x,s) plane rotated by 22.5$^o$ around s
-     (particles in this plane have x $>$ 0, y $>$ 0).  
+     (particles in this plane have x $>$ 0, y $>$ 0).
 
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad, i.e. a normal octupole). A positive angle represents a
      clockwise rotation. A \texttt{TILT=pi/8} turns a positive normal octupole
-     into a negative skew octupole.  
+     into a negative skew octupole.
 
      \textbf{Please note that contrary to \madeight one has to specify the
        desired TILT angle, otherwise it is taken as 0 rad. This was
@@ -441,9 +433,9 @@ An \texttt{OCTUPOLE} has four real attributes:
   skew quadrupole components of the magnet on the bench, while the
   \texttt{TILT} attribute can be considered as an tilt alignment error
   in the machine. In fact, a positive $K_3$ with a \texttt{TILT=0} is
-  equivalent to a positive $K_{3S}$ with positive \texttt{TILT=+pi/8}.} 
+  equivalent to a positive $K_{3S}$ with positive \texttt{TILT=+pi/8}.}
 
-Example: 
+Example:
 \madxmp{O3: OCTUPOLE, L=0.3, K3=0.543;}
 
 \textbf{Note:} Additional attributes can be given to octupoles; They
@@ -451,7 +443,7 @@ are useful for \ptc and are defined in \ref{sec:add-option-PTC}.
 
 The \hyperref[subsec:local-straight]{straight reference system} for a
 octupole is a Cartesian coordinate system. Octupoles are normally
-treated as thin lenses, except when tracking by Lie-algebraic methods.   
+treated as thin lenses, except when tracking by Lie-algebraic methods.
 
 
 
@@ -459,7 +451,7 @@ treated as thin lenses, except when tracking by Lie-algebraic methods.
 \ttindex{multipole}
 \label{sec:multipole}
 
-A \texttt{MULTIPOLE} is a thin-lens magnet of arbitrary order, including a 
+A \texttt{MULTIPOLE} is a thin-lens magnet of arbitrary order, including a
 dipole component.
 
 \madbox{
@@ -483,37 +475,37 @@ They are both expressed in $[\mathrm{m}^{-n}]$.
       A non-zero \texttt{LRAD} in conjunction with
       \hyperref[sec:option]{\texttt{OPTION, THIN\_FOC=true}}
       takes into account the weak focussing of bending magnets.
-      
+
     \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
       rad). A positive angle represents a clockwise rotation of the
       multipole element. The roll angle affects all components.
-      
-    \ttitem{KNL} An array of the integrated normal multipole coefficients, 
-      starting from order zero and up to the maximum order (currently 20). 
-      The parameters are positional in the array, therefore 
+
+    \ttitem{KNL} An array of the integrated normal multipole coefficients,
+      starting from order zero and up to the maximum order (currently 20).
+      The parameters are positional in the array, therefore
       zeros must be filled in for components that do not exist. \\
-      The coefficient of rank $i$ in the array corresponds to the integrated 
-      strength $K_i L = B_i . L / (B\rho)$ where the strength is given by 
-      equation \ref{eq:kn}. 
+      The coefficient of rank $i$ in the array corresponds to the integrated
+      strength $K_i L = B_i . L / (B\rho)$ where the strength is given by
+      equation \ref{eq:kn}.
       Hence the first argument of the array, the argument for a normal
       multipole of order zero, $K_0 L = B_0 . L / (B\rho)$ is equal to
       the normal horizontal rotation angle of the thin dipole.
-      
-    \ttitem{KSL} An array of the integrated skew multipole coefficients, 
+
+    \ttitem{KSL} An array of the integrated skew multipole coefficients,
      starting from order zero and up to the maximum order (currently 20). The
      parameters are positional in the array, therefore zeros must be
-     filled in for components that do not exist. 
+     filled in for components that do not exist.
 %     Hence the first argument of the array, the argument for a skew
 %     multipole of order zero, $K_0 L = B_0 . L / (B\rho)$ is equal to
 %    the skew or vertical rotation angle of the thin dipole.
- 
+
 \end{madlist}
 
-Both \texttt{KNL} and \texttt{KSL} may be specified for the same multipole. 
+Both \texttt{KNL} and \texttt{KSL} may be specified for the same multipole.
 
 Contrary to \madeight the desired \texttt{TILT} angle must be explicitly
 specified, and defaults otherwise to 0 rad. The roll angle specified
-with \texttt{TILT} is global to all multipolar components.  
+with \texttt{TILT} is global to all multipolar components.
 Hence the \texttt{KNL} and \texttt{KSL} components can be considered as the
 normal or skew multipole components of the magnet as measured on the
 bench, while the \texttt{TILT} attribute can be considered as an alignment
@@ -522,27 +514,27 @@ error as measured in the machine.
 A multipole with no dipole component has no effect on the reference
 orbit, i.e. the reference system at its exit is the same as at its
 entrance. If it includes a dipole component, it has the same effect on
-the reference orbit as a dipole with zero length, total deflection 
+the reference orbit as a dipole with zero length, total deflection
 \texttt{angle} defined by: %and \texttt{tilt} defined by:
 \begin{equation}
   \begin{aligned}
 %    \mathtt{angle} &=  \mathtt{KNL}(0) \\
  \mathtt{angle} &=  \sqrt{ \mathtt{KNL}(0)^2 + \mathtt{KSL}(0)^2 }\\
- \mathtt{tilt}     &= \mathtt{TILT} - \arctan (\mathtt{KSL}(0) / \mathtt{KNL}(0))  
+ \mathtt{tilt}     &= \mathtt{TILT} - \arctan (\mathtt{KSL}(0) / \mathtt{KNL}(0))
   \end{aligned}
 \end{equation}
 Note that the \texttt{TILT} attribute of the \texttt{MULTIPOLE}
-is added to the intrinsic tilt calculated from \texttt{KNL} and \texttt{KSL}. 
+is added to the intrinsic tilt calculated from \texttt{KNL} and \texttt{KSL}.
 
 %In order to know the current maximum order of a given multipole, use the
 %command \texttt{HELP, MULTIPOLE;} and count.
 
 
 \textbf{Examples:}\\
-A thin-lens sextupole:  
+A thin-lens sextupole:
 \madxmp{ms: MULTIPOLE, KNL=\{0, 0, k2l\};}
 
-A thin-lens skew octupole:  
+A thin-lens skew octupole:
 \madxmp{mso: MULTIPOLE, KSL=\{0, 0, 0, k3sl\};}
 
 A thin-lens multipole with a normal octupole component and a skew decapole
@@ -561,7 +553,7 @@ hvbend: MULTIPOLE, KSL=\{2.e-3\}, TILT=-pi/4;
 
 % moved from element format above
 % commented by Ghislain on 2014-01-01
-%A special format is used for a \href{multipole.html}{multipole}\index{multipole}: 
+%A special format is used for a \href{multipole.html}{multipole}\index{multipole}:
 %\madxmp{
 %m: multipole, \= knl= \{kn0, kn1, kn2, ..., knmax\}, \\
 %              \> ksl= \{ks0, ks1, ks2, ..., ksmax\};
@@ -572,31 +564,31 @@ hvbend: MULTIPOLE, KSL=\{2.e-3\}, TILT=-pi/4;
 
 
 
-%  Changed by: Alexander Koschik, 16-May-2006 
+%  Changed by: Alexander Koschik, 16-May-2006
 \section{Solenoid}
 \ttindex{solenoid}
 \label{sec:solenoid}
 
-Solenoids can be defined in two forms, a thick and a thin version: 
+Solenoids can be defined in two forms, a thick and a thin version:
 
 \madbox{
 xxxxxxxxxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxx\= \kill
-label: SOLENOID, L=real,  \>KS=real;           \> ! thick version \\ 
-label: SOLENOID, L=0,     \>KS=real, KSI=real; \> ! thin version 
+label: SOLENOID, L=real,  \>KS=real;           \> ! thick version \\
+label: SOLENOID, L=0,     \>KS=real, KSI=real; \> ! thin version
 }
 
-A \texttt{SOLENOID} has three real attributes: 
+A \texttt{SOLENOID} has three real attributes:
 \begin{madlist}
-   \ttitem{L} The length of the solenoid (default: 0 m) 
+   \ttitem{L} The length of the solenoid (default: 0 m)
    \ttitem{KS} The solenoid strength $K_s = B_0 / B\rho$ (default: 0
      rad/m). For positive \texttt{KS} and positive particle charge, the
-     solenoid field points in the direction of increasing $s$.  
+     solenoid field points in the direction of increasing $s$.
    \ttitem{KSI} The solenoid integrated strength $K_s L$
      (default: 0 rad).  This additional attribute is needed only when
-     using the thin solenoid,  where $L=0$.     
+     using the thin solenoid,  where $L=0$.
 \end{madlist}
 
-Example: 
+Example:
 \madxmp{
 xxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxx\= \kill
 SOLO:     \> SOLENOID, L = 2., \> KS = 0.001; \\
@@ -610,8 +602,8 @@ also be specified for solenoids. They have no effect in \madx proper but
 are used in \ptc for solenoid with multipoles.
 
 The \hyperref[subsec:local-straight]{straight reference system} for a
-solenoid is a Cartesian coordinate system. 
- 
+solenoid is a Cartesian coordinate system.
+
 
 
 \section{Nonlinear Lens with Elliptic Potential}
@@ -628,24 +620,24 @@ to create fully integrable 2D nonlinear accelerator lattice with very
 large nonlinear tune spread/shift. The \texttt{NLLENS} element is recognized by
 the thin tracking module. The quadrupole term of the potential is
 included in the transport map and, consequently, affects the calculation
-of tunes and Twiss functions.   
+of tunes and Twiss functions.
 
 \begin{madlist}
    \ttitem{KNLL} The integrated strength of lens (m). The strength is
      parametrized so that the quadrupole term of the multipole
-     expansion is \texttt{k1=2*KNLL/CNLL\textasciicircum2}.      
+     expansion is \texttt{k1=2*KNLL/CNLL\textasciicircum2}.
    \ttitem{CNLL} The dimensional parameter of lens (m). The singularities
-     of the potential are located at X=-CNLL,+CNLL and Y=0.  
+     of the potential are located at X=-CNLL,+CNLL and Y=0.
 \end{madlist}
 
 The scalar potential function of the element is given by
 \begin{equation}
-U(x,y)=\frac{k}{c}\frac{\xi\sqrt{\xi^2-1} \, \text{acosh}\xi +  
+U(x,y)=\frac{k}{c}\frac{\xi\sqrt{\xi^2-1} \, \text{acosh}\xi +
   \eta\sqrt{1-\eta^2}(\text{acos}\eta-\pi/2)}{\xi^2-\eta^2}
 \end{equation}
-\\ where \textit{k} = KNLL, \textit{c} = CNLL and 
+\\ where \textit{k} = KNLL, \textit{c} = CNLL and
 \begin{equation}
-\xi = \frac{\sqrt{(x+c)^2+y^2}+\sqrt{(x-c)^2+y^2}}{2c}, 
+\xi = \frac{\sqrt{(x+c)^2+y^2}+\sqrt{(x-c)^2+y^2}}{2c},
 \quad \eta = \frac{\sqrt{(x+c)^2+y^2}-\sqrt{(x-c)^2+y^2}}{2c},
 \end{equation}
 
@@ -660,19 +652,19 @@ Figure below shows the contour plot of the scalar potential: \\
 
 The multipole expansion of the scalar potential is \\
 \begin{equation}
-U(x,y)=k\cdot Re\left\{ \left(\dfrac{x + i y}{c}\right)^2 + 
+U(x,y)=k\cdot Re\left\{ \left(\dfrac{x + i y}{c}\right)^2 +
 \frac{2}{3}\left(\dfrac{x + i y}{c}\right)^4 +
-\frac{8}{15}\left(\dfrac{x + i y}{c}\right)^6 + 
+\frac{8}{15}\left(\dfrac{x + i y}{c}\right)^6 +
 \frac{16}{35}\left(\dfrac{x + i y}{c}\right)^8 + \cdots \right\}
 \end{equation}
-\\ 
+\\
 Note that this expansion is only valid inside the \textit{r=c} circle on
-the x,y plane.    
+the x,y plane.
 
 In order to create integrable optics, one needs to shape the potential
 along z axis according to the beta-function. Below is an example
 nonlinear section representing the necessary nonlinear field with 20
-thin lenses:  
+thin lenses:
 \begin{verbatim}
     mu0 = 0.3;  ! phase advance over straight section
     l0 = 2.0;   ! length of the straight section
@@ -707,27 +699,27 @@ thin lenses:
 %% References:
 %% \begin{enumerate}
 %% \item V. Danilov, S. Nagaitsev, Phys. Rev. ST Accel. Beams \textbf{13},
-%%   084002 (2010). 
-  
+%%   084002 (2010).
+
 %% \item A. Valishev, S. Nagaitsev, V. Kashikhin, V. Danilov, in
 %%   Proceedings of 2011 Particle Accelerator Conference, New York, NY,
-%%   USA, WEP070. 
+%%   USA, WEP070.
 %% \end{enumerate}
 
 %A. Valishev, March 19, 2012
 
 
-%  Changed by: Frank Schmidt, 28-Aug-2003 
-%  Changed by: Werner Herr, 22-May-2007 
+%  Changed by: Frank Schmidt, 28-Aug-2003
+%  Changed by: Werner Herr, 22-May-2007
 \section{Closed Orbit Corrector}
 \ttindex{kicker}\index{orbit corrector}
 \label{sec:closed-orbit-cor}\label{sec:kicker}
 
-Three types of magnetic closed orbit correctors are available: 
+Three types of magnetic closed orbit correctors are available:
 \begin{madlist}
-   \ttitem{HKICKER} a corrector for the horizontal plane, 
-   \ttitem{VKICKER} a corrector for the vertical plane, 
-   \ttitem{KICKER} a corrector for both planes. 
+   \ttitem{HKICKER} a corrector for the horizontal plane,
+   \ttitem{VKICKER} a corrector for the vertical plane,
+   \ttitem{KICKER} a corrector for both planes.
 \end{madlist}
 
 \madbox{
@@ -740,37 +732,37 @@ label: KICKER,  \>L=real, HKICK=real, \>VKICK=real, TILT=real;
 \textbf{The type \texttt{KICKER} should not be used when an orbit corrector
   kicks only in one plane.}
 
-The attributes have the following meaning: 
+The attributes have the following meaning:
 \begin{madlist}
-   \ttitem{L} The length of the closed orbit corrector (default: 0 m). 
-   \ttitem{KICK} The momentum change $\delta PX = \delta p_x/p_0$ or 
+   \ttitem{L} The length of the closed orbit corrector (default: 0 m).
+   \ttitem{KICK} The momentum change $\delta PX = \delta p_x/p_0$ or
      $\delta PY = \delta p_y / p_0$ for respectively horizontal or vertical
-     correctors. (default: 0).  
-   \ttitem{HKICK} The horizontal momentum change 
+     correctors. (default: 0).
+   \ttitem{HKICK} The horizontal momentum change
      $\delta PX = \delta p_x/p_0$ for a corrector acting in both planes
-     (default: 0).  
-   \ttitem{VKICK} The vertical momentum change 
+     (default: 0).
+   \ttitem{VKICK} The vertical momentum change
      $\delta PY = \delta p_y/p_0$  for a corrector acting in both planes
-     (default: 0).  
+     (default: 0).
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad). A positive angle represents a clockwise rotation of the
-     kicker.  
+     kicker.
 \end{madlist}
 
 A positive kick increases $p_x$ or $p_y$ respectively. This
 means that a positive horizontal kick bends to the left,  i.e. to
-positive $x$ which is opposite of what is true for bends.    
+positive $x$ which is opposite of what is true for bends.
 
 The deviation angle $\theta$ of the particle trajectory is related to
 the momentum change through  $\sin \theta = \delta P = \delta p / p_0$.
 
 It should be noted that the kick values assigned to an orbit corrector
-like above are not overwritten by an orbit correction using the 
+like above are not overwritten by an orbit correction using the
 \hyperref[sec:correct]{\texttt{CORRECT}}
 command. Instead the kicks computed by an orbit correction and the
-assigned values are added when the correctors are used.  
+assigned values are added when the correctors are used.
 
- Examples: 
+ Examples:
 \madxmp{
 xxxxxxx\=xxxxxxxxxx\=xxxxxxxxxxxxxxxxx\= \kill
 HK1:   \>HKICKER, \>KICK = 0.001;  \\
@@ -782,44 +774,44 @@ KHV2:  \>KICKER,  \>HKICK := AKHV2H, \>VKICK := AKHV2V;
 
 The assignment in the form of a deferred expression has the advantage
 that the values can be assigned and/or modified at any time (and
-matched!).   
+matched!).
 
 The \hyperref[subsec:local-straight]{straight reference system} for an
-orbit corrector is a Cartesian coordinate system.  
+orbit corrector is a Cartesian coordinate system.
 
 
 Please note that there is a new feature introduced by Stefan Sorge from
 GSI. Here his decription:
 
-The elements \texttt{KICKER, HKICKER}, and \texttt{VKICKER} can also be used as 
-magnetic exciters providing sinusoidal momentum kicks. The usage in this case 
+The elements \texttt{KICKER, HKICKER}, and \texttt{VKICKER} can also be used as
+magnetic exciters providing sinusoidal momentum kicks. The usage in this case
 is:
 
 \madxmp{
 xykick: KICKER,  \= SINKICK=integer, SINPEAK=real, SINTUNE=real, SINPHASE=real;  \\
 xkick : HKICKER, \> SINKICK=integer, SINPEAK=real, SINTUNE=real, SINPHASE=real;  \\
-ykick : VKICKER, \> SINKICK=integer, SINPEAK=real, SINTUNE=real, SINPHASE=real;  
+ykick : VKICKER, \> SINKICK=integer, SINPEAK=real, SINTUNE=real, SINPHASE=real;
 }
 where a sinusoidal momentum kick \texttt{dpz} as a function of the  revolution
-number \texttt{n} given by\\   
-\texttt{dpz(n)=SINPEAK * sin(2*PI*SINTUNE*n + SINPHASE), pz=px,py} \\ 
-is provided. 
+number \texttt{n} given by\\
+\texttt{dpz(n)=SINPEAK * sin(2*PI*SINTUNE*n + SINPHASE), pz=px,py} \\
+is provided.
 
 The \texttt{KICKER} element generates synchronous kicks in both horizontal and
 vertical planes. \texttt{HKICKER} generates only a horizontal kick, and
-\texttt{VKICKER} generates only a vertical kick.    
+\texttt{VKICKER} generates only a vertical kick.
 
-The variables are 
+The variables are
 
 \begin{madlist}
    \ttitem{SINKICK} must be set to 1 to switch on the sinusoidal
-     signal, default: 0.  
+     signal, default: 0.
    \ttitem{SINPEAK} amplitude of the bending angle (rad); default: 0
-     rad.   
+     rad.
    \ttitem{SINTUNE} frequency of the signal times the revolution
      frequency.  Hence, the phase per revolution is 2*PI*SINTUNE;
-     default: 0.   
-   \ttitem{SINPHASE} initial phase; default: 0 rad.  
+     default: 0.
+   \ttitem{SINPHASE} initial phase; default: 0 rad.
 \end{madlist}
 
 The momentum kick of a kicker has only a single frequency. An element
@@ -828,20 +820,20 @@ kickers with all amplitudes \texttt{SINPEAK}, frequencies
 \texttt{SINTUNE}, and initial phases \texttt{SINPHASE} desired and
 putting them at the same position \textit{s} in the accelerator.
 
-%From S.Sorge@gsi.de  
+%From S.Sorge@gsi.de
 
 
-%  Created by: Laurent Deniau, 15-Sep-2011 
+%  Created by: Laurent Deniau, 15-Sep-2011
 \section{Transverse Kicker}
 \ttindex{tkicker}
 \label{sec:tkicker}
 
 The type \texttt{TKICKER} should be used to create horizontal, vertical or
 combined transverse magnetic kickers physically equivalent to elements of type
-\texttt{KICKER}, but \textbf{not used} by the \hyperref[sec:correct]{CORRECT} 
+\texttt{KICKER}, but \textbf{not used} by the \hyperref[sec:correct]{CORRECT}
 command of the closed orbit correction module.
 
-Examples of elements that may use the type \texttt{TKICKER}: 
+Examples of elements that may use the type \texttt{TKICKER}:
 \begin{itemize}
    \item Fast kickers for injection, dump and tune
    \item Magnetic septa towards beam dump
@@ -851,7 +843,7 @@ Examples of elements that may use the type \texttt{TKICKER}:
 
 For further information on element type \texttt{TKICKER} and its attributes, look
 at the documentation of the orbit corrector type
-\hyperref[sec:kicker]{\texttt{KICKER}}.   
+\hyperref[sec:kicker]{\texttt{KICKER}}.
 
 
 \section{RF Cavity}
@@ -860,80 +852,80 @@ at the documentation of the orbit corrector type
 
 \madbox{
 label: RFCAVITY, \= L=real, VOLT=real, LAG=real, \\
-                 \> FREQ=real, HARMON=integer, \\    
+                 \> FREQ=real, HARMON=integer, \\
                  \> N\_BESSEL=integer, NO\_CAVITY\_TOTALPATH=logical;
 }
 
-An \texttt{RFCAVITY} has eight real attributes and one integer attribute: 
+An \texttt{RFCAVITY} has eight real attributes and one integer attribute:
 \begin{madlist}
-   \ttitem{L} The length of the cavity (DEFAULT: 0 m) 
+   \ttitem{L} The length of the cavity (DEFAULT: 0 m)
 
-   \ttitem{VOLT} The peak electrical RF voltage (DEFAULT: 0 MV). The effect of 
+   \ttitem{VOLT} The peak electrical RF voltage (DEFAULT: 0 MV). The effect of
    the cavity is \\
-     delta(\textit{E}) = VOLT * sin(2$\pi$ * (LAG - HARMON * \textit{f$_0$ t})). 
+     delta(\textit{E}) = VOLT * sin(2$\pi$ * (LAG - HARMON * \textit{f$_0$ t})).
 
-   \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0). 
+   \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0).
 
    \ttitem{FREQ} The frequency [MHz] (no DEFAULT).  \\[3mm]
    \textbf{Note that if the RF frequency is not given, it is computed
      from the harmonic number and the revolution frequency
      \textit{f$_0$}. For accelerating structures this makes no sense,
-     and the input of the frequency is mandatory.}   
+     and the input of the frequency is mandatory.}
 
    \ttitem{HARMON} The harmonic number \textit{h} (no DEFAULT). This
-   attribute is only used if the frequency is not given.  
+   attribute is only used if the frequency is not given.
 \end{madlist}
 
 \textbf{Caveats:}
 \begin{itemize}
   \item Please take note, that the following \madeight attributes:
-    \texttt{BETRF, PG, SHUNT} and \texttt{TFILL} are currently not implemented in 
-    \madx.    
+    \texttt{BETRF, PG, SHUNT} and \texttt{TFILL} are currently not implemented in
+    \madx.
 %  \item BETRF: RF coupling factor (DEFAULT: 0).
 %  \item PG: The RF power per cavity (DEFAULT: 0 MW).
 %  \item SHUNT: The relative shunt impedance (DEFAULT: 0 MOhm/m).
-%  \item TFILL: The filling time of the cavity $T_{fill}$ (DEFAULT: 0 microseconds). 
+%  \item TFILL: The filling time of the cavity $T_{fill}$ (DEFAULT: 0 microseconds).
 
   \item Important Note: The \hyperref[chap:twiss]{\texttt{TWISS}} command
     is 4D only. As a consequence the \texttt{TWISS} parameters in the plane
     of non-zero dispersion may not close as expected. Therefore, it is best
     to perform \texttt{TWISS} in 4D only, \textsl{i.e.} with cavities
     switched off. If 6D is needed one has to use the
-    \hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}} command. 
+    \hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}} command.
     Please refer to \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}} command,
     in particular to \texttt{TIME} and \texttt{TOTALPATH} switches,
     concerning RF behaviour of cavities in PTC.
-    
+
 \end{itemize}
 
-The \texttt{RFCAVITY} can also have attributes that only become active in 
-\ptc: 
+The \texttt{RFCAVITY} can also have attributes that only become active in
+\ptc:
 \begin{madlist}
    \ttitem{N\_BESSEL} (DEFAULT: 0): \\
      Transverse focussing effects are typically ignored in the cavity in
      \madx or even \ptc. This effect is being calculated to order
      \texttt{n\_bessel}, with \texttt{n\_bessel=0} disregarding this
      effect and with a correct treatment when \texttt{n\_bessel} goes to
-     infinity. 
+     infinity.
    \ttitem{NO\_CAVITY\_TOTALPATH} (Default: false): \\
      flag to select whether the transit time factor in the cavity is to be
      considered (\texttt{NO\_CAVITY\_TOTALPATH = false}) or if the particle is
-     kept on constant RF phase when passing through cavity. (\texttt{NO\_CAVITY\_TOTALPATH = true}).  
+     kept on constant RF phase when passing through cavity. (\texttt{NO\_CAVITY\_TOTALPATH = true}).
 \end{madlist}
 
 A cavity requires the particle \hyperref[sec:beam]{\texttt{ENERGY}}
 and the particle \hyperref[sec:beam]{\texttt{CHARGE}} to be set by a
 \hyperref[sec:beam]{\texttt{BEAM}} command before any calculations are
-performed. 
+performed.
 
-Example: 
+Example:
 \madxmp{
 BEAM, PARTICLE=ELECTRON, ENERGY=50.0; \\
 CAVITY: RFCAVITY, L=10.0, VOLT=150.0, LAG=0.0, HARMON=31320;
 }
 
 The \hyperref[subsec:local-straight]{straight reference system} for a
-cavity is a Cartesian coordinate system.  
+cavity is a Cartesian coordinate system.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -943,31 +935,31 @@ cavity is a Cartesian coordinate system.
 
 \madbox{
 label: TWCAVITY, \= L=real, VOLT=real, FREQ=real, LAG=real, \\
-                 \> PSI=real, DELTA\_LAG=real \\    
+                 \> PSI=real, DELTA\_LAG=real \\
                  \> N\_BESSEL=integer, NO\_CAVITY\_TOTALPATH=logical;
 }
 
 The travelling wave cavities model the accelerating structures of linacs
-where wavefront moves together with the accelerated particles. 
-This element is implemented only by PTC and is treated as drift 
+where wavefront moves together with the accelerated particles.
+This element is implemented only by PTC and is treated as drift
 by native MADX commands. The phase velocity is fixed to speed of light
-and can not be varied. 
+and can not be varied.
 
 \begin{madlist}
-   \ttitem{L} The length of the cavity (DEFAULT: 0 m) 
+   \ttitem{L} The length of the cavity (DEFAULT: 0 m)
 
-   \ttitem{VOLT} The peak electrical RF voltage (DEFAULT: 0 MV). 
+   \ttitem{VOLT} The peak electrical RF voltage (DEFAULT: 0 MV).
 
    \ttitem{FREQ} The frequency [MHz] (no DEFAULT).  \\[3mm]
 
-   \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0). Zero lag means the highest acceleration, 
-                i.e. the reference particle (starting at x=0, px=0, y=0, py=0,t=0, pt=0) 
-                is on the crest of the wave. Please not that it is different from 
+   \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0). Zero lag means the highest acceleration,
+                i.e. the reference particle (starting at x=0, px=0, y=0, py=0,t=0, pt=0)
+                is on the crest of the wave. Please not that it is different from
                 the \texttt{RFCAVITY} nomenclature.
 
-   \ttitem{PSI}  
+   \ttitem{PSI}
 
-   \ttitem{DELTA\_LAG}   
+   \ttitem{DELTA\_LAG}
 \end{madlist}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -993,16 +985,16 @@ the same RF frequency.
 
 The accelerating kick is \texttt{delta(E) = VOLT * sin(2$\pi$ * (LAG - HARMON *
 f0 t))}, and the multipole moments oscillate with the same RF frequency.
- 
+
 An \texttt{RFMULTIPOLE} requires the particle
-\hyperref[sec:beam]{\texttt{ENERGY}} and the particle 
+\hyperref[sec:beam]{\texttt{ENERGY}} and the particle
 \hyperref[sec:beam]{\texttt{CHARGE}} to be set with a
 \hyperref[sec:beam]{\texttt{BEAM}} command before any calculation is
-performed.  
+performed.
 
 Contrary to the regular multipole, where the dipole
 component has an effect on the reference orbit, an RF-Multipole that
-includes a dipole component does not bend the reference orbit.      
+includes a dipole component does not bend the reference orbit.
 
 In PTC there must be at least one cavity with non-zero voltage,
 otherwise all RF elements, including RF multipoles, are disabled.
@@ -1013,20 +1005,20 @@ in particular to \texttt{TIME} and \texttt{TOTALPATH} switches.
 
 \begin{madlist}
    \ttitem{VOLT} The peak voltage of the RF accelerating mode (DEFAULT: 0 MV).
-   \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0) 
-   \ttitem{FREQ} The frequency [MHz] (no DEFAULT). \\ 
+   \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0)
+   \ttitem{FREQ} The frequency [MHz] (no DEFAULT). \\
      Note that if the RF
      frequency is not given, it is computed from the harmonic
      number and the revolution frequency f0 as before. However, for
      accelerating structures this makes no sense, and the frequency
-     is mandatory.  
+     is mandatory.
    \ttitem{HARMON} The harmonic number h (no DEFAULT). Only if the
-     frequency is not given. 
+     frequency is not given.
    \ttitem{LRAD} A fictitious length, which was originally just used to
-     compute synchrotron radiation effects.  
+     compute synchrotron radiation effects.
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad). A positive angle represents a clockwise rotation of the
-     multipole element.            
+     multipole element.
 
      \textbf{Please note that contrary to \madeight one has to specify the
        desired \texttt{TILT} angle, otherwise it is taken as 0 rad. We
@@ -1037,22 +1029,22 @@ in particular to \texttt{TIME} and \texttt{TOTALPATH} switches.
        components can be considered as the normal or skew
        multipole components of the magnet on the bench, while the
        \texttt{TILT} attribute can be considered as an tilt alignment
-       error in the machine.} 
+       error in the machine.}
 
    \ttitem{KNL} An array of the integrated normal rfmultipole
      coefficients, starting from order zero and up to the maximum
-     order (currently 20). 
-     The parameters are positional in the array, therefore leading 
-     zeros must be filled in for components that do not exist. 
+     order (currently 20).
+     The parameters are positional in the array, therefore leading
+     zeros must be filled in for components that do not exist.
 %     The normal rfmultipole coefficients from order zero to
 %     the maximum; the parameters are positional, therefore zeros
 %     must be filled in for components that do not exist. Example of
-%     a thin-lens sextupole: ms:rfmultipole, knl:=\{0, 0, k2l\}; 
+%     a thin-lens sextupole: ms:rfmultipole, knl:=\{0, 0, k2l\};
    \ttitem{KSL} An array of the integrated skew rfmultipole
      coefficients, starting from order zero and up to the maximum
-     order (currently 20). 
-     The parameters are positional in the array, therefore leading 
-     zeros must be filled in for components that do not exist. 
+     order (currently 20).
+     The parameters are positional in the array, therefore leading
+     zeros must be filled in for components that do not exist.
 %     The skew rfmultipole coefficients from order zero to
 %     the maximum; the parameters are positional, therefore zeros
 %     must be filled in for components that do not exist. Example of
@@ -1060,11 +1052,11 @@ in particular to \texttt{TIME} and \texttt{TOTALPATH} switches.
    \ttitem{PNL} The phase for each normal rfmultipole coefficients from
      order zero to the maximum; the parameters are positional,
      therefore leading zeros must be filled in for components that do not
-     exist.  
+     exist.
    \ttitem{PSL} The phase for each skew rfmultipole coefficients from
      order zero to the maximum; the parameters are positional,
      therefore leading zeros must be filled in for components that do not
-     exist.  
+     exist.
 \end{madlist}
 
 \textbf{Examples}
@@ -1072,19 +1064,19 @@ in particular to \texttt{TIME} and \texttt{TOTALPATH} switches.
 	\item A skew RF octupole
 	\madxmp{MS: RFMULTIPOLE, KSL=\{0, 0, 0, k3sl\};}
 
-Notice that both \texttt{KNL} and \texttt{KSL} for the same multipole mode can be specified simultaneously.  
+Notice that both \texttt{KNL} and \texttt{KSL} for the same multipole mode can be specified simultaneously.
 
 \item An \texttt{RFMULTIPOLE} used as a \texttt{CRABCAVITY}:
 	\madxmp{rfdipole: RFMULTIPOLE, \=L=Lcrab, KNL=\{ Vcrab / PC0 \}, \\
 								   \>PNL=\{ 0.25 + LAGcrab \};}
-	
+
 is equivalent to
 
 	\madxmp{crab: CRABCAVITY,  \=L=Lcrab, VOLT=Vcrab, LAG=LAGcrab;}
 
 \end{itemize}
 
-%  Added by: R. Calaga, Sep 2010 
+%  Added by: R. Calaga, Sep 2010
 %  Edited by: A. Latina, Jun 2013
 \section{Crab Cavity}
 \ttindex{crabcavity}
@@ -1098,47 +1090,47 @@ label: CRABCAVITY, \=L=real, TILT=real, VOLT=real, LAG=real, \\
                    \>RPH1=integer, RPH2=integer, LAGF=real ;
 }
 
-A \texttt{CRABCAVITY} has six attributes describing its steady state 
-and seven attributes to describe dynamic behaviour: 
+A \texttt{CRABCAVITY} has six attributes describing its steady state
+and seven attributes to describe dynamic behaviour:
 
 \begin{madlist}
-  \ttitem{L} The length of the cavity (default: 0 m) 
+  \ttitem{L} The length of the cavity (default: 0 m)
 
   \ttitem{TILT} The tilt of the cavity in radian (default: 0 m). If the tilt is $\pi/2$, then the export to sixtrack will automatically convert it to a vertical cravity (default is horizontal).
 
-  \ttitem{VOLT} The peak RF voltage (default: 0 MV). 
+  \ttitem{VOLT} The peak RF voltage (default: 0 MV).
 
-  \ttitem{LAG} The initial phase lag [$2\pi$] (default: 0). 
+  \ttitem{LAG} The initial phase lag [$2\pi$] (default: 0).
 
   \ttitem{FREQ} The RF frequency [MHz] (no default). \\[3mm]
     \textbf{Note that if the RF frequency is not given, it is computed from the
-    harmonic number and the revolution frequency \textit{f$_0$}. 
-    For deflecting structures this makes no sense, and the 
-    frequency is mandatory.} 
+    harmonic number and the revolution frequency \textit{f$_0$}.
+    For deflecting structures this makes no sense, and the
+    frequency is mandatory.}
 
   \ttitem{HARMON} The harmonic number \textit{h} (no default). \\
-  Only if the frequency is not given. 
+  Only if the frequency is not given.
 
 % \item BETRF: RF coupling factor (default: 0).
 % \item PG: The RF power per cavity (default: 0 MW).
 % \item SHUNT: The relative shunt impedance (default: 0 MOhm/m).
-% \item TFILL: The filling time of the cavity T<sub>fill</sub> (default: 0 microseconds). 
-%\item EPHASE: Value of the final crab RF phase [2pi] with respect to  nominal value (default: 0). 
+% \item TFILL: The filling time of the cavity T<sub>fill</sub> (default: 0 microseconds).
+%\item EPHASE: Value of the final crab RF phase [2pi] with respect to  nominal value (default: 0).
 \end{madlist}
 
 The other attributes describe the time evolution of a \texttt{CRABCAVITY} behaviour:
 
-\begin{madlist}  
-  \ttitem{RV1} Number of initial turns with zero voltage (default: 0). 
-  \ttitem{RV2} Number of turns to ramp voltage from zero to nominal value (default: 0). 
-  \ttitem{RV3} Number of turns with nominal voltage (default: 0). 
-  \ttitem{RV4} Number of turns to ramp voltage from nominal value to zero (default: 0).  
+\begin{madlist}
+  \ttitem{RV1} Number of initial turns with zero voltage (default: 0).
+  \ttitem{RV2} Number of turns to ramp voltage from zero to nominal value (default: 0).
+  \ttitem{RV3} Number of turns with nominal voltage (default: 0).
+  \ttitem{RV4} Number of turns to ramp voltage from nominal value to zero (default: 0).
 
   \ttitem{LAGF} Value of the final crab RF phase lag [$2\pi$] (default: 0).
 
-  \ttitem{RPH1} Number of initial turns with nominal phase (default: 0). 
+  \ttitem{RPH1} Number of initial turns with nominal phase (default: 0).
   \ttitem{RPH2} Number of turns to ramp phase [$2\pi$] from nominal to
-    specified value \\ (default:~0). 
+    specified value \\ (default:~0).
 
 \end{madlist}
 
@@ -1150,18 +1142,18 @@ The other attributes describe the time evolution of a \texttt{CRABCAVITY} behavi
    \item Note that crab cavities are only implemented for
      tracking  purposes. \\
      \hyperref[chap:twiss]{\texttt{TWISS}} ignores any effect of the
-     crab cavity.   
+     crab cavity.
    \item Important Note: The \hyperref[chap:twiss]{\texttt{TWISS}} command
      is 4D only. As a consequence the \texttt{TWISS} parameters in the plane
      of non-zero dispersion may not close as expected. Therefore, it is best
      to perform \texttt{TWISS} in 4D only, \textsl{i.e.} with cavities
      switched off. If 6D is needed one has to use the
-     \hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}} command.  
-\end{itemize} 
+     \hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}} command.
+\end{itemize}
 
 %A cavity requires the particle energy (\href{beam.html#energy}{ENERGY})
 %and the particle charge (\href{beam.html#charge}{CHARGE}) to be set by
-%a \href{beam.html}{BEAM} command before any calculation is performed. 
+%a \href{beam.html}{BEAM} command before any calculation is performed.
 
 Before any calculation is performed with a \texttt{CRABCAVITY}, the particle
 \hyperref[sec:beam]{\texttt{ENERGY}} and the particle
@@ -1170,17 +1162,17 @@ Before any calculation is performed with a \texttt{CRABCAVITY}, the particle
 
 The effect of a \texttt{CRABCAVITY} on particle coordinates during tracking is
 \\
-\\ $\mathtt{\delta p_x  = VOLT * \sin(PHI - OMEGA * t)}$ 
-\\ $\mathtt{\delta E  = - VOLT * OMEGA * x * \cos (PHI - OMEGA * t)}$ 
-\\ 
-\\ where $\mathtt{PHI =  2\pi * (LAG - HARMON * f_0 t)}$, 
+\\ $\mathtt{\delta p_x  = VOLT * \sin(PHI - OMEGA * t)}$
+\\ $\mathtt{\delta E  = - VOLT * OMEGA * x * \cos (PHI - OMEGA * t)}$
+\\
+\\ where $\mathtt{PHI =  2\pi * (LAG - HARMON * f_0 t)}$,
 \\ and $\mathtt{OMEGA = 2\pi * FREQ / c}$
 \\
-% delta(<i>E</i>) = VOLT * 
-% sin(2 pi * (LAG - HARMON * <i>f<sub>0</sub> t</i>)). 
+% delta(<i>E</i>) = VOLT *
+% sin(2 pi * (LAG - HARMON * <i>f<sub>0</sub> t</i>)).
 
 
-Example: 
+Example:
 \madxmp{
 xxxxxxxx\= \kill
 BEAM, PARTICLE=PROTON, ENERGY=7000.0; \\
@@ -1190,8 +1182,8 @@ CAVITY:  \>CRABCAVITY, L=10.0, VOLT=5.0, LAG=0.0, FREQ=400, \\
 }
 
 The \hyperref[subsec:local-straight]{straight reference system} for a
-cavity is a Cartesian coordinate system.  
- 
+cavity is a Cartesian coordinate system.
+
 %\href{http://www.cern.ch/rcalaga}{R. Calaga}, September 2010
 
 
@@ -1203,44 +1195,44 @@ cavity is a Cartesian coordinate system.
 \ttindex{acdipole}\index{ac dipole}
 \label{sec:acdipole}
 
-Alternating Current (AC) dipole is implemented with: 
+Alternating Current (AC) dipole is implemented with:
 \begin{madlist}
-   \ttitem{HACDIPOLE} an AC dipole for the horizontal plane, 
-   \ttitem{VACDIPOLE} an AC dipole for the vertical plane, 
+   \ttitem{HACDIPOLE} an AC dipole for the horizontal plane,
+   \ttitem{VACDIPOLE} an AC dipole for the vertical plane,
 \end{madlist}
 
 \madbox{
 xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxx\= \kill
 label: HACDIPOLE, L=real, VOLT=real,  FREQ=real, LAG=real, \\
-                  \> RAMP1=integer, RAMP2=integer, \\ 
+                  \> RAMP1=integer, RAMP2=integer, \\
                   \> RAMP3=integer, RAMP4=integer; \\
 label: VACDIPOLE, L=real, VOLT=real,  FREQ=real, LAG=real, \\
                   \> RAMP1=integer, RAMP2=integer, \\
-                  \> RAMP3=integer, RAMP4=integer; 
+                  \> RAMP3=integer, RAMP4=integer;
 }
 In fact this element is rather oscilating (time varying) orbit corrector (kicker) rather than dipole
 because it does not change the reference frame. The oscillation is assumed to be slow
-compared with bunch length and the kick is constant along the bunch. 
+compared with bunch length and the kick is constant along the bunch.
 These devices are used for beam excitations in circular machines for optics measurements.
 They are linearly ramped up to the full amplitude (and ramped down)
 to avoid emittance growth.
 
-The attributes have the following meaning: 
+The attributes have the following meaning:
 \begin{madlist}
-   \ttitem{L} The length of the device (default: 0 m). 
+   \ttitem{L} The length of the device (default: 0 m).
    \ttitem{VOLT} The amplitude of the kick
-     (default: 0).  
+     (default: 0).
    \ttitem{FREQ} Tune of the oscillation in $2\pi$ units. \\
      \textbf{The name of the parameter is misleading and will be changed in the future for TUNE.} \\
-     (default: 0).  
-   \ttitem{RAMP1} Starting turn of amplitude ramp-up. \\ 
-     (default: 0).  
+     (default: 0).
+   \ttitem{RAMP1} Starting turn of amplitude ramp-up. \\
+     (default: 0).
    \ttitem{RAMP2} Last turn of amplitude ramp-up. \\
-     (default: 0).  
-   \ttitem{RAMP3} Starting turn of amplitude ramp-down. \\ 
-     (default: 0).  
+     (default: 0).
+   \ttitem{RAMP3} Starting turn of amplitude ramp-down. \\
+     (default: 0).
    \ttitem{RAMP4} Last turn of amplitude ramp-down. \\
-     (default: 0).  
+     (default: 0).
 \end{madlist}
 
 
@@ -1251,16 +1243,16 @@ changing transverse momentum by $(0.3 \cdot VOLT / p0c) \cdot sin(2\pi \cdot FRE
 where $turn$ is turn number. If ramp settings are left with default values (all zero)
 AC dipole has no effect in \texttt{TRACK}.
 
-PTC requires that \texttt{MODULATION} flag is set to true 
-via \texttt{PTC\_SETSWITCH} command to enable AC dipole, 
-otherwise it is treated as a drift. 
+PTC requires that \texttt{MODULATION} flag is set to true
+via \texttt{PTC\_SETSWITCH} command to enable AC dipole,
+otherwise it is treated as a drift.
 
 For computation of the maps in \texttt{PTC\_TWISS} and \texttt{PTC\_NORMAL}
 the phasespace is than extended by extra dimensions corresponding to
-the frequency clocks defined with AC dipoles. 
+the frequency clocks defined with AC dipoles.
 Maximum of three distinct frequencies are allowed.
 There can be more then three AC dipoles but than some of them need to have
-the same frequencies. 
+the same frequencies.
 \texttt{PTC\_TWISS}, when invoked with \texttt{NORMAL=true}, calculates
 dependence of optical paramters on amplitudes of the clocks.
 Results of \texttt{PTC\_TRACK} and \texttt{PTC\_TRACKLINE}
@@ -1268,7 +1260,7 @@ may be slightly different from \texttt{TRACK} because of some implementation det
 in particular for not fully relativistic beams.
 PTC internaly uses frequency so time of flight effects are taken into account
 and kick amplitude is inversely proportional to relativistic beta function.
-Please note that at the moment \texttt{LAG} parameter is ignored 
+Please note that at the moment \texttt{LAG} parameter is ignored
 in translation to PTC. If ramp settings are left with default values (all zero)
 PTC tracking will assume maximum amplitude.
 
@@ -1285,48 +1277,48 @@ PTC tracking will assume maximum amplitude.
 label: ELSEPARATOR, L=real, EX=real, EY=real, TILT=real;
 }
 
-An \texttt{ELSEPARATOR} element has four real attributes: 
+An \texttt{ELSEPARATOR} element has four real attributes:
 \begin{madlist}
-   \ttitem{L} The length of the separator (default: 0 m). 
-   \ttitem{EX} The horizontal electric field strength (default: 0 MV/m). 
-     A positive field increases \textit{p$_x$} for positive particles.  
-   \ttitem{EY} The vertical electric field strength (default: 0 MV/m). 
-     A positive field increases \textit{p$_y$} for positive particles.  
+   \ttitem{L} The length of the separator (default: 0 m).
+   \ttitem{EX} The horizontal electric field strength (default: 0 MV/m).
+     A positive field increases \textit{p$_x$} for positive particles.
+   \ttitem{EY} The vertical electric field strength (default: 0 MV/m).
+     A positive field increases \textit{p$_y$} for positive particles.
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad). A positive angle represents a clockwise of the electrostatic
      separator.
    \ttitem{EX\_L} The integrated vertical electric field strength (default: 0 MV).
-    This parameter is only used in \hyperref[sec:trackoverview]{\texttt{THINTRACK}} and ignored by \hyperref[chap:twiss]{\texttt{TWISS}}. 
+    This parameter is only used in \hyperref[sec:trackoverview]{\texttt{THINTRACK}} and ignored by \hyperref[chap:twiss]{\texttt{TWISS}}.
    \ttitem{EY\_L}  The integrated horizontal electric field strength (default: 0 MV).
     This parameter is only used in \hyperref[sec:trackoverview]{\texttt{THINTRACK}} and ignored by \hyperref[chap:twiss]{\texttt{TWISS}}.
 \end{madlist}
 An electrostatic separator requires the particle \texttt{ENERGY} and the
 particle \texttt{CHARGE} to be set by a
 \hyperref[sec:beam]{\texttt{BEAM}} command before any calculation is
-performed. Note that no thin elseparator currently exists in \hyperref[chap:twiss]{\texttt{TWISS}}. 
-Example: 
+performed. Note that no thin elseparator currently exists in \hyperref[chap:twiss]{\texttt{TWISS}}.
+Example:
 \madxmp{
 BEAM, PARTICLE=positron, ENERGY=50.0;\\
 SEP: ELSEPARATOR, L=5.0, EY=0.5;
 }
 
 The \hyperref[subsec:local-straight]{straight reference system} for a
-separator is a Cartesian coordinate system.   
+separator is a Cartesian coordinate system.
 
 
 \section{Beam Position Monitor}
 \label{sec:monitor}
 
 A beam monitor has no specific effect on the beam and behaves like a
-drift space. 
+drift space.
 In addition it serves to record the beam position for closed orbit
 correction.
 
-Three different types of beam position monitors are recognised:  
+Three different types of beam position monitors are recognised:
 \begin{madlist}
-   \ttitem{HMONITOR} Monitor for the horizontal beam position, 
-   \ttitem{VMONITOR} Monitor for the vertical beam position, 
-   \ttitem{MONITOR} Monitor for both horizontal and vertical beam position. 
+   \ttitem{HMONITOR} Monitor for the horizontal beam position,
+   \ttitem{VMONITOR} Monitor for the vertical beam position,
+   \ttitem{MONITOR} Monitor for both horizontal and vertical beam position.
 \end{madlist}
 
 \madbox{
@@ -1335,42 +1327,42 @@ label: VMONITOR, \>   L=real; \\
 label: MONITOR,  \>   L=real;
 }
 
-A beam position monitor has one real attribute: 
+A beam position monitor has one real attribute:
 \begin{madlist}
-   \ttitem{L} The length of the monitor (default: 0 m). 
+   \ttitem{L} The length of the monitor (default: 0 m).
      %% If the length is different from zero, the beam position is recorded
-     %% in the centre of the monitor.  
+     %% in the centre of the monitor.
 \end{madlist}
 
-Examples: 
+Examples:
 \madxmp{
 MH: HMONITOR, L = 1; \\
 MV: VMONITOR;
 }
 
 The \hyperref[subsec:local-straight]{straight reference system} for a
-monitor is a Cartesian coordinate system.  
+monitor is a Cartesian coordinate system.
 
 \section{Instrument and Placeholder}
 \label{sec:instrument}
 \label{sec:placeholder}
 An instrument or a placeholder has no specific effect on the beam and
-behaves like a drift space. 
+behaves like a drift space.
 An instrument is different from beam a position monitor and is not used
-for closed orbit correction.  
+for closed orbit correction.
 
-Two different types of instruments are recognised:  
+Two different types of instruments are recognised:
 
 \begin{madlist}
    \ttitem{INSTRUMENT} A place holder for any type of beam
      instrumentation. Optically it behaves like a drift space; it
      returns \emph{no beam observation}. It represent a class of
-     elements which is completely independent from drifts and monitors.  
+     elements which is completely independent from drifts and monitors.
    \ttitem{PLACEHOLDER} A place holder for any type of
-     element. Internally it is equivalent to an \texttt{INSTRUMENT}: 
-     optically it behaves as a drift space, it returns 
-     \emph{no beam observation}. It represent a class of elements 
-     which is completely independent from drifts and monitors. 
+     element. Internally it is equivalent to an \texttt{INSTRUMENT}:
+     optically it behaves as a drift space, it returns
+     \emph{no beam observation}. It represent a class of elements
+     which is completely independent from drifts and monitors.
 \end{madlist}
 
 \madbox{
@@ -1379,20 +1371,20 @@ label: INSTRUMENT,   \>L=real; \\
 label: PLACEHOLDER,  \>L=real;
 }
 
-An instrument or placeholder has one real attribute: 
+An instrument or placeholder has one real attribute:
 \begin{madlist}
-   \ttitem{L} The length of the instrument (default: 0 m). 
+   \ttitem{L} The length of the instrument (default: 0 m).
 \end{madlist}
 
-The \hyperref[subsec:local-straight]{straight reference system} for an 
-instrument is a Cartesian coordinate system.  
+The \hyperref[subsec:local-straight]{straight reference system} for an
+instrument is a Cartesian coordinate system.
 
 
 \section{Collimator}
 \label{sec:collimator}
 
 A \texttt{COLLIMATOR} has no specific effect on beam optics and behaves like a
-\hyperref[sec:drift]{drift space}. 
+\hyperref[sec:drift]{drift space}.
 
 \madbox{
 label: COLLIMATOR, \=L=real, \\
@@ -1400,43 +1392,43 @@ label: COLLIMATOR, \=L=real, \\
                    \>APER\_OFFSET=\{values\}, APER\_TOL=\{values\};
 }
 
-A \texttt{COLLIMATOR} has one specific real attribute: 
+A \texttt{COLLIMATOR} has one specific real attribute:
 \begin{madlist}
-  \ttitem{L} The collimator length (default: 0 m). 
+  \ttitem{L} The collimator length (default: 0 m).
 \end{madlist}
 
-Additionally, like any other element, except \texttt{DRIFT} space, 
-a \texttt{COLLIMATOR} can have specific aperture related attributes 
-as defined in the related section \hyperref[sec:def-aper]{Defining 
+Additionally, like any other element, except \texttt{DRIFT} space,
+a \texttt{COLLIMATOR} can have specific aperture related attributes
+as defined in the related section \hyperref[sec:def-aper]{Defining
 aperture in \madx}
 
-During \hyperref[chap:thintrack]{tracking} in \madx, particle loss 
-is checked at the entrance of the element by comparing the particle coordinates 
-and the defined aperture, provided that the \texttt{APERTURE} flag is \texttt{true} 
-in the \hyperref[sec:track]{\texttt{TRACK}} command, 
-and that the \texttt{APERTYPE} attribute value of the element is one of the 
-predefined types. 
+During \hyperref[chap:thintrack]{tracking} in \madx, particle loss
+is checked at the entrance of the element by comparing the particle coordinates
+and the defined aperture, provided that the \texttt{APERTURE} flag is \texttt{true}
+in the \hyperref[sec:track]{\texttt{TRACK}} command,
+and that the \texttt{APERTYPE} attribute value of the element is one of the
+predefined types.
 An aperture model defined in an external file (\texttt{APERTYPE=filename})
-is not used to check particle loss during tracking. 
+is not used to check particle loss during tracking.
 
-Example: 
+Example:
 \madxmp{
 COLLIM: COLLIMATOR, L=0.5, APERTYPE=ellipse, APERTURE={0.01,0.005};
 }
 
 The \hyperref[subsec:local-straight]{straight reference system} for a
-collimator is a Cartesian coordinate system.  
+collimator is a Cartesian coordinate system.
 
 \textbf{NOTE:} A collimator can be displaced transversally in order to
-model an asymmetric collimator by means of the \texttt{APER\_OFFSET} attributes; 
-During tracking particle losses are then reported with coordinates with respect 
-to the \textbf{displaced} reference system, not with respect to the surrounding 
+model an asymmetric collimator by means of the \texttt{APER\_OFFSET} attributes;
+During tracking particle losses are then reported with coordinates with respect
+to the \textbf{displaced} reference system, not with respect to the surrounding
 beam line.
 
-Other collimator elements have been inherited from \madeight and still exist 
+Other collimator elements have been inherited from \madeight and still exist
 in \madx for backward compatibility.
-\texttt{ECOLLIMATOR} (elliptic aperture collimator) and \texttt{RCOLLIMATOR} 
-(rectangular aperture collimator) behave both as drift spaces in \madx 
+\texttt{ECOLLIMATOR} (elliptic aperture collimator) and \texttt{RCOLLIMATOR}
+(rectangular aperture collimator) behave both as drift spaces in \madx
 They are declared with
 
 \madbox{
@@ -1444,43 +1436,43 @@ They are declared with
   label: RCOLLIMATOR, L=real, XSIZE=real, YSIZE=real;
 }
 
-Either type has several real attributes: 
+Either type has several real attributes:
 \begin{madlist}
-  \ttitem{L} The collimator length (default: 0 m). 
+  \ttitem{L} The collimator length (default: 0 m).
   \ttitem{XSIZE} The horizontal half-aperture (default: unlimited). \\
-  \textbf{OBSOLETE : parsed and stored but not used.} 
+  \textbf{OBSOLETE : parsed and stored but not used.}
   \ttitem{YSIZE} The vertical half-aperture (default: unlimited). \\
-  \textbf{OBSOLETE : parsed and stored but not used.} 
+  \textbf{OBSOLETE : parsed and stored but not used.}
 \end{madlist}
 
-Users are STRONGLY advised to replaced all instances of \texttt{RCOLLIMATOR} 
-and \texttt{ECOLLIMATOR} in input files with appropriate \texttt{COLLIMATOR} 
+Users are STRONGLY advised to replaced all instances of \texttt{RCOLLIMATOR}
+and \texttt{ECOLLIMATOR} in input files with appropriate \texttt{COLLIMATOR}
 elements. The \texttt{RCOLLIMATOR} and \texttt{ECOLLIMATOR} elements are only
-kept for the time being for backward compatibility and will be removed in 
-the near future. 
+kept for the time being for backward compatibility and will be removed in
+the near future.
 
-Note also that the \texttt{XSIZE} and \texttt{YSIZE} parameters can be declared 
+Note also that the \texttt{XSIZE} and \texttt{YSIZE} parameters can be declared
 but are simply ignored both in the \hyperref[chap:aperture]{\texttt{APERTURE}}
 command an in \hyperref[chap:thintrack]{tracking}.
 
 
-%  Changed by: Stefan Sorge, 2007 
+%  Changed by: Stefan Sorge, 2007
 \section{Beam-beam Interaction}
 The BEAMBEAM element may be inserted in a beam line to simulate a
-beam-beam interaction point:  
- 
+beam-beam interaction point:
+
 \madbox{
 label: BEAMBEAM, \= CHARGE=real, \\
                  \> XMA=real, YMA=real, \\
                  \> SIGX=real, SIGY=real, WIDTH=real,\\
-                 \> BBSHAPE=integer, BBDIR=integer;  
+                 \> BBSHAPE=integer, BBDIR=integer;
 }
 
 The beam-beam interaction is represented by a four-dimensional
 interaction with a thin element, i.e. horizontal and vertical non-linear kicks.
 The code for this element has been contributed by J.M.~Veuillen (1987)
-and extended by S.~Sorge (2007).  
- 
+and extended by S.~Sorge (2007).
+
 \begin{madlist}
    \ttitem{CHARGE}
      The charge of particles in the opposite beam, in elementary charges.
@@ -1489,7 +1481,7 @@ and extended by S.~Sorge (2007).
      particles and having a charge different from +1, one should set the
      \texttt{CHARGE} explicitly in the
      \hyperref[sec:beam]{\texttt{BEAM}} command as well as in the
-     \texttt{BEAMBEAM} element.   
+     \texttt{BEAMBEAM} element.
 
    \ttitem{XMA}
      The horizontal displacement of the opposite beam with respect to
@@ -1497,7 +1489,7 @@ and extended by S.~Sorge (2007).
    \ttitem{YMA}
      The vertical displacement of the opposite beam with respect to
      the ideal orbit (default: 0 m).
-     
+
    \ttitem{SIGX}
      The horizontal extent of the opposite beam (default: 1 m).
      Meaning depends on parameter \texttt{BBSHAPE}.
@@ -1508,34 +1500,34 @@ and extended by S.~Sorge (2007).
    \ttitem{WIDTH} The extent of the edge region, relative to the
      \texttt{SIGX, SIGY} parameters. The absolute value is given by
      \texttt{WIDTH*SIGX} and \texttt{WIDTH*SIGY} in horizontal and
-     vertical directions respectively. 
+     vertical directions respectively.
 
 
-   \ttitem{BBSHAPE} A parameter to select the radial density shape of the 
+   \ttitem{BBSHAPE} A parameter to select the radial density shape of the
      opposite beam \\ (default: 1)
      \begin{itemize}
        \item  \texttt{BBSHAPE=1}: Gaussian shape (default).
          \texttt{SIGX, SIGY} are the standard deviations in horizontal
          and vertical directions. \texttt{WIDTH} is ignored.
-         
-       \item  \texttt{BBSHAPE=2}: trapezoidal shape (see 
-       fig.\ref{fig:beambeam-n-trapez}). \texttt{SIGX, SIGY} are the half widths of 
+
+       \item  \texttt{BBSHAPE=2}: trapezoidal shape (see
+       fig.\ref{fig:beambeam-n-trapez}). \texttt{SIGX, SIGY} are the half widths of
        density profile, \textsl{i.e.} distance from the centre to half
        edge region with linear decrease of density in horizontal and
-       vertical directions. \\ 
+       vertical directions. \\
        Only circular opposite beam is possible, \textsl{i.e.} in the
        calculations \texttt{SIGX' = SIGY' = (SIGX+SIGY)/2} is used, if
        \texttt{SIGX} and \texttt{SIGY} have different values. \\
-       \texttt{WIDTH} denotes the full width of the edge 
-       region in units of \texttt{SIGX} (or \texttt{SIGX'} and \texttt{SIGY'}, 
-       respectively, if \texttt{SIGX} and \texttt{SIGY} are not equal), \textsl{i.e.} 
-       if \texttt{WIDTH=0.01} and \texttt{SIGX=5}mm, the edge region has a full 
+       \texttt{WIDTH} denotes the full width of the edge
+       region in units of \texttt{SIGX} (or \texttt{SIGX'} and \texttt{SIGY'},
+       respectively, if \texttt{SIGX} and \texttt{SIGY} are not equal), \textsl{i.e.}
+       if \texttt{WIDTH=0.01} and \texttt{SIGX=5}mm, the edge region has a full
        width of 0.05\ mm.  Condition: \texttt{WIDTH \textless 2.0}.
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=400bp]{jpg/beambeam_n_trapez.jpg}
-  \caption{Trapezoidal shape of radial density for beam-beam lens.} 
+  \caption{Trapezoidal shape of radial density for beam-beam lens.}
   \label{fig:beambeam-n-trapez}
 \end{figure}
 
@@ -1544,49 +1536,49 @@ and extended by S.~Sorge (2007).
        the distances from the centre to the maximum of the parabolic
        density profile in horizontal and vertical directions. \\
        Only circular opposite beam is possible, \textsl{i.e.} in the
-       calculations \texttt{SIGX' = SIGY' = (SIGX+SIGY)/2} is 
+       calculations \texttt{SIGX' = SIGY' = (SIGX+SIGY)/2} is
        used, if \texttt{SIGX} and \texttt{SIGY} have different
        values. \\
-       \texttt{WIDTH} denotes the full width at half 
+       \texttt{WIDTH} denotes the full width at half
        maximum of the parabolic density profile in units of
        \texttt{SIGX}, or \texttt{SIGX'} and \texttt{SIGY'},
-       respectively, if \texttt{SIGX} and \texttt{SIGY} are  
+       respectively, if \texttt{SIGX} and \texttt{SIGY} are
        not equal. Condition: \texttt{WIDTH \textless SQRT(2.0)}
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=420bp]{jpg/beambeam_n_hollowparabol.jpg}
-  \caption{Hollow parabolic shape of radial density for beam-beam lens.} 
+  \caption{Hollow parabolic shape of radial density for beam-beam lens.}
   \label{fig:beambeam-n-hollowparabol}
 \end{figure}
 
      \end{itemize}
-     
+
      The restriction to circular opposite beams in the cases \texttt{BBSHAPE=2,3}
-     appears to be sufficient, because such beam profiles are more important 
-     for the description of the interaction between the particle beam and 
-     an electron beam of an electron cooler, which are usually circular. 
-     
-   
-   \ttitem{BBDIR} A parameter to select the direction of motion of the 
-     opposite beam relative to the beam being studied. It determines 
-     the sign of the Lorentz force between both beams (default: -1): 
+     appears to be sufficient, because such beam profiles are more important
+     for the description of the interaction between the particle beam and
+     an electron beam of an electron cooler, which are usually circular.
+
+
+   \ttitem{BBDIR} A parameter to select the direction of motion of the
+     opposite beam relative to the beam being studied. It determines
+     the sign of the Lorentz force between both beams (default: -1):
      \begin{itemize}
-        \item  \texttt{BBDIR=-1}: Beams move in opposite directions as in a 
-        collider. The Lorentz force enhances the beam-beam interaction. 
-        \item  \texttt{BBDIR=0}: Opposite beam does not move. The Lorentz force is 
-        neglected 
-        \item  \texttt{BBDIR=1}: Beams move in the same direction as in an 
-        electron cooler. The Lorentz force reduces the beam-beam interaction. 
+        \item  \texttt{BBDIR=-1}: Beams move in opposite directions as in a
+        collider. The Lorentz force enhances the beam-beam interaction.
+        \item  \texttt{BBDIR=0}: Opposite beam does not move. The Lorentz force is
+        neglected
+        \item  \texttt{BBDIR=1}: Beams move in the same direction as in an
+        electron cooler. The Lorentz force reduces the beam-beam interaction.
      \end{itemize}
-     Note:  
-     \begin{itemize}  
-        \item  The particles in the beam considered may have a momentum 
+     Note:
+     \begin{itemize}
+        \item  The particles in the beam considered may have a momentum
         deviation given by \texttt{DELTAP} defined in the
-        \hyperref[sec:track]{\texttt{TRACK}} command.  
-        \item  The opposite beam is assumed to have the velocity according to 
-        the unperturbed energy of the particles in the beam considered. Only 
-        the direction of motion can be chosen. 
+        \hyperref[sec:track]{\texttt{TRACK}} command.
+        \item  The opposite beam is assumed to have the velocity according to
+        the unperturbed energy of the particles in the beam considered. Only
+        the direction of motion can be chosen.
         \item  In the case of motion in the opposite direction
         (\texttt{BBDIR=-1}), the time of interaction between the beams
         is given by \texttt{tau=length/(2*beta*clight)}, where
@@ -1595,9 +1587,9 @@ and extended by S.~Sorge (2007).
         as in an electron cooler, this time is given by
         \texttt{tau=length/(beta*c\_light)}, where \texttt{length} is
         the length of the cooler. Note that the factor 1/2 is inserted
-        only for \texttt{BBDIR=-1} to calculate correct results. 
+        only for \texttt{BBDIR=-1} to calculate correct results.
      \end{itemize}
-     
+
 \end{madlist}
 
 
@@ -1605,11 +1597,11 @@ A beam-beam element requires the particle
 \hyperref[sec:beam]{\texttt{ENERGY}} and the particle
 \hyperref[sec:beam]{\texttt{CHARGE}}, as well as the number of particles
 per bunch (\hyperref[sec:beam]{\texttt{NPART}}) to be set by a
-\hyperref[sec:beam]{\texttt{BEAM}} command before any 
-calculation is performed. 
+\hyperref[sec:beam]{\texttt{BEAM}} command before any
+calculation is performed.
 
 Example of a four-dimensional beam-beam element definition in Collider
-regime: 
+regime:
 \madxmp{
 beam,   particle = positron, npart = 1.e12, energy = 50.0; \\
 bb:     beambeam, sigx = 1.e-3, sigy = 5.e-4, charge = 1.;
@@ -1617,7 +1609,7 @@ bb:     beambeam, sigx = 1.e-3, sigy = 5.e-4, charge = 1.;
 
 
 Example of a four-dimensional beam-beam element definition in an
-Electron cooler:  
+Electron cooler:
 \madxmp{
 gamma0 = 1.032;                          \= ! relativistic factor \\
 beta0 = sqrt(1.0-1.0/gamm0/gamma0);      \>  \\
@@ -1634,7 +1626,7 @@ bb\_ecool: beambeam, sigx=re\_cool, sigy=re\_cool, bbshape=2, \\
 }
 
 
-%  Changed by: Frank Schmidt, 25-June-2003 
+%  Changed by: Frank Schmidt, 25-June-2003
 \section{Arbitrary Matrix Element}
 
 \madbox{
@@ -1644,20 +1636,20 @@ label: MATRIX, \= TYPE=string, L=real,  \\
                \> TM111=real, ..., TM666=real;
 }
 
-The \texttt{MATRIX} element allows the definition of an arbitrary transfer matrix. 
-It has four real array attributes: 
+The \texttt{MATRIX} element allows the definition of an arbitrary transfer matrix.
+It has four real array attributes:
 \begin{madlist}
-   \ttitem{L} Length of the element, which may be zero. 
+   \ttitem{L} Length of the element, which may be zero.
    \ttitem{KICKi} Defines the kick of the element acting on the six phase
-     space coordinates.  
-   \ttitem{RMik} Defines the linear transfer matrix ($6\times6$ terms) of the element.  
-   \ttitem{TMikl} Defines the second-order terms ($6\times6\times6$ terms) of the element. 
+     space coordinates.
+   \ttitem{RMik} Defines the linear transfer matrix ($6\times6$ terms) of the element.
+   \ttitem{TMikl} Defines the second-order terms ($6\times6\times6$ terms) of the element.
 \end{madlist}
 
 Data values that are not explicitly entered are taken from the identity
 transformation for the \texttt{RMik} matrix elements, and taken as zero
 for the \texttt{KICKi} kick factors and the \texttt{TMikl} second order
-terms. 
+terms.
 In the \hyperref[chap:thintrack]{thin-lens tracking
 module} a non-zero length for an arbitrary matrix is accepted, however
 no non-zero second order terms are allowed to avoid non symplectic
@@ -1685,19 +1677,19 @@ s_2 &= x_1 \sin\theta + s_1 \cos\theta
 %%\textit{x}$_2$=\textit{x}$_1$cos(theta)-\textit{s}$_1$sin(theta), \\
 %%\textit{y}$_2$=\textit{x}$_1$sin(theta)+\textit{s}$_1$cos(theta).\\
 
-It has one real attribute: 
+It has one real attribute:
 \begin{madlist}
-   \ttitem{ANGLE} The rotation angle $\theta$ (default: 0 rad).  
+   \ttitem{ANGLE} The rotation angle $\theta$ (default: 0 rad).
 \end{madlist}
 
 A positive angle means that the new reference system is rotated
-clockwise about the local \textit{y}-axis with respect to the old system. 
+clockwise about the local \textit{y}-axis with respect to the old system.
 
 \textbf{Important note:} \\
 The rotation angle $\theta$ must be \emph{small}, \textsl{i.e.} it must be at
-most comparable to the transverse angles of the orbit. 
+most comparable to the transverse angles of the orbit.
 
-Example: 
+Example:
 \madxmp{
 KINK: YROTATION, ANGLE = 0.0001;
 }
@@ -1707,31 +1699,31 @@ KINK: YROTATION, ANGLE = 0.0001;
 
 The element \texttt{SROTATION} rotates the
 \hyperref[subsec:local-straight]{straight reference system} about the
-longitudinal (\textit{s}) axis. 
+longitudinal (\textit{s}) axis.
 
 \madbox{
 label: SROTATION, ANGLE=real;
 }
 
-\texttt{SROTATION} has no effect on the beam, but it causes the beam to be 
-referred to the new coordinate system \\ 
+\texttt{SROTATION} has no effect on the beam, but it causes the beam to be
+referred to the new coordinate system \\
 \begin{equation}\begin{split}
 x_2 &= x_1 \cos\psi - y_1 \sin\psi \\
 y_2 &= x_1 \sin\psi + y_1 \cos\psi
 \end{split}\end{equation}
 
 %%\textit{x}$_2$=\textit{x}$_1$cos(psi)-\textit{y}$_1$sin(psi),\\
-%%\textit{y}$_2$=\textit{x}$_1$sin(psi)+\textit{y}$_1$cos(psi).\\ 
+%%\textit{y}$_2$=\textit{x}$_1$sin(psi)+\textit{y}$_1$cos(psi).\\
 
-It has one real attribute: 
+It has one real attribute:
 \begin{madlist}
-   \ttitem{ANGLE} The rotation angle $\psi$ (default: 0 rad) 
+   \ttitem{ANGLE} The rotation angle $\psi$ (default: 0 rad)
 \end{madlist}
 
 A positive angle means that the new reference system is rotated
-clockwise about the \textit{s}-axis with respect to the old system.  
+clockwise about the \textit{s}-axis with respect to the old system.
 
-Example: 
+Example:
 \madxmp{
 ROLL1: SROTATION, ANGLE=  PI/2.; \\
 ROLL2: SROTATION, ANGLE= -PI/2.; \\
@@ -1739,7 +1731,7 @@ HBEND: SBEND, L=6.0, ANGLE=0.01; \\
 VBEND: LINE=(ROLL1,HBEND,ROLL2); \\
 }
 The \texttt{VBEND} definition above is a way to represent a bend down in the
-vertical plane, it could be defined more simply by  
+vertical plane, it could be defined more simply by
 \madxmp{
 VBEND: SBEND, L=6.0, K0S=0.01/6;
 }
@@ -1748,7 +1740,7 @@ VBEND: SBEND, L=6.0, K0S=0.01/6;
 \label{sec:translation}
 
 The element \texttt{TRANSLATION} changes the
-\hyperref[subsec:local-straight]{reference system} 
+\hyperref[subsec:local-straight]{reference system}
 by applying a translation of the reference system.
 
 \madbox{
@@ -1756,15 +1748,15 @@ label: TRANSLATION, \= X=real,  \= Y=real,  \= T=real, \\
                     \> PX=real, \> PY=real, \> PT=real;
 }
 
-\texttt{TRANSLATION} has no effect on the beam, but it causes the beam to be 
-referred to the new coordinate system translated by the vector given. 
+\texttt{TRANSLATION} has no effect on the beam, but it causes the beam to be
+referred to the new coordinate system translated by the vector given.
 
 
 \section{Change of reference system}
 \label{sec:changeref}
 
 The element \texttt{CHANGEREF} changes the
-\hyperref[subsec:local-straight]{reference system} 
+\hyperref[subsec:local-straight]{reference system}
 by applying both translations and rotations.
 
 \madbox{
@@ -1774,6 +1766,6 @@ label: CHANGEREF, \= PATCH\_ANG={real, real, real}, \\
 
 \texttt{CHANGEREF} has no effect on the beam, but it causes the beam to
 be referred to the new coordinate system where both translations and
-rotations are applied.  
+rotations are applied.
 
 %%% END
