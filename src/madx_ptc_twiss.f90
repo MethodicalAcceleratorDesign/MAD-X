@@ -709,6 +709,15 @@ contains
 
     
     orbit(:)=zero
+    ! read the orbit
+    ! if closed orbit is to be found pass it as the starting point for the searcher
+    orbit(1)=get_value('ptc_twiss ','x ')
+    orbit(2)=get_value('ptc_twiss ','px ')
+    orbit(3)=get_value('ptc_twiss ','y ')
+    orbit(4)=get_value('ptc_twiss ','py ')
+    orbit(6)=-get_value('ptc_twiss ','t ') ! swap of t sign
+    orbit(5)=orbit(5)+get_value('ptc_twiss ','pt ')
+
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
     else
@@ -734,15 +743,6 @@ contains
           !          return
        endif
 
-       ! pass starting point for closed orbit search
-       orbit(1)=get_value('ptc_twiss ','x ')
-       orbit(2)=get_value('ptc_twiss ','px ')
-       orbit(3)=get_value('ptc_twiss ','y ')
-       orbit(4)=get_value('ptc_twiss ','py ')
-       orbit(6)=-get_value('ptc_twiss ','t ') ! swap of t sign
-       orbit(5)=orbit(5)+get_value('ptc_twiss ','pt ')
-
-       
 
        if (getdebug() > 2) then
          print*, "Looking for orbit"
@@ -768,14 +768,6 @@ contains
           call tidy()
           return
        endif
-       
-      ! print*, "From closed orbit", w_p%nc
-      ! if ( w_p%nc .gt. 0) then
-      !   do i=1,w_p%nc
-      !      call fort_warn('ptc_twiss: ',w_p%c(i))
-      !      call seterrorflag(10,"ptc_twiss ",w_p%c(i));
-      !   enddo
-      ! endif    
        
       if (getdebug() > 1) then
          CALL write_closed_orbit(icase,orbit)
