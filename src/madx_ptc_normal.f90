@@ -787,11 +787,22 @@ contains
           END SELECT
        endif
        
-     !  print*,'Indexes 1 3 5', ind(1), ind(3), ind(5)
-     !  print*,'Indexes 2 4 6', ind(2), ind(4), ind(6)
-     !  print*,'Factria 1 3 5', factorial(ind(1)), factorial(ind(3)), factorial(ind(5))
+       print*,'name_var ', name_var
+       print*,'Indexes 1 3 5', ind(1), ind(3), ind(5)
+       print*,'Indexes 2 4 6', ind(2), ind(4), ind(6)
        
-       d_factorial = factorial(ind(1))*factorial(ind(3))*factorial(ind(5))
+       !Taylor series monomial of order o ( o1,o2,... are powers of variable 1,2,..., o=o1+o2+...) 
+       !  has following factors in front of the partial derivatives 
+       !  /  1  \    /        o          \         /  1  \    /        o!	  \ 
+       ! |  --- | * |                    |  ==    |  --- | * | -----------------  | 
+       ! \  o! /    \ o1,o2,o3,o4,o5,o6 /         \  o! /	 \ o1!o2!o3!o4!o5!o6! /
+       !
+       ! therefore only product of factorials stays
+       
+       d_factorial = FACTORIAL_PRODUCT(ind,6)
+
+       print*,'FACTORIAL_PRODUCT ', d_factorial
+       
        double_from_normal_t1 = d_val*d_factorial
      
      END FUNCTION double_from_normal_t1

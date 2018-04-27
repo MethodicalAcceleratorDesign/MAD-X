@@ -2442,6 +2442,21 @@ CONTAINS
     END IF
   END FUNCTION FACTORIAL
   !________________________________________________________________________________________________
+  ! calculates product of factorials
+  RECURSIVE FUNCTION FACTORIAL_PRODUCT (A,N) &
+       RESULT (FACTORIAL_RESULT)
+    INTEGER :: N, FACTORIAL_RESULT
+    INTEGER :: A(6)
+    integer :: i
+    
+    FACTORIAL_RESULT = 1
+    
+    do i=1,N
+      FACTORIAL_RESULT = FACTORIAL_RESULT * FACTORIAL(A(i))
+    enddo
+
+  END FUNCTION FACTORIAL_PRODUCT
+  !________________________________________________________________________________________________
 
   subroutine ptc_track()
     implicit none
