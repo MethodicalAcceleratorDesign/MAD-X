@@ -1941,7 +1941,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
         if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " in " << rbend_el-> name << " has expression, use this " << parnam  << '\n';
         add_cmd_parameter_clone(sbend_cmd, return_param_recurse(parnam,rbend_el),parnam,1);
       }
-      else if( !strcmp(parnam,"aperture") || !strcmp(parnam,"apertype") || !strcmp(parnam,"aper_tol") ) // check also aperture, apertype, aper_tol
+      else if( !strcmp(parnam,"aperture") || !strcmp(parnam,"apertype") || !strcmp(parnam,"aper_tol") || !strcmp(parnam,"aper_offset") || !strcmp(parnam,"mech_sep")) // check also aperture, apertype, aper_tol
       {
         if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " parnam " << parnam << " cmdi->expr=" << cmdi->expr << " cmdi " << my_dump_command_parameter(cmdi) << '\n';
         add_cmd_parameter_clone(sbend_cmd,return_param_recurse(parnam,rbend_el),parnam,1);
