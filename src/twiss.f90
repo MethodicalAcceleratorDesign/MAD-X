@@ -3539,12 +3539,6 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      sks = g_elpar(b_k1s)
      h = an / el
 
-     !---  calculate body slice from start (no exit fringe field):
-     if (dl .lt. el .and. .not. fcentre) then
-       el = dl
-       kill_exi_fringe = .true.
-     endif
-
      !---- Apply field errors and change coefficients using DELTAP.
      F_ERRORS = zero
      n_ferr = node_fd_errors(f_errors)
@@ -3559,6 +3553,12 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      sk1 = bvk * (sk1 + f_errors(2) / el) / (one + deltap) ! quad term
      sk2 = bvk * (sk2 + f_errors(4) / el) / (one + deltap) ! sext term
      sks = bvk * (sks + f_errors(3) / el) / (one + deltap) ! skew quad term
+
+     !---  calculate body slice from start (no exit fringe field):
+     if (dl .lt. el .and. .not. fcentre) then
+       el = dl
+       kill_exi_fringe = .true.
+     endif
 
      !---- Half radiation effects at entrance.
      if (ftrk .and. radiate) then
