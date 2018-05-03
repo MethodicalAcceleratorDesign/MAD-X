@@ -4839,15 +4839,26 @@ contains
          ! we prefer to fix px and py to zero so order = sum(ind(:)) is consistent
          ind(2) = 0
          ind(4) = 0
+         if (c_%nd2 == 6) then
+          ! 6D case, we get Jt in longitudinal plane ind(5) == ind(6)
+          if (mod(sum(ind(5:6)),2) /=  0 ) then
+            !it should be always even
+            call fort_warn('ptc_twiss: ',' strange dependence of tune on longitudinal coordinates')
+          endif
+          ind(5) = 0  
+         endif
          
          order = sum(ind(1:cnv))
          
          nn = parname
 
          if (order == 0 ) then
+           ! O R D R E R   Z E R O
+           
            nick = parname  ! tune  q1
            !tune sometimes comes negative, add one in this case
            if (d_val .lt. zero) d_val = d_val + one
+         
          else
 
 
@@ -4861,11 +4872,20 @@ contains
            if (orderX > 1) write(nn,'(a,i1)') trim(nn),orderX
            if (orderY > 0) nn = trim(nn) // '_jy'
            if (orderY > 1) write(nn,'(a,i1)') trim(nn),orderY
-           if (orderPT> 0) nn = trim(nn) // '_p'
-           if (orderPT > 1) write(nn,'(a,i1)') trim(nn),orderPT
-           if (orderT> 0) nn = trim(nn) // '_t'
-           if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
 
+           if (c_%nd2 == 6) then
+            ! 6D case, we get Jt in longitudinal plane
+            if (orderT > 0) nn = trim(nn) // '_jt'
+            if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
+             
+             
+           else
+             if (orderPT> 0) nn = trim(nn) // '_p'
+             if (orderPT > 1) write(nn,'(a,i1)') trim(nn),orderPT
+             if (orderT> 0) nn = trim(nn) // '_t'
+             if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
+           endif
+           
            nick = nn
            
            if (order == ind(5) ) then
@@ -4880,8 +4900,8 @@ contains
 
            if ( order == (sum( ind(2*planei-1:2*planei))) ) then
              nick = 'anh'//planel
-             if (order > 2) then
-                write(nick,'(a,a1,i1)') trim(nick),'_',order/2 !qN_JxM
+             if (order > 1) then
+                write(nick,'(a,a1,i1)') trim(nick),'_',order !qN_JxM
              endif
            else 
              if ( (order==1) .and. (sum(ind(5:6)) == 0) ) then

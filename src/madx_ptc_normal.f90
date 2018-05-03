@@ -821,9 +821,6 @@ contains
        ! therefore only product of factorials stays
        
        d_factorial = FACTORIAL_PRODUCT(ind,6)
-
-       print*,'FACTORIAL_PRODUCT ', d_factorial
-       
        double_from_normal_t1 = d_val*d_factorial
      
      END FUNCTION double_from_normal_t1
