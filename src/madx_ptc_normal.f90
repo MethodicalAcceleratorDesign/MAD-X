@@ -267,8 +267,11 @@ contains
 
        if (getdebug() > 1) then
           write(19,'(/a/)') 'NORMAL:  Tunes, Chromaticities and Anharmonicities'
-
+          
+          write(19,'(/a/)') 'theNormalForm%A_t '
           call daprint(theNormalForm%A_t,19)! WARNING, this does not work with 6D dispersion, need to use Chao-Sands prescription
+          write(19,'(/a/)') ' --------------------------------------------  '
+          write(19,'(/a/)') 'vf_kernel: flattened factored Lie of theNormalForm%ker'
           call daprint(vf_kernel,19) ! tunes
 
 
@@ -554,7 +557,17 @@ contains
   
   contains
   !________________________________________________________________________________
-
+  ! Tunes are extracted from the kernel
+  !       this is polynomial of complex variables  
+  !       imaginary part are the tunes in radians ( therefore division by 2pi)
+  !       kernel has indexes in both tranverse planes 
+  !       !!!!   AND +1 FOR THE PLANE OF THE VARIABLE
+  !       i.e. anhx = dq1/dqx       has index 210000
+  !                   dq1^2 /d^2 x  has index 320000
+  !                   dq1^2 /dx dy  has index 211100
+  !       therefore we drop the index of momentum for display 
+  !       and for factorial calculation when extracting values of the partial derivatives
+   
      FUNCTION double_from_normal_t1(name_var,row,icase)
        USE ptc_results
        implicit none
@@ -677,7 +690,6 @@ contains
       
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
        
        if (name_l) then
           name_var4 = name_var
@@ -694,10 +706,15 @@ contains
              k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
              ind(5) = int(doublenum)
              ind(6) = 0
+             !print*,"ANHX order ", ind(1),ind(3),ind(5)
              ind(1) = ind(1) + 1
+             !print*,"ANHX extracting ", ind
              c_val=vf_kernel%v(1).sub.ind 
              d_val = -aimag(c_val)/(2.*pi)
+             !print*,"ANHX = ", d_val
              ind(1) = ind(1) - 1 ! need to subtract it back to get factorial factor correct
+             ind(2) = 0    ! to get the order and factorial factor correct
+             ind(4) = 0    ! 
           CASE ('anhy')
              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
              do j = 1,2
@@ -711,9 +728,13 @@ contains
              ind(5) = int(doublenum)
              ind(6) = 0
              ind(3) = ind(3) + 1
+
              c_val=vf_kernel%v(3).sub.ind 
              d_val = -aimag(c_val)/(2.*pi)
+
              ind(3) = ind(3) - 1 ! need to subtract it back to get factorial factor correct
+             ind(2) = 0    ! to get the order and factorial factor correct
+             ind(4) = 0    ! 
           CASE ('eign')
              ii=(icase/2)*2
              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
@@ -787,11 +808,19 @@ contains
           END SELECT
        endif
        
-     !  print*,'Indexes 1 3 5', ind(1), ind(3), ind(5)
-     !  print*,'Indexes 2 4 6', ind(2), ind(4), ind(6)
-     !  print*,'Factria 1 3 5', factorial(ind(1)), factorial(ind(3)), factorial(ind(5))
+      ! print*,'name_var ', name_var
+      ! print*,'Indexes 1 3 5', ind(1), ind(3), ind(5)
+      ! print*,'Indexes 2 4 6', ind(2), ind(4), ind(6)
        
-       d_factorial = factorial(ind(1))*factorial(ind(3))*factorial(ind(5))
+       !Taylor series monomial of order o ( o1,o2,... are powers of variable 1,2,..., o=o1+o2+...) 
+       !  has following factors in front of the partial derivatives 
+       !  /  1  \    /        o          \         /  1  \    /        o!         \ 
+       ! |  --- | * |                    |  ==    |  --- | * | -----------------  | 
+       ! \  o! /    \ o1,o2,o3,o4,o5,o6 /         \  o! /    \ o1!o2!o3!o4!o5!o6! /
+       !
+       ! therefore only product of factorials stays
+       
+       d_factorial = FACTORIAL_PRODUCT(ind,6)
        double_from_normal_t1 = d_val*d_factorial
      
      END FUNCTION double_from_normal_t1

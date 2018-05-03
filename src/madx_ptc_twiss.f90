@@ -709,6 +709,15 @@ contains
 
     
     orbit(:)=zero
+    ! read the orbit
+    ! if closed orbit is to be found pass it as the starting point for the searcher
+    orbit(1)=get_value('ptc_twiss ','x ')
+    orbit(2)=get_value('ptc_twiss ','px ')
+    orbit(3)=get_value('ptc_twiss ','y ')
+    orbit(4)=get_value('ptc_twiss ','py ')
+    orbit(6)=-get_value('ptc_twiss ','t ') ! swap of t sign
+    orbit(5)=orbit(5)+get_value('ptc_twiss ','pt ')
+
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
     else
@@ -734,15 +743,6 @@ contains
           !          return
        endif
 
-       ! pass starting point for closed orbit search
-       orbit(1)=get_value('ptc_twiss ','x ')
-       orbit(2)=get_value('ptc_twiss ','px ')
-       orbit(3)=get_value('ptc_twiss ','y ')
-       orbit(4)=get_value('ptc_twiss ','py ')
-       orbit(6)=-get_value('ptc_twiss ','t ') ! swap of t sign
-       orbit(5)=orbit(5)+get_value('ptc_twiss ','pt ')
-
-       
 
        if (getdebug() > 2) then
          print*, "Looking for orbit"
@@ -768,14 +768,6 @@ contains
           call tidy()
           return
        endif
-       
-      ! print*, "From closed orbit", w_p%nc
-      ! if ( w_p%nc .gt. 0) then
-      !   do i=1,w_p%nc
-      !      call fort_warn('ptc_twiss: ',w_p%c(i))
-      !      call seterrorflag(10,"ptc_twiss ",w_p%c(i));
-      !   enddo
-      ! endif    
        
       if (getdebug() > 1) then
          CALL write_closed_orbit(icase,orbit)
@@ -4830,29 +4822,48 @@ contains
          !print*, 'Value=',d_val,  ind(1:c_%nv)
          d_val = -aimag(c_val)/(2.*pi)
          ind(2*planei - 1) = ind(2*planei - 1) - 1 !kernel has extra exponent at the plane variable, q1=v(1).sub.'100000'
+
+         if (mod(sum(ind(1:2)),2) /=  0 ) then
+           !it should be always even
+           call fort_warn('ptc_twiss: ',' strange dependence of tune on horizontal coordinates')
+         endif
+
+         if (mod(sum(ind(3:4)),2) /=  0 ) then
+           !it should be always even
+           call fort_warn('ptc_twiss: ',' strange dependence of tune on vertical coordinates')
+         endif
+
+         !PTC gives the same order in x and px to mark Jx and Jy, i.e.
+         ! dQx/dJx has index 210000 ; after substracting the extra exponent in the plane of variable it is 110000
+         ! dQy/dJy has index 002100 
+         ! we prefer to fix px and py to zero so order = sum(ind(:)) is consistent
+         ind(2) = 0
+         ind(4) = 0
+         if (c_%nd2 == 6) then
+          ! 6D case, we get Jt in longitudinal plane ind(5) == ind(6)
+          if (mod(sum(ind(5:6)),2) /=  0 ) then
+            !it should be always even
+            call fort_warn('ptc_twiss: ',' strange dependence of tune on longitudinal coordinates')
+          endif
+          ind(5) = 0  
+         endif
+         
          order = sum(ind(1:cnv))
          
          nn = parname
 
          if (order == 0 ) then
+           ! O R D R E R   Z E R O
+           
            nick = parname  ! tune  q1
            !tune sometimes comes negative, add one in this case
            if (d_val .lt. zero) d_val = d_val + one
+         
          else
 
-           if (mod(sum(ind(1:2)),2) /=  0 ) then
-             !it should be always even
-             call fort_warn('ptc_twiss: ',' strange dependence of tune on horizontal coordinates')
-           endif
-           
-           if (mod(sum(ind(3:4)),2) /=  0 ) then
-             !it should be always even
-             call fort_warn('ptc_twiss: ',' strange dependence of tune on vertical coordinates')
-           endif
 
-
-           orderX = sum(ind(1:2))/2
-           orderY = sum(ind(3:4))/2
+           orderX = ind(1)
+           orderY = ind(3)
            orderPT= ind(5)
            orderT = ind(6)
 
@@ -4861,11 +4872,20 @@ contains
            if (orderX > 1) write(nn,'(a,i1)') trim(nn),orderX
            if (orderY > 0) nn = trim(nn) // '_jy'
            if (orderY > 1) write(nn,'(a,i1)') trim(nn),orderY
-           if (orderPT> 0) nn = trim(nn) // '_p'
-           if (orderPT > 1) write(nn,'(a,i1)') trim(nn),orderPT
-           if (orderT> 0) nn = trim(nn) // '_t'
-           if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
 
+           if (c_%nd2 == 6) then
+            ! 6D case, we get Jt in longitudinal plane
+            if (orderT > 0) nn = trim(nn) // '_jt'
+            if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
+             
+             
+           else
+             if (orderPT> 0) nn = trim(nn) // '_p'
+             if (orderPT > 1) write(nn,'(a,i1)') trim(nn),orderPT
+             if (orderT> 0) nn = trim(nn) // '_t'
+             if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
+           endif
+           
            nick = nn
            
            if (order == ind(5) ) then
@@ -4880,15 +4900,14 @@ contains
 
            if ( order == (sum( ind(2*planei-1:2*planei))) ) then
              nick = 'anh'//planel
-             if (order > 2) then
-                write(nick,'(a,a1,i1)') trim(nick),'_',order/2 !qN_JxM
+             if (order > 1) then
+                write(nick,'(a,a1,i1)') trim(nick),'_',order !qN_JxM
              endif
            else 
-             if ( (order==2) .and. (sum(ind(5:6)) == 0) ) then
+             if ( (order==1) .and. (sum(ind(5:6)) == 0) ) then
                 nick = 'anhc' 
              endif
            endif
-
 
         endif !else order==0  
 

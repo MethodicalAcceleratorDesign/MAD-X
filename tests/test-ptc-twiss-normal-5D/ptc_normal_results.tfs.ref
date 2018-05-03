@@ -1,9 +1,9 @@
 @ NAME             %14s "NORMAL_RESULTS"
 @ TYPE             %10s "NORMAL_RES"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.03.07 Linux 64"
-@ DATE             %08s "09/01/18"
-@ TIME             %08s "14.25.31"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "03/05/18"
+@ TIME             %08s "17.00.58"
 * NAME                   ORDER1     ORDER2     ORDER3     ORDER4              VALUE 
 $ %s                         %d         %d         %d         %d                %le 
  "GNFC"                       2          0          1          0       -0.211198277
@@ -34,7 +34,7 @@ $ %s                         %d         %d         %d         %d                
  "GNFC"                       1          0          1          1      -0.9941379383
  "GNFS"                       1          0          1          1      -0.3045057663
  "GNFA"                       1          0          1          1         1.03972785
- "GNFC"                       1          0          0          2       0.4339529594
- "GNFS"                       1          0          0          2      -0.5218067967
- "GNFA"                       1          0          0          2       0.6786733412
+ "GNFC"                       1          0          0          2       0.8679059188
+ "GNFS"                       1          0          0          2       -1.043613593
+ "GNFA"                       1          0          0          2        1.357346682
  "GNFU"                       3          0          0          0                  5
