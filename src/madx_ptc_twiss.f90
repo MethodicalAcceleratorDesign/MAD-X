@@ -4822,6 +4822,24 @@ contains
          !print*, 'Value=',d_val,  ind(1:c_%nv)
          d_val = -aimag(c_val)/(2.*pi)
          ind(2*planei - 1) = ind(2*planei - 1) - 1 !kernel has extra exponent at the plane variable, q1=v(1).sub.'100000'
+
+         if (mod(sum(ind(1:2)),2) /=  0 ) then
+           !it should be always even
+           call fort_warn('ptc_twiss: ',' strange dependence of tune on horizontal coordinates')
+         endif
+
+         if (mod(sum(ind(3:4)),2) /=  0 ) then
+           !it should be always even
+           call fort_warn('ptc_twiss: ',' strange dependence of tune on vertical coordinates')
+         endif
+
+         !PTC gives the same order in x and px to mark Jx and Jy, i.e.
+         ! dQx/dJx has index 210000 ; after substracting the extra exponent in the plane of variable it is 110000
+         ! dQy/dJy has index 002100 
+         ! we prefer to fix px and py to zero so order = sum(ind(:)) is consistent
+         ind(2) = 0
+         ind(4) = 0
+         
          order = sum(ind(1:cnv))
          
          nn = parname
@@ -4832,19 +4850,9 @@ contains
            if (d_val .lt. zero) d_val = d_val + one
          else
 
-           if (mod(sum(ind(1:2)),2) /=  0 ) then
-             !it should be always even
-             call fort_warn('ptc_twiss: ',' strange dependence of tune on horizontal coordinates')
-           endif
-           
-           if (mod(sum(ind(3:4)),2) /=  0 ) then
-             !it should be always even
-             call fort_warn('ptc_twiss: ',' strange dependence of tune on vertical coordinates')
-           endif
 
-
-           orderX = sum(ind(1:2))/2
-           orderY = sum(ind(3:4))/2
+           orderX = ind(1)
+           orderY = ind(3)
            orderPT= ind(5)
            orderT = ind(6)
 
@@ -4876,11 +4884,10 @@ contains
                 write(nick,'(a,a1,i1)') trim(nick),'_',order/2 !qN_JxM
              endif
            else 
-             if ( (order==2) .and. (sum(ind(5:6)) == 0) ) then
+             if ( (order==1) .and. (sum(ind(5:6)) == 0) ) then
                 nick = 'anhc' 
              endif
            endif
-
 
         endif !else order==0  
 
