@@ -19,7 +19,7 @@ mad_strncpy(const char *file, int line, char *dst, const char *src, size_t siz)
 {
   (void)file, (void)line;
 //  printf("DEBUG:strncpy:%s:%d:'%s'[%lu]\n", file, line, src, siz);
-  assert(dst && src)
+  assert(dst && src);
   assert(siz < INT_MAX);
   if (siz > 0) strncat((*dst=0, dst), src, siz-1);
   return dst;
