@@ -169,6 +169,7 @@ timex.o:                    $(FC_DIR_MAD)/timex.f90
 touschek.o:                 $(FC_DIR_MAD)/touschek.f90                util.o
 trrun.o:                    $(FC_DIR_MAD)/trrun.f90                   util.o
 twiss.o:                    $(FC_DIR_MAD)/twiss.f90                   util.o
+madx_space_charge.o:	    $(FC_DIR_MAD)/madx_space_charge.f90       util.o
 util.o:                     $(FC_DIR_MAD)/util.f90
 
 endif
