@@ -63,7 +63,7 @@
 @ ORBIT_Y          %le                   0
 @ ORBIT_PY         %le                   0
 @ ORBIT_PT         %le                   0
-@ ORBIT_T        %le                   0
+@ ORBIT_T          %le                   0
 @ XCORMS           %le       0.09743242902
 @ PXCORMS          %le      0.004804238866
 @ YCORMS           %le      0.007662771932
@@ -83,9 +83,9 @@
 @ PTCOMIN          %le                   0
 @ PTCOMAX          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "24/01/18"
-@ TIME             %08s "14.48.31"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.25.09"
 * NAME                                S                  X                 PX                  Y                 PY                  T                 PT              DISP1              DISP2              DISP3              DISP4             BETA11             BETA22             BETA12             BETA13             BETA21             BETA23             ALFA11             ALFA22             ALFA12             ALFA13             ALFA21             ALFA23 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "MYLINE$START"                       0                0.1                  0                  0                  0                 -0                  0                  0                  0                  0                  0                 10                 10                  0                  0                  0                  0                 -0                 -0                 -0                 -0                 -0                 -0
