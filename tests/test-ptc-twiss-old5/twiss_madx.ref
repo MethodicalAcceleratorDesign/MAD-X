@@ -15,6 +15,7 @@
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
+@ BV_FLAG          %le                   1
 @ LENGTH           %le               561.6
 @ ALFA             %le     0.0001708141631
 @ ORBIT5           %le      -0.02997564577
@@ -24,7 +25,7 @@
 @ DQ1              %le        -78.98623213
 @ DQ2              %le        -35.28688982
 @ DXMAX            %le        0.3117371246
-@ DYMAX            %le                  -0
+@ DYMAX            %le                   0
 @ XCOMAX           %le                   0
 @ YCOMAX           %le                   0
 @ BETXMAX          %le         22.59035178
@@ -40,12 +41,12 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %35s " Diamond Light Source Lattice 8.1.1"
-@ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "14/12/17"
-@ TIME             %08s "18.03.01"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.21.52"
 * NAME                                S               BETX               BETY                 DX                 DY                MUX                MUY                  X                  Y 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
- "DIAMOND$START"                      0        9.978688586        5.831556551      0.07210045564                 -0                  0                  0                  0                  0
+ "DIAMOND$START"                      0        9.978688586        5.831556551      0.07210045564                  0                  0                  0                  0                  0
  "D1D2"                          4.3775        11.89903173         9.11755851      0.07210045564                  0      0.06579537721       0.1024833046                  0                  0
  "BPM"                           4.3775        11.89903173         9.11755851      0.07210045564                  0      0.06579537721       0.1024833046                  0                  0
  "K1HC"                          4.3775        11.89903173         9.11755851      0.07210045564                  0      0.06579537721       0.1024833046                  0                  0

@@ -83,9 +83,9 @@
 @ PTCOMIN          %le     8.804816386e-07
 @ PTCOMAX          %le     8.804816457e-07
 @ TITLE            %24s " Chromaticity correction"
-@ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "13/02/18"
-@ TIME             %08s "23.45.58"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.22.24"
 * NAME                                S             BETA11             BETA22                MU1                MU2                MU3                  X                 PX                  Y                 PY                  T                 PT 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "LHCB1$START"                        0        17.00014506        16.99971471                  0                  0                  0     -0.00250001517   -3.567728269e-09   -7.649116866e-08    0.0001600066423    1.141438798e-05    8.804816453e-07

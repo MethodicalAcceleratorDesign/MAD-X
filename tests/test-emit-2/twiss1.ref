@@ -13,8 +13,9 @@
 @ SIGT             %le     0.0008578396946
 @ NPART            %le                   0
 @ EX               %le     1.125932202e-09
-@ EY               %le     1.195003214e-37
+@ EY               %le     1.733048712e-37
 @ ET               %le     9.569041561e-07
+@ BV_FLAG          %le                   1
 @ LENGTH           %le           67.200074
 @ ALFA             %le     0.0008829339349
 @ ORBIT5           %le      0.002156959202
@@ -24,15 +25,15 @@
 @ DQ1              %le        0.3280484114
 @ DQ2              %le        0.1526852468
 @ DXMAX            %le        0.2344520764
-@ DYMAX            %le      5.99260945e-16
+@ DYMAX            %le     5.990544448e-16
 @ XCOMAX           %le     1.388447428e-05
-@ YCOMAX           %le     2.573962149e-20
+@ YCOMAX           %le     1.325908778e-20
 @ BETXMAX          %le         17.73701544
 @ BETYMAX          %le          19.3658027
 @ XCORMS           %le     5.588625492e-06
-@ YCORMS           %le     1.282327637e-20
+@ YCORMS           %le     7.216229301e-21
 @ DXRMS            %le        0.1455152745
-@ DYRMS            %le     3.065494471e-16
+@ DYRMS            %le     3.064345625e-16
 @ DELTAP           %le                   0
 @ SYNCH_1          %le                   0
 @ SYNCH_2          %le                   0
@@ -40,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %33s "ALBA-24                          "
-@ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "14/12/17"
-@ TIME             %08s "17.57.34"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.29.37"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "QD1"                            4.215        14.01022269        8.121167257

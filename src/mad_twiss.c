@@ -92,7 +92,7 @@ static void
 fill_twiss_header(struct table* t)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, h_length = 39; /* change adding header lines ! */
+  int i, h_length = 40; /* change adding header lines ! */
   struct table* s;
   char tmp[NAME_L];
 
@@ -118,6 +118,7 @@ fill_twiss_header(struct table* t)
   table_add_header(t, "@ EX               %%le  %F", get_value("beam", "ex"));
   table_add_header(t, "@ EY               %%le  %F", get_value("beam", "ey"));
   table_add_header(t, "@ ET               %%le  %F", get_value("beam", "et"));
+  table_add_header(t, "@ BV_FLAG          %%le  %F", get_value("beam", "bv"));
 
   if ((s = find_table("summ")))
   {
@@ -145,6 +146,7 @@ fill_twiss_header(struct table* t)
     table_add_header(t, "@ SYNCH_3          %%le  %F", col_data(s, "synch_3")[0]);
     table_add_header(t, "@ SYNCH_4          %%le  %F", col_data(s, "synch_4")[0]);
     table_add_header(t, "@ SYNCH_5          %%le  %F", col_data(s, "synch_5")[0]);
+    
   }
 }
 
