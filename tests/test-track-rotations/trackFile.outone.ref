@@ -46,9 +46,9 @@
 @ E65              %le                   0
 @ E66              %le                   1
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.03.07 Linux 64"
-@ DATE             %08s "07/02/18"
-@ TIME             %08s "15.25.04"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "11.04.11"
 *             NUMBER               TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
 $                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
 #segment       1       2       1       0 start                                                                         
