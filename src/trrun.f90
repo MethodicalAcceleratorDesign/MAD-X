@@ -11,6 +11,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   use matrices, only : EYE
   use math_constfi, only : zero, one, two
   use code_constfi
+  use SpaceCharge
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -48,8 +49,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   logical :: onepass, onetable, last_out, info, aperflag, doupdate
   logical :: run=.false.,dynap=.false.
   logical, save :: first=.true.
-  logical :: bb_sxy_update, virgin_state, emittance_update
-  logical :: checkpnt_restart, fast_error_func, exit_loss_turn
+  logical :: fast_error_func
   integer :: i, j, k, code, ffile
   integer :: n_align, nlm, j_tot, turn, nobs, lobs
   integer :: nint, ndble, nchar, char_l, tot_segm, int_arr(1)
@@ -67,7 +67,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   double precision, save :: gamx_start=zero, gamy_start=zero
   double precision, save :: dx_start=zero,   dpx_start=zero
   double precision, save :: dy_start=zero,   dpy_start=zero
-  double precision, save :: ex_rms0=zero, ey_rms0=zero, sigma_p0=zero, sigma_z0=zero
+  !!! ALSC: double precision, save :: ex_rms0=zero, ey_rms0=zero, sigma_p0=zero, sigma_z0=zero
   double precision, save :: N_ions_in_beam, Npart_gain, N_ions_ini, n_ions_macro, N_ions_for_bb
   double precision, save :: sigma_z_ini, z_factor, t_rms, pt_rms, z_keep(6,max_part)
 
@@ -123,12 +123,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   endif
 
   !---- get options for space charge variables
-  exit_loss_turn = get_option('exit_loss_turn ') .ne. 0
-  bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
-  checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. zero
-  emittance_update = get_option('emittance_update ') .ne. 0
-  virgin_state = get_value('run ', 'virgin_state ') .ne. zero
-
+  call Init_SC();
+  
   if (run .and. bb_sxy_update) then
      open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
   else if (dynap) then
@@ -513,39 +509,13 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
              last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass)
 
         !-------- Space Charge update
-!frs on 04.06.2016 - fixing
-!a) bug concerning sigma_p
-!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
-!   obviously without update!
-!c) Fixing checkpnt_restart for "emittance_update = .false." which
-!   worked for ".true." alright.
-        ex_rms0=ex_rms
-        ey_rms0=ey_rms
-        sigma_z0=sigma_z
-        sigma_p0=sigma_p
-        if (bb_sxy_update .and. is_lost) then
-           call ixy_calcs(betas, orbit0, z,       &
-                          betx_start, bety_start, &
-                          alfx_start, alfy_start, &
-                          gamx_start, gamy_start, &
-                          dx_start,    dpx_start, &
-                          dy_start,    dpy_start)
-           call ixy_fitting()
-           is_lost = .false.
-        endif
-        if( .not. emittance_update) then
-           ex_rms=ex_rms0
-           ey_rms=ey_rms0
-           sigma_z=sigma_z0
-           sigma_p=sigma_p0
-        endif
-!frs on 04.06.2016 - fixing
-!a) bug concerning sigma_p
-!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
-!   obviously without update!
-!c) Fixing checkpnt_restart for "emittance_update = .false." which
-!   worked for ".true." alright.
-
+        call SC_Update(betas, orbit0, z,       &
+             betx_start, bety_start, &
+             alfx_start, alfy_start, &
+             gamx_start, gamy_start, &
+             dx_start,    dpx_start, &
+             dy_start,    dpy_start);
+        
         !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. code_drift .and. n_align.ne.0)  then
            do i = 1, jmax
@@ -3699,6 +3669,7 @@ subroutine ixy_calcs(betas, orbit, z,          &
   use bbfi
   use spch_bbfi
   use math_constfi, only : two
+  use SpaceCharge
   implicit none
   double precision :: betas, orbit(6), z(6,N_macro_surv)
   double precision :: betax_start, betay_start
@@ -3706,7 +3677,6 @@ subroutine ixy_calcs(betas, orbit, z,          &
   double precision :: gamax_start, gamay_start
   double precision :: dx_start,    dpx_start
   double precision :: dy_start,   dpy_start
-  logical :: sc_chrom_fix
   integer :: get_option
 
   integer :: i

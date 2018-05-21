@@ -492,28 +492,6 @@ module time_varfi
   character(len=name_len), save :: time_var_m_ch(n_time_var), time_var_p_ch(n_time_var), time_var_c_ch(n_time_var)
 end module time_varfi
 
-module spch_bbfi
-  use name_lenfi
-  use bbfi
-  implicit none
-  public
-  logical :: lost_in_turn = .false., is_lost = .false.
-  integer, save :: i_turn, N_macro_surv, N_for_I, N_spch, i_spch
-  integer, parameter :: N_macro_max=16000
-  double precision, save :: Ex_rms, Ey_rms, sigma_p, sigma_z
-  double precision, save :: Ix_array(N_macro_max), Iy_array(N_macro_max)
-  double precision, save :: dpi_array(N_macro_max), z_part_array(N_macro_max)
-  double precision :: alpha, I_div_E_sum_max
-!  parameter(alpha=0.0, I_div_E_sum_max=7.0)
-  double precision, save :: betx_bb(bbd_max), bety_bb(bbd_max), &
-                            alfx_bb(bbd_max), alfy_bb(bbd_max), &
-                            gamx_bb(bbd_max), gamy_bb(bbd_max), &
-                            dx_bb(bbd_max),   dy_bb(bbd_max)
-  double precision,save :: rat_bb_n_ions=1d0
-  double precision, save :: sigma_t=0.d0, mean_t=0.d0  ! calculate and transfer to BB
-  character(len=name_len), save :: spch_bb_name(bbd_max)
-end module spch_bbfi
-
 module plotfi
   implicit none
   public
