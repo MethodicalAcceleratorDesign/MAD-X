@@ -83,9 +83,9 @@
 @ PTCOMIN          %le                   0
 @ PTCOMAX          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.03.07 Linux 64"
-@ DATE             %08s "08/02/18"
-@ TIME             %08s "17.53.24"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.33.51"
 * NAME                                S                  X                 PX                  Y                 PY                 PT                  T 
 $ %s                                %le                %le                %le                %le                %le                %le                %le 
  "SEQ_PTC$START"                      0                  0                  0                  0                  0                  0                 -0

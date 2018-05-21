@@ -2,8 +2,8 @@
 @ TYPE             %10s "NORMAL_RES"
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "03/05/18"
-@ TIME             %08s "17.09.58"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.23.28"
 * NAME                   ORDER1     ORDER2     ORDER3     ORDER4              VALUE 
 $ %s                         %d         %d         %d         %d                %le 
  "DX"                         1          0          0          0        3.582458221

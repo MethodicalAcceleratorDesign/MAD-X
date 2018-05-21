@@ -92,7 +92,7 @@ static void
 fill_twiss_header(struct table* t)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, h_length = 39; /* change adding header lines ! */
+  int i, h_length = 40; /* change adding header lines ! */
   struct table* s;
   char tmp[NAME_L];
 
@@ -118,6 +118,7 @@ fill_twiss_header(struct table* t)
   table_add_header(t, "@ EX               %%le  %F", get_value("beam", "ex"));
   table_add_header(t, "@ EY               %%le  %F", get_value("beam", "ey"));
   table_add_header(t, "@ ET               %%le  %F", get_value("beam", "et"));
+  table_add_header(t, "@ BV_FLAG          %%le  %F", get_value("beam", "bv"));
 
   if ((s = find_table("summ")))
   {
@@ -145,6 +146,7 @@ fill_twiss_header(struct table* t)
     table_add_header(t, "@ SYNCH_3          %%le  %F", col_data(s, "synch_3")[0]);
     table_add_header(t, "@ SYNCH_4          %%le  %F", col_data(s, "synch_4")[0]);
     table_add_header(t, "@ SYNCH_5          %%le  %F", col_data(s, "synch_5")[0]);
+    
   }
 }
 
@@ -599,6 +601,12 @@ complete_twiss_table(struct table* t)
     else if (strcmp(tmp, "lrad") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "h1") == 0 &&
              strcmp(c_node->base_name, "dipedge") == 0) val = el_par_value("h", c_node->p_elem);
+    else if (strcmp(tmp, "bbcharge") == 0) val =  el_par_value("charge", c_node->p_elem);
+    else if (strcmp(tmp, "xma") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "yma") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "sigx") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "sigy") == 0) val =  el_par_value(tmp, c_node->p_elem); 
+
     else if(mult)
     {
       if(j<=twiss_mult_end)
@@ -636,6 +644,8 @@ complete_twiss_table(struct table* t)
             && strcmp(tmp, "freq") && strcmp(tmp, "harmon")) val *= el;
       }
     }
+
+
     t->d_cols[j][i] = val;
   }
 }
