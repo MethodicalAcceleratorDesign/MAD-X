@@ -148,7 +148,7 @@ user2_photon.o:             $(FC_DIR_MAD)/photoni.inc
 
 # chain of dependencies (MAD-X)
 dynap.o:                    $(FC_DIR_MAD)/dynap.f90                   util.o
-emit.o:                     $(FC_DIR_MAD)/emit.f90                    util.o
+emit.o:                     $(FC_DIR_MAD)/emit.f90                    util.o madx_space_charge.o
 gxx11.o:                    $(FC_DIR_MAD)/gxx11.f90                   util.o
 gxx11ps.o:                  $(FC_DIR_MAD)/gxx11ps.f90                 util.o
 ibsdb.o:                    $(FC_DIR_MAD)/ibsdb.f90                   util.o
@@ -168,7 +168,7 @@ timest.o:                   $(FC_DIR_MAD)/timest.f90
 timex.o:                    $(FC_DIR_MAD)/timex.f90
 touschek.o:                 $(FC_DIR_MAD)/touschek.f90                util.o
 trrun.o:                    $(FC_DIR_MAD)/trrun.f90                   util.o madx_space_charge.o
-twiss.o:                    $(FC_DIR_MAD)/twiss.f90                   util.o
+twiss.o:                    $(FC_DIR_MAD)/twiss.f90                   util.o madx_space_charge.o
 madx_space_charge.o:	    $(FC_DIR_MAD)/madx_space_charge.f90       util.o
 util.o:                     $(FC_DIR_MAD)/util.f90
 

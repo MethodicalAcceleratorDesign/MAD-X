@@ -1,9 +1,17 @@
+module bbfi
+  implicit none
+  public
+  integer, parameter :: bbd_max=100000
+  integer :: bbd_loc(bbd_max)=0, bbd_cnt=0, bbd_flag=0, bbd_pos=0
+  double precision :: bb_kick(2,bbd_max)=0.d0
+  double precision, parameter :: explim=150.0d0   ! if x > explim, exp(-x) is outside machine limits.
+end module bbfi
+
 module spch_bbfi
   use name_lenfi
   use bbfi
   implicit none
   public
-  logical :: lost_in_turn = .false., is_lost = .false.
   integer, save :: i_turn, N_macro_surv, N_for_I, N_spch, i_spch
   integer, parameter :: N_macro_max=16000
   double precision, save :: Ex_rms, Ey_rms, sigma_p, sigma_z
@@ -22,6 +30,7 @@ end module spch_bbfi
 
 module SpaceCharge
 
+  use trackfi, only : max_part
   use math_constfi
 
   implicit none
@@ -32,29 +41,30 @@ module SpaceCharge
 
   logical :: sc_chrom_fix
 
-  double precision, save :: ex_rms0=zero, ey_rms0=zero, sigma_p0=zero, sigma_z0=zero
+  double precision :: ex_rms0 = zero, ey_rms0 = zero, sigma_p0 = zero, sigma_z0 = zero
+  double precision :: N_ions_in_beam, Npart_gain, N_ions_ini, n_ions_macro, N_ions_for_bb
+  double precision :: sigma_z_ini, z_factor, t_rms, pt_rms, z_keep(6,max_part)
 
+  !VVK 20100321 -------------------------------------------------
+  integer :: i_part                     ! local counter
+  double precision  :: Summ_t_mean      ! local for mean value
+  double precision  :: Summ_t_square    ! local for rms value
+!-------------------------------------------------------------------
+  
   private :: table_input
   !private :: ixy_calcs
   !private :: ixy_fitting
 
 contains
 
-  subroutine SC_Init(first, run, dynap, turns, &
-       betax_start, betay_start, &
-       alfax_start, alfay_start, &
-       gamax_start, gamay_start, &
-       dx_start,    dpx_start,   &
-       dy_start,    dpy_start)
+  subroutine SC_Init(first, run, dynap, turns)
 
+    use trackfi
+    use spch_bbfi
+    
     logical, intent(IN) :: run, dynap
     integer, intent(IN)  :: turns
     logical, intent(INOUT) :: first
-    double precision, intent(IN)  :: betax_start, betay_start
-    double precision, intent(IN)  :: alfax_start, alfay_start
-    double precision, intent(IN)  :: gamax_start, gamay_start
-    double precision, intent(IN)  :: dx_start,    dpx_start
-    double precision, intent(IN)  :: dy_start,   dpy_start
 
     integer, external :: get_option
     double precision, external :: get_value
@@ -80,9 +90,9 @@ contains
 
     if (bb_sxy_update) then
        if (virgin_state) first=.true.
-       call table_input( betax_start, betay_start, &
-            alfax_start, alfay_start, &
-            gamax_start, gamay_start, &
+       call table_input( betx_start, bety_start, &
+            alfx_start, alfy_start, &
+            gamx_start, gamy_start, &
             dx_start,    dpx_start, &
             dy_start,    dpy_start)
        if (first) call make_bb6d_ixy(turns)
@@ -90,21 +100,13 @@ contains
 
   end subroutine SC_Init
 
-  subroutine SC_Update(betas, orbit, z, &
-       betax_start, betay_start, &
-       alfax_start, alfay_start, &
-       gamax_start, gamay_start, &
-       dx_start,    dpx_start,   &
-       dy_start,    dpy_start)
+  subroutine SC_Update(orbit, z)
 
     use spch_bbfi
-
-    double precision :: betas, orbit(6), z(6,N_macro_surv)
-    double precision :: betax_start, betay_start
-    double precision :: alfax_start, alfay_start
-    double precision :: gamax_start, gamay_start
-    double precision :: dx_start,    dpx_start
-    double precision :: dy_start,   dpy_start
+    use trackfi
+    use time_varfi
+    
+    double precision, intent(IN) :: orbit(6), z(6,N_macro_surv)
 
     !frs on 04.06.2016 - fixing
     !a) bug concerning sigma_p
@@ -118,9 +120,9 @@ contains
     sigma_p0=sigma_p
     if (bb_sxy_update .and. is_lost) then
        call ixy_calcs(betas, orbit, z,       &
-            betax_start, betay_start, &
-            alfax_start, alfay_start, &
-            gamax_start, gamay_start, &
+            betx_start, bety_start, &
+            alfx_start, alfy_start, &
+            gamx_start, gamy_start, &
             dx_start,    dpx_start, &
             dy_start,    dpy_start)
        call ixy_fitting()
@@ -141,7 +143,188 @@ contains
     !   worked for ".true." alright.    
   end subroutine SC_Update
 
-  subroutine table_input( betx_start, bety_start, &
+  subroutine BB_Update(first)
+
+    use trackfi
+    use spch_bbfi
+    use time_varfi
+
+    logical, intent(INOUT) :: first
+
+    double precision, external :: get_value
+
+    if (bb_sxy_update) then
+       trrun_nt = 0
+
+       if (first) then
+          time_var_m_cnt = 0 ; time_var_p_cnt = 0 ; time_var_c_cnt = 0
+          ! <<N_macro_part_ini = N_macro_surv + N_macro_lost>>
+          N_ions_in_beam = get_value('probe ', 'npart ') !BEAM->NPART
+          if (N_ions_in_beam .lt. zero) call fort_fail('TRRUN: ','N_ions_in_beam .lt. zero')
+          Npart_gain = get_value('run ', 'n_part_gain ')
+          N_ions_ini = Npart_gain * N_ions_in_beam
+          N_macro_surv = jmax    ! = number of START lines submitted
+          n_ions_macro = N_ions_ini/N_macro_surv
+
+          N_for_I = N_macro_surv ! at start (to be redefined in Ixy)
+          if (N_macro_surv .gt. N_macro_max) &
+               call fort_fail('TRRUN: ', 'Number N_macro_surv exceeds N_macro_max (array size)')
+
+          ! 2015-Jul-03  18:07:00  ghislain: BUG or voluntary ?
+          if (N_macro_surv .gt. N_macro_surv) &
+               call fort_fail('TRRUN: ', 'Number START-lines exceeds the initial number of macroparticles N_macro_surv')
+
+          t_rms = get_value('run ', 'sigma_z ') * beti
+          pt_rms = get_value('run ', 'deltap_rms ')
+          pt_rms = (sqrt((betas * (pt_rms + one))**2 + one/gammas**2) - one) * beti
+          sigma_z_ini = t_rms !betas: BEAM->BETA
+          sigma_z = sigma_z_ini !at start (to be redefined in Ixy)
+          sigma_p = pt_rms       !default
+          z_factor = one !at start sigma_z_ini/sigma_z
+          Ex_rms = get_value('probe ', 'ex ') !BEAM->Ex
+          Ey_rms = get_value('probe ', 'ey ') !BEAM->Ey
+          if (checkpnt_restart.and.emittance_update) then
+             Ex_rms = Ex_rms0
+             Ey_rms = Ey_rms0
+          endif
+
+          ! write(8,'(4(g16.9,1x))') Ex_rms, Ey_rms,sigma_z,sigma_p
+
+          first = .false.
+       endif
+    endif
+  end subroutine BB_Update
+
+  subroutine BB_Update2(turn, orbit0, z)
+
+    use spch_bbfi
+    use trackfi
+    use time_varfi
+
+    integer, intent(IN) :: turn
+    
+    double precision, intent(IN) :: orbit0(6), z(6,N_macro_surv)
+    
+    if (bb_sxy_update) then
+       trrun_nt = turn
+       time_var_m_lnt = 0 ; time_var_p_lnt = 0 ; time_var_c_lnt = 0
+
+       N_macro_surv = jmax
+       i_spch = 0 !a special spch-update counter
+
+       ex_rms0 = ex_rms
+       ey_rms0 = ey_rms
+       sigma_z0 = sigma_z
+       sigma_p0=sigma_p
+       !sigma_p0 = sigma_p !CM, 3/11/14
+       !fill, table=Ixy_unsorted; column=i_macro_part, Ix, Iy, dpi, z_part;
+       !new on 3/31/14:
+       !frs on 04.06.2016 - fixing
+       !a) bug concerning sigma_p
+       !b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+       !   obviously without update!
+       !c) Fixing checkpnt_restart for "emittance_update = .false." which
+       !   worked for ".true." alright.
+       !        if (emittance_update) then
+       call ixy_calcs(betas, orbit0, z, &
+            betx_start, bety_start, &
+            alfx_start, alfy_start, &
+            gamx_start, gamy_start, &
+            dx_start,    dpx_start, &
+            dy_start,    dpy_start)
+       call ixy_fitting()
+
+       call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
+       call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(n_macro_surv))
+       call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(n_for_i))
+       call double_to_table_curr('bb6d_ixy ', 'ex_rms ', ex_rms)
+       call double_to_table_curr('bb6d_ixy ', 'ey_rms ', ey_rms)
+       call double_to_table_curr('bb6d_ixy ', 'sigma_p ', sigma_p)
+       call double_to_table_curr('bb6d_ixy ', 'sigma_z ', sigma_z)
+       call augment_count('bb6d_ixy ')
+
+       if (sigma_p0 .eq. zero) sigma_p0 = sigma_p
+       !frs on 04.06.2016 - fixing
+       !a) bug concerning sigma_p
+       !b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+       !   obviously without update!
+       !c) Fixing checkpnt_restart for "emittance_update = .false." which
+       !   worked for ".true." alright.
+       !new on 3/31/14:
+       !        endif
+
+       if (.not.emittance_update) then
+          ex_rms = ex_rms0
+          ey_rms = ey_rms0
+          sigma_z = sigma_z0
+          sigma_p = sigma_p0
+       endif
+       !frs on 04.06.2016 - fixing
+       !a) bug concerning sigma_p
+       !b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+       !   obviously without update!
+       !c) Fixing checkpnt_restart for "emittance_update = .false." which
+       !   worked for ".true." alright.
+       !           sigma_p=sigma_p0
+       z_factor = one
+       if ( sigma_z.gt.zero .and. sigma_z_ini.gt.zero) z_factor = sigma_z_ini/sigma_z
+
+       N_ions_for_bb = n_ions_macro * N_for_I * z_factor
+       if (N_ions_in_beam .le. zero) then
+          rat_bb_n_ions = zero
+       else
+          rat_bb_n_ions = N_ions_for_bb/N_ions_in_beam
+       endif
+
+       time_var_m = .false. ; time_var_p = .false. ; time_var_c = .false.
+       if (idnint(time_var_m_nt(time_var_m_cnt+1)) .eq. tot_turn+turn) time_var_m=.true.
+       if (idnint(time_var_p_nt(time_var_p_cnt+1)) .eq. tot_turn+turn) time_var_p=.true.
+       if (idnint(time_var_c_nt(time_var_c_cnt+1)) .eq. tot_turn+turn) time_var_c=.true.
+    endif ! bb_sxy_update
+
+!!!! ALSC    nlm = 0
+!!!! ALSC    sum = zero
+
+    !frs on 04.06.2016 - fixing
+    !a) bug concerning sigma_p
+    !b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+    !   obviously without update!
+    !c) Fixing checkpnt_restart for "emittance_update = .false." which
+    !   worked for ".true." alright.
+    !frs on 07.06.2016 - fixing
+    !  longitudinal plane must be frozen too!
+    if (bb_sxy_update) then
+       if(emittance_update.or.(.not.emittance_update.and.mean_t.eq.0d0.and.sigma_t.eq.0d0)) then
+          !VVK 20100321 -------- Find RMS-value of t ----------------------
+          ! if we do 1-turn tracking, orbit0(5)=0 always
+          Summ_t_mean = zero
+          do i_part = 1, jmax
+             if (abs(z(5,i_part)) .ge. zero) then
+                Summ_t_mean = Summ_t_mean + z(5,i_part)
+             else
+                print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
+             endif
+          enddo
+          mean_t = Summ_t_mean/dble(jmax)
+
+          Summ_t_square = zero
+          do i_part = 1, jmax
+             if (abs(z(5,i_part)) .ge. zero) &
+                  Summ_t_square = Summ_t_square + (z(5,i_part) - mean_t)**2
+          enddo
+          sigma_t = sqrt(Summ_t_square/dble(jmax))
+
+          if (abs(sigma_t) .eq. zero) then
+             sigma_t=t_max/two
+             call fort_warn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
+          endif
+       endif
+       !-----------------------------------------------------------------
+    endif
+
+  end subroutine BB_Update2
+
+  subroutine table_input(betx_start, bety_start, &
        alfx_start, alfy_start, &
        gamx_start, gamy_start, &
        dx_start,    dpx_start, &
@@ -546,14 +729,13 @@ contains
     use bbfi
     use spch_bbfi
     use math_constfi, only : two
-
     implicit none
-    double precision :: betas, orbit(6), z(6,N_macro_surv)
-    double precision :: betax_start, betay_start
-    double precision :: alfax_start, alfay_start
-    double precision :: gamax_start, gamay_start
-    double precision :: dx_start,    dpx_start
-    double precision :: dy_start,   dpy_start
+    double precision, intent(IN) :: betas, orbit(6), z(6,N_macro_surv)
+    double precision, intent(IN) :: betax_start, betay_start
+    double precision, intent(IN) :: alfax_start, alfay_start
+    double precision, intent(IN) :: gamax_start, gamay_start
+    double precision, intent(IN) :: dx_start,   dpx_start
+    double precision, intent(IN) :: dy_start,   dpy_start
     integer :: get_option
 
     integer :: i

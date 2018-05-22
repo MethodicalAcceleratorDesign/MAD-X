@@ -266,15 +266,6 @@ contains
 
 end module Inf_NaN_Detection
 
-module bbfi
-  implicit none
-  public
-  integer, parameter :: bbd_max=100000
-  integer :: bbd_loc(bbd_max)=0, bbd_cnt=0, bbd_flag=0, bbd_pos=0
-  double precision :: bb_kick(2,bbd_max)=0.d0
-  double precision, parameter :: explim=150.0d0   ! if x > explim, exp(-x) is outside machine limits.
-end module bbfi
-
 module deltrafi
   implicit none
   public
@@ -475,6 +466,21 @@ module trackfi
   double precision, save :: bet0=0.d0, bet0i=0.d0
   double precision :: deltas=0.d0, t_max=1.d20, pt_max=1.d20
   logical :: radiate=.false., damp=.false., quantum=.false., fsecarb=.false.
+
+  !! AL
+  integer, save :: tot_turn
+  integer, save :: jmax, segment
+  logical :: lost_in_turn = .false., is_lost = .false.
+
+  integer, parameter :: max_part=20000
+  integer, save :: part_id_keep(max_part), last_turn_keep(max_part)
+
+  double precision, save :: betx_start=1d0, bety_start=1d0
+  double precision, save :: alfx_start=0d0, alfy_start=0d0
+  double precision, save :: gamx_start=0d0, gamy_start=0d0
+  double precision, save :: dx_start=0d0,   dpx_start=0d0
+  double precision, save :: dy_start=0d0,   dpy_start=0d0
+
 end module trackfi
 
 module time_varfi

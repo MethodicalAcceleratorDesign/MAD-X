@@ -53,35 +53,28 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   integer :: i, j, k, code, ffile
   integer :: n_align, nlm, j_tot, turn, nobs, lobs
   integer :: nint, ndble, nchar, char_l, tot_segm, int_arr(1)
-  integer, save :: jmax, segment
-  integer, save :: tot_turn=0
-
-  integer, parameter :: max_part=20000
-  integer, save :: part_id_keep(max_part), last_turn_keep(max_part)
-
+  !!ALSC  integer, save :: jmax, segment
+  
+  !!ALSC    integer, parameter :: max_part=20000
+  !!ALSC    integer, save :: part_id_keep(max_part), last_turn_keep(max_part)
+  
   double precision :: orbit(6), el, re(6,6), deltap, sum, spos
   double precision :: al_errors(align_max), zz(6), maxaper(6), obs_orb(6)
-
-  double precision, save :: betx_start=one, bety_start=one
-  double precision, save :: alfx_start=zero, alfy_start=zero
-  double precision, save :: gamx_start=zero, gamy_start=zero
-  double precision, save :: dx_start=zero,   dpx_start=zero
-  double precision, save :: dy_start=zero,   dpy_start=zero
-  !!! ALSC: double precision, save :: ex_rms0=zero, ey_rms0=zero, sigma_p0=zero, sigma_z0=zero
-  double precision, save :: N_ions_in_beam, Npart_gain, N_ions_ini, n_ions_macro, N_ions_for_bb
-  double precision, save :: sigma_z_ini, z_factor, t_rms, pt_rms, z_keep(6,max_part)
-
+  
+  !!ALSC    double precision, save :: betx_start=one, bety_start=one
+  !!ALSC    double precision, save :: alfx_start=zero, alfy_start=zero
+  !!ALSC    double precision, save :: gamx_start=zero, gamy_start=zero
+  !!ALSC    double precision, save :: dx_start=zero,   dpx_start=zero
+  !!ALSC    double precision, save :: dy_start=zero,   dpy_start=zero
+  !! ALSC: double precision, save :: ex_rms0=zero, ey_rms0=zero, sigma_p0=zero, sigma_z0=zero
+  !! ALSC: double precision, save :: N_ions_in_beam, Npart_gain, N_ions_ini, n_ions_macro, N_ions_for_bb
+  !! ALSC: double precision, save :: sigma_z_ini, z_factor, t_rms, pt_rms, z_keep(6,max_part)
+  
   character(len=12) :: tol_a='maxaper ', char_a=' '
   character(len=name_len) :: el_name
   character(len=4) :: vec_names(7)
   data vec_names /'x', 'px', 'y', 'py', 't', 'pt', 's'/
   character(len=20) :: text
-
-!VVK 20100321 -------------------------------------------------
-  integer :: i_part                     ! local counter
-  double precision  :: Summ_t_mean      ! local for mean value
-  double precision  :: Summ_t_square    ! local for rms value
-!-------------------------------------------------------------------
 
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
   double precision, external :: node_value, get_variable, get_value
@@ -123,12 +116,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   endif
 
   !---- get options for space charge variables
-  call SC_Init(first, run, dynap, turns, &
-       betx_start, bety_start, &
-       alfx_start, alfy_start, &
-       gamx_start, gamy_start, &
-       dx_start, dpx_start,   &
-       dy_start, dpy_start);
+  call SC_Init(first, run, dynap, turns);
   
   if (fsecarb) then
      call fort_warn('TRRUN: ','Second order terms of arbitrary Matrix not allowed for tracking.')
@@ -264,47 +252,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !--- loop over turns
   nobs = 0
 
-  if (bb_sxy_update) then
-     trrun_nt = 0
-
-     if (first) then
-        time_var_m_cnt = 0 ; time_var_p_cnt = 0 ; time_var_c_cnt = 0
-        ! <<N_macro_part_ini = N_macro_surv + N_macro_lost>>
-        N_ions_in_beam = get_value('probe ', 'npart ') !BEAM->NPART
-        if (N_ions_in_beam .lt. zero) call fort_fail('TRRUN: ','N_ions_in_beam .lt. zero')
-        Npart_gain = get_value('run ', 'n_part_gain ')
-        N_ions_ini = Npart_gain * N_ions_in_beam
-        N_macro_surv = jmax    ! = number of START lines submitted
-        n_ions_macro = N_ions_ini/N_macro_surv
-
-        N_for_I = N_macro_surv ! at start (to be redefined in Ixy)
-        if (N_macro_surv .gt. N_macro_max) &
-             call fort_fail('TRRUN: ', 'Number N_macro_surv exceeds N_macro_max (array size)')
-
-        ! 2015-Jul-03  18:07:00  ghislain: BUG or voluntary ?
-        if (N_macro_surv .gt. N_macro_surv) &
-             call fort_fail('TRRUN: ', 'Number START-lines exceeds the initial number of macroparticles N_macro_surv')
-
-        t_rms = get_value('run ', 'sigma_z ') * beti
-        pt_rms = get_value('run ', 'deltap_rms ')
-        pt_rms = (sqrt((betas * (pt_rms + one))**2 + one/gammas**2) - one) * beti
-        sigma_z_ini = t_rms !betas: BEAM->BETA
-        sigma_z = sigma_z_ini !at start (to be redefined in Ixy)
-        sigma_p = pt_rms       !default
-        z_factor = one !at start sigma_z_ini/sigma_z
-        Ex_rms = get_value('probe ', 'ex ') !BEAM->Ex
-        Ey_rms = get_value('probe ', 'ey ') !BEAM->Ey
-        if (checkpnt_restart.and.emittance_update) then
-           Ex_rms = Ex_rms0
-           Ey_rms = Ey_rms0
-        endif
-
-        ! write(8,'(4(g16.9,1x))') Ex_rms, Ey_rms,sigma_z,sigma_p
-
-        first = .false.
-     endif
-  endif
-
+  call BB_Update(first);
+  
   turnloop: do turn = 1, turns
 
      !--- Write checkpoint_restart data - disable for speed reasons
@@ -322,122 +271,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
      j = restart_sequ()
 
-     if (bb_sxy_update) then
-        trrun_nt = turn
-        time_var_m_lnt = 0 ; time_var_p_lnt = 0 ; time_var_c_lnt = 0
-
-        N_macro_surv = jmax
-        i_spch = 0 !a special spch-update counter
-
-        ex_rms0 = ex_rms
-        ey_rms0 = ey_rms
-        sigma_z0 = sigma_z
-        sigma_p0=sigma_p
-        !sigma_p0 = sigma_p !CM, 3/11/14
-        !fill, table=Ixy_unsorted; column=i_macro_part, Ix, Iy, dpi, z_part;
-        !new on 3/31/14:
-!frs on 04.06.2016 - fixing
-!a) bug concerning sigma_p
-!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
-!   obviously without update!
-!c) Fixing checkpnt_restart for "emittance_update = .false." which
-!   worked for ".true." alright.
-!        if (emittance_update) then
-           call ixy_calcs(betas, orbit0, z, &
-                          betx_start, bety_start, &
-                          alfx_start, alfy_start, &
-                          gamx_start, gamy_start, &
-                          dx_start,    dpx_start, &
-                          dy_start,    dpy_start)
-           call ixy_fitting()
-
-           call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
-           call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(n_macro_surv))
-           call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(n_for_i))
-           call double_to_table_curr('bb6d_ixy ', 'ex_rms ', ex_rms)
-           call double_to_table_curr('bb6d_ixy ', 'ey_rms ', ey_rms)
-           call double_to_table_curr('bb6d_ixy ', 'sigma_p ', sigma_p)
-           call double_to_table_curr('bb6d_ixy ', 'sigma_z ', sigma_z)
-           call augment_count('bb6d_ixy ')
-
-           if (sigma_p0 .eq. zero) sigma_p0 = sigma_p
-!frs on 04.06.2016 - fixing
-!a) bug concerning sigma_p
-!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
-!   obviously without update!
-!c) Fixing checkpnt_restart for "emittance_update = .false." which
-!   worked for ".true." alright.
-           !new on 3/31/14:
-!        endif
-
-        if (.not.emittance_update) then
-           ex_rms = ex_rms0
-           ey_rms = ey_rms0
-           sigma_z = sigma_z0
-           sigma_p = sigma_p0
-        endif
-!frs on 04.06.2016 - fixing
-!a) bug concerning sigma_p
-!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
-!   obviously without update!
-!c) Fixing checkpnt_restart for "emittance_update = .false." which
-!   worked for ".true." alright.
-!           sigma_p=sigma_p0
-        z_factor = one
-        if ( sigma_z.gt.zero .and. sigma_z_ini.gt.zero) z_factor = sigma_z_ini/sigma_z
-
-        N_ions_for_bb = n_ions_macro * N_for_I * z_factor
-        if (N_ions_in_beam .le. zero) then
-           rat_bb_n_ions = zero
-        else
-           rat_bb_n_ions = N_ions_for_bb/N_ions_in_beam
-        endif
-
-        time_var_m = .false. ; time_var_p = .false. ; time_var_c = .false.
-        if (idnint(time_var_m_nt(time_var_m_cnt+1)) .eq. tot_turn+turn) time_var_m=.true.
-        if (idnint(time_var_p_nt(time_var_p_cnt+1)) .eq. tot_turn+turn) time_var_p=.true.
-        if (idnint(time_var_c_nt(time_var_c_cnt+1)) .eq. tot_turn+turn) time_var_c=.true.
-     endif ! bb_sxy_update
+     call BB_Update2(jmax, orbit0, z);
 
      nlm = 0
      sum = zero
-
-!frs on 04.06.2016 - fixing
-!a) bug concerning sigma_p
-!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
-!   obviously without update!
-!c) Fixing checkpnt_restart for "emittance_update = .false." which
-!   worked for ".true." alright.
-!frs on 07.06.2016 - fixing
-!  longitudinal plane must be frozen too!
-     if (bb_sxy_update) then
-        if(emittance_update.or.(.not.emittance_update.and.mean_t.eq.0d0.and.sigma_t.eq.0d0)) then
-        !VVK 20100321 -------- Find RMS-value of t ----------------------
-        ! if we do 1-turn tracking, orbit0(5)=0 always
-           Summ_t_mean = zero
-           do i_part = 1, jmax
-              if (abs(z(5,i_part)) .ge. zero) then
-                 Summ_t_mean = Summ_t_mean + z(5,i_part)
-              else
-                 print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
-              endif
-           enddo
-           mean_t = Summ_t_mean/dble(jmax)
-
-           Summ_t_square = zero
-           do i_part = 1, jmax
-              if (abs(z(5,i_part)) .ge. zero) &
-                   Summ_t_square = Summ_t_square + (z(5,i_part) - mean_t)**2
-           enddo
-           sigma_t = sqrt(Summ_t_square/dble(jmax))
-
-           if (abs(sigma_t) .eq. zero) then
-              sigma_t=t_max/two
-              call fort_warn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
-           endif
-        endif
-        !-----------------------------------------------------------------
-     endif
 
      do !--- loop over nodes
 
@@ -497,12 +334,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
              last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass)
 
         !-------- Space Charge update
-        call SC_Update(betas, orbit0, z,       &
-             betx_start, bety_start, &
-             alfx_start, alfy_start, &
-             gamx_start, gamy_start, &
-             dx_start,    dpx_start, &
-             dy_start,    dpy_start);
+        call SC_Update(orbit0, z);
         
         !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. code_drift .and. n_align.ne.0)  then
@@ -2369,13 +2201,14 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
 
 end subroutine ttbb_hollowparabolic
 
-subroutine trkill(n, turn, sum, jmax, part_id, &
+subroutine trkill(n, turn, sum, ntrk, part_id, &
      last_turn, last_pos, last_orbit, z, aptype)
   use name_lenfi
-  use spch_bbfi
+  use trackfi
+  !!!ALSC use spch_bbfi
   implicit none
 
-  integer :: n, turn, jmax, part_id(*), last_turn(*)
+  integer :: n, turn, ntrk, part_id(*), last_turn(*)
   double precision :: z(6,*), last_pos(*), last_orbit(6,*), sum
   character(len=name_len) :: aptype
 
@@ -2422,11 +2255,11 @@ subroutine trkill(n, turn, sum, jmax, part_id, &
 
   if (recloss) call tt_ploss(part_id(n),turn,sum,torb,el_name)
 
-  do i = n+1, jmax
+  do i = n+1, ntrk
      part_id(i-1) = part_id(i)
      Z(:,i-1) = Z(:,i)
   enddo
-  jmax = jmax - 1
+  ntrk = ntrk - 1
 
 end subroutine trkill
 
