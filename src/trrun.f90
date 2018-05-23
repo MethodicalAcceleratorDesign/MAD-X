@@ -2192,7 +2192,6 @@ subroutine trkill(n, turn, sum, ntrk, part_id, &
      last_turn, last_pos, last_orbit, z, aptype)
   use name_lenfi
   use trackfi
-  !!!ALSC use spch_bbfi
   implicit none
 
   integer :: n, turn, ntrk, part_id(*), last_turn(*)

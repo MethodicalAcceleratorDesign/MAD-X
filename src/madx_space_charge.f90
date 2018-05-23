@@ -59,8 +59,8 @@ module SpaceCharge
 !-------------------------------------------------------------------
   
   private :: table_input
-  !private :: ixy_calcs
-  !private :: ixy_fitting
+  private :: ixy_calcs
+  private :: ixy_fitting
 
 contains
 
