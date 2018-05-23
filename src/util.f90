@@ -475,12 +475,6 @@ module trackfi
   integer, parameter :: max_part=20000
   integer, save :: part_id_keep(max_part), last_turn_keep(max_part)
 
-  double precision, save :: betx_start=1d0, bety_start=1d0
-  double precision, save :: alfx_start=0d0, alfy_start=0d0
-  double precision, save :: gamx_start=0d0, gamy_start=0d0
-  double precision, save :: dx_start=0d0,   dpx_start=0d0
-  double precision, save :: dy_start=0d0,   dpy_start=0d0
-
 end module trackfi
 
 module time_varfi

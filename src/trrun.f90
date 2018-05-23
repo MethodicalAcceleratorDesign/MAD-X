@@ -53,23 +53,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   integer :: i, j, k, code, ffile
   integer :: n_align, nlm, j_tot, turn, nobs, lobs
   integer :: nint, ndble, nchar, char_l, tot_segm, int_arr(1)
-  !!ALSC  integer, save :: jmax, segment
-  
-  !!ALSC    integer, parameter :: max_part=20000
-  !!ALSC    integer, save :: part_id_keep(max_part), last_turn_keep(max_part)
   
   double precision :: orbit(6), el, re(6,6), deltap, sum, spos
   double precision :: al_errors(align_max), zz(6), maxaper(6), obs_orb(6)
-  
-  !!ALSC    double precision, save :: betx_start=one, bety_start=one
-  !!ALSC    double precision, save :: alfx_start=zero, alfy_start=zero
-  !!ALSC    double precision, save :: gamx_start=zero, gamy_start=zero
-  !!ALSC    double precision, save :: dx_start=zero,   dpx_start=zero
-  !!ALSC    double precision, save :: dy_start=zero,   dpy_start=zero
-  !! ALSC: double precision, save :: ex_rms0=zero, ey_rms0=zero, sigma_p0=zero, sigma_z0=zero
-  !! ALSC: double precision, save :: N_ions_in_beam, Npart_gain, N_ions_ini, n_ions_macro, N_ions_for_bb
-  !! ALSC: double precision, save :: sigma_z_ini, z_factor, t_rms, pt_rms, z_keep(6,max_part)
-  
+    
   character(len=12) :: tol_a='maxaper ', char_a=' '
   character(len=name_len) :: el_name
   character(len=4) :: vec_names(7)

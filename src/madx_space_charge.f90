@@ -19,6 +19,7 @@ module spch_bbfi
   double precision, save :: dpi_array(N_macro_max), z_part_array(N_macro_max)
   double precision :: alpha, I_div_E_sum_max
   !  parameter(alpha=0.0, I_div_E_sum_max=7.0)
+
   double precision, save :: betx_bb(bbd_max), bety_bb(bbd_max), &
        alfx_bb(bbd_max), alfy_bb(bbd_max), &
        gamx_bb(bbd_max), gamy_bb(bbd_max), &
@@ -44,7 +45,13 @@ module SpaceCharge
   double precision :: ex_rms0 = zero, ey_rms0 = zero, sigma_p0 = zero, sigma_z0 = zero
   double precision :: N_ions_in_beam, Npart_gain, N_ions_ini, n_ions_macro, N_ions_for_bb
   double precision :: sigma_z_ini, z_factor, t_rms, pt_rms, z_keep(6,max_part)
-
+  
+  double precision, save :: betx_start=1d0, bety_start=1d0
+  double precision, save :: alfx_start=0d0, alfy_start=0d0
+  double precision, save :: gamx_start=0d0, gamy_start=0d0
+  double precision, save :: dx_start=0d0,   dpx_start=0d0
+  double precision, save :: dy_start=0d0,   dpy_start=0d0
+  
   !VVK 20100321 -------------------------------------------------
   integer :: i_part                     ! local counter
   double precision  :: Summ_t_mean      ! local for mean value
