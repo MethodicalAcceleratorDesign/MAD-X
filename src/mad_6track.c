@@ -2744,7 +2744,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "d");
-    fprintf(f2, "%-19s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
+    fprintf(f2, "%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(knl[1])>eps_9) {
@@ -2755,7 +2755,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "q");
-    fprintf(f2, "%-19s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
+    fprintf(f2, "%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(knl[2])>eps_9) {
@@ -2766,7 +2766,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "s");
-    fprintf(f2, "%-19s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
+    fprintf(f2, "%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(knl[3])>eps_9) {
@@ -2777,7 +2777,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "o");
-    fprintf(f2, "%-19s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
+    fprintf(f2, "%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[0])>eps_9) {
@@ -2789,7 +2789,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "ds");
-    fprintf(f2, "%-19s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
+    fprintf(f2, "%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[1])>eps_9) {
@@ -2800,7 +2800,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "qs");
-    fprintf(f2, "%-19s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
+    fprintf(f2, "%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[2])>eps_9) {
@@ -2811,7 +2811,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "ss");
-    fprintf(f2, "%-19s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
+    fprintf(f2, "%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[3])>eps_9) {
@@ -2822,7 +2822,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "os");
-    fprintf(f2, "%-19s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
+    fprintf(f2, "%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
 }
@@ -2834,7 +2834,7 @@ write_c6t_element(struct c6t_element* el)
     if (strcmp(el->base_name, "rfmultipole")==0) {
       write_rfmultipole(el);
     } else {
-      fprintf(f2, "%-19s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
+      fprintf(f2, "%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n",
 	      el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
     }
   }
@@ -2859,14 +2859,14 @@ write_blocks(void)
       if (p->flag != 0)
       {
         sprintf(p->name, "BLOC%d", ++nbct);
-        fprintf(f2, "%-18s", p->name); lc++;
+        fprintf(f2, "%-48s", p->name); lc++;
         for (i = 0; i < p->elements->curr; i++)
         {
           if (lc++ == LINES_MAX)
           {
             fprintf(f2,"\n"); fprintf(f2,"                  "); lc = 2;
           }
-          fprintf(f2, "%-18s",p->elements->elem[i]->equiv->name);
+          fprintf(f2, "%-48s",p->elements->elem[i]->equiv->name);
         }
       }
       if (lc > 0)
@@ -2897,7 +2897,7 @@ write_f8_errors(void)
     if (current_element->na_err > 0)
     {
       if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
-      fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
+      fprintf(f8, "%-48s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
               1000*current_element->p_al_err->a_dble[0],
               1000*current_element->p_al_err->a_dble[1],
               1000*(current_element->p_al_err->a_dble[5]+tiltval));
@@ -2905,7 +2905,7 @@ write_f8_errors(void)
     else if (current_element->tilt_err > 0)
     {
       if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
-      fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
+      fprintf(f8, "%-48s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
               0.0,
               0.0,
               1000*tiltval);
@@ -3001,7 +3001,7 @@ write_f34_special(void)
           if ((err=double_from_table_row("twiss","muy",&(current_element->twtab_row),&muy)))
             printf ("Not found double_from table = %i\n",err);
           fprintf(f34,
-                  " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
+                  " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n",
                   spos,t_name,flags[j],values[j],betx,bety,mux,muy);
         }
       }
@@ -3022,7 +3022,7 @@ write_f34_special(void)
       printf ("Not found double_from table = %i\n",err);
   }
   fprintf(f34,
-          " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
+          " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n",
           spos,"end_marker",100,zero,betx,bety,mux,muy);
 }
 
@@ -3100,15 +3100,15 @@ write_f3_aux(void)
   if (aux_val[0] > -1.e10 && aux_val[1] > -1.e10)
   {
     fprintf(f3aux, "TUNE\n");
-    fprintf(f3aux, "QF%12.5f\n", aux_val[0]);
-    fprintf(f3aux, "QD%12.5f\n", aux_val[1]);
+    fprintf(f3aux, "QF%23.15f\n", aux_val[0]);
+    fprintf(f3aux, "QD%23.15f\n", aux_val[1]);
     fprintf(f3aux, "NEXT\n");
   }
   if (aux_val[2] > -1.e10 && aux_val[3] > -1.e10)
   {
     fprintf(f3aux, "CHRO\n");
-    fprintf(f3aux, "SXF%12.5f\n", aux_val[2]);
-    fprintf(f3aux, "SXD%12.5f\n", aux_val[3]);
+    fprintf(f3aux, "SXF%23.15f\n", aux_val[2]);
+    fprintf(f3aux, "SXD%23.15f\n", aux_val[3]);
     fprintf(f3aux, "NEXT\n");
   }
 }
@@ -3132,7 +3132,7 @@ write_f3_matrix(void)
     if (strcmp(current_element->base_name, "matrix") == 0)
     {
       fprintf(f3,"TROM\n");
-      fprintf(f3,"%-16s\n",current_element->name);
+      fprintf(f3,"%-48s\n",current_element->name);
     
       for (i = 1; i < i_max; i++) {
         value=current_element->value[i];
@@ -3176,7 +3176,7 @@ write_f3_mult(struct c6t_element* el)
   struct c6t_element* eln;
   if (multi_type < 0)  return;
   fprintf(f3,"MULT\n");
-  fprintf(f3,"%-16s%20.10e%20.10e\n", el->name, c1p3*el->ref_radius,
+  fprintf(f3,"%-48s%20.10e%20.10e\n", el->name, c1p3*el->ref_radius,
           el->ref_delta);
   /* find non-zero errors in all elements equiv. to this, print error matrix */
   for (i = 0; i < FIELD_MAX; i++) error_matrix[i] = zero;
@@ -3237,42 +3237,42 @@ rfmultipole_name(char *name, struct c6t_element* el)
   if (fabs(knl[0])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "d");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, "%-48s", tmp);
   }
   if (fabs(knl[1])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "q");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, "%-48s", tmp);
   }
   if (fabs(knl[2])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "s");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, "%-48s", tmp);
   }
   if (fabs(knl[3])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "o");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, "%-48s", tmp);
   }
   if (fabs(ksl[0])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "ds");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, "%-48s", tmp);
   }
   if (fabs(ksl[1])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "qs");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, "%-48s", tmp);
   }
   if (fabs(ksl[2])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "ss");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, "%-48s", tmp);
   }
   if (fabs(ksl[3])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "os");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, "%-48s", tmp);
   }
 }
 
@@ -3302,7 +3302,7 @@ write_struct(void)
     {
       fprintf(f2,"\n"); lc = 1;
     }
-    fprintf(f2, "%-17s ", name);
+    fprintf(f2, "%-48s ", name);
     p = p->next;
   }
   if (lc > 0)
