@@ -574,7 +574,8 @@ complete_twiss_table(struct table* t)
   t->s_cols[0][i] = tmpbuff(c_node->name);
   t->s_cols[1][i] = tmpbuff(c_node->base_name);
   t->s_cols[twiss_fill_end+1][i] = tmpbuff(c_node->p_elem->parent->name);
-  for (j = twiss_opt_end+1; j<= twiss_fill_end; j++)
+  t->s_cols[twiss_fill_end+2][i] = command_par_string("comments",c_node->p_elem->def);
+  for (j = twiss_opt_end+2; j<= twiss_fill_end; j++)
   {
     el = c_node->length;
     strcpy(tmp, twiss_table_cols[j]);
@@ -606,7 +607,6 @@ complete_twiss_table(struct table* t)
     else if (strcmp(tmp, "yma") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "sigx") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "sigy") == 0) val =  el_par_value(tmp, c_node->p_elem); 
-
     else if(mult)
     {
       if(j<=twiss_mult_end)
