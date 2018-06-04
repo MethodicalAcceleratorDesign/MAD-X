@@ -575,7 +575,7 @@ complete_twiss_table(struct table* t)
   t->s_cols[1][i] = tmpbuff(c_node->base_name);
   t->s_cols[twiss_fill_end+1][i] = tmpbuff(c_node->p_elem->parent->name);
   t->s_cols[twiss_fill_end+2][i] = command_par_string("comments",c_node->p_elem->def);
-  for (j = twiss_opt_end+2; j<= twiss_fill_end; j++)
+  for (j = twiss_opt_end+1; j<= twiss_fill_end; j++)
   {
     el = c_node->length;
     strcpy(tmp, twiss_table_cols[j]);
