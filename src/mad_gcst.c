@@ -220,7 +220,7 @@ const int twiss_table_types[] =
   1, 1, 2,
   2, /* v_pos */
   2, 2, 2, 2, 2,
-  2, 3,
+  2, 3, 3,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
@@ -291,7 +291,7 @@ const char* const twiss_table_cols[] =
   "v_pos",
   "bbcharge","xma", "yma", "sigx", "sigy",
   /*==*/
-  "lrad","parent",
+  "lrad","parent","comments",
   "re11", "re12", "re13", "re14", "re15", "re16",
   "re21", "re22", "re23", "re24", "re25", "re26",
   "re31", "re32", "re33", "re34", "re35", "re36",
