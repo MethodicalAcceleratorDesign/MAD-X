@@ -376,6 +376,7 @@ static void write_f3_entry(const char*, struct c6t_element*);
 static void write_f3_mult(struct c6t_element*);
 static void write_f34_special(void);
 static void write_struct(void);
+static void setup_output_string(void);
 static int my_table_row(struct table*, char*);
 
 /* routines used from makethin.c */
@@ -453,6 +454,8 @@ static char tmp_name[KEY_LENGTH];
 static char name_format[70];
 static char name_format_short[6];
 static char name_format_error[62];
+static char name_format_3[40];
+static char name_format_4[40];
 //static char name_format[80]; /*This is used by fprint to determin the length of the names"*/
 
 static int
@@ -1745,8 +1748,6 @@ get_args(struct in_cmd* my_cmd)
 {
   int tmp_max_mult_ord;
   double tmp_ref_def;
-  printf("looongNameFlag");
-  printf("%d",long_names_flag);
   if ((aperture_flag = command_par_value("aperture", my_cmd->clone)))
     put_info("c6t - aperture flag selected","");
   if ((cavall_flag = command_par_value("cavall", my_cmd->clone)))
@@ -1773,8 +1774,7 @@ get_args(struct in_cmd* my_cmd)
     ref_def = tmp_ref_def;
     printf("Reference radius set to : %f\n",ref_def);
   }
-  printf("looongNameFlag");
-  printf("%d",long_names_flag);
+
 }
 
 static void
@@ -2910,7 +2910,7 @@ write_f8_errors(void)
     if (current_element->na_err > 0)
     {
       if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
-      fprintf(f8, "%-48s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
+      fprintf(f8, name_format_4,current_element->equiv->name,
               1000*current_element->p_al_err->a_dble[0],
               1000*current_element->p_al_err->a_dble[1],
               1000*(current_element->p_al_err->a_dble[5]+tiltval));
@@ -2918,7 +2918,7 @@ write_f8_errors(void)
     else if (current_element->tilt_err > 0)
     {
       if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
-      fprintf(f8, "%-48s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
+      fprintf(f8, name_format_4,current_element->equiv->name,
               0.0,
               0.0,
               1000*tiltval);
@@ -3014,7 +3014,7 @@ write_f34_special(void)
           if ((err=double_from_table_row("twiss","muy",&(current_element->twtab_row),&muy)))
             printf ("Not found double_from table = %i\n",err);
           fprintf(f34,
-                  " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n",
+                  name_format_error,
                   spos,t_name,flags[j],values[j],betx,bety,mux,muy);
         }
       }
@@ -3035,7 +3035,7 @@ write_f34_special(void)
       printf ("Not found double_from table = %i\n",err);
   }
   fprintf(f34,
-          " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n",
+          name_format_error,
           spos,"end_marker",100,zero,betx,bety,mux,muy);
 }
 
@@ -3189,7 +3189,7 @@ write_f3_mult(struct c6t_element* el)
   struct c6t_element* eln;
   if (multi_type < 0)  return;
   fprintf(f3,"MULT\n");
-  fprintf(f3,"%-48s%20.10e%20.10e\n", el->name, c1p3*el->ref_radius,
+  fprintf(f3,name_format_3, el->name, c1p3*el->ref_radius,
           el->ref_delta);
   /* find non-zero errors in all elements equiv. to this, print error matrix */
   for (i = 0; i < FIELD_MAX; i++) error_matrix[i] = zero;
@@ -3315,7 +3315,15 @@ write_struct(void)
     {
       fprintf(f2,"\n"); lc = 1;
     }
-    fprintf(f2, "%-48s ", name);
+    if(long_names_flag==1)
+    {
+      fprintf(f2, "%-48s ", name);
+    }
+    else
+    {
+      fprintf(f2, "%-17s ", name);
+    }
+    
     p = p->next;
   }
   if (lc > 0)
@@ -3496,17 +3504,8 @@ process_c6t(void)  /* steering routine */
   assign_att();  /* assign attributes + errors to all single elements */
   mod_errors();  /* flip normal components */
 
-  
-  if(long_names_flag==1){
-    strcpy(name_format,"%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n");
-    strcpy(name_format_short,"%-48s" );
-    strcpy(name_format_error, " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n");
-  }
-    else{
-    strcpy(name_format,"%-17s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n");
-    strcpy(name_format_short, "%-48s");
-    strcpy(name_format_error, " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n");
-    }
+  setup_output_string(); /* sets the output format used for the out put files */
+
 
   write_all_el();
   write_blocks();
@@ -3520,7 +3519,26 @@ process_c6t(void)  /* steering routine */
 }
 
 // public interface
+static void
+setup_output_string(void)
+{
+    if(long_names_flag==1){
+    strcpy(name_format,"%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n");
+    strcpy(name_format_short,"%-48s" );
+    strcpy(name_format_error, " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n");
+    strcpy(name_format_3,  "%-48s%20.10e%20.10e\n");
+    strcpy(name_format_4, "%-48s  %14.6e%14.6e%17.9e\n");
 
+  }
+    else{
+    strcpy(name_format,"%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n");
+    strcpy(name_format_short, "%-18s");
+    strcpy(name_format_error, " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n");
+    strcpy(name_format_3,"%-16s%20.10e%20.10e\n");
+    strcpy(name_format_4,"%-16s  %14.6e%14.6e%17.9e\n");
+
+    }
+}
 void
 conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
 {
