@@ -458,6 +458,7 @@ const char *const_command_def =
 "aperture      = [l, false, true], "
 "split         = [l, false, true], "
 "mangle        = [l, false, true], "
+"long_names     = [l, false, true], "
 "max_mult_ord  = [i, 11], "
 "radius        = [r, 1]; "
 " "
