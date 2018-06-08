@@ -43,6 +43,7 @@ export_element(struct element* el, struct el_list* ell, FILE* file, int noexpr)
     {
       export_element(el->parent, ell, file, noexpr);
       strcpy(out, el->name);
+
       strcat(out, ": ");
       strcat(out, el->parent->name);
       export_el_def(el, out, noexpr);
@@ -189,10 +190,7 @@ par_out_flag(char* base_name, char* par_name)
   if (strcmp(par_name,"at") == 0 || strcmp(par_name,"from") == 0) return 0;
   if (strcmp(base_name, "multipole") == 0
       && strcmp(par_name,"l") == 0) return 0;
-  if ( (strcmp(base_name, "collimator") == 0 ||
-	strcmp(base_name, "ecollimator") == 0 ||
-	strcmp(base_name, "rcollimator") == 0)
-      && strcmp(par_name,"lrad") == 0) return 0;
+
   return 1;
 }
 
