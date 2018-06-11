@@ -27,7 +27,7 @@
 # preprocessor flags
 #
 
-CPPFLAGS = -D_LF95
+CPPFLAGS += -D_LF95
 
 #
 # compiler flags

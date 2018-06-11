@@ -1,7 +1,6 @@
 #ifndef MAD_MAC_H
 #define MAD_MAC_H
 
-#include <assert.h>
 #include <limits.h>
 #include <string.h>
 
