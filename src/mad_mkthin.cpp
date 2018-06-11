@@ -41,10 +41,6 @@ extern "C" {
 #define mkstring(s) mkstring_(s)
 #define mkstring_(s) #s
 
-#undef  NDEBUG
-#define NDEBUG 1
-#include <assert.h>
-
 // LD: variables local to module that control makethin behavior (was pushed in option before)
 static int iMakeDipedge, iMakeEndMarkers, iMinimizeParents, iMoreExpressions;
 
@@ -336,7 +332,7 @@ static std::string my_dump_command_parameter(const command_parameter* cp) // dum
       case k_cstring_array: // string array
         dump_char_p_array(cp->m_string);
         /* FALLTHRU */
-        
+
       case '?':
         ostr << " cp->type=" << cp->type << " no info dump implemented so far" << '\n';
     }
