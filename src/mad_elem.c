@@ -599,7 +599,7 @@ el_par_value(const char* par, const struct element* el)
     else if (!strcmp(par, "l")    )
     {
       if (fact != zero && get_option("rbarc") && fabs(angle) > 1e-8)
-        val = l * (angle/two) / sin(angle/two); // l_arc = l_cord / sinc(angle/2)
+        val = l * angle / (two * sin(angle/two)); // l_arc = l_cord / sinc(angle/2)
       else val = l;
     }
     else if (strcmp(par, "e1") == 0)
