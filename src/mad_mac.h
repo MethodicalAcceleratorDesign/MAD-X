@@ -18,10 +18,10 @@ static inline char* // Safer copy (close with '\0')
 mad_strncpy(const char *file, int line, char *dst, const char *src, size_t siz)
 {
   (void)file, (void)line;
-//  printf("DEBUG:strncpy:%s:%d:'%s'[%lu]\n", file, line, src, siz);
-  assert(dst && src);
-  assert(siz < INT_MAX);
-  if (siz > 0) strncat((*dst=0, dst), src, siz-1);
+  // printf("DEBUG:strncpy:%s:%d:'%s'[%lu] -> %p\n", file, line, src, siz, dst);
+  assert(dst && src && siz < INT_MAX);
+  *dst = 0;
+  if (siz > 0) strncat(dst, src, siz-1);
   return dst;
 }
 
@@ -30,8 +30,7 @@ mad_strncat(const char *file, int line, char *dst, const char *src, size_t siz)
 {
   (void)file, (void)line;
 //  printf("DEBUG:strncat:%s:%d:'%s'[%lu]\n", file, line, src, siz);
-  assert(dst && src);
-  assert(siz < INT_MAX);
+  assert(dst && src && siz < INT_MAX);
   return strncat(dst, src, siz);
 }
 
@@ -40,10 +39,10 @@ mad_strfcpy(const char *file, int line, char *dst, const char *src, size_t siz)
 {
   (void)file, (void)line;
 //  printf("DEBUG:strfcpy:%s:%d:'%s'[%lu]\n", file, line, src, siz);
-  assert(dst && src);
-  assert(siz < INT_MAX);
+  assert(dst && src && siz < INT_MAX);
+  *dst = 0;
   if (siz > 0) {
-    strncat((*dst=0, dst), src, siz-1);
+    strncat(dst, src, siz-1);
     size_t len = strlen(dst);
     memset(dst+len, ' ', siz-len);
   }
