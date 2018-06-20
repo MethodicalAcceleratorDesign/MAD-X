@@ -40,15 +40,15 @@ libs/gc/**/Makefile
 libs/gc/gc-7.6.4/bdw-gc.pc
 libs/gc/gc-7.6.4/config.status
 libs/gc/gc-7.6.4/gctest
-libs/gc/ggc-7.6.4/hugetest
-libs/gc/ggc-7.6.4/include/private/config.h
-libs/gc/ggc-7.6.4/include/private/stamp-h1
-libs/gc/ggc-7.6.4/leaktest
-libs/gc/ggc-7.6.4/libtool
-libs/gc/ggc-7.6.4/middletest
-libs/gc/ggc-7.6.4/realloc_test
-libs/gc/ggc-7.6.4/smashtest
-libs/gc/ggc-7.6.4/staticrootstest
+libs/gc/gc-7.6.4/hugetest
+libs/gc/gc-7.6.4/include/private/config.h
+libs/gc/gc-7.6.4/include/private/stamp-h1
+libs/gc/gc-7.6.4/leaktest
+libs/gc/gc-7.6.4/libtool
+libs/gc/gc-7.6.4/middletest
+libs/gc/gc-7.6.4/realloc_test
+libs/gc/gc-7.6.4/smashtest
+libs/gc/gc-7.6.4/staticrootstest
 
 libs/gc/gc-7.2f/bdw-gc.pc
 libs/gc/gc-7.2f/config.status
