@@ -2154,20 +2154,38 @@ contains
          
        enddo
         
-
-       if (fib%mag%p%nmul > 0) then
-         call double_to_table_curr2(rdt_table_name,'k1l ', fib%mag%bn(1))
-         call double_to_table_curr2(rdt_table_name,'k1sl ',fib%mag%an(1))
+       if (fib%mag%p%nmul > 0) then 
        endif  
 
-       if (fib%mag%p%nmul > 1) then
-         call double_to_table_curr(rdt_table_name,'k2l ', fib%mag%bn(2))
-         call double_to_table_curr(rdt_table_name,'k2sl ',fib%mag%an(2))
+       if (fib%mag%p%nmul > 1) then 
+         if (fib%mag%l > 0) then
+           call double_to_table_curr2(rdt_table_name,'k1l ', fib%mag%bn(2)*fib%mag%l)
+           call double_to_table_curr2(rdt_table_name,'k1sl ',fib%mag%an(2)*fib%mag%l)
+         else
+           call double_to_table_curr2(rdt_table_name,'k1l ', fib%mag%bn(2))
+           call double_to_table_curr2(rdt_table_name,'k1sl ',fib%mag%an(2))
+         endif
        endif  
 
        if (fib%mag%p%nmul > 2) then
-         call double_to_table_curr(rdt_table_name,'k3l ', fib%mag%bn(3))
-         call double_to_table_curr(rdt_table_name,'k3sl ',fib%mag%an(3))
+         if (fib%mag%l > 0) then
+           call double_to_table_curr(rdt_table_name,'k2l ', fib%mag%bn(3)*fib%mag%l)
+           call double_to_table_curr(rdt_table_name,'k2sl ',fib%mag%an(3)*fib%mag%l)
+         else
+           call double_to_table_curr(rdt_table_name,'k2l ', fib%mag%bn(3))
+           call double_to_table_curr(rdt_table_name,'k2sl ',fib%mag%an(3))
+         endif
+           
+       endif  
+
+       if (fib%mag%p%nmul > 3) then
+         if (fib%mag%l > 0) then
+           call double_to_table_curr(rdt_table_name,'k3l ', fib%mag%bn(4)*fib%mag%l)
+           call double_to_table_curr(rdt_table_name,'k3sl ',fib%mag%an(4)*fib%mag%l)
+         else
+           call double_to_table_curr(rdt_table_name,'k3l ', fib%mag%bn(4))
+           call double_to_table_curr(rdt_table_name,'k3sl ',fib%mag%an(4))
+         endif  
        endif  
 
        call augment_count(rdt_table_name)
