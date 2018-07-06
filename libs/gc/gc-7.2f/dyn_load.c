@@ -944,6 +944,9 @@ GC_INNER void GC_register_dynamic_libraries(void)
             protect = buf.Protect;
             if (buf.State == MEM_COMMIT
                 && (protect == PAGE_EXECUTE_READWRITE
+                    || protect == PAGE_EXECUTE_WRITECOPY
+                    || protect == PAGE_READWRITE
+                    || protect == PAGE_WRITECOPY)
                     || protect == PAGE_READWRITE)
                 && (buf.Type == MEM_IMAGE
 #                   ifdef GC_REGISTER_MEM_PRIVATE
