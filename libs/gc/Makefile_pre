@@ -16,6 +16,6 @@
 # | $Id$
 # |
 
-GCDIR := gc-7.6.4
+GCDIR := gc-7.2f
 
 # end of makefile
