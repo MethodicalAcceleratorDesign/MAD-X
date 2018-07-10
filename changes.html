@@ -13,8 +13,44 @@
 <hr class="h1">
 <!-- -------- -->
 
-<h3>MAD-X release 5.04.00 (2018.03.02)</h3>
+<h3>MAD-X release 5.04.01 (2018.07.10)</h3>
 
+<ul>
+<li> Increased the possible length of a name in the conversion to SixTrack. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/620">#620</a>. (Tobias, James)
+<li> Added the possibility comments to elements. 
+    <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/619">#619</a>. (Laurent, Tobias)
+<li> Twiss output contains information about the beam-beam element. 
+    <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/622">#622</a>. (Tobias)
+<li> The BV flag is included in the twiss output. 
+    <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/367">#367</a>. (Tobias)
+<li> Fixed the documentation about E1 and E2 in Bending Magnet section.
+    <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/618">#618</a>. (Laurent)
+<li> Corrected factorials for normal form results.
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/617">#617</a>. (Piotr)
+<li> RDT oscillations in ptc_twiss.
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/611">#611</a>. (Piotr)
+<li> Disabling stochastic for closed orbit search also in ptc_twiss and ptc_normal.
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/611">#611</a>. (Piotr)
+<li> Aper_offset and mech_sep now in slices after makethin.
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/615">#615</a>. (Riccardo)
+<li> Fix incorrect field errors in tmbend with INTERPOLATE. The full length was not used.
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/610">#610</a>. (Thomas)
+<li> Fix parsing negated logical after string parameter.
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/601">#601</a>. (Thomas)
+<li> The output to Sixtrack of the Trombone element is now in sigma and p_sigma. 
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/605">#605</a>. (Tobias)
+<li> Synchrotron Radiation generator added.
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/608">#608,#609</a>. (Helmuth, Laurent)
+<li> Possible to set `sectorfile=""` to disable file output.
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/606">#606</a>. (Thomas)
+<li> SROTATION in SURVEY is changed back to the same defintion as in 5.03.07. 
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/642">#642</a>. (Thomas)
+
+</ul>
+
+
+<h3>MAD-X release 5.04.00 (2018.03.02)</h3>
 <h4>Backward incompatibilties with previous releases</h4>
 <ul>
 
