@@ -42,7 +42,7 @@ cleanarch:
 madx-win-gnu:    madx-win64-gnu     madx-win32-gnu
 madx-win-intel:  madx-win64-intel   madx-win32-intel
 
-madx-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
+madx-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes X11=no
 madx-win%: MAKE_OPTS = -j9 $(MAKEARGS)
 madx-win%: MAKE_LINK = ln -sf $(DESTDIR)$@.exe && ln -sf $@.exe
 

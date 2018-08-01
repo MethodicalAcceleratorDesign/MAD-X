@@ -10,10 +10,13 @@ file(GLOB src_files
    *.F90
    *.cpp)
 file(GLOB main_file mad_main.c)
-if(WIN32 OR CYGWIN)
-    file(GLOB gxx_remove gxx11.f90)
-else()
+
+if(MADX_X11)
     file(GLOB gxx_remove gxx11ps.f90)
+    set_property(SOURCE mad_gxx11c.c
+                 APPEND PROPERTY COMPILE_DEFINITIONS _USE_X11)
+else()
+    file(GLOB gxx_remove gxx11.f90)
 endif()
 
 # Some source files which should not be included:
@@ -74,16 +77,18 @@ target_link_libraries(madxbin madx)
 
 # I turn off search for libraries in case you are on Linux,
 # to make sure we make use of the lib/lib64 folders
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
-   #necessary to search for X11 for OSX instead of directly including it
-   find_package(X11)
-   if(X11_FOUND)
-      include_directories(${X11_INCLUDE_DIR})
-      target_link_libraries(madx ${X11_X11_LIB})
-   endif()
-else()
-   target_link_libraries(madx X11)
-endif()
+if (MADX_X11)
+    if (MADX_STATIC AND (CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+        target_link_libraries(madx X11)
+    else()
+        #necessary to search for X11 for OSX instead of directly including it
+        find_package(X11)
+        if(X11_FOUND)
+            include_directories(${X11_INCLUDE_DIR})
+            target_link_libraries(madx ${X11_X11_LIB})
+        endif()
+    endif()
+endif ()
 
 if(LAPACK_FOUND AND BLAS_FOUND)
    target_link_libraries(madx ${LAPACK_LIBRARIES})
