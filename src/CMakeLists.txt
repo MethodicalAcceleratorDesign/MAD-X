@@ -97,8 +97,6 @@ endif()
 # Online libraries:
 if(MADX_ONLINE)
    target_link_libraries(madx ${SDDS_LIBRARIES}) 
-endif()
-if(NOT WIN32)
    target_link_libraries(madx z)
 endif()
 
