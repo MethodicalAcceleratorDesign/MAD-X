@@ -150,7 +150,7 @@ contains
     !   worked for ".true." alright.    
   end subroutine SC_Update
 
-  subroutine BB_Update(first)
+  subroutine BB_Init(first)
 
     use trackfi
     use spch_bbfi
@@ -200,9 +200,9 @@ contains
           first = .false.
        endif
     endif
-  end subroutine BB_Update
+  end subroutine BB_Init
 
-  subroutine BB_Update2(turn, orbit0, z)
+  subroutine BB_Update(turn, orbit0, z)
 
     use spch_bbfi
     use trackfi
@@ -329,7 +329,7 @@ contains
        !-----------------------------------------------------------------
     endif
 
-  end subroutine BB_Update2
+  end subroutine BB_Update
 
   subroutine table_input(betx_start, bety_start, &
        alfx_start, alfy_start, &

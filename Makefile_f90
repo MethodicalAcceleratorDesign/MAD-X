@@ -167,9 +167,10 @@ survey.o:                   $(FC_DIR_MAD)/survey.f90                  util.o
 timest.o:                   $(FC_DIR_MAD)/timest.f90
 timex.o:                    $(FC_DIR_MAD)/timex.f90
 touschek.o:                 $(FC_DIR_MAD)/touschek.f90                util.o
-trrun.o:                    $(FC_DIR_MAD)/trrun.f90                   util.o madx_space_charge.o
-twiss.o:                    $(FC_DIR_MAD)/twiss.f90                   util.o madx_space_charge.o
+trrun.o:                    $(FC_DIR_MAD)/trrun.f90                   util.o madx_space_charge.o madx_beam_beam.o
+twiss.o:                    $(FC_DIR_MAD)/twiss.f90                   util.o madx_space_charge.o madx_beam_beam.o
 madx_space_charge.o:	    $(FC_DIR_MAD)/madx_space_charge.f90       util.o
+madx_beam_beam.o:	    $(FC_DIR_MAD)/madx_beam_beam.f90          util.o madx_space_charge.o
 util.o:                     $(FC_DIR_MAD)/util.f90
 
 endif

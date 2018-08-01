@@ -468,7 +468,7 @@ module trackfi
   logical :: radiate=.false., damp=.false., quantum=.false., fsecarb=.false.
 
   !! AL
-  integer, save :: tot_turn
+  integer, save :: tot_turn = 0;
   integer, save :: jmax, segment
   logical :: lost_in_turn = .false., is_lost = .false.
 

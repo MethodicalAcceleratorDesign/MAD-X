@@ -239,7 +239,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !--- loop over turns
   nobs = 0
 
-  call BB_Update(first);
+  call BB_Init(first);
   
   turnloop: do turn = 1, turns
 
@@ -258,7 +258,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
      j = restart_sequ()
 
-     call BB_Update2(jmax, orbit0, z);
+     call BB_Update(jmax, orbit0, z);
 
      nlm = 0
      sum = zero
