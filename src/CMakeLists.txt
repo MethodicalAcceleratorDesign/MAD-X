@@ -58,8 +58,12 @@ set_target_properties(madx PROPERTIES LINKER_LANGUAGE Fortran)
 
 # set library version:
 set_target_properties(madx     PROPERTIES VERSION ${MADX_VERSION})
-set_target_properties(madx     PROPERTIES CXX_STANDARD 11)
 
+if (${CMAKE_VERSION} VERSION_LESS "3.1")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+else()
+  set_target_properties(madx   PROPERTIES CXX_STANDARD 11)
+endif()
 
 # adding an executable:
 if(MADX_BUNDLE)
