@@ -11,9 +11,9 @@ file(GLOB src_files
    *.cpp)
 file(GLOB main_file mad_main.c)
 if(WIN32 OR CYGWIN)
-   file(GLOB gxx_remove gxx11c.c gxx11.f90)
+    file(GLOB gxx_remove gxx11.f90)
 else()
-   file(GLOB gxx_remove gxx11psc.c gxx11ps.f90)
+    file(GLOB gxx_remove gxx11ps.f90)
 endif()
 
 # Some source files which should not be included:
