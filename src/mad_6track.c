@@ -3151,18 +3151,20 @@ write_f3_matrix(void)
         value=current_element->value[i];
         // The if statemenst are to go from pt to psigma and from t to sigma.     
         if((i+1)%dim==0){
-          value=value/beta;
-        }
-        if(i%dim==0){
           value=value*beta;
         }
-        if(i>(dim+24) && i <(31+dim)){
-          value = value*beta;
+        if(i%dim==0){
+          value=value/beta;
         }
-        if(i>(dim+30) && i < (37+dim)){
+        if(i>(dim+24) && i <(31+dim)){
           value = value/beta;
         }
-        
+        if(i>(dim+30) && i < (37+dim)){
+          value = value*beta;
+        }
+        if(i<(dim+1)){
+		  value = value * 1000;
+        }
     
 
         fprintf(f3,"%23.15e", value);
