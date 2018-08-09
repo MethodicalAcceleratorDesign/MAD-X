@@ -1,5 +1,5 @@
 CURR=$(pwd)
-OPHYS=$CURR/html/userguide
+OPHYS=$CURR/html/webguide
 cd $OPHYS
 cp manual_temp.html manual.html
 for FILE in *temp.html; do

@@ -11,7 +11,7 @@ TUSER=$CURR/user_manual_temp
 MPHYS=$CURR/latexuguide
 
 
-OPHYS=$CURR/html/userguide
+OPHYS=$CURR/html/webguide
 OBUILD=$CURR/html/build_full
 
 # LaTeXML Options
