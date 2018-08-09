@@ -276,7 +276,6 @@ write_table(struct table* t, const char* filename)
     for (i = 0; i < col->curr; i++)
     {
       strcpy(l_name, t->columns->names[col->i[i]]);
-//      printf("name: col %d->%d:%s\n",i, col->i[i], l_name);
 
       if (t->columns->inform[col->i[i]] == 1)
         fprintf(out_file, v_format("%NIs "), stoupper(l_name));
@@ -327,8 +326,10 @@ write_table(struct table* t, const char* filename)
             if (t->s_cols[col->i[i]][j] != NULL) {
 //              printf("%s[%2d,%2d]=%s    ",t->name,col->i[i],j, t->s_cols[col->i[i]][j]);
               strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
+              if(strcmp(t->columns->names[col->i[i]],"comments")!=0){
               stoupper(c_dum->c);
               pc = strip(c_dum->c); /* remove :<occ_count> */
+              }
               k = strlen(pc);
             }
             pc[k++] = '"'; pc[k] = '\0';
@@ -1100,6 +1101,7 @@ print_table(struct table* t)
             fprintf(prt_file, v_format("%F "), t->d_cols[i][j]);
           else if (t->columns->inform[i] == 3)
             fprintf(prt_file, v_format("%S "), t->s_cols[i][j]);
+
         }
         fprintf(prt_file, "\n");
       }

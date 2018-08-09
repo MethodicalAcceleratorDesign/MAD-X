@@ -7,7 +7,6 @@
 
 // standard headers
 
-#include <assert.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -21,6 +20,7 @@
 
 // defines
 
+#include "mad_dbg.h"
 #include "mad_mac.h"
 #include "mad_def.h"
 #include "mad_main.h"

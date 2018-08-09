@@ -3,21 +3,11 @@
 static void
 exec_delete_sequ(const char* name)
 {
-  struct sequence* keep = current_sequ;
-  int spos;
-  if ((spos = name_list_pos(name, sequences->list)) >= 0) {
-    current_sequ = sequences->sequs[spos];
-    if (current_sequ->ex_start != NULL) { /* delete expanded */
-      current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
-      current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
-      current_sequ->orbits = delete_vector_list(current_sequ->orbits);
-    }
-    sequences->sequs[spos] = delete_sequence(current_sequ);
-    remove_from_sequ_list(current_sequ, sequences);
-    current_sequ = keep;
+  struct sequence* sequ = find_sequence(name, sequences);
+  if (sequ) {
+    delete_sequence(sequ);
   }
   else warning("sequence to be deleted does not exist:", name);
-  return;
 }
 
 void

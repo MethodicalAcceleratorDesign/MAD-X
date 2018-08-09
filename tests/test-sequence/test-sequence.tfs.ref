@@ -1,9 +1,9 @@
 @ NAME             %06s "SURVEY"
 @ TYPE             %06s "SURVEY"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "14/12/17"
-@ TIME             %08s "18.08.41"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.17.43"
 * NAME                                            S                       L                   ANGLE                       X                       Y 
 $ %s                                            %le                     %le                     %le                     %le                     %le 
  "PS$START"                      0.0000000000000000      0.0000000000000000      0.0000000000000000      0.0000000000000000      0.0000000000000000

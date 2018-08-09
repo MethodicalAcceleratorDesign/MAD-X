@@ -29,7 +29,7 @@ ptc_create_universe;
   !!!!!       T I M E   T R U E ,   T O T P A T H  F A L S E
   ptc_setswitch, debuglevel=0, exact_mis=true, time=true, totalpath=false;
   
-  ptc_twiss, table=ptc_twiss, icase=6, no=4, closed_orbit, normal;
+  ptc_twiss, table=ptc_twiss, icase=6, no=5, closed_orbit, normal;
   
   write, table=ptc_twiss, file="leir.6D.ptc.twiss";
   write, table=ptc_twiss_summary, file="leir.6D.ptc.summ.twiss";
@@ -37,7 +37,7 @@ ptc_create_universe;
   
   select_ptc_normal, gnfu=-3,0,0;
   select_ptc_normal, gnfu= 3,0,0;
-  ptc_normal,closed_orbit,normal,maptable,icase=6,no=4;
+  ptc_normal,closed_orbit,normal,maptable,icase=6,no=5;
 
   write, table=normal_results,file="ptc_normal_results.tfs"; 
   write, table=map_table, file="ptc_map_table.tfs";

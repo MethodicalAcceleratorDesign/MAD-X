@@ -15,6 +15,7 @@
 @ EX               %le             1.5e-06
 @ EY               %le               3e-06
 @ ET               %le               0.001
+@ BV_FLAG          %le                   1
 @ LENGTH           %le              11.715
 @ ALFA             %le                   0
 @ ORBIT5           %le                  -0
@@ -40,9 +41,9 @@
 @ SYNCH_4          %le         3.049096885
 @ SYNCH_5          %le         10.03783676
 @ TITLE            %18s "TRANSLINE_2+4 type"
-@ ORIGIN           %16s "5.03.07 Linux 64"
-@ DATE             %08s "02/03/18"
-@ TIME             %08s "10.53.53"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.53.23"
 * NAME                                S               BETX               ALFX                MUX                 DX                DPX               BETY               ALFY              MVAR1              MVAR2 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TRANS$START"                        0                  6                  0                  0                  0                  0                  3                  0              0.003              0.003

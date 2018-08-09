@@ -303,7 +303,7 @@ static void att_rfmultipole(struct c6t_element*);
 static void att_undefined(struct c6t_element*);
 static void clean_c6t_element(struct c6t_element*);
 static struct c6t_element* create_aperture(const char* ,const char* ,double, double, double, double, double, double, double,
-					   struct double_array*);
+             struct double_array*);
 static void concat_drifts(void);
 static void conv_elem(void);
 static void c6t_finish(void);
@@ -376,6 +376,7 @@ static void write_f3_entry(const char*, struct c6t_element*);
 static void write_f3_mult(struct c6t_element*);
 static void write_f34_special(void);
 static void write_struct(void);
+static void setup_output_string(void);
 static int my_table_row(struct table*, char*);
 
 /* routines used from makethin.c */
@@ -450,6 +451,12 @@ static char mpole_names[][16] = {"dipole", "quadrupole", "sextupole",
 static char acro_list[20];   /* list for name starts */
 static int acro_cnt[20];    /* counters for name starts */
 static char tmp_name[KEY_LENGTH];
+static char name_format[70];
+static char name_format_short[6];
+static char name_format_error[62];
+static char name_format_3[40];
+static char name_format_4[40];
+//static char name_format[80]; /*This is used by fprint to determin the length of the names"*/
 
 static int
   block_count = 0,     /* current block count for naming */
@@ -465,6 +472,7 @@ static int
   special_flag = 1,    /* produce special output file from twiss */
   cavall_flag = 0,     /* if 0 dump all cavities into first */
   markall_flag = 0,    /* if 1 dump all markers into first */
+  long_names_flag = 0,    /* if 1 dump all markers into first */
   aperture_flag = 0,   /* if 1 insert apertures into structure */
 //  radius_flag = 0, // not used    /* change the default reference radius */
   split_flag = 0,      /* if 1 keep zero multipoles after split */
@@ -1110,7 +1118,7 @@ clean_c6t_element(struct c6t_element* cleanme)
 
 static struct c6t_element*
 create_aperture(const char* name, const char* type, double ap1, double ap2, double ap3, double ap4,
-		double offx, double offy, double tilt, struct double_array* p_al_err)
+    double offx, double offy, double tilt, struct double_array* p_al_err)
 {
   struct c6t_element* aper_element;
   aper_element = new_c6t_element(9,name,"aperture");
@@ -1378,7 +1386,7 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
   }
   else if ((strcmp(p->base_name,"ecollimator") == 0) ||
-	   (strcmp(p->base_name,"rcollimator") == 0))
+     (strcmp(p->base_name,"rcollimator") == 0))
   {
     c6t_elem = new_c6t_element(13,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
@@ -1440,7 +1448,7 @@ convert_madx_to_c6t(struct node* p)
       maxps=ks_param->double_array->curr;
     }
     if (maxkn>3 || maxks>3) {
-    	printf("warning while converting rfmultipole: components beyond octupole are ignored\n");
+      printf("warning while converting rfmultipole: components beyond octupole are ignored\n");
     }
 
     /*
@@ -1537,8 +1545,8 @@ convert_madx_to_c6t(struct node* p)
       {
         if (aper_param->expr_list != NULL)
           update_vector(aper_param->expr_list, aper_param->double_array);
-	j = 4;
-	if (aper_param->double_array->curr < 4) j = aper_param->double_array->curr;
+  j = 4;
+  if (aper_param->double_array->curr < 4) j = aper_param->double_array->curr;
         for(i=1; i<=j; i++) tag_aperture.value[i] = aper_param->double_array->a[i-1];
       }
 
@@ -1546,8 +1554,8 @@ convert_madx_to_c6t(struct node* p)
       {
         if (aper_param->expr_list != NULL)
           update_vector(aper_param->expr_list, aper_param->double_array);
-	j = 2;
-	if (aper_param->double_array->curr < 2) j = aper_param->double_array->curr;
+  j = 2;
+  if (aper_param->double_array->curr < 2) j = aper_param->double_array->curr;
         for(i=1; i<=j; i++) tag_aperture.value[i+4] = aper_param->double_array->a[i-1];
       }
 
@@ -1555,9 +1563,9 @@ convert_madx_to_c6t(struct node* p)
       {
         if (aper_param->expr_list != NULL)
           update_vector(aper_param->expr_list, aper_param->double_array);
-      	j = 1;
-      	if (aper_param->double_array->curr == 1)
-      	  tag_aperture.value[7] = aper_param->double_array->a[0];
+        j = 1;
+        if (aper_param->double_array->curr == 1)
+          tag_aperture.value[7] = aper_param->double_array->a[0];
       }
     }
 
@@ -1752,6 +1760,8 @@ get_args(struct in_cmd* my_cmd)
     put_info("c6t - split flag selected","");
   if ((mangle_flag = command_par_value("mangle", my_cmd->clone)))
     put_info("c6t - mangle flag selected","");
+  if ((long_names_flag = command_par_value("long_names", my_cmd->clone)))
+    put_info("c6t - long names flag selected","");
   if (mult_auto_off &&
      (tmp_max_mult_ord = command_par_value("max_mult_ord", my_cmd->clone))>0)
   {
@@ -1764,6 +1774,7 @@ get_args(struct in_cmd* my_cmd)
     ref_def = tmp_ref_def;
     printf("Reference radius set to : %f\n",ref_def);
   }
+
 }
 
 static void
@@ -2403,7 +2414,7 @@ pro_elem(struct node* cnode)
     else if (0 == strcmp(tag_aperture.style,"ellipse"))     strcpy(keyword, "EL");
     else if (0 == strcmp(tag_aperture.style,"rectangle"))   strcpy(keyword, "RE");
     else if (0 == strcmp(tag_aperture.style,"rectcircle") ||
-	     0 == strcmp(tag_aperture.style,"lhcscreen"))   strcpy(keyword, "RC");
+       0 == strcmp(tag_aperture.style,"lhcscreen"))   strcpy(keyword, "RC");
     else if (0 == strcmp(tag_aperture.style,"rectellipse")) strcpy(keyword, "RL");
     else if (0 == strcmp(tag_aperture.style,"racetrack"))   strcpy(keyword, "RT");
     else if (0 == strcmp(tag_aperture.style,"octagon"))     strcpy(keyword, "OC");
@@ -2416,11 +2427,11 @@ pro_elem(struct node* cnode)
   if (strcmp(keyword,"00") != 0 && current_element->value[0] > 0.) {
     tmp_element = current_element;
     tag_element = create_aperture(tag_aperture.name, keyword,
-  				  tag_aperture.value[1], tag_aperture.value[2],
-  				  tag_aperture.value[3], tag_aperture.value[4],
-  				  tag_aperture.value[5], tag_aperture.value[6],
-  				  tag_aperture.value[7],
-  				  cnode->p_al_err);
+            tag_aperture.value[1], tag_aperture.value[2],
+            tag_aperture.value[3], tag_aperture.value[4],
+            tag_aperture.value[5], tag_aperture.value[6],
+            tag_aperture.value[7],
+            cnode->p_al_err);
 
     tag_element->previous = prev_element;
     prev_element->next = tag_element;
@@ -2445,11 +2456,11 @@ pro_elem(struct node* cnode)
   /* add aperture element if necessary */
   if (strcmp(keyword,"00") != 0) {
     tag_element = create_aperture(tag_aperture.name, keyword,
-				  tag_aperture.value[1], tag_aperture.value[2],
-				  tag_aperture.value[3], tag_aperture.value[4],
-				  tag_aperture.value[5], tag_aperture.value[6],
-				  tag_aperture.value[7],
-				  cnode->p_al_err);
+          tag_aperture.value[1], tag_aperture.value[2],
+          tag_aperture.value[3], tag_aperture.value[4],
+          tag_aperture.value[5], tag_aperture.value[6],
+          tag_aperture.value[7],
+          cnode->p_al_err);
     tag_element->previous = current_element;
     tag_element->next = current_element->next;
     current_element->next = tag_element;
@@ -2735,6 +2746,7 @@ static void write_rfmultipole(struct c6t_element* el)
   double tilt = el->value[2];
   double freq = el->value[3];
   char name[48];
+
   if (fabs(knl[0])>eps_9) {
     double lag = 0.25-el->value[8];
     double pc0 = get_value("beam", "pc"); // GeV/c
@@ -2744,8 +2756,8 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "d");
-    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    fprintf(f2, name_format,
+      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(knl[1])>eps_9) {
     double lag = -el->value[9];
@@ -2755,8 +2767,8 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "q");
-    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    fprintf(f2, name_format,
+      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(knl[2])>eps_9) {
     double lag = -el->value[10];
@@ -2766,8 +2778,8 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "s");
-    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    fprintf(f2, name_format,
+      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(knl[3])>eps_9) {
     double lag = -el->value[11];
@@ -2777,8 +2789,8 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "o");
-    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    fprintf(f2, name_format,
+      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[0])>eps_9) {
     double lag = -0.25-el->value[19];
@@ -2789,8 +2801,8 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "ds");
-    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    fprintf(f2, name_format,
+      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[1])>eps_9) {
     double lag = -el->value[15];
@@ -2800,8 +2812,8 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "qs");
-    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    fprintf(f2, name_format,
+      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[2])>eps_9) {
     double lag = -el->value[16];
@@ -2811,8 +2823,8 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "ss");
-    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    fprintf(f2, name_format,
+      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[3])>eps_9) {
     double lag = -el->value[17];
@@ -2822,8 +2834,8 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "os");
-    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    fprintf(f2, name_format,
+      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
 }
 
@@ -2834,8 +2846,9 @@ write_c6t_element(struct c6t_element* el)
     if (strcmp(el->base_name, "rfmultipole")==0) {
       write_rfmultipole(el);
     } else {
-      fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	      el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+
+      fprintf(f2, name_format,
+        el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
     }
   }
   el->w_flag = 1;
@@ -2859,14 +2872,14 @@ write_blocks(void)
       if (p->flag != 0)
       {
         sprintf(p->name, "BLOC%d", ++nbct);
-        fprintf(f2, "%-18s", p->name); lc++;
+        fprintf(f2, name_format_short, p->name); lc++;
         for (i = 0; i < p->elements->curr; i++)
         {
           if (lc++ == LINES_MAX)
           {
             fprintf(f2,"\n"); fprintf(f2,"                  "); lc = 2;
           }
-          fprintf(f2, "%-18s",p->elements->elem[i]->equiv->name);
+          fprintf(f2, name_format_short,p->elements->elem[i]->equiv->name);
         }
       }
       if (lc > 0)
@@ -2897,7 +2910,7 @@ write_f8_errors(void)
     if (current_element->na_err > 0)
     {
       if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
-      fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
+      fprintf(f8, name_format_4,current_element->equiv->name,
               1000*current_element->p_al_err->a_dble[0],
               1000*current_element->p_al_err->a_dble[1],
               1000*(current_element->p_al_err->a_dble[5]+tiltval));
@@ -2905,7 +2918,7 @@ write_f8_errors(void)
     else if (current_element->tilt_err > 0)
     {
       if (f8_cnt++ == 0)    f8 = fopen("fc.8", "w");
-      fprintf(f8, "%-16s  %14.6e%14.6e%17.9e\n",current_element->equiv->name,
+      fprintf(f8, name_format_4,current_element->equiv->name,
               0.0,
               0.0,
               1000*tiltval);
@@ -3001,7 +3014,7 @@ write_f34_special(void)
           if ((err=double_from_table_row("twiss","muy",&(current_element->twtab_row),&muy)))
             printf ("Not found double_from table = %i\n",err);
           fprintf(f34,
-                  " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
+                  name_format_error,
                   spos,t_name,flags[j],values[j],betx,bety,mux,muy);
         }
       }
@@ -3022,7 +3035,7 @@ write_f34_special(void)
       printf ("Not found double_from table = %i\n",err);
   }
   fprintf(f34,
-          " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
+          name_format_error,
           spos,"end_marker",100,zero,betx,bety,mux,muy);
 }
 
@@ -3053,11 +3066,11 @@ write_f3_aper(void)
       else strcpy(keyword, "UK") ; // unknown aperture type
 
       fprintf(f3aper,"%s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n",
-	      current_element->name, keyword,
-	      current_element->value[2], current_element->value[3],
-	      current_element->value[4], current_element->value[5],
-      	      current_element->value[6], current_element->value[7],
-	      current_element->value[8]);
+        current_element->name, keyword,
+        current_element->value[2], current_element->value[3],
+        current_element->value[4], current_element->value[5],
+              current_element->value[6], current_element->value[7],
+        current_element->value[8]);
     }
     current_element = current_element->next;
   }
@@ -3091,8 +3104,8 @@ write_f3_aux(void)
     fprintf(f3aux, "BEAM\n");
     fprintf(f3aux, "%12.4e%14.6g%14.6g%12.4e%12.4e  1  0\n",
             command_par_value("npart", current_beam),
-	    1e6*command_par_value("exn", current_beam), // um.rad in sixtrack
-	    1e6*command_par_value("eyn", current_beam),
+      1e6*command_par_value("exn", current_beam), // um.rad in sixtrack
+      1e6*command_par_value("eyn", current_beam),
             command_par_value("sigt", current_beam),
             command_par_value("sige", current_beam));
     fprintf(f3aux, "NEXT\n");
@@ -3100,15 +3113,15 @@ write_f3_aux(void)
   if (aux_val[0] > -1.e10 && aux_val[1] > -1.e10)
   {
     fprintf(f3aux, "TUNE\n");
-    fprintf(f3aux, "QF%12.5f\n", aux_val[0]);
-    fprintf(f3aux, "QD%12.5f\n", aux_val[1]);
+    fprintf(f3aux, "QF%23.15f\n", aux_val[0]);
+    fprintf(f3aux, "QD%23.15f\n", aux_val[1]);
     fprintf(f3aux, "NEXT\n");
   }
   if (aux_val[2] > -1.e10 && aux_val[3] > -1.e10)
   {
     fprintf(f3aux, "CHRO\n");
-    fprintf(f3aux, "SXF%12.5f\n", aux_val[2]);
-    fprintf(f3aux, "SXD%12.5f\n", aux_val[3]);
+    fprintf(f3aux, "SXF%23.15f\n", aux_val[2]);
+    fprintf(f3aux, "SXD%23.15f\n", aux_val[3]);
     fprintf(f3aux, "NEXT\n");
   }
 }
@@ -3116,8 +3129,15 @@ write_f3_aux(void)
 static void
 write_f3_matrix(void)
 {
-  int i, i_max = 43;
+  int i, i_max = 43, dim=6;
   current_element = first_in_sequ;
+  
+  
+  double beta, value;
+
+ 
+  beta= get_value("beam ","beta ");
+ 
   if (!f3) f3 = fopen("fc.3", "w");
 
   while (current_element != NULL)
@@ -3125,10 +3145,27 @@ write_f3_matrix(void)
     if (strcmp(current_element->base_name, "matrix") == 0)
     {
       fprintf(f3,"TROM\n");
-      fprintf(f3,"%-16s\n",current_element->name);
-
+      fprintf(f3,"%-48s\n",current_element->name);
+    
       for (i = 1; i < i_max; i++) {
-        fprintf(f3,"%23.15e", current_element->value[i]);
+        value=current_element->value[i];
+        // The if statemenst are to go from pt to psigma and from t to sigma.     
+        if((i+1)%dim==0){
+          value=value/beta;
+        }
+        if(i%dim==0){
+          value=value*beta;
+        }
+        if(i>(dim+24) && i <(31+dim)){
+          value = value*beta;
+        }
+        if(i>(dim+30) && i < (37+dim)){
+          value = value/beta;
+        }
+        
+    
+
+        fprintf(f3,"%23.15e", value);
         if (i%3 == 0) fprintf(f3,"\n");
       }
 
@@ -3152,7 +3189,7 @@ write_f3_mult(struct c6t_element* el)
   struct c6t_element* eln;
   if (multi_type < 0)  return;
   fprintf(f3,"MULT\n");
-  fprintf(f3,"%-16s%20.10e%20.10e\n", el->name, c1p3*el->ref_radius,
+  fprintf(f3,name_format_3, el->name, c1p3*el->ref_radius,
           el->ref_delta);
   /* find non-zero errors in all elements equiv. to this, print error matrix */
   for (i = 0; i < FIELD_MAX; i++) error_matrix[i] = zero;
@@ -3213,42 +3250,42 @@ rfmultipole_name(char *name, struct c6t_element* el)
   if (fabs(knl[0])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "d");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, name_format_short, tmp);
   }
   if (fabs(knl[1])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "q");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, name_format_short, tmp);
   }
   if (fabs(knl[2])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "s");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, name_format_short, tmp);
   }
   if (fabs(knl[3])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "o");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, name_format_short, tmp);
   }
   if (fabs(ksl[0])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "ds");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, name_format_short, tmp);
   }
   if (fabs(ksl[1])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "qs");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, name_format_short, tmp);
   }
   if (fabs(ksl[2])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "ss");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, name_format_short, tmp);
   }
   if (fabs(ksl[3])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "os");
-    n += sprintf(name+n, "%-18s", tmp);
+    n += sprintf(name+n, name_format_short, tmp);
   }
 }
 
@@ -3278,7 +3315,15 @@ write_struct(void)
     {
       fprintf(f2,"\n"); lc = 1;
     }
-    fprintf(f2, "%-17s ", name);
+    if(long_names_flag==1)
+    {
+      fprintf(f2, "%-48s ", name);
+    }
+    else
+    {
+      fprintf(f2, "%-17s ", name);
+    }
+    
     p = p->next;
   }
   if (lc > 0)
@@ -3421,6 +3466,7 @@ c6t_init(void)
   aperture_flag = 0;   /* if 1 insert apertures into structure */
   cavall_flag = 0;     /* if 0 dump all cavities into first */
   markall_flag = 0;    /* if 0 dump all marker into first */
+  long_names_flag = 0; 
 //  radius_flag = 0; // not used    /* change the default reference radius */
   split_flag = 0;      /* if 1 keep zero multipoles after split */
   mangle_flag = 0;     /* if 1 truncate to 14 chars and mangle names */
@@ -3458,6 +3504,9 @@ process_c6t(void)  /* steering routine */
   assign_att();  /* assign attributes + errors to all single elements */
   mod_errors();  /* flip normal components */
 
+  setup_output_string(); /* sets the output format used for the out put files */
+
+
   write_all_el();
   write_blocks();
   write_struct();
@@ -3470,7 +3519,26 @@ process_c6t(void)  /* steering routine */
 }
 
 // public interface
+static void
+setup_output_string(void)
+{
+    if(long_names_flag==1){
+    strcpy(name_format,"%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n");
+    strcpy(name_format_short,"%-48s" );
+    strcpy(name_format_error, " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n");
+    strcpy(name_format_3,  "%-48s%20.10e%20.10e\n");
+    strcpy(name_format_4, "%-48s  %14.6e%14.6e%17.9e\n");
 
+  }
+    else{
+    strcpy(name_format,"%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n");
+    strcpy(name_format_short, "%-18s");
+    strcpy(name_format_error, " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n");
+    strcpy(name_format_3,"%-16s%20.10e%20.10e\n");
+    strcpy(name_format_4,"%-16s  %14.6e%14.6e%17.9e\n");
+
+    }
+}
 void
 conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
 {

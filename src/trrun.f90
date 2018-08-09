@@ -1254,7 +1254,7 @@ subroutine ttyrot(track,ktrack)
     py = TRACK(4,i)
     t  = TRACK(5,i)
     pt = TRACK(6,i)
-    
+
     pz = sqrt(one + two*pt/bet0i + pt**2 - px**2 - py**2)
     ptt = 1 - ta*px/pz
     track(1,i) = x/(ca*ptt)
@@ -3239,12 +3239,12 @@ subroutine trsol(track,ktrack)
            cosTh = cos(two*skl/onedp)
            sinTh = sin(two*skl/onedp)
            omega = sk/onedp;
-           
+
            ! total path length traveled by the particle
            bet = onedp / (one/bet0 + pt_);
            length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
                 two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
-           
+
            track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
            track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
            track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
@@ -4378,12 +4378,12 @@ subroutine tttquad(track, ktrack)
   else
      tilt = zero
   endif
-  
+
   if (k1.eq.zero) then
      call ttdrf(length,track,ktrack);
      return
   endif
-  
+
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1, ktrack
      !---- The particle position
@@ -4541,8 +4541,8 @@ subroutine tttdipole(track, ktrack)
   n_ferr = node_fd_errors(f_errors)
   if (k0.ne.0) f_errors(0) = f_errors(0) + k0*length - angle;
   k0 = k0 + f_errors(0) / length ! dipole term
-  k1 = k1 + f_errors(2) / length ! quad term 
-  
+  k1 = k1 + f_errors(2) / length ! quad term
+
   !---- Apply entrance dipole edge effect
   if (node_value('kill_ent_fringe ') .eq. zero) &
        call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, zero)
@@ -4641,12 +4641,18 @@ subroutine trphot(el,curv,rfac,deltap)
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
+  ! option synrad=1                                                      *
   !   Generate random energy loss for photons, using a look-up table to  *
   !   invert the function Y.  Ultra-basic interpolation computed;        *
   !   leads to an extrapolation outside the table using the two outmost  *
   !   point on each side (low and high).                                 *
   !   Assumes ultra-relativistic particles (beta = 1).                   *
-  ! Author: Ghislain Roy                                                 *
+  !   Author: Ghislain Roy                                               *
+  ! option synrad=2                                                      *
+  !   Generate random energy loss for photons, using the                 *
+  !   Synchrotron radiation spectrum generator                           *
+  !   described in CERN-OPEN-2007-018 by Helmut Burkhardt                *                                                 *
+
   ! Input:                                                               *
   !   EL     (double)       Element length.                              *
   !   CURV   (double)       Local curvature of orbit.                    *
@@ -4660,12 +4666,13 @@ subroutine trphot(el,curv,rfac,deltap)
   double precision :: el, curv, rfac, deltap
 
   integer :: i, ierror, j, nphot
-  double precision :: amean, dlogr, slope, ucrit, xi, sumxi
+  double precision :: amean, dlogr, slope, ucrit, xi, sumxi, InvSynFracInt,rn_arg
   integer, parameter :: maxtab=101
   double precision :: tabxi(maxtab),taby(maxtab)
   double precision :: arad, pc, gamma, amass
   character(len=20) text
-
+  integer, external :: get_option
+  integer :: synrad
   double precision :: get_value, frndm
   double precision, parameter :: fac1=3.256223d0
   ! integer, parameter :: maxran=1000000000
@@ -4753,23 +4760,31 @@ subroutine trphot(el,curv,rfac,deltap)
 
      !---- For all photons, sum the radiated photon energy in units of UCRIT
      if (nphot .ne. 0) then
-        do i = 1, nphot
-
-           !---- Find a uniform random number in the range [ 0,3.256223 ].
-           !     Note that the upper limit is not exactly 15*sqrt(3)/8
-           !     because of imprecision in the integration of F.
-           dlogr = log(fac1 * frndm())
-           !---- Now look for the energy of the photon in the table TABY/TABXI
-           do j = 2, maxtab
-              if (dlogr .le. taby(j) ) go to 20
-           enddo
-
-           !---- Perform linear interpolation and sum up energy lost.
-20         slope = (dlogr - taby(j-1)) / (taby(j) - taby(j-1))
-           xi = dexp(tabxi(j-1) + slope * (tabxi(j) - tabxi(j-1)))
-           sumxi = sumxi + xi
-           ! write(60,*) xi ! 2016-Mar-16  18:22:30  ghislain: dump individual photons to file
-        enddo
+        synrad = get_option('synrad ')
+        if (synrad .eq. 1) then
+          do i = 1, nphot
+             !---- Find a uniform random number in the range [ 0,3.256223 ].
+             !     Note that the upper limit is not exactly 15*sqrt(3)/8
+             !     because of imprecision in the integration of F.
+             dlogr = log(fac1 * frndm())
+             !---- Now look for the energy of the photon in the table TABY/TABXI
+             do j = 2, maxtab
+                if (dlogr .le. taby(j) ) go to 20
+             enddo
+             !---- Perform linear interpolation and sum up energy lost.
+  20         slope = (dlogr - taby(j-1)) / (taby(j) - taby(j-1))
+             xi = dexp(tabxi(j-1) + slope * (tabxi(j) - tabxi(j-1)))
+             sumxi = sumxi + xi
+             ! write(60,*) xi ! 2016-Mar-16  18:22:30  ghislain: dump individual photons to file
+          enddo
+        else !-- synrad .eq. 2
+          do i = 1, nphot
+             rn_arg = frndm()
+             xi = InvSynFracInt(rn_arg)
+  !hbutest   print *,xi,rn_arg," InvSynFracIntdata"
+             sumxi = sumxi + xi
+          enddo
+        endif
      endif
   endif
 

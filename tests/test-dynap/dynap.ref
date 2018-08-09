@@ -1,9 +1,9 @@
 @ NAME             %05s "DYNAP"
 @ TYPE             %05s "DYNAP"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "13/02/18"
-@ TIME             %08s "23.39.16"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.30.27"
 *          DYNAPFRAC          DKTRTURNS               XEND              PXEND               YEND              PYEND               TEND              PTEND              WXMIN              WXMAX              WYMIN              WYMAX             WXYMIN             WXYMAX              SMEAR           LYAPUNOV 
 $                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
                   0               1024                  0                  0                  0                  0                  0                  0    1.255550067e-12    1.583787111e-12    1.252956794e-12    1.257054265e-12    2.509113715e-12    2.840414271e-12     0.003786673518                  0

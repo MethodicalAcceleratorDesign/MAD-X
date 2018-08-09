@@ -1,0 +1,325 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.04.00  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2018.03.02               +
+  + Execution date: 2018.03.19 13:49:03      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+circum=120.;
+
+lcell=20.;
+
+f=lcell/sin(pi/5)/4;
+
+k=1.0/f;
+
+
+
+beam, particle=proton, energy = 2;
+
+angle = 2*pi/6;
+
+qfstart: multipole, knl={0, 0.99*k};
+
+qf: multipole, knl={0, k};
+
+qd: multipole, knl={0, -k};
+
+hkick: HKICKER,L=real, KICK=0.00030, TILT=real;
+
+vkick: VKICKER,L=real, KICK=0.01033, TILT=real;
+
+rfcav: RFCAVITY, VOLT=0.1, LAG=0.0, L =0.0, HARMON=100;
+
+markLOC.BIM:marker;
+
+
+
+
+
+seq: sequence, refer=center, l=circum;
+
+qfstart: qfstart, at = 0.00*lcell ;
+
+qd: qd, at = 0.5 * lcell;
+
+hkick: hkick, at =0.55* lcell;
+
+vkick: vkick, at =0.56* lcell;
+
+qf: qf, at = 1.0 * lcell;
+
+qd: qd, at = 1.5 * lcell;
+
+qf: qf, at = 2.0 * lcell;
+
+qd: qd, at = 2.5 * lcell;
+
+qf: qf, at =  3*lcell;
+
+rfcav:rfcav, at = 3.001*lcell;
+
+qd: qd, at = 0.5 * lcell+3*lcell;
+
+markLOC.BIM, at = 0.7 * lcell+3*lcell;
+
+qf: qf, at = 1.0 * lcell+3*lcell;
+
+qd: qd, at = 1.5 * lcell+3*lcell;
+
+qf: qf, at = 2.0 * lcell+3*lcell;
+
+qd: qd, at = 2.5 * lcell+3*lcell;
+
+endsequence;
+
+use,sequence=seq;
+
+SELECT,FLAG=twiss,clear;
+
+select, flag=twiss, column=name, betx, bety, MUX, MUY, pt, t;
+
+
+
+twiss, file="beforeTromb.twiss";
+
+enter Twiss module
+  
+iteration:   1 error:   9.090304E-02 deltap:   0.000000E+00
+orbit:   4.724546E-03  2.898752E-04  1.379906E-01 -7.415257E-03 -1.298658E-03 -3.816579E-05
+  
+iteration:   2 error:   1.122714E-02 deltap:   0.000000E+00
+orbit:   4.733584E-03  2.906429E-04  1.382554E-01 -7.404894E-03 -9.440653E-04  2.953597E-04
+  
+iteration:   3 error:   6.424979E-06 deltap:   0.000000E+00
+orbit:   4.733614E-03  2.906454E-04  1.382562E-01 -7.404873E-03 -9.455828E-04  2.955536E-04
+  
+iteration:   4 error:   2.786190E-12 deltap:   0.000000E+00
+orbit:   4.733614E-03  2.906454E-04  1.382562E-01 -7.404873E-03 -9.455828E-04  2.955536E-04
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+               120    0.0009455828463     0.001514716203        25.69415646 
+
+                q1                dq1            betxmax              dxmax 
+       1.196402684       -1.564636277        34.08100071      0.03433722835 
+
+             dxrms             xcomax             xcorms                 q2 
+     0.02240947468       0.0047346074     0.002990700135        1.200345182 
+
+               dq2            betymax              dymax              dyrms 
+       -1.56669961        33.52498058        2.048261354        1.171760195 
+
+            ycomax             ycorms             deltap            synch_1 
+      0.2712763129       0.1646686218                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+
+
+dphix = 0.15;
+
+dphiy = 0.1;
+
+twopi = PI*2;
+
+++++++ warning: ignored: attempt to redefine constant: twopi
+
+
+!This matrix is kept just to have has a test.
+
+!dumpytromb : MATRIX,RM11:=1,RM12:=1,RM13:=1,RM14:=1,RM15:=1, RM16:=1,
+
+!                    RM21:=1,RM22:=1,RM23:=1,RM24:=1,RM25:=1, RM26:=1,
+
+!                    RM31:=1,RM32:=1,RM33:=1,RM34:=1,RM35:=1, RM36:=1,
+
+!                    RM41:=1,RM42:=1,RM43:=1,RM44:=1,RM45:=1, RM46:=1,
+
+!	            RM51:=1,RM52:=1,RM53:=1,RM54:=1,RM55:=1, RM56:=1,
+
+!	            RM61:=1,RM62:=1,RM63:=1,RM64:=1,RM65:=1, RM66:=1;
+
+
+
+
+
+MATLOC.BIM : MATRIX,RM11:=R11LOC.BIM,RM12:=R12LOC.BIM,RM21:=R21LOC.BIM,RM22:=R22LOC.BIM,
+
+              RM16:=R16LOC.BIM,RM26:=R26LOC.BIM,RM51:=R51LOC.BIM,RM52:=R52LOC.BIM,
+
+              RM33:=R33LOC.BIM,RM34:=R34LOC.BIM,RM43:=R43LOC.BIM,RM44:=R44LOC.BIM,
+
+              RM55:=1.,RM66:=1.;
+
+
+
+
+
+twiss;
+
+enter Twiss module
+  
+iteration:   1 error:   9.090304E-02 deltap:   0.000000E+00
+orbit:   4.724546E-03  2.898752E-04  1.379906E-01 -7.415257E-03 -1.298658E-03 -3.816579E-05
+  
+iteration:   2 error:   1.122714E-02 deltap:   0.000000E+00
+orbit:   4.733584E-03  2.906429E-04  1.382554E-01 -7.404894E-03 -9.440653E-04  2.953597E-04
+  
+iteration:   3 error:   6.424979E-06 deltap:   0.000000E+00
+orbit:   4.733614E-03  2.906454E-04  1.382562E-01 -7.404873E-03 -9.455828E-04  2.955536E-04
+  
+iteration:   4 error:   2.786190E-12 deltap:   0.000000E+00
+orbit:   4.733614E-03  2.906454E-04  1.382562E-01 -7.404873E-03 -9.455828E-04  2.955536E-04
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+               120    0.0009455828463     0.001514716203        25.69415646 
+
+                q1                dq1            betxmax              dxmax 
+       1.196402684       -1.564636277        34.08100071      0.03433722835 
+
+             dxrms             xcomax             xcorms                 q2 
+     0.02240947468       0.0047346074     0.002990700135        1.200345182 
+
+               dq2            betymax              dymax              dyrms 
+       -1.56669961        33.52498058        2.048261354        1.171760195 
+
+            ycomax             ycorms             deltap            synch_1 
+      0.2712763129       0.1646686218                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+betxLOC.BIM=table(twiss,markLOC.BIM,betx);betyLOC.BIM=table(twiss,markLOC.BIM,bety);
+
+alfxLOC.BIM=table(twiss,markLOC.BIM,alfx);alfyLOC.BIM=table(twiss,markLOC.BIM,alfy);
+
+dispxLOC.BIM=table(twiss,markLOC.BIM,dx);disppxLOC.BIM=table(twiss,markLOC.BIM,dpx);
+
+
+
+R11LOC.BIM:=cos(twopi*dphix)+alfxLOC.BIM*sin(twopi*dphix);
+
+R12LOC.BIM:=betxLOC.BIM*sin(twopi*dphix);
+
+R22LOC.BIM:=cos(twopi*dphix)-alfxLOC.BIM*sin(twopi*dphix);
+
+R21LOC.BIM:=-sin(twopi*dphix)*(1+alfxLOC.BIM^2)/betxLOC.BIM;
+
+R33LOC.BIM:=cos(twopi*dphiy)+alfyLOC.BIM*sin(twopi*dphiy);
+
+R34LOC.BIM:=betyLOC.BIM*sin(twopi*dphiy);
+
+R44LOC.BIM:=cos(twopi*dphiy)-alfyLOC.BIM*sin(twopi*dphiy);
+
+R43LOC.BIM:=-sin(twopi*dphiy)*(1+alfyLOC.BIM^2)/betyLOC.BIM;
+
+R16LOC.BIM:=dispxLOC.BIM*(1-R11LOC.BIM)-R12LOC.BIM*disppxLOC.BIM;
+
+R26LOC.BIM:=disppxLOC.BIM*(1-R22LOC.BIM)-R21LOC.BIM*dispxLOC.BIM;
+
+R51LOC.BIM:=R21LOC.BIM*R16LOC.BIM-R11LOC.BIM*R26LOC.BIM;
+
+R52LOC.BIM:=R22LOC.BIM*R16LOC.BIM-R12LOC.BIM*R26LOC.BIM;
+
+
+
+!show, MATLOC.BIM ;
+
+seqedit,sequence=seq;
+
+install, element=MATLOC.BIM, at = 0.7 * lcell+3*lcell;
+
+remove, element=markLOC.BIM;
+
+endedit;
+
+++++++ info: seqedit - number of elements installed:  1
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    1
+++++++ info: seqedit - number of elements replaced:   0
+
+
+
+
+use, sequence=seq;
+
+SELECT,FLAG=twiss,clear;
+
+select, flag=twiss, column=name, x,y, betx, bety, MUX, MUY, pt, t;
+
+
+
+twiss, file="afterTrom.twiss";
+
+enter Twiss module
+  
+iteration:   1 error:   1.529813E-01 deltap:   0.000000E+00
+orbit:   2.903345E-03  1.359622E-04  9.670465E-02 -8.783003E-03 -1.179661E-03  9.192434E-06
+  
+iteration:   2 error:   5.119056E-03 deltap:   0.000000E+00
+orbit:   2.907153E-03  1.362660E-04  9.678024E-02 -8.782199E-03 -7.342620E-04  1.608800E-04
+  
+iteration:   3 error:   1.320211E-06 deltap:   0.000000E+00
+orbit:   2.907156E-03  1.362662E-04  9.678030E-02 -8.782200E-03 -7.344539E-04  1.609192E-04
+  
+iteration:   4 error:   9.048643E-14 deltap:   0.000000E+00
+orbit:   2.907156E-03  1.362662E-04  9.678030E-02 -8.782200E-03 -7.344539E-04  1.609192E-04
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+               120    0.0007344539463     0.000805030598        35.24469903 
+
+                q1                dq1            betxmax              dxmax 
+       1.346613813       -1.564759784        34.08793922       0.0293352885 
+
+             dxrms             xcomax             xcorms                 q2 
+     0.01824923054     0.002907156139     0.001728796459         1.30055717 
+
+               dq2            betymax              dymax              dyrms 
+      -1.566810637        33.53118674        1.113099445       0.5591484967 
+
+            ycomax             ycorms             deltap            synch_1 
+       0.190476743       0.1108253658                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+sixtrack, CAVALL;	
+
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+++++++ info: c6t - cavall flag selected 
+Reference radius set to : 1.000000
+++++++ info: MADX sequence converted to c6t internal. 
+
+total block length: 120.000000
+
+c6t terminated - total number of elements: 32
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 0
+                 alignment errors   MAD-X: 0
+                alignment errors SixTrack: 0
+                          sequence length: 120.000000 [m]
+stop;
+
+
+  Number of warnings: 1
+1 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

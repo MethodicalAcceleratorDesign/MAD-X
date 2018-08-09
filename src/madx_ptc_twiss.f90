@@ -556,6 +556,7 @@ contains
     logical(lp)             :: ring_parameters  !! forces isRing variable to true, i.e. calclulation of closed solution
     logical(lp)             :: doNormal         !! do normal form analysis
     logical(lp)             :: doRDTtracking    !! 
+    logical(lp)             :: isstochastic  !! tempurary veriable used in switching off stochastic in closed orbit search
     type(c_damap)           :: AscriptInPhasor, dummyMap  !! maps for RDTs calculations
     type(c_vector_field)    :: vectorField                !! defined here to avoid every step alloc and kill
     type(c_taylor)          :: theRDTs                    !!
@@ -708,6 +709,15 @@ contains
 
     
     orbit(:)=zero
+    ! read the orbit
+    ! if closed orbit is to be found pass it as the starting point for the searcher
+    orbit(1)=get_value('ptc_twiss ','x ')
+    orbit(2)=get_value('ptc_twiss ','px ')
+    orbit(3)=get_value('ptc_twiss ','y ')
+    orbit(4)=get_value('ptc_twiss ','py ')
+    orbit(6)=-get_value('ptc_twiss ','t ') ! swap of t sign
+    orbit(5)=orbit(5)+get_value('ptc_twiss ','pt ')
+
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
     else
@@ -733,27 +743,23 @@ contains
           !          return
        endif
 
-       ! pass starting point for closed orbit search
-       orbit(1)=get_value('ptc_twiss ','x ')
-       orbit(2)=get_value('ptc_twiss ','px ')
-       orbit(3)=get_value('ptc_twiss ','y ')
-       orbit(4)=get_value('ptc_twiss ','py ')
-       orbit(6)=-get_value('ptc_twiss ','t ') ! swap of t sign
-       orbit(5)=orbit(5)+get_value('ptc_twiss ','pt ')
-
-       
 
        if (getdebug() > 2) then
          print*, "Looking for orbit"
          print*, "Init orbit ", orbit
          call print(default,6)
        endif
-       
+
+       ! disable stochastic for closed orbit seach       
+       isstochastic = default%stochastic
+       default%stochastic = .false. 
        
        current=>my_ring%start
        !global_verbose = .true.
        call FIND_ORBIT_x(orbit,default,c_1d_8,fibre1=current)
        !global_verbose = .false.
+       
+       default%stochastic = isstochastic
        
        if ( .not. check_stable) then
           write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
@@ -762,14 +768,6 @@ contains
           call tidy()
           return
        endif
-       
-      ! print*, "From closed orbit", w_p%nc
-      ! if ( w_p%nc .gt. 0) then
-      !   do i=1,w_p%nc
-      !      call fort_warn('ptc_twiss: ',w_p%c(i))
-      !      call seterrorflag(10,"ptc_twiss ",w_p%c(i));
-      !   enddo
-      ! endif    
        
       if (getdebug() > 1) then
          CALL write_closed_orbit(icase,orbit)
@@ -2108,7 +2106,9 @@ contains
       integer     :: ind(10), i, mynres, order,rrr
       character(len=18):: nick
         
-        AscriptInPhasor=A_script_probe%x
+        dummyMap=A_script_probe%x
+        call c_canonise(dummyMap,AscriptInPhasor)
+        
         AscriptInPhasor=to_phasor() * AscriptInPhasor * from_phasor()
         call c_factor_map(AscriptInPhasor,dummyMap,vectorField,0) 
 
@@ -2154,20 +2154,38 @@ contains
          
        enddo
         
-
-       if (fib%mag%p%nmul > 0) then
-         call double_to_table_curr2(rdt_table_name,'k1l ', fib%mag%bn(1))
-         call double_to_table_curr2(rdt_table_name,'k1sl ',fib%mag%an(1))
+       if (fib%mag%p%nmul > 0) then 
        endif  
 
-       if (fib%mag%p%nmul > 1) then
-         call double_to_table_curr(rdt_table_name,'k2l ', fib%mag%bn(2))
-         call double_to_table_curr(rdt_table_name,'k2sl ',fib%mag%an(2))
+       if (fib%mag%p%nmul > 1) then 
+         if (fib%mag%l > 0) then
+           call double_to_table_curr2(rdt_table_name,'k1l ', fib%mag%bn(2)*fib%mag%l)
+           call double_to_table_curr2(rdt_table_name,'k1sl ',fib%mag%an(2)*fib%mag%l)
+         else
+           call double_to_table_curr2(rdt_table_name,'k1l ', fib%mag%bn(2))
+           call double_to_table_curr2(rdt_table_name,'k1sl ',fib%mag%an(2))
+         endif
        endif  
 
        if (fib%mag%p%nmul > 2) then
-         call double_to_table_curr(rdt_table_name,'k3l ', fib%mag%bn(3))
-         call double_to_table_curr(rdt_table_name,'k3sl ',fib%mag%an(3))
+         if (fib%mag%l > 0) then
+           call double_to_table_curr(rdt_table_name,'k2l ', fib%mag%bn(3)*fib%mag%l)
+           call double_to_table_curr(rdt_table_name,'k2sl ',fib%mag%an(3)*fib%mag%l)
+         else
+           call double_to_table_curr(rdt_table_name,'k2l ', fib%mag%bn(3))
+           call double_to_table_curr(rdt_table_name,'k2sl ',fib%mag%an(3))
+         endif
+           
+       endif  
+
+       if (fib%mag%p%nmul > 3) then
+         if (fib%mag%l > 0) then
+           call double_to_table_curr(rdt_table_name,'k3l ', fib%mag%bn(4)*fib%mag%l)
+           call double_to_table_curr(rdt_table_name,'k3sl ',fib%mag%an(4)*fib%mag%l)
+         else
+           call double_to_table_curr(rdt_table_name,'k3l ', fib%mag%bn(4))
+           call double_to_table_curr(rdt_table_name,'k3sl ',fib%mag%an(4))
+         endif  
        endif  
 
        call augment_count(rdt_table_name)
@@ -4822,29 +4840,48 @@ contains
          !print*, 'Value=',d_val,  ind(1:c_%nv)
          d_val = -aimag(c_val)/(2.*pi)
          ind(2*planei - 1) = ind(2*planei - 1) - 1 !kernel has extra exponent at the plane variable, q1=v(1).sub.'100000'
+
+         if (mod(sum(ind(1:2)),2) /=  0 ) then
+           !it should be always even
+           call fort_warn('ptc_twiss: ',' strange dependence of tune on horizontal coordinates')
+         endif
+
+         if (mod(sum(ind(3:4)),2) /=  0 ) then
+           !it should be always even
+           call fort_warn('ptc_twiss: ',' strange dependence of tune on vertical coordinates')
+         endif
+
+         !PTC gives the same order in x and px to mark Jx and Jy, i.e.
+         ! dQx/dJx has index 210000 ; after substracting the extra exponent in the plane of variable it is 110000
+         ! dQy/dJy has index 002100 
+         ! we prefer to fix px and py to zero so order = sum(ind(:)) is consistent
+         ind(2) = 0
+         ind(4) = 0
+         if (c_%nd2 == 6) then
+          ! 6D case, we get Jt in longitudinal plane ind(5) == ind(6)
+          if (mod(sum(ind(5:6)),2) /=  0 ) then
+            !it should be always even
+            call fort_warn('ptc_twiss: ',' strange dependence of tune on longitudinal coordinates')
+          endif
+          ind(5) = 0  
+         endif
+         
          order = sum(ind(1:cnv))
          
          nn = parname
 
          if (order == 0 ) then
+           ! O R D R E R   Z E R O
+           
            nick = parname  ! tune  q1
            !tune sometimes comes negative, add one in this case
            if (d_val .lt. zero) d_val = d_val + one
+         
          else
 
-           if (mod(sum(ind(1:2)),2) /=  0 ) then
-             !it should be always even
-             call fort_warn('ptc_twiss: ',' strange dependence of tune on horizontal coordinates')
-           endif
-           
-           if (mod(sum(ind(3:4)),2) /=  0 ) then
-             !it should be always even
-             call fort_warn('ptc_twiss: ',' strange dependence of tune on vertical coordinates')
-           endif
 
-
-           orderX = sum(ind(1:2))/2
-           orderY = sum(ind(3:4))/2
+           orderX = ind(1)
+           orderY = ind(3)
            orderPT= ind(5)
            orderT = ind(6)
 
@@ -4853,11 +4890,20 @@ contains
            if (orderX > 1) write(nn,'(a,i1)') trim(nn),orderX
            if (orderY > 0) nn = trim(nn) // '_jy'
            if (orderY > 1) write(nn,'(a,i1)') trim(nn),orderY
-           if (orderPT> 0) nn = trim(nn) // '_p'
-           if (orderPT > 1) write(nn,'(a,i1)') trim(nn),orderPT
-           if (orderT> 0) nn = trim(nn) // '_t'
-           if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
 
+           if (c_%nd2 == 6) then
+            ! 6D case, we get Jt in longitudinal plane
+            if (orderT > 0) nn = trim(nn) // '_jt'
+            if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
+             
+             
+           else
+             if (orderPT> 0) nn = trim(nn) // '_p'
+             if (orderPT > 1) write(nn,'(a,i1)') trim(nn),orderPT
+             if (orderT> 0) nn = trim(nn) // '_t'
+             if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
+           endif
+           
            nick = nn
            
            if (order == ind(5) ) then
@@ -4872,15 +4918,14 @@ contains
 
            if ( order == (sum( ind(2*planei-1:2*planei))) ) then
              nick = 'anh'//planel
-             if (order > 2) then
-                write(nick,'(a,a1,i1)') trim(nick),'_',order/2 !qN_JxM
+             if (order > 1) then
+                write(nick,'(a,a1,i1)') trim(nick),'_',order !qN_JxM
              endif
            else 
-             if ( (order==2) .and. (sum(ind(5:6)) == 0) ) then
+             if ( (order==1) .and. (sum(ind(5:6)) == 0) ) then
                 nick = 'anhc' 
              endif
            endif
-
 
         endif !else order==0  
 

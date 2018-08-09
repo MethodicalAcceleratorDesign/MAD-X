@@ -41,10 +41,6 @@ extern "C" {
 #define mkstring(s) mkstring_(s)
 #define mkstring_(s) #s
 
-#undef  NDEBUG
-#define NDEBUG 1
-#include <assert.h>
-
 // LD: variables local to module that control makethin behavior (was pushed in option before)
 static int iMakeDipedge, iMakeEndMarkers, iMinimizeParents, iMoreExpressions;
 
@@ -336,7 +332,7 @@ static std::string my_dump_command_parameter(const command_parameter* cp) // dum
       case k_cstring_array: // string array
         dump_char_p_array(cp->m_string);
         /* FALLTHRU */
-        
+
       case '?':
         ostr << " cp->type=" << cp->type << " no info dump implemented so far" << '\n';
     }
@@ -1941,7 +1937,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
         if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " in " << rbend_el-> name << " has expression, use this " << parnam  << '\n';
         add_cmd_parameter_clone(sbend_cmd, return_param_recurse(parnam,rbend_el),parnam,1);
       }
-      else if( !strcmp(parnam,"aperture") || !strcmp(parnam,"apertype") || !strcmp(parnam,"aper_tol") ) // check also aperture, apertype, aper_tol
+      else if( !strcmp(parnam,"aperture") || !strcmp(parnam,"apertype") || !strcmp(parnam,"aper_tol") || !strcmp(parnam,"aper_offset") || !strcmp(parnam,"mech_sep")) // check also aperture, apertype, aper_tol
       {
         if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " parnam " << parnam << " cmdi->expr=" << cmdi->expr << " cmdi " << my_dump_command_parameter(cmdi) << '\n';
         add_cmd_parameter_clone(sbend_cmd,return_param_recurse(parnam,rbend_el),parnam,1);

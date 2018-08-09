@@ -1,0 +1,92 @@
+circum=120.;
+lcell=20.;
+f=lcell/sin(pi/5)/4;
+k=1.0/f;
+
+beam, particle=proton, energy = 2;
+angle = 2*pi/6;
+qfstart: multipole, knl={0, 0.99*k};
+qf: multipole, knl={0, k};
+qd: multipole, knl={0, -k};
+hkick: HKICKER,L=real, KICK=0.00030, TILT=real;
+vkick: VKICKER,L=real, KICK=0.01033, TILT=real;
+rfcav: RFCAVITY, VOLT=0.1, LAG=0.0, L =0.0, HARMON=100;
+markLOC.BIM:marker;
+
+
+seq: sequence, refer=center, l=circum;
+qfstart: qfstart, at = 0.00*lcell ;
+qd: qd, at = 0.5 * lcell;
+hkick: hkick, at =0.55* lcell;
+vkick: vkick, at =0.56* lcell;
+qf: qf, at = 1.0 * lcell;
+qd: qd, at = 1.5 * lcell;
+qf: qf, at = 2.0 * lcell;
+qd: qd, at = 2.5 * lcell;
+qf: qf, at =  3*lcell;
+rfcav:rfcav, at = 3.001*lcell;
+qd: qd, at = 0.5 * lcell+3*lcell;
+markLOC.BIM, at = 0.7 * lcell+3*lcell;
+qf: qf, at = 1.0 * lcell+3*lcell;
+qd: qd, at = 1.5 * lcell+3*lcell;
+qf: qf, at = 2.0 * lcell+3*lcell;
+qd: qd, at = 2.5 * lcell+3*lcell;
+endsequence;
+use,sequence=seq;
+SELECT,FLAG=twiss,clear;
+select, flag=twiss, column=name, betx, bety, MUX, MUY, pt, t;
+
+twiss, file="beforeTromb.twiss";
+
+dphix = 0.15;
+dphiy = 0.1;
+twopi = PI*2;
+
+!This matrix is kept just to have has a test.
+!dumpytromb : MATRIX,RM11:=1,RM12:=1,RM13:=1,RM14:=1,RM15:=1, RM16:=1,
+!                    RM21:=1,RM22:=1,RM23:=1,RM24:=1,RM25:=1, RM26:=1,
+!                    RM31:=1,RM32:=1,RM33:=1,RM34:=1,RM35:=1, RM36:=1,
+!                    RM41:=1,RM42:=1,RM43:=1,RM44:=1,RM45:=1, RM46:=1,
+!	            RM51:=1,RM52:=1,RM53:=1,RM54:=1,RM55:=1, RM56:=1,
+!	            RM61:=1,RM62:=1,RM63:=1,RM64:=1,RM65:=1, RM66:=1;
+
+
+MATLOC.BIM : MATRIX,RM11:=R11LOC.BIM,RM12:=R12LOC.BIM,RM21:=R21LOC.BIM,RM22:=R22LOC.BIM,
+              RM16:=R16LOC.BIM,RM26:=R26LOC.BIM,RM51:=R51LOC.BIM,RM52:=R52LOC.BIM,
+              RM33:=R33LOC.BIM,RM34:=R34LOC.BIM,RM43:=R43LOC.BIM,RM44:=R44LOC.BIM,
+              RM55:=1.,RM66:=1.;
+
+
+twiss;
+betxLOC.BIM=table(twiss,markLOC.BIM,betx);betyLOC.BIM=table(twiss,markLOC.BIM,bety);
+alfxLOC.BIM=table(twiss,markLOC.BIM,alfx);alfyLOC.BIM=table(twiss,markLOC.BIM,alfy);
+dispxLOC.BIM=table(twiss,markLOC.BIM,dx);disppxLOC.BIM=table(twiss,markLOC.BIM,dpx);
+
+R11LOC.BIM:=cos(twopi*dphix)+alfxLOC.BIM*sin(twopi*dphix);
+R12LOC.BIM:=betxLOC.BIM*sin(twopi*dphix);
+R22LOC.BIM:=cos(twopi*dphix)-alfxLOC.BIM*sin(twopi*dphix);
+R21LOC.BIM:=-sin(twopi*dphix)*(1+alfxLOC.BIM^2)/betxLOC.BIM;
+R33LOC.BIM:=cos(twopi*dphiy)+alfyLOC.BIM*sin(twopi*dphiy);
+R34LOC.BIM:=betyLOC.BIM*sin(twopi*dphiy);
+R44LOC.BIM:=cos(twopi*dphiy)-alfyLOC.BIM*sin(twopi*dphiy);
+R43LOC.BIM:=-sin(twopi*dphiy)*(1+alfyLOC.BIM^2)/betyLOC.BIM;
+R16LOC.BIM:=dispxLOC.BIM*(1-R11LOC.BIM)-R12LOC.BIM*disppxLOC.BIM;
+R26LOC.BIM:=disppxLOC.BIM*(1-R22LOC.BIM)-R21LOC.BIM*dispxLOC.BIM;
+R51LOC.BIM:=R21LOC.BIM*R16LOC.BIM-R11LOC.BIM*R26LOC.BIM;
+R52LOC.BIM:=R22LOC.BIM*R16LOC.BIM-R12LOC.BIM*R26LOC.BIM;
+
+!show, MATLOC.BIM ;
+seqedit,sequence=seq;
+install, element=MATLOC.BIM, at = 0.7 * lcell+3*lcell;
+remove, element=markLOC.BIM;
+endedit;
+
+
+use, sequence=seq;
+SELECT,FLAG=twiss,clear;
+select, flag=twiss, column=name, x,y, betx, bety, MUX, MUY, pt, t;
+
+twiss, file="afterTrom.twiss";
+sixtrack, CAVALL;	
+stop;
+

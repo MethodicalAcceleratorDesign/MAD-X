@@ -4,7 +4,7 @@
 
 # env settings
 export PATH="`pwd`:/c/Program Files/gnuplot/bin:$PATH"
-
+export PATH="/mingw64/bin:$PATH"
 # error handler
 check_error ()
 {
