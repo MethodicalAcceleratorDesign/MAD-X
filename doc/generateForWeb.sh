@@ -1,9 +1,8 @@
 #!/bin/bash
 
-#
-# This script generates the files necessary for the /SixTrack/web/docs folder on the website.
+# Generates a web based on the latex file. 
 # Requires the latexml package to be installed.
-# Written by Veronica Berglyd Olsen, Feb 2018
+# Written by Veronica Berglyd Olsen, Feb 2018 and adapted to the need for MAD-X by Tobias Persson Aug 2018
 #
 
 CURR=$(pwd)
@@ -23,6 +22,9 @@ FORMAT=html5
 #mkdir -pv $OUSERS
 mkdir -pv $OPHYS
 
+cd $MPHYS/figures
+./generatePlots.sh 
+cd ../..
 
 echo ""
 echo "*******************************"
@@ -81,16 +83,16 @@ echo ""
 cd $TUSER
 #make
 #cp $MPHYS/sixphys.pdf $CURR/html/physics_manual.pdf
-latexml uguide.tex --includestyles | latexmlpost --dest=$OPHYS/manual.html --format=$FORMAT --javascript=$MATHJAX -
+latexml uguide.tex --includestyles | latexmlpost --dest=$OPHYS/manual_temp.html --format=$FORMAT --javascript=$MATHJAX -
 #$CURR/cleanupHTML.py $OPHYS
 #rm -v $OPHYS/*.html
-echo "<?php header('Location: manual.php'); ?>" > $OPHYS/index.php
-
+#echo "<?php header('Location: manual.php'); ?>" > $OPHYS/index.php
+./postHtmlCreation.sh
 
 echo ""
 echo "**********"
 echo "*  DONE  *"
 echo "**********"
 echo ""
-echo "The content of the folder 'html' can now be uploaded to /afs/cern.ch/project/sixtrack/web/docs/"
+echo "The content of the folder 'html' can now be uploaded to "
 echo ""
