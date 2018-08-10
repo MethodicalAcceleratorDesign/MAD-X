@@ -57,7 +57,7 @@ madx-linux-nagfor:  madx-linux64-nagfor  madx-linux32-nagfor
 
 LINUX_STATIC := $(if $(call eq,$(PLUGIN),yes),no,yes)
 
-madx-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=yes STATIC=$(LINUX_STATIC) USEGC=yes APPENDLD=yes
+madx-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=yes STATIC=$(LINUX_STATIC) USEGC=yes APPENDLD=yes X11=yes
 madx-linux%: MAKE_OPTS = -j9 $(MAKEARGS)
 madx-linux%: MAKE_LINK = ln -sf $(DESTDIR)$@ && ln -sf $@
 

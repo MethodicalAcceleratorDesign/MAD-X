@@ -1,0 +1,65 @@
+\documentclass{standalone}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{standalone}
+\usepackage{xspace}
+\usepackage[dvipsnames,svgnames]{xcolor}
+
+    %% \oddsidemargin 0.125 in    %   Note that \oddsidemargin = \evensidemargin
+    %% \evensidemargin 0.125 in
+    %% \marginparwidth 0.75 in
+    %% \textwidth 6.125 in % Width of text line.
+\usepackage{amsmath}
+\usepackage[english]{babel}
+%%\usepackage[pdftex]{graphicx} 
+%% Show image: \includegraphics[width=x]{file}.
+\usepackage{graphicx} % Show image: \includegraphics[width=x]{file}.
+\usepackage{pict2e}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{parskip}
+\usepackage{float}
+%\usepackage{makeidx}
+\usepackage{color}
+
+\begin{document}
+
+	\begin{picture}(400,150)
+	\thinlines
+	\put(204,75){\line(1,0){96}}
+	\put(196,75){\vector(-1,0){96}}
+	\put(305,75){\makebox(0,0)[l]{\shortstack{
+		\footnotesize horizontal \\
+		\footnotesize plane}}}
+	\put(106,68){\makebox(0,0)[l]{$x$}}
+	\put(200,75){\circle{8}}
+	\put(200,75){\makebox(0,0){\(\times\)}}
+	\put(208,66){\makebox(0,0){$s$}}
+	\put(200,0){\line(0,1){71}}
+	\put(200,79){\vector(0,1){71}}
+	\put(193,142){\makebox(0,0){$y$}}
+	\thicklines
+	\color{blue}
+	\put(196,76.3){\vector(-3,1){70}}
+	\put(204,73.7){\line(3,-1){70}}
+	\put(198.7,72){\line(-1,-3){23.3}}
+	\put(201.3,78){\vector(1,3){23.3}}
+	
+	\put(160,55){\line(3,-1){60}}
+	\put(180,115){\line(3,-1){60}}
+	\put(160,55){\line(1,3){20}}
+	\put(220,35){\line(1,3){20}}
+	\color{black}
+	\bezier{20}(260,75)(260,65)(257,56)
+	\put(259,62){\vector(-1,-3){2}}
+	\put(265,67){\makebox(0,0)[l]\texttt{DPSI}}
+	
+	\bezier{20}(213,114)(222,111)(229,104)
+	\put(233,125){\makebox(0,0)\texttt{ROT}}
+	\put(227,106){\vector(1,-1){2}}
+	\color{magenta}
+	\put(197.2,72.2){\line(-1,-1){50}}
+	\put(202.8,77.8){\line(1,1){50}}
+	\end{picture}
+
+
+\end{document}

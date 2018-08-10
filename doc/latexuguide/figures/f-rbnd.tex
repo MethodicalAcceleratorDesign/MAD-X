@@ -1,0 +1,80 @@
+\documentclass{standalone}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{standalone}
+\usepackage{xspace}
+\usepackage[dvipsnames,svgnames]{xcolor}
+
+    %% \oddsidemargin 0.125 in    %   Note that \oddsidemargin = \evensidemargin
+    %% \evensidemargin 0.125 in
+    %% \marginparwidth 0.75 in
+    %% \textwidth 6.125 in % Width of text line.
+\usepackage{amsmath}
+\usepackage[english]{babel}
+%%\usepackage[pdftex]{graphicx} 
+%% Show image: \includegraphics[width=x]{file}.
+\usepackage{graphicx} % Show image: \includegraphics[width=x]{file}.
+\usepackage{pict2e}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{parskip}
+\usepackage{float}
+%\usepackage{makeidx}
+\usepackage{color}
+
+\begin{document}
+
+\centering
+\setlength{\unitlength}{1pt}
+\begin{picture}(400,215)
+% axes
+\thinlines
+\put(150,150){\circle{8}}\put(150,150){\circle*{2}}
+\put(160,140){\makebox(0,0){\(y_1\)}}
+\put(250,150){\circle{8}}\put(250,150){\circle*{2}}
+\put(240,140){\makebox(0,0){\(y_2\)}}
+\put(74,124.7){\vector(3,1){72}}
+\put(84,135){\makebox(0,0){\(s_1\)}}
+\put(254,148.7){\vector(3,-1){72}}
+\put(316,135){\makebox(0,0){\(s_2\)}}
+\put(200,0){\vector(-1,3){48.7}}
+\put(165,75){\makebox(0,0){\(\rho\)}}
+\put(148.7,154){\vector(-1,3){18}}
+\put(118,206){\makebox(0,0){\(x_1\)}}
+\put(200,0){\vector(1,3){48.7}}
+\put(235,75){\makebox(0,0){\(\rho\)}}
+\put(251.3,154){\vector(1,3){18}}
+\put(282,206){\makebox(0,0){\(x_2\)}}
+\bezier{20}(190.5,28.5)(200,31.7)(209.5,28.5)
+\put(200,20){\makebox(0,0){\(\alpha\)}}
+\put(154,150){\line(1,0){92}}
+\put(200,150){\circle*{4}}
+\put(200,150){\vector(0,1){60}}
+\put(210,200){\makebox(0,0){\(x\)}}
+\put(150,154){\line(0,1){44}}
+\put(150,146){\line(0,-1){46}}
+\put(151,154){\line(1,4){11}}
+\put(250,154){\line(0,1){44}}
+\put(250,146){\line(0,-1){46}}
+\put(249,154){\line(-1,4){11}}
+% magnet outline
+\thicklines
+\put(200,102){\vector(-1,0){50}}
+\put(200,102){\vector(1,0){50}}
+\put(200,110){\makebox(0,0){L}}
+\color{blue}
+\put(151,154){\line(1,4){6}}
+\put(149,146){\line(-1,-4){6}}
+\put(249,154){\line(-1,4){6}}
+\put(251,146){\line(1,-4){6}}
+\put(157,178){\line(1,0){86}}
+\put(143,122){\line(1,0){114}}
+\color{black}
+\bezier{10}(150,195)(155.5,195)(160.9,193.7)
+\put(155.5,195){\vector(3,-1){5.4}}
+\put(150,205){\makebox(0,0)[l]{\(e_1\)}}
+\bezier{10}(250,195)(244.5,195)(239.1,193.7)
+\put(244.5,195){\vector(-3,-1){5.4}}
+\put(250,205){\makebox(0,0)[r]{\(e_2\)}}
+\end{picture}
+
+\end{document}

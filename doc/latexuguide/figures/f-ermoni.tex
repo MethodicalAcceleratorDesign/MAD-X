@@ -1,0 +1,59 @@
+\documentclass{standalone}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{standalone}
+\usepackage{xspace}
+\usepackage[dvipsnames,svgnames]{xcolor}
+
+    %% \oddsidemargin 0.125 in    %   Note that \oddsidemargin = \evensidemargin
+    %% \evensidemargin 0.125 in
+    %% \marginparwidth 0.75 in
+    %% \textwidth 6.125 in % Width of text line.
+\usepackage{amsmath}
+\usepackage[english]{babel}
+%%\usepackage[pdftex]{graphicx} 
+%% Show image: \includegraphics[width=x]{file}.
+\usepackage{graphicx} % Show image: \includegraphics[width=x]{file}.
+\usepackage{pict2e}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{parskip}
+\usepackage{float}
+%\usepackage{makeidx}
+\usepackage{color}
+
+\begin{document}
+
+	\begin{picture}(400,150)(0,20)
+	\thinlines
+	\put(204,75){\line(1,0){96}}
+	\put(196,75){\vector(-1,0){196}}
+	\put(305,75){\makebox(0,0)[l]{\shortstack{
+		\footnotesize horizontal \\
+		\footnotesize plane}}}
+	\put(8,68){\makebox(0,0)[l]{$x$}}
+	\put(200,75){\circle{8}}\put(200,75){\makebox(0,0){\(\times\)}}
+	\put(220,55){\vector(-1,1){15}}
+	\put(220,55){\makebox(0,0)[tl]{\shortstack{
+		\footnotesize true beam \\
+		\footnotesize position}}}
+	\put(208,83){\makebox(0,0){$s$}}
+	\put(200,30){\line(0,1){41}}
+	\put(200,79){\vector(0,1){101}}
+	\put(193,172){\makebox(0,0){$y$}}
+	\color{blue}
+	\put(100,50){\vector(0,1){125}}
+	\put(150,125){\vector(-1,0){100}}
+	\put(100,125){\circle*{4}}
+	\color{black}
+	\put(80,145){\vector(1,-1){15}}
+	\put(80,145){\makebox(0,0)[br]{\shortstack{
+		\footnotesize beam position given \\
+		\footnotesize by the monitor}}}
+	\thicklines
+	\put(200,55){\vector(-1,0){100}}
+	\put(150,45){\makebox(0,0)\texttt{MREX}}
+	\put(80,75){\vector(0,1){50}}
+	\put(70,100){\makebox(0,0)[r]\texttt{MREY}}
+	\end{picture}
+
+\end{document}

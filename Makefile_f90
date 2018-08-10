@@ -27,12 +27,12 @@ FC_DIR_PTC := libs/ptc/src
 FC_SRC_PTC := $(notdir $(wildcard $(FC_DIR_PTC)/*.f90 $(FC_DIR_PTC)/*.F90))
 
  # x11 dependencies
-ifeq ($(OSTYPE),Windows)
-FC_SRC_MAD += gxx11ps.f90
-FC_SRC_RM  += gxx11.f90
-else
+ifeq ($(X11),yes)
 FC_SRC_MAD += gxx11.f90
 FC_SRC_RM  += gxx11ps.f90
+else
+FC_SRC_MAD += gxx11ps.f90
+FC_SRC_RM  += gxx11.f90
 endif
 
 # ptc dependencies

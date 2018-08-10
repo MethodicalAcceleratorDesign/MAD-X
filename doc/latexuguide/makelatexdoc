@@ -1,7 +1,10 @@
 #!/bin/sh
 echo 'building documentation for MAD-X. Be patient...'
 set -x
-lualatex uguide.tex > makelatexdoc.log
+cd figures
+./generatePlots.sh >  makelatexdoc.log
+cd ..
+lualatex uguide.tex >> makelatexdoc.log
 lualatex uguide.tex >> makelatexdoc.log
 makeindex uguide >> makelatexdoc.log  2&>1
 bibtex uguide >> makelatexdoc.log
