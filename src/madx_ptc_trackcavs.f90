@@ -732,7 +732,7 @@ contains
              pathlegth = pathlegth + p%mag%p%ld
 
              if (getdebug() > 2 ) then
-                write(6,*) e, 'l=',pathlegth
+                write(6,*) e, ' ', p%mag%name, 'l=',pathlegth
                 write(6,'(5f8.4, f16.8)') x(1),x(2),x(3),x(4),x(5),x(6)
              endif
 
@@ -1031,7 +1031,7 @@ contains
              pathlegth = pathlegth + p%mag%p%ld
 
              if (getdebug() > 2 ) then
-                write(6,*) e, 'l=',pathlegth
+                write(6,*) e, ' ', p%mag%name, 'l=',pathlegth
                 write(6,'(5f8.4, f16.8)') x(1),x(2),x(3),x(4),x(5),x(6)
              endif
 

@@ -171,6 +171,14 @@ within the aperture limits.
 The Normal Form calculation is controlled through options of the 
 \texttt{PTC\_TRACK} command.
 
+\textbf{Remarks} \\
+If \texttt{TOTALPATH} is set to true than the 5th coordinate is 
+total path length or time of flight and the PTC conversion is kept
+for the output tables and files.
+In particular, initial coordinates provided in \texttt{PTC\_START}
+will appear with swapped sign.
+
+
 \madbox{
 PTC\_TRACK, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\ 
             \>ELEMENT\_BY\_ELEMENT=logical, TURNS=integer, \\
@@ -184,7 +192,6 @@ PTC\_TRACK, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\
             \>RADIATION\_QUAD=logical, \\
             \>BEAM\_ENVELOPE=logical, SPACE\_CHARGE=logical;
 }
-
 
 The attributes are: 
 \begin{madlist}
