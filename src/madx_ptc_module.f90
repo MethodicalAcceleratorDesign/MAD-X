@@ -2794,7 +2794,7 @@ CONTAINS
 
        if ( (icav==0) .and. my_ring%closed .and. (getenforce6D() .eqv. .false.)) then
           default = default - delta0 - only_4d0 + NOCAVITY0
-          call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 5 and 1/2')
+          call fort_warn('my_state: ',' no cavity - dimensionality reduced 6 -> 5 and 1/2')
           i=56
        else
           default = default - delta0 - only_4d0 - NOCAVITY0 !enforcing nocavity to false
@@ -2815,6 +2815,9 @@ CONTAINS
       !print*, "Resulting state"
       call print(default,6)
     endif
+
+    !Update the global flag of ptc_module 
+    mytime = default%time
 
     icase = i
 
@@ -2896,6 +2899,26 @@ CONTAINS
     ENDIF
 
   END SUBROUTINE Convert_dp_to_dt
+  !=============================================================================
+  SUBROUTINE Convert_dt_to_dp(dt, deltap )
+    implicit none
+    ! convert deltap=(p-p0)/p0 to dt=deltaE/p0c
+    REAL(dp), INTENT(IN)  :: dt
+    REAL(dp), INTENT(OUT) :: deltap
+
+    ! local
+    real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
+
+    ! to get "energy" value
+    Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)
+
+    IF (beta0.gt.zero ) THEN
+       deltap=SQRT( one + two*dt/beta0 +dt*dt)-one
+    ELSE  ! exculde devision by 0
+       call aafail('SUBR. Convert_dp_to_dt: ',' CALL GET_ONE => beta0.LE.0')
+    ENDIF
+
+  END SUBROUTINE Convert_dt_to_dp
   !=============================================================================
 
   subroutine makemaptable(y,order)
