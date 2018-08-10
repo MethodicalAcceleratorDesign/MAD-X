@@ -1,0 +1,93 @@
+\documentclass{standalone}
+\includeonly{
+  coverpage, copyright, changelog, contributors,    
+  conventions, format, programflow, control, files, tables, beams, seqedit,
+  definitions, elements, ranges, line, sequence,
+  tfs, c6t, sxf, plot, index, rplot_index,
+  survey, twiss, match, emit, aperture, makethin, error, cororbit, sodd, touschek, ibs, thintrack,	
+  ptc-general, ptc-track, ptc-twiss, ptc-normal, ptc-auxiliaries, 
+  defects, pitfalls
+ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{standalone}
+\usepackage{xspace}
+\usepackage[dvipsnames,svgnames]{xcolor}
+\usepackage{a4wide} % for better presentation
+    %% \oddsidemargin 0.125 in    %   Note that \oddsidemargin = \evensidemargin
+    %% \evensidemargin 0.125 in
+    %% \marginparwidth 0.75 in
+    %% \textwidth 6.125 in % Width of text line.
+\usepackage{amsmath}
+\usepackage[english]{babel}
+%%\usepackage[pdftex]{graphicx} 
+%% Show image: \includegraphics[width=x]{file}.
+\usepackage{graphicx} % Show image: \includegraphics[width=x]{file}.
+\usepackage{pict2e}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{parskip}
+\usepackage{float}
+%\usepackage{makeidx}
+\usepackage{color}
+%\usepackage[totoc]{idxlayout} % ensures that Index appears in TOC
+
+
+\begin{document}
+
+
+
+
+\centering
+\setlength{\unitlength}{1pt}
+\begin{picture}(400,250)
+% axes
+\thicklines
+\put(180,60){\vector(0,1){130}}
+\put(188,182){\makebox(0,0){\(y\)}}
+\put(280,0){\vector(-1,1){160}}
+\put(120,150){\makebox(0,0){\(x\)}}
+\put(140,80){\vector(2,1){100}}
+\put(225,130){\makebox(0,0){\(z\)}}
+\thinlines
+\put(180,100){\circle*{4}}
+% coordinates
+\put(150,130){\line(0,1){60}}
+\put(180,160){\line(-1,1){30}}
+\put(150,130){\circle*{4}}
+\put(150,190){\circle*{4}}
+\put(180,160){\circle*{4}}
+% radii of curvature and centre
+\put(280,0){\vector(-3,1){172}}
+\put(160,30){\makebox(0,0){\(\rho\)}}
+\put(280,0){\vector(0,1){142}}
+\put(290,60){\makebox(0,0){\(\rho\)}}
+\put(280,0){\circle*{4}}
+\put(295,15){\vector(-1,-1){12}}
+\put(295,15){\makebox(0,0)[bl]{\shortstack{centre of \\curvature}}}
+% actual orbit
+\thicklines
+\color{red}
+\bezier{150}(0,100)(75,165)(150,190)
+\bezier{150}(150,190)(240,220)(320,220)
+\put(320,220){\vector(1,0){4}}
+\color{black}
+\put(80,180){\vector(1,-1){12}}
+\put(80,180){\makebox(0,0)[br]{\shortstack{actual \\orbit}}}
+\put(150,190){\vector(3,1){18}}
+\put(159,200){\makebox(0,0)[br]{\(d\vec r\)}}
+% actual orbit
+\color{blue}
+\bezier{150}(40,0)(100,60)(180,100)
+\bezier{150}(180,100)(260,140)(340,160)
+\put(340,160){\vector(4,1){4}}
+\color{black}
+\put(328,162){\makebox{\(s\)}}
+\put(320,135){\vector(-1,1){12}}
+\put(320,135){\makebox(0,0)[tl]{\shortstack{reference \\orbit}}}
+\end{picture}
+
+  
+
+
+\end{document}
