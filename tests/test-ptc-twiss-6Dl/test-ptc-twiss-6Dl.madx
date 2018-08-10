@@ -12,7 +12,7 @@ beam, particle = electron, energy = eg;
 use, period=ALS;
 
 select,flag=twiss,clear;
-select, flag=twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2;
+select, flag=twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2,t,pt;
 
 
 create,table=orbitvsfreq,column=rffreq,

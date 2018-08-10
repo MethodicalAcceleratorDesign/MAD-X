@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.04.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.08 17:48:52      +
+  + Release   date: 2018.07.10               +
+  + Execution date: 2018.08.10 16:14:53      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !tests for closed orbit search with totalpath=true
 
@@ -29,7 +29,7 @@ use, period=ALS;
 
 select,flag=twiss,clear;
 
-select, flag=twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2;
+select, flag=twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2,t,pt;
 
 
 
