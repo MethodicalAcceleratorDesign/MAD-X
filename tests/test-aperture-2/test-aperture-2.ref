@@ -141,7 +141,7 @@ select, flag=ptc_twiss, column=name,s,betx,bety,x,px,y,py,apertype,on_elem, clas
 
 ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
 
-++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
+++++++ warning: my_state:   no cavity - dimensionality reduced 6 -> 5 and 1/2
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
