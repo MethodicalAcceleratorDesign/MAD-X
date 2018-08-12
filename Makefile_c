@@ -35,7 +35,8 @@ mad_gcst.o: CPPFLAGS   += -D_VERSION=$(VERSION) \
                           -D_VERSION_DATE=$(VERSION_DATE) \
                           -D_VERSION_OSTYPE=$(OSTYPE)
 mad_dict.o: CPPFLAGS   += -D_VERSION_NUM=$(VERSION_NUM)
-mad_gxx11c.o: CPPFLAGS += $(call incdir,/usr/X11/include /opt/X11/include)
+mad_gxx11c.o: CPPFLAGS += $(call incdir,/usr/X11/include /opt/X11/include) \
+                          $(if $(call neq,$(X11),yes),,-D_USE_X11)
 mad_gxx11c.o: CFLAGS   += $(if $(call neq,$(CCNAME),icc),,-diag-disable 161) \
                           $(if $(call neq,$(CCNAME),gcc),,-Wno-variadic-macros)
 mad_dict.o:   CFLAGS   += $(if $(call neq,$(CCNAME),gcc),,-Wno-overlength-strings)

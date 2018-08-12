@@ -24,55 +24,10 @@ with no fringe fields (see Figure~\ref{F-REF}).
 \begin{figure}[htb]
 \centering
 \setlength{\unitlength}{1pt}
-\begin{picture}(400,250)
-% axes
-\thicklines
-\put(180,60){\vector(0,1){130}}
-\put(188,182){\makebox(0,0){\(y\)}}
-\put(280,0){\vector(-1,1){160}}
-\put(120,150){\makebox(0,0){\(x\)}}
-\put(140,80){\vector(2,1){100}}
-\put(225,130){\makebox(0,0){\(z\)}}
-\thinlines
-\put(180,100){\circle*{4}}
-% coordinates
-\put(150,130){\line(0,1){60}}
-\put(180,160){\line(-1,1){30}}
-\put(150,130){\circle*{4}}
-\put(150,190){\circle*{4}}
-\put(180,160){\circle*{4}}
-% radii of curvature and centre
-\put(280,0){\vector(-3,1){172}}
-\put(160,30){\makebox(0,0){\(\rho\)}}
-\put(280,0){\vector(0,1){142}}
-\put(290,60){\makebox(0,0){\(\rho\)}}
-\put(280,0){\circle*{4}}
-\put(295,15){\vector(-1,-1){12}}
-\put(295,15){\makebox(0,0)[bl]{\shortstack{centre of \\curvature}}}
-% actual orbit
-\thicklines
-\color{red}
-\bezier{150}(0,100)(75,165)(150,190)
-\bezier{150}(150,190)(240,220)(320,220)
-\put(320,220){\vector(1,0){4}}
-\color{black}
-\put(80,180){\vector(1,-1){12}}
-\put(80,180){\makebox(0,0)[br]{\shortstack{actual \\orbit}}}
-\put(150,190){\vector(3,1){18}}
-\put(159,200){\makebox(0,0)[br]{\(d\vec r\)}}
-% actual orbit
-\color{blue}
-\bezier{150}(40,0)(100,60)(180,100)
-\bezier{150}(180,100)(260,140)(340,160)
-\put(340,160){\vector(4,1){4}}
-\color{black}
-\put(328,162){\makebox{\(s\)}}
-\put(320,135){\vector(-1,1){12}}
-\put(320,135){\makebox(0,0)[tl]{\shortstack{reference \\orbit}}}
-\end{picture}
+\includegraphics{figures/f-ref.pdf}
 \caption[Local Reference System]{Local Reference System}
 \label{F-REF}
-\end{figure}
+\end{figure}  
 
 
 The reference orbit consists of a series of straight line segments and
@@ -194,116 +149,7 @@ defined by three displacements  ($X_i$, $Y_i$, $Z_i$) and three angles
 \begin{figure}[htb]% 1.2
 \centering
 \setlength{\unitlength}{1pt}
-\begin{picture}(400,270)
-
-% global axes
-\color{black}
-\thicklines
-\put(20,150){\vector(2,-1){280}}
-\put(300,20){\makebox(0,0){\(Z\)}}
-\put(20,100){\vector(3,1){360}}
-\put(380,210){\makebox(0,0){\(X\)}}
-\put(80,0){\vector(0,1){270}}
-\put(70,265){\makebox(0,0){\(Y\)}}
-
-%local axes
-\color{red}
-\thinlines
-\put(133.3,0){\vector(1,3){90}}
-\put(213.3,265){\makebox(0,0){\(x\)}}
-\put(300,150){\vector(-2,1){180}}
-\put(125,230){\makebox(0,0){\(y\)}}
-\put(0,100){\vector(2,1){270}}
-\put(260,240){\makebox(0,0){\(s\)}}
-
-% displacement of local system
-\color{black}
-\put(140,140){\line(2,-1){60}}
-\put(160,128){\makebox(0,0)[tr]{\(Z_i\)}}
-\put(140,90){\line(3,1){60}}
-\put(180,100){\makebox(0,0)[tl]{\(X_i\)}}
-\put(200,110){\line(0,1){90}}
-\put(205,140){\makebox(0,0)[l]{\(Y_i\)}}
-
-% roll angle
-\bezier{30}(160,30)(160,40)(150,50)
-\put(151,49){\vector(-1,1){1}}
-\put(150,30){\makebox(0,0){\(\psi_i\)}}
-
-% pitch angle
-\bezier{20}(60,110)(60,120)(55,125)
-\put(57,123){\vector(-1,2){2}}
-\put(50,118){\makebox(0,0){\(\phi_i\)}}
-
-% azimuth angle
-\bezier{20}(130,95)(140,100)(140,110)
-\put(140,105){\vector(0,1){5}}
-\put(130,103){\makebox(0,0){\(\theta_i\)}}
-
-% reference orbit
-\color{black}
-\thicklines
-\bezier{80}(140,155)(170,185)(200,200)
-\bezier{80}(200,200)(230,215)(260,210)
-\put(260,213){\makebox(0,0)[l]{\shortstack{reference \\orbit}}}
-
-% intersections of planes
-\color{green}
-\thinlines
-\multiput(130,0)(2,2){115}{\line(0,1){1}}
-\thicklines
-\put(180,20){\vector(-1,1){12}}
-\put(172,20){\makebox(0,0)[tl]{\shortstack{intersection of \\
-			\(xy\) and \(ZX\) planes}}}
-
-\thinlines
-\multiput(0,128)(2,-1.8){73}{\line(0,-1){1}}
-\thicklines
-\put(60,50){\vector(1,1){12}}
-\put(0,50){\makebox(0,0)[tl]{\shortstack{intersection of \\
-			\(xs\) and \(ZX\) \\ planes}}}
-
-\thinlines
-\multiput(0,107)(3,0.522){120}{\line(0,1){1}}
-\thicklines
-\put(318,149){\vector(-1,1){12}}
-\put(320,150){\makebox(0,0)[tl]{\shortstack{intersection of \\
-			\(ys\) and \(ZX\) \\ planes}}}
-
-% projection of axes onto ZX (horizontal plane)
-\color{blue}
-\thinlines
-\multiput(0,110)(2,0){180}{\line(1,0){1}}
-\put(300,95){\makebox(0,0)[l]{\shortstack{projection of \(s\) \\
-onto \(ZX\)-plane}}}
-
-\put(50,110){\circle*{4}}
-\put(100,110){\circle*{4}}
-
-\multiput(131,0)(1,1.6){123}{\line(1,0){1}}
-\put(177,71){\circle*{4}}
-\put(240,173){\circle*{4}}
-
-\multiput(147,80)(1.79,1){100}{\line(1,0){1}}
-\put(154,83){\circle*{4}}
-
-% dots for intersections of planes
-\color{green}
-\put(20,110){\circle*{4}}
-\put(28,102){\circle*{4}}
-\put(135,5){\circle*{4}}
-\put(193.3,63.3){\circle*{4}}
-\put(240,110){\circle*{4}}
-\put(286.7,156.7){\circle*{4}}
-\put(335,205){\circle*{4}}
-
-% dots for displacements
-\color{black}
-\put(140,90){\circle*{4}}
-\put(140,140){\circle*{4}}
-\put(200,110){\circle*{4}}
-
-\end{picture}
+\includegraphics{figures/f-glob.pdf}
 \caption[Global Reference System]{Global Reference System showing the global 
 Cartesian system ($X, Y, Z$) in black and the local reference system ($x, y, 
 s$) in red after translation ($X_i , Y_i, Z_i$) and rotation ($\theta_i, 
@@ -495,37 +341,7 @@ before and after the element cancel.
 \begin{figure}[ht]
 \centering
 \setlength{\unitlength}{1pt}
-\begin{picture}(400,100)
-\thinlines
-% axes
-\put(150,50){\circle{8}}\put(150,50){\circle*{2}}
-\put(140,40){\makebox(0,0){\(y_1\)}}
-\put(250,50){\circle{8}}\put(250,50){\circle*{2}}
-\put(260,40){\makebox(0,0){\(y_2\)}}
-\put(100,50){\line(1,0){46}}
-\put(154,50){\line(1,0){92}}
-\put(254,50){\vector(1,0){46}}
-\put(290,40){\makebox(0,0){\(s\)}}
-\put(150,0){\line(0,1){46}}
-\put(150,54){\vector(0,1){46}}
-\put(140,90){\makebox(0,0){\(x_1\)}}
-\put(250,0){\line(0,1){46}}
-\put(250,54){\vector(0,1){46}}
-\put(260,90){\makebox(0,0){\(x_2\)}}
-% magnet outline
-\thicklines
-\color{blue}
-\put(150,54){\line(0,1){26}}
-\put(150,46){\line(0,-1){26}}
-\put(250,54){\line(0,1){26}}
-\put(250,46){\line(0,-1){26}}
-\put(150,20){\line(1,0){100}}
-\put(150,80){\line(1,0){100}}
-\color{black}
-\put(200,2){\vector(1,0){50}}
-\put(200,2){\vector(-1,0){50}}
-\put(200,10){\makebox(0,0){L}}
-\end{picture}
+\includegraphics{figures/f-drf.pdf}
 \caption{Reference System for Straight Beam Elements}
 \label{F-DRF}
 \end{figure}
@@ -577,57 +393,7 @@ The special value $\psi = \pi/2$ represents a bend down.
 \begin{figure}[htb]
 \centering
 \setlength{\unitlength}{1pt}
-\begin{picture}(400,215)
-% axes
-\thinlines
-\put(150,150){\circle{8}}\put(150,150){\circle*{2}}
-\put(160,140){\makebox(0,0){\(y_1\)}}
-\put(250,150){\circle{8}}\put(250,150){\circle*{2}}
-\put(240,140){\makebox(0,0){\(y_2\)}}
-\put(74,124.7){\vector(3,1){72}}
-\put(84,135){\makebox(0,0){\(s_1\)}}
-\put(254,148.7){\vector(3,-1){72}}
-\put(316,135){\makebox(0,0){\(s_2\)}}
-\put(200,0){\vector(-1,3){48.7}}
-\put(165,75){\makebox(0,0){\(\rho\)}}
-\put(148.7,154){\vector(-1,3){18}}
-\put(118,206){\makebox(0,0){\(x_1\)}}
-\put(200,0){\vector(1,3){48.7}}
-\put(235,75){\makebox(0,0){\(\rho\)}}
-\put(251.3,154){\vector(1,3){18}}
-\put(282,206){\makebox(0,0){\(x_2\)}}
-\bezier{20}(190.5,28.5)(200,31.7)(209.5,28.5)
-\put(200,20){\makebox(0,0){\(\alpha\)}}
-\put(154,150){\line(1,0){92}}
-\put(200,150){\circle*{4}}
-\put(200,150){\vector(0,1){60}}
-\put(210,200){\makebox(0,0){\(x\)}}
-\put(150,154){\line(0,1){44}}
-\put(150,146){\line(0,-1){46}}
-\put(151,154){\line(1,4){11}}
-\put(250,154){\line(0,1){44}}
-\put(250,146){\line(0,-1){46}}
-\put(249,154){\line(-1,4){11}}
-% magnet outline
-\thicklines
-\put(200,102){\vector(-1,0){50}}
-\put(200,102){\vector(1,0){50}}
-\put(200,110){\makebox(0,0){L}}
-\color{blue}
-\put(151,154){\line(1,4){6}}
-\put(149,146){\line(-1,-4){6}}
-\put(249,154){\line(-1,4){6}}
-\put(251,146){\line(1,-4){6}}
-\put(157,178){\line(1,0){86}}
-\put(143,122){\line(1,0){114}}
-\color{black}
-\bezier{10}(150,195)(155.5,195)(160.9,193.7)
-\put(155.5,195){\vector(3,-1){5.4}}
-\put(150,205){\makebox(0,0)[l]{\(e_1\)}}
-\bezier{10}(250,195)(244.5,195)(239.1,193.7)
-\put(244.5,195){\vector(-3,-1){5.4}}
-\put(250,205){\makebox(0,0)[r]{\(e_2\)}}
-\end{picture}
+\includegraphics{figures/f-rbnd.pdf}
 \caption[Reference System for a Rectangular Bending Magnet]%
 {Reference System for a Rectangular Bending Magnet;
 the signs of pole-face rotations are positive as shown.}
@@ -637,53 +403,7 @@ the signs of pole-face rotations are positive as shown.}
 \begin{figure}[htb]
 \centering
 \setlength{\unitlength}{1pt}
-\begin{picture}(400,215)
-% axes
-\thinlines
-\put(150,150){\circle{8}}\put(150,150){\circle*{2}}
-\put(160,140){\makebox(0,0){\(y_1\)}}
-\put(250,150){\circle{8}}\put(250,150){\circle*{2}}
-\put(240,140){\makebox(0,0){\(y_2\)}}
-\put(74,124.7){\vector(3,1){72}}
-\put(84,135){\makebox(0,0){\(s_1\)}}
-\put(254,148.7){\vector(3,-1){72}}
-\put(316,135){\makebox(0,0){\(s_2\)}}
-\put(200,0){\vector(-1,3){48.7}}
-\put(165,75){\makebox(0,0){\(\rho\)}}
-\put(148.7,154){\vector(-1,3){18}}
-\put(118,206){\makebox(0,0){\(x_1\)}}
-\put(200,0){\vector(1,3){48.7}}
-\put(235,75){\makebox(0,0){\(\rho\)}}
-\put(251.3,154){\vector(1,3){18}}
-\put(282,206){\makebox(0,0){\(x_2\)}}
-\bezier{20}(190.5,28.5)(200,31.7)(209.5,28.5)
-\put(200,20){\makebox(0,0){\(\alpha\)}}
-\put(200,158.8){\circle*{4}}
-\put(200,158.8){\vector(0,1){50}}
-\put(210,200){\makebox(0,0){\(r\)}}
-\put(151,154){\line(1,4){10}}
-\put(249,154){\line(-1,4){10}}
-% magnet outline
-\thicklines
-\bezier{100}(154,151.3)(200,166.7)(246,151.3)
-\put(162,154){\vector(-3,-1){8}}
-\put(238,154){\vector(3,-1){8}}
-\put(210,168){\makebox(0,0){L}}
-\color{blue}
-\put(151,154){\line(1,4){6}}
-\put(149,146){\line(-1,-4){6}}
-\put(249,154){\line(-1,4){6}}
-\put(251,146){\line(1,-4){6}}
-\bezier{90}(157,178)(200,188.4)(243,178)
-\bezier{110}(143,122)(200,148.6)(257,122)
-\color{black}
-\bezier{20}(137.4,187.9)(149.1,191.5)(159.7,188.8)
-\put(153.7,190.8){\vector(3,-1){6}}
-\put(150,180){\makebox(0,0){\(e_1\)}}
-\bezier{20}(262.6,187.9)(250.9,191.5)(240.3,188.8)
-\put(246.3,190.8){\vector(-3,-1){6}}
-\put(250,180){\makebox(0,0){\(e_2\)}}
-\end{picture}
+\includegraphics{figures/f-sbnd.pdf}
 \caption[Reference System for a Sector Bending Magnet]%
 {Reference System for a Sector Bending Magnet;
 the signs of pole-face rotations are positive as shown.}
