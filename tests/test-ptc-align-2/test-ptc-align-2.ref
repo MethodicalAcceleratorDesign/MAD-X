@@ -194,6 +194,7 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
+++++++ warning: time=false => coord. system: {-pathlength, delta_p}  the table headers mean:  PT -> delta_p, T -> pathlength
  Track            1  is lost at            9  turn            1  flag            1
  Track            2  is lost at            9  turn            1  flag            1
  Track            3  is lost at            9  turn            1  flag            1
@@ -2613,7 +2614,8 @@ ptc_end;
 
 
 
-  Number of warnings: 0
+  Number of warnings: 1
+0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
