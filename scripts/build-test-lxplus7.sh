@@ -43,14 +43,14 @@ echo "PWD   : `echo $PWD`"
 echo -e "\n===== Git clone/update/clean ====="
 if [ "$1" = "clone" ] ; then
   shift # git clone
-  rm -rf madx-nightly7 && \
-  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly7
+  rm -rf madx-nightly && \
+  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly
   check_error "git clone failed"
-  [ -d madx-nightly7 ] && cd madx-nightly7 && echo "moving down to cloned madx-nightly7"
+  [ -d madx-nightly7 ] && cd madx-nightly && echo "moving down to cloned madx-nightly"
 
 elif [ "$1" = "update" ] ; then
   shift # faster "clone" + git cleanup
-  [ -d madx-nightly7 ] && cd madx-nightly7 && echo "moving down to updated madx-nightly7"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to updated madx-nightly"
   git fetch && \
   git fetch --tags && \
   git reset --hard origin/master
@@ -60,7 +60,7 @@ elif [ "$1" = "update" ] ; then
 
 elif [ "$1" = "clean" ] ; then
   shift # git cleanup
-  [ -d madx-nightly7 ] && cd madx-nightly7 && echo "moving down to cleaned madx-nightly7"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to cleaned madx-nightly"
   git clean -fqx
   check_error "git cleanup failed" "no-exit"
 
