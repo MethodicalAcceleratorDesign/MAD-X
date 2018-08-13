@@ -220,10 +220,10 @@ build_test_send ()
 clean_tmp
 
 # check if local report is finished
-build_test_local  lxplus lxplus7
+build_test_local  lxplus
 
 # retrieve remote reports
-build_test_remote        macosx linux win
+build_test_remote        macosx linux win lxplus7
 
 # check if all reports are finished
 build_test_check  lxplus macosx linux win lxplus7
