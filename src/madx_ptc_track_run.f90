@@ -1119,7 +1119,7 @@ CONTAINS
       
       totpath_maxwavelen = n*maxwavelen 
       
-      if (getdebug()>2) then
+      if (getdebug()>1) then
         print*," Final result: nominator product = ",n, " denominators product = ", d
         print*," totpath_maxwavelen = ", totpath_maxwavelen
       endif
@@ -1129,9 +1129,9 @@ CONTAINS
       do i=1,nwavelens
         
         wavelen = wavelens(i)
-        j = totpath_maxwavelen / wavelen 
+        j = nint(totpath_maxwavelen / wavelen)
 
-        if (getdebug()>2) then
+        if (getdebug()>1) then
           print*,'Check rf ',i," (int)ratio = ", j, " (float)ratio = ", totpath_maxwavelen / wavelen
         endif
 
@@ -1149,7 +1149,7 @@ CONTAINS
       !do i=1,nwavelens
       !  
       !  wavelen = wavelens(i)
-      !  j = maxwavelen / wavelen 
+      !  j = nint(maxwavelen / wavelen)
       !  
       !  if (getdebug()>1) then
       !    print*," WLmax[ ", i, "]/WL ", maxwavelen / wavelen 
@@ -1188,7 +1188,7 @@ CONTAINS
         d = ni
         n = di
       endif
-      if (getdebug() > 2) then
+      if (getdebug() > 1) then
         print*,"rationalize: f = ", f, " = ", n ," / ", d  
       endif
     

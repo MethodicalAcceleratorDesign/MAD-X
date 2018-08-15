@@ -117,7 +117,7 @@ ptc_create_universe;
   
   
   
-  ptc_setswitch, debuglevel=0, maxacceleration=false, exact_mis=true, time=true, totalpath=true, fringe=true, modulation=true;
+  ptc_setswitch, debuglevel=1, maxacceleration=false, exact_mis=true, time=true, totalpath=true, fringe=true, modulation=true;
 
   
   
