@@ -1,0 +1,173 @@
+!Example of PTC_TRACK command with 6D and totalpath true
+! It also tests totalpath subtraction and its compatibility with AC Dipoles
+!
+! Lattice is a la CERN PS Booster, very simplified to be fast.
+! It has 3 RF cavities with non-realistic odd frequencies, 
+! just to make it difficult for the tested algorithms
+!
+!Piotr Skowronski (CERN)
+!
+! examples/ptc_madx_interface/intstate/intstate.ptc.madx
+!
+option,-echo;
+option,-info;
+
+
+call, file="../share/PSBsimplecell/cell.seq";
+
+beam, PARTICLE=proton, ENERGY=4;
+betarel = beam->beta;
+
+HACD: hACdipole, L= 1.0, volt=0.0005, freq=0.615, 
+                 ramp1=100,
+                 ramp2=200,
+                 ramp3=800,
+                 ramp4=900; 
+
+VACD: vACdipole, L= 1.0, volt=0.001, freq=0.83, 
+                 ramp1= 50,
+                 ramp2=200,
+                 ramp3=800,
+                 ramp4=950;
+
+
+value, betarel;
+
+       
+ltot = 160.1029241;
+
+rf1_wavelen = ltot/2;
+rf1_freq = 1e-6 * clight / (rf1_wavelen/betarel) ;
+rf1: rfcavity, l=1, freq=rf1_freq, lag:=rf1_lag,  volt=5;
+
+rf2_wavelen = ltot/3;
+rf2_freq = 1e-6 * clight / (rf2_wavelen/betarel) ;
+rf2: rfcavity, l=1, freq=rf2_freq, lag:=rf2_lag,  volt=0.01;
+
+rf3_wavelen = 3*ltot/8;
+rf3_freq = 1e-6 * clight / (rf3_wavelen/betarel) ;
+rf3: rfcavity, l=1, freq=rf3_freq, lag:=rf3_lag,  volt=0.01;
+
+machine: line = (d05, cell, 
+                 rf1, cell, 
+                 rf2, cell, 
+                 rf3, cell, d05,
+                 d05, cell, d05,
+                 d05, cell, 
+                 HACD,cell, 
+                 VACD,cell, d05,
+                 d05, cell, d05,
+                 d05, cell, d05,
+                 d05, cell, d05,
+                 d05, cell, d05,
+                 d05, cell, d05,
+                 d05, cell, d05,
+                 d05, cell, d05,
+                 d05, cell, d05  );
+
+
+
+USE, period=machine;
+
+twiss, rmatrix;
+!plot, haxis=s, vaxis=betx, bety, colour=100;
+!plot, haxis=s, vaxis=dx, colour=100;
+!plot, haxis=s, vaxis=re56, colour=100;
+
+write, table=twiss, file="twiss.tfs";
+
+
+rf1_spos = table(twiss, rf1, s);
+rf2_spos = table(twiss, rf2, s);
+rf3_spos = table(twiss, rf3, s);
+
+value, rf1_spos, rf2_spos, rf2_spos - rf1_spos;
+
+rf1_nrf_wavelen = rf1_spos / rf1_wavelen;
+rf2_nrf_wavelen = rf2_spos / rf2_wavelen;
+rf3_nrf_wavelen = rf3_spos / rf3_wavelen;
+
+rf1_lag = rf1_nrf_wavelen*twopi + 0.5;
+rf2_lag = rf2_nrf_wavelen*twopi + 0.5;
+rf3_lag = rf3_nrf_wavelen*twopi + 0.5;
+
+
+
+
+
+ptc_create_universe;
+  ptc_create_layout, model=1, method=2, nst=15, exact=false, closed_layout=true;
+
+
+  ptc_setswitch, debuglevel=0, maxacceleration=false, exact_mis=true, time=true, totalpath=true, fringe=true, modulation=false;
+  
+  ptc_twiss, table=twiss, icase=6, no=3, closed_orbit, t=0;
+  write, table=twiss, file="twiss.ptc.tfs";
+
+!  plot, haxis=s, vaxis=beta11, beta22, colour=100;
+!  plot, haxis=s, vaxis=disp1, colour=100;
+!  plot, haxis=s, vaxis=x, colour=100;
+  
+  x_co  = table(twiss, machine$start, x);
+  y_co  = table(twiss, machine$start, y);
+  t_co  = table(twiss, machine$start, t);
+  px_co = table(twiss, machine$start, px);
+  py_co = table(twiss, machine$start, py);
+  pt_co = table(twiss, machine$start, pt);
+  
+  
+  
+  ptc_setswitch, debuglevel=0, maxacceleration=false, exact_mis=true, time=true, totalpath=true, fringe=true, modulation=true;
+
+  
+  
+  ptc_START, x  = x_co ,
+             y  = y_co ,
+             t  = t_co,
+             px = px_co,
+             py = py_co,
+             pt = pt_co;
+
+  ptc_START, x  = x_co ,
+             y  = y_co ,
+             t  = t_co + 2e-2,
+             px = px_co,
+             py = py_co,
+             pt = pt_co;
+
+
+  ptc_track, icase=6, element_by_element,  dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6}, turns=1000, ffile=1;
+
+  ptc_track_end;
+
+ptc_end;
+
+
+
+
+value,  x_co ,
+        y_co ,
+        t_co ,
+        px_co,
+        py_co,
+        pt_co;
+
+
+value, betarel;
+
+
+stop;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  SSSSS  TTTTT   OOO   PPP
+!  S        T    O   O  P  P
+!  SSSSS    T    O   O  PPP
+!      S    T    O   O  P
+!  SSSSS    T     OOO   P
+!
+
+! gnuplot commands to plot track data
+!
+! betarel = 0.9720997088 # 4GeV
+! circum = 160.1029241
+! plot  "track.obs0001.p0001" using ($7-$2*circum/betarel):8, \
+!       "track.obs0001.p0002" using ($7-$2*circum/betarel):8 

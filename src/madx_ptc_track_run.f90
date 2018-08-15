@@ -394,6 +394,7 @@ CONTAINS
     totpath_turncount = 0
     dototpathsubtraction = .false.
     if ( (nvariables .gt. 5) .and. (MYSTATE%TOTALPATH .gt. 0) ) then       !   !
+      ! must be after ptc_track_ini_modulation, clocks must be already initialized
       call calculate_nrfwavelen()
     endif
     
@@ -954,21 +955,33 @@ CONTAINS
     END SUBROUTINE  rplotstartcoord
 
     !=============================================================================
+    ! must be called after ptc_track_ini_modulation, clocks must be already initialized
 
     SUBROUTINE calculate_nrfwavelen()
       USE madx_keywords, only: kind4, kind21
       implicit none
       integer, parameter :: maxnwavelens = 100
       real(dp) :: wavelens(maxnwavelens)
+      real(dp) :: nominators(maxnwavelens)
+      real(dp) :: denominators(maxnwavelens)
       real(dp) ::  wavelen, maxwavelen
       integer i,j, nwavelens
       type(fibre), pointer:: p
       logical :: found
+      integer(kind=8) :: d,n
+      real(dp) ::  f
+      real(dp) ::  MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
+      
+      Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)        !
+      
       
       nwavelens = 0
 
       p=>my_ring%start
       
+      ! Search form all frequencies
+      
+      ! 1. RF cavities (including RF multipoles) and TW cavities
       DO j=1, my_ring%n
          
          !print*, "Element ", p%mag%name, " kind ", p%mag%kind
@@ -984,9 +997,9 @@ CONTAINS
             cycle
          endif
          
-         print*, "Getting wavelength"
-         wavelen = clight/p%mag%freq
-         print*, "Getting wavelength = ",wavelen
+         !print*, "Getting wavelength"
+         wavelen = (clight/p%mag%freq)
+         !print*, "Getting wavelength = ",wavelen
          
          found = .false.
          
@@ -1000,18 +1013,62 @@ CONTAINS
          if (.not. found) then
            nwavelens = nwavelens + 1
            wavelens(nwavelens) = wavelen
+
+           if (getdebug()>1) then
+              !print*," RF Cav  no. ", nwavelens, " wavelength ", wavelen
+              print*,"calculate_nrfwavelen:  Added wavelen no ", nwavelens," f=", wavelens(nwavelens)
+           endif
            
-           print*, nwavelens, " Added wavelen no ", wavelens(nwavelens)
          endif
-         
          
          p=>p%next
          
       enddo
+
+      !__________________________________________
+      ! 2. AC dipoles 
+      ! AC dipoles are ignored, the way they work is completely independent of X6 variable
+      ! Clock arms are moved only by travelled S (nominal length of elements)
+      ! it was verified on a relistic use case that big X6 (disabled totpath subtraction) 
+      ! makes bigger error than ignoring clock frequencies 
+      ! I leave the code commented out if it changes in the future 
+      !    if (.false. ) then
+      !      do j=1,nclocks
+      ! 
+      !        wavelen = twopi / savedProbe%ac(j)%om
+      ! 
+      !        if (getdebug()>1) then
+      !           print*," Clock  no. ", j, " wavelength ", wavelen
+      !        endif
+      ! 
+      !         found = .false.
+      ! 
+      !         do i=1,nwavelens
+      !           if ( abs(wavelens(i) - wavelen) < 1e-12) then
+      !	 found = .true.
+      !	 exit ! this loop 
+      !           endif
+      !         enddo
+      ! 
+      !         if (.not. found) then
+      !           nwavelens = nwavelens + 1
+      !           wavelens(nwavelens) = wavelen
+      ! 
+      !           print*, nwavelens, " Added wavelen no ", wavelens(nwavelens)
+      !         endif
+      ! 
+      !      enddo
+      !    endif
+      
+      !__________________________________________
       
       if (nwavelens < 1) then
+        ! No cavities, it means we run icase=56
+        ! Let's use the circumference
+        totpath_maxwavelen = circumference
+        dototpathsubtraction = .true.
         if (getdebug()>1) then
-           print*,"No RF if modulation was found: dototpathsubtraction = ", dototpathsubtraction
+           print*,"calculate_nrfwavelen:  No RF cavity was found: using circumference "
         endif
         return
       endif
@@ -1019,24 +1076,93 @@ CONTAINS
       ! find the biggest wave length
       maxwavelen = 0
       do i=1,nwavelens
-        if (wavelens(nwavelens) > maxwavelen) then
-          maxwavelen = wavelens(nwavelens)
+        if (wavelens(i) > maxwavelen) then
+          maxwavelen = wavelens(i)
         endif
       enddo
       
-      dototpathsubtraction  = .true.
+      if (getdebug()>1) then
+        print*,"calculate_nrfwavelen: max wavelength = ", maxwavelen
+      endif
       
+      dototpathsubtraction  = .true.
+            
+      do i=1,nwavelens
+
+        wavelen = wavelens(i)
+        f = wavelen / (maxwavelen)
+        call rationalize(f,n,d)
+        nominators(i) = n
+        denominators(i) = d
+
+      enddo
+
+      ! find common denominator
+      d = 1.0
+      n = 1.0
+      do i=1,nwavelens
+      
+        d = d*denominators(i)
+        n = n*  nominators(i)
+        
+        if (abs(n) > 1e5) then
+
+           call fort_warn('ptc_track: ','Can not enable TOTALPATH subtraction schema')
+           print*, 'ptc_track: Common denominator of the present wavelengths corresponds to more than 100000 max wavelengths'
+           
+           dototpathsubtraction = .false.
+           return
+
+        endif
+      
+      enddo
+      
+      totpath_maxwavelen = n*maxwavelen 
+      
+      if (getdebug()>2) then
+        print*," Final result: nominator product = ",n, " denominators product = ", d
+        print*," totpath_maxwavelen = ", totpath_maxwavelen
+      endif
+      
+       
+      ! A check
       do i=1,nwavelens
         
-        wavelen = wavelens(nwavelens)
-        j = wavelen / maxwavelen
-        
-        if ( abs( maxwavelen -  (j*wavelen) ) > 1e-12 ) then
+        wavelen = wavelens(i)
+        j = totpath_maxwavelen / wavelen 
+
+        if (getdebug()>2) then
+          print*,'Check rf ',i," (int)ratio = ", j, " (float)ratio = ", totpath_maxwavelen / wavelen
+        endif
+
+        if ( abs( totpath_maxwavelen -  (j*wavelen) ) > 1e-8 ) then
+           call fort_warn('ptc_track: ','Can not enable TOTALPATH subtraction schema')
+           print*,'Problem: please report to mad.support'
+           print*,'abs( totpath_maxwavelen -  (j*wavelen) ) = ', abs( totpath_maxwavelen -  (j*wavelen) )
            dototpathsubtraction  = .false.
         endif
       enddo
       
-      totpath_maxwavelen = maxwavelen 
+      
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+      ! 
+      !do i=1,nwavelens
+      !  
+      !  wavelen = wavelens(i)
+      !  j = maxwavelen / wavelen 
+      !  
+      !  if (getdebug()>1) then
+      !    print*," WLmax[ ", i, "]/WL ", maxwavelen / wavelen 
+      !  endif
+      !
+      !  if ( abs( maxwavelen -  (j*wavelen) ) > 1e-8 ) then
+      !  
+      !     call fort_warn('ptc_track: ','Can not enable TOTALPATH subtraction schema')
+      !     print*,'Can not find common multiple of all the wavelengths, disabling TOTALPATH subtraction schema'
+      !     dototpathsubtraction  = .false.
+      !  endif
+      !enddo
+      !totpath_maxwavelen = maxwavelen 
       
       if (getdebug()>1) then
         print*,"dototpathsubtraction = ", dototpathsubtraction
@@ -1044,6 +1170,88 @@ CONTAINS
       endif
       
     END SUBROUTINE calculate_nrfwavelen
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    SUBROUTINE rationalize(f,n,d)
+      implicit none
+      real(dp), intent (IN)           :: f
+      integer(kind=8), intent (OUT) :: n,d
+      integer(kind=8)               :: ni,di
+      
+      call rationalize1(f,n,d)
+      !often some numbers give huge d and n numbers while invers gives small numbers
+      ! best example 0.1
+      call rationalize1(1./f,ni,di)
+      
+      if ( (di < d) .and. (ni < n) ) then
+        d = ni
+        n = di
+      endif
+      if (getdebug() > 2) then
+        print*,"rationalize: f = ", f, " = ", n ," / ", d  
+      endif
+    
+    END SUBROUTINE rationalize
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    
+    SUBROUTINE rationalize1(f,n,d)
+    !Returns f as d/n, where d and n are integers
+      implicit none
+      real(dp), intent (IN)           :: f
+      integer(kind=8), intent (OUT) :: n,d
+      real(dp)  float_part
+      integer(kind=8) exponent_part, expshift
+      integer i
+      
+      d = 0
+      n = 0
+      
+      float_part = fraction(f)
+      exponent_part = exponent(f)
+      
+     ! print*, "f       : ", f
+     ! print*, "fraction: ", float_part
+     ! print*, "exponent: ", exponent_part
+      
+      do i=0,300
+        !print*, " i=",i, float_part , floor(float_part,8)
+        if (float_part .eq. floor(float_part,8)) then
+          exit
+        endif
+        
+        float_part = float_part*2.0;
+        exponent_part = exponent_part - 1
+      
+      enddo
+      
+     ! print*,"After the loop "
+     ! print*,"float_part    = ", float_part
+     ! print*,"exponent_part = ", exponent_part
+      n = float_part
+      
+     ! print*,"n ini = ", n
+      
+      d = 1
+      
+      expshift = abs(exponent_part)
+      
+      if (exponent_part .gt. 0) then
+        n = LSHIFT(n,expshift)
+      else
+        d = LSHIFT(d,expshift)
+      endif
+      
+
+    !  print*, " ", n      
+    !  print*, "                ----------"      
+    !  print*, " ", d
+    !  print*, " "      
+      
+    
+    END SUBROUTINE rationalize1
+
 
     !=============================================================================
 
@@ -1071,7 +1279,6 @@ CONTAINS
          sumt = 0.0
          DO j=1, jmax_numb_particl_at_i_th_turn  
             sumt = sumt + x_coord_incl_co(6,j)
-            print*,x_coord_incl_co(6,j)
          enddo
          
          sumt = sumt/jmax_numb_particl_at_i_th_turn
@@ -3596,8 +3803,7 @@ CONTAINS
     real(dp) ::  MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
     Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)        !
 
-     
-    
+    ! n_rf is a variable of PTC that must be set accordingly
     n_rf = nclocks
     
     do i=1,nclocks

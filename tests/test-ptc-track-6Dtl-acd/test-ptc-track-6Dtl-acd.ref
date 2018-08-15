@@ -1,0 +1,149 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.04.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2018.07.10               +
+  + Execution date: 2018.08.15 14:18:57      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+!Example of PTC_TRACK command with 6D and totalpath true
+
+! It also tests totalpath subtraction and its compatibility with AC Dipoles
+
+!
+
+! Lattice is a la CERN PS Booster, very simplified to be fast.
+
+! It has 3 RF cavities with non-realistic odd frequencies, 
+
+! just to make it difficult for the tested algorithms
+
+!
+
+!Piotr Skowronski (CERN)
+
+!
+
+! examples/ptc_madx_interface/intstate/intstate.ptc.madx
+
+!
+
+option,-echo;
+
+betarel            =       0.9720997088 ;
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       160.1029241                 -0      0.08232069558        3.485342678 
+
+                q1                dq1            betxmax              dxmax 
+       3.600856589       -3.350234778        9.087520369        2.359954278 
+
+             dxrms             xcomax             xcorms                 q2 
+       2.135070862                  0                  0        5.739685153 
+
+               dq2            betymax              dymax              dyrms 
+      -11.31959364        23.04886746                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+rf1_spos           =        10.50643276 ;
+rf2_spos           =        20.51286551 ;
+rf2_spos-rf1_spos  =        10.00643276 ;
+Determined SECTOR NMUL MAX :  2
+ MAD-X Beam Parameters
+                  Energy : 0.400000E+01
+          Kinetic Energy : 0.306173E+01
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.388840E+01
+ Setting MADx with 
+     energy           4.0000000000000000     
+     method                   2
+     Num. of steps           15
+     charge           1.0000000000000000     
+  Length of machine:    160.10292410137447     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -1.1060596882828122E-014   0.0000000000000000        6.7723604502134549E-015
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       160.1029241      0.08108628463           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000      0.02606412847        3.511771898       0.6264471292 
+
+                q2                dq1                dq2                 qs 
+      0.8178647592                  0                  0      0.00331601849 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+       4.795874594         8.65225191         2.12769675        18.67437144 
+
+         beta11min          beta11max          beta12min          beta12max 
+       4.795874594         8.65225191     5.85228859e-32    1.503629894e-30 
+
+         beta13min          beta13max          beta21min          beta21max 
+     0.01598501709      0.02617710236    2.680527121e-33    1.066047022e-30 
+
+         beta22min          beta22max          beta23min          beta23max 
+        2.12769675        18.67437144     5.00462727e-32     7.36988402e-28 
+
+         beta31min          beta31max          beta32min          beta32max 
+      0.5647686671       0.7168179366    3.828775456e-31    2.016427066e-30 
+
+         beta33min          beta33max           disp1min           disp1max 
+       211.9250655        211.9696919       -2.289706197       -1.789238286 
+
+          disp2min           disp2max           disp3min           disp3max 
+     -0.5921219254        0.592113091   -1.251750585e-14    1.440132716e-14 
+
+          disp4min           disp4max             deltap            orbit_x 
+  -5.373130268e-15     5.30444704e-15                  0    5.205943962e-06 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+   6.465200835e-07                  0                  0    5.501535769e-07 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+      -4.706852589    5.493537216e-06                  0    1.242668928e-06 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0        100.9279987    1.180236134e-06    7.259296354e-06 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    2.854407446e-06                  0        169.4049002 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+   5.501535769e-07   -9.867480027e-06                  0   -2.930060887e-06 
+
+           pycomin             tcomin            ptcomin 
+                 0        4.706852589   -3.926025439e-06 
+ ********************************************************************
+ MAXAPER check of T variable not to be done because TOTALPATH is used
+ ********************************************************************
+x_co               =    5.205943962e-06 ;
+y_co               =                  0 ;
+t_co               =       -4.706852589 ;
+px_co              =    6.465200835e-07 ;
+py_co              =                  0 ;
+pt_co              =    5.501535769e-07 ;
+betarel            =       0.9720997088 ;
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
