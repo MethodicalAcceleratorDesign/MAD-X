@@ -75,6 +75,7 @@ readonly winsrc="mad@macserv15865w10.cern.ch:"
 readonly linuxsrc="mad@macserv15865lx.cern.ch:"
 readonly macosxsrc="mad@macserv15865.cern.ch:"
 readonly lxplussrc="mad@lxplus.cern.ch:madx/"
+readonly lxplus7src="mad@lxplus7.cern.ch:madx_lxplus7/"
 
 # clean tempory files
 clean_tmp ()
@@ -222,19 +223,19 @@ clean_tmp
 build_test_local  lxplus
 
 # retrieve remote reports
-build_test_remote        macosx linux win
+build_test_remote        macosx linux win lxplus7
 
 # check if all reports are finished
-build_test_check  lxplus macosx linux win
+build_test_check  lxplus macosx linux win lxplus7
 
 # retrieve local and remote binaries
-build_test_binary        macosx linux win
+build_test_binary        macosx linux win lxplus7
 
 # build the final report
-build_test_report lxplus macosx linux win
+build_test_report lxplus macosx linux win lxplus7
 
 # send the final report
-build_test_send   lxplus macosx linux win
+build_test_send   lxplus macosx linux win lxplus7
 
 # report errors by email if any
 if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
