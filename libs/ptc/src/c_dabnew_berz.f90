@@ -1023,7 +1023,11 @@ contains
     do i=l,1,-1
        if(idal(i).le.nomax+2.or.idal(i).gt.nda_dab) then
           write(line,'(a38,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL(I),NDA = ',idal(i),nda_dab
-          ipause=mypauses(13,line)
+          !ipause=mypauses(13,line)
+          C_%STABLE_DA = .false.
+          l = 1
+          return
+          
           call dadeb !(31,'ERR DADAL ',1)
        endif
        if(idal(i).eq.nda_dab) then

@@ -970,7 +970,10 @@ contains
     do i=l,1,-1
        if(idal(i).le.c_nomax+2.or.idal(i).gt.c_nda_dab) then
           write(line,'(a38,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL(I),NDA = ',idal(i),c_nda_dab
-          ipause=mypauses(13,line)
+          !ipause=mypauses(13,line)
+          C_%STABLE_DA = .false.
+          l = 1
+          return
           call dadeb !(31,'ERR DADAL ',1)
        endif
        if(idal(i).eq.c_nda_dab) then
@@ -1008,7 +1011,7 @@ contains
     !       return
     !    endif
     if(idal.le.c_nomax+2.or.idal.gt.c_nda_dab) then
-       write(6,'(a35,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL,NDA = ',idal,c_nda_dab
+       write(6,'(a35,i8,1x,i8)') 'ERROR IN ROUTINE DADAL1, IDAL,NDA = ',idal,c_nda_dab
        call dadeb !(31,'ERR DADAL ',1)
     endif
     if(idal.eq.c_nda_dab) then
