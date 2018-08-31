@@ -2189,9 +2189,10 @@ element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no
         if (angle_param->expr) multipole_angle_param->expr = clone_expression(angle_param->expr);
         multipole_angle_param->double_value = angle_param->double_value;
       }
-      if(fabs(k0val) < eps){ //This is in case k0 is defined but 0
-      kn_pars[0]=k0_from_angle(angle_param); // k0 generated from angle
-      mult_with_length = false; // angle is already  k0 * length
+      if(fabs(k0val) < eps)
+      { //This is in case k0 is defined but 0
+        kn_pars[0]=k0_from_angle(angle_param); // k0 generated from angle
+        mult_with_length = false; // angle is already  k0 * length
       }
     }
     else // k0 not defined, angle given, generate k0
