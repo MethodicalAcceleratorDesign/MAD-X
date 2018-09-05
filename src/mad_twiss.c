@@ -762,11 +762,19 @@ pro_twiss(void)
     }
   }
 
-  if(par_present("centre", current_twiss)) set_option("centre", &k);
+  if(par_present("centre", current_twiss)) {
+    set_option("centre", &k);
+    // Special check that it really is set to TRUE (not only included in the argument)
+    if(command_par_value("centre", current_twiss)>0){
+      current_sequ->tw_centre=1;
+    }
+  }
   else {
     k = 0;
+    current_sequ->tw_centre=0;
     set_option("centre", &k);
     k = 1;
+
   }
 
   name = command_par_string_user("keeporbit", current_twiss);
@@ -1023,6 +1031,7 @@ embedded_twiss(void)
   {
     /* beta0 specified */
     embedded_twiss_beta[0] = buffer(cp->m_string->p[0]);
+
 
     /* START defining a TWISS input command for the sequence */
     tnl = local_twiss[0]->cmd_def->par_names;
