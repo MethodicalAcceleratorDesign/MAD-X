@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.04.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:56:54      +
+  + Release   date: 2018.07.10               +
+  + Execution date: 2018.09.17 16:32:20      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=2;
 
@@ -39,13 +39,10 @@ twiss,X=-0.0,Y=0.000, BETX=1, BETY=1, file="translation.twiss";
 
 enter Twiss module
  Found 2 initial orbit vector values from twiss command. 
- output   1.0000000000000000E-002
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:  -0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
- output   1.0000000000000000E-002
 final orbit vector:     1.099455E-02  9.895001E-04  3.001050E-03  1.002500E-03  9.900398E-05  2.000000E-04
- output   1.0000000000000000E-002
 
 ++++++ table: summ
 
