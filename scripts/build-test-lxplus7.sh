@@ -96,7 +96,7 @@ echo -e "\n===== Gnu build ====="
 #make all-linux32-gnu
 #check_error "make all-linux32-gnu failed" "no-exit"
 
-source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/x86_64-slc6/setup.sh
+source source /afs/cern.ch/sw/lcg/contrib/gcc/6.3.0/x86_64-centos7/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
