@@ -147,6 +147,18 @@ build_test_binary ()
     #scp -q -p "${src}madx-nightly/numdiff-${arch}32-*" .
   done
 }
+copy_build_binary_lxplus()
+{
+
+cp "../madx-nightly/madx-linux64-gnu" "madx-lxplus64-gnu"
+cp "../madx-nightly/numdiff-linux64-gnu" "numdiff-lxplus64-gnu"
+# A way to not use ssh-key that works poorly to connect to lxplus and avoid the relative part.. 
+cp "/afs/cern.ch/user/m/mad/madx_lxplus7/madx-nightly/madx-linux64-gnu" "madx-lxplus7-64-gnu"
+cp "/afs/cern.ch/user/m/mad/madx_lxplus7/madx-nightly/madx-linux64-intel" "madx-lxplus7-64-intel"
+cp "/afs/cern.ch/user/m/mad/madx_lxplus7/madx-nightly/numdiff-linux64-intel" "numdiff-lxplus7-64-intel"
+
+}
+
 
 # look for failed tests [lxplus | macosx | linux | win]
 build_test_report ()
@@ -231,8 +243,10 @@ build_test_check  lxplus macosx linux win lxplus7
 # retrieve local and remote binaries
 build_test_binary        macosx linux win lxplus7
 
+copy_build_binary_lxplus
+
 # build the final report
-build_test_report lxplus macosx linux win lxplus7
+build_test_report lxplus macosx linux win
 
 # send the final report
 build_test_send   lxplus macosx linux win lxplus7
