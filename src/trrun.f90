@@ -2841,8 +2841,8 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
         !*** case of racetrack: test outer rectangle (ap1,ap2) first
         !    then test ellipse for corner part.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. &
-             ( x .gt. ap1-ap3 .and. y .gt. ap2-ap3 .and. &
-               ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap3)) / ap4)**2 .gt. one )
+             ( x .gt. ap1-ap3 .and. y .gt. ap2-ap4 .and. &
+               ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap4)) / ap4)**2 .gt. one )
 
      case ("octagon")
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape
