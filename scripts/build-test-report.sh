@@ -241,12 +241,12 @@ build_test_remote        macosx linux win lxplus7
 build_test_check  lxplus macosx linux win lxplus7
 
 # retrieve local and remote binaries
-build_test_binary        macosx linux win lxplus7
+build_test_binary        macosx linux win
 
 copy_build_binary_lxplus
 
 # build the final report
-build_test_report lxplus macosx linux win
+build_test_report lxplus macosx linux win lxplus7
 
 # send the final report
 build_test_send   lxplus macosx linux win lxplus7
