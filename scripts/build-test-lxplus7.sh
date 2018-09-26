@@ -118,7 +118,7 @@ if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
 #  make all-linux32-intel
 #  check_error "make all-linux32-intel failed" "no-exit"
 
-  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh intel64
+  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/18-all-setup.sh intel64
   icc      --version
   ifort    --version
 
