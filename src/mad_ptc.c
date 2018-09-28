@@ -146,7 +146,7 @@ pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, 
   pos = name_list_pos(columnname,aTable->columns);
   if (pos < 0)
   {
-    error("mad_ptc.c: pro_ptc_select","Can not find column named <<%s>> in table <<%s>>.",
+    mad_error("mad_ptc.c: pro_ptc_select","Can not find column named <<%s>> in table <<%s>>.",
           columnname,aTable->name);
     return 7;
   }
@@ -772,7 +772,7 @@ pro_ptc_enforce6d(struct in_cmd* cmd)
 
   if (cmd->clone == 0x0)
   {
-    error("pro_ptc_enforce6d","Command Definintion is null!!!");
+    mad_error("pro_ptc_enforce6d","Command Definintion is null!!!");
     return;
   }
 

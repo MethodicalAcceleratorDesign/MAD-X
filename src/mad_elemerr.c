@@ -669,7 +669,7 @@ error_efcomp(struct in_cmd* cmd)
 		      /* NORMAL COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
               if(i==2) {
 		            if(rr < 1.0E-6) {
-		              error("trying to assign relative field errors with no or zero reference radius specified","");
+		              mad_error("trying to assign relative field errors with no or zero reference radius specified","");
 		            }
 		            double norfac = pow(rr,(order-j)) * (fact(j)/fact(order));
 
@@ -694,7 +694,7 @@ error_efcomp(struct in_cmd* cmd)
   		    /* SKEW COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
               if(i==3) {
                 if(rr < 1.0E-6) {
-                  error("trying to assign relative field errors with no or zero reference radius specified","");
+                  mad_error("trying to assign relative field errors with no or zero reference radius specified","");
       		      }
 		            double norfac = pow(rr,(order-j)) * (fact(j)/fact(order));
 

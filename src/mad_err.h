@@ -16,7 +16,7 @@ void  fatal_error (const char* t1, const char* t2);
 
 // used in C only
 void  warningnew  (const char* t1, const char* fmt, ...);
-void  error       (const char* t1, const char* fmt, ...);
+void  mad_error   (const char* t1, const char* fmt, ...);
 
 // used only in madx_finish
 void  mad_err_getwarn(int* cwarn, int* fwarn);

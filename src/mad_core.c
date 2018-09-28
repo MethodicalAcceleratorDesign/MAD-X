@@ -22,7 +22,7 @@ mad_init_c(void)
   // quick and dirty fix to accept jobs from filename
   in->input_files[0] = mad_argc > 1 ? fopen(mad_argv[1], "r") : stdin;
   if (!in->input_files[0]) {
-    error("invalid input filename ", " %s", mad_argv[1]);
+    mad_error("invalid input filename ", " %s", mad_argv[1]);
     in->input_files[0] = stdin;
   }
   interactive = intrac();
