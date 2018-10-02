@@ -41,8 +41,8 @@ seterrorflag(int errcode, const char* from, const char* descr)
 /*Sets error flag - Used to comunicate occurance of an error.
   Mainly between c and fortran parts*/
   errorflag = errcode;
-  error("seterrorflag","Errorcode: %d   Reported from %s:",errorflag,from);
-  error("seterrorflag","Description: %s",descr);
+  mad_error("seterrorflag","Errorcode: %d   Reported from %s:",errorflag,from);
+  mad_error("seterrorflag","Description: %s",descr);
 }
 
 int
@@ -91,7 +91,7 @@ warningnew(const char* t1, const char* fmt, ...)
 }
 
 void
-error(const char* t1, const char* fmt, ...)
+mad_error(const char* t1, const char* fmt, ...)
 {
 /*prints warning on the standard error and accepts parameters printout with std C formatting*/
 /*Piotr Skowronski CERN*/

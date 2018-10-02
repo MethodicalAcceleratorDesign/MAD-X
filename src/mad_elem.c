@@ -478,26 +478,26 @@ element_value(const struct node* node, const char* par)
   double e_val;
 
   if (node == 0) {
-     error("element_value","node parameter is NULL.");
+     mad_error("element_value","node parameter is NULL.");
      return 0.0;
    }
 
   const struct element* el = node->p_elem;
 
    if (el == 0) {
-     error("element_value","node has NULL element pointer.");
+     mad_error("element_value","node has NULL element pointer.");
      return 0.0;
    }
 
    if (strcmp(el->name,"in_cmd") == 0) {
-     error("element_value","node '%.47s' refers to invalid element (improper (re)definition?).", node->name);
+     mad_error("element_value","node '%.47s' refers to invalid element (improper (re)definition?).", node->name);
      return 0.0;
    }
 
    const struct command* def = el->def;
 
    if (def == 0) {
-     error("element_value","element has NULL defintion pointer.");
+     mad_error("element_value","element has NULL defintion pointer.");
      return 0.0;
    }
 

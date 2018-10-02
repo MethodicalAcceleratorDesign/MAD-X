@@ -163,7 +163,7 @@ findsetknob(char* ename, int exactnamematch, char* initialpar)
         }
         else
         {
-          error("findsetknob","A knob for such named element(s) found, but name matching flag does not agree.");
+          mad_error("findsetknob","A knob for such named element(s) found, but name matching flag does not agree.");
           return -i;
         }
       }
@@ -177,7 +177,7 @@ findsetknob(char* ename, int exactnamematch, char* initialpar)
       bconta = strstr(madx_mpk_knobs[i].elname, ename);
       if ( (acontb && (exactnamematch == 0)) || (bconta && (madx_mpk_knobs[i].exactnamematch  == 0)) )
       {
-        error("findsetknob",
+        mad_error("findsetknob",
               "This variable (name %s, exactmatch %d) can cause ambiguity with another already defined variable (name %s, exactmatch %d)",
               ename, exactnamematch, madx_mpk_knobs[i].elname, madx_mpk_knobs[i].exactnamematch);
         return -i;
@@ -194,7 +194,7 @@ findsetknob(char* ename, int exactnamematch, char* initialpar)
         if (( strcmp(initialpar,madx_mpk_knobs[i].initial) == 0 ))
         {
 
-          error("findsetknob","Such initial parameter is already defined");
+          mad_error("findsetknob","Such initial parameter is already defined");
           return -i;
         }
       }
@@ -456,7 +456,7 @@ madx_mpk_scalelimits(int nv)
 
   if ( (nv < 0) || (nv >= MAX_KNOBS) )
   {
-    error("madx_mpk_scalelimits","Passed variable out of range");
+    mad_error("madx_mpk_scalelimits","Passed variable out of range");
     return 1;
   }
 
@@ -503,7 +503,7 @@ madx_mpk_scalelimits(int nv)
  *    }
  *   if (el == 0x0)
  *    {
- *      error("madx_mpk_scalelimits","Can not find element named %s in the current sequence",madx_mpk_knobs[v->knobidx].elname);
+ *      mad_error("madx_mpk_scalelimits","Can not find element named %s in the current sequence",madx_mpk_knobs[v->knobidx].elname);
  *      return 1;
  *    }
  *
@@ -1026,7 +1026,7 @@ madx_mpk_run(struct in_cmd* cmd)
 
     if (geterrorflag())
     {
-      error("Matching With Knobs","PTC calculation ended with an error. Check your setting and matching limits.");
+      mad_error("Matching With Knobs","PTC calculation ended with an error. Check your setting and matching limits.");
       pro_input_(ptcend);
       goto cleaning;
     }
@@ -1333,14 +1333,14 @@ madx_mpk_addvariable(struct in_cmd* cmd)
   initialpar = command_par_string("initial",cmd->clone);
   if (( ename == 0x0 ) && ( initialpar == 0x0 ))
   {
-    error("matchknobs.c: madx_mpk_addvariable",
+    mad_error("matchknobs.c: madx_mpk_addvariable",
           "Neither element nor initial parameter specified. Command ignored!");
     return;
   }
 
   if ( ename && initialpar)
   {
-    error("matchknobs.c: madx_mpk_addvariable",
+    mad_error("matchknobs.c: madx_mpk_addvariable",
           "Single command may define only one of two, field component or initial parameter. Command ignored!");
     return;
   }
@@ -1350,7 +1350,7 @@ madx_mpk_addvariable(struct in_cmd* cmd)
 
   if ( ename && (kn >= 0) && (ks >=0) )
   {
-    error("matchknobs.c: madx_mpk_addvariable",
+    mad_error("matchknobs.c: madx_mpk_addvariable",
           "Single command may define only one field component, not ks and kn together. Command ignored.");
     return;
   }
@@ -1361,7 +1361,7 @@ madx_mpk_addvariable(struct in_cmd* cmd)
 
   if (knobidx < 0)
   {
-    error("madx_mpk_addvariable","Error occured while adding this variable.");
+    mad_error("madx_mpk_addvariable","Error occured while adding this variable.");
     return;
   }
 
