@@ -1,7 +1,7 @@
 %!PS-Adobe-2.0
 %%Title: madx.ps
 %%Creator: gx11 version  1.50
-%%CreationDate: 18/02/21 10:02
+%%CreationDate: 18/10/02 09:05
 %%Orientation: Landscape
 %%BoundingBox:  17  30 573 790
 %%Pages: (atend)
@@ -215,11 +215,11 @@ black  384  825 t    90 r
 (leir)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -989,19 +989,16 @@ col-1 s
 black n   131  1392 m   211  1392 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1405 m   211  1434 l
+black n   211  1405 m   211  1409 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1420 m   211  1429 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1434 m   261  1434 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1434 m   211  1451 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1451 m   261  1451 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1451 m   211  1464 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1464 m   151  1464 l
@@ -1015,9 +1012,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1464 m   151  1464 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1464 m   211  1467 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1467 m   151  1467 l
 col-1 s                                 
@@ -1030,9 +1024,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1467 m   151  1467 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1467 m   211  1523 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1523 m   151  1523 l
 col-1 s                                 
@@ -1044,9 +1035,6 @@ black n   271  1523 m   271  1523 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1523 m   151  1523 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1523 m   211  1526 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1526 m   151  1526 l
@@ -1061,19 +1049,19 @@ col-1 s
 black n   271  1526 m   151  1526 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1526 m   211  1539 l
+black n   211  1539 m   211  1539 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1539 m   261  1539 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1539 m   211  1556 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1556 m   261  1556 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1556 m   211  1585 l
+black n   211  1561 m   211  1570 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1581 m   211  1585 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   211  1585 m   211  1598 l
@@ -2313,11 +2301,11 @@ black  384  825 t    90 r
 (sample plot)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -3087,19 +3075,16 @@ col-1 s
 black n   131  1392 m   211  1392 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1405 m   211  1434 l
+black n   211  1405 m   211  1409 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1420 m   211  1429 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1434 m   261  1434 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1434 m   211  1451 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1451 m   261  1451 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1451 m   211  1464 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1464 m   151  1464 l
@@ -3113,9 +3098,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1464 m   151  1464 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1464 m   211  1467 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1467 m   151  1467 l
 col-1 s                                 
@@ -3128,9 +3110,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1467 m   151  1467 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1467 m   211  1523 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1523 m   151  1523 l
 col-1 s                                 
@@ -3142,9 +3121,6 @@ black n   271  1523 m   271  1523 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1523 m   151  1523 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1523 m   211  1526 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1526 m   151  1526 l
@@ -3159,19 +3135,19 @@ col-1 s
 black n   271  1526 m   151  1526 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1526 m   211  1539 l
+black n   211  1539 m   211  1539 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1539 m   261  1539 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1539 m   211  1556 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1556 m   261  1556 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1556 m   211  1585 l
+black n   211  1561 m   211  1570 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1581 m   211  1585 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   211  1585 m   211  1598 l
@@ -4411,11 +4387,11 @@ black  384  825 t    90 r
 (two variables)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -5229,19 +5205,16 @@ col-1 s
 black n   131  1392 m   211  1392 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1405 m   211  1434 l
+black n   211  1405 m   211  1409 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1420 m   211  1429 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1434 m   261  1434 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1434 m   211  1451 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1451 m   261  1451 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1451 m   211  1464 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1464 m   151  1464 l
@@ -5255,9 +5228,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1464 m   151  1464 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1464 m   211  1467 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1467 m   151  1467 l
 col-1 s                                 
@@ -5270,9 +5240,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1467 m   151  1467 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1467 m   211  1523 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1523 m   151  1523 l
 col-1 s                                 
@@ -5284,9 +5251,6 @@ black n   271  1523 m   271  1523 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1523 m   151  1523 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1523 m   211  1526 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1526 m   151  1526 l
@@ -5301,19 +5265,19 @@ col-1 s
 black n   271  1526 m   151  1526 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1526 m   211  1539 l
+black n   211  1539 m   211  1539 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1539 m   261  1539 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1539 m   211  1556 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1556 m   261  1556 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1556 m   211  1585 l
+black n   211  1561 m   211  1570 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1581 m   211  1585 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   211  1585 m   211  1598 l
@@ -6610,11 +6574,11 @@ black  384  825 t    90 r
 (two variables with range)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 /Times-Italic    77 stwn
 black  384 2835 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 show xs 0 t 0 0 m   -90 r  -384 -2835 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -7283,19 +7247,16 @@ col-1 s
 black n   131  2296 m   211  2296 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  2343 m   211  2446 l
+black n   211  2343 m   211  2358 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  2397 m   211  2429 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  2446 m   261  2446 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  2446 m   211  2504 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  2504 m   261  2504 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  2504 m   211  2553 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  2553 m   151  2553 l
@@ -7309,9 +7270,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  2553 m   151  2553 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  2553 m   211  2563 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  2563 m   151  2563 l
 col-1 s                                 
@@ -7323,9 +7281,6 @@ black n   271  2563 m   271  2563 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  2563 m   151  2563 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  2563 m   211  2663 l
 col-1 s                                 
 gs showpage gr
 %%Page: number     5
@@ -8232,19 +8187,16 @@ col-1 s
 black n   131  2296 m   211  2296 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  2343 m   211  2446 l
+black n   211  2343 m   211  2358 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  2397 m   211  2429 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  2446 m   261  2446 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  2446 m   211  2504 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  2504 m   261  2504 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  2504 m   211  2553 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  2553 m   151  2553 l
@@ -8258,9 +8210,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  2553 m   151  2553 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  2553 m   211  2563 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  2563 m   151  2563 l
 col-1 s                                 
@@ -8272,9 +8221,6 @@ black n   271  2563 m   271  2563 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  2563 m   151  2563 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  2563 m   211  2663 l
 col-1 s                                 
 gs showpage gr
 %%Page: number     6
@@ -8458,11 +8404,11 @@ black  384  825 t    90 r
 (two variables on vaxis2)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -9276,19 +9222,16 @@ col-1 s
 black n   131  1392 m   211  1392 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1405 m   211  1434 l
+black n   211  1405 m   211  1409 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1420 m   211  1429 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1434 m   261  1434 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1434 m   211  1451 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1451 m   261  1451 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1451 m   211  1464 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1464 m   151  1464 l
@@ -9302,9 +9245,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1464 m   151  1464 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1464 m   211  1467 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1467 m   151  1467 l
 col-1 s                                 
@@ -9317,9 +9257,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1467 m   151  1467 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1467 m   211  1523 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1523 m   151  1523 l
 col-1 s                                 
@@ -9331,9 +9268,6 @@ black n   271  1523 m   271  1523 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1523 m   151  1523 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1523 m   211  1526 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1526 m   151  1526 l
@@ -9348,19 +9282,19 @@ col-1 s
 black n   271  1526 m   151  1526 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1526 m   211  1539 l
+black n   211  1539 m   211  1539 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1539 m   261  1539 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1539 m   211  1556 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1556 m   261  1556 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1556 m   211  1585 l
+black n   211  1561 m   211  1570 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1581 m   211  1585 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   211  1585 m   211  1598 l
@@ -12506,19 +12440,16 @@ col-1 s
 black n   131  1323 m   211  1323 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1334 m   211  1359 l
+black n   211  1334 m   211  1338 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1347 m   211  1355 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1359 m   261  1359 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1359 m   211  1374 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1374 m   261  1374 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1374 m   211  1386 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1386 m   151  1386 l
@@ -12532,9 +12463,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1386 m   151  1386 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1386 m   211  1388 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1388 m   151  1388 l
 col-1 s                                 
@@ -12547,9 +12475,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1388 m   151  1388 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1388 m   211  1437 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1437 m   151  1437 l
 col-1 s                                 
@@ -12561,9 +12486,6 @@ black n   271  1437 m   271  1437 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1437 m   151  1437 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1437 m   211  1440 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1440 m   151  1440 l
@@ -12578,19 +12500,19 @@ col-1 s
 black n   271  1440 m   151  1440 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1440 m   211  1452 l
+black n   211  1452 m   211  1452 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1452 m   261  1452 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1452 m   211  1466 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1466 m   261  1466 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1466 m   211  1492 l
+black n   211  1470 m   211  1478 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1488 m   211  1492 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   211  1492 m   211  1503 l
@@ -15029,19 +14951,16 @@ col-1 s
 black n   131  1323 m   211  1323 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1334 m   211  1359 l
+black n   211  1334 m   211  1338 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1347 m   211  1355 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1359 m   261  1359 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1359 m   211  1374 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1374 m   261  1374 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1374 m   211  1386 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1386 m   151  1386 l
@@ -15055,9 +14974,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1386 m   151  1386 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1386 m   211  1388 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1388 m   151  1388 l
 col-1 s                                 
@@ -15070,9 +14986,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1388 m   151  1388 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1388 m   211  1437 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1437 m   151  1437 l
 col-1 s                                 
@@ -15084,9 +14997,6 @@ black n   271  1437 m   271  1437 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1437 m   151  1437 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1437 m   211  1440 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1440 m   151  1440 l
@@ -15101,19 +15011,19 @@ col-1 s
 black n   271  1440 m   151  1440 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1440 m   211  1452 l
+black n   211  1452 m   211  1452 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1452 m   261  1452 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1452 m   211  1466 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1466 m   261  1466 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1466 m   211  1492 l
+black n   211  1470 m   211  1478 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1488 m   211  1492 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   211  1492 m   211  1503 l
@@ -17864,11 +17774,11 @@ black  192  886 t    90 r
 (non-s horizontal axis)
 show   -90 r  -192  -886 t
 /xs 0 def
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 /Times-Italic    85 stwn
 black  192 2864 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     85 sf 0 0 m
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 show xs 0 t 0 0 m   -90 r  -192 -2864 t
  3.750 setlinewidth [] 0 sd                 
 black n  1936   886 m  215  886 l
@@ -19611,19 +19521,16 @@ col-1 s
 black n   131  1392 m   211  1392 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1405 m   211  1434 l
+black n   211  1405 m   211  1409 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1420 m   211  1429 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1434 m   261  1434 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1434 m   211  1451 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1451 m   261  1451 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1451 m   211  1464 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1464 m   151  1464 l
@@ -19637,9 +19544,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1464 m   151  1464 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1464 m   211  1467 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1467 m   151  1467 l
 col-1 s                                 
@@ -19652,9 +19556,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1467 m   151  1467 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1467 m   211  1523 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1523 m   151  1523 l
 col-1 s                                 
@@ -19666,9 +19567,6 @@ black n   271  1523 m   271  1523 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1523 m   151  1523 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1523 m   211  1526 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1526 m   151  1526 l
@@ -19683,19 +19581,19 @@ col-1 s
 black n   271  1526 m   151  1526 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1526 m   211  1539 l
+black n   211  1539 m   211  1539 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1539 m   261  1539 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1539 m   211  1556 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1556 m   261  1556 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1556 m   211  1585 l
+black n   211  1561 m   211  1570 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1581 m   211  1585 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   211  1585 m   211  1598 l
@@ -22077,19 +21975,16 @@ col-1 s
 black n   131  1299 m   211  1299 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1310 m   211  1334 l
+black n   211  1310 m   211  1313 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1322 m   211  1330 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1334 m   261  1334 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1334 m   211  1348 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1348 m   261  1348 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1348 m   211  1359 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1359 m   151  1359 l
@@ -22103,9 +21998,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1359 m   151  1359 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1359 m   211  1361 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1361 m   151  1361 l
 col-1 s                                 
@@ -22118,9 +22010,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1361 m   151  1361 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1361 m   211  1408 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1408 m   151  1408 l
 col-1 s                                 
@@ -22132,9 +22021,6 @@ black n   271  1408 m   271  1408 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1408 m   151  1408 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1408 m   211  1410 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1410 m   151  1410 l
@@ -22149,19 +22035,19 @@ col-1 s
 black n   271  1410 m   151  1410 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1410 m   211  1422 l
+black n   211  1422 m   211  1422 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1422 m   261  1422 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1422 m   211  1435 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1435 m   261  1435 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1435 m   211  1460 l
+black n   211  1440 m   211  1447 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1456 m   211  1460 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   211  1460 m   211  1471 l
@@ -23401,11 +23287,11 @@ black  384  825 t    90 r
 (overflow in number of variables to be plotted)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 /Times-Italic    77 stwn
 black  384 2368 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.03.07  21/02/18 10.02.20)
+(MAD-X 5.04.02  02/10/18 09.05.01)
 show xs 0 t 0 0 m   -90 r  -384 -2368 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -24161,19 +24047,16 @@ col-1 s
 black n   131  1251 m   211  1251 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1261 m   211  1282 l
+black n   211  1261 m   211  1264 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1272 m   211  1279 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1282 m   261  1282 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1282 m   211  1295 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1295 m   261  1295 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1295 m   211  1305 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1305 m   151  1305 l
@@ -24187,9 +24070,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1305 m   151  1305 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1305 m   211  1307 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1307 m   151  1307 l
 col-1 s                                 
@@ -24202,9 +24082,6 @@ col-1 s
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1307 m   151  1307 l
 col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1307 m   211  1349 l
-col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1349 m   151  1349 l
 col-1 s                                 
@@ -24216,9 +24093,6 @@ black n   271  1349 m   271  1349 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   271  1349 m   151  1349 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
-black n   211  1349 m   211  1351 l
 col-1 s                                 
  3.750 setlinewidth [2 10] 0 sd             
 black n   151  1351 m   151  1351 l
@@ -24233,19 +24107,19 @@ col-1 s
 black n   271  1351 m   151  1351 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1351 m   211  1362 l
+black n   211  1362 m   211  1362 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   161  1362 m   261  1362 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1362 m   211  1374 l
-col-1 s                                 
- 3.750 setlinewidth [] 0 sd                 
 black n   161  1374 m   261  1374 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   211  1374 m   211  1396 l
+black n   211  1378 m   211  1384 l
+col-1 s                                 
+ 3.750 setlinewidth [] 0 sd                 
+black n   211  1393 m   211  1396 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   211  1396 m   211  1406 l

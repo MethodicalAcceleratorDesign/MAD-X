@@ -326,7 +326,7 @@ subroutine pefill(ierr)
 
   !--- codes see in peschm
   ! plot types (pltyp) as a function of mad code
-  data ilist / 0, 21, 1, 0, 2, 10, 12, 8, 0, 9,  &
+  data ilist / 0, 21, 1, 0, 2, 10, 12, 8, 15, 9,  &
                6,  0, 0, 0, 0,  0,  4, 4, 4, 0,  &
                0,  0, 0, 0, 0,  0, 14, 0, 0, 0,  &
                0,  0, 0, 0, 0,  0,  9, 0, 0, 0,  &
@@ -449,7 +449,6 @@ subroutine pefill(ierr)
      if (itbv.eq.1 .and. advance_to_pos(tabname, j).eq.0) goto 100
 
      k = double_from_table_row(tabname, horname, j, currpos)
-
      if (itbv .eq. 1)  then
         currtyp = node_value('mad8_type ')
         if (currtyp .eq. 39) currtyp = 15
@@ -1893,6 +1892,7 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
   !                       12: positive oct                               *
   !                       13: negative oct                               *
   !                       14: lcavity                                    *
+  !                       15: solenoid                                   *
   !                       21: rbend, zero tilt                           *
   !                       27: rbend, non-zero tilt                       *
   !                       37: crab cavity                                *
