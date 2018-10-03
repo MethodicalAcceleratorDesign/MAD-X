@@ -13,6 +13,29 @@
 <hr class="h1">
 <!-- -------- -->
 
+<h3>MAD-X release 5.04.02 (2018.10.03)</h3>
+
+<ul>
+<li> Added a X11=yes/no switch to the build systems do disable usage of X11 on linux/mac 
+     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/issues/652">#652</a>. (Thomas)
+<li> Fix a bug in the export of the trombone matrix to Sixtrack.  
+     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/656">#656</a>. (Joel, Tobias)
+<li> Increased numerical stability in PTC when TOTALTIME=true and many turns.
+     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/657">#657</a>. (Piotr)
+<li> Added full functionality to find wavelength to subtract in TOTALPATH=true mode.
+     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/663">#663</a>. (Piotr)
+<li>  Fix make thin for k0=0 when angle is also defined.
+     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/666">#666</a>. (Tobias, Helmut)
+<li>  Prevents the aperture model running with the wrong TWISS settings. 
+     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/667">#667</a>. (Tobias)
+<li>  Fix bug in racetrack aperture check.
+     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/673">#673</a>. (Laurent)
+<li>  Fixed memory corruption after several TWISS commands when comments were selected.
+     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/677">#677</a>. (Tobias)
+<li>  Fixed plotting when there are only solenoids in the lattice.
+     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/679">#679</a>. (Tobias)
+</ul>
+
 <h3>MAD-X release 5.04.01 (2018.07.10)</h3>
 
 <ul>
@@ -41,7 +64,7 @@
 <li> The output to Sixtrack of the Trombone element is now in sigma and p_sigma. 
     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/605">#605</a>. (Tobias)
 <li> Synchrotron Radiation generator added.
-    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/608">#608,#609</a>. (Helmuth, Laurent)
+    <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/608">#608,#609</a>. (Helmut, Laurent)
 <li> Possible to set `sectorfile=""` to disable file output.
     <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/606">#606</a>. (Thomas)
 <li> SROTATION in SURVEY is changed back to the same defintion as in 5.03.07. 
@@ -118,7 +141,7 @@
 <li> SECTORPURE option implemented for sectormaps
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/518">#518</a>. (Tobias)
 <li> Thick attribute for SOLENOID implemented in MAKETHIN
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/547">#547</a>. (Helmuth)
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/547">#547</a>. (Helmut)
 <li> XROTATION and YROTATION implemented.
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/569">#569</a>. (Laurent, Tobias)
 <li> Field errors added to thick SBENDs and QUADRUPOLEs in TRACK
