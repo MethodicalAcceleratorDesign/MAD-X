@@ -27,13 +27,13 @@ module polymorphic_taylor
   private unarySUB,subs,dscsub,dsubsc,scsub,subsc,iscsub,isubsc
   private mul,dmulsc,dscmul,mulsc,scmul,imulsc,iscmul
   private div,ddivsc,dscdiv,divsc,scdiv,idivsc,iscdiv
-  private POW,POWR,POWR8
+  private POW,POWR,POWR8,POWq
   private dexpt,dcost,dcosdt,dsindt,dsint,dlogt,dsqrtt
   private greaterthan,greatereq
   private lessthan,dlessthansc,dsclessthan,lessthansc,sclessthan,ilessthansc,isclessthan
   private igreatersc,iscgreater,dgreatersc,dscgreater,greatersc,scgreater
   private dgreatereqsc,dscgreatereq,greatereqsc,scgreatereq,igreatereqsc,iscgreatereq
-  private abst,full_abst
+  private abst,full_abst,print6
   private lesseq,dlesseqsc,dsclesseq,lesseqsc,sclesseq,ilesseqsc,isclesseq
   private eq,deqsc,dsceq,eqsc,sceq,ieqsc,isceq
   private neq,dneqsc,dscneq,neqsc,scneq,ineqsc,iscneq
@@ -46,7 +46,8 @@ module polymorphic_taylor
   ! PRIVATE EQUAL1D,EQUAL2D
   ! end complex stuff
   private printpoly,printdouble,printsingle,dmulmapconcat,nbiP
-  private line,Mequaldacon
+  private line,Mequaldacon,cos_quaternionr,cos_quaternionp,sin_quaternionr,sin_quaternionp
+  private make_it_knobr,kill_knobr
   character(120) line
   !integer npol
   !parameter (npol=20)
@@ -61,11 +62,18 @@ module polymorphic_taylor
   real(dp) :: sinhx_x_minp=1.0_dp  !  1.e-9  !c_0_0001
  
 INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
+  private allocquaternion,allocquaternionn,A_OPT_quaternion
+  private k_opt_quaternion,killquaternionn,killquaternion
+  private equalq,mulq,subq,addq,EQUALq_8_r,EQUALq_r_8,printpolyq,absq,absq2,invq,EQUALq_r
 
  
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL   ! 2002.10.9
+     MODULE PROCEDURE EQUALq 
+     MODULE PROCEDURE EQUALq_8_r   ! 2002.10.9
+     MODULE PROCEDURE EQUALq_r_8
+     MODULE PROCEDURE EQUALq_r
      !     MODULE PROCEDURE EQUAL1D  ! 2004.7.10
      !     MODULE PROCEDURE EQUAL2D  ! 2004.7.10
      MODULE PROCEDURE complexreal_8
@@ -182,6 +190,7 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
   INTERFACE OPERATOR (+)
      MODULE PROCEDURE unaryADD  !
      MODULE PROCEDURE add   !
+     MODULE PROCEDURE addq   
      MODULE PROCEDURE daddsc  !
      MODULE PROCEDURE dscadd  !
      MODULE PROCEDURE addsc  !
@@ -277,6 +286,7 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
   INTERFACE OPERATOR (-)
      MODULE PROCEDURE unarySUB   !
      MODULE PROCEDURE subs    !
+     MODULE PROCEDURE subq   !
      MODULE PROCEDURE dscsub   !
      MODULE PROCEDURE dsubsc   !
      MODULE PROCEDURE subsc   !
@@ -371,6 +381,7 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
 
   INTERFACE OPERATOR (*)
      MODULE PROCEDURE mul    !
+     MODULE PROCEDURE mulq   !
      MODULE PROCEDURE dmulsc   !
      MODULE PROCEDURE dscmul   !
      MODULE PROCEDURE mulsc   !
@@ -474,6 +485,7 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
 
   INTERFACE OPERATOR (**)
      MODULE PROCEDURE POW     !
+     MODULE PROCEDURE POWq     !
      MODULE PROCEDURE POWR     !
      MODULE PROCEDURE POWR8    !
   END INTERFACE
@@ -563,6 +575,10 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
 
   INTERFACE exp
      MODULE PROCEDURE dexpt
+  END INTERFACE
+
+  INTERFACE invqq
+     MODULE PROCEDURE invq
   END INTERFACE
 
   INTERFACE dexp
@@ -667,13 +683,21 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
   INTERFACE sqrt
      MODULE PROCEDURE dsqrtt
   END INTERFACE
+
   INTERFACE dsqrt
      MODULE PROCEDURE dsqrtt
   END INTERFACE
 
   INTERFACE abs
      MODULE PROCEDURE abst
+     MODULE PROCEDURE absq
   END INTERFACE
+
+
+  INTERFACE abs_square
+     MODULE PROCEDURE absq2
+  END INTERFACE
+
   INTERFACE dabs
      MODULE PROCEDURE abst
   END INTERFACE
@@ -770,17 +794,30 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
      MODULE PROCEDURE SINX_XT
   END INTERFACE
 
+  INTERFACE cos_quaternion
+     MODULE PROCEDURE cos_quaternionr
+     MODULE PROCEDURE cos_quaternionp
+   end INTERFACE 
+
+  INTERFACE sin_quaternion
+     MODULE PROCEDURE sin_quaternionr
+     MODULE PROCEDURE sin_quaternionp
+   end INTERFACE 
   ! i/o
 
   INTERFACE daprint
      MODULE PROCEDURE printpoly !
      MODULE PROCEDURE printdouble
      MODULE PROCEDURE printsingle
+     MODULE PROCEDURE printpolyq
+     MODULE PROCEDURE print6
   END INTERFACE
   INTERFACE print
      MODULE PROCEDURE printpoly   !
      MODULE PROCEDURE printdouble
      MODULE PROCEDURE printsingle
+     MODULE PROCEDURE printpolyq
+     MODULE PROCEDURE print6
   END INTERFACE
 
 
@@ -790,11 +827,15 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
   INTERFACE alloc
      MODULE PROCEDURE A_OPT    !allocpoly   !
      MODULE PROCEDURE allocpolyn  !
+     MODULE PROCEDURE  allocquaternionn
+     MODULE PROCEDURE  A_OPT_quaternion
 
   END INTERFACE
 
   INTERFACE kill
      MODULE PROCEDURE k_opt
+     MODULE PROCEDURE killquaternionn
+     MODULE PROCEDURE k_opt_quaternion
      MODULE PROCEDURE resetpolyn0  !
      MODULE PROCEDURE resetpoly_R
      MODULE PROCEDURE resetpoly_RN
@@ -805,6 +846,15 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
      MODULE PROCEDURE resetpolyn  !
   END INTERFACE
 
+interface make_it_knob
+ module procedure make_it_knobr
+end INTERFACE
+
+interface kill_knob
+module procedure kill_knobr
+end INTERFACE
+
+
   ! Managing
 
   INTERFACE ass
@@ -813,7 +863,7 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
 
 contains
 
-  subroutine make_it_knob(k,i,s)
+  subroutine make_it_knobr(k,i,s)
     implicit none
     TYPE (real_8), intent(inout) :: k
     real(dp), optional :: s
@@ -823,15 +873,15 @@ contains
     if(present(s)) k%s=s
     k%i=i
     k%kind=3
-  end subroutine make_it_knob
+  end subroutine make_it_knobr
 
-  subroutine kill_knob(k)
+  subroutine kill_knobr(k)
     implicit none
     TYPE (real_8), intent(inout) :: k
     k%s=1.0_dp
     k%i=0
     k%kind=1
-  end subroutine kill_knob
+  end subroutine kill_knobr
 
 
   FUNCTION polymorpht( S1 )
@@ -2896,6 +2946,209 @@ contains
     end select
   END FUNCTION add
 
+  FUNCTION addq( S1, S2 )
+    implicit none
+    TYPE (quaternion_8) addq
+    TYPE (quaternion_8), INTENT (IN) :: S1, S2
+    type(real_8) temp
+    integer i,localmaster
+
+
+       call alloc(temp)
+       do i=0,3
+        temp=s1%x(i)+s2%x(i)
+       if(temp%kind==2) then
+             localmaster=master
+        call ass(addq%x(i))
+         addq%x(i)=temp
+          master=localmaster
+        else
+         addq%x(i)%r=temp%r
+         addq%x(i)%kind=1
+        endif
+       enddo
+       call kill(temp)
+
+  END FUNCTION addq
+
+  FUNCTION absq2( S1 )
+    implicit none
+    real(dp) absq2
+    TYPE (quaternion_8), INTENT (IN) :: S1
+    integer i
+
+    IF(.NOT.C_%STABLE_DA) then
+     absq2=0
+     RETURN
+    endif
+           absq2=0
+       do i=0,3
+         absq2 = s1%x(i)**2+absq2
+       enddo
+  END FUNCTION absq2
+
+  FUNCTION absq( S1 )
+    implicit none
+    real(dp) absq
+    TYPE (quaternion_8), INTENT (IN) :: S1
+    integer i
+
+    IF(.NOT.C_%STABLE_DA) then
+     absq=0
+     RETURN
+    endif
+           absq=sqrt(abs_square(s1))
+            
+  END FUNCTION absq
+
+  FUNCTION subq( S1, S2 )
+    implicit none
+    TYPE (quaternion_8) subq
+    TYPE (quaternion_8), INTENT (IN) :: S1, S2
+    type(real_8) temp
+    integer i,localmaster
+ 
+ 
+       call alloc(temp)
+       do i=0,3
+        temp=s1%x(i)-s2%x(i)
+       if(temp%kind==2) then
+             localmaster=master
+        call ass(subq%x(i))
+         subq%x(i)%t=temp%t
+          master=localmaster
+        else
+
+         subq%x(i)%r=temp%r
+         subq%x(i)%kind=1
+        endif
+       enddo
+       call kill(temp)
+
+  END FUNCTION subq
+
+  FUNCTION invq( S1 )
+    implicit none
+    TYPE (quaternion_8) invq
+    TYPE (quaternion_8), INTENT (IN) :: S1
+    type(real_8) norm
+    type(real_8) temp(4)
+    integer i,localmaster
+
+    IF(.NOT.C_%STABLE_DA) then
+     invq%x(1)=0
+     RETURN
+    endif
+ 
+       call alloc(temp)
+      call alloc(norm)
+
+              norm=s1%x(0)**2+s1%x(1)**2+s1%x(2)**2+s1%x(3)**2
+
+            temp(1)=s1%x(1)
+              do i=1,3
+                temp(i)=-s1%x(i)
+              enddo
+              do i=0,3
+                temp(i)=temp(i)/norm
+              enddo
+
+    do i=0,3
+       if(temp(i)%kind==2) then
+             localmaster=master
+        call ass(invq%x(i))
+         invq%x(i)=temp(i)
+          master=localmaster
+        else
+         invq%x(i)%r=temp(i)%r
+         invq%x(i)%kind=1
+        endif
+    enddo
+
+          call kill(norm)
+          call kill(temp)
+
+ 
+  END FUNCTION invq
+
+  FUNCTION POWq( S1, R2 )
+    implicit none
+    TYPE (quaternion_8) POWq,qtemp
+    TYPE (quaternion_8), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: R2
+    INTEGER I,R22
+    integer localmaster
+    IF(.NOT.C_%STABLE_DA) then
+       POWq=0.0_dp
+      RETURN
+    endif
+
+ 
+     call alloc(qtemp)    
+     qtemp=1.0_dp
+
+    R22=IABS(R2)
+    DO I=1,R22
+       qtemp=qtemp*s1
+    ENDDO
+    IF(R2.LT.0) THEN
+       qtemp=invq(qtemp)
+    ENDIF
+
+     do i=0,3
+       if(qtemp%x(i)%kind==2) then
+             localmaster=master
+        call ass(powq%x(i))
+         powq%x(i)=qtemp%x(i)
+        master=localmaster
+        else
+         powq%x(i)%r=qtemp%x(i)%r
+         powq%x(i)%kind=1
+        endif
+
+     enddo
+      call kill(qtemp)
+        master=localmaster
+  END FUNCTION POWq
+
+  FUNCTION mulq( S1, S2 )
+    implicit none
+    TYPE (quaternion_8) mulq
+    TYPE (quaternion_8), INTENT (IN) :: S1, S2
+    type(real_8) temp(0:3)
+    integer i,localmaster
+
+ !       call ass_quaternion_8(mulq)
+        call alloc(temp)
+ 
+         temp(0)=s1%x(0)*s2%x(0)-s1%x(1)*s2%x(1)-s1%x(2)*s2%x(2)-s1%x(3)*s2%x(3)
+
+         temp(1)=s1%x(2)*s2%x(3)-s1%x(3)*s2%x(2)
+         temp(2)=s1%x(3)*s2%x(1)-s1%x(1)*s2%x(3)
+         temp(3)=s1%x(1)*s2%x(2)-s1%x(2)*s2%x(1)
+
+        do i=1,3
+         temp(i)= temp(i) + s1%x(0)*s2%x(i)+ s1%x(i)*s2%x(0)
+        enddo
+
+        do i=0,3
+            if(temp(i)%kind==2) then
+             localmaster=master
+               call ass(mulq%x(i))
+
+                  mulq%x(i)=temp(i)
+                 master=localmaster
+             else
+              mulq%x(i)%r=temp(i)%r
+              mulq%x(i)%kind=1
+             endif      
+       enddo
+       call kill(temp)
+
+
+  END FUNCTION mulq
+
+
 
   FUNCTION subs( S1, S2 )
     implicit none
@@ -4005,10 +4258,15 @@ contains
        imulsc%r=s1%r*REAL(s2,kind=DP)
        imulsc%kind=1
     case(m2)
-       localmaster=master
-       call ass(imulsc)
-       imulsc%t= s1%t*REAL(s2,kind=DP)
-       master=localmaster
+       if(s2/=0) then
+        localmaster=master
+        call ass(imulsc)
+        imulsc%t= s1%t*REAL(s2,kind=DP)
+        master=localmaster
+       else
+        imulsc%r=0.0_dp
+        imulsc%kind=1
+       endif
     case(m3)
        if(knob) then
           localmaster=master
@@ -4044,10 +4302,15 @@ contains
        iscmul%r=s1%r*REAL(s2,kind=DP)
        iscmul%kind=1
     case(m2)
-       localmaster=master
-       call ass(iscmul)
-       iscmul%t= s1%t*REAL(s2,kind=DP)
-       master=localmaster
+       if(s2/=0) then
+        localmaster=master
+        call ass(iscmul)
+        iscmul%t= s1%t*REAL(s2,kind=DP)
+        master=localmaster
+       else
+        iscmul%r=0.0_dp
+        iscmul%kind=1
+       endif
     case(m3)
        if(knob) then
           localmaster=master
@@ -4149,6 +4412,21 @@ contains
     end select
   END FUNCTION iscdiv
 
+  SUBROUTINE  printpolyq(S2,mf,prec)
+    implicit none
+    integer ipause, mypauses,i,k
+    type (quaternion_8),INTENT(INOUT)::S2
+    integer,optional :: mf
+    real(dp), optional :: prec
+    i=6
+    if(present(mf)) i=mf
+        write(i,*) " quaternion_8 " 
+    do k=0,3
+      call print(s2%x(k),i,prec)
+    enddo
+
+  END SUBROUTINE printpolyq
+
   SUBROUTINE  printpoly(S2,mf,prec)
     implicit none
     integer ipause, mypauses,i
@@ -4165,11 +4443,15 @@ contains
        case(m2)
           call pri(S2%t,i,prec)
        case(m3)
+
           if(s2%i>0) then
-             write(i,*) s2%r,"  +",s2%s,"  *x_",int(s2%i)
-          else
-             write(i,*) s2%r
+             write(line,*) s2%r,"  +",s2%s,"  (x_",s2%i,")"
+
+         else
+          write(line,*) s2%r
           endif
+             call context(line,maj=.false.)
+             write(i,'(a)') adjustr(line(1:len_trim(line)))
           if(s2%alloc) then
              write(line,'(a41)')  " weird Taylor part should be deallocated "
              ipause=mypauses(0,line)
@@ -4183,6 +4465,24 @@ contains
     endif
 
   END SUBROUTINE printpoly
+
+  SUBROUTINE  print6(S1,mf)
+    implicit none
+    type (real_8),INTENT(INout)::S1(:)
+    integer,optional :: mf
+    integer        i
+    
+ !   if(size(s1)==6) then
+ !    do i=1,ndd
+ !       call print(s1(i),mf)
+ !    enddo
+ !   else
+     do i=lbound(s1,1),ubound(s1,1)
+        call print(s1(i),mf)
+     enddo
+ !   endif
+  END SUBROUTINE print6
+
 
   SUBROUTINE  printdouble(S2,mf)
     implicit none
@@ -4405,11 +4705,85 @@ contains
     s2%kind=1
     s2%r=0.0_dp
     s2%i=0
-    s2%g=0
-    s2%nb=0
+!    s2%g=0
+!    s2%nb=0
     s2%s=1.0_dp
 
   END SUBROUTINE allocpoly
+
+  SUBROUTINE  allocquaternion(S2)
+    implicit none
+    type (quaternion_8),INTENT(INOUT)::S2
+    integer i
+     do i=0,3
+      call allocpoly(s2%x(i))
+    enddo
+
+  END SUBROUTINE allocquaternion
+
+  SUBROUTINE  killquaternion(S2)
+    implicit none
+    type (quaternion_8),INTENT(INOUT)::S2
+    integer i
+     do i=0,3
+      call resetpoly0(s2%x(i))
+    enddo
+
+  END SUBROUTINE killquaternion
+
+  SUBROUTINE  allocquaternionn(S2)
+    implicit none
+    type (quaternion_8),INTENT(INOUT)::S2(:)
+    integer i
+     do i=1,size(s2)
+      call alloc(s2(i))
+    enddo
+
+  END SUBROUTINE allocquaternionn
+ 
+  SUBROUTINE  killquaternionn(S2)
+    implicit none
+    type (quaternion_8),INTENT(INOUT)::S2(:)
+    integer i
+     do i=1,size(s2)
+      call kill(s2(i))
+    enddo
+
+  END SUBROUTINE killquaternionn
+
+  SUBROUTINE  A_OPT_quaternion(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
+    implicit none
+    type (quaternion_8),INTENT(INout)::S1
+    type (quaternion_8),optional, INTENT(INout):: S2,s3,s4,s5,s6,s7,s8,s9,s10
+    call allocquaternion(s1)
+    if(present(s2)) call allocquaternion(s2)
+    if(present(s3)) call allocquaternion(s3)
+    if(present(s4)) call allocquaternion(s4)
+    if(present(s5)) call allocquaternion(s5)
+    if(present(s6)) call allocquaternion(s6)
+    if(present(s7)) call allocquaternion(s7)
+    if(present(s8)) call allocquaternion(s8)
+    if(present(s9)) call allocquaternion(s9)
+    if(present(s10))call allocquaternion(s10)
+
+  END SUBROUTINE A_OPT_quaternion
+
+  SUBROUTINE  K_OPT_quaternion(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
+    implicit none
+    type (quaternion_8),INTENT(INout)::S1
+    type (quaternion_8),optional, INTENT(INout):: S2,s3,s4,s5,s6,s7,s8,s9,s10
+    call killquaternion(s1)
+    if(present(s2)) call killquaternion(s2)
+    if(present(s3)) call killquaternion(s3)
+    if(present(s4)) call killquaternion(s4)
+    if(present(s5)) call killquaternion(s5)
+    if(present(s6)) call killquaternion(s6)
+    if(present(s7)) call killquaternion(s7)
+    if(present(s8)) call killquaternion(s8)
+    if(present(s9)) call killquaternion(s9)
+    if(present(s10))call killquaternion(s10)
+
+  END SUBROUTINE K_OPT_quaternion
 
   SUBROUTINE  A_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
     implicit none
@@ -4520,6 +4894,59 @@ contains
     ENDDO
 
   end SUBROUTINE  EQUAL1D
+
+  SUBROUTINE  EQUALq(S2,S1)
+    implicit none
+    integer ipause, mypauses
+    type (quaternion_8),INTENT(inOUT)::S2
+    type (quaternion_8),INTENT(IN)::S1
+    integer i
+
+      do i=0,3
+        s2%x(i)=s1%x(i)
+      enddo
+
+ end   SUBROUTINE  EQUALq
+
+  SUBROUTINE  EQUALq_r_8(S2,S1)
+    implicit none
+    integer ipause, mypauses
+    type (quaternion),INTENT(inOUT)::S2
+    type (quaternion_8),INTENT(IN)::S1
+    integer i
+
+      do i=0,3
+        s2%x(i)=s1%x(i)
+      enddo
+
+ end   SUBROUTINE  EQUALq_r_8
+
+  SUBROUTINE  EQUALq_8_r(S2,S1)
+    implicit none
+    integer ipause, mypauses
+    type (quaternion_8),INTENT(inOUT)::S2
+    type (quaternion),INTENT(IN)::S1
+    integer i
+
+      do i=0,3
+        s2%x(i)=s1%x(i)
+      enddo
+
+ end   SUBROUTINE  EQUALq_8_r
+
+  SUBROUTINE  EQUALq_r(S2,S1)
+    implicit none
+    integer ipause, mypauses
+    type (quaternion_8),INTENT(inOUT)::S2
+    real(dp),INTENT(IN)::S1
+    integer i
+
+      do i=0,3
+        s2%x(i)=0.0_dp
+      enddo
+        s2%x(1)=s1
+
+ end   SUBROUTINE  EQUALq_r
 
   SUBROUTINE  EQUAL(S2,S1)
     implicit none
@@ -5105,6 +5532,7 @@ contains
 
   end subroutine ASSp
 
+
   subroutine assp_no_master(s1)
     implicit none
     TYPE (real_8) s1
@@ -5117,29 +5545,7 @@ contains
 
   end subroutine assp_no_master
 
-  subroutine assp_master(s1)
-    implicit none
-    TYPE (real_8) s1
-    integer ipause,mypauses
-    ! lastmaster=master  ! 2002.12.13
-
-    select case(master)
-    case(0:ndumt-1)
-       master=master+1
-    case(ndumt)
-       line=  " cannot indent anymore "
-       ipause=mypauses(0,line)
-    end select
-    !    write(26,*) " real polymorph  ",master
-
-    call ass0(s1%t)
-    s1%alloc=t
-    s1%kind=1
-    s1%i=0
-
-  end subroutine assp_master
-
-  ! complex
+ 
 
   FUNCTION datant( S1 )
     implicit none
@@ -6085,13 +6491,13 @@ contains
     type (real_8),INTENT(IN)::  S2
 
     if(knob) then
-       if(nb_==0) then
+    !   if(nb_==0) then
           varf1=(/S2%R,S2%S/).var.(s2%i+npara_fpp)
-       elseif(s2%nb==nb_) then
-          varf1=(/S2%R,S2%S/).var.(s2%i+npara_fpp-s2%g+1)
-       else
-          varf1=S2%R
-       endif
+    !   elseif(s2%nb==nb_) then
+    !      varf1=(/S2%R,S2%S/).var.(s2%i+npara_fpp-s2%g+1)
+    !   else
+    !      varf1=S2%R
+    !   endif
     else ! Not a knob
        stop 333
        varf1=(/S2%R,0.0_dp/).var.0  ! this is a buggy line never used
@@ -6106,13 +6512,13 @@ contains
     type (real_8),INTENT(IN)::  S2
 
     if(knob) then
-       if(nb_==0) then
+  !     if(nb_==0) then
           varf2=(/S2%R,S2%S/).var.(s2%i+npara_fpp)
-       elseif(s2%nb==nb_) then
-          varf2=(/S2%R,S2%S/).var.(s2%i+npara_fpp-s2%g+1)
-       else
-          varf2=S2%R
-       endif
+  !     elseif(s2%nb==nb_) then
+  !        varf2=(/S2%R,S2%S/).var.(s2%i+npara_fpp-s2%g+1)
+  !     else
+  !        varf2=S2%R
+  !     endif
     else ! Not a knob
        stop 334
        varf2=(/S2%R,0.0_dp/).var.0   ! this is a buggy line never used
@@ -6268,6 +6674,7 @@ contains
        CALL KILL(SIN_HP); CALL KILL(Y); CALL KILL(SINH_HP0);
     case(m3)
        if(knob) then
+       CALL ALLOC(SIN_HP); CALL ALLOC(Y); CALL ALLOC(SINH_HP0);
           localmaster=master
           call ass(sinX_Xt)
           call varfk1(S1)
@@ -6300,6 +6707,8 @@ contains
                 line="NO CONVERGENCE IN SINH_HP"
                 ipause=mypauses(NMAX_pol,line)
              ENDIF
+       CALL kill(SIN_HP); CALL kill(Y); CALL kill(SINH_HP0);
+
           else
              SIN_HP=SIN(varf1)/varf1
           endif
@@ -6320,6 +6729,321 @@ contains
        ! call !write_e(0)
     end select
   END FUNCTION sinX_XT
+
+  ! cosine for quaternion DONE partly COSY-INFINITY WISE FOR TPSA
+  function sin_quaternionr(X)
+    implicit none
+    real(dp), INTENT (IN) :: X
+    real(dp) sin_quaternionr,Y,NORM0,NORM,SINH_HR0
+    logical(lp) NOTDONE,CHECK
+    INTEGER I,ipause,mypauses
+
+    if(abs(x)<.1d0) then
+       NOTDONE=.TRUE.
+       CHECK=.TRUE.
+       sin_quaternionr=1.0_dp
+       Y=1.0_dp
+       I=2
+       NORM0=1e5_dp
+       DO WHILE(I<NMAX_pol.AND.NOTDONE)
+          Y=-Y*X/REAL(I,kind=DP)/REAL(I+1,kind=DP)
+          SINH_HR0=sin_quaternionr+Y
+          NORM=ABS(sin_quaternionr-SINH_HR0)
+          IF(NORM<=EPS_real_poly.AND.CHECK) THEN
+             NORM0=NORM
+             CHECK=.FALSE.
+          ELSE
+             IF(NORM>=NORM0) THEN
+                NOTDONE=.FALSE.
+             ELSE
+                NORM0=NORM
+             ENDIF
+          ENDIF
+          sin_quaternionr=SINH_HR0
+          I=I+2
+       ENDDO
+       IF(I==NMAX_pol) THEN
+          line="NO CONVERGENCE IN SINH_HR"
+          ipause=mypauses(NMAX_pol,line)
+       ENDIF
+    else
+       sin_quaternionr=sin(sqrt(x))/sqrt(x)
+    endif
+    return
+  end function sin_quaternionr
+
+FUNCTION sin_quaternionp( S1 )
+    implicit none
+    integer ipause, mypauses
+    TYPE (real_8) sin_quaternionp
+    TYPE (real_8), INTENT (IN) :: S1
+    integer localmaster
+    TYPE(TAYLOR)SIN_HP
+    TYPE(TAYLOR)Y,SINH_HP0
+    real(dp) NORM0,NORM
+    logical(lp) NOTDONE,CHECK
+    INTEGER I
+
+    select case(s1%kind)
+    case(m1)
+       sin_quaternionp%r=sin_quaternionr(s1%r)
+       sin_quaternionp%kind=1
+    case(m2)
+       CALL ALLOC(SIN_HP); CALL ALLOC(Y); CALL ALLOC(SINH_HP0);
+       localmaster=master
+       call ass(sin_quaternionp)
+
+       if(ABS(S1%T.SUB.'0')<.1d0) then
+          NOTDONE=.TRUE.
+          CHECK=.TRUE.
+
+          SIN_HP=1.0_dp
+          Y=1.0_dp
+          I=2
+          NORM0=1e5_dp
+          DO WHILE(I<NMAX_pol.AND.NOTDONE)
+             Y=-Y*S1%T/REAL(I,kind=DP)/REAL(I+1,kind=DP)
+             SINH_HP0=SIN_HP+Y
+             NORM=full_abs(SIN_HP-SINH_HP0)
+             IF(NORM<=EPS_real_poly.AND.CHECK) THEN
+                NORM0=NORM
+                CHECK=.FALSE.
+             ELSE
+                IF(NORM>=NORM0.and.(.not.check)) THEN  ! sagan
+                   NOTDONE=.FALSE.
+                ELSE
+                   NORM0=NORM
+                ENDIF
+             ENDIF
+             SIN_HP=SINH_HP0
+             I=I+2
+          ENDDO
+          IF(I==NMAX_pol) THEN
+             line="NO CONVERGENCE IN SIN_HP"
+             ipause=mypauses(NMAX_pol,line)
+          ENDIF
+       else
+          SIN_HP=sin(sqrt(S1%T)) / sqrt(S1%T)
+       endif
+       sin_quaternionp%t= SIN_HP
+
+       master=localmaster
+       CALL KILL(SIN_HP); CALL KILL(Y); CALL KILL(SINH_HP0);
+    case(m3)
+       if(knob) then
+       CALL ALLOC(SIN_HP); CALL ALLOC(Y); CALL ALLOC(SINH_HP0);
+          localmaster=master
+          call ass(sin_quaternionp)
+          call varfk1(S1)
+          if(ABS(varf1.SUB.'0')<.1d0) then
+             NOTDONE=.TRUE.
+             CHECK=.TRUE.
+
+             SIN_HP=1.0_dp
+             Y=1.0_dp
+             I=2
+             NORM0=1e5_dp
+             DO WHILE(I<NMAX_pol.AND.NOTDONE)
+                Y=-Y*varf1/REAL(I,kind=DP)/REAL(I+1,kind=DP)
+                SINH_HP0=SIN_HP+Y
+                NORM=full_abs(SIN_HP-SINH_HP0)
+                IF(NORM<=EPS_real_poly.AND.CHECK) THEN
+                   NORM0=NORM
+                   CHECK=.FALSE.
+                ELSE
+                   IF(NORM>=NORM0.and.(.not.check)) THEN  ! sagan
+                      NOTDONE=.FALSE.
+                   ELSE
+                      NORM0=NORM
+                   ENDIF
+                ENDIF
+                SIN_HP=SINH_HP0
+                I=I+2
+             ENDDO
+             IF(I==NMAX_pol) THEN
+                line="NO CONVERGENCE IN SINH_HP"
+                ipause=mypauses(NMAX_pol,line)
+             ENDIF
+          else
+             SIN_HP=sin(sqrt(varf1))/sqrt(varf1)
+          endif
+          sin_quaternionp%t= SIN_HP
+          master=localmaster
+       CALL KILL(SIN_HP); CALL KILL(Y); CALL KILL(SINH_HP0);
+       else
+          sin_quaternionp%r= sin_quaternionr(S1%r)
+          sin_quaternionp%kind=1
+       endif
+    case default
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in sinX_XT "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
+       ! call !write_e(0)
+    end select
+  END FUNCTION sin_quaternionp
+
+  ! cosine for quaternion DONE partly COSY-INFINITY WISE FOR TPSA
+  function cos_quaternionr(X)
+    implicit none
+    real(dp), INTENT (IN) :: X
+    real(dp) cos_quaternionr,Y,NORM0,NORM,SINH_HR0
+    logical(lp) NOTDONE,CHECK
+    INTEGER I,ipause,mypauses
+
+    if(abs(x)<.1d0) then
+       NOTDONE=.TRUE.
+       CHECK=.TRUE.
+       cos_quaternionr=1.0_dp
+       Y=1.0_dp
+       I=1
+       NORM0=1e5_dp
+       DO WHILE(I<NMAX_pol.AND.NOTDONE)
+          Y=-Y*X/REAL(I,kind=DP)/REAL(I+1,kind=DP)
+          SINH_HR0=cos_quaternionr+Y
+          NORM=ABS(cos_quaternionr-SINH_HR0)
+          IF(NORM<=EPS_real_poly.AND.CHECK) THEN
+             NORM0=NORM
+             CHECK=.FALSE.
+          ELSE
+             IF(NORM>=NORM0) THEN
+                NOTDONE=.FALSE.
+             ELSE
+                NORM0=NORM
+             ENDIF
+          ENDIF
+          cos_quaternionr=SINH_HR0
+          I=I+2
+       ENDDO
+       IF(I==NMAX_pol) THEN
+          line="NO CONVERGENCE IN SINH_HR"
+          ipause=mypauses(NMAX_pol,line)
+       ENDIF
+    else
+       cos_quaternionr=cos(sqrt(x))
+    endif
+    return
+  end function cos_quaternionr
+
+  FUNCTION cos_quaternionp( S1 )
+    implicit none
+    integer ipause, mypauses
+    TYPE (real_8) cos_quaternionp
+    TYPE (real_8), INTENT (IN) :: S1
+    integer localmaster
+    TYPE(TAYLOR)SIN_HP
+    TYPE(TAYLOR)Y,SINH_HP0
+    real(dp) NORM0,NORM
+    logical(lp) NOTDONE,CHECK
+    INTEGER I
+
+    select case(s1%kind)
+    case(m1)
+       cos_quaternionp%r=cos_quaternionr(s1%r)
+       cos_quaternionp%kind=1
+    case(m2)
+       CALL ALLOC(SIN_HP); CALL ALLOC(Y); CALL ALLOC(SINH_HP0);
+       localmaster=master
+       call ass(cos_quaternionp)
+
+       if(ABS(S1%T.SUB.'0')<.1d0) then
+          NOTDONE=.TRUE.
+          CHECK=.TRUE.
+
+          SIN_HP=1.0_dp
+          Y=1.0_dp
+          I=1
+          NORM0=1e5_dp
+          DO WHILE(I<NMAX_pol.AND.NOTDONE)
+             Y=-Y*S1%T/REAL(I,kind=DP)/REAL(I+1,kind=DP)
+             SINH_HP0=SIN_HP+Y
+             NORM=full_abs(SIN_HP-SINH_HP0)
+             IF(NORM<=EPS_real_poly.AND.CHECK) THEN
+                NORM0=NORM
+                CHECK=.FALSE.
+             ELSE
+                IF(NORM>=NORM0.and.(.not.check)) THEN  ! sagan
+                   NOTDONE=.FALSE.
+                ELSE
+                   NORM0=NORM
+                ENDIF
+             ENDIF
+             SIN_HP=SINH_HP0
+             I=I+2
+          ENDDO
+          IF(I==NMAX_pol) THEN
+             line="NO CONVERGENCE IN SIN_HP"
+             ipause=mypauses(NMAX_pol,line)
+          ENDIF
+       else
+          SIN_HP=cos(sqrt(S1%T)) 
+       endif
+       cos_quaternionp%t= SIN_HP
+
+       master=localmaster
+       CALL KILL(SIN_HP); CALL KILL(Y); CALL KILL(SINH_HP0);
+    case(m3)
+       if(knob) then
+       CALL ALLOC(SIN_HP); CALL ALLOC(Y); CALL ALLOC(SINH_HP0);
+          localmaster=master
+          call ass(cos_quaternionp)
+          call varfk1(S1)
+          if(ABS(varf1.SUB.'0')<.1d0) then
+             NOTDONE=.TRUE.
+             CHECK=.TRUE.
+
+             SIN_HP=1.0_dp
+             Y=1.0_dp
+             I=1
+             NORM0=1e5_dp
+             DO WHILE(I<NMAX_pol.AND.NOTDONE)
+                Y=-Y*varf1/REAL(I,kind=DP)/REAL(I+1,kind=DP)
+                SINH_HP0=SIN_HP+Y
+                NORM=full_abs(SIN_HP-SINH_HP0)
+                IF(NORM<=EPS_real_poly.AND.CHECK) THEN
+                   NORM0=NORM
+                   CHECK=.FALSE.
+                ELSE
+                   IF(NORM>=NORM0.and.(.not.check)) THEN  ! sagan
+                      NOTDONE=.FALSE.
+                   ELSE
+                      NORM0=NORM
+                   ENDIF
+                ENDIF
+                SIN_HP=SINH_HP0
+                I=I+2
+             ENDDO
+             IF(I==NMAX_pol) THEN
+                line="NO CONVERGENCE IN SINH_HP"
+                ipause=mypauses(NMAX_pol,line)
+             ENDIF
+          else
+             SIN_HP=cos(sqrt(varf1))
+          endif
+          cos_quaternionp%t= SIN_HP
+          master=localmaster
+       CALL KILL(SIN_HP); CALL KILL(Y); CALL KILL(SINH_HP0);
+       else
+          cos_quaternionp%r= cos_quaternionr(S1%r)
+          cos_quaternionp%kind=1
+       endif
+    case default
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in sinX_XT "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
+       ! call !write_e(0)
+    end select
+  END FUNCTION cos_quaternionp
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   FUNCTION sinHX_Xt( S1 )
     implicit none
@@ -6381,6 +7105,8 @@ contains
        CALL KILL(SIN_HP); CALL KILL(Y); CALL KILL(SINH_HP0);
     case(m3)
        if(knob) then
+       CALL alloc(SIN_HP); CALL alloc(Y); CALL alloc(SINH_HP0);
+
           localmaster=master
           call ass(sinHX_Xt)
           call varfk1(S1)
@@ -6422,6 +7148,8 @@ contains
           sinHX_Xt%r= SINH_HR(S1%r)
           sinHX_Xt%kind=1
        endif
+       CALL KILL(SIN_HP); CALL KILL(Y); CALL KILL(SINH_HP0);
+
     case default
        !w_p=0
        !w_p%nc=2
@@ -6482,6 +7210,6 @@ contains
   end SUBROUTINE  flip_real_8
 
 
-
+ 
 
 end module  polymorphic_taylor

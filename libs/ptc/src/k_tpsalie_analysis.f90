@@ -1284,6 +1284,7 @@ contains
     implicit none
     integer NO1,ND1,NP1,NDPT1,i
     LOGICAL(lp) log1,present_tpsa
+
     nb_=0
     !    if(first_time) then
     !       first_time=.false.
@@ -1367,6 +1368,8 @@ contains
     call alloc(varf2)
     npara_fpp=nd2
     NPARA_original=npara_fpp
+
+
 
   end subroutine init_map
 

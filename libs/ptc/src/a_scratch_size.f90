@@ -22,7 +22,7 @@
 module precision_constants
   implicit none
   public
-  integer,parameter  :: newscheme_max =200
+  integer,parameter  :: newscheme_max =200 
   integer,private,parameter::n_read_max=20,NCAR=120
   private read_d,read_int,read_int_a,read_d_a
   !Double precision
@@ -197,6 +197,8 @@ module precision_constants
   character(1024) :: messagelost
   integer, target :: ndpt_bmad = 0, only2d =0, addclock=0
   integer,TARGET :: HIGHEST_FRINGE=2
+  logical :: use_quaternion = .false.
+  logical :: use_tpsa = .false.
   !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence
@@ -207,7 +209,7 @@ module precision_constants
   !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
   !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
   !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
-  !  lielib_print(10)=1  print lingyun's checks
+  !  lielib_print(10)=1  print radation gain 
   !  lielib_print(11)=1  print warning about Teng-Edwards
   !  lielib_print(12)=1  print info in make_node_layout
   !  lielib_print(13)=1  print info of normal form kernel into file kernel.txt and kernel_spin.txt
@@ -753,18 +755,20 @@ CONTAINS
   END SUBROUTINE ReportOpenFiles
 
 
-  SUBROUTINE CONTEXT( STRING, nb,dollar )
+  SUBROUTINE CONTEXT( STRING, nb,dollar,maj )
     IMPLICIT NONE
     CHARACTER(*) STRING
     CHARACTER(1) C1
     integer, optional :: nb
-    logical(lp), optional :: dollar
+    logical(lp), optional :: dollar ,maj
     integer I,J,K,nb0,count
-     logical(lp) dol
+     logical(lp) dol,ma
     nb0=0
     dol=.false.
+    ma=.true.
     if(present(nb)) nb0=1
     if(present(dollar)) dol=dollar
+    if(present(maj)) ma=maj
     J = 0
     count=0
     DO I = 1, LEN (STRING)
@@ -781,7 +785,7 @@ CONTAINS
           endif
           J = J + 1
           K = ICHAR( C1 )
-          IF( K .GE. ICHAR('a') .AND. K .LE. ICHAR('z') ) THEN
+          IF( K .GE. ICHAR('a') .AND. K .LE. ICHAR('z').and.ma ) THEN
              C1 = CHAR( K - ICHAR('a') + ICHAR('A') )
           ENDIF
           STRING(J:J) = C1

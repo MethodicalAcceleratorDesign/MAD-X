@@ -956,7 +956,7 @@ M%B_L=M%B_T
 
 
     call kanalnummer(mf)
-    open(unit=mf,file=filename,recl=200)
+    open(unit=mf,file=filename) !,recl=200)
 
     nst=2*el%p%nst+1
 
@@ -2059,7 +2059,7 @@ if(present(last)) fin=last
 !goto 1
 if(present(com)) comt=com
 call kanalnummer(mf)
-open(unit=mf,file=filename,position=comt,recl=200) !comt could be append for a complex universe 
+open(unit=mf,file=filename,position=comt) !,recl=200) !comt could be append for a complex universe 
 
    write(mf,'(a120)') ring%name                        ! Sagan depedent line
    write(mf,*) highest_fringe  , " highest fringe "    !  Sagan depedent line DO NOT CHANGE
@@ -2311,7 +2311,7 @@ endif
 enddo
 
 call kanalnummer(mf)
-open(unit=mf,file=filename,position='APPEND',recl=200)
+open(unit=mf,file=filename,position='APPEND') !,recl=200)
 write(MF,*) k, " siamese in the universe "
 
 
@@ -3672,7 +3672,7 @@ comt='REWIND'
 if(present(com)) comt=com
 
 call kanalnummer(mf)
-open(unit=mf,file=filename,position=comt,recl=4000)
+open(unit=mf,file=filename,position=comt) !,recl=4000)
 
 call TIE_MAD_UNIVERSE(ud)
 

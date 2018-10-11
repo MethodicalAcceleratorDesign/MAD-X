@@ -243,7 +243,7 @@ CONTAINS
     DO I=1,R%N
        IF(P%MAG%kind==kind4) THEN
           energy=energy+p%mag%delta_e
-          write(6,*) p%mag%name
+          if(lielib_print(10)==1) write(6,*) p%mag%name
        ENDIF
        P=>P%NEXT
     ENDDO

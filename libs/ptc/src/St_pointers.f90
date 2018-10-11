@@ -21,6 +21,8 @@ module pointer_lattice
   integer :: kind_ap=2,file_ap=0                      ! Single aperture position and kind of aperture + file unit
   character(nlp) name_ap,namet(2)
   character(255) :: filename_ap = "Tracking.txt"
+  character(255), private :: file_zher,filezhe, name_zhe
+  integer, private :: k_zhe,number_zhe_maps
   integer last_npara 
   integer :: i_layout=0,i_layout_t=1
   integer my_lost_position
@@ -29,8 +31,8 @@ module pointer_lattice
   !  BEAM STUFF
   REAL(DP) SIG(6) 
   REAL(DP) ait(6,6)
-
-
+ 
+  logical :: nophase=.false. 
   INTEGER :: N_BEAM=0,USE_BEAM=1
   logical, private :: m_u_t = .true.
   TYPE(REAL_8),private :: Y(6)
@@ -58,46 +60,46 @@ module pointer_lattice
 
 !!  new stuff on non-perturbative !
 
-type  vector_field_fourier 
-     real(dp) fix(6)    !   closed orbit of map
-     integer :: ns(3)=0   ! integer for Fourier transform
-     real(dp), pointer :: mr(:,:,:,:,:) =>null()   ! spin matrices produced by code (i,j,k,1:3,1:3)
-     real(dp), pointer ::  x_i(:,:,:,:) =>null()   ! starting position in phase  x_i(i,j,k,1:6)=r%x(1:6)
-     real(dp), pointer :: phis(:,:,:,:) =>null()   ! %phis(i,j,k,2)=j*dphi2
-     type(spinor), pointer :: sp(:,:,:)            ! sp(:i,j,k)   spinor for all the matrices mr  
-     integer n1,n2,n3,nd                           ! # fourier modes -n1:n1, etc... nd=degree of freedom
-     real(dp)  mu(3),muf(3),em(3)                  ! tune and initial emitances
-     complex(dp),  DIMENSION(:,:,:,:), POINTER :: f  !  vector field expansion f(1:3,-n1:n1,-n2:n2,-n3:n3)
-end  type vector_field_fourier
-   type(vector_field_fourier) af
+!type  vector_field_fourier 
+!     real(dp) fix(6)    !   closed orbit of map
+!     integer :: ns(3)=0   ! integer for Fourier transform
+!     real(dp), pointer :: mr(:,:,:,:,:) =>null()   ! spin matrices produced by code (i,j,k,1:3,1:3)
+!     real(dp), pointer ::  x_i(:,:,:,:) =>null()   ! starting position in phase  x_i(i,j,k,1:6)=r%x(1:6)
+!     real(dp), pointer :: phis(:,:,:,:) =>null()   ! %phis(i,j,k,2)=j*dphi2
+!     type(spinor), pointer :: sp(:,:,:)            ! sp(:i,j,k)   spinor for all the matrices mr  
+!     integer n1,n2,n3,nd                           ! # fourier modes -n1:n1, etc... nd=degree of freedom
+!     real(dp)  mu(3),muf(3),em(3)                  ! tune and initial emitances
+!     complex(dp),  DIMENSION(:,:,:,:), POINTER :: f  !  vector field expansion f(1:3,-n1:n1,-n2:n2,-n3:n3)
+!end  type vector_field_fourier
+!   type(vector_field_fourier) af
 
-type  spinor_fourier 
-     integer n1,n2,n3
-     complex(dp),  DIMENSION(:,:,:,:), POINTER :: s
-end  type spinor_fourier 
+!type  spinor_fourier 
+!     integer n1,n2,n3
+!     complex(dp),  DIMENSION(:,:,:,:), POINTER :: s
+!end  type spinor_fourier 
 
-type  matrix_fourier 
-      real(dp) muf(3)
-     type(spinor_fourier) v(3)
-end  type matrix_fourier 
+!type  matrix_fourier 
+!      real(dp) muf(3)
+!     type(spinor_fourier) v(3)
+!end  type matrix_fourier 
 
-  type  explogs  
-     integer n1,n2
-     complex(dp),  DIMENSION(:,:,:), POINTER :: h
-  end  type explogs
+!  type  explogs  
+!     integer n1,n2
+!     complex(dp),  DIMENSION(:,:,:), POINTER :: h
+!  end  type explogs
 
 
-  type  logs 
-     integer  m(3),ms  
-     integer  ns,no
-     type(explogs) h,a,n
-     type(explogs), pointer ::  af(:)
-     real(dp), pointer :: as(:,:,:)
-     type(spinor), pointer :: sp(:,:)
-     real(dp), pointer :: s(:,:,:,:)  !   spin matrices
-     real(dp) em(2),mu(2),fix(6)
-     real(dp), pointer :: x_i(:,:,:),phis(:,:,:)
-  end  type logs
+!  type  logs 
+!     integer  m(3),ms  
+!     integer  ns,no
+!     type(explogs) h,a,n
+!     type(explogs), pointer ::  af(:)
+!     real(dp), pointer :: as(:,:,:)
+!     type(spinor), pointer :: sp(:,:)
+!     real(dp), pointer :: s(:,:,:,:)  !   spin matrices
+!     real(dp) em(2),mu(2),fix(6)
+!     real(dp), pointer :: x_i(:,:,:),phis(:,:,:)
+!  end  type logs
 
 
 contains
@@ -167,7 +169,7 @@ endif
     integer ntune(2)
     ! fitting and scanning tunes
     real(dp) tune_ini(2),tune_fin(2),dtu(2),fint,hgap
-    integer nstep(2),i1,i2,I3,n_bessel
+    integer nstep(2),i1,i2,I3,n_bessel,i11,i22,di12
     LOGICAL(LP) STRAIGHT,skip,fixp,skipcav,fact
     ! end
     ! TRACK 4D NORMALIZED
@@ -216,7 +218,7 @@ endif
     REAL(DP) RA(2)
     REAL(DP) XA,YA,DXA,DYA, DC_ac,A_ac,theta_ac,D_ac
     real(dp), allocatable :: an(:),bn(:) !,n_co(:)
-    integer icnmin,icnmax,n_ac,inode !,n_coeff
+    integer icnmin,icnmax,n_ac,inode,icavv !,n_coeff
     logical :: longprintt,onemap
 !    logical :: log_estate=.true. 
     integer :: mftune=6,nc
@@ -1341,11 +1343,60 @@ endif
       !    if(n_coeff>0) then
       !       deallocate(n_co)
       !    endif
+       case('MAPSFORZHE')
+          READ(MF,*) i11,I22,number_zhe_maps ,hgap ! position  i1=i2 one turn map,  fact is precision of stochastic kick
+          READ(MF,*) MY_A_NO   ! ORDER OF THE MAP  
+          READ(MF,*) filename
+          if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
+          if(i11==i22) i22=i11+my_ering%n
+          di12=float(i22-i11)/number_zhe_maps
+                        do k_zhe=1,number_zhe_maps
+                             write(name_zhe,*) k_zhe
+                           file_zher(1:len_trim(filename))=filename(1:len_trim(filename))
+                           file_zher(1+len_trim(filename):len_trim(filename)+len_trim(name_zhe))=name_zhe(1:len_trim(name_zhe))
+                           call context(file_zher)
+                          write(6,*) "out file ",file_zher(1:len_trim(file_zher))
+           
+          i1=i11+(k_zhe-1)*di12
+          i2=i1+di12
+          if(i2>i22.or.k_zhe==number_zhe_maps) i2=i22
+          write(6,*)" from to ", i1,i2,i22
+!pause 873
+           p=>my_ering%start
+           f1=>p          
+           do ii=2,i1
+            p=>p%next
+             f1=>p
+           enddo
+           if(I2==i1) then
+            f2=>f1
+           else
+            p=>my_ering%start
+            f2=>p 
+            do ii=2,i2
+              p=>p%next
+              f2=>p
+            enddo
+            endif
+             x_ref=0.0_dp
 
+
+if(.not.my_estate%envelope) hgap=-1
+ if(my_a_no>0)            call FIND_ORBIT_x(x_ref,my_estate,1.d-7,fibre1=f1)
+
+              call fill_tree_element_line_zhe(my_estate,f1,f2,iabs(MY_A_NO),x_ref,file_zher,stochprec=hgap) 
+
+
+write(6,*) " State used "
+          call print(my_estate,6)
+write(6,*) " closed orbit at position ",i1
+           write(6,*) x_ref(1:3)
+           write(6,*) x_ref(4:6)
+                  enddo
 
        case('MAPFORZHE')
           READ(MF,*) i1,I2,hgap  ! position  i1=i2 one turn map,  fact is precision of stochastic kick
-          READ(MF,*) MY_A_NO  ! ORDER OF THE MAP
+          READ(MF,*) MY_A_NO   ! ORDER OF THE MAP  
           READ(MF,*) filename
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
           
@@ -1368,9 +1419,11 @@ endif
              x_ref=0.0_dp
 
 
+if(.not.my_estate%envelope) hgap=-1
+ if(my_a_no>0)            call FIND_ORBIT_x(x_ref,my_estate,1.d-7,fibre1=f1)
 
-             call FIND_ORBIT_x(x_ref,my_estate,1.d-7,fibre1=f1)
-              call fill_tree_element_line_zhe(my_estate,f1,f2,MY_A_NO,x_ref,filename,stochprec=hgap) 
+              call fill_tree_element_line_zhe(my_estate,f1,f2,iabs(MY_A_NO),x_ref,filename,stochprec=hgap) 
+
 
 write(6,*) " State used "
           call print(my_estate,6)
@@ -1383,7 +1436,7 @@ write(6,*) " closed orbit at position ",i1
           READ(MF,*) i1,I2,i3  ! position
           READ(MF,*) MY_A_NO  ! ORDER OF THE MAP
           READ(MF,*) fixp,fact,noca  !  SYMPLECTIC , factored
-    !      READ(MF,*) filename
+          READ(MF,*) filename
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
           
            
@@ -1409,9 +1462,22 @@ write(6,*) " closed orbit at position ",i1
              else
                 ft=>my_fring%start       
              endif
+
+if(noca) then
+             call FIND_ORBIT_x(x_ref,time0+nocavity0,1.d-7,fibre1=f1)
+else
              call FIND_ORBIT_x(x_ref,time0,1.d-7,fibre1=f1)
+endif  
+
+             name_root=filename
+             call context(name_root)
+             if(name_root(1:2)=='NO') then
+              call fill_tree_element_line(f1,f2,ft,i2,x_ref,fact,nocav=noca)
+             else
+              call fill_tree_element_line(f1,f2,ft,i2,x_ref,fact,nocav=noca,file=filename)
+             endif
   
-              call fill_tree_element_line(f1,f2,ft,MY_A_NO,x_ref,fact,nocav=noca)
+
 
                     ft%mag%forward(3)%symptrack=FIXP
                     ft%magP%forward(3)%symptrack=FIXP
@@ -1433,7 +1499,7 @@ write(6,*) " closed orbit at position ",i1
           READ(MF,*) i1,i3  ! position
           READ(MF,*) I2  ! ORDER OF THE MAP
           READ(MF,*) fixp,fact,noca  !  SYMPLECTIC , factored
-    !      READ(MF,*) filename
+          READ(MF,*) filename
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
           
            p=>my_ering%start
@@ -1453,14 +1519,20 @@ write(6,*) " closed orbit at position ",i1
              else
                 ft=>my_fring%start       
              endif
+if(noca) then
+             call FIND_ORBIT_x(x_ref,time0+nocavity0,1.d-7,fibre1=f1)
+else
              call FIND_ORBIT_x(x_ref,time0,1.d-7,fibre1=f1)
-         !    name_root=filename
-        !     call context(name_root)
-       !      if(name_root(1:2)=='NO') then
+endif  
+write(6,*) x_ref
+       
+             name_root=filename
+             call context(name_root)
+             if(name_root(1:2)=='NO') then
               call fill_tree_element_line(f1,f2,ft,i2,x_ref,fact,nocav=noca)
-       !      else
-        !      call fill_tree_element_line(f1,f2,ft,i2,x_ref,fact,nocav=noca,file=filename)
-      !       endif
+             else
+              call fill_tree_element_line(f1,f2,ft,i2,x_ref,fact,nocav=noca,file=filename)
+             endif
                     ft%mag%forward(3)%symptrack=FIXP
                     ft%magP%forward(3)%symptrack=FIXP
                     ft%mag%do1mapf=.true.
@@ -1537,6 +1609,7 @@ write(6,*) " closed orbit at position ",i1
           READ(MF,*) skipcav  !  skip cavity 
           icnmin=0
           icnmax=0
+          icavv=0
           x_ref=0.0_DP
            n_ac=0
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
@@ -1567,7 +1640,8 @@ write(6,*) " closed orbit at position ",i1
                     p%mag%BACKward(3)%symptrack=FIXP
                     p%magP%BACKward(3)%symptrack=FIXP
                    ENDIF
-  
+              else
+                icavv=icavv+1
               endif
              else
               icnmin=icnmin+1
@@ -1578,6 +1652,7 @@ write(6,*) " closed orbit at position ",i1
           enddo
          write(6,*) icnmax, " changed into Taylor maps "
          write(6,*) icnmin, " markers "
+         write(6,*) icavv, " cavities left alone "
          write(6,*) my_ering%N, " total number of fibres "
        case('REMOVEALLMAPS')
        READ(MF,*) I1,I2  ! ORDER OF THE MAP
@@ -3065,7 +3140,547 @@ endif
  
 
 
-!!!!!!!  stuff for demin  !!!!!!!
+!!!!!!!  stuff sodomite !!!!!!!
+
+
+ subroutine data_normal_form_fourier_c_quaternion(fq,r)
+ implicit none
+ type(layout), target :: r
+ type(c_quaternion_fourier) fq
+ type(c_damap) c_map,id_s
+ type(c_normal_form) c_n
+ type(probe_8) xs
+ type(probe) xs0
+ type(internal_state) state
+type(c_fourier_index) , pointer ::p
+ integer i,j,n(2),count
+ real(dp) x(6),phi(2)
+type(c_ray) cray
+
+CALL FIND_ORBIT(r,fq%closed_orbit,fq%pos,fq%STATE,c_1d_5)  ! (3)
+ 
+XS0=fq%closed_orbit
+ 
+write(6,'(6(1x,g20.13))')fq%closed_orbit
+
+state=fq%state+spin0
+
+
+call init_all(STATE,fq%no,0)
+
+call alloc(c_map,id_s)
+call alloc(c_n)
+call alloc(xs)
+
+id_s=1
+
+xs=xs0 + id_s
+
+ CALL propagate(r,XS,STATE,FIBRE1=fq%pos)  ! (4)
+
+c_map=xs
+call  c_normal(c_map,c_n,dospin=my_true) 
+
+fq%mux=c_n%tune(1)*twopi 
+fq%muy=c_n%tune(2)*twopi 
+
+
+fq%a=c_n%atot
+fq%ai=c_n%atot**(-1)
+ 
+
+x=0
+
+x(1)= fq%rx
+x(3)= fq%ry 
+if(fq%no==1) then
+
+ x(1:4)=matmul(fq%a,x(1:4)) 
+else
+ cray%x=0
+ cray%x(1:6)=x(1:6)
+
+ cray=c_n%a_t.o.cray
+
+  x = cray%x(1:6)
+
+endif
+fq%x(1:6,0)=x 
+write(6,*) " closed "
+write(6,'(6(1x,g20.13))')fq%closed_orbit
+write(6,'(6(1x,g20.13))')fq%x(1:6,0)
+!write(6,*) " start 0"
+
+if(fq%nray==0) then
+
+do i=0,fq%nphix
+do j=0,fq%nphiy
+x=0
+
+x(1)= fq%rx*cos(i*fq%dphix)
+x(2)=-fq%rx*sin(i*fq%dphix)
+x(3)= fq%ry*cos(j*fq%dphiy)
+x(4)=-fq%ry*sin(j*fq%dphiy)
+
+if(fq%no==1) then
+ x(1:4)=matmul(fq%a,x(1:4)) 
+else
+ cray%x=0
+ cray%x(1:6)=x(1:6)
+
+ cray=c_n%a_t.o.cray
+
+  x = cray%x(1:6)
+
+endif
+
+
+
+
+x=x+fq%closed_orbit
+
+XS0%x=x
+XS0%q=1.0_dp
+
+ CALL propagate(r,XS0,STATE,FIBRE1=1) 
+ 
+fq%qd(i,j)=XS0%q
+ 
+!write(6,'(6(1x,g20.13))') xs0%x(1:6)
+enddo
+enddo
+!write(6,*) " end 0"
+
+call kill(c_map,id_s)
+call kill(c_n)
+call kill(xs)
+
+
+else 
+
+write(6,*) " initial ray around the closed orbit "
+write(6,*) x
+write(6,*) " ######################################"
+state=fq%state-spin0
+
+XS0%x=fq%x(1:6,0)+fq%closed_orbit
+ 
+do i=0,fq%nray
+
+ CALL propagate(r,XS0,STATE,FIBRE1=1) 
+ if(i/=fq%nray) then
+  fq%x(1:6,i+1)=xs0%x-fq%closed_orbit
+  fq%x(5:6,i+1)=0
+ endif
+enddo
+call find_tunes(fq)
+
+count=0
+  call locate_phi(fq,0,phi,n,count)
+ 
+do i=0,fq%nray
+
+ if(i/=fq%nray) then
+  fq%x(1:6,i+1)=xs0%x-fq%closed_orbit
+  fq%x(5:6,i+1)=0
+  call locate_phi(fq,i+1,phi,n,count)
+ endif
+ if( count==fq%nphix*fq%nphiy) exit
+
+
+! call locate_phi(fq,i,phi,n)
+ !if(fq%nd/=0) write(6,*) i,"fq%nd ", fq%nd
+
+ if(.not.check_stable) then
+ write(6,*) xs0%x
+  stop 666
+ endif
+
+enddo
+
+
+call kill(c_map,id_s)
+call kill(c_n)
+call kill(xs)
+
+ call c_phi(fq)
+
+
+
+
+ 
+fq%f(0,0)%r(1:6)=fq%x(1:6,0)
+
+if(.true.) then
+
+state=fq%state+spin0
+!write(6,*) " closed "
+!write(6,'(6(1x,g20.13))')fq%closed_orbit
+!write(6,*) " start "
+do i=0,fq%nphix-1
+do j=0,fq%nphiy-1
+
+
+XS0%x=fq%f( i,j)%r+fq%closed_orbit
+XS0%q=1.0_dp
+
+ CALL propagate(r,XS0,STATE,FIBRE1=1) 
+! write(6,'(6(1x,g20.13))')  xs0%x(1:6)
+ if(.not.check_stable) then
+ write(6,*) i,j
+ write(6,*) fq%r(1:6, i,j)
+ write(6,*) xs0%x
+ stop 666
+endif
+
+ fq%qd(i,j)=XS0%q
+ 
+enddo
+enddo
+
+write(6,*) " end "
+endif ! false
+
+endif
+
+
+ end subroutine data_normal_form_fourier_c_quaternion
+
+subroutine c_phi(fq)
+implicit none
+type(c_quaternion_fourier) fq
+type(c_fourier_index) , pointer ::p
+integer i,j,k,nx,ny,l,inx
+type(taylor) g,h,f(4)
+type(gmap) gm
+ 
+
+call init(2,2,0,0)
+call alloc(gm)
+call alloc(g,h)
+call alloc(f)
+
+nx=fq%nphix
+ny=fq%nphiy
+
+do i=0,nx-1
+do j=0,ny-1
+ fq%f(i,j)%r=0.0_dp
+do inx=1,4
+p=> fq%f(i,j)
+ h=0.0_dp
+f(inx)=0.0_dp
+do k=1,fq%f(i,j)%i
+p=>p%next
+ 
+  g=dz_t(1)+dz_t(2)*p%ph(1)+dz_t(3)*p%ph(2) !+dz_t(4)*p%ph(1)**2 + &
+   !+dz_t(5)*p%ph(1)*p%ph(2) +dz_t(6)*p%ph(2)**2 
+  f(inx)=0.5_dp*(p%x(inx) - g)**2 + f(inx)
+enddo
+ 
+ 
+ do l=1,3  !6
+  gm%v(l)=f(inx).d.l
+ enddo
+gm%v(4)=1.d0.mono.4
+ 
+  gm=gm.oo.(-1)
+  fq%f(i,j)%r(inx)=gm%v(1).sub.'0'
+ 
+enddo ! inx
+
+enddo 
+ enddo
+
+call kill(gm)
+call kill(g,h)
+
+end subroutine c_phi
+
+subroutine locate_phi(fq,i,phi,n,count)
+implicit none
+type(c_quaternion_fourier) fq
+type(c_fourier_index) , pointer ::p
+integer i,n(2) ,count
+real(dp) phi(2),nx,ny,d
+
+nx=fq%nphix
+ny=fq%nphiy
+
+phi(1)=mod(i*fq%mux/fq%dphix,nx)
+phi(2)=mod(i*fq%muy/fq%dphiy,ny)
+
+if(nx-0.5d0<phi(1)) phi(1)=phi(1)-nx
+if(ny-0.5d0<phi(2)) phi(2)=phi(2)-ny
+n(1)=nint(phi(1))
+n(2)=nint(phi(2))
+d=sqrt( (n(1)-phi(1))**2+ (n(2)-phi(2))**2)
+ 
+if(fq%found(n(1),n(2))) then
+ if(d<fq%d(n(1),n(2))) then
+  fq%d(n(1),n(2))=d
+  fq%p(n(1),n(2))=i
+  fq%ph(1,n(1),n(2))=-n(1)+phi(1)
+  fq%ph(2,n(1),n(2))=-n(2)+phi(2)
+  fq%f(n(1),n(2))%ph=-n(1:2)+phi(1:2)
+  fq%f(n(1),n(2))%x=fq%x(1:6,i)
+!   write(6,*) n(1),n(2),d
+ endif
+ 
+     allocate(fq%f(n(1),n(2))%last%next)
+     fq%f(n(1),n(2))%last=>fq%f(n(1),n(2))%last%next
+     p=>fq%f(n(1),n(2))%last
+     allocate(p%i)
+     allocate(p%x(6))
+     allocate(p%ph(2))
+     p%ph(1:2)=-n(1:2)+phi(1:2)
+     p%x=fq%x(1:6,i)
+     p%i=fq%f(n(1),n(2))%i+1
+   if(p%i==fq%countmax) count=count+1
+     fq%f(n(1),n(2))%i=fq%f(n(1),n(2))%i+1
+ 
+else
+ fq%found(n(1),n(2))=.true.
+ fq%d(n(1),n(2))=d
+ fq%p(n(1),n(2))=i
+ fq%nd=fq%nd-1
+  fq%ph(1,n(1),n(2))=-n(1)+phi(1)
+  fq%ph(2,n(1),n(2))=-n(2)+phi(2)
+ !  if(n(1)+n(2)/=0) then
+     allocate(fq%f(n(1),n(2))%next)
+     fq%f(n(1),n(2))%last=>fq%f(n(1),n(2))%next
+     p=>fq%f(n(1),n(2))%next
+     allocate(p%i)
+     allocate(p%x(6))
+     allocate(p%ph(2))
+     p%ph(1:2)=-n(1:2)+phi(1:2)
+     p%x=fq%x(1:6,i)
+     p%i=1
+     fq%f(n(1),n(2))%i=1
+ ! endif
+
+endif
+
+end subroutine locate_phi
+
+subroutine find_tunes(fq)
+implicit none
+type(c_quaternion_fourier) fq
+integer i,j
+ real(dp)  d(3),w(6),r(6),c,s
+ 
+  d=0
+
+ r=0
+ w=0
+ r=fq%x(1:6,0)
+ r(1:4)=matmul(fq%ai,r(1:4)) 
+ do i=1,fq%nray
+  w=fq%x(1:6,i)
+ w(1:4)=matmul(fq%ai,w(1:4)) 
+ do j=1,2
+  c=(w(2*j-1)*r(2*j-1)+w(2*j)*r(2*j)) 
+  s=(w(2*j-1)*r(2*j)-w(2*j)*r(2*j-1)) 
+  c=atan2(s,c)
+  if(c<0) c=c+twopi
+  d(j)=d(j)+c
+ enddo
+  r=w
+ enddo
+ d=d/fq%nray
+write(6,*) d(1:2)
+write(6,*) fq%mux,fq%muy
+write(6,*) " replace "
+read(5,*) i
+if(i==1) then
+ fq%mux=d(1)
+ fq%muy=d(2)
+endif
+ end subroutine find_tunes
+
+subroutine create_phi(fq)
+implicit none
+type(c_quaternion_fourier) fq
+integer k1,k2,pos,k11,pos11,k22,pos22,k
+ real(dp) dxx,dxy,dyx,dyy,d(2)
+ type(c_damap) a,b
+
+ call alloc(a,b)
+
+do k1=0, fq%nphix-1
+do k2=0, fq%nphiy-1
+
+pos=0
+if(k1==0.and.k2==0) cycle
+
+!  1  1
+b=0
+pos=fq%p(k1,k2)
+k11=k1+1
+if(k11==fq%nphix) k11=0
+pos11=fq%p(k11,k2)
+! write(6,*) " *** ",k11,k2
+!write(6,*) fq%ph(1,k11,k2), fq%ph(2,k11,k2)
+dxx=fq%ph(1,k11,k2)+1-fq%ph(1,k1,k2)
+dxy=fq%ph(2,k11,k2)-fq%ph(2,k1,k2)
+k22=k2+1
+if(k22==fq%nphiy) k22=0
+pos22=fq%p(k1,k22)
+! write(6,*) " *** ",k1,k22
+!write(6,*) fq%ph(1,k1,k22), fq%ph(2,k1,k22)
+dyx=fq%ph(1,k1,k22)-fq%ph(1,k1,k2)
+dyy=fq%ph(2,k1,k22)+1-fq%ph(2,k1,k2)
+! write(6,*) " deltas "
+!write(6,*) dxx,dxy
+!write(6,*) dyx,dyy
+
+do k=1,4
+ a=1
+ a%v(1)=(dxx.cmono.1)+(dxy.cmono.2)
+ a%v(2)=(dyx.cmono.1)+(dyy.cmono.2)
+ a=a**(-1)
+ b%v(1)=fq%x(k,pos11)-fq%x(k,pos)
+ b%v(2)=fq%x(k,pos22)-fq%x(k,pos)
+ b=a.o.b
+
+ d(1)=b%v(1)
+ d(2)=b%v(2)
+ !    allocate(f%r(1:6,0:f%nphix-1,0:f%nphiy-1))
+ fq%r(k, k1,k2)= fq%x(k,pos) - d(1)*fq%ph(1,k1,k2)- d(2)*fq%ph(2,k1,k2)
+! write(6,*) fq%r(k, k1,k2) ,fq%x(k,pos) 
+enddo
+ if(nophase) fq%r(1:6, k1,k2)=fq%x(1:6,pos)
+fq%r(1:6, 0,0)=fq%x(1:6,0)
+!else
+
+! -1 -1
+b=0
+pos=fq%p(k1,k2)
+k11=k1-1
+if(k11==-1) k11=fq%nphix-1
+pos11=fq%p(k11,k2)
+! write(6,*) " *** ",k11,k2
+!write(6,*) fq%ph(1,k11,k2), fq%ph(2,k11,k2)
+dxx=fq%ph(1,k11,k2)-1-fq%ph(1,k1,k2)
+dxy=fq%ph(2,k11,k2)-fq%ph(2,k1,k2)
+k22=k2-1
+if(k22==-1) k22=fq%nphiy-1
+pos22=fq%p(k1,k22)
+! write(6,*) " *** ",k1,k22
+!write(6,*) fq%ph(1,k1,k22), fq%ph(2,k1,k22)
+dyx=fq%ph(1,k1,k22)-fq%ph(1,k1,k2)
+dyy=fq%ph(2,k1,k22)-1-fq%ph(2,k1,k2)
+! write(6,*) " deltas "
+!write(6,*) dxx,dxy
+!write(6,*) dyx,dyy
+
+do k=1,4
+ a=1
+ a%v(1)=(dxx.cmono.1)+(dxy.cmono.2)
+ a%v(2)=(dyx.cmono.1)+(dyy.cmono.2)
+ a=a**(-1)
+ b%v(1)=fq%x(k,pos11)-fq%x(k,pos)
+ b%v(2)=fq%x(k,pos22)-fq%x(k,pos)
+ b=a.o.b
+
+ d(1)=b%v(1)
+ d(2)=b%v(2)
+ !    allocate(f%r(1:6,0:f%nphix-1,0:f%nphiy-1))
+ fq%r(k, k1,k2)=fq%r(k, k1,k2)+ fq%x(k,pos) - d(1)*fq%ph(1,k1,k2)- d(2)*fq%ph(2,k1,k2)
+!fq%r(k, k1,k2)=fq%r(k, k1,k2)/2.0_dp
+! write(6,*) fq%r(k, k1,k2) ,fq%x(k,pos) 
+enddo
+ if(nophase) fq%r(1:6, k1,k2)=fq%x(1:6,pos)
+
+
+!   1 -1
+b=0
+pos=fq%p(k1,k2)
+k11=k1+1
+if(k11==fq%nphix) k11=0
+pos11=fq%p(k11,k2)
+! write(6,*) " *** ",k11,k2
+!write(6,*) fq%ph(1,k11,k2), fq%ph(2,k11,k2)
+dxx=fq%ph(1,k11,k2)+1-fq%ph(1,k1,k2)
+dxy=fq%ph(2,k11,k2)-fq%ph(2,k1,k2)
+k22=k2-1
+if(k22==-1) k22=fq%nphiy-1
+pos22=fq%p(k1,k22)
+! write(6,*) " *** ",k1,k22
+!write(6,*) fq%ph(1,k1,k22), fq%ph(2,k1,k22)
+dyx=fq%ph(1,k1,k22)-fq%ph(1,k1,k2)
+dyy=fq%ph(2,k1,k22)-1-fq%ph(2,k1,k2)
+! write(6,*) " deltas "
+!write(6,*) dxx,dxy
+!write(6,*) dyx,dyy
+
+do k=1,4
+ a=1
+ a%v(1)=(dxx.cmono.1)+(dxy.cmono.2)
+ a%v(2)=(dyx.cmono.1)+(dyy.cmono.2)
+ a=a**(-1)
+ b%v(1)=fq%x(k,pos11)-fq%x(k,pos)
+ b%v(2)=fq%x(k,pos22)-fq%x(k,pos)
+ b=a.o.b
+
+ d(1)=b%v(1)
+ d(2)=b%v(2)
+ !    allocate(f%r(1:6,0:f%nphix-1,0:f%nphiy-1))
+ fq%r(k, k1,k2)=fq%r(k, k1,k2)+ fq%x(k,pos) - d(1)*fq%ph(1,k1,k2)- d(2)*fq%ph(2,k1,k2)
+!fq%r(k, k1,k2)=fq%r(k, k1,k2)/2.0_dp
+! write(6,*) fq%r(k, k1,k2) ,fq%x(k,pos) 
+enddo
+ if(nophase) fq%r(1:6, k1,k2)=fq%x(1:6,pos)
+
+! -1 1
+b=0
+pos=fq%p(k1,k2)
+k11=k1-1
+if(k11==-1) k11=fq%nphix-1
+pos11=fq%p(k11,k2)
+! write(6,*) " *** ",k11,k2
+!write(6,*) fq%ph(1,k11,k2), fq%ph(2,k11,k2)
+dxx=fq%ph(1,k11,k2)-1-fq%ph(1,k1,k2)
+dxy=fq%ph(2,k11,k2)-fq%ph(2,k1,k2)
+k22=k2+1
+if(k22==fq%nphiy) k22=0
+pos22=fq%p(k1,k22)
+! write(6,*) " *** ",k1,k22
+!write(6,*) fq%ph(1,k1,k22), fq%ph(2,k1,k22)
+dyx=fq%ph(1,k1,k22)-fq%ph(1,k1,k2)
+dyy=fq%ph(2,k1,k22)+1-fq%ph(2,k1,k2)
+! write(6,*) " deltas "
+!write(6,*) dxx,dxy
+!write(6,*) dyx,dyy
+
+do k=1,4
+ a=1
+ a%v(1)=(dxx.cmono.1)+(dxy.cmono.2)
+ a%v(2)=(dyx.cmono.1)+(dyy.cmono.2)
+ a=a**(-1)
+ b%v(1)=fq%x(k,pos11)-fq%x(k,pos)
+ b%v(2)=fq%x(k,pos22)-fq%x(k,pos)
+ b=a.o.b
+
+ d(1)=b%v(1)
+ d(2)=b%v(2)
+ !    allocate(f%r(1:6,0:f%nphix-1,0:f%nphiy-1))
+ fq%r(k, k1,k2)=fq%r(k, k1,k2)+ fq%x(k,pos) - d(1)*fq%ph(1,k1,k2)- d(2)*fq%ph(2,k1,k2)
+ fq%r(k, k1,k2)=fq%r(k, k1,k2)/4.0_dp
+! write(6,*) fq%r(k, k1,k2) ,fq%x(k,pos) 
+enddo
+ if(nophase) fq%r(1:6, k1,k2)=fq%x(1:6,pos)
+
+
+
+
+fq%r(1:6, 0,0)=fq%x(1:6,0)
+!endif
+enddo
+enddo
+call kill(a,b)
+end subroutine create_phi
+
 
 
 end module pointer_lattice

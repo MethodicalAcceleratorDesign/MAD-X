@@ -25,7 +25,7 @@ module ptc_multiparticle
   real(dp) :: xsm0t=0.0_dp,xsmt=0.0_dp
   !real(dp) :: unit_time =1.0e-3_dp
   REAL(dp) :: x_orbit_sync(6)= 0.0_dp,dt_orbit_sync=0.0_dp
-    logical(lp) :: use_bmad_units=.false.
+  logical(lp) :: use_bmad_units=.false.,inside_bmad=.false.
 
   INTERFACE TRACK_NODE_SINGLE
      MODULE PROCEDURE TRACK_NODE_SINGLER     !@1  t,x,state,charge
@@ -838,7 +838,7 @@ ENDIF
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
 
-    
+
     ! The magnet frame of reference is located here implicitely before misalignments
     CALL DTILTD(C%MAGP%P%TILTD,2,X)
 
@@ -858,7 +858,6 @@ ENDIF
     ! The CHART frame of reference is located here implicitely
     b1=C%BETA0
     IF(PATCHE/=0.AND.PATCHE/=1.AND.PATCHE/=4) THEN
-
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
 !       IF(.NOT.ASSOCIATED(CN)) CN=>C
@@ -892,7 +891,6 @@ ENDIF
                X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp   ! 8/31/2016
              ENDIF               
     ENDIF
-    
 endif
  
 
@@ -1220,7 +1218,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     IF(.NOT.CHECK_STABLE) return
     !       CALL RESET_APERTURE_FLAG
     !    endif
-    
+
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then
        messageLOST="exceed absolute_aperture in TRACKP_NODE_SINGLE"
        lost_node=>t
@@ -1244,25 +1242,20 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     SELECT CASE(T%CAS)
     CASE(CASEP1)
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
-       if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
-          TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==-1 .OR.  &
-             T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
+     if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
+TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAGP%p%dir  &
+*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
           if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
-       endif
-          global_e= x(5)*el%p%p0c
+     endif
+        global_e= x(5)*el%p%p0c
     CASE(CASEP2)
-    
-  
-       if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
-          TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1 .OR.  &
-                 T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
+     if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
+TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAGP%p%dir  &
+*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
           if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
-       endif
-
+     endif
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
-       global_e= x(5)*el%p%p0c
-
-  
+        global_e= x(5)*el%p%p0c
     CASE(CASE1,CASE2)
 !       el=>T%PARENT_FIBRE%MAGP
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE.and.t%cas==case2) &
@@ -1331,7 +1324,6 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
        END SELECT
         global_e= x(5)*el%p%p0c
     CASE(CASE0)
-
  !      el=>T%PARENT_FIBRE%MAGP
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
             call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
@@ -1445,7 +1437,6 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
             call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
 
     case(CASET)
-
        if(associated(t%bb).and.dobb.and.do_beam_beam) then
 
           if(t%bb%patch) call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_true)
@@ -3107,7 +3098,7 @@ if(.not.associated(p%t1%a))     CALL  allocate_node_frame( R)   !call FILL_SURVE
  
 
 
-!t=>p%t1
+t=>p%t1
 !call survey_integration_node_p1(t,a0,ent0)
 t=>t%next
 call survey_integration_fringe(t,a0,ent0)

@@ -25,13 +25,13 @@ module tree_element_MODULE
   !  private smatp,smatmulp
 
   PRIVATE EQUAL_PROBE8_PROBE8,PRINT_probe8,PRINT_probe
-  PRIVATE assprobe_8
+
   private read_probe8
 
 
   private scdaddo,daddsco
-  private real_8REAL6,REAL6real_8,real_8REAL_8,PRINT6
-
+  private real_8REAL6,REAL6real_8,real_8REAL_8
+  private probe_quaternion_to_matrixr,probe_quaternion_to_matrixp
 
 
   private EQUAL_RF8_RF8 !,extract_envelope_probe8
@@ -49,7 +49,8 @@ module tree_element_MODULE
   integer :: nbe=8
   integer :: n_rf=0  !number of modulation clocks in the simulation
   integer :: modulationtype=0 ! 0 is the full blown and internal anf externa field, 1 is simple one on external field only without cos(theta)
-  INTERFACE assignment (=)
+  
+   INTERFACE assignment (=)
      !
      MODULE PROCEDURE REAL_8REAL6
      MODULE PROCEDURE REAL6REAL_8
@@ -79,7 +80,11 @@ module tree_element_MODULE
      !    MODULE PROCEDURE     EQUAL_nn_damap
   end  INTERFACE
 
-
+  INTERFACE probe_quaternion_to_matrix
+     MODULE PROCEDURE probe_quaternion_to_matrixr
+     MODULE PROCEDURE probe_quaternion_to_matrixp
+  END INTERFACE
+ 
   INTERFACE OPERATOR (.dot.)
      MODULE PROCEDURE dot_real
      MODULE PROCEDURE dot_spinor
@@ -108,7 +113,7 @@ module tree_element_MODULE
 
 
   INTERFACE PRINT
-     MODULE PROCEDURE PRINT6
+
 !!!
      MODULE PROCEDURE PRINT_probe
      MODULE PROCEDURE PRINT_probe8
@@ -116,10 +121,7 @@ module tree_element_MODULE
      MODULE PROCEDURE print_rf_phasor_8
   END INTERFACE
 
-  INTERFACE daPRINT
-     MODULE PROCEDURE PRINT6
-!!!!
-  END INTERFACE
+
 
   INTERFACE READ
      MODULE PROCEDURE read_probe8   ! a bit illegal : reading polymorphs as taylor...
@@ -156,9 +158,6 @@ module tree_element_MODULE
      MODULE PROCEDURE KILL_TREE_N
   END INTERFACE
 
-  INTERFACE ass
-     MODULE PROCEDURE assprobe_8
-  END INTERFACE
 
 
 CONTAINS
@@ -264,27 +263,6 @@ CONTAINS
     enddo
   END SUBROUTINE real_8REAL6
 
-
- 
- 
-
-  SUBROUTINE  print6(S1,mf)
-    implicit none
-    type (real_8),INTENT(INout)::S1(:)
-    integer,optional :: mf
-    integer        i
-    
- !   if(size(s1)==6) then
- !    do i=1,ndd
- !       call print(s1(i),mf)
- !    enddo
- !   else
-     do i=1,size(s1)
-        call print(s1(i),mf)
-     enddo
- !   endif
-  END SUBROUTINE print6
-
 !!! end of "use to be in extend_poly"
 
   SUBROUTINE COPY_TREE(T,U)
@@ -312,7 +290,8 @@ CONTAINS
     U%eps=T%eps
     U%symptrack=T%symptrack
     U%usenonsymp=T%usenonsymp
-
+    U%factored=T%factored
+   ! U%ng=T%ng
   END SUBROUTINE COPY_TREE
 
   SUBROUTINE COPY_TREE_N(T,U)
@@ -348,7 +327,7 @@ CONTAINS
 
     ALLOCATE(T%CC(N),T%fix0(6),T%fix(6),T%fixr(6),T%JL(N),T%JV(N),T%N,T%ds,T%beta0,T%np,T%no, & 
   !  t%e_ij(c_%nd2,c_%nd2),T%rad(c_%nd2,c_%nd2),t%usenonsymp, t%symptrack, t%eps)  !,t%file)
-     t%e_ij(6,6),T%rad(6,6),t%usenonsymp, t%symptrack, t%eps)  !,t%file)
+     t%e_ij(6,6),T%rad(6,6),t%usenonsymp, t%symptrack, t%eps,t%factored) !,t%ng)  !,t%file)
     t%cc=0
     t%jl=0
     t%jv=0
@@ -369,7 +348,8 @@ CONTAINS
     t%eps=1.d-7
     t%symptrack=.false.
     t%usenonsymp=.false.
-
+    t%factored=.false.
+  !  t%ng=1
   END SUBROUTINE ALLOC_TREE
 
   SUBROUTINE SET_TREE(T,MA)
@@ -527,7 +507,7 @@ CONTAINS
 
 
      IF(ASSOCIATED(T%CC))DEALLOCATE(T%CC,T%fix0,T%fix,T%fixr,t%ds,t%beta0,T%JL,T%JV,T%N,T%NP, &
-    T%No,t%e_ij,t%rad,t%eps,t%symptrack,t%usenonsymp)  !,t%file)
+    T%No,t%e_ij,t%rad,t%eps,t%symptrack,t%usenonsymp,t%factored)  !,t%file)
 
 
   END SUBROUTINE KILL_TREE
@@ -729,55 +709,6 @@ CONTAINS
 
 
 
-  subroutine assprobe_8(s1)
-    implicit none
-    TYPE (probe_8) s1
-    integer i,j
-
-    select case(master)
-    case(0:ndumt-1)
-       master=master+1
-    case(ndumt)
- 
-       write(6,*) " cannot indent anymore assprobe_8" 
- 
-       ! call !write_e(100)
-    end select
-
-    !    if(C_%SPIN_POS/=0) then
-    !       do i=1,3
-    !          call ass0(s1%s%x(i)%t)
-    !          s1%s%x(i)%alloc=my_true
-    !          s1%s%x(i)%kind=2
-    !          s1%s%x(i)%i=0
-    !       enddo
-    do j=1,3
-       do i=1,3
-          call assp_no_master(s1%s(j)%x(i))
-          !          call ass0(s1%s(j)%x(i)%t)
-          !          s1%s(j)%x(i)%alloc=my_true
-          !          s1%s(j)%x(i)%kind=1
-          !          s1%s(j)%x(i)%i=0
-       enddo
-    enddo
-
-    !    endif
-    do i=1,6  !
-       call assp_no_master(s1%x(i))
-       !       call ass0(s1%x(i)%t)
-       !       s1%x(i)%alloc=my_true
-       !       s1%x(i)%kind=1
-       !       s1%x(i)%i=0
-    enddo
-    do j=1,s1%nac
-    do i=1,2  !
-       call assp_no_master(s1%AC(j)%x(i))
-    enddo
-    enddo
-
-
-  end subroutine assprobe_8
-
 
  
 
@@ -854,7 +785,7 @@ CONTAINS
   subroutine EQUAL_PROBE_REAL6 (P,X)
     implicit none
     TYPE(PROBE), INTENT(INOUT) :: P
-    REAL(DP), INTENT(IN) :: X(6)
+    REAL(DP), INTENT(IN) :: X(:)
     INTEGER I
     P%u=my_false
     !       P%s(0)%x=zero
@@ -864,7 +795,12 @@ CONTAINS
        P%s(i)%x=0.0_dp
        P%s(i)%x(i)=1.0_dp
     enddo
-    P%X=X
+! quaternion
+    p%q=1.0_dp
+    p%use_q=use_quaternion
+    DO I=1,size(x,1)
+       P%X(i)=X(i)
+    enddo
     P%ac%t=0.0_dp
     p%nac=n_rf
   END    subroutine EQUAL_PROBE_REAL6
@@ -872,7 +808,7 @@ CONTAINS
   subroutine EQUAL_PROBE8_REAL6 (P,X)
     implicit none
     TYPE(PROBE_8), INTENT(INOUT) :: P
-    REAL(DP), INTENT(IN) :: X(6)
+    REAL(DP), INTENT(IN) :: X(:)
     INTEGER I
 
     P%u=my_false
@@ -885,10 +821,12 @@ CONTAINS
        P%s(i)=0
        P%s(i)%x(i)=1.0_dp
     enddo
-
-    DO I=1,6
+! quaternion
+    p%q=1.0_dp
+    DO I=1,size(x,1)
        P%X(i)=X(i)
     enddo
+    p%use_q=use_quaternion
     p%nac=n_rf
     P%AC%X(1)=0.0_dp
     P%AC%X(2)=0.0_dp
@@ -911,18 +849,21 @@ CONTAINS
           P8%E_ij(I,j)=P%E_ij(I,j)
        ENDDO
     ENDDO
-
+! quaternion
+    p8%q=p%q
     !    P8%S=P%S
     DO I=1,3
        P8%S(i)=P%S(i)
     enddo
+     p8%q=p%q
      P8%nac=P%nac
     do i=1,P%nac
     P8%AC(i)=P%AC(i)
     enddo
     P8%u=P%u
-
+    p8%use_q=P%use_q
     P8%e=P%e
+    P8%x0=P%x0
 
 
   END subroutine EQUAL_PROBE8_PROBE8
@@ -990,6 +931,8 @@ CONTAINS
     do I=1,ISPIN1R
        P8%S(I)=P%s(I)
     enddo
+! quaternion
+    P8%q=P%q
     P8%nac=P%nac
 !!!new 2018.1.4
     do I=1,P%nac
@@ -1000,6 +943,8 @@ CONTAINS
     P8%e=P%e
     P8%u=P%u
     P8%e_ij=0.0_dp
+    p8%use_q=P%use_q
+    p8%x0=P%x
   END subroutine EQUAL_PROBE8_PROBE
 
   subroutine EQUAL_PROBE_PROBE8 (P,P8)
@@ -1016,6 +961,10 @@ CONTAINS
     ENDDO
     P%u=P8%u
     P%e=P8%e
+! quaternion
+    P%q=P8%q
+    p%use_q=P8%use_q
+
 !!!new 2018.1.4
     p%nac=P8%nac
     do I=1,P8%nac
@@ -1037,6 +986,9 @@ CONTAINS
     ENDDO
     P%u=P8%u
     P%e=P8%e
+! quaternion
+    P%q=P8%q
+    p%use_q=P8%use_q
 !!!new 2018.1.4
     p%nac=P8%nac
     do I=1,P8%nac
@@ -1069,7 +1021,10 @@ CONTAINS
     else
        STOP 100
     ENDIF
+! quaternion
+    r%q=1.0_dp
     r%u=.false.
+    r%use_q=use_quaternion
     r%e=0
   END    subroutine EQUAL_IDENTITY_probe
 
@@ -1095,17 +1050,21 @@ CONTAINS
        R%S(1)=1
        R%S(2)=2
        R%S(3)=3
+       r%q=1.0_dp
     ELSEIF(S==0) THEN
 
        !       DO I=1,6  !-C_%NSPIN
        !        R%X(I)=ZERO!
        !       enddo
+       r%q=0.0_dp
     ELSE
        STOP 100
     ENDIF
     R%e_ij=0.0_dp
     r%u=.false.
+    r%use_q=use_quaternion
     r%e=0
+    r%x0=0
   END    subroutine EQUAL_IDENTITY_probe_8
 
 
@@ -1170,6 +1129,40 @@ CONTAINS
 
   END subroutine EQUAL_DAMAP_RAY8
  
+
+   subroutine  probe_quaternion_to_matrixr(p)
+    implicit none
+    TYPE(probe), INTENT(INOUT) :: p
+    type(quaternion) s,sf
+    integer i
+    do i=1,3
+     s=0.0_dp
+     s%x(i)=1.0_dp
+     sf=p%q*s*p%q**(-1)
+     p%s(i)%x=sf%x(1:3)
+    enddo
+
+    end subroutine  probe_quaternion_to_matrixr 
+
+   subroutine  probe_quaternion_to_matrixp(p)
+    implicit none
+    TYPE(probe_8), INTENT(INOUT) :: p
+    type(quaternion_8) s,sf
+    integer i,j
+     call ALLOC(s)
+     call ALLOC(sf)
+    do i=1,3
+     s=0.0_dp
+     s%x(i)=1.0_dp
+     sf=p%q*s*p%q**(-1)
+     do j=1,3
+       p%s(i)%x(j)=sf%x(j+1)
+     enddo
+    enddo
+     call kill(s)
+     call kill(sf)
+    end subroutine  probe_quaternion_to_matrixp 
+
    subroutine print_probe(DS,MF)
     implicit none
     TYPE(probe), INTENT(INOUT) :: DS
@@ -1184,7 +1177,10 @@ CONTAINS
        write(mfi,*) ' Variable ',i
        write(mfi,'(6(1X,G20.13))') ds%x(i) 
     enddo
- 
+   if(ds%use_q) then
+    WRITE(MFi,*) " quaternion "
+     call print(ds%q,mfi)
+    else
     WRITE(MFi,*) " SPIN X "
        write(mfi,'(3(1X,G20.13))') ds%s(1)%x 
  
@@ -1193,7 +1189,7 @@ CONTAINS
  
     WRITE(MFi,*) " SPIN Z "
        write(mfi,'(3(1X,G20.13))') ds%s(3)%x 
-
+   endif
  
 
   END subroutine print_probe
@@ -1213,30 +1209,22 @@ CONTAINS
        write(mfi,*) ' Variable ',i
        call print(ds%x(i),mfi)
     enddo
-    !    WRITE(MF,*) " SPIN 0 "
-    !    do i=1,3
-    !       write(mf,*) ' Spin Variable ',i
-    !       call print(ds%s(0)%x(i),mf)
-    !    enddo
+
+   if(ds%use_q) then
+    WRITE(MFi,*) " quaternion "
+     call print(ds%q,mfi)
+    else
+
     WRITE(MFi,*) " SPIN X "
     call print(ds%s(1),mfi)
-    !    do i=1,3
-    !       write(mf,*) ' Spin Variable ',i
-    !       call print(ds%s(1)%x(i),mf)
-    !    enddo
+ 
     WRITE(MFi,*) " SPIN Y "
     call print(ds%s(2),mfi)
-    !    do i=1,3
-    !       write(mf,*) ' Spin Variable ',i
-    !       call print(ds%s(2)%x(i),mf)
-    !    enddo
+ 
     WRITE(MFi,*) " SPIN Z "
     call print(ds%s(3),mfi)
-    !    do i=1,3
-    !       write(mf,*) ' Spin Variable ',i
-    !       call print(ds%s(3)%x(i),mf)
-    !    enddo
-
+ 
+    endif
 
     call check_rad(DS%e_ij,rad_in)
 
@@ -1395,6 +1383,7 @@ CONTAINS
        CALL ALLOC(R%S(I))
     ENDDO
     CALL ALLOC(R%X,6)
+    CALL ALLOC(R%q)
     !      R%S(0)%X(N0_NORMAL)=ONE
     DO I=1,3
        R%S(I)=0
@@ -1405,7 +1394,9 @@ CONTAINS
     enddo
     r%e_ij=0.0_dp
     r%u=.false.
+    r%use_q=use_quaternion
     r%e=0
+    r%x0=0
   END    subroutine ALLOC_probe_8
 
   subroutine ALLOC_rf_phasor_8(R)
@@ -1442,6 +1433,7 @@ CONTAINS
        CALL KILL(R%S(I))
     ENDDO
     CALL KILL(R%X,6)
+    CALL KILL(R%q)
     do i=1,r%nac
      CALL KILL(R%ac(i))
     enddo

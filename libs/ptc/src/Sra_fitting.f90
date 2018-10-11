@@ -3515,9 +3515,13 @@ call kill(yy); call kill(id);
     use_bmad_units_temp=use_bmad_units
     if(use_bmad_units_temp) then 
           if(present(fibre1)) then
-           beta1=fibre1%mag%p%beta0
+           beta1=fibre1%beta0
+  !         beta1=fibre1%mag%p%beta0
+
           else
-           beta1=node1%parent_fibre%mag%p%beta0
+!           beta1=node1%parent_fibre%mag%p%beta0
+           beta1=node1%parent_fibre%beta0
+
           endif
       call convert_bmad_to_ptc(fix,beta1,STATE%TIME)
     endif
@@ -3558,6 +3562,7 @@ call kill(yy); call kill(id);
           
           messagelost= " No Cavity in the Line "
           check_stable=.false.
+            use_bmad_units=use_bmad_units_temp
           return
  
        ENDIF
@@ -3569,6 +3574,7 @@ call kill(yy); call kill(id);
              check_stable=.false.
 
              messagelost= " Cavity needed when radiation present "
+            use_bmad_units=use_bmad_units_temp
              return
           endif
        ELSE
@@ -3581,6 +3587,7 @@ call kill(yy); call kill(id);
           enddo
           check_stable=.false.
           messagelost= " State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
+            use_bmad_units=use_bmad_units_temp
          return
 
        ENDIF
@@ -3663,6 +3670,7 @@ call kill(yy); call kill(id);
           messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking guessed orbit "
           c_%APERTURE_FLAG=APERTURE
  !                if(try>0) goto 1111
+            use_bmad_units=use_bmad_units_temp
           return
        endif
 
@@ -3692,6 +3700,7 @@ call kill(yy); call kill(id);
              !   fixed_found=my_false
              c_%APERTURE_FLAG=APERTURE
  !                   if(try>0) goto 1111
+            use_bmad_units=use_bmad_units_temp
              return
           endif
 
@@ -3719,6 +3728,7 @@ call kill(yy); call kill(id);
              !   fixed_found=my_false
              c_%APERTURE_FLAG=APERTURE
  !                   if(try>0) goto 1111
+            use_bmad_units=use_bmad_units_temp
              return
           endif
  
@@ -3765,6 +3775,7 @@ call kill(yy); call kill(id);
     IF(IER==132)  then
        messagelost= " Inversion failed in FIND_ORBIT_LAYOUT_noda"
         check_stable=.false.
+            use_bmad_units=use_bmad_units_temp
        return
     endif
 
@@ -3817,6 +3828,7 @@ call kill(yy); call kill(id);
        !     ENDIF
        ITE=0
    !           if(try>0) goto 1111
+            use_bmad_units=use_bmad_units_temp
       return
     endif
     !   write(6,*) item,xdix,xdix0,tiny
