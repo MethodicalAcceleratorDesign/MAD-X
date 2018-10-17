@@ -1295,7 +1295,7 @@ get_drift(double length, int count)
 }
 
 static int
-add_drifts(struct node* c_node, struct node* end)
+add_drifts(struct node* c_node, struct node* end,struct sequence* sequ)
 {
   const double tol = 1e-6;
   int cnt;
@@ -1305,7 +1305,7 @@ add_drifts(struct node* c_node, struct node* end)
 
   int debug;
   debug = get_option("debug");
-
+  double sequencelength = sequence_length(sequ); 
   if (!c_node) return 0;
 
   for (cnt=1; c_node != end && c_node->next; c_node = c_node->next, cnt++) {
@@ -1313,7 +1313,10 @@ add_drifts(struct node* c_node, struct node* end)
     double drift_end = c_node->next->position - c_node->next->length / 2;
     double drift_len = drift_end-drift_beg;
 
-    if (drift_len < -tol) {
+    if(fabs((drift_len) + sequencelength) < tol){ //If the drift is exactly -length of the accelerator -> do nothing. 
+      (void)0;
+    }
+    else if (drift_len < -tol) {
       // implicit drift with negative length
       sprintf(buf, " %s and %s, length %e", c_node->name, c_node->next->name, drift_len);
 
@@ -1913,7 +1916,7 @@ expand_curr_sequ(int flag)
     /* flatten the current sequence */
     expand_sequence(current_sequ, flag);
     /* add implict drifts in current sequence */
-    current_sequ->n_nodes = add_drifts(current_sequ->ex_start, current_sequ->ex_end);
+    current_sequ->n_nodes = add_drifts(current_sequ->ex_start, current_sequ->ex_end, current_sequ);
 
     if (current_sequ->all_nodes != NULL) myfree(rout_name, current_sequ->all_nodes);
     current_sequ->all_nodes = mymalloc(rout_name, current_sequ->n_nodes * sizeof *current_sequ->all_nodes);
