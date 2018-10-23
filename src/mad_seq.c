@@ -354,7 +354,7 @@ expand_line(struct char_p_array* l_buff)
       if (b_level->i[i] == level && (pos = lbpos->i[i]) > 1) {
         if (*l_buff->p[pos-1] == '*') {
           sscanf(l_buff->p[pos-2], "%d", &rep);
-    add = rep - 1;
+          add = rep - 1;
           number = rbpos->i[i] - pos - 1; /* inside bracket */
           n = number * add; /* extra tokens */
           while (l_buff->curr + n >= l_buff->max) grow_char_p_array(l_buff);
@@ -606,7 +606,6 @@ install_one(struct element* el, char* from_name, double at_value, struct express
   node->position = position;
   node->at_value = at_value;
   node->at_expr = at_expr;
-  dump_expression(node->at_expr);
   node->from_name = from_name;
   set_command_par_value("at", el->def, position);
   insert_elem(edit_sequ, node);
@@ -1085,16 +1084,17 @@ seq_move(struct in_cmd* cmd)
               return;
             }
             if(strcmp(from_name, name)==0){
-              warning("you are reference 'FROM' same element -> impossible positioning", from_name);
+              warning("reference 'FROM' the same element -> impossible positioning", from_name);
               return;
             }
-            newexp = clone_expression(command_par_expr("to", cmd->clone));
-            dump_expression(newexp);
-          }  
+                      
+          }
+          newexp = clone_expression(command_par_expr("to", cmd->clone));
           at = to + from;
         }
         else
         {
+          from_name = node->from_name;
           by = command_par_value("by", cmd->clone);
           at = node->position + by;
           tmp = clone_expression(node->at_expr);
