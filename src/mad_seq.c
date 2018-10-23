@@ -1040,33 +1040,39 @@ seq_move(struct in_cmd* cmd)
               {
                 at = node->position + by;
                 el = node->p_elem;
-
-                expr = clone_expression(command_par_expr("by", cmd->clone));
                 from_name = node->from_name;
+              if(from_name==NULL)
+              {
 
-                if(expr==NULL)
-                {
-                
+	                expr = clone_expression(command_par_expr("by", cmd->clone));
+	                tmp = clone_expression(node->at_expr);
+	              if(expr==NULL)
+	              { 
+	                
+					char result[50] = "";
+					sprintf(result, "%f", by);
+	                expr = new_expression(result,NULL);
+	              }
+	              if(tmp==NULL)
+	              { 
+					char result[50] = "";
+					sprintf(result, "%f", node->position);
+	                tmp = new_expression(result,NULL);
+	              }
 
-                  //char buf[sizeof(number)];
-                  //memcpy(buf, &number, sizeof(number)); 
+              	newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+              }
+              else{
 
+              	newexp = clone_expression(node->at_expr);
+              }
 
-  
-                  //printf("temp %c \n",buf);
-                  //expr=make_expression(1, &temp[0]);
-                  //dump_expression(expr);
-                  printf("after dump");
-                }
-
-                tmp = clone_expression(node->at_expr);
-                dump_expression(tmp);
-                //expr = clone_expression(command_par_expr("by", cmd->clone));
-                newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
-                                
                 if (remove_one(node) > 0)
-                {
+                {	
                   install_one(el, from_name, at, newexp, at);
+                  tmp = NULL;
+                  expr = NULL;
+				  newexp = NULL;
                   node->moved = 1;
                   seqedit_move++;
                 }
@@ -1110,18 +1116,33 @@ seq_move(struct in_cmd* cmd)
                       
           }
           newexp = clone_expression(command_par_expr("to", cmd->clone));
-        //  printf("aaaarrggg %s \n", newexp->string);
-        //  printf("aaaarrggg %s \n", newexp->string);
           at = to + from;
         }
         else
         {
+          by = command_par_value("by", cmd->clone);
           from_name = node->from_name;
           at = node->position + by;
-          by = command_par_value("by", cmd->clone);
           tmp = clone_expression(node->at_expr);
           expr = clone_expression(command_par_expr("by", cmd->clone));
+          if(expr==NULL)
+            { 
+                
+				char result[50] = "";
+				sprintf(result, "%f", by);
+                expr = new_expression(result,NULL);
+                expr->status=0;
+            }
+          if(tmp==NULL)
+            { 
+				char result[50] = "";
+				sprintf(result, "%f", node->position);
+                tmp = new_expression(result,NULL);
+                tmp->status=0;
+            }
+          
           newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+          dump_expression(newexp);
 
         }
         el = node->p_elem;
