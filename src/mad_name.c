@@ -192,6 +192,27 @@ int name_list_pos(const char* name, struct name_list* vlist)
   
   return -1;
 }
+int name_list_pos2(const char* name, struct name_list* vlist)
+{
+  assert(name);
+
+  if (!vlist) return -1; // empty vlist
+  
+//  if (!strcmp(name, "map_table")) show_name_list(__func__,vlist);
+
+  int low = 0, high = vlist->curr - 1;
+  
+  while (low <= high) {
+    int mid = (low + high) / 2;
+    printf("to compareeeee %s %s \n", name,vlist->names[vlist->index[mid]] );
+    int num = strcmp(name, vlist->names[vlist->index[mid]]);
+         if (num < 0) high = mid - 1;
+    else if (num > 0) low  = mid + 1;
+    else return vlist->index[mid];
+  }
+  
+  return -1;
+}
 
 int
 remove_from_name_list(const char* name, struct name_list* nl)

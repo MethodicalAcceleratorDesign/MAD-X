@@ -29,6 +29,7 @@ struct vector_list              /* contains named vectors */
 char*   get_new_name(void);
 // double  find_value(char* name, int ntok, char** toks);
 int     name_list_pos(const char* p, struct name_list* vlist);
+int     name_list_pos2(const char* p, struct name_list* vlist);
 
 struct name_list*  new_name_list(const char* list_name, int length);
 struct name_list*  clone_name_list(struct name_list*);

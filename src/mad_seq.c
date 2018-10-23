@@ -1028,6 +1028,7 @@ seq_move(struct in_cmd* cmd)
             if (any
                 || name_list_pos(node->name, selected_ranges->list) > -1)
             {
+              
               name = NULL;
               for (k = 0; k < seqedit_select->curr; k++)
               {
@@ -1040,6 +1041,7 @@ seq_move(struct in_cmd* cmd)
               {
                 at = node->position + by;
                 el = node->p_elem;
+                printf("thenamnnnnnnnnnnnnn %s", name);
                 from_name = node->from_name;
               if(from_name==NULL)
               {
@@ -1063,16 +1065,31 @@ seq_move(struct in_cmd* cmd)
               	newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
               }
               else{
+              	//if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) == 0) any = 1;
+              	/*char *tempa; 
+              	tempa= malloc(sizeof(char) * strlen(from_name));
+              	strcpy(tempa,from_name);
+              	if(name_list_pos2(from_name, selected_ranges->list) > -1 ||
+				   name_list_pos2(strncat(tempa, ":1", strlen(tempa)+2), selected_ranges->list) > -1
+              		){
+              		newexp = clone_expression(node->at_expr);
+              		
+              	}
+              	else{
+              		printf("shouldddddd");	
+              		expr = clone_expression(command_par_expr("by", cmd->clone));
+	                tmp = clone_expression(node->at_expr);
+	                newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
 
-              	newexp = clone_expression(node->at_expr);
-              }
+        	
+              	}*/
+              	from_name = NULL;
+              	 }
 
                 if (remove_one(node) > 0)
                 {	
                   install_one(el, from_name, at, newexp, at);
-                  tmp = NULL;
-                  expr = NULL;
-				  newexp = NULL;
+                  
                   node->moved = 1;
                   seqedit_move++;
                 }
