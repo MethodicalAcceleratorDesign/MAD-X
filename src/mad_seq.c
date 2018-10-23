@@ -1040,13 +1040,33 @@ seq_move(struct in_cmd* cmd)
               {
                 at = node->position + by;
                 el = node->p_elem;
-                tmp = clone_expression(node->at_expr);
+
                 expr = clone_expression(command_par_expr("by", cmd->clone));
+                from_name = node->from_name;
+
+                if(expr==NULL)
+                {
+                
+
+                  //char buf[sizeof(number)];
+                  //memcpy(buf, &number, sizeof(number)); 
+
+
+  
+                  //printf("temp %c \n",buf);
+                  //expr=make_expression(1, &temp[0]);
+                  //dump_expression(expr);
+                  printf("after dump");
+                }
+
+                tmp = clone_expression(node->at_expr);
+                dump_expression(tmp);
+                //expr = clone_expression(command_par_expr("by", cmd->clone));
                 newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
                                 
                 if (remove_one(node) > 0)
                 {
-                  install_one(el, NULL, at, newexp, at);
+                  install_one(el, from_name, at, newexp, at);
                   node->moved = 1;
                   seqedit_move++;
                 }
@@ -1090,13 +1110,15 @@ seq_move(struct in_cmd* cmd)
                       
           }
           newexp = clone_expression(command_par_expr("to", cmd->clone));
+        //  printf("aaaarrggg %s \n", newexp->string);
+        //  printf("aaaarrggg %s \n", newexp->string);
           at = to + from;
         }
         else
         {
           from_name = node->from_name;
-          by = command_par_value("by", cmd->clone);
           at = node->position + by;
+          by = command_par_value("by", cmd->clone);
           tmp = clone_expression(node->at_expr);
           expr = clone_expression(command_par_expr("by", cmd->clone));
           newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
