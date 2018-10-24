@@ -989,7 +989,7 @@ seq_move(struct in_cmd* cmd)
       int any = 0, k;
       struct node *node, *next, *node2, *next2;
       struct element* el;
-      int pos, is_ref_from_moved;
+      int pos, is_ref_from_moved,max_c=50;
       struct expression* tmp = NULL; 
       struct expression* expr = NULL;
       struct expression* newexp = NULL;
@@ -1048,15 +1048,17 @@ seq_move(struct in_cmd* cmd)
                     tmp = clone_expression(node->at_expr);
                     if(expr==NULL)
                     {
-                      char result[50] = "";
+                      char *result = malloc(max_c * sizeof(char));
                       sprintf(result, "%f", by);
                       expr = new_expression(result,NULL);
+                      free(result);
                     }
                     if(tmp==NULL)
                     { 
-                     char result[50] = "";
+                     char *result = malloc(max_c * sizeof(char));
                      sprintf(result, "%f", node->position);
                      tmp = new_expression(result,NULL);
+                     free(result);
                     }
 
                     newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
@@ -1106,12 +1108,14 @@ seq_move(struct in_cmd* cmd)
                     tmp = clone_expression(node->at_expr);
                       if(tmp==NULL)
                       {
-                        char result[50] = "";
-                        char result2[50] = "";
+                        char *result = malloc(max_c * sizeof(char));
+                        char *result2 = malloc(max_c * sizeof(char));
                         sprintf(result, "%f", node->at_value);
                         sprintf(result2, "%f", 0.0);
                         tmp = new_expression(result,NULL);
                         expr = new_expression(result2,NULL);
+                        free(result);
+                        free(result2);
                       }
 
                       newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
@@ -1123,15 +1127,17 @@ seq_move(struct in_cmd* cmd)
                       if(expr==NULL)
                       { 
 
-                        char result[50] = "";
+                        char *result = malloc(max_c * sizeof(char));
                         sprintf(result, "%f", by);
                         expr = new_expression(result,NULL);
+                        free(result);
                       }
                       if(tmp==NULL)
                       { 
-                        char result[50] = "";
+                        char *result = malloc(max_c * sizeof(char));
                         sprintf(result, "%f", node->position);
                         tmp = new_expression(result,NULL);
+                        free(result);
                       }
 
                       newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
@@ -1187,7 +1193,6 @@ seq_move(struct in_cmd* cmd)
             
             from_name = NULL;
             at = to + from;
-
           }
           else
           {
@@ -1200,36 +1205,32 @@ seq_move(struct in_cmd* cmd)
             if(expr==NULL)
             { 
 
-              char result[50] = "";
+              char *result = malloc(max_c * sizeof(char));
               sprintf(result, "%f", by);
               expr = new_expression(result,NULL);
-              expr->status=0;
+              free(result);
+              
             }
             if(tmp==NULL)
             { 
-              char result[50] = "";
+              
+              char *result = malloc(max_c * sizeof(char));
               sprintf(result, "%f", node->position);
               tmp = new_expression(result,NULL);
-              tmp->status=0;
+              free(result);
             }
-
             newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
 
           }
           el = node->p_elem;
           if (remove_one(node) > 0)
           {
-
             install_one(el, from_name, at, newexp, at);
             seqedit_move++;
           }
         }
       }
     }
-    delete_expression(expr);
-    delete_expression(tmp);
-    delete_expression(newexp); 
-
   }
 
 
