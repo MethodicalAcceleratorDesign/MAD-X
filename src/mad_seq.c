@@ -988,9 +988,9 @@ seq_move(struct in_cmd* cmd)
   char *name, *from_name=NULL;
   double at, by, to, from = zero;
   int any = 0, k;
-  struct node *node, *next;
+  struct node *node, *next, *node2, *next2;
   struct element* el;
-  int pos;
+  int pos, is_ref_from_moved;
   struct expression* tmp = NULL; 
   struct expression* expr = NULL;
   struct expression* newexp = NULL;
@@ -1065,6 +1065,76 @@ seq_move(struct in_cmd* cmd)
               	newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
               }
               else{
+              	printf("heeeree we have fromname");
+		is_ref_from_moved = 0;
+
+	    node2 = edit_sequ->start;
+        while (node2 != edit_sequ->end)
+        {
+          node2 = node2->next; node2->moved = 0;
+        }
+        node2 = edit_sequ->start;
+        while (node2 != NULL && node2 != edit_sequ->end)
+        {
+          next2 = node2->next;
+          if (node2->moved == 0)
+          {
+            if (any
+                || name_list_pos(node2->name, selected_ranges->list) > -1)
+            {
+              
+              name = NULL;
+              for (k = 0; k < seqedit_select->curr; k++)
+              {
+                if (node2->p_elem != NULL) name = node2->p_elem->name;
+                if (name != NULL && strchr(name, '$') == NULL &&
+                    pass_select_el(node2->p_elem,
+                                seqedit_select->commands[k])) {
+                	if(strcmp(from_name, name)){
+                		printf("is innnnn %s \n",name );
+                		is_ref_from_moved=1;
+                	}
+
+                	break;
+                }
+
+              }
+      }
+  }
+  node2 = next2;
+}
+
+ if(is_ref_from_moved){
+ 	newexp = clone_expression(node->at_expr);
+ }
+ else{
+ 	expr = clone_expression(command_par_expr("by", cmd->clone));
+	tmp = clone_expression(node->at_expr);
+	              if(expr==NULL)
+	              { 
+	                
+					char result[50] = "";
+					sprintf(result, "%f", by);
+	                expr = new_expression(result,NULL);
+	              }
+	              if(tmp==NULL)
+	              { 
+					char result[50] = "";
+					sprintf(result, "%f", node->position);
+	                tmp = new_expression(result,NULL);
+	              }
+	
+	newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+
+
+ }
+
+
+
+
+
+
+
               	//if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) == 0) any = 1;
               	/*char *tempa; 
               	tempa= malloc(sizeof(char) * strlen(from_name));
@@ -1083,7 +1153,7 @@ seq_move(struct in_cmd* cmd)
 
         	
               	}*/
-              	from_name = NULL;
+            
               	 }
 
                 if (remove_one(node) > 0)
@@ -1118,7 +1188,7 @@ seq_move(struct in_cmd* cmd)
           from_name = command_par_string_user("from", cmd->clone);
           if (from_name)
           {
-            
+             
             
             if ((from = hidden_node_pos(from_name, edit_sequ)) == INVALID )
             {
