@@ -1227,6 +1227,10 @@ write_sequs(struct sequence_list* sql,struct command_list* cl, FILE* file, int n
         }
       }
     }
+    delete_expression(expr);
+    delete_expression(tmp);
+    delete_expression(newexp); 
+
   }
 
 static void
