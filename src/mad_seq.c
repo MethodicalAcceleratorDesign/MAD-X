@@ -1041,7 +1041,6 @@ seq_move(struct in_cmd* cmd)
               {
                 at = node->position + by;
                 el = node->p_elem;
-                printf("thenamnnnnnnnnnnnnn %s", name);
                 from_name = node->from_name;
               if(from_name==NULL)
               {
@@ -1105,7 +1104,17 @@ seq_move(struct in_cmd* cmd)
 }
 
  if(is_ref_from_moved){
- 	newexp = clone_expression(node->at_expr);
+ 	tmp = clone_expression(node->at_expr);
+                  if(tmp==NULL){
+                  char result[50] = "";
+                  char result2[50] = "";
+                  sprintf(result, "%f", node->at_value);
+                  sprintf(result2, "%f", 0.0);
+                  tmp = new_expression(result,NULL);
+                  expr = new_expression(result2,NULL);
+                  }
+
+  newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
  }
  else{
  	expr = clone_expression(command_par_expr("by", cmd->clone));
@@ -1130,30 +1139,6 @@ seq_move(struct in_cmd* cmd)
  }
 
 
-
-
-
-
-
-              	//if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) == 0) any = 1;
-              	/*char *tempa; 
-              	tempa= malloc(sizeof(char) * strlen(from_name));
-              	strcpy(tempa,from_name);
-              	if(name_list_pos2(from_name, selected_ranges->list) > -1 ||
-				   name_list_pos2(strncat(tempa, ":1", strlen(tempa)+2), selected_ranges->list) > -1
-              		){
-              		newexp = clone_expression(node->at_expr);
-              		
-              	}
-              	else{
-              		printf("shouldddddd");	
-              		expr = clone_expression(command_par_expr("by", cmd->clone));
-	                tmp = clone_expression(node->at_expr);
-	                newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
-
-        	
-              	}*/
-            
               	 }
 
                 if (remove_one(node) > 0)
