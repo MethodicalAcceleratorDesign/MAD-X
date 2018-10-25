@@ -1092,8 +1092,8 @@ seq_move(struct in_cmd* cmd)
                             {
                               if(strcmp(from_name, name)==0)
                               {
-
                                 is_ref_from_moved=1;
+                                
                               }
                                 break;
                             }
@@ -1105,8 +1105,8 @@ seq_move(struct in_cmd* cmd)
 
                     if(is_ref_from_moved)
                     {
-                    tmp = clone_expression(node->at_expr);
-                      if(tmp==NULL)
+                    newexp = clone_expression(node->at_expr);
+                      if(newexp==NULL)
                       {
                         char *result = malloc(max_c * sizeof(char));
                         char *result2 = malloc(max_c * sizeof(char));
@@ -1118,7 +1118,7 @@ seq_move(struct in_cmd* cmd)
                         free(result2);
                       }
 
-                      newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                      //newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
                     }
                     else
                     {
@@ -1215,7 +1215,7 @@ seq_move(struct in_cmd* cmd)
             { 
               
               char *result = malloc(max_c * sizeof(char));
-              sprintf(result, "%f", node->position);
+              sprintf(result, "%f", node->at_value);
               tmp = new_expression(result,NULL);
               free(result);
             }
