@@ -163,10 +163,16 @@ update_beam(struct command* comm)
 
   // energy related
   if (par_present("energy", comm)) {
-    if (par_present("pc", comm))    warning("Both energy and pc specified;",    "pc was ignored.");
-    if (par_present("gamma", comm)) warning("Both energy and gamma specified;", "gamma was ignored.");
-    if (par_present("beta", comm))  warning("Both energy and beta specified;",  "beta was ignored.");
-    if (par_present("brho", comm))  warning("Both energy and bhro specified;",  "brho was ignored.");
+    int inform = -1; // Set to 1 in set_defaults to indicate that it is marked as read;
+                     // otherwise inform == 2
+    if ((inform=par_present("pc", comm))    && inform!=1)
+      warning("Both energy and pc specified;",    "pc was ignored.");
+    if ((inform=par_present("gamma", comm)) && inform!=1)
+      warning("Both energy and gamma specified;", "gamma was ignored.");
+    if ((inform=par_present("beta", comm))  && inform!=1)
+      warning("Both energy and beta specified;",  "beta was ignored.");
+    if ((inform=par_present("brho", comm))  && inform!=1)
+      warning("Both energy and bhro specified;",  "brho was ignored.");
 
     if ((energy = command_par_value("energy", comm)) <= mass) fatal_error("energy must be","> mass");
 
@@ -176,9 +182,13 @@ update_beam(struct command* comm)
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if(par_present("pc", comm)) {
-    if (par_present("gamma", comm)) warning("Both pc and gamma specified;", "gamma was ignored.");
-    if (par_present("beta", comm))  warning("Both pc and beta specified;",  "beta was ignored.");
-    if (par_present("brho", comm))  warning("Both pc and brho specified;",  "brho was ignored.");
+    int inform = -1;
+    if ((inform=par_present("gamma", comm)) && inform != 1)
+      warning("Both pc and gamma specified;", "gamma was ignored.");
+    if ((inform=par_present("beta", comm))   && inform != 1)
+      warning("Both pc and beta specified;",  "beta was ignored.");
+    if ((inform=par_present("brho", comm)) && inform != 1)
+      warning("Both pc and brho specified;",  "brho was ignored.");
 
     if ((pc = command_par_value("pc", comm)) <= 0.0) fatal_error("pc must be", "> 0.0");
 
@@ -188,8 +198,11 @@ update_beam(struct command* comm)
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if(par_present("gamma", comm)) {
-    if (par_present("beta", comm))  warning("Both gamma and beta specified;",  "beta was ignored.");
-    if (par_present("brho", comm))  warning("Both gamma and brho specified;",  "brho was ignored.");
+    int inform = -1;
+    if ((inform=par_present("beta", comm)) && inform != 1)
+      warning("Both gamma and beta specified;",  "beta was ignored.");
+    if ((inform=par_present("brho", comm)) && inform != 1)
+      warning("Both gamma and brho specified;",  "brho was ignored.");
 
     if ((gamma = command_par_value("gamma", comm)) <= one) fatal_error("gamma must be","> 1");
 
@@ -199,7 +212,9 @@ update_beam(struct command* comm)
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if(par_present("beta", comm)) {
-    if (par_present("brho", comm))  warning("Both beta and brho specified;",  "brho was ignored.");
+    int inform = -1;
+    if ((inform=par_present("brho", comm)) && inform != 1)
+      warning("Both beta and brho specified;",  "brho was ignored.");
 
     if ((beta = command_par_value("beta", comm)) >= one) fatal_error("beta must be","< 1");
 
