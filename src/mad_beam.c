@@ -168,7 +168,7 @@ update_beam(struct command* comm)
     if (par_present("beta", comm))  warning("Both energy and beta specified;",  "beta was ignored.");
     if (par_present("brho", comm))  warning("Both energy and bhro specified;",  "brho was ignored.");
 
-    if (energy = command_par_value("energy", comm) <= mass) fatal_error("energy must be","> mass");
+    if ((energy = command_par_value("energy", comm)) <= mass) fatal_error("energy must be","> mass");
 
     pc = sqrt(energy*energy - mass*mass);
     gamma = energy / mass;
@@ -180,7 +180,7 @@ update_beam(struct command* comm)
     if (par_present("beta", comm))  warning("Both pc and beta specified;",  "beta was ignored.");
     if (par_present("brho", comm))  warning("Both pc and brho specified;",  "brho was ignored.");
 
-    if (pc = command_par_value("pc", comm) <= 0.0) fatal_error("pc must be", "> 0.0");
+    if ((pc = command_par_value("pc", comm)) <= 0.0) fatal_error("pc must be", "> 0.0");
 
     energy = sqrt(pc*pc + mass*mass);
     gamma = energy / mass;
@@ -217,7 +217,7 @@ update_beam(struct command* comm)
     beta = pc / energy;
   }
   else {
-    if (energy = command_par_value("energy", current_beam) <= mass) fatal_error("energy must be","> mass");
+    if ((energy = command_par_value("energy", current_beam)) <= mass) fatal_error("energy must be","> mass");
 
     pc = sqrt(energy*energy - mass*mass);
     gamma = energy / mass;
