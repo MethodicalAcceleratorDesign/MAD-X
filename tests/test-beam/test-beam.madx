@@ -113,8 +113,25 @@ select, flag=twiss, clear;
 select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
+! Overspecification warnings
 
-! failure case
+beam, energy=450.0, pc=-1.0, gamma=-1.0, beta=2.0, brho=-1.0;
+show, beam;
+
+beam, pc=449.9990218, gamma=-1.0, beta=2.0, brho=-1.0;
+show, beam;
+
+beam, gamma=479.6050377, beta=2.0, brho=-1.0;
+show, beam;
+
+beam, beta=0.9999978263, brho=-1.0;
+show, beam;
+
+!beam, brho=1501.035166;
+!show, beam;
+
+
+! Failure case (beta < 1 check)
 
 !beam, particle=proton, gamma=.999999, exn=3.75e-6, eyn=3.75e-6;
 beam, particle=proton, beta=1., exn=3.75e-6, eyn=3.75e-6;

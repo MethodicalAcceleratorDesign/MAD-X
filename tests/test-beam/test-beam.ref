@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:01:19      +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2018.10.31 10:50:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'testing BEAM definitions in MADX';
 
@@ -622,9 +622,185 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0 
 
 
+! Overspecification warnings
 
 
-! failure case
+
+beam, energy=450.0, pc=-1.0, gamma=-1.0, beta=2.0, brho=-1.0;
+
+++++++ warning: Both energy and pc specified; pc was ignored.
+++++++ warning: Both energy and gamma specified; gamma was ignored.
+++++++ warning: Both energy and beta specified; beta was ignored.
+++++++ warning: Both energy and bhro specified; brho was ignored.
+show, beam;
+
+command: beam  module: control
+parameter: particle   string: proton
+parameter: sequence   string: default_beam
+parameter: bunched   logical: true
+parameter: radiate   logical: false
+parameter: mass   double value:       0.9382720813
+parameter: charge   double value:                  1
+parameter: energy   double value:                450
+parameter: pc   double value:        449.9990218
+parameter: gamma   double value:        479.6050197
+parameter: beta   double value:       0.9999978263
+parameter: brho   double value:        1501.035166
+parameter: ex   double value:    7.818951005e-09
+parameter: exn   double value:    3.749999999e-06
+parameter: ey   double value:    7.818951005e-09
+parameter: eyn   double value:    3.749999999e-06
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:         2.80441353
+parameter: circ   double value:              106.9
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: alfa   double value:    4.347429622e-06
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    1.534698265e-18
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
+
+
+beam, pc=449.9990218, gamma=-1.0, beta=2.0, brho=-1.0;
+
+++++++ warning: Both pc and gamma specified; gamma was ignored.
+++++++ warning: Both pc and beta specified; beta was ignored.
+++++++ warning: Both pc and brho specified; brho was ignored.
+show, beam;
+
+command: beam  module: control
+parameter: particle   string: proton
+parameter: sequence   string: default_beam
+parameter: bunched   logical: true
+parameter: radiate   logical: false
+parameter: mass   double value:       0.9382720813
+parameter: charge   double value:                  1
+parameter: energy   double value:                450
+parameter: pc   double value:        449.9990218
+parameter: gamma   double value:        479.6050196
+parameter: beta   double value:       0.9999978263
+parameter: brho   double value:        1501.035165
+parameter: ex   double value:    7.818951005e-09
+parameter: exn   double value:    3.749999999e-06
+parameter: ey   double value:    7.818951005e-09
+parameter: eyn   double value:    3.749999999e-06
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:         2.80441353
+parameter: circ   double value:              106.9
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: alfa   double value:    4.347429623e-06
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    1.534698265e-18
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
+
+
+beam, gamma=479.6050377, beta=2.0, brho=-1.0;
+
+++++++ warning: Both gamma and beta specified; beta was ignored.
+++++++ warning: Both gamma and brho specified; brho was ignored.
+show, beam;
+
+command: beam  module: control
+parameter: particle   string: proton
+parameter: sequence   string: default_beam
+parameter: bunched   logical: true
+parameter: radiate   logical: false
+parameter: mass   double value:       0.9382720813
+parameter: charge   double value:                  1
+parameter: energy   double value:        450.0000169
+parameter: pc   double value:        449.9990388
+parameter: gamma   double value:        479.6050377
+parameter: beta   double value:       0.9999978263
+parameter: brho   double value:        1501.035222
+parameter: ex   double value:    7.818951005e-09
+parameter: exn   double value:     3.75000014e-06
+parameter: ey   double value:    7.818951005e-09
+parameter: eyn   double value:     3.75000014e-06
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:         2.80441353
+parameter: circ   double value:              106.9
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: alfa   double value:    4.347429295e-06
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    1.534698265e-18
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
+
+
+beam, beta=0.9999978263, brho=-1.0;
+
+++++++ warning: Both beta and brho specified; brho was ignored.
+show, beam;
+
+command: beam  module: control
+parameter: particle   string: proton
+parameter: sequence   string: default_beam
+parameter: bunched   logical: true
+parameter: radiate   logical: false
+parameter: mass   double value:       0.9382720813
+parameter: charge   double value:                  1
+parameter: energy   double value:        450.0017777
+parameter: pc   double value:        450.0007995
+parameter: gamma   double value:        479.6069143
+parameter: beta   double value:       0.9999978263
+parameter: brho   double value:        1501.041095
+parameter: ex   double value:    7.818951005e-09
+parameter: exn   double value:    3.750014813e-06
+parameter: ey   double value:    7.818951005e-09
+parameter: eyn   double value:    3.750014813e-06
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:         2.80441353
+parameter: circ   double value:              106.9
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: alfa   double value:    4.347395275e-06
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    1.534698265e-18
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
+
+
+!beam, brho=1501.035166;
+
+!show, beam;
+
+
+
+
+
+! Failure case (beta < 1 check)
 
 
 

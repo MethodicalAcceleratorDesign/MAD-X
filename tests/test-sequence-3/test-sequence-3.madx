@@ -40,7 +40,7 @@ INITBETA0: BETA0,
  * Beam
  * NB! beam->ex == (beam->exn)/(beam->gamma*beam->beta*4)
  *******************************************************************************/
- Beam, particle=POSITRON, MASS=0.51099906E-3, ENERGY=1.0,PC=0.99999986944, GAMMA=1.956950762297E3;
+ Beam, particle=POSITRON, MASS=0.51099906E-3, ENERGY=1.0;
  Use, sequence=ad;
 
  select flag=twiss,column=name, s, l, alfx, betx,dx, alfy, bety;
