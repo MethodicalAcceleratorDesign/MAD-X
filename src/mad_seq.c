@@ -1118,7 +1118,6 @@ seq_move(struct in_cmd* cmd)
                         free(result);
                         free(result2);
                         newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
-                        dump_expression(expr);
                       }
 
                     }
