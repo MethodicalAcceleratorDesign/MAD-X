@@ -989,11 +989,11 @@ seq_move(struct in_cmd* cmd)
       int any = 0, k;
       struct node *node, *next, *node2, *next2;
       struct element* el;
-      int pos, is_ref_from_moved,max_c=50;
+      int pos, is_ref_from_moved,max_c=100;
       struct expression* tmp = NULL; 
       struct expression* expr = NULL;
       struct expression* newexp = NULL;
-
+      struct name_list* movelist;  
 
       name = command_par_string_user("element", cmd->clone);
       if (name)
@@ -1014,6 +1014,7 @@ seq_move(struct in_cmd* cmd)
             if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
               == 0) any = 1;
               node = edit_sequ->start;
+            movelist=clone_name_list(selected_ranges->list);
             while (node != edit_sequ->end)
             {
               node = node->next; node->moved = 0;
@@ -1025,9 +1026,9 @@ seq_move(struct in_cmd* cmd)
               if (node->moved == 0)
               {
                 if (any
-                  || name_list_pos(node->name, selected_ranges->list) > -1)
+                  || name_list_pos(node->name, movelist) > -1)
                 {
-
+                  remove_from_name_list(node->name, movelist);
                   name = NULL;
                   for (k = 0; k < seqedit_select->curr; k++)
                   {
@@ -1116,9 +1117,10 @@ seq_move(struct in_cmd* cmd)
                         expr = new_expression(result2,NULL);
                         free(result);
                         free(result2);
+                        newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                        dump_expression(expr);
                       }
 
-                      //newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
                     }
                     else
                     {
@@ -1135,12 +1137,12 @@ seq_move(struct in_cmd* cmd)
                       if(tmp==NULL)
                       { 
                         char *result = malloc(max_c * sizeof(char));
-                        sprintf(result, "%f", node->position);
+                        sprintf(result, "%f", node->at_value);
                         tmp = new_expression(result,NULL);
                         free(result);
                       }
-
                       newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                      
                     }
                   }
                   if (remove_one(node) > 0)
@@ -1196,7 +1198,6 @@ seq_move(struct in_cmd* cmd)
           }
           else
           {
-
             by = command_par_value("by", cmd->clone);
             from_name = node->from_name;
             at = node->position + by;
