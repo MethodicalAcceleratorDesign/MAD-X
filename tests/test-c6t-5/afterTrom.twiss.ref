@@ -15,6 +15,7 @@
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
+@ BV_FLAG          %le                   1
 @ LENGTH           %le                 120
 @ ALFA             %le      0.000805030598
 @ ORBIT5           %le     0.0007344539463
@@ -41,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "19/03/18"
-@ TIME             %08s "13.47.06"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.31.00"
 * NAME                                X                  Y               BETX               BETY                MUX                MUY                 PT                  T 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le 
  "SEQ$START"             0.002907156139       0.0967802983        33.60963339        8.655352869                  0                  0    0.0001609191569   -0.0007344539463

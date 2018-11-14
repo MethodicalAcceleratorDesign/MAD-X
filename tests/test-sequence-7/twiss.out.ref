@@ -15,6 +15,7 @@
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
+@ BV_FLAG          %le                   1
 @ LENGTH           %le                  50
 @ ALFA             %le                   0
 @ ORBIT5           %le                  -0
@@ -41,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "05/03/18"
-@ TIME             %08s "10.59.48"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.17.44"
 *                  S NAME               KEYWORD                          BETX               BETY 
 $                %le %s                 %s                                %le                %le 
                   0 "MYSEQ$START"       "MARKER"                             1                  1

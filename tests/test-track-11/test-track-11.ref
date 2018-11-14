@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.04.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.13 23:37:09      +
+  + Release   date: 2018.07.10               +
+  + Execution date: 2018.08.31 16:51:40      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -86,21 +86,20 @@ enter Twiss module
   
 iteration:   1 error:   1.026361E-07 deltap:   0.000000E+00
 orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.186162E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003463097584        53.73628459 
+        26658.8832                 -0    0.0003463097584        53.73628458 
 
                 q1                dq1            betxmax              dxmax 
-       62.30999979        2.000072948         19393.4338        2.716654145 
+       62.30999979        2.000072951        19393.43379         2.71665413 
 
              dxrms             xcomax             xcorms                 q2 
        1.451766744    1.162795311e-06    1.785920639e-07        60.32000043 
 
                dq2            betymax              dymax              dyrms 
-       2.000043755        19393.44125                 -0                  0 
+       2.000043744        19393.44125                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -115,21 +114,20 @@ enter Twiss module
   
 iteration:   1 error:   1.026361E-07 deltap:   0.000000E+00
 orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.186162E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003463097584        53.73628459 
+        26658.8832                 -0    0.0003463097584        53.73628458 
 
                 q1                dq1            betxmax              dxmax 
-       62.30999979        2.000072948         19393.4338        2.716654145 
+       62.30999979        2.000072951        19393.43379         2.71665413 
 
              dxrms             xcomax             xcorms                 q2 
        1.451766744    1.162795311e-06    1.785920639e-07        60.32000043 
 
                dq2            betymax              dymax              dyrms 
-       2.000043755        19393.44125                 -0                  0 
+       2.000043744        19393.44125                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -143,21 +141,20 @@ enter Twiss module
   
 iteration:   1 error:   1.026361E-07 deltap:   0.000000E+00
 orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.186162E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003463097584        53.73628459 
+        26658.8832                 -0    0.0003463097584        53.73628458 
 
                 q1                dq1            betxmax              dxmax 
-       62.30999979        2.000072948         19393.4338        2.716654145 
+       62.30999979        2.000072951        19393.43379         2.71665413 
 
              dxrms             xcomax             xcorms                 q2 
        1.451766744    1.162795311e-06    1.785920639e-07        60.32000043 
 
                dq2            betymax              dymax              dyrms 
-       2.000043755        19393.44125                 -0                  0 
+       2.000043744        19393.44125                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -499,13 +496,13 @@ orbit:   2.292566E-12  2.911529E-14  9.267972E-14  5.983343E-16  4.824161E-10 -4
         26658.8832   -4.824161205e-10    0.0003463029846        53.73681013 
 
                 q1                dq1            betxmax              dxmax 
-       62.30999994        2.000096874        19393.42999        2.716682725 
+       62.30999994        2.000096878        19393.42999        2.716682711 
 
              dxrms             xcomax             xcorms                 q2 
        1.451766608    7.748466141e-09    6.523472198e-10         60.3200002 
 
                dq2            betymax              dymax              dyrms 
-       2.000000357        19393.42412    1.139595435e-10    1.971656961e-11 
+       2.000000346        19393.42412    1.139595434e-10     1.97165696e-11 
 
             ycomax             ycorms             deltap            synch_1 
    1.488167623e-12    1.827727081e-13                  0                  0 
@@ -526,12 +523,12 @@ orbit0   2.292566E-12  2.911529E-14  9.267972E-14  5.983343E-16  4.824161E-10 -4
 
 6D closed orbit found by subroutine trclor 
 iteration:  11 error:   2.196811E-12 deltap:   0.000000E+00
-orbit:   2.271168E-12  2.902872E-14  2.213597E-19  2.712372E-21 -5.210299E-12 -4.448774E-12
+orbit:   2.271167E-12  2.902872E-14  2.213597E-19  2.712372E-21 -5.210299E-12 -4.448774E-12
 exit TRACK module
 
 
-  Number of warnings: 4
-0 in C and 4 in Fortran
+  Number of warnings: 1
+0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

@@ -300,7 +300,7 @@ export_comm_par(struct command_parameter* par, char* string, int noexpr)
       strcat(string, "}");
       break;
     }
-    default: error("export command param", "invalid type %d", par->type);
+    default: mad_error("export command param", "invalid type %d", par->type);
   }
 }
 

@@ -63,7 +63,7 @@
 @ ORBIT_Y          %le                   0
 @ ORBIT_PY         %le                   0
 @ ORBIT_PT         %le     1.540436433e-12
-@ ORBIT_T        %le        -0.149896229
+@ ORBIT_T          %le        -0.149896229
 @ XCORMS           %le     1.796834153e-13
 @ PXCORMS          %le     1.699545599e-13
 @ YCORMS           %le                   0
@@ -83,9 +83,9 @@
 @ PTCOMIN          %le     1.540403378e-12
 @ PTCOMAX          %le     1.540436433e-12
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.03.07 Linux 64"
-@ DATE             %08s "19/01/18"
-@ TIME             %08s "15.25.19"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.23.01"
 * NAME                                S             ENERGY                  X                  Y                 PT                  T             BETA11             BETA22             BETA33                MU1                MU2                MU3              DISP1              DISP2               RE11               RE12               RE13               RE14               RE15               RE16               RE21               RE22               RE23               RE24               RE25               RE26               RE31               RE32               RE33               RE34               RE35               RE36               RE41               RE42               RE43               RE44               RE45               RE46               RE51               RE52               RE53               RE54               RE55               RE56               RE61               RE62               RE63               RE64               RE65               RE66 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "ALS$START"                          0        1.500000087     1.84931325e-15                  0    1.540436433e-12       -0.149896229        11.15660734        3.734862983        16.49448223                  0                  0                  0     0.001203281652    4.674508944e-07                  1                  0                  0                  0                  0                  0                  0                  1                  0                  0                  0                  0                  0                  0                  1                  0                  0                  0                  0                  0                  0                  1                  0                  0                  0                  0                  0                  0                  1                  0                  0                  0                  0                  0                  0                  1

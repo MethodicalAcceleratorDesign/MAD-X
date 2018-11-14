@@ -75,6 +75,7 @@ readonly winsrc="mad@macserv15865w10.cern.ch:"
 readonly linuxsrc="mad@macserv15865lx.cern.ch:"
 readonly macosxsrc="mad@macserv15865.cern.ch:"
 readonly lxplussrc="mad@lxplus.cern.ch:madx/"
+readonly lxplus7src="mad@lxplus7.cern.ch:madx_lxplus7/"
 
 # clean tempory files
 clean_tmp ()
@@ -146,6 +147,18 @@ build_test_binary ()
     #scp -q -p "${src}madx-nightly/numdiff-${arch}32-*" .
   done
 }
+copy_build_binary_lxplus()
+{
+
+cp "../madx-nightly/madx-linux64-gnu" "madx-lxplus64-gnu"
+cp "../madx-nightly/numdiff-linux64-gnu" "numdiff-lxplus64-gnu"
+# A way to not use ssh-key that works poorly to connect to lxplus and avoid the relative part.. 
+cp "/afs/cern.ch/user/m/mad/madx_lxplus7/madx-nightly/madx-linux64-gnu" "madx-lxplus7-64-gnu"
+cp "/afs/cern.ch/user/m/mad/madx_lxplus7/madx-nightly/madx-linux64-intel" "madx-lxplus7-64-intel"
+cp "/afs/cern.ch/user/m/mad/madx_lxplus7/madx-nightly/numdiff-linux64-intel" "numdiff-lxplus7-64-intel"
+
+}
+
 
 # look for failed tests [lxplus | macosx | linux | win]
 build_test_report ()
@@ -222,19 +235,21 @@ clean_tmp
 build_test_local  lxplus
 
 # retrieve remote reports
-build_test_remote        macosx linux win
+build_test_remote        macosx linux win lxplus7
 
 # check if all reports are finished
-build_test_check  lxplus macosx linux win
+build_test_check  lxplus macosx linux win lxplus7
 
 # retrieve local and remote binaries
 build_test_binary        macosx linux win
 
+copy_build_binary_lxplus
+
 # build the final report
-build_test_report lxplus macosx linux win
+build_test_report lxplus macosx linux win lxplus7
 
 # send the final report
-build_test_send   lxplus macosx linux win
+build_test_send   lxplus macosx linux win lxplus7
 
 # report errors by email if any
 if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then

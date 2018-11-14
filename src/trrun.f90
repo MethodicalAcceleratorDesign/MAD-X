@@ -471,10 +471,11 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
            if ( code.ne.code_drift .and. &
                 code.ne.code_quadrupole .and. &
+                code.ne.code_rbend .and. &
                 code.ne.code_sbend .and. &
                 code.ne.code_matrix .and. &
                 code.ne.code_solenoid .and. &
-                el.ne.zero ) then ! rbend missing ?
+                el.ne.zero ) then
               !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
               print *," "
               print *,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
@@ -2841,8 +2842,8 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
         !*** case of racetrack: test outer rectangle (ap1,ap2) first
         !    then test ellipse for corner part.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. &
-             ( x .gt. ap1-ap3 .and. y .gt. ap2-ap3 .and. &
-               ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap3)) / ap4)**2 .gt. one )
+             ( x .gt. ap1-ap3 .and. y .gt. ap2-ap4 .and. &
+               ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap4)) / ap4)**2 .gt. one )
 
      case ("octagon")
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape
@@ -3444,8 +3445,11 @@ subroutine trclor(switch,orbit0)
         if (code .eq. code_placeholder) code = code_instrument
         el      = node_value('l ')
         if (itra .eq. 1 .and. &
-             code.ne.code_drift .and. code.ne.code_quadrupole .and. code.ne.code_sbend &
-             .and. code.ne.code_matrix .and. el.ne.zero ) then ! rbend missing ?
+            code.ne.code_drift .and. &
+            code.ne.code_quadrupole .and. &
+            code.ne.code_rbend .and. &
+            code.ne.code_sbend .and. &
+            code.ne.code_matrix .and. el.ne.zero ) then
            !  .not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
            print *,"\ncode: ",code," el: ",el,"   THICK ELEMENT FOUND\n"
            print *,"Track dies nicely"
@@ -4489,6 +4493,8 @@ subroutine tttdipole(track, ktrack)
   use twtrrfi
   use trackfi
   use math_constfi, only : zero, one, two, three, half
+  use code_constfi
+
   implicit none
   !-------------------------*
   ! Andrea Latina 2013-2014 *
@@ -4515,8 +4521,9 @@ subroutine tttdipole(track, ktrack)
   double precision, external :: node_value, get_value
   double precision :: f_errors(0:maxferr)
   integer, external :: node_fd_errors
-  integer :: n_ferr
+  integer :: n_ferr, code
 
+  code = node_value('mad8_type ')
   arad    = get_value('probe ','arad ')
   gamma   = get_value('probe ','gamma ')
   radiate = get_value('probe ','radiate ') .ne. zero
@@ -4535,6 +4542,11 @@ subroutine tttdipole(track, ktrack)
   h = angle/length;
   k0 = h;
   k1 = node_value('k1 ');
+
+  if (code .eq. code_rbend) then
+     e1 = e1 + angle / two;
+     e2 = e2 + angle / two;
+  endif
 
   !---- Apply errors
   f_errors = zero

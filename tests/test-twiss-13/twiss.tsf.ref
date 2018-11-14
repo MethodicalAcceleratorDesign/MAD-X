@@ -15,6 +15,7 @@
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
+@ BV_FLAG          %le                   1
 @ LENGTH           %le         86.33884601
 @ ALFA             %le     4.357888937e-05
 @ ORBIT5           %le                  -0
@@ -32,7 +33,7 @@
 @ XCORMS           %le                   0
 @ YCORMS           %le                   0
 @ DXRMS            %le        0.0228849519
-@ DYRMS            %le      5.96279526e-06
+@ DYRMS            %le     5.962795259e-06
 @ DELTAP           %le                   0
 @ SYNCH_1          %le                   0
 @ SYNCH_2          %le                   0
@@ -40,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "14/12/17"
-@ TIME             %08s "17.56.54"
+@ ORIGIN           %16s "5.04.00 Linux 64"
+@ DATE             %08s "15/05/18"
+@ TIME             %08s "18.33.51"
 * NAME                                S               BETX             BETA11               BETY             BETA22             BETA12             BETA21                MU1                MU2 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "T_INSERTION.A$START"                   0        1.110269702       0.5553009487         10.4888701        5.246004198       0.5548341895        5.244137453                  0                  0

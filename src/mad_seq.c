@@ -983,111 +983,256 @@ seq_install(struct in_cmd* cmd)
 static void
 seq_move(struct in_cmd* cmd)
   /* executes move command */
-{
-  char *name, *from_name;
-  double at, by, to, from = zero;
-  int any = 0, k;
-  struct node *node, *next;
-  struct element* el;
-  int pos;
-  name = command_par_string_user("element", cmd->clone);
-  if (name)
   {
-    if (strcmp(name, "selected") == 0)
-    {
-      if (seqedit_select->curr == 0)
+      char *name, *from_name=NULL;
+      double at, by, to, from = zero;
+      int any = 0, k;
+      struct node *node, *next, *node2, *next2;
+      struct element* el;
+      int pos, is_ref_from_moved,max_c=50;
+      struct expression* tmp = NULL; 
+      struct expression* expr = NULL;
+      struct expression* newexp = NULL;
+
+
+      name = command_par_string_user("element", cmd->clone);
+      if (name)
       {
-        warning("no active select commands:", "ignored"); return;
-      }
-      else
-      {
-        if (!par_present("by", cmd->clone))
+        if (strcmp(name, "selected") == 0)
         {
-          warning("no 'by' given,", "ignored"); return;
-        }
-        by = command_par_value("by", cmd->clone);
-        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
-            == 0) any = 1;
-        node = edit_sequ->start;
-        while (node != edit_sequ->end)
-        {
-          node = node->next; node->moved = 0;
-        }
-        node = edit_sequ->start;
-        while (node != NULL && node != edit_sequ->end)
-        {
-          next = node->next;
-          if (node->moved == 0)
+          if (seqedit_select->curr == 0)
           {
-            if (any
-                || name_list_pos(node->name, selected_ranges->list) > -1)
+            warning("no active select commands:", "ignored"); return;
+          }
+          else
+          {
+            if (!par_present("by", cmd->clone))
             {
-              name = NULL;
-              for (k = 0; k < seqedit_select->curr; k++)
+              warning("no 'by' given,", "ignored"); return;
+            }
+            by = command_par_value("by", cmd->clone);
+            if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
+              == 0) any = 1;
+              node = edit_sequ->start;
+            while (node != edit_sequ->end)
+            {
+              node = node->next; node->moved = 0;
+            }
+            node = edit_sequ->start;
+            while (node != NULL && node != edit_sequ->end)
+            {
+              next = node->next;
+              if (node->moved == 0)
               {
-                if (node->p_elem != NULL) name = node->p_elem->name;
-                if (name != NULL && strchr(name, '$') == NULL &&
-                    pass_select_el(node->p_elem,
-                                seqedit_select->commands[k])) break;
-              }
-              if (k < seqedit_select->curr)
-              {
-                at = node->position + by;
-                el = node->p_elem;
-                if (remove_one(node) > 0)
+                if (any
+                  || name_list_pos(node->name, selected_ranges->list) > -1)
                 {
-                  node = install_one(el, NULL, at, NULL, at);
-                  node->moved = 1;
-                  seqedit_move++;
+
+                  name = NULL;
+                  for (k = 0; k < seqedit_select->curr; k++)
+                  {
+                    if (node->p_elem != NULL) name = node->p_elem->name;
+                    if (name != NULL && strchr(name, '$') == NULL &&
+                      pass_select_el(node->p_elem,
+                        seqedit_select->commands[k])) break;
+                  }
+                  if (k < seqedit_select->curr)
+                  {
+                    at = node->position + by;
+                    el = node->p_elem;
+                    from_name = node->from_name;
+                    if(from_name==NULL)
+                    {
+
+                    expr = clone_expression(command_par_expr("by", cmd->clone));
+                    tmp = clone_expression(node->at_expr);
+                    if(expr==NULL)
+                    {
+                      char *result = malloc(max_c * sizeof(char));
+                      sprintf(result, "%f", by);
+                      expr = new_expression(result,NULL);
+                      free(result);
+                    }
+                    if(tmp==NULL)
+                    { 
+                     char *result = malloc(max_c * sizeof(char));
+                     sprintf(result, "%f", node->position);
+                     tmp = new_expression(result,NULL);
+                     free(result);
+                    }
+
+                    newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                  }
+                  else
+                  {
+                    is_ref_from_moved = 0;
+
+                    node2 = edit_sequ->start;
+                    while (node2 != edit_sequ->end)
+                    {
+                      node2 = node2->next; node2->moved = 0;
+                    }
+                    node2 = edit_sequ->start;
+                    while (node2 != NULL && node2 != edit_sequ->end)
+                    {
+                      next2 = node2->next;
+                      if (node2->moved == 0)
+                      {
+                        if (any
+                        || name_list_pos(node2->name, selected_ranges->list) > -1)
+                        {
+
+                          name = NULL;
+                          for (k = 0; k < seqedit_select->curr; k++)
+                          {
+                            if (node2->p_elem != NULL) name = node2->p_elem->name;
+                            if (name != NULL && strchr(name, '$') == NULL &&
+                              pass_select_el(node2->p_elem,
+                                seqedit_select->commands[k])) 
+                            {
+                              if(strcmp(from_name, name)==0)
+                              {
+                                is_ref_from_moved=1;
+                                
+                              }
+                                break;
+                            }
+                          }
+                        }
+                      }
+                      node2 = next2;
+                    }
+
+                    if(is_ref_from_moved)
+                    {
+                    newexp = clone_expression(node->at_expr);
+                      if(newexp==NULL)
+                      {
+                        char *result = malloc(max_c * sizeof(char));
+                        char *result2 = malloc(max_c * sizeof(char));
+                        sprintf(result, "%f", node->at_value);
+                        sprintf(result2, "%f", 0.0);
+                        tmp = new_expression(result,NULL);
+                        expr = new_expression(result2,NULL);
+                        free(result);
+                        free(result2);
+                      }
+
+                      //newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                    }
+                    else
+                    {
+                      expr = clone_expression(command_par_expr("by", cmd->clone));
+                      tmp = clone_expression(node->at_expr);
+                      if(expr==NULL)
+                      { 
+
+                        char *result = malloc(max_c * sizeof(char));
+                        sprintf(result, "%f", by);
+                        expr = new_expression(result,NULL);
+                        free(result);
+                      }
+                      if(tmp==NULL)
+                      { 
+                        char *result = malloc(max_c * sizeof(char));
+                        sprintf(result, "%f", node->position);
+                        tmp = new_expression(result,NULL);
+                        free(result);
+                      }
+
+                      newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                    }
+                  }
+                  if (remove_one(node) > 0)
+                  { 
+                    install_one(el, from_name, at, newexp, at);
+
+                    node->moved = 1;
+                    seqedit_move++;
+                  }
                 }
               }
             }
+            node = next;
           }
-          node = next;
         }
       }
-    }
-    else
-    {
-      strcpy(c_dum->c, name);
-      square_to_colon(c_dum->c);
-      if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
+      else
       {
-        node = edit_sequ->nodes->nodes[pos];
-        if (!par_present("by", cmd->clone))
+        strcpy(c_dum->c, name);
+        square_to_colon(c_dum->c);
+        if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
         {
-          if (!par_present("to", cmd->clone))
+          node = edit_sequ->nodes->nodes[pos];
+          if (!par_present("by", cmd->clone))
           {
-            warning("no position given,", "ignored"); return;
-          }
-          to = command_par_value("to", cmd->clone);
-          from_name = command_par_string_user("from", cmd->clone);
-          if (from_name)
-          {
-            if ((from = hidden_node_pos(from_name, edit_sequ)) == INVALID)
+            if (!par_present("to", cmd->clone))
             {
-              warning("ignoring 'from' reference to unknown element:",
-                      from_name);
-              return;
+              warning("no position given,", "ignored"); return;
             }
+            to = command_par_value("to", cmd->clone);
+
+            from_name = command_par_string_user("from", cmd->clone);
+            if (from_name)
+            {
+
+
+              if ((from = hidden_node_pos(from_name, edit_sequ)) == INVALID )
+              {
+                warning("ignoring 'from' reference to unknown element:",
+                  from_name);
+                return;
+              }
+              if(strcmp(from_name, name)==0){
+                warning("reference 'FROM' the same element -> impossible positioning", from_name);
+                return;
+              }
+
+            }
+            if(from_name==NULL) newexp = clone_expression(command_par_expr("to", cmd->clone));
+            
+            from_name = NULL;
+            at = to + from;
           }
-          at = to + from;
-        }
-        else
-        {
-          by = command_par_value("by", cmd->clone);
-          at = node->position + by;
-        }
-        el = node->p_elem;
-        if (remove_one(node) > 0)
-        {
-          install_one(el, NULL, at, NULL, at);
-          seqedit_move++;
+          else
+          {
+
+            by = command_par_value("by", cmd->clone);
+            from_name = node->from_name;
+            at = node->position + by;
+            tmp = clone_expression(node->at_expr);
+            expr = clone_expression(command_par_expr("by", cmd->clone));
+            if(expr==NULL)
+            { 
+
+              char *result = malloc(max_c * sizeof(char));
+              sprintf(result, "%f", by);
+              expr = new_expression(result,NULL);
+              free(result);
+              
+            }
+            if(tmp==NULL)
+            { 
+              
+              char *result = malloc(max_c * sizeof(char));
+              sprintf(result, "%f", node->at_value);
+              tmp = new_expression(result,NULL);
+              free(result);
+            }
+            newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+
+          }
+          el = node->p_elem;
+          if (remove_one(node) > 0)
+          {
+            install_one(el, from_name, at, newexp, at);
+            seqedit_move++;
+          }
         }
       }
     }
   }
-}
+
 
 static void
 seq_reflect(struct in_cmd* cmd)
@@ -1295,7 +1440,7 @@ get_drift(double length, int count)
 }
 
 static int
-add_drifts(struct node* c_node, struct node* end)
+add_drifts(struct node* c_node, struct node* end,struct sequence* sequ)
 {
   const double tol = 1e-6;
   int cnt;
@@ -1305,7 +1450,7 @@ add_drifts(struct node* c_node, struct node* end)
 
   int debug;
   debug = get_option("debug");
-
+  double sequencelength = sequence_length(sequ); 
   if (!c_node) return 0;
 
   for (cnt=1; c_node != end && c_node->next; c_node = c_node->next, cnt++) {
@@ -1313,7 +1458,10 @@ add_drifts(struct node* c_node, struct node* end)
     double drift_end = c_node->next->position - c_node->next->length / 2;
     double drift_len = drift_end-drift_beg;
 
-    if (drift_len < -tol) {
+    if(fabs((drift_len) + sequencelength) < tol){ //If the drift is exactly -length of the accelerator -> do nothing. 
+      (void)0;
+    }
+    else if (drift_len < -tol) {
       // implicit drift with negative length
       sprintf(buf, " %s and %s, length %e", c_node->name, c_node->next->name, drift_len);
 
@@ -1913,7 +2061,7 @@ expand_curr_sequ(int flag)
     /* flatten the current sequence */
     expand_sequence(current_sequ, flag);
     /* add implict drifts in current sequence */
-    current_sequ->n_nodes = add_drifts(current_sequ->ex_start, current_sequ->ex_end);
+    current_sequ->n_nodes = add_drifts(current_sequ->ex_start, current_sequ->ex_end, current_sequ);
 
     if (current_sequ->all_nodes != NULL) myfree(rout_name, current_sequ->all_nodes);
     current_sequ->all_nodes = mymalloc(rout_name, current_sequ->n_nodes * sizeof *current_sequ->all_nodes);

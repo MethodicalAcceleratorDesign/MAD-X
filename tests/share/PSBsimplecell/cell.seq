@@ -1,0 +1,69 @@
+! A cell a la CERN PS booster
+! 10m long
+! quad triplet between 2 bends of 360/32 degrees
+! dispersion ~ -2m
+! 5 < betx <  9
+! 2 < bety < 19
+
+kq3               =        0.35 ;
+kq5               =       -0.70 ;
+kq7               =        0.35 ;
+
+midbendanglefactor = -0.2;
+
+bendangle = -2*pi/32;
+
+
+lbend = 2.0;
+lquad = 1;
+
+! 10 - 3*1 - 2*2 = 3
+! 
+
+ldrift = 3/6.;
+
+ltr0 := ldrift;
+ltr2 := ldrift;
+ltr4 := ldrift;
+ltr6 := ldrift;
+ltr8 := ldrift;
+ltr10:= ldrift;
+
+
+d05: drift, l:=0.5;
+
+d0: drift, l:=ltr0;
+d2: drift, l:=ltr2;
+d4: drift, l:=ltr4;
+d6: drift, l:=ltr6;
+d8: drift, l:=ltr8;
+d10:drift, l:=ltr10;
+
+
+bend1: rbend,  l:=lbend, angle:= +bendangle, k1:=bendk1;
+bend9: rbend,  l:=lbend, angle:= +bendangle, k1:=bendk1 ;
+
+
+q3: quadrupole, l := lquad, k1 := kq3;
+q5: quadrupole, l := lquad, k1 := kq5;
+q7: quadrupole, l := lquad, k1 := kq7;
+
+
+
+cellf: line = (          d0,
+                 bend1,  d2,
+                 q3,     d4,
+                 q5,     d6,
+                 q7,     d8,
+                 bend9,  d10 );
+                 
+
+cell: line = (         
+                 bend1,  d2,
+                 q3,     d4,
+                 q5,     d6,
+                 q7,     d8,
+                 bend9     );
+                 
+
+return;

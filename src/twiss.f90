@@ -5709,8 +5709,6 @@ SUBROUTINE tmtrans(ftrk,orbit)
  orbit(5) = orbit(5) + t
  orbit(6) = orbit(6) + pt
 
- print *, "output", orbit(1)
-
   !---- Track orbit.
   !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 

@@ -4,6 +4,7 @@
 
 #define MIN_DOUBLE 1.e-36
 
+int isSliced = 0;
 struct table;
 struct aper_node            /* aperture limit node */
 {
@@ -1240,6 +1241,11 @@ pro_aperture(struct in_cmd* cmd)
   struct aper_node *limit_pt = &limit_node;
 
   limit_pt = aperture(table, use_range, tw_cp, &tw_cnt, limit_pt);
+  /*If TWISS CENTRE is used and some elements with a non-zero length and aperture. Than the node interpolation is wrong. */
+  if(current_sequ->tw_centre==1 && isSliced==1){
+       warning("Aperture module - not possible to use TWISS, CENTRE=TRUE with thick apperture elements.", "Aperture command ignored");
+    return;
+  }
 
   if (limit_pt->n1 != -1) {
     printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
@@ -1391,6 +1397,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   /* get initial twiss parameters, from start of first element in range */
   aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy);
+  
   // LD: shift further results by one step (?) and finish outside the table
   //  (*tw_cnt)++;
   aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
@@ -1470,7 +1477,6 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       n1=999999; n1x_m=999999; n1y_m=999999; on_ap=-999999; nint=1;
 
       aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy);
-
       aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
 		       apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec,
                        &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, table);
@@ -1503,6 +1509,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       node_n1   = 999999;
       true_node = 0;
       offs_node = 0;
+      
 
       /* calculate the number of slices per node */
       if (true_flag == 0)
@@ -1518,7 +1525,13 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       if (!nint) nint = 1;
 
       /* do not interpolate 0-length elements*/
-      if (fabs(length) < MIN_DOUBLE ) is_zero_len = 1;
+      if (fabs(length) < MIN_DOUBLE ) {
+        is_zero_len = 1;
+      }
+      else{
+        isSliced = 1;
+      }
+
 
       /* slice the node, call survey if necessary, make twiss for slices*/
       interpolate_node(&nint);

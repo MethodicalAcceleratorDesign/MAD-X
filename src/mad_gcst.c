@@ -190,7 +190,7 @@ const char* const sxf_table_names[] =
 const int twiss_opt_end = 33; /* last column filled by twiss module */
 const int twiss_mult_end = 78; /* last multipole column filled
                             by complete_twiss_table */
-const int twiss_fill_end = 97; /* last standard column filled
+const int twiss_fill_end = 102; /* last standard column filled
                             by complete_twiss_table */
 /*== increased twiss_fill_end from 96 to 97 to accomodate for v_pos */
 
@@ -219,7 +219,8 @@ const int twiss_table_types[] =
   2, 2, 2, 2,
   1, 1, 2,
   2, /* v_pos */
-  2, 3,
+  2, 2, 2, 2, 2,
+  2, 3, 3,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
@@ -288,8 +289,9 @@ const char* const twiss_table_cols[] =
   "slot_id","assembly_id","mech_sep",
   /*== dealt with the new property v_pos as for mech_sep */
   "v_pos",
+  "bbcharge","xma", "yma", "sigx", "sigy",
   /*==*/
-  "lrad","parent",
+  "lrad","parent","comments",
   "re11", "re12", "re13", "re14", "re15", "re16",
   "re21", "re22", "re23", "re24", "re25", "re26",
   "re31", "re32", "re33", "re34", "re35", "re36",

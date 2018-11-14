@@ -20,6 +20,10 @@
 # defines
 #
 
+ifeq ($(DEBUG),yes)
+CPPFLAGS += -D_ASSERT_DBG
+endif
+
 ifeq ($(ONLINE),yes)
 CPPFLAGS += -D_ONLINE
 endif

@@ -1,0 +1,74 @@
+\documentclass{standalone}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{standalone}
+\usepackage{xspace}
+\usepackage[dvipsnames,svgnames]{xcolor}
+
+    %% \oddsidemargin 0.125 in    %   Note that \oddsidemargin = \evensidemargin
+    %% \evensidemargin 0.125 in
+    %% \marginparwidth 0.75 in
+    %% \textwidth 6.125 in % Width of text line.
+\usepackage{amsmath}
+\usepackage[english]{babel}
+%%\usepackage[pdftex]{graphicx} 
+%% Show image: \includegraphics[width=x]{file}.
+\usepackage{graphicx} % Show image: \includegraphics[width=x]{file}.
+\usepackage{pict2e}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{parskip}
+\usepackage{float}
+%\usepackage{makeidx}
+\usepackage{color}
+
+\begin{document}
+
+\begin{picture}(400,140)(0,30)
+	\thinlines
+	\put(50,75){\line(1,0){96}}
+	\put(154,75){\vector(1,0){246}}
+	\put(50,75){\makebox(0,0)[r]{\shortstack{
+		\footnotesize original \\
+		\footnotesize beam line}}}
+	\put(395,67){\makebox(0,0)[r]{$s$}}
+	\put(150,75){\circle{8}}
+	\put(150,75){\circle*{2}}
+	\put(142,83){\makebox(0,0){$y$}}
+	\put(150,30){\line(0,1){41}}
+	\put(150,79){\vector(0,1){91}}
+	\put(142,163){\makebox(0,0){$x$}}
+	\put(130,55){\vector(1,1){15}}
+	\put(130,55){\makebox(0,0)[tr]{\shortstack{
+		\footnotesize original entrance \\
+		\footnotesize of the magnet}}}
+	\thicklines
+	\put(150,55){\vector(1,0){50}}
+	\put(175,45){\makebox(0,0)\texttt{DS}}
+	\put(130,75){\vector(0,1){50}}
+	\put(125,100){\makebox(0,0)[r]\texttt{DX}}
+	\thinlines
+	\put(125,125){\line(1,0){185}}
+	\put(200,50){\line(0,1){120}}
+	\put(200,125){\circle*{4}}
+	\thicklines
+	\color{blue}
+	\put(168,117){\vector(4,1){144}}
+	\put(210,85){\vector(-1,4){20}}
+
+	\put(282,137){\line(-1,4){4}}
+	\put(202,117){\line(-1,4){4}}
+	\put(198,133){\line(4,1){80}}
+	\put(202,117){\line(4,1){80}}
+	\color{black}
+	\bezier{30}(300,125)(300,137)(297,149)
+	\put(299,140){\vector(-1,4){2}}
+	\put(305,137){\makebox(0,0)[l]\texttt{DTHETA}}
+
+	\put(150,67){\line(1,0){80}}
+	\put(150,83){\line(1,0){80}}
+	\put(150,67){\line(0,1){4}}
+	\put(150,79){\line(0,1){4}}
+	\put(230,67){\line(0,1){16}}
+	\end{picture}
+
+\end{document}
