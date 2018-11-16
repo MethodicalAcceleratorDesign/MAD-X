@@ -4523,7 +4523,7 @@ subroutine tttdipole(track, ktrack)
   integer, external :: node_fd_errors
   integer :: n_ferr, code
 
-  code = node_value('mad8_type ')
+  code    = node_value('mad8_type ')
   arad    = get_value('probe ','arad ')
   gamma   = get_value('probe ','gamma ')
   radiate = get_value('probe ','radiate ') .ne. zero
