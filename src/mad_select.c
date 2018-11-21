@@ -17,7 +17,7 @@ start_iter_select(struct command* cmd, struct sequence_list* sequs, struct seque
 {
   const char* name;
 
-  if (!sequs)
+  if (!sequs && !sequ)
     sequs = sequences;
 
   if (sequs && !sequ && (name = command_par_string("sequence", cmd))) {
