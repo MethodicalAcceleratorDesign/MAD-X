@@ -253,7 +253,8 @@ void
 write_vars(struct var_list* varl, struct command_list* cl, FILE* file, int noexpr)
 {
   for (int i = 0; i < varl->curr; i++) {
-    if (predef_var(varl->vars[i]) == 0 && pass_select_list_str(varl->vars[i]->name, cl))
+    if (predef_var(varl->vars[i]) == 0 &&
+            pass_select_list_str(varl->vars[i]->name, "variable", cl))
       export_variable(varl->vars[i], file, noexpr);
   }
 }
@@ -265,7 +266,7 @@ write_vars_8(struct var_list* varl, struct command_list* cl, FILE* file)
   for (i = 0; i < varl->curr; i++)
   {
     if (predef_var(varl->vars[i]) == 0
-        && pass_select_list_str(varl->vars[i]->name, cl))
+        && pass_select_list_str(varl->vars[i]->name, "variable", cl))
       export_var_8(varl->vars[i], file);
   }
 }
