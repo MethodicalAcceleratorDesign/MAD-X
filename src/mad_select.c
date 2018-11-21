@@ -109,7 +109,7 @@ pass_select(const char* name, struct command* sc)
   /* Don't use for selecting elements. It may not find all elements. */
 {
   struct element* el = find_element(strip(name), element_list);
-  return el ? pass_select_el(el, sc) : pass_select_str(name, sc);
+  return el ? pass_select_el(el, sc) : pass_select_str(name, NULL, sc);
 }
 
 int
@@ -126,14 +126,14 @@ pass_select_el(struct element* el, struct command* sc)
   return _pass_select_pat(el->name, sc);
 }
 
-int pass_select_str(const char* name, struct command* sc)
+int pass_select_str(const char* name, const char* class, struct command* sc)
 {
   /* checks name against pattern that may
      (but need not) be contained in command sc;
-     considers only SELECT commands *without CLASS*!
+     considers only SELECT commands with the given class!
      0: does not pass, 1: passes */
-  // if the command has CLASS attribute, it is supposed to match elements:
-  if (par_present("class", sc))  /* parameter has been read */
+  char* selected_class = command_par_string_user("class", sc);
+  if (selected_class && class && strcmp(selected_class, class) != 0)
     return 0;
   return _pass_select_pat(name, sc);
 }
@@ -146,12 +146,12 @@ int _pass_select_pat(const char* name, struct command* sc)
 }
 
 int
-pass_select_list_str(const char* name, struct command_list* cl)
+pass_select_list_str(const char* name, const char* class, struct command_list* cl)
   /* returns 0 (does not pass) or 1 (passes) for a list of selects */
   /* Don't use for selecting elements! It may not find all elements. */
 {
   for (int i = 0; i < cl->curr; i++) {
-    if (pass_select_str(name, cl->commands[i]))
+    if (pass_select_str(name, class, cl->commands[i]))
         return 1;
   }
   return cl->curr == 0;
