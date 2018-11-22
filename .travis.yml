@@ -29,13 +29,6 @@ after_success:
 # Travis settings:
 # ----------------------------------------
 
-# Build on Ubuntu 14.04 LTS Server Edition 64 bit (Trusty Tahr) which is
-# currently on beta (instead of precise which is current default):
-dist: trusty
-
-# We cannot use 'sudo apt-get' to install missing apt-packages, see:
-#   - https://docs.travis-ci.com/user/installing-dependencies/
-#   - https://github.com/travis-ci/apt-package-whitelist
 addons:
   apt:
     packages:
