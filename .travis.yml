@@ -1,7 +1,3 @@
-# ----------------------------------------
-# Build/test script
-# ----------------------------------------
-
 language: cpp
 compiler:
   - gcc
@@ -25,9 +21,6 @@ script:
 after_success:
   - coveralls --include src -x .c -x .cpp
 
-# ----------------------------------------
-# Travis settings:
-# ----------------------------------------
 
 addons:
   apt:
@@ -35,10 +28,7 @@ addons:
     - gfortran
 
 git:
-  # Travis CI clones repositories to a depth of 50 commits, which is only
-  # really useful if you are performing git operations.
-  # We restrict to just top level commit, because we are not interested in git
-  # operations and fetching the history could be quite large.
+  # Limit cloning depth to reduce download bandwidth:
   # Please note that if you use a depth of 1 and have a queue of jobs, Travis
   # CI won’t build commits that are in the queue when you push a new commit.
   depth: 1
