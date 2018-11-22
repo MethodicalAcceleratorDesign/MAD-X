@@ -10,11 +10,8 @@ install:
   - make numdiff-linux64-gnu
 
 script:
-  # Temporarily exclude test-plot until we can install gnuplot on the travis
-  # docker container, see:
-  # https://github.com/travis-ci/apt-package-whitelist/issues/3866
   - >-
-    make tests tests-to-rm=test-plot &&
+    make tests &&
     NUM_FAILED=$(<tests/tests-summary.txt grep -o 'FAILED.*' | awk '{print $2}') &&
     [[ $NUM_FAILED = 0 ]]
 
@@ -26,6 +23,7 @@ addons:
   apt:
     packages:
     - gfortran
+    - gnuplot
 
 git:
   # Limit cloning depth to reduce download bandwidth:
