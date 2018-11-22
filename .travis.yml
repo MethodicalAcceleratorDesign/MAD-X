@@ -2,18 +2,15 @@ language: cpp
 compiler:
   - gcc
 
-before_install:
-  - pip install --user cpp-coveralls
-
 install:
+  - pip install --user cpp-coveralls
   - make madx-linux64-gnu COVERAGE=yes
   - make numdiff-linux64-gnu
 
 script:
-  - >-
-    make tests &&
-    NUM_FAILED=$(<tests/tests-summary.txt grep -o 'FAILED.*' | awk '{print $2}') &&
-    [[ $NUM_FAILED = 0 ]]
+  - make tests &&
+    NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
+    [[ $NUM_FAILED -eq 0 ]]
 
 after_success:
   - coveralls --include src -x .c -x .cpp
