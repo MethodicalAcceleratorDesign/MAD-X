@@ -1774,7 +1774,7 @@ subroutine track_one_element(el, fexit, contrib_rms)
 
   n_align = node_al_errors(al_errors)
   if (n_align .ne. 0)  then
-     !print*, "coupl1: Element = ", el_name
+     print*, "coupl1: Element = "
      ele_body = .false.
      orbit2 = orbit
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
@@ -5558,6 +5558,7 @@ end SUBROUTINE tmsol
 SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twissbeamfi, only : deltap, beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, three, six
+    use matrices, only : EYE
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -5576,11 +5577,11 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk, fmap
   double precision :: el
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: orbit(6), ek(6), re(6,6), ek_t1(6), ek_t2(6), re_t1(6,6), re_t2(6,6), te(6,6,6)
 
   logical :: cplxy
   double precision :: sks, sk, skl, bvk
-  double precision :: co, si, sibk, temp
+  double precision :: co, si, sibk, temp, xtilt
 
   double precision, external :: node_value
   double precision, parameter :: ten5m=1d-5
@@ -5588,9 +5589,20 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !---- Initialize.
   fmap = el .ne. zero
   if (.not. fmap) return
-
+  EK = zero
+  RE = EYE
   !---- Strength.
   sks = node_value('ks ')
+  xtilt = node_value('xtilt ')
+  re_t1 = EYE
+  re_t2 = EYE
+  ek_t1 = zero
+  ek_t2 = zero
+  if(xtilt .ne. zero) then
+    
+     
+  endif
+
   if (sks .ne. zero) cplxy = .true.
 
   !---- BV flag
@@ -5662,10 +5674,21 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
      te(5,6,6) = - three * re(5,6) / (two * beta)
      call tmsymm(te)
   endif
-
+  
+  !if(xtilt .ne. zero) then
+    !!call tmtrak(ek_t2,re_t2,te,orbit,orbit)
+  !endif
   !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+ 
+  print *, "orbitSolenoid", ek
 
+  if (ftrk) then
+  orbit(2) = orbit(2) - xtilt
+  call tmtrak(ek,re,te,orbit,orbit)
+  orbit(2) = orbit(2) + xtilt
+  orbit(1) = orbit(1) + el*xtilt
+  !orbit(2) = orbit(2) + xtilt
+  endif
 end SUBROUTINE tmsol0
 
 SUBROUTINE tmtrans(ftrk,orbit)
@@ -5846,7 +5869,7 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   sa = sin(angle)
   ta = tan(angle)
 
-  ek(2) = sa
+  ek(2) = angle
 
   !---- Transfer matrix.
   re(1,1) = 1/ca
@@ -6398,7 +6421,7 @@ SUBROUTINE tmali1(orb1, errors, beta, gamma, orb2, rm)
   psi = errors(6)
   call sumtrx(the, phi, psi, w)
   s2 = (w(1,3) * dx + w(2,3) * dy + w(3,3) * ds) / w(3,3)
-
+  print *, "heeereee", the, phi, psi
   !---- F2 terms (transfer matrix).
   RM = EYE
   rm(2,2) = w(1,1)
@@ -6430,6 +6453,8 @@ SUBROUTINE tmali1(orb1, errors, beta, gamma, orb2, rm)
   orb2(4) = orbt(4) + w(3,2)
   orb2(5) = orbt(5) - s2 / beta
   orb2(6) = orbt(6)
+  print *, "orb1", orbt
+  print *, "orb2", orb2
 
 end SUBROUTINE tmali1
 

@@ -760,13 +760,16 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
      st = sin(theta)
      ct = cos(theta)
      do jtrk = 1,ktrack
+
         tmp = track(1,jtrk)
         track(1,jtrk) = ct * tmp + st * track(3,jtrk)
         track(3,jtrk) = ct * track(3,jtrk) - st * tmp
         tmp = track(2,jtrk)
         track(2,jtrk) = ct * tmp + st * track(4,jtrk)
         track(4,jtrk) = ct * track(4,jtrk) - st * tmp
+        print *, "rotttate", track(:, jtrk) 
      enddo
+
   endif
 
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
@@ -3166,11 +3169,11 @@ subroutine trsol(track,ktrack)
   double precision :: bet0
   double precision :: sk, skl, cosTh, sinTh, Q, R, Z
   double precision :: xf, yf, pxf, pyf, sigf, psigf, bvk
-  double precision :: onedp, fpsig, fppsig
+  double precision :: onedp, fpsig, fppsig, xtilt
 
   double precision :: get_value, node_value
 
-  double precision :: omega, length
+  double precision :: omega, length, lengthreal
   double precision :: x_, y_, z_, px_, py_, pt_
   double precision :: bet, length_
 
@@ -3182,7 +3185,8 @@ subroutine trsol(track,ktrack)
   bvk = node_value('other_bv ')
   sk  = bvk * node_value('ks ') / two
   length = node_value('l ')
-
+  lengthreal = node_value('l ')
+  print *, "eeeeerrreee"
   if (length.eq.zero) then
 
      skl = bvk * node_value('ksi ') / two
@@ -3220,20 +3224,28 @@ subroutine trsol(track,ktrack)
      enddo
   else
      if (sk.ne.zero) then
+        xtilt = node_value('xtilt ')
+        print *, "the xxtttillttt", xtilt
+
+
         skl = sk*length
 
         !---- Loop over particles
         do  i = 1, ktrack
            ! initial phase space coordinates
+           onedp = sqrt(one + two*track(6,i)/bet0 + track(6,i)**2);
+           print *, "onedppp", onedp
            x_  = track(1,i)
-           y_  = track(3,i)
-           px_ = track(2,i)
+           y_  = track(3,i) 
+           px_ = track(2,i) + xtilt*(onedp) ! This might be wrong... 
            py_ = track(4,i)
            z_  = track(5,i)
            pt_ = track(6,i)
 
+
            ! set up constants
            onedp = sqrt(one + two*pt_/bet0 + pt_**2);
+
 
            ! set up constants
            cosTh = cos(two*skl/onedp)
@@ -3245,12 +3257,20 @@ subroutine trsol(track,ktrack)
            length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
                 two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
 
-           track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
-           track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
-           track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
-           track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
-           track(5,i) = z_ + length/bet0 - length_/bet;
+           x_ = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
+           y_ = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
+           px_ = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
+           py_   = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
+           z_ = z_ + length/bet0 - length_/bet;
 
+
+
+           track(1,i) = x_ - lengthreal*px_ - lengthreal*pt_/bet0
+           track(3,i) = y_
+           track(2,i) = px_- xtilt*(onedp) ! This might be wrong... 
+           track(4,i) = py_
+           track(5,i) = z_
+           track(6,i) = pt_
         enddo
      else
         call ttdrf(length,track,ktrack);
@@ -4374,6 +4394,7 @@ subroutine tttquad(track, ktrack)
 
   if (k1s.ne.zero) then
      tilt = -atan2(k1s, k1)/two + tilt
+     print * ,"skew tilt", tilt
      k1 = sqrt(k1**2 + k1s**2)
   else
      tilt = zero
@@ -4393,9 +4414,10 @@ subroutine tttquad(track, ktrack)
      py = track(4,jtrk);
      z  = track(5,jtrk);
      pt = track(6,jtrk);
-
+     print *, "before internal tilt", x, y, px, py
      !---  rotate orbit before entry
      if (tilt .ne. zero)  then
+        print *, "ever hereeere", x, y, px, py
         st = sin(tilt)
         ct = cos(tilt)
         tmp = x
@@ -4405,7 +4427,7 @@ subroutine tttquad(track, ktrack)
         px = ct * tmp + st * py
         py = ct * py  - st * tmp
      endif
-
+  print *, "after internal tilt", x, y, px, py
      !---- Computes 1+delta
      delta_plus_1 = sqrt(pt*pt + two*pt/bet0 + one);
 
