@@ -5575,17 +5575,19 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap
+  logical :: fsec, ftrk, fmap, inclength
   double precision :: el
-  double precision :: orbit(6), ek(6), re(6,6), ek_t1(6), ek_t2(6), re_t1(6,6), re_t2(6,6), te(6,6,6)
+  double precision :: orbit(6), ek(6), re(6,6), ek_t1(6), ek_t2(6), re_t1(6,6), re_t2(6,6), te(6,6,6), te_t1(6,6,6)
 
   logical :: cplxy
-  double precision :: sks, sk, skl, bvk
+  double precision :: sks, sk, skl, bvk, pxbeta, beta0
   double precision :: co, si, sibk, temp, xtilt
 
-  double precision, external :: node_value
+  double precision, external :: node_value, get_value 
   double precision, parameter :: ten5m=1d-5
 
+  beta0   = get_value('probe ','beta ')
+  inclength = .true.
   !---- Initialize.
   fmap = el .ne. zero
   if (.not. fmap) return
@@ -5598,9 +5600,8 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   re_t2 = EYE
   ek_t1 = zero
   ek_t2 = zero
-  if(xtilt .ne. zero) then
-    
-     
+  if(xtilt .ne. zero .and. inclength) then
+    !el = el/cos(xtilt)
   endif
 
   if (sks .ne. zero) cplxy = .true.
@@ -5680,14 +5681,28 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !endif
   !---- Track orbit.
  
-  print *, "orbitSolenoid", ek
-
   if (ftrk) then
-  orbit(2) = orbit(2) - xtilt
-  call tmtrak(ek,re,te,orbit,orbit)
-  orbit(2) = orbit(2) + xtilt
-  orbit(1) = orbit(1) + el*xtilt
-  !orbit(2) = orbit(2) + xtilt
+
+    if(xtilt .ne. zero) then
+      xtilt = sin(xtilt)
+      orbit(2) = orbit(2) - xtilt !Tilts the frame
+      call tmtrak(ek,re,te,orbit,orbit) !Calls the normal solenoid
+      pxbeta = xtilt*el/beta
+      ek = zero
+      ek(1) =  el*xtilt
+      ek(2) =  xtilt
+      if(inclength) then
+        te_t1 = zero
+        ek(5) = -0.5d0*pxbeta*xtilt
+        re_t1(1,6) = -pxbeta
+        re_t1(5,2) = -pxbeta
+        call tmtrak(ek,re_t1,te_t1,orbit,orbit)
+        re = matmul(re, re_t1)
+      endif
+    else
+      call tmtrak(ek,re,te,orbit,orbit)
+    endif
+
   endif
 end SUBROUTINE tmsol0
 
@@ -5869,7 +5884,7 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   sa = sin(angle)
   ta = tan(angle)
 
-  ek(2) = angle
+  ek(2) = sa
 
   !---- Transfer matrix.
   re(1,1) = 1/ca

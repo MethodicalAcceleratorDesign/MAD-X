@@ -3174,7 +3174,7 @@ subroutine trsol(track,ktrack)
   double precision :: get_value, node_value
 
   double precision :: omega, length, lengthreal
-  double precision :: x_, y_, z_, px_, py_, pt_
+  double precision :: x_, y_, z_, px_, py_, pt_, pxbeta
   double precision :: bet, length_
 
   !---- Initialize.
@@ -3186,7 +3186,6 @@ subroutine trsol(track,ktrack)
   sk  = bvk * node_value('ks ') / two
   length = node_value('l ')
   lengthreal = node_value('l ')
-  print *, "eeeeerrreee"
   if (length.eq.zero) then
 
      skl = bvk * node_value('ksi ') / two
@@ -3225,7 +3224,8 @@ subroutine trsol(track,ktrack)
   else
      if (sk.ne.zero) then
         xtilt = node_value('xtilt ')
-        print *, "the xxtttillttt", xtilt
+        xtilt = sin(xtilt)
+ 
 
 
         skl = sk*length
@@ -3234,10 +3234,9 @@ subroutine trsol(track,ktrack)
         do  i = 1, ktrack
            ! initial phase space coordinates
            onedp = sqrt(one + two*track(6,i)/bet0 + track(6,i)**2);
-           print *, "onedppp", onedp
            x_  = track(1,i)
            y_  = track(3,i) 
-           px_ = track(2,i) + xtilt*(onedp) ! This might be wrong... 
+           px_ = track(2,i) - xtilt
            py_ = track(4,i)
            z_  = track(5,i)
            pt_ = track(6,i)
@@ -3264,12 +3263,12 @@ subroutine trsol(track,ktrack)
            z_ = z_ + length/bet0 - length_/bet;
 
 
-
-           track(1,i) = x_ - lengthreal*px_ - lengthreal*pt_/bet0
+           pxbeta = xtilt*lengthreal/bet0
+           track(1,i) = x_ + lengthreal*xtilt - pxbeta*pt_
            track(3,i) = y_
-           track(2,i) = px_- xtilt*(onedp) ! This might be wrong... 
+           track(2,i) = px_ + xtilt ! This might be wrong... 
            track(4,i) = py_
-           track(5,i) = z_
+           track(5,i) = z_ -0.5d0*pxbeta*xtilt - px_*pxbeta
            track(6,i) = pt_
         enddo
      else
