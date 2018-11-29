@@ -1064,16 +1064,14 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      if (damp) then
         do jtrk = 1,ktrack
            curv = sqrt((dipr + dxt(jtrk))**2 + (dipi + dyt(jtrk))**2) / elrad
-
-           if (quantum) then
-              call trphot(elrad,curv,rfac,deltas)
-           else
-              rfac = const * curv**2 * elrad
-           endif
-
            px = track(2,jtrk)
            py = track(4,jtrk)
            pt = track(6,jtrk)
+           if (quantum) then
+              call trphot(elrad,curv,rfac,pt)
+           else
+              rfac = const * curv**2 * elrad
+           endif
            track(2,jtrk) = px - rfac * (one + pt) * px
            track(4,jtrk) = py - rfac * (one + pt) * py
            track(6,jtrk) = pt - rfac * (one + pt) ** 2
@@ -1116,16 +1114,14 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      if (damp) then
         do jtrk = 1,ktrack
            curv = sqrt((dipr + dxt(jtrk))**2 + (dipi + dyt(jtrk))**2) / elrad
-
-           if (quantum) then
-              call trphot(elrad,curv,rfac,deltas)
-           else
-              rfac = const * curv**2 * elrad
-           endif
-
            px = track(2,jtrk)
            py = track(4,jtrk)
            pt = track(6,jtrk)
+           if (quantum) then
+              call trphot(elrad,curv,rfac,pt)
+           else
+              rfac = const * curv**2 * elrad
+           endif
            track(2,jtrk) = px - rfac * (one + pt) * px
            track(4,jtrk) = py - rfac * (one + pt) * py
            track(6,jtrk) = pt - rfac * (one + pt) ** 2
@@ -1787,10 +1783,10 @@ subroutine ttcorr(el,track,ktrack,turn)
 
      if (damp) then !---- Full damping.
         do i = 1, ktrack
-           if (quantum) call trphot(el,curv,rfac,deltas)
            px = track(2,i)
            py = track(4,i)
            pt = track(6,i)
+           if (quantum) call trphot(el,curv,rfac,pt)
            track(2,i) = px - rfac * (one + pt) * px
            track(4,i) = py - rfac * (one + pt) * py
            track(6,i) = pt - rfac * (one + pt) ** 2
@@ -1871,10 +1867,10 @@ subroutine ttcorr(el,track,ktrack,turn)
   if (radiate  .and.  el .ne. 0) then
      if (damp) then !---- Full damping.
         do i = 1, ktrack
-           if (quantum) call trphot(el,curv,rfac,deltas)
            px = track(2,i)
            py = track(4,i)
            pt = track(6,i)
+           if (quantum) call trphot(el,curv,rfac,pt)
            track(2,i) = px - rfac * (one + pt) * px
            track(4,i) = py - rfac * (one + pt) * py
            track(6,i) = pt - rfac * (one + pt) ** 2
@@ -1883,7 +1879,6 @@ subroutine ttcorr(el,track,ktrack,turn)
         rpx = rfac * (one + track(6,1)) * track(2,1)
         rpy = rfac * (one + track(6,1)) * track(4,1)
         rpt = rfac * (one + track(6,1)) ** 2
-
         do i = 1, ktrack
            track(2,i) = track(2,i) - rpx
            track(4,i) = track(4,i) - rpy
@@ -4163,7 +4158,7 @@ subroutine ttrfmult(track, ktrack, turn)
     if (radiate  .and.  elrad .ne. zero) then
        if (quantum) then
           curv = sqrt(dpx**2+dpy**2) / elrad;
-          call trphot(elrad,curv,rfac,deltas)
+          call trphot(elrad,curv,rfac,pt)
        else
           rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
        endif
@@ -4192,7 +4187,7 @@ subroutine ttrfmult(track, ktrack, turn)
     if (radiate  .and.  elrad .ne. zero) then
        if (quantum) then
           curv = sqrt(dpx**2+dpy**2) / elrad;
-          call trphot(elrad,curv,rfac,deltas)
+          call trphot(elrad,curv,rfac,pt)
        else
           rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
        endif
@@ -4419,7 +4414,7 @@ subroutine tttquad(track, ktrack)
         hy = ( k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length,curv,rfac,deltas)
+           call trphot(length,curv,rfac,pt)
         else
            rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2);
         endif
@@ -4447,7 +4442,7 @@ subroutine tttquad(track, ktrack)
         hy = ( k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length,curv,rfac,deltas)
+           call trphot(length,curv,rfac,pt)
         else
            rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2);
         endif
@@ -4579,7 +4574,7 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length * (one + h*x) - two * tan(e1)*x, curv, rfac, deltas);
+           call trphot(length * (one + h*x) - two * tan(e1)*x, curv, rfac, pt);
         else
            rfac = (arad * gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e1)*x)
         endif
@@ -4609,7 +4604,7 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length * (one + h*x) - two * tan(e2)*x, curv, rfac, deltas);
+           call trphot(length * (one + h*x) - two * tan(e2)*x, curv, rfac, pt);
         else
            rfac = (arad * gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e2)*x)
         endif
@@ -4647,9 +4642,10 @@ subroutine tttdipole(track, ktrack)
 
 end subroutine tttdipole
 
-subroutine trphot(el,curv,rfac,deltap)
+subroutine trphot(el,curv,rfac,pt)
   use math_constfi, only : zero, one, two, three, five, twelve
   use phys_constfi, only : clight, hbar
+  use trackfi, only : arad, gammas, betas
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -4675,17 +4671,17 @@ subroutine trphot(el,curv,rfac,deltap)
   !     The random integers are generated in the range [0, MAXRAN).      *
   !---- Table definition: maxtab, taby(maxtab), tabxi(maxtab)            *
   !----------------------------------------------------------------------*
-  double precision :: el, curv, rfac, deltap
+  double precision :: el, curv, rfac, pt
 
   integer :: i, ierror, j, nphot
   double precision :: amean, dlogr, slope, ucrit, xi, sumxi, InvSynFracInt,rn_arg
   integer, parameter :: maxtab=101
   double precision :: tabxi(maxtab),taby(maxtab)
-  double precision :: arad, pc, gamma, amass
+  double precision :: pc, gamma, amass
   character(len=20) text
   integer, external :: get_option
   integer :: synrad
-  double precision :: get_value, frndm
+  double precision :: get_value, frndm, delta_plus_1
   double precision, parameter :: fac1=3.256223d0
   ! integer, parameter :: maxran=1000000000
 
@@ -4745,16 +4741,16 @@ subroutine trphot(el,curv,rfac,deltap)
        2.64617491d0 /
 
   !Get constants
-  arad   = get_value('probe ','arad ')
   pc     = get_value('probe ','pc ')
   amass  = get_value('probe ','mass ')
-  gamma  = get_value('probe ','gamma ')
-  deltap = get_value('probe ','deltap ')
 
+  gamma = (betas*pt + one)*gammas;
+  delta_plus_1 = sqrt(pt*pt + two*pt/betas + one);
+  
   !---- AMEAN is the average number of photons emitted.,
   !     NPHOT is the integer number generated from Poisson's law.
   !-AL- AMEAN implicitly takes el / 2 (half the element length)
-  amean = five * sqrt(three) / (twelve * hbar * clight) * abs(arad * pc * (one+deltap) * el * curv)
+  amean = five * sqrt(three) / (twelve * hbar * clight) * abs(arad * pc * delta_plus_1 * el * curv)
   ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
   sumxi = zero
   if (amean.gt.3d-1) then
