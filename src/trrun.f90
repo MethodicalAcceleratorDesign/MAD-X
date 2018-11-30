@@ -767,7 +767,6 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
         tmp = track(2,jtrk)
         track(2,jtrk) = ct * tmp + st * track(4,jtrk)
         track(4,jtrk) = ct * track(4,jtrk) - st * tmp
-        print *, "rotttate", track(:, jtrk) 
      enddo
 
   endif
@@ -4413,10 +4412,8 @@ subroutine tttquad(track, ktrack)
      py = track(4,jtrk);
      z  = track(5,jtrk);
      pt = track(6,jtrk);
-     print *, "before internal tilt", x, y, px, py
      !---  rotate orbit before entry
      if (tilt .ne. zero)  then
-        print *, "ever hereeere", x, y, px, py
         st = sin(tilt)
         ct = cos(tilt)
         tmp = x
@@ -4426,7 +4423,6 @@ subroutine tttquad(track, ktrack)
         px = ct * tmp + st * py
         py = ct * py  - st * tmp
      endif
-  print *, "after internal tilt", x, y, px, py
      !---- Computes 1+delta
      delta_plus_1 = sqrt(pt*pt + two*pt/bet0 + one);
 

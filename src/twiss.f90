@@ -1774,7 +1774,7 @@ subroutine track_one_element(el, fexit, contrib_rms)
 
   n_align = node_al_errors(al_errors)
   if (n_align .ne. 0)  then
-     print*, "coupl1: Element = "
+!     print*, "coupl1: Element = "
      ele_body = .false.
      orbit2 = orbit
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
@@ -5575,19 +5575,20 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap, inclength
+  logical :: fsec, ftrk, fmap, extend_length
   double precision :: el
   double precision :: orbit(6), ek(6), re(6,6), ek_t1(6), ek_t2(6), re_t1(6,6), re_t2(6,6), te(6,6,6), te_t1(6,6,6)
 
   logical :: cplxy
   double precision :: sks, sk, skl, bvk, pxbeta, beta0
-  double precision :: co, si, sibk, temp, xtilt
+  double precision :: co, si, sibk, temp, xtilt,xtilt_rad,dl
 
   double precision, external :: node_value, get_value 
   double precision, parameter :: ten5m=1d-5
 
   beta0   = get_value('probe ','beta ')
-  inclength = .true.
+  extend_length = node_value('extend_length ') .ne. 0d0
+
   !---- Initialize.
   fmap = el .ne. zero
   if (.not. fmap) return
@@ -5595,13 +5596,14 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   RE = EYE
   !---- Strength.
   sks = node_value('ks ')
-  xtilt = node_value('xtilt ')
+  xtilt_rad = node_value('xtilt ')
+
   re_t1 = EYE
   re_t2 = EYE
   ek_t1 = zero
   ek_t2 = zero
-  if(xtilt .ne. zero .and. inclength) then
-    !el = el/cos(xtilt)
+  if(xtilt_rad .ne. zero .and. extend_length) then
+    el = el/cos(xtilt_rad)
   endif
 
   if (sks .ne. zero) cplxy = .true.
@@ -5676,28 +5678,35 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
      call tmsymm(te)
   endif
   
-  !if(xtilt .ne. zero) then
-    !!call tmtrak(ek_t2,re_t2,te,orbit,orbit)
-  !endif
+
   !---- Track orbit.
  
   if (ftrk) then
 
-    if(xtilt .ne. zero) then
-      xtilt = sin(xtilt)
+    if(xtilt_rad .ne. zero) then
+      xtilt = sin(xtilt_rad)
       orbit(2) = orbit(2) - xtilt !Tilts the frame
       call tmtrak(ek,re,te,orbit,orbit) !Calls the normal solenoid
       pxbeta = xtilt*el/beta
       ek = zero
       ek(1) =  el*xtilt
       ek(2) =  xtilt
-      if(inclength) then
-        te_t1 = zero
-        ek(5) = -0.5d0*pxbeta*xtilt
-        re_t1(1,6) = -pxbeta
-        re_t1(5,2) = -pxbeta
-        call tmtrak(ek,re_t1,te_t1,orbit,orbit)
-        re = matmul(re, re_t1)
+      
+      te_t1 = zero
+      ek(5) = -0.5d0*pxbeta*xtilt
+      re_t1(1,6) = -pxbeta
+      re_t1(5,2) = -pxbeta
+      call tmtrak(ek,re_t1,te_t1,orbit,orbit)
+      re = matmul(re, re_t1)
+      
+      if(extend_length) then
+        dl = el - el*cos(xtilt_rad)
+        re_t2(1,2) = -dl
+        re_t2(3,4) = -dl
+        re_t2(5,6) = -dl/(beta*gamma)**2
+        ek_t1(5) = -dl*dtbyds
+        call tmtrak(ek_t1,re_t2,te_t1,orbit,orbit)
+        re = matmul(re, re_t2)
       endif
     else
       call tmtrak(ek,re,te,orbit,orbit)
@@ -6436,7 +6445,7 @@ SUBROUTINE tmali1(orb1, errors, beta, gamma, orb2, rm)
   psi = errors(6)
   call sumtrx(the, phi, psi, w)
   s2 = (w(1,3) * dx + w(2,3) * dy + w(3,3) * ds) / w(3,3)
-  print *, "heeereee", the, phi, psi
+
   !---- F2 terms (transfer matrix).
   RM = EYE
   rm(2,2) = w(1,1)
@@ -6468,8 +6477,7 @@ SUBROUTINE tmali1(orb1, errors, beta, gamma, orb2, rm)
   orb2(4) = orbt(4) + w(3,2)
   orb2(5) = orbt(5) - s2 / beta
   orb2(6) = orbt(6)
-  print *, "orb1", orbt
-  print *, "orb2", orb2
+
 
 end SUBROUTINE tmali1
 
