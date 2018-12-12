@@ -1,0 +1,107 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.04.02  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2018.12.12 18:46:57      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+n=5 ;
+
+el=1.5 ;
+
+tlt=pi/6 ;
+
+ang=pi/2 ;
+
+dl=el*sinc(ang/2) ;
+
+
+
+seq1: sequence, l=(2*n-1)*el, refer=entry ;
+
+!s11: srotation, at=0, angle=-tlt;
+
+m11: sbend, at=1*el, l=el, angle=-ang, tilt=tlt ;
+
+m12: sbend, at=3*el, l=el, angle= ang, tilt=tlt ;
+
+m13: sbend, at=5*el, l=el, angle= ang, tilt=tlt ;
+
+m14: sbend, at=7*el, l=el, angle=-ang, tilt=tlt ;
+
+endsequence ;
+
+
+
+! sbend-like chicane using patches for survey z vs x,y
+
+bend1: sequence, l=dl, refer=entry ;
+
+mt11: srotation, at= 0, angle=tlt;
+
+my11: yrotation, at= 0, angle=-ang/2;
+
+my12: yrotation, at=dl, angle=-ang/2;
+
+mt12: srotation, at=dl, angle=-tlt;
+
+endsequence ;
+
+
+
+bend2: sequence, l=dl, refer=entry ;
+
+mt21: srotation, at= 0, angle=tlt;
+
+my21: yrotation, at= 0, angle=ang/2;
+
+my22: yrotation, at=dl, angle=ang/2;
+
+mt22: srotation, at=dl, angle=-tlt;
+
+endsequence ;
+
+
+
+seq2: sequence, l=n*el+(n-1)*dl, refer=entry ;
+
+!s1: srotation, at=0, angle=-tlt;
+
+bend1, at=0*(el+dl)+el ;
+
+bend2, at=1*(el+dl)+el ;
+
+bend2, at=2*(el+dl)+el ;
+
+bend1, at=3*(el+dl)+el ;
+
+endsequence ;
+
+
+
+beam ;
+
+select, flag=survey, column={name, keyword, s, l, angle, x, y, z, theta, phi, psi} ;
+
+
+
+use sequence=seq1 ;
+
+survey, file="survey_chicane_sbend.tfs" ;
+
+!plot, table=survey, haxis=z, vaxis={x,y}, colour=100, symbol=5, file="srv_chicane" ;
+
+
+
+use sequence=seq2 ;
+
+survey, file="survey_chicane_patch.tfs" ;
+
+!plot, table=survey, haxis=z, vaxis={x,y}, colour=100, symbol=5, file="srv_chicane" ;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
