@@ -45,3 +45,9 @@ survey, file="survey_chicane_sbend.tfs" ;
 use sequence=seq2 ;
 survey, file="survey_chicane_patch.tfs" ;
 !plot, table=survey, haxis=z, vaxis={x,y}, colour=100, symbol=5, file="srv_chicane" ;
+
+select, flag=makethin, slice=3 ;
+makethin, sequence=seq1, style=simple ;
+use sequence=seq1 ;
+survey, file="survey_chicane_thin.tfs" ;
+!plot, table=survey, haxis=z, vaxis={x,y}, colour=100, symbol=5, file="srv_chicane" ;
