@@ -2,8 +2,8 @@
 @ TYPE             %06s "SURVEY"
 @ TITLE            %08s "no-title"
 @ ORIGIN           %17s "5.04.02 Darwin 64"
-@ DATE             %08s "12/12/18"
-@ TIME             %08s "18.46.57"
+@ DATE             %08s "14/12/18"
+@ TIME             %08s "12.59.30"
 * NAME               KEYWORD                             S                  L              ANGLE                  X                  Y                  Z              THETA                PHI                PSI 
 $ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "SEQ1$START"        "MARKER"                             0                  0                  0                  0                  0                  0                  0                  0                  0
