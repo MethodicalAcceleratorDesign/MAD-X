@@ -1,53 +1,85 @@
 n=5 ;
 el=1.5 ;
-tlt=pi/6 ;
+cl=el/2 ;
 ang=pi/2 ;
+tlt=pi/6 ;
 dl=el*sinc(ang/2) ;
 
-seq1: sequence, l=(2*n-1)*el, refer=entry ;
-!s11: srotation, at=0, angle=-tlt;
-m11: sbend, at=1*el, l=el, angle=-ang, tilt=tlt ;
-m12: sbend, at=3*el, l=el, angle= ang, tilt=tlt ;
-m13: sbend, at=5*el, l=el, angle= ang, tilt=tlt ;
-m14: sbend, at=7*el, l=el, angle=-ang, tilt=tlt ;
+!!! sbend chicane
+seq1: sequence, l=(2*n-1)*el ;
+!s1: srotation, at=0, angle=-tlt;
+m11: sbend, at=cl+1*el, l=el, angle=-ang, tilt=tlt ;
+m12: sbend, at=cl+3*el, l=el, angle= ang, tilt=tlt ;
+m13: sbend, at=cl+5*el, l=el, angle= ang, tilt=tlt ;
+m14: sbend, at=cl+7*el, l=el, angle=-ang, tilt=tlt ;
 endsequence ;
 
-! sbend-like chicane using patches for survey z vs x,y
-bend1: sequence, l=dl, refer=entry ;
+!!! sbend-like chicane using patches for survey z vs x,y
+bend1: sequence, l=dl ;
 mt11: srotation, at= 0, angle=tlt;
 my11: yrotation, at= 0, angle=-ang/2;
 my12: yrotation, at=dl, angle=-ang/2;
 mt12: srotation, at=dl, angle=-tlt;
 endsequence ;
 
-bend2: sequence, l=dl, refer=entry ;
+bend2: sequence, l=dl ;
 mt21: srotation, at= 0, angle=tlt;
 my21: yrotation, at= 0, angle=ang/2;
 my22: yrotation, at=dl, angle=ang/2;
 mt22: srotation, at=dl, angle=-tlt;
 endsequence ;
 
-seq2: sequence, l=n*el+(n-1)*dl, refer=entry ;
-!s1: srotation, at=0, angle=-tlt;
-bend1, at=0*(el+dl)+el ;
-bend2, at=1*(el+dl)+el ;
-bend2, at=2*(el+dl)+el ;
-bend1, at=3*(el+dl)+el ;
+seq2: sequence, l=(2*n-1)*el ;
+!s2: srotation, at=0, angle=-tlt;
+bend1, at=cl+1*el ;
+bend2, at=cl+3*el ;
+bend2, at=cl+5*el ;
+bend1, at=cl+7*el ;
 endsequence ;
 
+!!! thin-like chicane using patches for survey z vs x,y
+tbend1: sequence, l=el ;
+tmt11: srotation, at=0     , angle=tlt;
+tmy11: yrotation, at=el/6  , angle=-ang/3;
+tmy12: yrotation, at=el/2  , angle=-ang/3;
+tmy13: yrotation, at=5*el/6, angle=-ang/3;
+tmt12: srotation, at=el    , angle=-tlt;
+endsequence ;
+
+tbend2: sequence, l=el ;
+tmt21: srotation, at= 0    , angle=tlt;
+tmy21: yrotation, at=el/6  , angle=ang/3;
+tmy22: yrotation, at=el/2  , angle=ang/3;
+tmy23: yrotation, at=5*el/6, angle=ang/3;
+tmt22: srotation, at=el    , angle=-tlt;
+endsequence ;
+
+seq3: sequence, l=(2*n-1)*el ;
+!s3: srotation, at=0, angle=-tlt;
+tbend1, at=cl+1*el ;
+tbend2, at=cl+3*el ;
+tbend2, at=cl+5*el ;
+tbend1, at=cl+7*el ;
+endsequence ;
+
+!!!
 beam ;
 select, flag=survey, column={name, keyword, s, l, angle, x, y, z, theta, phi, psi} ;
 
 use sequence=seq1 ;
 survey, file="survey_chicane_sbend.tfs" ;
-!plot, table=survey, haxis=z, vaxis={x,y}, colour=100, symbol=5, file="srv_chicane" ;
+!plot, table=survey, haxis=z, vaxis={x,y}, hmax=10, vmax=3, colour=100, symbol=5, file="srv_chicane" ;
 
 use sequence=seq2 ;
 survey, file="survey_chicane_patch.tfs" ;
-!plot, table=survey, haxis=z, vaxis={x,y}, colour=100, symbol=5, file="srv_chicane" ;
+!plot, table=survey, haxis=z, vaxis={x,y}, hmax=10, vmax=3, colour=100, symbol=5, file="srv_chicane" ;
 
 select, flag=makethin, slice=3 ;
 makethin, sequence=seq1, style=simple ;
 use sequence=seq1 ;
 survey, file="survey_chicane_thin.tfs" ;
-!plot, table=survey, haxis=z, vaxis={x,y}, colour=100, symbol=5, file="srv_chicane" ;
+!plot, table=survey, haxis=z, vaxis={x,y}, hmax=10, vmax=3, colour=100, symbol=5, file="srv_chicane" ;
+
+use sequence=seq3 ;
+survey, file="survey_chicane_thinpatch.tfs" ;
+!plot, table=survey, haxis=z, vaxis={x,y}, hmax=10, vmax=3, colour=100, symbol=5, file="srv_chicane" ;
