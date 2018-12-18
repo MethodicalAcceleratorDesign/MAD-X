@@ -936,7 +936,7 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const char*
     if(to_param) // modify the existing parameter in to_el
     {
       if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " original to_param " << my_dump_command_parameter(to_param) << '\n';
-      to_param->expr = compound_expr(to_param->expr,0,"+",half_angle_expr,0);
+      to_param->expr = compound_expr( my_get_param_expression(to_param) ,0,"+",half_angle_expr,0);
       if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << "    now  to_param " << my_dump_command_parameter(to_param) << '\n';
     }
     else // param not yet in to_el, start from parameter definition
