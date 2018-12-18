@@ -4425,7 +4425,7 @@ subroutine tttquad(track, ktrack)
   k1s = node_value('k1s ') + f_errors(3)/length
 
   if (k1s.ne.zero) then
-     tilt = -atan2(k1s, k1)/two + tilt
+     tilt = -atan2(k1s, k1)/two ! + tilt
      k1 = sqrt(k1**2 + k1s**2)
   else
      tilt = zero
