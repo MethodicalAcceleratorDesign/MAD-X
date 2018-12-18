@@ -3142,9 +3142,9 @@ subroutine ttdpdg(track, ktrack)
 
 end subroutine ttdpdg
 
-subroutine trsol(track,ktrack,dxtdyt)
-
-  use math_constfi, only : zero, one, two, half, four
+subroutine trsol(track,ktrack,dxt,dyt)
+  use trackfi, only : radiate, arad, damp, quantum, gammas
+  use math_constfi, only : zero, half, one, two, three, four
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3171,6 +3171,7 @@ subroutine trsol(track,ktrack,dxtdyt)
   double precision :: x_, y_, z_, px_, py_, pt_
   double precision :: pxf_, pyf_
   double precision :: bet, length_
+  double precision :: curv, const, rfac
 
   !---- Initialize.
   bet0 = get_value('probe ','beta ')
@@ -3197,7 +3198,7 @@ subroutine trsol(track,ktrack,dxtdyt)
         fpsig   = onedp - one
         fppsig  = ( one + (bet0**2)*psigf ) / onedp
 
-        !     Set up C,S, Q,R,Z
+        ! Set up C,S, Q,R,Z
         cosTh = cos(skl/onedp)
         sinTh = sin(skl/onedp)
         Q = -skl * sk / onedp
@@ -3227,14 +3228,15 @@ subroutine trsol(track,ktrack,dxtdyt)
               curv = sqrt(dxt(i)**2 + dyt(i)**2) / length
               
               if (quantum) then
-                 call trphot(length,curv,rfac,deltas)
+                 call trphot(length,curv,rfac,track(6,i))
               else
+                 const = arad * gammas**3 / three
                  rfac = const * curv**2 * length
               endif
               
-              track(2,i) = px - rfac * (one + track(6,i)) * track(2,i)
-              track(4,i) = py - rfac * (one + track(6,i)) * track(4,i)
-              track(6,i) = pt - rfac * (one + track(6,i)) ** 2
+              track(2,i) = track(2,i) - rfac * (one + track(6,i)) * track(2,i)
+              track(4,i) = track(4,i) - rfac * (one + track(6,i)) * track(4,i)
+              track(6,i) = track(6,i) - rfac * (one + track(6,i)) ** 2
               
               !---- Energy loss like for closed orbit.
            else
