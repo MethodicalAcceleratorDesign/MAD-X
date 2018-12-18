@@ -811,7 +811,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call ttmult(track,ktrack,dxt,dyt,turn)
 
     case (code_solenoid)
-       call trsol(track, ktrack)
+       call trsol(track, ktrack,dxt,dyt)
 
     case (code_rfcavity)
        call ttrf(track,ktrack)
@@ -3147,7 +3147,7 @@ subroutine ttdpdg(track, ktrack)
 
 end subroutine ttdpdg
 
-subroutine trsol(track,ktrack)
+subroutine trsol(track,ktrack,dxtdyt)
 
   use math_constfi, only : zero, one, two, half, four
   implicit none
@@ -3164,6 +3164,7 @@ subroutine trsol(track,ktrack)
   integer :: ktrack
 
   integer :: i
+  double precision :: dxt(*), dyt(*)
   double precision :: bet0
   double precision :: sk, skl, cosTh, sinTh, Q, R, Z
   double precision :: xf, yf, pxf, pyf, sigf, psigf, bvk
@@ -3173,6 +3174,7 @@ subroutine trsol(track,ktrack)
 
   double precision :: omega, length
   double precision :: x_, y_, z_, px_, py_, pt_
+  double precision :: pxf_, pyf_
   double precision :: bet, length_
 
   !---- Initialize.
@@ -3211,13 +3213,56 @@ subroutine trsol(track,ktrack)
         pyf  = track(4,i) + yf*Q
         sigf = track(5,i)*bet0 - half*(xf**2 + yf**2)*R
 
+        ! For radiation calculations (initial angles)
+        dxt(i) = track(2,i);
+        dyt(i) = track(4,i);
+
+        ! final angles after solenoid
+        pxf_ =  pxf * cosTh  +  pyf * sinTh;
+        pyf_ = -pxf * sinTh  +  pyf * cosTh;
+
+        ! kick received by particle
+        dxt(i) = pxf_ - track(2,i);
+        dyt(i) = pyf_ - track(4,i);
+
+        !---- Radiation loss at entrance.
+        if (radiate .and. length .ne. 0) then
+           !---- Full damping.
+           if (damp) then
+              curv = sqrt(dxt(i)**2 + dyt(i)**2) / length
+              
+              if (quantum) then
+                 call trphot(length,curv,rfac,deltas)
+              else
+                 rfac = const * curv**2 * length
+              endif
+              
+              track(2,i) = px - rfac * (one + track(6,i)) * track(2,i)
+              track(4,i) = py - rfac * (one + track(6,i)) * track(4,i)
+              track(6,i) = pt - rfac * (one + track(6,i)) ** 2
+              
+              !---- Energy loss like for closed orbit.
+           else
+              
+              !---- Store energy loss on closed orbit.
+              ! 2016-Mar-16  18:45:41  ghislain: track(i,1) is not the closed orbit but the first particle!!!
+              rfac = const * (dxt(1)**2 + dyt(1)**2)
+              
+              TRACK(2,i) = TRACK(2,i) - pxf_
+              TRACK(4,i) = TRACK(4,i) - pyf_
+              TRACK(6,i) = TRACK(6,i) - rfac * (one + track(6,1)) ** 2
+              
+           endif
+        endif
+        
         !       Ripken formulae p.29 (3.37)
         track(1,i) =  xf  * cosTh  +  yf  * sinTh
-        track(2,i) =  pxf * cosTh  +  pyf * sinTh
+        track(2,i) =  pxf_
         track(3,i) = -xf  * sinTh  +  yf  * cosTh
-        track(4,i) = -pxf * sinTh  +  pyf * cosTh
+        track(4,i) =  pyf_
         track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) / bet0
         ! track(6,i) =  psigf*bet0
+        
      enddo
   else
      if (sk.ne.zero) then
@@ -3246,11 +3291,19 @@ subroutine trsol(track,ktrack)
            length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
                 two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
 
+           ! For radiation calculations (initial angles)
+           dxt(i) = track(2,i);
+           dyt(i) = track(4,i);
+           
            track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
            track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
            track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
            track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
            track(5,i) = z_ + length/bet0 - length_/bet;
+
+           ! For radiation calculations (kick received per particle)
+           dxt(i) = track(2,i) - dxt(i);
+           dyt(i) = track(4,i) - dyt(i);
 
         enddo
      else
