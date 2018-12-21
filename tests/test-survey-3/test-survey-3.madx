@@ -1,4 +1,4 @@
-n=5 ;
+n=4 ;
 el=1.5 ;
 cl=el/2 ;
 ang=pi/2 ;
@@ -6,7 +6,7 @@ tlt=pi/6 ;
 dl=el*sinc(ang/2) ;
 
 !!! sbend chicane
-seq1: sequence, l=(2*n-1)*el ;
+seq1: sequence, l=(2*n+1)*el ;
 !s1: srotation, at=0, angle=-tlt;
 m11: sbend, at=cl+1*el, l=el, angle=-ang, tilt=tlt ;
 m12: sbend, at=cl+3*el, l=el, angle= ang, tilt=tlt ;
@@ -29,7 +29,7 @@ my22: yrotation, at=dl, angle=ang/2;
 mt22: srotation, at=dl, angle=-tlt;
 endsequence ;
 
-seq2: sequence, l=(2*n-1)*el ;
+seq2: sequence, l=(2*n+1)*el ;
 !s2: srotation, at=0, angle=-tlt;
 bend1, at=cl+1*el ;
 bend2, at=cl+3*el ;
@@ -54,7 +54,7 @@ tmy23: yrotation, at=5*el/6, angle=ang/3;
 tmt22: srotation, at=el    , angle=-tlt;
 endsequence ;
 
-seq3: sequence, l=(2*n-1)*el ;
+seq3: sequence, l=(2*n+1)*el ;
 !s3: srotation, at=0, angle=-tlt;
 tbend1, at=cl+1*el ;
 tbend2, at=cl+3*el ;
