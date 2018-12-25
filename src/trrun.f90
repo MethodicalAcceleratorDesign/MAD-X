@@ -4358,7 +4358,7 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
           (A**2*length)/(two*Kx)+(B**2*length)/two-(A*B*Cx**2)/Kx+(A*B)/Kx);
   else
      length_ = length_ + h*length*(three*length*xp+six*x-(k0-h)*length**2)/six;
-     length_ = length_ + half*(B**2+(A*length)**2/three+A*B*length)*length;
+     length_ = length_ + half*(B**2)*length;
   endif
   if (Ky.ne.zero) then
      length_ = length_ + half*(-(C**2*Cy*Sy)/(two*Ky)+(D**2*Cy*Sy)/two+&
