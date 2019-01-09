@@ -302,7 +302,7 @@ static void att_vkicker(struct c6t_element*);
 static void att_rfmultipole(struct c6t_element*);
 static void att_undefined(struct c6t_element*);
 static void clean_c6t_element(struct c6t_element*);
-static void write_f3_rfmultipoles(struct node*, char*);
+static void write_f3_rfmultipoles(void);
 static struct c6t_element* create_aperture(const char* ,const char* ,double, double, double, double, double, double, double,
              struct double_array*);
 static void concat_drifts(void);
@@ -1428,8 +1428,8 @@ convert_madx_to_c6t(struct node* p)
   else if (strcmp(p->base_name,"rfmultipole") == 0)
   {
     
-    /*
-    int maxkn=0, maxks=0, maxpn=0, maxps=0;
+    int maxkn=0, maxks=0, mmult=0;
+
     if ((index = name_list_pos("knl",p->p_elem->def->par_names))>-1)
     {
       kn_param = p->p_elem->def->par->parameters[index];
@@ -1443,18 +1443,13 @@ convert_madx_to_c6t(struct node* p)
     if ((index = name_list_pos("pnl",p->p_elem->def->par_names))>-1)
     {
       pn_param = p->p_elem->def->par->parameters[index];
-      maxpn=kn_param->double_array->curr;
     }
     if ((index = name_list_pos("psl",p->p_elem->def->par_names))>-1)
     {
       ps_param = p->p_elem->def->par->parameters[index];
-      maxps=ks_param->double_array->curr;
     }
 
-    if (maxkn>3 || maxks>3) {
-      printf("warning while converting rfmultipole: components beyond octupole are ignored\n");
-    }
-    */
+    
     /*
     ** In particular, for the RF multipoles:
     ** Name: any name
@@ -1489,10 +1484,32 @@ convert_madx_to_c6t(struct node* p)
     ** value[17] = phase for skew octupole
     */
 
-    c6t_elem = new_c6t_element(19,t_name,p->base_name);
-    clean_c6t_element(c6t_elem);
-    strcpy(c6t_elem->org_name,t_name);
-    write_f3_rfmultipoles(p,c6t_elem->org_name);
+      if(maxkn >=maxks){
+        mmult = maxkn;
+      }
+      else{
+        mmult = maxks;
+      }
+
+      c6t_elem = new_c6t_element(6+mmult*4,t_name,p->base_name);
+      clean_c6t_element(c6t_elem);
+      strcpy(c6t_elem->org_name,t_name);
+
+      c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+      c6t_elem->value[1] = el_par_value_recurse("volt",p->p_elem);
+      c6t_elem->value[2] = el_par_value_recurse("tilt",p->p_elem);
+      c6t_elem->value[3] = el_par_value_recurse("freq",p->p_elem);
+      c6t_elem->value[4] = mmult;
+
+
+      for (int i=0; i<mmult; i++){
+        c6t_elem->value[5+i*4] = kn_param->double_array->a[i];
+        c6t_elem->value[6+i*4] = pn_param->double_array->a[i];
+        c6t_elem->value[7+i*4] = ks_param->double_array->a[i];
+        c6t_elem->value[8+i*4] = ps_param->double_array->a[i];  
+      }
+
+
 
     // rf & general params
     /*
@@ -2727,6 +2744,7 @@ write_all_el(void)
   current_element = first_in_sequ;
   while (current_element != NULL)
   {
+    printf("%s %s %s", "aaaaa \n", current_element->name,current_element->equiv->name );
     if (current_element->flag > 0
         && current_element == current_element->equiv
         && current_element->w_flag == 0)
@@ -3031,60 +3049,33 @@ write_f3_aux(void)
 }
 
 static void
-write_f3_rfmultipoles(struct node* current_element, char* sixname)
+write_f3_rfmultipoles(void)
 {
-  int index;
-
-  
-
+  current_element = first_in_sequ;
   if (!f3) f3 = fopen("fc.3", "w");
-  struct command_parameter *kn_param = NULL,*ks_param = NULL;
-  struct command_parameter *pn_param = NULL,*ps_param = NULL;
 
+  while (current_element != NULL)
+  {
+      printf(current_element->base_name);
     if (strcmp(current_element->base_name, "rfmultipole") == 0)
     {
       fprintf(f3,"RFMULTIPOLE\n");
 
+      fprintf(f3, "%s %f \n", current_element->name,current_element->value[3]);
+      
+      for (int i=0; i < current_element->value[i+4]; i++){
+        fprintf(f3, "%f %f %f %f \n", current_element->value[i*4+5], current_element->value[i*4+6],
+          current_element->value[i*4+7], current_element->value[i*4+8]);
     
-      int maxkn=0, maxks=0, mmult=0;
-      if ((index = name_list_pos("knl",current_element->p_elem->def->par_names))>-1)
-      {
-        kn_param = current_element->p_elem->def->par->parameters[index];
-        maxkn=kn_param->double_array->curr;
       }
-      if ((index = name_list_pos("ksl",current_element->p_elem->def->par_names))>-1)
-      {
-        ks_param = current_element->p_elem->def->par->parameters[index];
-        maxks=ks_param->double_array->curr;
-      }
-      if ((index = name_list_pos("pnl",current_element->p_elem->def->par_names))>-1)
-      {
-        pn_param = current_element->p_elem->def->par->parameters[index];
-      }
-      if ((index = name_list_pos("psl",current_element->p_elem->def->par_names))>-1)
-      {
-        ps_param = current_element->p_elem->def->par->parameters[index];
-      }
-      if(maxkn >=maxks){
-        mmult = maxkn;
-      }
-      else{
-        mmult = maxks;
-      }
-      fprintf(f3, "%s %f \n",sixname, el_par_value_recurse("freq",current_element->p_elem));
-
-      for (int i=0; i<mmult; i++){
-        fprintf(f3, "%f %f %f %f \n", kn_param->double_array->a[i], pn_param->double_array->a[i],
-          ks_param->double_array->a[i], ps_param->double_array->a[i]);
-        
-        
-
-      }
-
-
       fprintf(f3,"NEXT\n");
     }
+    current_element = current_element->next;
+  }
 }
+  
+
+ 
 
 
 static void
@@ -3193,71 +3184,7 @@ write_f3_mult(struct c6t_element* el)
   fprintf(f3,"NEXT\n");
 }
 
-static void
-rfmultipole_name(char *name, struct c6t_element* el)
-{
-  /*
-    strcpy(tmp, el->name);
 
-    n += sprintf(name+n, name_format_short, tmp);
-    */
-  /*
-  const double knl[] = {
-    el->value[4],
-    el->value[5],
-    el->value[6],
-    el->value[7]
-  };
-  const double ksl[] = {
-    el->value[18],
-    el->value[12],
-    el->value[13],
-    el->value[14]
-  };
-  char tmp[256] = "";
-  int n = 0;
-  if (fabs(knl[0])>eps_9) {
-    strcpy(tmp, el->name);
-    strcat(tmp, "d");
-    n += sprintf(name+n, name_format_short, tmp);
-  }
-  if (fabs(knl[1])>eps_9) {
-    strcpy(tmp, el->name);
-    strcat(tmp, "q");
-    n += sprintf(name+n, name_format_short, tmp);
-  }
-  if (fabs(knl[2])>eps_9) {
-    strcpy(tmp, el->name);
-    strcat(tmp, "s");
-    n += sprintf(name+n, name_format_short, tmp);
-  }
-  if (fabs(knl[3])>eps_9) {
-    strcpy(tmp, el->name);
-    strcat(tmp, "o");
-    n += sprintf(name+n, name_format_short, tmp);
-  }
-  if (fabs(ksl[0])>eps_9) {
-    strcpy(tmp, el->name);
-    strcat(tmp, "ds");
-    n += sprintf(name+n, name_format_short, tmp);
-  }
-  if (fabs(ksl[1])>eps_9) {
-    strcpy(tmp, el->name);
-    strcat(tmp, "qs");
-    n += sprintf(name+n, name_format_short, tmp);
-  }
-  if (fabs(ksl[2])>eps_9) {
-    strcpy(tmp, el->name);
-    strcat(tmp, "ss");
-    n += sprintf(name+n, name_format_short, tmp);
-  }
-  if (fabs(ksl[3])>eps_9) {
-    strcpy(tmp, el->name);
-    strcat(tmp, "os");
-    n += sprintf(name+n, name_format_short, tmp);
-  }
-  */
-}
 
 static void
 write_struct(void)
@@ -3481,6 +3408,7 @@ process_c6t(void)  /* steering routine */
   write_f34_special();
   write_f3_aux();
   write_f3_matrix();
+  write_f3_rfmultipoles();
   write_f3_aper();
   write_f8_errors();
 }
