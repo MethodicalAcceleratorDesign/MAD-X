@@ -29,7 +29,7 @@ endsequence;
 
 use, sequence=seq_notrans;
 SELECT, FLAG=ERROR, range = qf;
-EALIGN, DTHETA=-ang;
+EALIGN, DTHETA=ang;
 
 select, flag=twiss, column=name, s, x,px, y, py, PT, T;
 twiss,X=xin,Y=yin, BETX=1, BETY=1, file="elementRot.twiss";

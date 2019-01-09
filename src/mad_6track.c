@@ -302,7 +302,7 @@ static void att_vkicker(struct c6t_element*);
 static void att_rfmultipole(struct c6t_element*);
 static void att_undefined(struct c6t_element*);
 static void clean_c6t_element(struct c6t_element*);
-static void write_f3_rfmultipoles(void);
+static void write_f3_rfmultipoles(struct c6t_element*);
 static struct c6t_element* create_aperture(const char* ,const char* ,double, double, double, double, double, double, double,
              struct double_array*);
 static void concat_drifts(void);
@@ -2759,6 +2759,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_1 = 41; // ID
     fprintf(f2, name_format,
     el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    write_f3_rfmultipoles(el);
 }
 
 static void
@@ -3049,28 +3050,24 @@ write_f3_aux(void)
 }
 
 static void
-write_f3_rfmultipoles(void)
+write_f3_rfmultipoles(struct c6t_element* current_element)
 {
-  current_element = first_in_sequ;
+
   if (!f3) f3 = fopen("fc.3", "w");
 
-  while (current_element != NULL)
-  {
+
       printf(current_element->base_name);
     if (strcmp(current_element->base_name, "rfmultipole") == 0)
     {
       fprintf(f3,"RFMULTIPOLE\n");
-
       fprintf(f3, "%s %f \n", current_element->name,current_element->value[3]);
       
-      for (int i=0; i < current_element->value[i+4]; i++){
+      for (int i=0; i < current_element->value[4]; i++){
         fprintf(f3, "%f %f %f %f \n", current_element->value[i*4+5], current_element->value[i*4+6],
           current_element->value[i*4+7], current_element->value[i*4+8]);
-    
       }
       fprintf(f3,"NEXT\n");
-    }
-    current_element = current_element->next;
+    
   }
 }
   
@@ -3408,7 +3405,6 @@ process_c6t(void)  /* steering routine */
   write_f34_special();
   write_f3_aux();
   write_f3_matrix();
-  write_f3_rfmultipoles();
   write_f3_aper();
   write_f8_errors();
 }
