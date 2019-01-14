@@ -1485,7 +1485,7 @@ convert_madx_to_c6t(struct node* p)
     }
     else { //This is the new RF-multipoles
       if (maxkn > maxks) {j=maxkn;} else {j=maxks;}
-      i=j*2+12+1;
+      //i=j*2+12+1;
       c6t_elem = new_c6t_element(i,t_name,p->base_name);
       clean_c6t_element(c6t_elem);
       strcpy(c6t_elem->org_name,t_name);
