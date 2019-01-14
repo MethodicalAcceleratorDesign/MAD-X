@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:01:19      +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2019.01.14 13:51:28      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -50,14 +50,14 @@ Assigned alignment errors to 4 elements
 
 Reference radius set to : 0.017000
 ++++++ info: MADX sequence converted to c6t internal. 
-
+rfmultipole
 total block length: 1.000000
 
 c6t terminated - total number of elements: 3
                     field errors    MAD-X: 0
                     field errors SixTrack: 1
-                 alignment errors   MAD-X: 2
-                alignment errors SixTrack: 2
+                 alignment errors   MAD-X: 5
+                alignment errors SixTrack: 3
                           sequence length: 1.000000 [m]
 
   Number of warnings: 2
