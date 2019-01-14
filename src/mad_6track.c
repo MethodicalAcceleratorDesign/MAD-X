@@ -2986,10 +2986,9 @@ static void
 write_f3_rfmultipoles(struct c6t_element* current_element)
 {
 
-  if (!f3) f3 = fopen("fc.3", "a");
+  if (!f3) f3 = fopen("fc.3", "w");
 
 
-      printf(current_element->base_name);
     if (strcmp(current_element->base_name, "rfmultipole") == 0)
     {
       fprintf(f3,"RFMULTIPOLE\n");
@@ -3057,7 +3056,7 @@ write_f3_matrix(void)
 static void
 write_f3_entry(const char* option, struct c6t_element* el)
 {
-  if (f3_cnt++ == 0) f3 = fopen("fc.3", "w");
+  if (f3_cnt++ == 0 && !f3) f3 = fopen("fc.3", "w");
   if (strcmp(option, "multipole") == 0) write_f3_mult(el);
 }
 
