@@ -460,7 +460,7 @@ const char *const_command_def =
 "mangle        = [l, false, true], "
 "long_names    = [l, false, true], "
 "max_mult_ord  = [i, 11], "
-"version       = [i, 0], "
+"six_version   = [i, 0], "
 "radius        = [r, 1]; "
 " "
 "ptc_create_universe: ptc_create_universe none 0 0 "

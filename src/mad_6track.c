@@ -377,6 +377,7 @@ static void write_f3_mult(struct c6t_element*);
 static void write_f34_special(void);
 static void write_struct(void);
 static void setup_output_string(void);
+static void write_f3_rfmultipoles(struct c6t_element*);
 static int my_table_row(struct table*, char*);
 
 /* routines used from makethin.c */
@@ -456,6 +457,8 @@ static char name_format_short[6];
 static char name_format_error[62];
 static char name_format_3[40];
 static char name_format_4[40];
+static char name_format_5[40];
+static int general_rf_req = 50209 ;
 //static char name_format[80]; /*This is used by fprint to determin the length of the names"*/
 
 static int
@@ -1427,7 +1430,7 @@ convert_madx_to_c6t(struct node* p)
   }
   else if (strcmp(p->base_name,"rfmultipole") == 0)
   {
-    int maxkn=0, maxks=0, maxpn=0, maxps=0;
+    int maxkn=0, maxks=0, maxpn=0, maxps=0, mmult=0;
     if ((index = name_list_pos("knl",p->p_elem->def->par_names))>-1)
     {
       kn_param = p->p_elem->def->par->parameters[index];
@@ -1449,7 +1452,7 @@ convert_madx_to_c6t(struct node* p)
       maxps=ks_param->double_array->curr;
     }
 
-    if(six_version < 50200)
+    if(six_version < general_rf_req)
     {
       if (maxkn>3 || maxks>3) {
         printf("warning while converting rfmultipole: components beyond octupole are ignored\n");
@@ -1483,28 +1486,33 @@ convert_madx_to_c6t(struct node* p)
       c6t_elem->value[17] = maxps>3?(ps_param->double_array->a[3]):0.0;
         
     }
-    else { //This is the new RF-multipoles
-      if (maxkn > maxks) {j=maxkn;} else {j=maxks;}
-      //i=j*2+12+1;
-      c6t_elem = new_c6t_element(i,t_name,p->base_name);
+    else 
+    { //This is the new RF-multipoles
+      if(maxkn >=maxks){
+        mmult = maxkn;
+      }
+      else{
+        mmult = maxks;
+      }
+
+      c6t_elem = new_c6t_element(11+mmult*4,t_name,p->base_name);
       clean_c6t_element(c6t_elem);
       strcpy(c6t_elem->org_name,t_name);
+
       c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+      c6t_elem->value[1] = el_par_value_recurse("volt",p->p_elem);
+      c6t_elem->value[2] = el_par_value_recurse("freq",p->p_elem);
+      c6t_elem->value[3] = mmult;
       c6t_elem->value[6] = el_par_value_recurse("tilt",p->p_elem);
-      c6t_elem->value[11] = el_par_value_recurse("lrad",p->p_elem);
-      for (i=0; i<j; i++)
-      {
-        if (i<maxkn) c6t_elem->value[i*2+12] = kn_param->double_array->a[i];
-        if (i<maxks) c6t_elem->value[i*2+13] = ks_param->double_array->a[i];
+
+
+      for (int i=0; i<mmult; i++){
+        c6t_elem->value[7+i*4] = kn_param->double_array->a[i];
+        c6t_elem->value[8+i*4] = pn_param->double_array->a[i];
+        c6t_elem->value[9+i*4] = ks_param->double_array->a[i];
+        c6t_elem->value[10+i*4] = ps_param->double_array->a[i];  
       }
     }
-
-    /*
-    printf("\t KN= %e %e %e %e (%i)\n",kn_param->double_array->a[0], kn_param->double_array->a[1], kn_param->double_array->a[2], kn_param->double_array->a[3], maxkn);
-    printf("\t PN= %e %e %e %e (%i)\n",pn_param->double_array->a[0], pn_param->double_array->a[1], pn_param->double_array->a[2], pn_param->double_array->a[3], maxpn);
-    printf("\t KS= %e %e %e %e (%i)\n",ks_param->double_array->a[0], ks_param->double_array->a[1], ks_param->double_array->a[2], ks_param->double_array->a[3], maxks);
-    printf("\t PS= %e %e %e %e (%i)\n",ps_param->double_array->a[0], ps_param->double_array->a[1], ps_param->double_array->a[2], ps_param->double_array->a[3], maxps);
-    */
   }
   else
   {
@@ -2720,111 +2728,120 @@ write_all_el(void)
 
 static void write_rfmultipole(struct c6t_element* el)
 {
-  const double knl[] = {
-    el->value[4],
-    el->value[5],
-    el->value[6],
-    el->value[7]
-  };
-  const double ksl[] = {
-    el->value[18],
-    el->value[12],
-    el->value[13],
-    el->value[14]
-  };
-  double tilt = el->value[2];
-  double freq = el->value[3];
-  char name[48];
+  if(six_version < general_rf_req)
+  {
+    const double knl[] = {
+      el->value[4],
+      el->value[5],
+      el->value[6],
+      el->value[7]
+    };
+    const double ksl[] = {
+      el->value[18],
+      el->value[12],
+      el->value[13],
+      el->value[14]
+    };
+    double tilt = el->value[2];
+    double freq = el->value[3];
+    char name[48];
 
-  if (fabs(knl[0])>eps_9) {
-    double lag = 0.25-el->value[8];
-    double pc0 = get_value("beam", "pc"); // GeV/c
-    el->out_1 = fabs(tilt - M_PI/2)<eps_9 ? -23 : 23; // ID
-    el->out_2 = knl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "d");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    if (fabs(knl[0])>eps_9) {
+      double lag = 0.25-el->value[8];
+      double pc0 = get_value("beam", "pc"); // GeV/c
+      el->out_1 = fabs(tilt - M_PI/2)<eps_9 ? -23 : 23; // ID
+      el->out_2 = knl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "d");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(knl[1])>eps_9) {
+      double lag = -el->value[9];
+      el->out_1 = 26; // ID
+      el->out_2 = -knl[1]; // 1/m
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "q");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(knl[2])>eps_9) {
+      double lag = -el->value[10];
+      el->out_1 = 27; // ID
+      el->out_2 = -knl[2] / 2.0; // 1/m^2
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "s");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(knl[3])>eps_9) {
+      double lag = -el->value[11];
+      el->out_1 = 28; // ID
+      el->out_2 = -knl[3] / 6.0; // 1/m^3
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "o");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(ksl[0])>eps_9) {
+      double lag = -0.25-el->value[19];
+      double pc0 = get_value("beam", "pc"); // GeV/c
+      el->out_1 = -23; // ID
+      el->out_2 = ksl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "ds");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(ksl[1])>eps_9) {
+      double lag = -el->value[15];
+      el->out_1 = -26; // ID
+      el->out_2 = ksl[1]; // 1/m
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "qs");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(ksl[2])>eps_9) {
+      double lag = -el->value[16];
+      el->out_1 = -27; // ID
+      el->out_2 = ksl[2] / 2.0; // 1/m^2
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "ss");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(ksl[3])>eps_9) {
+      double lag = -el->value[17];
+      el->out_1 = -28; // ID
+      el->out_2 = ksl[3] / 6.0; // 1/m^3
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "os");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
   }
-  if (fabs(knl[1])>eps_9) {
-    double lag = -el->value[9];
-    el->out_1 = 26; // ID
-    el->out_2 = -knl[1]; // 1/m
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "q");
+  else{
+    el->out_1 = 41; // ID
     fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(knl[2])>eps_9) {
-    double lag = -el->value[10];
-    el->out_1 = 27; // ID
-    el->out_2 = -knl[2] / 2.0; // 1/m^2
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "s");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(knl[3])>eps_9) {
-    double lag = -el->value[11];
-    el->out_1 = 28; // ID
-    el->out_2 = -knl[3] / 6.0; // 1/m^3
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "o");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(ksl[0])>eps_9) {
-    double lag = -0.25-el->value[19];
-    double pc0 = get_value("beam", "pc"); // GeV/c
-    el->out_1 = -23; // ID
-    el->out_2 = ksl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "ds");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(ksl[1])>eps_9) {
-    double lag = -el->value[15];
-    el->out_1 = -26; // ID
-    el->out_2 = ksl[1]; // 1/m
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "qs");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(ksl[2])>eps_9) {
-    double lag = -el->value[16];
-    el->out_1 = -27; // ID
-    el->out_2 = ksl[2] / 2.0; // 1/m^2
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "ss");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(ksl[3])>eps_9) {
-    double lag = -el->value[17];
-    el->out_1 = -28; // ID
-    el->out_2 = ksl[3] / 6.0; // 1/m^3
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "os");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    write_f3_rfmultipoles(el);
   }
 }
 
@@ -3169,7 +3186,7 @@ write_f3_matrix(void)
 static void
 write_f3_entry(const char* option, struct c6t_element* el)
 {
-  if (f3_cnt++ == 0) f3 = fopen("fc.3", "w");
+  if (f3_cnt++ == 0 && !f3) f3 = fopen("fc.3", "w");
   if (strcmp(option, "multipole") == 0) write_f3_mult(el);
 }
 
@@ -3221,6 +3238,24 @@ write_f3_mult(struct c6t_element* el)
   fprintf(f3,"NEXT\n");
 }
 
+static void
+write_f3_rfmultipoles(struct c6t_element* current_element)
+{
+
+  if (!f3) f3 = fopen("fc.3", "w");
+
+  if (strcmp(current_element->base_name, "rfmultipole") == 0)
+  {
+    fprintf(f3,"RFMULTIPOLE\n");
+    fprintf(f3, "%s %f \n", current_element->name,current_element->value[2]);
+    
+    for (int i=0; i < current_element->value[3]; i++){
+      fprintf(f3, name_format_5, current_element->value[i*4+7], current_element->value[i*4+8],
+        current_element->value[i*4+9], current_element->value[i*4+10]);
+    }
+    fprintf(f3,"NEXT\n");
+  }
+}
 static void
 rfmultipole_name(char *name, struct c6t_element* el)
 {
@@ -3294,7 +3329,7 @@ write_struct(void)
     char name[256] = "";
 
     if (p->flag == 0) {
-      if (strcmp(p->first->equiv->base_name,"rfmultipole") == 0)
+      if (strcmp(p->first->equiv->base_name,"rfmultipole") == 0 && six_version < general_rf_req)
         rfmultipole_name(name, p->first->equiv);
       else
         strcpy(name, p->first->equiv->name);
@@ -3519,6 +3554,7 @@ setup_output_string(void)
     strcpy(name_format_error, " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n");
     strcpy(name_format_3,  "%-48s%20.10e%20.10e\n");
     strcpy(name_format_4, "%-48s  %14.6e%14.6e%17.9e\n");
+    strcpy(name_format_5, "%23.15e %23.15e %23.15e %23.15e\n");
 
   }
     else{
@@ -3527,6 +3563,7 @@ setup_output_string(void)
     strcpy(name_format_error, " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n");
     strcpy(name_format_3,"%-16s%20.10e%20.10e\n");
     strcpy(name_format_4,"%-16s  %14.6e%14.6e%17.9e\n");
+    strcpy(name_format_5, "%17.9e %17.9e %17.9e %17.9e\n");
 
     }
 }
