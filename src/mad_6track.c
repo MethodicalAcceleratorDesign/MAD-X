@@ -1450,98 +1450,31 @@ convert_madx_to_c6t(struct node* p)
     }
 
     
-    /*
-    ** In particular, for the RF multipoles:
-    ** Name: any name
-    ** type: (-)23, (-)26, (-)27 or (-)28
-    **       for dipole, quadrupole, sextupole and octupole, respectively.
-    ** n1: Integrated multipole strength in the same units as the normal sixtrack elements
-    ** n2: Frequency in MHz
-    ** n3: RF phase in radians
-    */
+    if(maxkn >=maxks){
+      mmult = maxkn;
+    }
+    else{
+      mmult = maxks;
+    }
 
-    /*
-    ** we have 19 parameters
-    ** value[0]  = el_par_value_recurse("l",p->p_elem);
-    ** value[1]  = el_par_value_recurse("volt",p->p_elem);
-    ** value[2]  = el_par_value_recurse("tilt",p->p_elem);
-    ** value[3]  = frequency in MHz
-    ** value[4]  = integrated dipole strength
-    ** value[5]  = integrated quadrupole strength
-    ** value[6]  = integrated sextupole strength
-    ** value[7]  = integrated octupole strength
-    ** value[8]  = phase for dipole
-    ** value[9]  = phase for quadrupole
-    ** value[10] = phase for sextupole
-    ** value[11] = phase for octupole
-    ** value[18] = integrated skew dipole strength
-    ** value[12] = integrated skew quadrupole strength
-    ** value[13] = integrated skew sextupole strength
-    ** value[14] = integrated skew octupole strength
-    ** value[19] = phase for skew dipole
-    ** value[15] = phase for skew quadrupole
-    ** value[16] = phase for skew sextupole
-    ** value[17] = phase for skew octupole
-    */
-
-      if(maxkn >=maxks){
-        mmult = maxkn;
-      }
-      else{
-        mmult = maxks;
-      }
-
-      c6t_elem = new_c6t_element(6+mmult*4,t_name,p->base_name);
+      c6t_elem = new_c6t_element(11+mmult*4,t_name,p->base_name);
       clean_c6t_element(c6t_elem);
       strcpy(c6t_elem->org_name,t_name);
 
       c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
       c6t_elem->value[1] = el_par_value_recurse("volt",p->p_elem);
-      c6t_elem->value[2] = el_par_value_recurse("tilt",p->p_elem);
-      c6t_elem->value[3] = el_par_value_recurse("freq",p->p_elem);
-      c6t_elem->value[4] = mmult;
+      c6t_elem->value[2] = el_par_value_recurse("freq",p->p_elem);
+      c6t_elem->value[3] = mmult;
+      c6t_elem->value[6] = el_par_value_recurse("tilt",p->p_elem);
 
 
       for (int i=0; i<mmult; i++){
-        c6t_elem->value[5+i*4] = kn_param->double_array->a[i];
-        c6t_elem->value[6+i*4] = pn_param->double_array->a[i];
-        c6t_elem->value[7+i*4] = ks_param->double_array->a[i];
-        c6t_elem->value[8+i*4] = ps_param->double_array->a[i];  
+        c6t_elem->value[7+i*4] = kn_param->double_array->a[i];
+        c6t_elem->value[8+i*4] = pn_param->double_array->a[i];
+        c6t_elem->value[9+i*4] = ks_param->double_array->a[i];
+        c6t_elem->value[10+i*4] = ps_param->double_array->a[i];  
       }
 
-
-
-    // rf & general params
-    /*
-    c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
-    c6t_elem->value[1] = el_par_value_recurse("volt",p->p_elem);
-    c6t_elem->value[2] = el_par_value_recurse("tilt",p->p_elem);
-    c6t_elem->value[3] = el_par_value_recurse("freq",p->p_elem);
-    // normal components
-    c6t_elem->value[4] = maxkn>0?(kn_param->double_array->a[0]):0.0;
-    c6t_elem->value[5] = maxkn>1?(kn_param->double_array->a[1]):0.0;
-    c6t_elem->value[6] = maxkn>2?(kn_param->double_array->a[2]):0.0;
-    c6t_elem->value[7] = maxkn>3?(kn_param->double_array->a[3]):0.0;
-    c6t_elem->value[8] = maxpn>0?(pn_param->double_array->a[0]):0.0;
-    c6t_elem->value[9] = maxpn>1?(pn_param->double_array->a[1]):0.0;
-    c6t_elem->value[10] = maxpn>2?(pn_param->double_array->a[2]):0.0;
-    c6t_elem->value[11] = maxpn>3?(pn_param->double_array->a[3]):0.0;
-    // skew component
-    c6t_elem->value[18] = maxks>0?(ks_param->double_array->a[0]):0.0;
-    c6t_elem->value[12] = maxks>1?(ks_param->double_array->a[1]):0.0;
-    c6t_elem->value[13] = maxks>2?(ks_param->double_array->a[2]):0.0;
-    c6t_elem->value[14] = maxks>3?(ks_param->double_array->a[3]):0.0;
-    c6t_elem->value[19] = maxps>0?(ps_param->double_array->a[0]):0.0;
-    c6t_elem->value[15] = maxps>1?(ps_param->double_array->a[1]):0.0;
-    c6t_elem->value[16] = maxps>2?(ps_param->double_array->a[2]):0.0;
-    c6t_elem->value[17] = maxps>3?(ps_param->double_array->a[3]):0.0;
-*/
-    /*
-    printf("\t KN= %e %e %e %e (%i)\n",kn_param->double_array->a[0], kn_param->double_array->a[1], kn_param->double_array->a[2], kn_param->double_array->a[3], maxkn);
-    printf("\t PN= %e %e %e %e (%i)\n",pn_param->double_array->a[0], pn_param->double_array->a[1], pn_param->double_array->a[2], pn_param->double_array->a[3], maxpn);
-    printf("\t KS= %e %e %e %e (%i)\n",ks_param->double_array->a[0], ks_param->double_array->a[1], ks_param->double_array->a[2], ks_param->double_array->a[3], maxks);
-    printf("\t PS= %e %e %e %e (%i)\n",ps_param->double_array->a[0], ps_param->double_array->a[1], ps_param->double_array->a[2], ps_param->double_array->a[3], maxps);
-    */
   }
   else
   {
@@ -2744,7 +2677,6 @@ write_all_el(void)
   current_element = first_in_sequ;
   while (current_element != NULL)
   {
-    printf("%s %s %s", "aaaaa \n", current_element->name,current_element->equiv->name );
     if (current_element->flag > 0
         && current_element == current_element->equiv
         && current_element->w_flag == 0)
@@ -3060,11 +2992,11 @@ write_f3_rfmultipoles(struct c6t_element* current_element)
     if (strcmp(current_element->base_name, "rfmultipole") == 0)
     {
       fprintf(f3,"RFMULTIPOLE\n");
-      fprintf(f3, "%s %f \n", current_element->name,current_element->value[3]);
+      fprintf(f3, "%s %f \n", current_element->name,current_element->value[2]);
       
-      for (int i=0; i < current_element->value[4]; i++){
-        fprintf(f3, "%f %f %f %f \n", current_element->value[i*4+5], current_element->value[i*4+6],
-          current_element->value[i*4+7], current_element->value[i*4+8]);
+      for (int i=0; i < current_element->value[3]; i++){
+        fprintf(f3, "%f %f %f %f \n", current_element->value[i*4+7], current_element->value[i*4+8],
+          current_element->value[i*4+9], current_element->value[i*4+10]);
       }
       fprintf(f3,"NEXT\n");
     
