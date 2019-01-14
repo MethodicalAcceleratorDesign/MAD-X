@@ -53,7 +53,7 @@ esave, file=error.tab;
 !!! save the lattice in Six-Track format
 !!!
 
-use, period=test_line;
+!use, period=test_line;
 sixtrack, radius=0.017;
 
 stop;
