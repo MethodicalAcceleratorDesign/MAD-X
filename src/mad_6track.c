@@ -500,6 +500,7 @@ static const double eps_6 = 1.e-6;
 static const double eps_9 = 1.e-9;
 static const double eps_12 = 1.e-12;
 static double ref_def = 0.017;
+static double six_version = 0;
 
 static FILE *f2, *f3, *f3aux, *f3aper, *f8, *f16, *f34;
 
@@ -1447,70 +1448,56 @@ convert_madx_to_c6t(struct node* p)
       ps_param = p->p_elem->def->par->parameters[index];
       maxps=ks_param->double_array->curr;
     }
-    if (maxkn>3 || maxks>3) {
-      printf("warning while converting rfmultipole: components beyond octupole are ignored\n");
+
+    if(six_version < 50200)
+    {
+      if (maxkn>3 || maxks>3) {
+        printf("warning while converting rfmultipole: components beyond octupole are ignored\n");
+      }
+
+      c6t_elem = new_c6t_element(19,t_name,p->base_name);
+      clean_c6t_element(c6t_elem);
+      strcpy(c6t_elem->org_name,t_name);
+      // rf & general params
+      c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+      c6t_elem->value[1] = el_par_value_recurse("volt",p->p_elem);
+      c6t_elem->value[2] = el_par_value_recurse("tilt",p->p_elem);
+      c6t_elem->value[3] = el_par_value_recurse("freq",p->p_elem);
+      // normal components
+      c6t_elem->value[4] = maxkn>0?(kn_param->double_array->a[0]):0.0;
+      c6t_elem->value[5] = maxkn>1?(kn_param->double_array->a[1]):0.0;
+      c6t_elem->value[6] = maxkn>2?(kn_param->double_array->a[2]):0.0;
+      c6t_elem->value[7] = maxkn>3?(kn_param->double_array->a[3]):0.0;
+      c6t_elem->value[8] = maxpn>0?(pn_param->double_array->a[0]):0.0;
+      c6t_elem->value[9] = maxpn>1?(pn_param->double_array->a[1]):0.0;
+      c6t_elem->value[10] = maxpn>2?(pn_param->double_array->a[2]):0.0;
+      c6t_elem->value[11] = maxpn>3?(pn_param->double_array->a[3]):0.0;
+      // skew component
+      c6t_elem->value[18] = maxks>0?(ks_param->double_array->a[0]):0.0;
+      c6t_elem->value[12] = maxks>1?(ks_param->double_array->a[1]):0.0;
+      c6t_elem->value[13] = maxks>2?(ks_param->double_array->a[2]):0.0;
+      c6t_elem->value[14] = maxks>3?(ks_param->double_array->a[3]):0.0;
+      c6t_elem->value[19] = maxps>0?(ps_param->double_array->a[0]):0.0;
+      c6t_elem->value[15] = maxps>1?(ps_param->double_array->a[1]):0.0;
+      c6t_elem->value[16] = maxps>2?(ps_param->double_array->a[2]):0.0;
+      c6t_elem->value[17] = maxps>3?(ps_param->double_array->a[3]):0.0;
+        
     }
-
-    /*
-    ** In particular, for the RF multipoles:
-    ** Name: any name
-    ** type: (-)23, (-)26, (-)27 or (-)28
-    **       for dipole, quadrupole, sextupole and octupole, respectively.
-    ** n1: Integrated multipole strength in the same units as the normal sixtrack elements
-    ** n2: Frequency in MHz
-    ** n3: RF phase in radians
-    */
-
-    /*
-    ** we have 19 parameters
-    ** value[0]  = el_par_value_recurse("l",p->p_elem);
-    ** value[1]  = el_par_value_recurse("volt",p->p_elem);
-    ** value[2]  = el_par_value_recurse("tilt",p->p_elem);
-    ** value[3]  = frequency in MHz
-    ** value[4]  = integrated dipole strength
-    ** value[5]  = integrated quadrupole strength
-    ** value[6]  = integrated sextupole strength
-    ** value[7]  = integrated octupole strength
-    ** value[8]  = phase for dipole
-    ** value[9]  = phase for quadrupole
-    ** value[10] = phase for sextupole
-    ** value[11] = phase for octupole
-    ** value[18] = integrated skew dipole strength
-    ** value[12] = integrated skew quadrupole strength
-    ** value[13] = integrated skew sextupole strength
-    ** value[14] = integrated skew octupole strength
-    ** value[19] = phase for skew dipole
-    ** value[15] = phase for skew quadrupole
-    ** value[16] = phase for skew sextupole
-    ** value[17] = phase for skew octupole
-    */
-
-    c6t_elem = new_c6t_element(19,t_name,p->base_name);
-    clean_c6t_element(c6t_elem);
-    strcpy(c6t_elem->org_name,t_name);
-    // rf & general params
-    c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
-    c6t_elem->value[1] = el_par_value_recurse("volt",p->p_elem);
-    c6t_elem->value[2] = el_par_value_recurse("tilt",p->p_elem);
-    c6t_elem->value[3] = el_par_value_recurse("freq",p->p_elem);
-    // normal components
-    c6t_elem->value[4] = maxkn>0?(kn_param->double_array->a[0]):0.0;
-    c6t_elem->value[5] = maxkn>1?(kn_param->double_array->a[1]):0.0;
-    c6t_elem->value[6] = maxkn>2?(kn_param->double_array->a[2]):0.0;
-    c6t_elem->value[7] = maxkn>3?(kn_param->double_array->a[3]):0.0;
-    c6t_elem->value[8] = maxpn>0?(pn_param->double_array->a[0]):0.0;
-    c6t_elem->value[9] = maxpn>1?(pn_param->double_array->a[1]):0.0;
-    c6t_elem->value[10] = maxpn>2?(pn_param->double_array->a[2]):0.0;
-    c6t_elem->value[11] = maxpn>3?(pn_param->double_array->a[3]):0.0;
-    // skew component
-    c6t_elem->value[18] = maxks>0?(ks_param->double_array->a[0]):0.0;
-    c6t_elem->value[12] = maxks>1?(ks_param->double_array->a[1]):0.0;
-    c6t_elem->value[13] = maxks>2?(ks_param->double_array->a[2]):0.0;
-    c6t_elem->value[14] = maxks>3?(ks_param->double_array->a[3]):0.0;
-    c6t_elem->value[19] = maxps>0?(ps_param->double_array->a[0]):0.0;
-    c6t_elem->value[15] = maxps>1?(ps_param->double_array->a[1]):0.0;
-    c6t_elem->value[16] = maxps>2?(ps_param->double_array->a[2]):0.0;
-    c6t_elem->value[17] = maxps>3?(ps_param->double_array->a[3]):0.0;
+    else { //This is the new RF-multipoles
+      if (maxkn > maxks) {j=maxkn;} else {j=maxks;}
+      i=j*2+12+1;
+      c6t_elem = new_c6t_element(i,t_name,p->base_name);
+      clean_c6t_element(c6t_elem);
+      strcpy(c6t_elem->org_name,t_name);
+      c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+      c6t_elem->value[6] = el_par_value_recurse("tilt",p->p_elem);
+      c6t_elem->value[11] = el_par_value_recurse("lrad",p->p_elem);
+      for (i=0; i<j; i++)
+      {
+        if (i<maxkn) c6t_elem->value[i*2+12] = kn_param->double_array->a[i];
+        if (i<maxks) c6t_elem->value[i*2+13] = ks_param->double_array->a[i];
+      }
+    }
 
     /*
     printf("\t KN= %e %e %e %e (%i)\n",kn_param->double_array->a[0], kn_param->double_array->a[1], kn_param->double_array->a[2], kn_param->double_array->a[3], maxkn);
@@ -1762,6 +1749,8 @@ get_args(struct in_cmd* my_cmd)
     put_info("c6t - mangle flag selected","");
   if ((long_names_flag = command_par_value("long_names", my_cmd->clone)))
     put_info("c6t - long names flag selected","");
+  if ((six_version = command_par_value("six_version", my_cmd->clone)))
+    printf("SixTrack Version of (or higher is assumed): %f\n",six_version);
   if (mult_auto_off &&
      (tmp_max_mult_ord = command_par_value("max_mult_ord", my_cmd->clone))>0)
   {
