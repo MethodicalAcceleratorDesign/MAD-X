@@ -1,14 +1,16 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Darwin)      +
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2018.10.03               +
-  + Execution date: 2018.12.17 23:05:33      +
+  + Execution date: 2019.01.14 16:54:20      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -debug, -echo;
 
 enter TRACK module
 one pass is on
+ TWDISP: Unable to compute intial dispersion --- dispersion set to zero.
+ TWDISP: Unable to compute intial dispersion --- dispersion set to zero.
 
 ++++++ table: tracksumm
 
