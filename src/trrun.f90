@@ -4067,7 +4067,7 @@ subroutine ttrfmult(track, ktrack, turn)
 
   ! LD: 2016.03.04 - use complex declaration compatible with Lahey
   integer, parameter:: dp=kind(0.d0)
-  complex(kind=dp) :: Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
+  complex(kind=dp) :: Cp0, Sp1
 
   double precision, external :: node_value, get_value
   integer, external :: node_fd_errors
@@ -4128,25 +4128,15 @@ subroutine ttrfmult(track, ktrack, turn)
       field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z))
     enddo
 
-    Cm2 = zero; Sm2 = zero; Cm1 = zero; Sm1 = zero;
-    Cp0 = zero; Sp0 = zero; Cp1 = zero; Sp1 = zero;
+    
+    Cp0 = zero; Sp1 = zero;
 
     do iord = nord, 0, -1
-      if (iord.ge.2) then
-        Cm2 = Cm2 * (x+ii*y) / (iord-1) + field_cos(1,iord)+ii*field_cos(2,iord);
-        Sm2 = Sm2 * (x+ii*y) / (iord-1) + field_sin(1,iord)+ii*field_sin(2,iord);
-      endif
-      if (iord.ge.1) then
-        Cm1 = Cm1 * (x+ii*y) / (iord)   + field_cos(1,iord)+ii*field_cos(2,iord);
-        Sm1 = Sm1 * (x+ii*y) / (iord)   + field_sin(1,iord)+ii*field_sin(2,iord);
-      endif
       Cp0 = Cp0 * (x+ii*y) / (iord+1)   + field_cos(1,iord)+ii*field_cos(2,iord);
-      Sp0 = Sp0 * (x+ii*y) / (iord+1)   + field_sin(1,iord)+ii*field_sin(2,iord);
-      Cp1 = Cp1 * (x+ii*y) / (iord+2)   + field_cos(1,iord)+ii*field_cos(2,iord);
       Sp1 = Sp1 * (x+ii*y) / (iord+2)   + field_sin(1,iord)+ii*field_sin(2,iord);
     enddo
+    
     Sp1 = Sp1 * (x+ii*y);
-    Cp1 = Cp1 * (x+ii*y);
 
     !---- The kick
     ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
