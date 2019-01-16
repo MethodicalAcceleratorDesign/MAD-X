@@ -4533,13 +4533,17 @@ subroutine tttdipole(track, ktrack)
   angle = node_value('angle ')
   rho = abs(length/angle)
   h = angle/length
-  k0 = node_value('k0 ') ! h
+  k0 = node_value('k0 ') ! was h
   k1 = node_value('k1 ')
 
   !---- Apply errors
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  if (k0.ne.0) f_errors(0) = f_errors(0) + k0*length - angle
+  if (k0.ne.0) then 
+    f_errors(0) = f_errors(0) + k0*length - angle
+  else
+    k0 = h
+  endif
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
