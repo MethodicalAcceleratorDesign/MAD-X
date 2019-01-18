@@ -12,7 +12,7 @@ mb1: sbend,l:=lmb ,angle:=amb ,tilt:= 0.013,k1:=kmb ,kill_ent_fringe=true,kill_e
 mb1_dex: dipedge,h:=( amb ) / ( lmb ) ,e1:=ee2 ,fint:= 0.6,tilt:= 0.013,hgap:= 0.12;
 mb2_den: dipedge,h:=( amb ) / ( ( lmb2 ) * ( 1.0 / sinc ( amb * 0.5 ) ) ) ,e1:=( amb ) * ( 0.5 ) ,fint:= 0.7,hgap:= 0.12;
 mb2: sbend,l:=( lmb2 ) * ( 1.0 / sinc ( amb * 0.5 ) ) ,angle:=amb ,k1:=kmb ,thick=true,kill_ent_fringe=true,kill_exi_fringe=true;
-mb2_dex: dipedge,h:=( amb ) / ( ( lmb2 ) * ( 1.0 / sinc ( amb * 0.5 ) ) ) ,e1:=( ee2 ) + ( ( amb ) * ( 0.5 ) ) ,fint:= 0.7,hgap:= 0.12;
+mb2_dex: dipedge,h:=( amb ) / ( ( lmb2 ) * ( 1.0 / sinc ( amb * 0.5 ) ) ) ,e1:=( 0 ) + ( ( amb ) * ( 0.5 ) ) ,fint:= 0.7,hgap:= 0.12;
 myseq: sequence, l = 30;
 mb1_den, at = ( lmb / 2 ) + ( ( lmb ) * ( 0 - 0.5 ) ) ;
 mb1, at = ( lmb / 2 ) + ( ( lmb ) * ( 0 ) ) ;
