@@ -1694,6 +1694,43 @@ Example:
 KINK: YROTATION, ANGLE = 0.0001;
 }
 
+\section{Rotation around the horizontal axis}
+\label{sec:xrotation}
+
+The element \texttt{XROTATION} rotates the
+\hyperref[subsec:local-straight]{straight reference system} about the
+vertical (\textit{x}) axis.
+
+\madbox{
+	label: XROTATION, ANGLE=real;
+}
+
+\texttt{XROTATION} has no effect on the beam, but it
+causes the beam to be referred to the new coordinate system  \\
+\begin{equation}\begin{split}
+y_2 &= y_1 \cos\theta - s_1 \sin\theta \\
+s_2 &= y_1 \sin\theta + s_1 \cos\theta
+\end{split}\end{equation}
+%%\textit{x}$_2$=\textit{x}$_1$cos(theta)-\textit{s}$_1$sin(theta), \\
+%%\textit{y}$_2$=\textit{x}$_1$sin(theta)+\textit{s}$_1$cos(theta).\\
+
+It has one real attribute:
+\begin{madlist}
+	\ttitem{ANGLE} The rotation angle $\theta$ (default: 0 rad).
+\end{madlist}
+
+A positive angle means that the new reference system is rotated
+clockwise about the local \textit{x}-axis with respect to the old system.
+
+\textbf{Important note:} \\
+The rotation angle $\theta$ must be \emph{small}, \textsl{i.e.} it must be at
+most comparable to the transverse angles of the orbit.
+
+Example:
+\madxmp{
+	KINK: XROTATION, ANGLE = 0.0001;
+}
+
 \section{Rotation around the longitudinal axis}
 \label{sec:srotation}
 
