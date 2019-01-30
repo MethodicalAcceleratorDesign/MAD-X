@@ -238,19 +238,16 @@ write_table(struct table* t, const char* filename)
             stoupper(l_name));
     if (t->header != NULL)
     {
-      for (j = 0; j < t->header->curr; j++)
-    	if(t->header->curr < 30){ // this number here is just to prevent from removing title which is put into the header..
-    		fprintf(out_file, "%s\n", t->header->p[j]);
-    	}
-    	else {
-			if(strncmp(t->header->p[j], "@ TITLE ", 8) != 0
-			&& strncmp(t->header->p[j], "@ ORIGIN ", 8) != 0
-			&& strncmp(t->header->p[j], "@ DATE ", 6) != 0
-			&& strncmp(t->header->p[j], "@ TIME ", 6) != 0
-			&& strncmp(t->header->p[j], "* NAME ", 6) != 0)
-			{
-				fprintf(out_file, "%s\n", t->header->p[j]);
-    	    }
+      for (j = 0; j < t->header->curr; j++) {
+  			if((!title ||
+           strncmp(t->header->p[j], "@ TITLE " , 8))  &&
+           strncmp(t->header->p[j], "@ ORIGIN ", 9)   &&
+           strncmp(t->header->p[j], "@ DATE "  , 7)   &&
+           strncmp(t->header->p[j], "@ TIME "  , 7)   &&
+           strncmp(t->header->p[j], "* NAME "  , 7))
+        {
+  				fprintf(out_file, "%s\n", t->header->p[j]);
+   	    }
     	}
     }
     if (title != NULL)
@@ -263,7 +260,7 @@ write_table(struct table* t, const char* filename)
     fprintf(out_file,
             "@ ORIGIN           %%%02ds \"%s %s %s\"\n",
             n, version_name, version_ostype, version_arch);
-    
+
     fprintf(out_file,
             "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
             tm->tm_mday, tm->tm_mon+1, tm->tm_year%100);
@@ -1271,179 +1268,172 @@ out_table(const char* tname, struct table* t, const char* filename)
     write_table(t, filename);
 }
 
-struct table*
+void
 read_table(struct in_cmd* cmd)
   /* reads and stores TFS table */
 {
   struct table* t = NULL;
-  struct char_p_array* tcpa = NULL;
-  struct name_list* tnl = NULL;
-  short sk;
-  int i, k, error = 0;
-  char *cc, *filename, *type = NULL, *tmp, *name;
-
-  char* namtab;
+  struct char_p_array* tcpa = NULL;  // COLUMN TYPES
+  struct name_list* tnl = NULL;      // COLUMN NAMES
+  char *namtab = NULL, *typtab = NULL, *filename = NULL;
+  char *cc, *tmp;
 
   if ((namtab = command_par_string("table",cmd->clone)) != NULL) {
     printf("Want to make named table: %s\n",namtab);
   }
-  else
-  {
-    if (get_option("debug")) {
-      printf("No table name requested\n");
-      printf("Use default name (i.e. name from file) \n");
-    }
-    namtab = NULL;
+  else if (get_option("debug")) {
+    printf("No table name requested\n");
+    printf("Use default name (i.e. name from file) \n");
   }
 
-  if((filename = command_par_string_user("file", cmd->clone)))
-  {
-    if ((tab_file = fopen(filename, "r")) == NULL)
-    {
-      fatal_error("cannot open file:", filename); return NULL;
+  if((filename = command_par_string_user("file", cmd->clone)) != NULL) {
+    if ((tab_file = fopen(filename, "r")) == NULL) {
+      fatal_error("cannot open file:", filename); return;
     }
   }
-  else
-  {
-    warning("no filename,","ignored"); return NULL;
+  else {
+    warning("no filename,","ignored"); return;
   }
-  while (fgets(aux_buff->c, aux_buff->max, tab_file))
-  {
+
+  int error = 0;
+  while (!error && fgets(aux_buff->c, aux_buff->max, tab_file)) {
     supp_char('\r', aux_buff->c);
     cc = strtok(aux_buff->c, " \"\n");
-    if (*cc == '@')
-    {
-      if ((tmp = strtok(NULL, " \"\n")) != NULL
-          && strcmp(tmp, "TYPE") == 0)
-      {
-        if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
-        {
-          if ((name = strtok(NULL, " \"\n")) != NULL)
-            type = permbuff(stolower(name));
+
+    if (*cc == '@') {                                   // HEADER
+      if ((tmp = strtok(NULL, " \"\n")) != NULL) {
+        char *str;
+        if (!typtab && strcmp(tmp, "TYPE") == 0) {     // TYPE
+          if ((str = strtok(NULL, " \"\n")) != NULL) { /* skip format */
+            if ((str = strtok(NULL, " \"\n")) != NULL)
+              typtab = permbuff(stolower(str));
+          }
+        } else
+        if (!namtab && (strcmp(tmp, "NAME") == 0)) {   // NAME
+          if ((str = strtok(NULL, " \"\n")) != NULL) { /* skip format */
+            if ((str = strtok(NULL, " \"\n")) != NULL)
+              namtab = permbuff(stolower(str));
+          }
         }
       }
-      else if (strcmp(tmp, "NAME") == 0 && !namtab)
-      {
-        if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
-        {
-          if ((name = strtok(NULL, " \"\n")) != NULL)
-            namtab = permbuff(stolower(name));
-        }
-      }
-    }
-    else if (*cc == '*' && tnl == NULL)
-    {
+    } else
+
+    if (*cc == '*' && tnl == NULL) {                    // COLUMN NAMES
       tnl = new_name_list("table_names", 20);
       while ((tmp = strtok(NULL, " \"\n")) != NULL)
         add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
-    }
-    else if (*cc == '$' && tcpa == NULL)
-    {
-      if (tnl == NULL)
-      {
-        warning("formats before names","skipped"); return NULL;
+    } else
+
+    if (*cc == '$' && tcpa == NULL) {                   // COLUMN TYPES
+      if (tnl == NULL) {
+        warning("formats before names","skipped");
+        error = 1; break;
       }
+
       tcpa = new_char_p_array(20);
-      while ((tmp = strtok(NULL, " \"\n")) != NULL)
-      {
+
+      while ((tmp = strtok(NULL, " \"\n")) != NULL) {
         if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
-        if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
-        else if (strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
+             if (strcmp(tmp, "%s" ) == 0) tnl->inform[tcpa->curr] = 3;
+        else if (strcmp(tmp, "%d" ) == 0) tnl->inform[tcpa->curr] = 1;
         else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
         else                              tnl->inform[tcpa->curr] = 2;
         tcpa->p[tcpa->curr++] = permbuff(tmp);
       }
-    }
-    else
-    {
-      if(t == NULL)
-      {
-        if (type == NULL)
-        {
-          warning("TFS table without type,","skipped"); error = 1;
+
+    } else {
+
+      if(t == NULL) {
+        if (typtab == NULL) {
+          warning("TFS table without type,","skipped");
+          error = 1; break;
         }
-        else if (tcpa == NULL)
-        {
-          warning("TFS table without formats,","skipped"); error = 1;
+        else if (tcpa == NULL) {
+          warning("TFS table without formats,","skipped");
+          error = 1;  break;
         }
-        else if (tnl == NULL)
-        {
-          warning("TFS table without column names,","skipped"); error = 1;
+        else if (tnl == NULL) {
+          warning("TFS table without column names,","skipped");
+          error = 1; break;
         }
-        else if (tnl->curr == 0)
-        {
+        else if (tnl->curr == 0) {
           warning("TFS table: empty column name list,","skipped");
-          error = 1;
+          error = 1; break;
         }
-        else if (tnl->curr != tcpa->curr)
-        {
-          warning("TFS table: number of names and formats differ,",
-                  "skipped");
-          error = 1;
+        else if (tnl->curr != tcpa->curr) {
+          warning("TFS table: number of names and formats differ,", "skipped");
+          error = 1; break;
         }
-        if (error)
-        {
-          delete_name_list(tnl); return NULL;
-        }
-        if(namtab != NULL) {
-          t = new_table(namtab, type,    500, tnl);
-        }
-        else
-        {
-          t = new_table(type, type,    500, tnl);
-        }
+
+        t = new_table(namtab ? namtab : typtab, typtab, 500, tnl);
       }
-      for (i = 0; i < tnl->curr; i++)
-      {
+
+      for (int i = 0; i < tnl->curr; i++) {
         if (t->curr == t->max) grow_table(t);
         tmp = tcpa->p[i];
-        if (strcmp(tmp,"%s") == 0) t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
-        else if (strcmp(tmp,"%d") == 0)
-        {
+
+        if (strcmp(tmp,"%s") == 0) {
+          t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
+        } else
+        if (strcmp(tmp,"%d") == 0) {
+          int k;
           sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
-        }
-        else if (strcmp(tmp,"%hd") == 0)
-        {
+        } else
+        if (strcmp(tmp,"%hd") == 0) {
+          short sk;
           sscanf(cc, tmp, &sk); t->d_cols[i][t->curr] = sk;
+        } else
+        if (strcmp(tmp,"%le") == 0) {
+          sscanf(cc, tmp, &t->d_cols[i][t->curr]);
+        } else {
+          warning("TFS table: invalid column formats in line:", aux_buff->c);
+          error = 1; break;
         }
-        else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
-        if (i+1 < tnl->curr)
-        {
-          if ((cc =strtok(NULL, " \"\n")) == NULL)
-          {
+
+        if (i+1 < tnl->curr) {
+          if ((cc =strtok(NULL, " \"\n")) == NULL) {
             warning("read_table: incomplete table line starting with:", aux_buff->c);
-            return NULL;
+            error = 1; break;
           }
         }
       }
       t->curr++;
     }
   }
-  fclose(tab_file);
-  if ((tab_file = fopen(filename, "r")) == NULL)
-  {
-    warning("cannot open file:", filename); return NULL;
+  fclose(tab_file); tab_file = NULL;
+  if (error == 1) return;
+
+  if ((tab_file = fopen(filename, "r")) == NULL) {
+    warning("cannot open file:", filename); return;
   }
-/* read & store table header */
-  t->header = new_char_p_array(50);
-  while (fgets(aux_buff->c, aux_buff->max, tab_file))
-  {
+
+  /* (re)read & store table header */
+  t->header = new_char_p_array(32);
+  while (fgets(aux_buff->c, aux_buff->max, tab_file)) {
+    if (*aux_buff->c != '@') break;
+
+    if (namtab && !strncmp(aux_buff->c, "@ NAME ", 7)) continue;
+    if (typtab && !strncmp(aux_buff->c, "@ TYPE ", 7)) continue;
+
+    if (t->header->curr == t->header->max)
+      grow_char_p_array(t->header);
+
     supp_char('\r', aux_buff->c);
-    if ((*aux_buff->c != ' ') &&
-        ((*aux_buff->c == '@') || (*aux_buff->c == '*')))
-    {
-      if (t->header->curr == t->header->max) grow_char_p_array(t->header);
-      int len = strlen(aux_buff->c)+1;
-      t->header->p[t->header->curr] = mymalloc_atomic("read_table", len * sizeof *t->header->p[0]);
-      strncpy(t->header->p[t->header->curr], aux_buff->c,len * sizeof *(aux_buff->c)-1);
-      //strcpy(t->header->p[t->header->curr], aux_buff->c);
-      t->header->curr++;
-    }
+    int len = strlen(aux_buff->c)+1;
+    t->header->p[t->header->curr] = mymalloc_atomic("read_table", len * sizeof *t->header->p[0]);
+    strncpy(t->header->p[t->header->curr], aux_buff->c,len * sizeof *(aux_buff->c)-1);
+    t->header->curr++;
   }
   fclose(tab_file);
+
+//  if (t->header) {
+//    for (int i=0; i<t->header->curr; i++)
+//      printf("[%d]: %s\n", i, t->header->p[i]);
+//  }
+
   t->origin = 1;
   add_to_table_list(t, table_register);
-  return NULL;
+  return;
 }
 
 int
@@ -1974,31 +1964,31 @@ double_to_table_curr2(const char* table, const char* name, const double* val)
   }
   mycpy(col_s, name);
   if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
-    
+
     /*limit to a reasonable number of columns*/
     if (tbl->num_cols > 10000)
      {
-      warning("double_to_table_curr: Did not find the column and and can not add more (>10000):", 
+      warning("double_to_table_curr: Did not find the column and and can not add more (>10000):",
               (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
       return -2;
      }
-     
+
    /* put_info("double_to_table_curr: column not found, creating one:", col_s);*/
-    
+
     add_to_name_list(permbuff(col_s), 2, tbl->columns );
-    
+
     /*Copy the old columns*/
     d_cols = mycalloc(rout_name, tbl->num_cols, sizeof *tbl->d_cols);
     for (int i=0; i<tbl->num_cols; i++)
      {
        d_cols[i] = tbl->d_cols[i];
      }
-    
+
     /*Create the new column*/
     d_cols[tbl->num_cols] = mycalloc_atomic(rout_name, tbl->max - 1, sizeof *d_cols[0]);
     /*zero the new array to assure previous rows are not random*/
-    memset(d_cols[tbl->num_cols], 0, (tbl->max - 1)* (sizeof *d_cols[0])); 
-    
+    memset(d_cols[tbl->num_cols], 0, (tbl->max - 1)* (sizeof *d_cols[0]));
+
     myfree(rout_name,tbl->d_cols);
     tbl->d_cols = d_cols;
     tbl->num_cols++;
@@ -2007,14 +1997,14 @@ double_to_table_curr2(const char* table, const char* name, const double* val)
     while (tbl->num_cols > tbl->col_out->max)
       grow_int_array(tbl->col_out);
 
-    
+
     if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
       warning("double_to_table_curr2: Failed to add column:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
       return -2;
     }
-    
+
   }
-  
+
   if (tbl->columns->inform[col] >= 3) {
     warning("double_to_table_curr2: invalid column type:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
     return -2;
@@ -2025,7 +2015,7 @@ double_to_table_curr2(const char* table, const char* name, const double* val)
   }
 
   tbl->d_cols[col][tbl->curr] = *val;
-  
+
 
   return 0;
 }
