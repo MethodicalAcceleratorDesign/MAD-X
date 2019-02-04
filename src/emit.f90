@@ -572,7 +572,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         sumu0 = sumu0 + rfv * sin(rfl - rff * time)
 
 
-     case (code_hkicker, code_kicker, code_vkicker, code_tkicker) !---- Orbit correctors.
+     case (code_hkicker, code_kicker, code_vkicker, code_tkicker, code_solenoid) !---- Orbit correctors.
 
         n_ferr = node_fd_errors(f_errors)
 
@@ -590,6 +590,14 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         case (code_vkicker)
            xkick = zero
            ykick = bvk * (node_value('kick ') + node_value('cvkick ') + ferror(2))
+        case (code_solenoid)
+           sks = node_value('ks ');
+           xkick = sks*(sks*orb1(1)-orb1(4))*el;
+           ykick = sks*(sks*orb1(3)+orb1(2))*el;
+           xkick = sks*(sks*orb2(1)-orb2(4))*el;
+           ykick = sks*(sks*orb2(3)+orb2(2))*el;
+           xkick = xkick*half;
+           ykick = ykick*half;
         case default
            xkick = zero
            ykick = zero
