@@ -2014,7 +2014,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
      if (spch_bb_name(i_spch)(:mylen) .ne. name(:mylen)) then
         call fort_fail('TTBB: ', 'wrong element name in Table: spch_bb')
      endif
-
+     print *, "output bbbit", bborbit 
      sx = sqrt(betx_bb(i_spch)*Ex_rms+(dx_bb(i_spch)*sigma_p)**2)
      sy = sqrt(bety_bb(i_spch)*Ey_rms+(dy_bb(i_spch)*sigma_p)**2)
   else
@@ -3262,8 +3262,8 @@ subroutine trsol(track,ktrack)
            z_ = z_ + length/bet0 - length_/bet;
 
 
-           pxbeta = xtilt*lengthreal/bet0
-           track(1,i) = x_ + lengthreal*xtilt - pxbeta*pt_
+           pxbeta = xtilt*length_/bet0
+           track(1,i) = x_ + length_*xtilt - pxbeta*pt_
            track(3,i) = y_
            track(2,i) = px_ + xtilt ! This might be wrong... 
            track(4,i) = py_

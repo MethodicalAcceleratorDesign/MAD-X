@@ -5577,8 +5577,8 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk, fmap, extend_length
   double precision :: el
-  double precision :: orbit(6), ek(6), re(6,6), ek_t1(6), ek_t2(6), re_t1(6,6), re_t2(6,6), te(6,6,6), te_t1(6,6,6)
-
+  double precision :: orbit(6), ek(6), re(6,6), ek_t1(6), ek_t2(6), re_t1(6,6) 
+  double precision :: re_t2(6,6), te(6,6,6), te_t1(6,6,6), ek2(6)
   logical :: cplxy
   double precision :: sks, sk, skl, bvk, pxbeta, beta0
   double precision :: co, si, sibk, temp, xtilt,xtilt_rad,dl
@@ -5684,21 +5684,23 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   if (ftrk) then
 
     if(xtilt_rad .ne. zero) then
-      xtilt = sin(xtilt_rad)
-      orbit(2) = orbit(2) - xtilt !Tilts the frame
-      call tmtrak(ek,re,te,orbit,orbit) !Calls the normal solenoid
-      pxbeta = xtilt*el/beta
-      ek = zero
-      ek(1) =  el*xtilt
-      ek(2) =  xtilt
-      
       te_t1 = zero
-      ek(5) = -0.5d0*pxbeta*xtilt
+      xtilt = sin(xtilt_rad)
+      orbit(2) = orbit(2) - xtilt ! Tilts the inital frame
+      call tmtrak(ek,re,te,orbit,orbit) ! Calls the normal solenoid
+      
+      !To tilt it back
+      pxbeta = xtilt*el/beta
+      ek_t2(1) =  el*xtilt
+      ek_t2(2) =  xtilt
+      ek_t2(5) = -0.5d0*pxbeta*xtilt      
       re_t1(1,6) = -pxbeta
       re_t1(5,2) = -pxbeta
-      call tmtrak(ek,re_t1,te_t1,orbit,orbit)
-      re = matmul(re, re_t1)
       
+      call tmtrak(ek_t2,re_t1,te_t1 ,orbit,orbit)
+      call tmcat(.true.,re_t1,te_t1,re,te,re,te)
+
+      !Anti-drift in case there was an extended length was required 
       if(extend_length) then
         dl = el - el*cos(xtilt_rad)
         re_t2(1,2) = -dl
@@ -5706,7 +5708,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
         re_t2(5,6) = -dl/(beta*gamma)**2
         ek_t1(5) = -dl*dtbyds
         call tmtrak(ek_t1,re_t2,te_t1,orbit,orbit)
-        re = matmul(re, re_t2)
+        call tmcat(.true.,re_t2,te_t1,re,te,re,te)
       endif
     else
       call tmtrak(ek,re,te,orbit,orbit)
