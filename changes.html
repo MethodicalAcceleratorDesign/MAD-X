@@ -13,6 +13,46 @@
 <hr class="h1">
 <!-- -------- -->
 
+
+
+<h3>MAD-X release 5.04.03 (2019.02.06)</h3>
+<h4>Backward incompatibilties with previous releases</h4>
+<ul>
+
+<li> 
+</ul>
+
+<h4>Bug Fixes</h4>
+<ul>
+<li> Fixed a problem with readtable/write tables.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/720">#720</a>. (Laurent)
+<li> MKTHIN was previously disregarding disregards E1 and E2 of RBEND.   
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/710">#710</a>. (Helmut, Tobias)
+<li> The thick quadrupole was tilted twice in TRACK when k1s was not equal to 0.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/706">#706</a>. (Laurent)
+<li> Fix selecting by class=variable and class=sequence. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/696">#696</a>. (Thomas)
+<li> A bug when cycling the lattice that created a negative drift with exactly the length of the sequence. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/683">#683</a>. (Tobias)
+</ul>
+
+
+
+<h4>Added features/checks/functionalities</h4>
+<ul>
+<li> Added conversion of the generalized RF-multipoles.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/714">#714</a>. (Tobias)
+<li> Added support for thick RBEND in TRACK.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/697">#697</a>. (Andrea)
+<li> Move command now keeps variables when the sequence is saved. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/692">#692</a>. (Tobias)
+<li> Added beam sanity checks such as checking that the energy is > 0. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/689">#689</a>. (Kyrre)
+</ul>
+
+
+
+
 <h3>MAD-X release 5.04.02 (2018.10.03)</h3>
 
 <ul>
