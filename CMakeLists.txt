@@ -40,7 +40,7 @@ include(setupOptions)
 # some of our options are incompatible with e.g. GC
 if(USE_GC)
    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-   add_subdirectory(libs/gc/gc-7.2f)
+   add_subdirectory(libs/gc/gc-8.0.2)
 endif()
 
 # 
