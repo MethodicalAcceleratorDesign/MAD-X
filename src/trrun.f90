@@ -3158,7 +3158,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
   double precision :: track(6,*)
   integer :: ktrack
 
-  integer :: i
+  integer :: i, step
   double precision :: dxt(*), dyt(*)
   double precision :: bet0
   double precision :: sk, skl, cosTh, sinTh, Q, R, Z
@@ -3170,14 +3170,14 @@ subroutine trsol(track,ktrack,dxt,dyt)
   double precision :: omega, length
   double precision :: x_, y_, z_, px_, py_, pt_
   double precision :: pxf_, pyf_
-  double precision :: bet, length_
+  double precision :: bet, length_, elrad
   double precision :: curv, const, rfac
 
   !---- Initialize.
   bet0 = get_value('probe ','beta ')
 
   !---- Get solenoid parameters
-  ! elrad   = node_value('lrad ')
+  elrad   = node_value('lrad ')
   bvk = node_value('other_bv ')
   sk  = bvk * node_value('ks ') / two
   length = node_value('l ')
@@ -3188,121 +3188,154 @@ subroutine trsol(track,ktrack,dxt,dyt)
 
      !---- Loop over particles
      do  i = 1, ktrack
-        !     Ripken formulae p.28 (3.35 and 3.36)
-        xf    = track(1,i)
-        yf    = track(3,i)
-        psigf = track(6,i) / bet0
-
-        !     We do not use a constant deltap!!!!! WE use full 6D formulae!
-        onedp   = sqrt( one + two*psigf + (bet0**2)*(psigf**2) )
-        fpsig   = onedp - one
-        fppsig  = ( one + (bet0**2)*psigf ) / onedp
-
-        ! Set up C,S, Q,R,Z
-        cosTh = cos(skl/onedp)
-        sinTh = sin(skl/onedp)
-        Q = -skl * sk / onedp
-        R = fppsig / (onedp**2) * skl * sk
-        Z = fppsig / (onedp**2) * skl
-
-        pxf  = track(2,i) + xf*Q
-        pyf  = track(4,i) + yf*Q
-        sigf = track(5,i)*bet0 - half*(xf**2 + yf**2)*R
-
-        ! For radiation calculations (initial angles)
-        dxt(i) = track(2,i);
-        dyt(i) = track(4,i);
-
-        ! final angles after solenoid
-        pxf_ =  pxf * cosTh  +  pyf * sinTh;
-        pyf_ = -pxf * sinTh  +  pyf * cosTh;
-
-        ! kick received by particle
-        dxt(i) = pxf_ - track(2,i);
-        dyt(i) = pyf_ - track(4,i);
-
-        !---- Radiation loss at entrance.
-        if (radiate .and. length .ne. 0) then
-           !---- Full damping.
-           if (damp) then
-              curv = sqrt(dxt(i)**2 + dyt(i)**2) / length
-              
-              if (quantum) then
-                 call trphot(length,curv,rfac,track(6,i))
-              else
-                 const = arad * gammas**3 / three
-                 rfac = const * curv**2 * length
+        do step = 1, 3
+           !     Ripken formulae p.28 (3.35 and 3.36)
+           xf    = track(1,i)
+           yf    = track(3,i)
+           psigf = track(6,i) / bet0
+           
+           !     We do not use a constant deltap!!!!! WE use full 6D formulae!
+           onedp   = sqrt( one + two*psigf + (bet0**2)*(psigf**2) )
+           fpsig   = onedp - one
+           fppsig  = ( one + (bet0**2)*psigf ) / onedp
+           
+           ! Set up C,S, Q,R,Z
+           cosTh = cos(skl/onedp)
+           sinTh = sin(skl/onedp)
+           Q = -skl * sk / onedp
+           R = fppsig / (onedp**2) * skl * sk
+           Z = fppsig / (onedp**2) * skl
+           
+           pxf  = track(2,i) + xf*Q
+           pyf  = track(4,i) + yf*Q
+           sigf = track(5,i)*bet0 - half*(xf**2 + yf**2)*R
+           
+           ! For radiation calculations (initial angles)
+           dxt(i) = track(2,i);
+           dyt(i) = track(4,i);
+           
+           ! final angles after solenoid
+           pxf_ =  pxf * cosTh  +  pyf * sinTh;
+           pyf_ = -pxf * sinTh  +  pyf * cosTh;
+           
+           ! kick received by particle
+           dxt(i) = pxf_ - track(2,i);
+           dyt(i) = pyf_ - track(4,i);
+           
+           !---- Radiation loss at entrance (step.eq.1) and exit (step.eq.3)
+           if ((step.eq.1).or.(step.eq.3)) then
+              if (radiate) then
+                 !---- Full damping.
+                 if (damp) then
+                    curv = sqrt(dxt(i)**2 + dyt(i)**2) / elrad;
+                    
+                    if (quantum) then
+                       call trphot(elrad,curv,rfac,track(6,i))
+                    else
+                       const = arad * gammas**3 / three
+                       rfac = const * curv**2 * elrad
+                    endif
+                    
+                    track(2,i) = track(2,i) - rfac * (one + track(6,i)) * track(2,i)
+                    track(4,i) = track(4,i) - rfac * (one + track(6,i)) * track(4,i)
+                    track(6,i) = track(6,i) - rfac * (one + track(6,i)) ** 2
+                    
+                    !---- Energy loss like for closed orbit.
+                 else
+                    
+                    !---- Store energy loss on closed orbit.
+                    rfac = const * (dxt(1)**2 + dyt(1)**2)
+                    track(2,i) = track(2,i) - rfac * (one + track(6,1)) * track(2,1)
+                    track(4,i) = track(4,i) - rfac * (one + track(6,1)) * track(4,1)
+                    track(6,i) = track(6,i) - rfac * (one + track(6,1)) ** 2
+                    
+                 endif
               endif
-              
-              track(2,i) = track(2,i) - rfac * (one + track(6,i)) * track(2,i)
-              track(4,i) = track(4,i) - rfac * (one + track(6,i)) * track(4,i)
-              track(6,i) = track(6,i) - rfac * (one + track(6,i)) ** 2
-              
-              !---- Energy loss like for closed orbit.
-           else
-              
-              !---- Store energy loss on closed orbit.
-              ! 2016-Mar-16  18:45:41  ghislain: track(i,1) is not the closed orbit but the first particle!!!
-              rfac = const * (dxt(1)**2 + dyt(1)**2)
-              
-              TRACK(2,i) = TRACK(2,i) - pxf_
-              TRACK(4,i) = TRACK(4,i) - pyf_
-              TRACK(6,i) = TRACK(6,i) - rfac * (one + track(6,1)) ** 2
-              
+           else !   step.eq.2, body of the solenoid
+              !       Ripken formulae p.29 (3.37)
+              track(1,i) =  xf  * cosTh  +  yf  * sinTh
+              track(2,i) =  pxf_
+              track(3,i) = -xf  * sinTh  +  yf  * cosTh
+              track(4,i) =  pyf_
+              track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) / bet0
+              ! track(6,i) =  psigf*bet0
            endif
-        endif
-        
-        !       Ripken formulae p.29 (3.37)
-        track(1,i) =  xf  * cosTh  +  yf  * sinTh
-        track(2,i) =  pxf_
-        track(3,i) = -xf  * sinTh  +  yf  * cosTh
-        track(4,i) =  pyf_
-        track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) / bet0
-        ! track(6,i) =  psigf*bet0
-        
-     enddo
+        enddo ! step
+     enddo ! i
+
   else
      if (sk.ne.zero) then
         skl = sk*length
 
         !---- Loop over particles
         do  i = 1, ktrack
-           ! initial phase space coordinates
-           x_  = track(1,i)
-           y_  = track(3,i)
-           px_ = track(2,i)
-           py_ = track(4,i)
-           z_  = track(5,i)
-           pt_ = track(6,i)
-
-           ! set up constants
-           onedp = sqrt(one + two*pt_/bet0 + pt_**2);
-
-           ! set up constants
-           cosTh = cos(two*skl/onedp)
-           sinTh = sin(two*skl/onedp)
-           omega = sk/onedp;
-
-           ! total path length traveled by the particle
-           bet = onedp / (one/bet0 + pt_);
-           length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
-                two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
-
-           ! For radiation calculations (initial angles)
-           dxt(i) = track(2,i);
-           dyt(i) = track(4,i);
+           do step = 1, 3
+              ! initial phase space coordinates
+              x_  = track(1,i)
+              y_  = track(3,i)
+              px_ = track(2,i)
+              py_ = track(4,i)
+              z_  = track(5,i)
+              pt_ = track(6,i)
+              
+              ! set up constants
+              onedp = sqrt(one + two*pt_/bet0 + pt_**2);
+              
+              ! set up constants
+              cosTh = cos(two*skl/onedp)
+              sinTh = sin(two*skl/onedp)
+              omega = sk/onedp;
+              
+              ! Store the kick for radiation calculations
+              pxf_ = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
+              pyf_ = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
+              dxt(i) = pxf_ - track(2,i);
+              dyt(i) = pyf_ - track(4,i);
+              
+              if ((step.eq.1).or.(step.eq.3)) then
+                 if (radiate) then
+                    !---- Full damping.
+                    if (damp) then
+                       curv = sqrt(dxt(i)**2 + dyt(i)**2) / length;
+                       
+                       if (quantum) then
+                          call trphot(length,curv,rfac,track(6,i))
+                       else
+                          const = arad * gammas**3 / three
+                          rfac = const * curv**2 * length
+                       endif
+                       
+                       track(2,i) = track(2,i) - rfac * (one + track(6,i)) * track(2,i)
+                       track(4,i) = track(4,i) - rfac * (one + track(6,i)) * track(4,i)
+                       track(6,i) = track(6,i) - rfac * (one + track(6,i)) ** 2
+                       
+                       !---- Energy loss like for closed orbit.
+                    else
+                       
+                       !---- Store energy loss on closed orbit.
+                       rfac = const * (dxt(1)**2 + dyt(1)**2)
+                       track(2,i) = track(2,i) - rfac * (one + track(6,1)) * track(2,1)
+                       track(4,i) = track(4,i) - rfac * (one + track(6,1)) * track(4,1)
+                       track(6,i) = track(6,i) - rfac * (one + track(6,1)) ** 2
+                       
+                    endif
+                 endif
+              else
+                 ! total path length traveled by the particle
+                 bet = onedp / (one/bet0 + pt_);
+                 length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
+                      two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
+                 
+                 ! Thick transport
+                 track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
+                 track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
+                 track(2,i) = pxf_;
+                 track(4,i) = pyf_;
+                 track(5,i) = z_ + length/bet0 - length_/bet;
+              endif
+           enddo ! step
            
-           track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
-           track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
-           track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
-           track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
-           track(5,i) = z_ + length/bet0 - length_/bet;
-
-           ! For radiation calculations (kick received per particle)
-           dxt(i) = track(2,i) - dxt(i);
-           dyt(i) = track(4,i) - dyt(i);
-
-        enddo
+        enddo ! i
      else
         call ttdrf(length,track,ktrack);
      endif
