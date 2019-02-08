@@ -5578,10 +5578,10 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   logical :: fsec, ftrk, fmap, extend_length
   double precision :: el
   double precision :: orbit(6), ek(6), re(6,6), ek_t1(6), ek_t2(6), re_t1(6,6) 
-  double precision :: re_t2(6,6), te(6,6,6), te_t1(6,6,6), ek2(6)
+  double precision :: re_t2(6,6), te(6,6,6), te_t1(6,6,6), ek2(6),ek_s(6), re_s(6,6), te_s(6,6,6)
   logical :: cplxy
-  double precision :: sks, sk, skl, bvk, pxbeta, beta0
-  double precision :: co, si, sibk, temp, xtilt,xtilt_rad,dl
+  double precision :: sks, sk, skl, bvk, pxbeta, beta0, startrot
+  double precision :: co, si, sibk, temp, xtilt,xtilt_rad, dl
 
   double precision, external :: node_value, get_value 
   double precision, parameter :: ten5m=1d-5
@@ -5594,10 +5594,12 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   if (.not. fmap) return
   EK = zero
   RE = EYE
+  ek_s = zero
+  re_s = EYE
   !---- Strength.
   sks = node_value('ks ')
   xtilt_rad = node_value('xtilt ')
-
+  startrot =node_value('rot_start ') 
   re_t1 = EYE
   re_t2 = EYE
   ek_t1 = zero
@@ -5624,58 +5626,58 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
   !---- First-order terms.
-  re(1,1) = co**2
-  re(2,2) = re(1,1)
-  re(3,3) = re(1,1)
-  re(4,4) = re(1,1)
+  re_s(1,1) = co**2
+  re_s(2,2) = re_s(1,1)
+  re_s(3,3) = re_s(1,1)
+  re_s(4,4) = re_s(1,1)
 
-  re(1,2) = co * sibk
-  re(3,4) = re(1,2)
-  re(1,3) = co * si
-  re(2,4) = re(1,3)
-  re(3,1) = - re(1,3)
-  re(4,2) = re(3,1)
-  re(2,1) = sk * re(3,1)
-  re(4,3) = re(2,1)
-  re(1,4) = si * sibk
-  re(3,2) = - re(1,4)
-  re(4,1) = sk * si**2
-  re(2,3) = - re(4,1)
-  re(5,6) = el/(beta*gamma)**2
+  re_s(1,2) = co * sibk
+  re_s(3,4) = re_s(1,2)
+  re_s(1,3) = co * si
+  re_s(2,4) = re_s(1,3)
+  re_s(3,1) = - re_s(1,3)
+  re_s(4,2) = re_s(3,1)
+  re_s(2,1) = sk * re_s(3,1)
+  re_s(4,3) = re_s(2,1)
+  re_s(1,4) = si * sibk
+  re_s(3,2) = - re_s(1,4)
+  re_s(4,1) = sk * si**2
+  re_s(2,3) = - re_s(4,1)
+  re_s(5,6) = el/(beta*gamma)**2
 
   ek(5) = el*dtbyds
 
   !---- Second-order terms.
   if (fsec) then
      temp = el * co * si / beta
-     te(1,4,6) = - temp
-     te(3,2,6) =   temp
-     te(1,1,6) =   temp * sk
-     te(2,2,6) =   temp * sk
-     te(3,3,6) =   temp * sk
-     te(4,4,6) =   temp * sk
-     te(2,3,6) =   temp * sk**2
-     te(4,1,6) = - temp * sk**2
+     te_s(1,4,6) = - temp
+     te_s(3,2,6) =   temp
+     te_s(1,1,6) =   temp * sk
+     te_s(2,2,6) =   temp * sk
+     te_s(3,3,6) =   temp * sk
+     te_s(4,4,6) =   temp * sk
+     te_s(2,3,6) =   temp * sk**2
+     te_s(4,1,6) = - temp * sk**2
 
      temp = el * (co**2 - si**2) / (two * beta)
-     te(1,2,6) = - temp
-     te(3,4,6) = - temp
-     te(1,3,6) = - temp * sk
-     te(2,4,6) = - temp * sk
-     te(3,1,6) =   temp * sk
-     te(4,2,6) =   temp * sk
-     te(2,1,6) =   temp * sk**2
-     te(4,3,6) =   temp * sk**2
+     te_s(1,2,6) = - temp
+     te_s(3,4,6) = - temp
+     te_s(1,3,6) = - temp * sk
+     te_s(2,4,6) = - temp * sk
+     te_s(3,1,6) =   temp * sk
+     te_s(4,2,6) =   temp * sk
+     te_s(2,1,6) =   temp * sk**2
+     te_s(4,3,6) =   temp * sk**2
 
      temp = el / (two * beta)
-     te(5,2,2) = - temp
-     te(5,4,4) = - temp
-     te(5,1,4) =   temp * sk
-     te(5,2,3) = - temp * sk
-     te(5,1,1) = - temp * sk**2
-     te(5,3,3) = - temp * sk**2
-     te(5,6,6) = - three * re(5,6) / (two * beta)
-     call tmsymm(te)
+     te_s(5,2,2) = - temp
+     te_s(5,4,4) = - temp
+     te_s(5,1,4) =   temp * sk
+     te_s(5,2,3) = - temp * sk
+     te_s(5,1,1) = - temp * sk**2
+     te_s(5,3,3) = - temp * sk**2
+     te_s(5,6,6) = - three * re_s(5,6) / (two * beta)
+     call tmsymm(te_s)
   endif
   
 
@@ -5683,24 +5685,37 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
  
   if (ftrk) then
 
-    if(xtilt_rad .ne. zero) then
+    if(xtilt_rad > 0.00001) then
       te_t1 = zero
-      xtilt = sin(xtilt_rad)
-      orbit(2) = orbit(2) - xtilt ! Tilts the inital frame
-      call tmtrak(ek,re,te,orbit,orbit) ! Calls the normal solenoid
-      
-      !To tilt it back
-      pxbeta = xtilt*el/beta
-      ek_t2(1) =  el*xtilt
-      ek_t2(2) =  xtilt
-      ek_t2(5) = -0.5d0*pxbeta*xtilt      
+      xtilt = -sin(xtilt_rad)
+
+      pxbeta = xtilt*startrot/beta
+      ek_t1(1) =  startrot*xtilt
+      ek_t1(2) =  xtilt
+      ek_t1(5) = -0.5d0*pxbeta*xtilt      
       re_t1(1,6) = -pxbeta
       re_t1(5,2) = -pxbeta
-      
-      call tmtrak(ek_t2,re_t1,te_t1 ,orbit,orbit)
+      call tmtrak(ek_t1,re_t1,te_t1,orbit,orbit)
       call tmcat(.true.,re_t1,te_t1,re,te,re,te)
 
-      !Anti-drift in case there was an extended length was required 
+
+
+      call tmtrak(ek_s,re_s,te_s,orbit,orbit) ! Calls the normal solenoid
+      call tmcat(.true.,re_s,te_s,re,te,re,te)
+      
+      !To tilt it back
+      xtilt=-xtilt
+      pxbeta = xtilt*(el+startrot)/beta
+      ek_t2(1) =  (el+startrot)*xtilt
+      ek_t2(2) =  xtilt
+      ek_t2(5) = -0.5d0*pxbeta*xtilt      
+      re_t2(1,6) = -pxbeta
+      re_t2(5,2) = -pxbeta
+      
+      call tmtrak(ek_t2,re_t2,te_t1 ,orbit,orbit)
+      call tmcat(.true.,re_t2,te_t1,re,te,re,te)
+
+    !Anti-drift in case there was an extended length was required 
       if(extend_length) then
         dl = el - el*cos(xtilt_rad)
         re_t2(1,2) = -dl
@@ -5711,6 +5726,10 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
         call tmcat(.true.,re_t2,te_t1,re,te,re,te)
       endif
     else
+      ek=ek_s
+      re=re_s
+      te=te_s
+
       call tmtrak(ek,re,te,orbit,orbit)
     endif
 
