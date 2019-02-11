@@ -5600,13 +5600,11 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   sks = node_value('ks ')
   xtilt_rad = node_value('xtilt ')
   startrot =node_value('rot_start ') 
+  
   re_t1 = EYE
   re_t2 = EYE
   ek_t1 = zero
   ek_t2 = zero
-  if(xtilt_rad .ne. zero .and. extend_length) then
-    el = el/cos(xtilt_rad)
-  endif
 
   if (sks .ne. zero) cplxy = .true.
 
@@ -5715,16 +5713,6 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
       call tmtrak(ek_t2,re_t2,te_t1 ,orbit,orbit)
       call tmcat(.true.,re_t2,te_t1,re,te,re,te)
 
-    !Anti-drift in case there was an extended length was required 
-      if(extend_length) then
-        dl = el - el*cos(xtilt_rad)
-        re_t2(1,2) = -dl
-        re_t2(3,4) = -dl
-        re_t2(5,6) = -dl/(beta*gamma)**2
-        ek_t1(5) = -dl*dtbyds
-        call tmtrak(ek_t1,re_t2,te_t1,orbit,orbit)
-        call tmcat(.true.,re_t2,te_t1,re,te,re,te)
-      endif
     else
       ek=ek_s
       re=re_s
