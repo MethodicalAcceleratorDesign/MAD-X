@@ -5696,12 +5696,12 @@ SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
  !---- Get translation parameters
  x    = node_value('x ')
  y    = node_value('y ')
- z    = node_value('t ')
+ z    = node_value('z ')
  
  call tmdrf(fsec,ftrk,orbit,fmap,z,ek,re,te)
  
- ek(1) = ek(1) - x
- ek(3) = ek(3) - y
+ ek(1) = ek(1) + x
+ ek(3) = ek(3) + y
   !---- Track orbit.
  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
