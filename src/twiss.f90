@@ -5683,7 +5683,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
  
   if (ftrk) then
 
-    if(xtilt_rad > 0.00001) then
+    if(abs(xtilt_rad) > ten5m) then
       te_t1 = zero
       xtilt = -sin(xtilt_rad)
 
