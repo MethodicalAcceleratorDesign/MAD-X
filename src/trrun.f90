@@ -3270,30 +3270,24 @@ subroutine tttrans(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: t_x, t_px, t_y, t_py, t_sig, t_psig
+  double precision :: t_x, t_y, t_z
   double precision :: node_value
 
   !---- Get translation parameters
   t_x    = node_value('x ')
-  t_px   = node_value('px ')
   t_y    = node_value('y ')
-  t_py   = node_value('py ')
-  t_sig  = node_value('t ')
-  t_psig = node_value('pt ')
+  t_z    = node_value('z ')
 
   !---- Loop over particles
 !$OMP PARALLEL PRIVATE(i)
 !$OMP DO
+  call ttdrf(t_z,track,ktrack)
   do  i = 1, ktrack
      ! Add vector to particle coordinates
      track(1,i) = track(1,i) + t_x
-     track(2,i) = track(2,i) + t_px
      track(3,i) = track(3,i) + t_y
-     track(4,i) = track(4,i) + t_py
-     track(5,i) = track(5,i) + t_sig
-     track(6,i) = track(6,i) + t_psig
-     !
   enddo
+
 !$OMP END DO
 !$OMP END PARALLEL
 end subroutine tttrans
