@@ -5605,6 +5605,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   re_t2 = EYE
   ek_t1 = zero
   ek_t2 = zero
+  te_t1 = zero
 
   if (sks .ne. zero) cplxy = .true.
 
@@ -5643,7 +5644,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   re_s(2,3) = - re_s(4,1)
   re_s(5,6) = el/(beta*gamma)**2
 
-  ek(5) = el*dtbyds
+  ek_s(5) = el*dtbyds
 
   !---- Second-order terms.
   if (fsec) then
