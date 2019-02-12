@@ -5605,7 +5605,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   re_t2 = EYE
   ek_t1 = zero
   ek_t2 = zero
-  te_t1 = zero
+  te_ts = zero
 
   if (sks .ne. zero) cplxy = .true.
 
