@@ -3281,11 +3281,11 @@ subroutine tttrans(track,ktrack)
   !---- Loop over particles
 !$OMP PARALLEL PRIVATE(i)
 !$OMP DO
-  call ttdrf(t_z,track,ktrack)
+  call ttdrf(-t_z,track,ktrack)
   do  i = 1, ktrack
      ! Add vector to particle coordinates
-     track(1,i) = track(1,i) + t_x
-     track(3,i) = track(3,i) + t_y
+     track(1,i) = track(1,i) - t_x
+     track(3,i) = track(3,i) - t_y
   enddo
 
 !$OMP END DO
