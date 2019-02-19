@@ -1,0 +1,115 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2019.02.19 10:45:39      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+lenseq:=10;
+
+option, update_parent;
+
+select, flag = twiss, clear;
+
+select, flag=twiss, column=name,apertype,aper_1, angle;
+
+
+
+mb: sbend,l:=lenseq,  angle =0.001;
+
+
+
+TestOrder : sequence, l=lenseq;
+
+mb2: mb, at=lenseq/2;
+
+endsequence;
+
+
+
+beam;
+
+mb, apertype=ellipse, aperture:={ 1,2 };
+
+
+
+use,sequence=TestOrder;
+
+
+
+twiss,betx=1.,bety=1.,file="updateparent.twiss"; 
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                10                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2341372465                  0        100.9999657     0.005000000236 
+
+             dxrms             xcomax             xcorms                 q2 
+    0.004082483097                  0                  0       0.2341372413 
+
+               dq2            betymax              dymax              dyrms 
+                 0                101                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+option, -update_parent;
+
+mb, apertype=ellipse, aperture:={ 1,4 };
+
+twiss,betx=1.,bety=1.,file="not_updateparent.twiss";
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                10                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2341372465                  0        100.9999657     0.005000000236 
+
+             dxrms             xcomax             xcorms                 q2 
+    0.004082483097                  0                  0       0.2341372413 
+
+               dq2            betymax              dymax              dyrms 
+                 0                101                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+
+
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

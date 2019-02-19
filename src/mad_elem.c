@@ -813,7 +813,7 @@ update_element_children(struct element* el, struct command* update)
 
   for(int i=0; i<element_list->max;i++){
     if(element_list->elem[i]==NULL) break;
-    
+
     if(strcmp(el->name,element_list->elem[i]->parent->name)==0)
       update_element(element_list->elem[i], update);
   }
