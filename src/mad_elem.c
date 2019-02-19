@@ -770,6 +770,7 @@ void
 update_element(struct element* el, struct command* update)
   /* updates the parameters of el from those read into update */
 {
+
   struct command_parameter_list* e_pl = el->def->par;
   struct command_parameter_list* pl = update->par;
   struct command_parameter *e_par, *par;
@@ -805,6 +806,18 @@ update_element(struct element* el, struct command* update)
   }
 }
 
+void
+update_element_children(struct element* el, struct command* update)
+  /* updates the parameters of the children to el. Note that it is only updating one layer (not recursive) */
+{
+
+  for(int i=0; i<element_list->max;i++){
+    if(element_list->elem[i]==NULL) break;
+    
+    if(strcmp(el->name,element_list->elem[i]->parent->name)==0)
+      update_element(element_list->elem[i], update);
+  }
+}
 void
 add_to_el_list( /* adds element to alphabetic element list */
   struct element** el, int inf, struct el_list* ell, int flag)
