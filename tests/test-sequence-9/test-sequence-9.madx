@@ -1,5 +1,5 @@
 lenseq:=10;
-option, update_parent;
+option, update_from_parent;
 select, flag = twiss, clear;
 select, flag=twiss, column=name,apertype,aper_1, angle;
 
@@ -15,7 +15,7 @@ mb, apertype=ellipse, aperture:={ 1,2 };
 use,sequence=TestOrder;
 
 twiss,betx=1.,bety=1.,file="updateparent.twiss"; 
-option, -update_parent;
+option, -update_from_parent;
 mb, apertype=ellipse, aperture:={ 1,4 };
 twiss,betx=1.,bety=1.,file="not_updateparent.twiss";
 

@@ -79,9 +79,11 @@ QF, K1 = 0.03;                       \>! Replace value of K1 for QF\\
 When the type of the element remains the same, replacement of an
 attribute is the more efficient way.  
 
-Element definitions can be edited freely. The changes do not affect
+Element definitions can be edited freely. The changes only affect
 already defined objects which belong to its
-\hyperref[sec:element-classes]{element class} (see below).  
+\hyperref[sec:element-classes]{element class} in case the: \madxmp{option, update_from_parent} is used. 
+In case this option is used all elements which belong to that class will be updated. 
+An example is given in \hyperref[sec:element-classes]{element class}.   
 
 
 %\input{Introduction/elm_class}
@@ -125,7 +127,8 @@ economic input structure.
 
 The full power of the class concept is revealed when object classes are
 used to select instances of elements for various purposes. Example:  
-\madxmp{
+
+
 SELECT, FLAG=twiss, CLASS = QUADRUPOLE; \=! Select all quadrupoles for the\\
                                         \>! Twiss TFS file
 }
@@ -136,6 +139,18 @@ which can be used to define new objects, which will become members of
 this class. A new object inherits all attributes from its class; but its
 definition may override some of those values by new ones. All class and
 object names can be used in range selections, providing a powerful
-mechanism to specify positions for matching constraints and printing.  
+mechanism to specify positions for matching constraints and printing.
 
+The default option is that if you change the parent of an element you will
+not change the children of that class. Let's see in the following example how 
+it works:
+\madxmp{ mb: sbend,l:=lenseq,  angle =0.001; \\
+ mb2: mb;
+ }
+ This will create an element \texttt{mb} that then is used as the parent for \texttt{mb2}. If we now do want to give mb
+ an aperture we can do the following:
+ \madxmp{ apertype=ellipse, aperture:={ 1,4 }; }
+
+ This, however, does not modify \texttt{mb2}. In case we want \texttt{mb2} to also inherent the change from mb we need to use the
+ flag \madxmp{option, update_from_parent}. This should be used with care and is only changing the direct parent.
 %% EOF

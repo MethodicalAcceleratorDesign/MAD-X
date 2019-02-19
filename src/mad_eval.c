@@ -435,7 +435,7 @@ process(void)  /* steering routine: processes one command */
           strcpy(this_cmd->clone->name, name);
           scan_in_cmd(this_cmd);
           update_element(el, this_cmd->clone);
-          if(get_option("update_parent ")==1)
+          if(get_option("update_from_parent ")==1)
             update_element_children(el, this_cmd->clone);
         }
       }
