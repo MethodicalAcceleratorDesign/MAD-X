@@ -1781,13 +1781,10 @@ The element \texttt{TRANSLATION} changes the
 by applying a translation of the reference system.
 
 \madbox{
-label: TRANSLATION, \= X=real,  \= Y=real,  \= T=real, \\
-                    \> PX=real, \> PY=real, \> PT=real;
+label: TRANSLATION, \= X=real,  \= Y=real,  \= S=real;
 }
 
-\texttt{TRANSLATION} has no effect on the beam, but it causes the beam to be
-referred to the new coordinate system translated by the vector given.
-
+\texttt{TRANSLATION} moves the coordinate system. \ttitem{X} and \ttitem{Y} will translate the position and \ttitem{S} will introduce a virtual drift. 
 
 \section{Change of reference system}
 \label{sec:changeref}
