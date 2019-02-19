@@ -59,7 +59,7 @@ void    element_name(char* name, int* l);
 double  element_value(const struct node*, const char* par);
 int     element_vector(const struct element*, const char* par, double* vector);
 
-int     belongs_to_class(struct element*, char*);
+int     belongs_to_class(struct element*, const char*);
 void    get_node_vector(const char* par, int* length, double* vector);
 int     el_par_vector(int* total, double* vect);
 double  el_par_value(const char* par, const struct element*);

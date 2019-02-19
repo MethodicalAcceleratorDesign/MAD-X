@@ -248,7 +248,9 @@ make_element(const char* name, const char* parent, struct command* def, int flag
 {
 /*  double length; */
   struct element* el = new_element(name);
+  double xtilt = 0;
   el->def = def;
+
   if (strcmp(name, parent) == 0)  /* basic element type like drift etc. */
   {
     add_to_el_list(&el, def->mad8_type, base_type_list, 1);
@@ -260,6 +262,15 @@ make_element(const char* name, const char* parent, struct command* def, int flag
       fatal_error("unknown class type:", parent);
     el->base_type = el->parent->base_type;
     el->length = el_par_value("l", el);
+
+    print_command(el->def);
+    if(belongs_to_class(el,"solenoid")==1){
+      if(log_val("extend_length", el->def) == 1){
+        xtilt = command_par_value("xtilt", el->def);
+        el->length = el->length/cos(xtilt);
+            printf("aaaaa %f",el->length );
+      } 
+    }
   }
   add_to_el_list(&el, def->mad8_type, element_list, flag);
   return el;
@@ -443,7 +454,7 @@ export_el_def_8(struct element* el, char* string)
 }
 
 int
-belongs_to_class(struct element* el, char* class)
+belongs_to_class(struct element* el, const char* class)
   /* returns 1 if an element belongs to a class, else 0 */
 {
   int in = 0;
@@ -770,6 +781,7 @@ void
 update_element(struct element* el, struct command* update)
   /* updates the parameters of el from those read into update */
 {
+  
   struct command_parameter_list* e_pl = el->def->par;
   struct command_parameter_list* pl = update->par;
   struct command_parameter *e_par, *par;
@@ -781,6 +793,7 @@ update_element(struct element* el, struct command* update)
       el->def->par_names->inform[pos]=update->par_names->inform[pos]; /*hbu activate this parameter in the element */
       e_par = e_pl->parameters[pos];
       par = pl->parameters[pos];
+      printf("thissss is the type,... %d", par->type);
       switch (par->type)
       {
         case 0:
