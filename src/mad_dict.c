@@ -287,6 +287,7 @@ const char *const_command_def =
 "no_fatal_stop= [l, false, true], "
 "twiss_print  = [l, true, true], "
 "warn     = [l, true, true], "
+"update_from_parent = [l, false, true], "
   /* BB and SPCH related options */
 "bborbit          = [l, false, true], " /* frs */
 "bb_ultra_relati  = [l, false, true], " /* frs */
