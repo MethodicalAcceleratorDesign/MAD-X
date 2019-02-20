@@ -259,6 +259,8 @@ make_element(const char* name, const char* parent, struct command* def, int flag
     if((el->parent = find_element(parent, element_list)) == NULL)
       fatal_error("unknown class type:", parent);
     el->base_type = el->parent->base_type;
+    if(command_par_value("l",def) !=0 && belongs_to_class(el,"multipole"))
+      warning("Multipole defined with non-zero length:", el->name);
     el->length = el_par_value("l", el);
   }
   add_to_el_list(&el, def->mad8_type, element_list, flag);
@@ -443,7 +445,7 @@ export_el_def_8(struct element* el, char* string)
 }
 
 int
-belongs_to_class(struct element* el, char* class)
+belongs_to_class(struct element* el, const char* class)
   /* returns 1 if an element belongs to a class, else 0 */
 {
   int in = 0;
