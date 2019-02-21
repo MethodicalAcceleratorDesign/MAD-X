@@ -248,9 +248,7 @@ make_element(const char* name, const char* parent, struct command* def, int flag
 {
 /*  double length; */
   struct element* el = new_element(name);
-  double xtilt = 0;
   el->def = def;
-
   if (strcmp(name, parent) == 0)  /* basic element type like drift etc. */
   {
     add_to_el_list(&el, def->mad8_type, base_type_list, 1);
@@ -261,16 +259,9 @@ make_element(const char* name, const char* parent, struct command* def, int flag
     if((el->parent = find_element(parent, element_list)) == NULL)
       fatal_error("unknown class type:", parent);
     el->base_type = el->parent->base_type;
+    if(command_par_value("l",def) !=0 && belongs_to_class(el,"multipole"))
+      warning("Multipole defined with non-zero length:", el->name);
     el->length = el_par_value("l", el);
-
-    print_command(el->def);
-    if(belongs_to_class(el,"solenoid")==1){
-      if(log_val("extend_length", el->def) == 1){
-        xtilt = command_par_value("xtilt", el->def);
-        el->length = el->length/cos(xtilt);
-            printf("aaaaa %f",el->length );
-      } 
-    }
   }
   add_to_el_list(&el, def->mad8_type, element_list, flag);
   return el;
@@ -781,7 +772,7 @@ void
 update_element(struct element* el, struct command* update)
   /* updates the parameters of el from those read into update */
 {
-  
+
   struct command_parameter_list* e_pl = el->def->par;
   struct command_parameter_list* pl = update->par;
   struct command_parameter *e_par, *par;
@@ -793,7 +784,6 @@ update_element(struct element* el, struct command* update)
       el->def->par_names->inform[pos]=update->par_names->inform[pos]; /*hbu activate this parameter in the element */
       e_par = e_pl->parameters[pos];
       par = pl->parameters[pos];
-      printf("thissss is the type,... %d", par->type);
       switch (par->type)
       {
         case 0:
@@ -818,6 +808,18 @@ update_element(struct element* el, struct command* update)
   }
 }
 
+void
+update_element_children(struct element* el, struct command* update)
+  /* updates the parameters of the children to el. Note that it is only updating one layer (not recursive) */
+{
+
+  for(int i=0; i<element_list->max;i++){
+    if(element_list->elem[i]==NULL) break;
+
+    if(strcmp(el->name,element_list->elem[i]->parent->name)==0)
+      update_element(element_list->elem[i], update);
+  }
+}
 void
 add_to_el_list( /* adds element to alphabetic element list */
   struct element** el, int inf, struct el_list* ell, int flag)

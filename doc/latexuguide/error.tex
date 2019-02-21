@@ -500,6 +500,27 @@ ESAVE, FILE = err.file;
 \textbf{Please note: in case of field errors, the absolute errors are
   saved and not relative errors. } 
 
+\section{ETABLE: Saving the}
+\label{sec:esave}
+
+\madbox{
+ESAVE, TABLE=string;
+}
+
+This command saves a table of errors assigned to elements on a table,
+using a format which can be read in again to obtain the same
+results. This allows storing the errors and reloading them after a new
+USE command. 
+
+Example: 
+\madxmp{
+SELECT, FLAG=myerrortable, RANGE=range, CLASS=name, PATTERN=string;
+ETABLE, TABLE=myerrortable;
+}
+and elements selected by the  \hyperref[sec:select]{\texttt{SELECT}}
+command are stored to the table.  
+
+
 \section{SETERR: Reading errors from a table or file}
 \label{sec:seterr}
 

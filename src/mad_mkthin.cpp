@@ -697,6 +697,19 @@ static expression* my_get_param_expression(const element* el,const char* parnam)
   return cmdpar_copy->expr;
 }
 
+static expression* my_get_param_expression(const command_parameter* cp) // get a new copy of the expression for a parameter, use the value as new expression if the expression was NULL
+{
+  expression* ep=nullptr;
+  if(cp->expr==nullptr) // no expression yet
+  { // use the value as new expression if the expression was NULL
+    std::ostringstream ostr;
+    ostr << std::setprecision(15) << cp->double_value; // use the value as string
+    ep = new_expression(ostr.str().c_str(),deco); // where deco is a global.  // cp_copy->expr->value = cp->double_value; // seems to have no effect and this not needed
+    //if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " create new expression from string " << ostr.str() << " now " << my_dump_expression(ep) << '\n';
+  }
+  return ep;
+}
+
 static bool thick_fl(const element* el) // true if the element has a thick parameter and if the value is positive, 0 otherwise
 {
   const int thick_pos = name_list_pos("thick", el->def->par_names);
@@ -936,7 +949,7 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const char*
     if(to_param) // modify the existing parameter in to_el
     {
       if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " original to_param " << my_dump_command_parameter(to_param) << '\n';
-      to_param->expr = compound_expr(to_param->expr,0,"+",half_angle_expr,0);
+      to_param->expr = compound_expr( my_get_param_expression(to_param) ,0,"+",half_angle_expr,0);
       if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << "    now  to_param " << my_dump_command_parameter(to_param) << '\n';
     }
     else // param not yet in to_el, start from parameter definition

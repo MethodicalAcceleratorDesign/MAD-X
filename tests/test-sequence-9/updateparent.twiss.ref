@@ -1,0 +1,51 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %09s "TESTORDER"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le     0.0005109989461
+@ CHARGE           %le                   1
+@ ENERGY           %le                   1
+@ PC               %le        0.9999998694
+@ GAMMA            %le         1956.951198
+@ KBUNCH           %le                   1
+@ BCURRENT         %le                   0
+@ SIGE             %le               0.001
+@ SIGT             %le                   1
+@ NPART            %le                   0
+@ EX               %le                   1
+@ EY               %le                   1
+@ ET               %le               0.001
+@ BV_FLAG          %le                   1
+@ LENGTH           %le                  10
+@ ALFA             %le                   0
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le                   0
+@ Q1               %le        0.2341372465
+@ Q2               %le        0.2341372413
+@ DQ1              %le                   0
+@ DQ2              %le                   0
+@ DXMAX            %le      0.005000000236
+@ DYMAX            %le                   0
+@ XCOMAX           %le                   0
+@ YCOMAX           %le                   0
+@ BETXMAX          %le         100.9999657
+@ BETYMAX          %le                 101
+@ XCORMS           %le                   0
+@ YCORMS           %le                   0
+@ DXRMS            %le      0.004082483097
+@ DYRMS            %le                   0
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.04.02 Linux 64"
+@ DATE             %08s "19/02/19"
+@ TIME             %08s "10.27.59"
+* NAME               APERTYPE                       APER_1             APER_2              ANGLE 
+$ %s                 %s                                %le                %le                %le 
+ "TESTORDER$START"   "CIRCLE"                             0                  0                  0
+ "MB2"               "ELLIPSE"                            1                  2              0.001
+ "TESTORDER$END"     "CIRCLE"                             0                  0                  0

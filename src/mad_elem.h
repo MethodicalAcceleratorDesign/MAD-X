@@ -40,6 +40,8 @@ struct element* make_element(const char* name, const char* parent, struct comman
 struct element* clone_element(struct element*);
 struct element* delete_element(struct element*);
 void            update_element(struct element*, struct command* update);
+void            update_element_children(struct element*, struct command* update);
+
 void            dump_element(struct element*);
 void            export_el_def(struct element*, char* string, int noexpr);
 void            export_el_def_8(struct element*, char* string);

@@ -1172,12 +1172,18 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   reval = zero
   aival = zero
 
-  call laseig(r_eig, reval, aival, em)
 
-  cosmu1_eig = ( reval(1)+ aival(1) + reval(2) + aival(2) )/ 2
-  cosmu2_eig = ( reval(3)+ aival(3) + reval(4) + aival(4) )/ 2
-  if (get_option('info  ') .ne. 0) then
-     if (.not. ((abs(cosmux - cosmu1_eig) .lt. diff_cos .and. abs(cosmuy - cosmu2_eig) .lt. diff_cos) .or.  &
+  if (get_option('debug ') .ne. 0) then
+    call laseig(r_eig, reval, aival, em)
+    cosmu1_eig = ( reval(1)+ aival(1) + reval(2) + aival(2) )/ 2
+    cosmu2_eig = ( reval(3)+ aival(3) + reval(4) + aival(4) )/ 2
+
+    write (warnstr,'(a,e13.6,a,e13.6)') "cosmux =  ", cosmux, ", cosmuy =", cosmuy
+    call fort_warn('TWCPIN: ', warnstr)
+    write (warnstr,'(a,e13.6,a,e13.6)')  "cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
+    call fort_warn('TWCPIN: ', warnstr)
+
+    if (.not. ((abs(cosmux - cosmu1_eig) .lt. diff_cos .and. abs(cosmuy - cosmu2_eig) .lt. diff_cos) .or.  &
           (abs(cosmuy - cosmu1_eig) .lt. diff_cos .and. abs(cosmux - cosmu2_eig) .lt. diff_cos))) then
         write (warnstr,'(a)') "Difference in the calculation of cosmux/cosmuy based of R_EIG eigen values!  "
         call fort_warn('TWCPIN: ', warnstr)
@@ -1185,11 +1191,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
         call fort_warn('TWCPIN: ', warnstr)
         write (warnstr,'(a,e13.6, a, e13.6)') "cosmuy-cosmu1_eig =", cosmuy-cosmu1_eig, "cosmuy-cosmu2_eig =", cosmuy-cosmu2_eig
         call fort_warn('TWCPIN: ', warnstr)
-        write (warnstr,'(a,e13.6,a,e13.6)') "cosmux =  ", cosmux, ", cosmuy =", cosmuy
-        call fort_warn('TWCPIN: ', warnstr)
-        write (warnstr,'(a,e13.6,a,e13.6)')  "cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
-        call fort_warn('TWCPIN: ', warnstr)
-     endif
+    endif
   endif
 
   ! call twcpin_print(rt,r0mat)
@@ -3433,7 +3435,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmdpdg(ftrk,orbit,fmap,ek,re,te)
 
      case (code_translation)
-        call tmtrans(ftrk,orbit)
+        call tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
 
       case(code_changeref)
         call fort_warn('TWISS: ','Changeref is nto implemented for MAD-X twiss.')
@@ -5724,7 +5726,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 end SUBROUTINE tmsol0
 
-SUBROUTINE tmtrans(ftrk,orbit)
+SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   use twissbeamfi, only : beta
   implicit none
@@ -5742,31 +5744,24 @@ SUBROUTINE tmtrans(ftrk,orbit)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: ftrk, fmap
+  logical :: ftrk, fmap,fsec
   double precision :: orbit(6);
 
-  double precision :: x, px, y, py, t, pt
-  double precision :: node_value
+  double precision :: x, y, z 
+  double precision :: node_value, ek(6), re(6,6), te(6,6,6)
 
 
  !---- Get translation parameters
  x    = node_value('x ')
- px   = node_value('px ')
  y    = node_value('y ')
- py   = node_value('py ')
- t    = node_value('t ')
- pt   = node_value('pt ')
-
- !re(1,1) =  t_x
- orbit(1) = orbit(1) + x
- orbit(2) = orbit(2) + px
- orbit(3) = orbit(3) + y
- orbit(4) = orbit(4) + py
- orbit(5) = orbit(5) + t
- orbit(6) = orbit(6) + pt
-
+ z    = node_value('z ')
+ 
+ call tmdrf(fsec,ftrk,orbit,fmap,-z,ek,re,te)
+ 
+ ek(1) = ek(1) - x
+ ek(3) = ek(3) - y
   !---- Track orbit.
-  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+ if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmtrans
 
@@ -5855,7 +5850,7 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   ta = tan(angle)
 
   ek(4) = sa
-  
+
   !---- Transfer matrix.
   re(3,3) = 1/ca
   re(4,4) =   ca

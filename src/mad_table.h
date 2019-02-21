@@ -63,7 +63,7 @@ struct table*           new_table(const char* name, const char* type, int rows, 
 struct table_list*      new_table_list(int size);
 struct table_list_list* new_table_list_list(int size);
 struct table*           delete_table(struct table*);
-struct table*           read_table(struct in_cmd*);
+void                    read_table(struct in_cmd*);
 struct table*           find_table(const char* name);
 
 void    check_table(char* string);
