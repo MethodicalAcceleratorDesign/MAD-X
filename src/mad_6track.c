@@ -2422,6 +2422,8 @@ pro_elem(struct node* cnode)
   // check whether the element is long and has an aperture, and therefore
   // whether we should insert an aperture marker before the current element
   if (strcmp(keyword,"00") != 0 && current_element->value[0] > 0.) {
+
+
     tmp_element = current_element;
     tag_element = create_aperture(tag_aperture.name, keyword,
             tag_aperture.value[1], tag_aperture.value[2],
@@ -2451,22 +2453,31 @@ pro_elem(struct node* cnode)
 
 
   /* add aperture element if necessary */
-  if (strcmp(keyword,"00") != 0) {
-    tag_element = create_aperture(tag_aperture.name, keyword,
-          tag_aperture.value[1], tag_aperture.value[2],
-          tag_aperture.value[3], tag_aperture.value[4],
-          tag_aperture.value[5], tag_aperture.value[6],
-          tag_aperture.value[7],
-          cnode->p_al_err);
-    tag_element->previous = current_element;
-    tag_element->next = current_element->next;
-    current_element->next = tag_element;
+  if (strcmp(keyword,"00") != 0) 
+    {
+    if(tag_aperture.value[1] > 0 || tag_aperture.value[2] > 0 || tag_aperture.value[3] > 0)
+    {
+      tag_element = create_aperture(tag_aperture.name, keyword,
+      tag_aperture.value[1], tag_aperture.value[2],
+      tag_aperture.value[3], tag_aperture.value[4],
+      tag_aperture.value[5], tag_aperture.value[6],
+      tag_aperture.value[7],
+      cnode->p_al_err);
+      tag_element->previous = current_element;
+      tag_element->next = current_element->next;
+      current_element->next = tag_element;
 
-    prev_element = current_element;
-    current_element = tag_element;
-    // 2015-Oct-13  15:45:58  ghislain: add half the prev_element length to account for thick elements
-    current_element->position = cnode->position + prev_element->value[0] / 2.;
-    add_to_ellist(current_element);
+      prev_element = current_element;
+      current_element = tag_element;
+      // 2015-Oct-13  15:45:58  ghislain: add half the prev_element length to account for thick elements
+      current_element->position = cnode->position + prev_element->value[0] / 2.;
+      add_to_ellist(current_element);
+    }
+    else
+    {
+      warning("An aperture type has been defined without any settings. It will NOT be converted:",
+      tag_aperture.name);
+    }
   }
 }
 
