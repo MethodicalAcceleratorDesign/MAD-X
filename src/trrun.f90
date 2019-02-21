@@ -471,10 +471,11 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
            if ( code.ne.code_drift .and. &
                 code.ne.code_quadrupole .and. &
+                code.ne.code_rbend .and. &
                 code.ne.code_sbend .and. &
                 code.ne.code_matrix .and. &
                 code.ne.code_solenoid .and. &
-                el.ne.zero ) then ! rbend missing ?
+                el.ne.zero ) then
               !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
               print *," "
               print *,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
@@ -760,7 +761,6 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
      st = sin(theta)
      ct = cos(theta)
      do jtrk = 1,ktrack
-
         tmp = track(1,jtrk)
         track(1,jtrk) = ct * tmp + st * track(3,jtrk)
         track(3,jtrk) = ct * track(3,jtrk) - st * tmp
@@ -768,7 +768,6 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
         track(2,jtrk) = ct * tmp + st * track(4,jtrk)
         track(4,jtrk) = ct * track(4,jtrk) - st * tmp
      enddo
-
   endif
 
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
@@ -1065,16 +1064,14 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      if (damp) then
         do jtrk = 1,ktrack
            curv = sqrt((dipr + dxt(jtrk))**2 + (dipi + dyt(jtrk))**2) / elrad
-
-           if (quantum) then
-              call trphot(elrad,curv,rfac,deltas)
-           else
-              rfac = const * curv**2 * elrad
-           endif
-
            px = track(2,jtrk)
            py = track(4,jtrk)
            pt = track(6,jtrk)
+           if (quantum) then
+              call trphot(elrad,curv,rfac,pt)
+           else
+              rfac = const * curv**2 * elrad
+           endif
            track(2,jtrk) = px - rfac * (one + pt) * px
            track(4,jtrk) = py - rfac * (one + pt) * py
            track(6,jtrk) = pt - rfac * (one + pt) ** 2
@@ -1117,16 +1114,14 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      if (damp) then
         do jtrk = 1,ktrack
            curv = sqrt((dipr + dxt(jtrk))**2 + (dipi + dyt(jtrk))**2) / elrad
-
-           if (quantum) then
-              call trphot(elrad,curv,rfac,deltas)
-           else
-              rfac = const * curv**2 * elrad
-           endif
-
            px = track(2,jtrk)
            py = track(4,jtrk)
            pt = track(6,jtrk)
+           if (quantum) then
+              call trphot(elrad,curv,rfac,pt)
+           else
+              rfac = const * curv**2 * elrad
+           endif
            track(2,jtrk) = px - rfac * (one + pt) * px
            track(4,jtrk) = py - rfac * (one + pt) * py
            track(6,jtrk) = pt - rfac * (one + pt) ** 2
@@ -1788,10 +1783,10 @@ subroutine ttcorr(el,track,ktrack,turn)
 
      if (damp) then !---- Full damping.
         do i = 1, ktrack
-           if (quantum) call trphot(el,curv,rfac,deltas)
            px = track(2,i)
            py = track(4,i)
            pt = track(6,i)
+           if (quantum) call trphot(el,curv,rfac,pt)
            track(2,i) = px - rfac * (one + pt) * px
            track(4,i) = py - rfac * (one + pt) * py
            track(6,i) = pt - rfac * (one + pt) ** 2
@@ -1872,10 +1867,10 @@ subroutine ttcorr(el,track,ktrack,turn)
   if (radiate  .and.  el .ne. 0) then
      if (damp) then !---- Full damping.
         do i = 1, ktrack
-           if (quantum) call trphot(el,curv,rfac,deltas)
            px = track(2,i)
            py = track(4,i)
            pt = track(6,i)
+           if (quantum) call trphot(el,curv,rfac,pt)
            track(2,i) = px - rfac * (one + pt) * px
            track(4,i) = py - rfac * (one + pt) * py
            track(6,i) = pt - rfac * (one + pt) ** 2
@@ -1884,7 +1879,6 @@ subroutine ttcorr(el,track,ktrack,turn)
         rpx = rfac * (one + track(6,1)) * track(2,1)
         rpy = rfac * (one + track(6,1)) * track(4,1)
         rpt = rfac * (one + track(6,1)) ** 2
-
         do i = 1, ktrack
            track(2,i) = track(2,i) - rpx
            track(4,i) = track(4,i) - rpy
@@ -2014,7 +2008,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
      if (spch_bb_name(i_spch)(:mylen) .ne. name(:mylen)) then
         call fort_fail('TTBB: ', 'wrong element name in Table: spch_bb')
      endif
-     print *, "output bbbit", bborbit 
+
      sx = sqrt(betx_bb(i_spch)*Ex_rms+(dx_bb(i_spch)*sigma_p)**2)
      sy = sqrt(bety_bb(i_spch)*Ey_rms+(dy_bb(i_spch)*sigma_p)**2)
   else
@@ -3168,12 +3162,12 @@ subroutine trsol(track,ktrack)
   double precision :: bet0
   double precision :: sk, skl, cosTh, sinTh, Q, R, Z
   double precision :: xf, yf, pxf, pyf, sigf, psigf, bvk
-  double precision :: onedp, fpsig, fppsig, xtilt
+  double precision :: onedp, fpsig, fppsig
 
   double precision :: get_value, node_value
 
-  double precision :: omega, length, lengthreal
-  double precision :: x_, y_, z_, px_, py_, pt_, pxbeta
+  double precision :: omega, length
+  double precision :: x_, y_, z_, px_, py_, pt_
   double precision :: bet, length_
 
   !---- Initialize.
@@ -3184,7 +3178,7 @@ subroutine trsol(track,ktrack)
   bvk = node_value('other_bv ')
   sk  = bvk * node_value('ks ') / two
   length = node_value('l ')
-  lengthreal = node_value('l ')
+
   if (length.eq.zero) then
 
      skl = bvk * node_value('ksi ') / two
@@ -3222,28 +3216,20 @@ subroutine trsol(track,ktrack)
      enddo
   else
      if (sk.ne.zero) then
-        xtilt = node_value('xtilt ')
-        xtilt = sin(xtilt)
- 
-
-
         skl = sk*length
 
         !---- Loop over particles
         do  i = 1, ktrack
            ! initial phase space coordinates
-           onedp = sqrt(one + two*track(6,i)/bet0 + track(6,i)**2);
            x_  = track(1,i)
-           y_  = track(3,i) 
-           px_ = track(2,i) - xtilt
+           y_  = track(3,i)
+           px_ = track(2,i)
            py_ = track(4,i)
            z_  = track(5,i)
            pt_ = track(6,i)
 
-
            ! set up constants
            onedp = sqrt(one + two*pt_/bet0 + pt_**2);
-
 
            ! set up constants
            cosTh = cos(two*skl/onedp)
@@ -3255,20 +3241,12 @@ subroutine trsol(track,ktrack)
            length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
                 two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
 
-           x_ = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
-           y_ = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
-           px_ = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
-           py_   = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
-           z_ = z_ + length/bet0 - length_/bet;
+           track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
+           track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
+           track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
+           track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
+           track(5,i) = z_ + length/bet0 - length_/bet;
 
-
-           pxbeta = xtilt*length_/bet0
-           track(1,i) = x_ + length_*xtilt - pxbeta*pt_
-           track(3,i) = y_
-           track(2,i) = px_ + xtilt ! This might be wrong... 
-           track(4,i) = py_
-           track(5,i) = z_ -0.5d0*pxbeta*xtilt - px_*pxbeta
-           track(6,i) = pt_
         enddo
      else
         call ttdrf(length,track,ktrack);
@@ -3288,30 +3266,24 @@ subroutine tttrans(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: t_x, t_px, t_y, t_py, t_sig, t_psig
+  double precision :: t_x, t_y, t_z
   double precision :: node_value
 
   !---- Get translation parameters
   t_x    = node_value('x ')
-  t_px   = node_value('px ')
   t_y    = node_value('y ')
-  t_py   = node_value('py ')
-  t_sig  = node_value('t ')
-  t_psig = node_value('pt ')
+  t_z    = node_value('z ')
 
   !---- Loop over particles
 !$OMP PARALLEL PRIVATE(i)
 !$OMP DO
+  call ttdrf(-t_z,track,ktrack)
   do  i = 1, ktrack
      ! Add vector to particle coordinates
-     track(1,i) = track(1,i) + t_x
-     track(2,i) = track(2,i) + t_px
-     track(3,i) = track(3,i) + t_y
-     track(4,i) = track(4,i) + t_py
-     track(5,i) = track(5,i) + t_sig
-     track(6,i) = track(6,i) + t_psig
-     !
+     track(1,i) = track(1,i) - t_x
+     track(3,i) = track(3,i) - t_y
   enddo
+
 !$OMP END DO
 !$OMP END PARALLEL
 end subroutine tttrans
@@ -3462,8 +3434,11 @@ subroutine trclor(switch,orbit0)
         if (code .eq. code_placeholder) code = code_instrument
         el      = node_value('l ')
         if (itra .eq. 1 .and. &
-             code.ne.code_drift .and. code.ne.code_quadrupole .and. code.ne.code_sbend &
-             .and. code.ne.code_matrix .and. el.ne.zero ) then ! rbend missing ?
+            code.ne.code_drift .and. &
+            code.ne.code_quadrupole .and. &
+            code.ne.code_rbend .and. &
+            code.ne.code_sbend .and. &
+            code.ne.code_matrix .and. el.ne.zero ) then
            !  .not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
            print *,"\ncode: ",code," el: ",el,"   THICK ELEMENT FOUND\n"
            print *,"Track dies nicely"
@@ -4177,7 +4152,7 @@ subroutine ttrfmult(track, ktrack, turn)
     if (radiate  .and.  elrad .ne. zero) then
        if (quantum) then
           curv = sqrt(dpx**2+dpy**2) / elrad;
-          call trphot(elrad,curv,rfac,deltas)
+          call trphot(elrad,curv,rfac,pt)
        else
           rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
        endif
@@ -4206,7 +4181,7 @@ subroutine ttrfmult(track, ktrack, turn)
     if (radiate  .and.  elrad .ne. zero) then
        if (quantum) then
           curv = sqrt(dpx**2+dpy**2) / elrad;
-          call trphot(elrad,curv,rfac,deltas)
+          call trphot(elrad,curv,rfac,pt)
        else
           rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
        endif
@@ -4391,8 +4366,7 @@ subroutine tttquad(track, ktrack)
   k1s = node_value('k1s ') + f_errors(3)/length
 
   if (k1s.ne.zero) then
-     tilt = -atan2(k1s, k1)/two + tilt
-     print * ,"skew tilt", tilt
+     tilt = -atan2(k1s, k1)/two ! + tilt
      k1 = sqrt(k1**2 + k1s**2)
   else
      tilt = zero
@@ -4412,6 +4386,7 @@ subroutine tttquad(track, ktrack)
      py = track(4,jtrk);
      z  = track(5,jtrk);
      pt = track(6,jtrk);
+
      !---  rotate orbit before entry
      if (tilt .ne. zero)  then
         st = sin(tilt)
@@ -4423,6 +4398,7 @@ subroutine tttquad(track, ktrack)
         px = ct * tmp + st * py
         py = ct * py  - st * tmp
      endif
+
      !---- Computes 1+delta
      delta_plus_1 = sqrt(pt*pt + two*pt/bet0 + one);
 
@@ -4432,7 +4408,7 @@ subroutine tttquad(track, ktrack)
         hy = ( k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length,curv,rfac,deltas)
+           call trphot(length,curv,rfac,pt)
         else
            rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2);
         endif
@@ -4460,7 +4436,7 @@ subroutine tttquad(track, ktrack)
         hy = ( k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length,curv,rfac,deltas)
+           call trphot(length,curv,rfac,pt)
         else
            rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2);
         endif
@@ -4506,6 +4482,8 @@ subroutine tttdipole(track, ktrack)
   use twtrrfi
   use trackfi
   use math_constfi, only : zero, one, two, three, half
+  use code_constfi
+
   implicit none
   !-------------------------*
   ! Andrea Latina 2013-2014 *
@@ -4532,8 +4510,9 @@ subroutine tttdipole(track, ktrack)
   double precision, external :: node_value, get_value
   double precision :: f_errors(0:maxferr)
   integer, external :: node_fd_errors
-  integer :: n_ferr
+  integer :: n_ferr, code
 
+  code    = node_value('mad8_type ')
   arad    = get_value('probe ','arad ')
   gamma   = get_value('probe ','gamma ')
   radiate = get_value('probe ','radiate ') .ne. zero
@@ -4546,17 +4525,26 @@ subroutine tttdipole(track, ktrack)
   hgap  = node_value('hgap ')
   fint  = node_value('fint ')
   fintx = node_value('fintx ')
-  length = node_value('l ');
-  angle = node_value('angle ');
-  rho = abs(length/angle);
-  h = angle/length;
-  k0 = h;
-  k1 = node_value('k1 ');
+  length = node_value('l ')
+  angle = node_value('angle ')
+  rho = abs(length/angle)
+  h = angle/length
+  k0 = node_value('k0 ') ! was h
+  k1 = node_value('k1 ')
+
+  if (code .eq. code_rbend) then
+     e1 = e1 + angle / two;
+     e2 = e2 + angle / two;
+  endif
 
   !---- Apply errors
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  if (k0.ne.0) f_errors(0) = f_errors(0) + k0*length - angle;
+  if (k0.ne.0) then 
+    f_errors(0) = f_errors(0) + k0*length - angle
+  else
+    k0 = h
+  endif
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
@@ -4584,7 +4572,7 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length * (one + h*x) - two * tan(e1)*x, curv, rfac, deltas);
+           call trphot(length * (one + h*x) - two * tan(e1)*x, curv, rfac, pt);
         else
            rfac = (arad * gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e1)*x)
         endif
@@ -4614,7 +4602,7 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length * (one + h*x) - two * tan(e2)*x, curv, rfac, deltas);
+           call trphot(length * (one + h*x) - two * tan(e2)*x, curv, rfac, pt);
         else
            rfac = (arad * gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e2)*x)
         endif
@@ -4652,9 +4640,10 @@ subroutine tttdipole(track, ktrack)
 
 end subroutine tttdipole
 
-subroutine trphot(el,curv,rfac,deltap)
+subroutine trphot(el,curv,rfac,pt)
   use math_constfi, only : zero, one, two, three, five, twelve
   use phys_constfi, only : clight, hbar
+  use trackfi, only : arad, gammas, betas
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -4680,17 +4669,17 @@ subroutine trphot(el,curv,rfac,deltap)
   !     The random integers are generated in the range [0, MAXRAN).      *
   !---- Table definition: maxtab, taby(maxtab), tabxi(maxtab)            *
   !----------------------------------------------------------------------*
-  double precision :: el, curv, rfac, deltap
+  double precision :: el, curv, rfac, pt
 
   integer :: i, ierror, j, nphot
   double precision :: amean, dlogr, slope, ucrit, xi, sumxi, InvSynFracInt,rn_arg
   integer, parameter :: maxtab=101
   double precision :: tabxi(maxtab),taby(maxtab)
-  double precision :: arad, pc, gamma, amass
+  double precision :: pc, gamma, amass
   character(len=20) text
   integer, external :: get_option
   integer :: synrad
-  double precision :: get_value, frndm
+  double precision :: get_value, frndm, delta_plus_1
   double precision, parameter :: fac1=3.256223d0
   ! integer, parameter :: maxran=1000000000
 
@@ -4750,16 +4739,16 @@ subroutine trphot(el,curv,rfac,deltap)
        2.64617491d0 /
 
   !Get constants
-  arad   = get_value('probe ','arad ')
   pc     = get_value('probe ','pc ')
   amass  = get_value('probe ','mass ')
-  gamma  = get_value('probe ','gamma ')
-  deltap = get_value('probe ','deltap ')
 
+  gamma = (betas*pt + one)*gammas;
+  delta_plus_1 = sqrt(pt*pt + two*pt/betas + one);
+  
   !---- AMEAN is the average number of photons emitted.,
   !     NPHOT is the integer number generated from Poisson's law.
   !-AL- AMEAN implicitly takes el / 2 (half the element length)
-  amean = five * sqrt(three) / (twelve * hbar * clight) * abs(arad * pc * (one+deltap) * el * curv)
+  amean = five * sqrt(three) / (twelve * hbar * clight) * abs(arad * pc * delta_plus_1 * el * curv)
   ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
   sumxi = zero
   if (amean.gt.3d-1) then

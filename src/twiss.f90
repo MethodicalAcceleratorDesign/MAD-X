@@ -5695,8 +5695,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
       re_t1(1,6) = -pxbeta
       re_t1(5,2) = -pxbeta
       call tmtrak(ek_t1,re_t1,te_t1,orbit,orbit)
-      call tmcat(.true.,re_t1,te_t1,re,te,re,te)
-
+      call tmcat(.true.,re_t1,te_t1,re,te,re,te)  
 
 
       call tmtrak(ek_s,re_s,te_s,orbit,orbit) ! Calls the normal solenoid
