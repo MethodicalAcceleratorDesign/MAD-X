@@ -1776,7 +1776,7 @@ subroutine track_one_element(el, fexit, contrib_rms)
 
   n_align = node_al_errors(al_errors)
   if (n_align .ne. 0)  then
-!     print*, "coupl1: Element = "
+     !print*, "coupl1: Element = "
      ele_body = .false.
      orbit2 = orbit
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
@@ -5577,10 +5577,11 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap, extend_length
+  logical :: fsec, ftrk, fmap
   double precision :: el
   double precision :: orbit(6), ek(6), re(6,6), ek_t1(6), ek_t2(6), re_t1(6,6) 
-  double precision :: re_t2(6,6), te(6,6,6), te_t1(6,6,6), ek2(6),ek_s(6), re_s(6,6), te_s(6,6,6)
+  double precision :: re_t2(6,6), te(6,6,6), te_t1(6,6,6), ek2(6)
+  double precision :: ek_s(6), re_s(6,6), te_s(6,6,6)
   logical :: cplxy
   double precision :: sks, sk, skl, bvk, pxbeta, beta0, startrot
   double precision :: co, si, sibk, temp, xtilt,xtilt_rad, dl
@@ -5589,7 +5590,6 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision, parameter :: ten5m=1d-5
 
   beta0   = get_value('probe ','beta ')
-  extend_length = node_value('extend_length ') .ne. 0d0
 
   !---- Initialize.
   fmap = el .ne. zero

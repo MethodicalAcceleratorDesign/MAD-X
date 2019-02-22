@@ -1294,7 +1294,6 @@ const char *const_command_def =
 "ks       = [r, 0],  "
 "xtilt       = [r, 0],  "
 "rot_start   = [r, 0],  "
-"extend_length     = [l, false, true], "
 "ksi      = [r, 0],  " /* was: ksl, but that clashes with naming conventions of multipoles */
 "knl      = [r, {0}], "
 "ksl      = [r, {0}], "
