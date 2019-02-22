@@ -1726,6 +1726,7 @@ const char *const_command_def =
 "bend_fringe     = [l, false, true], "
 "kill_ent_fringe = [l, false, true], "
 "kill_exi_fringe = [l, false, true], "
+"slice    = [i, 1],  "  /* hbu */
 "comments = [s, none, none]; "
 " "
 "rcollimator: element none 0 21 "
@@ -1758,6 +1759,7 @@ const char *const_command_def =
 "bend_fringe     = [l, false, true], "
 "kill_ent_fringe = [l, false, true], "
 "kill_exi_fringe = [l, false, true], "
+"slice    = [i, 1],  "  /* hbu */
 "comments = [s, none, none]; "
 " "
 "beambeam: element none 0 22 "
@@ -2451,6 +2453,7 @@ const char *const_command_def =
 "bend_fringe     = [l, false, true], "
 "kill_ent_fringe = [l, false, true], "
 "kill_exi_fringe = [l, false, true], "
+"slice    = [i, 1],  "  /* hbu */
 "comments = [s, none, none]; "
 " "
 "emit: emit none 0 0 "
