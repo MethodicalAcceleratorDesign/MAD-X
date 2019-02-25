@@ -5719,11 +5719,15 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
       ek=ek_s
       re=re_s
       te=te_s
-
       call tmtrak(ek,re,te,orbit,orbit)
     endif
-
+  else
+    ek=ek_s
+    re=re_s
+    te=te_s
   endif
+
+
 end SUBROUTINE tmsol0
 
 SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
