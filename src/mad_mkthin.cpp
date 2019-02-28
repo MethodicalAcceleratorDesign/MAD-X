@@ -2082,9 +2082,12 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
 void SeqElList::slice_node_translate() // slice/translate and add slices to sliced sequence  sliced_seq
 {
   bool UseDipedges=true; // Normally true.   For tests set false, to see the result without dipedges, dipedges will then be created but not written
-  element* thick_elem=thick_node->p_elem; // work directly on this element  --  to do translation only once, element maybe used several times in sequence
+ 
   std::string base_name=thick_node->base_name;
-  
+  node* work_node=thick_node;
+  if( base_name=="rbend") work_node=clone_node(thick_node, 0); // work on node copy that can be changed to sbend leaving the original
+  element* thick_elem=work_node->p_elem;     // work directly on this element  --  to do translation only once, element maybe used several times in sequence
+
   const bool ThickSLice=thick_fl(thick_elem);
   const bool IsQuad     = base_name=="quadrupole";
   const bool IsSolenoid = base_name=="solenoid";
@@ -2094,10 +2097,10 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   if( base_name=="rbend" && nslices>0 ) // rbend translation to sbend
   {
     thick_elem=sbend_from_rbend(thick_elem); // translate any rbend to sbend right away --  then no need to deal any more with rbend in rest of makethin
-    thick_node->p_elem=thick_elem;
-    strcpy(thick_node->base_name,"sbend");
+    work_node->p_elem=thick_elem;
+    strcpy(work_node->base_name,"sbend");
   } // done with any rbend, for the rest all bends will be sbend
-  
+
   bool already_translated_rbend=false;
   if(IsBend && MakeDipedge)
   { // check if translated rbend, if found use the translated
@@ -2106,7 +2109,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
     { // use the already translated
       already_translated_rbend=true;
       thick_elem=sbend_el;          // continue with aleady translated sbend
-      thick_node->p_elem=sbend_el;  // update node
+      work_node->p_elem=sbend_el;  // update node
     }
   }
   
@@ -2115,7 +2118,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
     if(nslices>1)
     {
       std::ostringstream WarnStr;
-      WarnStr << thick_elem->name << " nslices=" << nslices << " thick slicing with nslices>1 for " << thick_node->base_name << " not defined. Will use nslices=1";
+      WarnStr << thick_elem->name << " nslices=" << nslices << " thick slicing with nslices>1 for " << work_node->base_name << " not defined. Will use nslices=1";
       warning_to_c(WarnStr);
     }
     nslices=1;
@@ -2123,8 +2126,8 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   
   if(nslices<1 || (nslices==1 && ThickSLice && !IsBend) )
   {
-    if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << " ThickSLice=" << ThickSLice << " nslices=" << nslices << " place thick_node " << thick_node->name << " without slicing" << '\n';
-    add_node_at_end_of_sequence(thick_node,sliced_seq); // straight copy
+    if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << " ThickSLice=" << ThickSLice << " nslices=" << nslices << " place work_node " << work_node->name << " without slicing" << '\n';
+    add_node_at_end_of_sequence(work_node,sliced_seq); // straight copy
     return;
   }
   
@@ -2132,9 +2135,9 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   
   if(verbose>1)
   {
-    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << " " << thick_node->base_name << " slice_style=\"" << slice_style << "\""
-    << " nslices=" << nslices << " IsQuad=" << IsQuad << " IsSolenoid=" << IsSolenoid << " IsBend=" << IsBend << " ThickSLice=" << ThickSLice << " at_value=" << std::setw(10) << thick_node->at_value << " from_name=";
-    if(thick_node->from_name) std::cout << thick_node->from_name; else std::cout << "NULL ";
+    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << " " << work_node->base_name << " slice_style=\"" << slice_style << "\""
+    << " nslices=" << nslices << " IsQuad=" << IsQuad << " IsSolenoid=" << IsSolenoid << " IsBend=" << IsBend << " ThickSLice=" << ThickSLice << " at_value=" << std::setw(10) << work_node->at_value << " from_name=";
+    if(work_node->from_name) std::cout << work_node->from_name; else std::cout << "NULL ";
   }
   
   element *EntryDipedge=nullptr, *ExitDipedge=nullptr;
@@ -2147,7 +2150,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
     ExitDipedge =theBendEdgeList->find_slice(thick_elem,std::string(thick_elem->name)+"_dex"); // dipedge exit,  BULL if not yet known or e2=0
     if(verbose>1)
     {
-      if(verbose>1)    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << "              " << std::setw(MaTh::par_name_maxlen) <<   thick_elem->name << " " << thick_node->base_name << '\n';
+      if(verbose>1)    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << "              " << std::setw(MaTh::par_name_maxlen) <<   thick_elem->name << " " << work_node->base_name << '\n';
       if(EntryDipedge) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << " EntryDipedge=" << std::setw(MaTh::par_name_maxlen) << EntryDipedge->name << " already exists " << EntryDipedge << '\n';
       if(ExitDipedge)  std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << "  ExitDipedge=" << std::setw(MaTh::par_name_maxlen) <<  ExitDipedge->name << " already exists " << EntryDipedge << '\n';
     }
@@ -2164,7 +2167,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       {
         EntryDipedge=create_bend_dipedge_element(thick_elem,true); // make new StartEdge element and remove e1 from thick_elem
         theBendEdgeList->put_slice(thick_elem,EntryDipedge);       // to remember this has been translated
-        if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << " thick node " << thick_node->name << " " << thick_elem->name << " now has EntryDipedge=" << EntryDipedge << '\n';
+        if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << " thick node " << work_node->name << " " << thick_elem->name << " now has EntryDipedge=" << EntryDipedge << '\n';
       }
     }
     
@@ -2174,7 +2177,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       {
         ExitDipedge=create_bend_dipedge_element(thick_elem,false); // make new ExitDipedge element and remove e2 from thick_elem
         theBendEdgeList->put_slice(thick_elem,ExitDipedge);   // to remember this has been translated
-        if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << " thick node " << thick_node->name << " " << thick_elem->name << " now has ExitDipedge=" << EntryDipedge << " " << my_dump_element(ExitDipedge) << '\n';
+        if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << " thick node " << work_node->name << " " << thick_elem->name << " now has ExitDipedge=" << EntryDipedge << " " << my_dump_element(ExitDipedge) << '\n';
       }
     } // new ExitDipedge
     if(!already_translated_rbend) Remove_All_Fringe_Field_Parameters(thick_elem); // remove what is taken care of by dipedges
@@ -2204,7 +2207,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   }
   else
   {
-    if(strstr(thick_node->base_name,"elseparator")) sliced_elem = create_thin_elseparator(thick_elem,1); // create the first thin elseparator slice
+    if(strstr(work_node->base_name,"elseparator")) sliced_elem = create_thin_elseparator(thick_elem,1); // create the first thin elseparator slice
     else if (IsSolenoid && !ThickSLice)             sliced_elem = create_thin_solenoid(thick_elem,1);    // create the initial solenoid slice
     else                                            sliced_elem = create_sliced_magnet(thick_elem,1,ThickSLice); // create the initial magnet slice
     if(verbose>1) if(sliced_elem) std::cout << sliced_elem->name << " nslices=" << nslices << " sliced_elem now " << my_dump_element(sliced_elem); // collimator lrad here and active
@@ -2212,15 +2215,15 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   
   if(verbose>1)
   {
-    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " thick node " << thick_node->name <<  " thick_elem " << thick_elem->name  << " of type " << thick_node->base_name << " if nslices >1 with entry/exit pieces ";
+    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " thick node " << work_node->name <<  " thick_elem " << thick_elem->name  << " of type " << work_node->base_name << " if nslices >1 with entry/exit pieces ";
     if(en)          std::cout << " en->name=" << en->name; else std::cout << " en=" << en;
     if(bo)          std::cout << " bo->name=" << bo->name; else std::cout << " bo=" << bo;
     if(ex)          std::cout << " ex->name=" << ex->name; else std::cout << " ex=" << ex;
     std::cout << '\n';
   }
   
-  expression* at_expr = thick_node->at_expr;
-  double at = thick_node->at_value;
+  expression* at_expr = work_node->at_expr;
+  double at = work_node->at_value;
   if(at_expr==nullptr) // then make a new expression from the value
   {
     std::ostringstream ostr;
@@ -2230,7 +2233,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
     if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " from at value=" << std::setw(8) << at << " new at_expr " << my_dump_expression(at_expr) << '\n';
   }
   
-  double length = thick_node->length; // direct curved thick_elem->length
+  double length = work_node->length; // direct curved thick_elem->length
   
   expression* l_expr = nullptr;
   if (length_param)
@@ -2242,8 +2245,8 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   int middle=-1;
   if (nslices>1) middle = nslices/2+1; // used to determine after which slide to place the central marker in case of thin slicing
   
-  if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " length_param=" << length_param << " l_expr=" << l_expr << " thick_node->p_elem=" << thick_node->p_elem << " thick_elem=" << thick_elem << '\n';
-  if(EntryDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,EntryDipedge,-0.5); // subtract half of the length to be at start
+  if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " length_param=" << length_param << " l_expr=" << l_expr << " work_node->p_elem=" << work_node->p_elem << " thick_elem=" << thick_elem << '\n';
+  if(EntryDipedge && UseDipedges) place_thin_slice(work_node,sliced_seq,EntryDipedge,-0.5); // subtract half of the length to be at start
   
   if(MaTh::iMakeEndMarkers) place_start_or_end_marker(true); // start
   
@@ -2263,7 +2266,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
     }
     else
     {
-      if (strstr(thick_node->base_name,"elseparator")) slice_i = create_thin_elseparator(thick_elem,i);
+      if (strstr(work_node->base_name,"elseparator")) slice_i = create_thin_elseparator(thick_elem,i);
       else // magnet which can be sliced
       {
         if (IsSolenoid && !ThickSLice) slice_i = create_thin_solenoid(thick_elem,i); // create the solenoid slices
@@ -2271,8 +2274,8 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       }
       if (fabs(at_shift(nslices,i,local_slice_style))>0.0)
       {
-        if( MaTh::iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,thick_node->at_value,"+",  nullptr, length*at_shift(nslices,i,local_slice_style) );  // use length and shift values, no expressions
-        else thin_at_expr = compound_expr(at_expr,thick_node->at_value,"+",scale_expr(l_expr,at_shift(nslices,i,local_slice_style)),length*at_shift(nslices,i,local_slice_style)); // use length expressions
+        if( MaTh::iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",  nullptr, length*at_shift(nslices,i,local_slice_style) );  // use length and shift values, no expressions
+        else thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",scale_expr(l_expr,at_shift(nslices,i,local_slice_style)),length*at_shift(nslices,i,local_slice_style)); // use length expressions
       }
       else
       {
@@ -2282,7 +2285,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
     
     if(verbose>1)
     {
-      std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " thick_node->base_name=" << " el->name=" << std::left << std::setw(MaTh::el_type_maxlen) << thick_node->base_name << " i=" << i << " middle=" << middle << " nslices=" << nslices;
+      std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " work_node->base_name=" << " el->name=" << std::left << std::setw(MaTh::el_type_maxlen) << work_node->base_name << " i=" << i << " middle=" << middle << " nslices=" << nslices;
       if(slice_i) std::cout << " slice_i->name=" << slice_i->name << " at_expr " << my_dump_expression(at_expr) << " l_expr " << my_dump_expression(l_expr);
       std::cout << '\n';
     }
@@ -2290,16 +2293,17 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
     if (i==middle && !ThickSLice) // create and place new marker with name of thick_elem  in the middle = poition of thick_elem
     {
       element* middle_marker=new_marker_element(thick_elem->name,thick_elem);
-      place_node_at(thick_node, sliced_seq, middle_marker,at_expr);
-      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " thick_node " << thick_node->name << " nslices=" << nslices << " i=" << i << " middle=" << middle << " place middle marker at=" << thick_node->at_value << " at_expr=" << at_expr
+      place_node_at(work_node, sliced_seq, middle_marker,at_expr);
+      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " work_node " << work_node->name << " nslices=" << nslices << " i=" << i << " middle=" << middle << " place middle marker at=" << work_node->at_value << " at_expr=" << at_expr
         << " thin_at_value=" << my_get_expression_value(thin_at_expr) << '\n';
     }
-    if(slice_i && !ThickSLice) place_node_at(thick_node, sliced_seq, slice_i,thin_at_expr);
+    if(slice_i && !ThickSLice) place_node_at(work_node, sliced_seq, slice_i,thin_at_expr);
   }
   
   if(MaTh::iMakeEndMarkers) place_start_or_end_marker(false); // end
   
-  if(ExitDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,ExitDipedge,0.5);  // write end dipedge for dipoles
+  if(ExitDipedge && UseDipedges) place_thin_slice(work_node,sliced_seq,ExitDipedge,0.5);  // write end dipedge for dipoles
+  
 } // SeqElList::slice_node_translate()
 
 void SeqElList::slice_node_default() // slice/translate and add slices to sliced sequence  sliced_seq,  here make always end markers
