@@ -9,7 +9,7 @@ alias lualatex="lualatex --halt-on-error --interaction=nonstopmode"
 
 lualatex uguide.tex >> makelatexdoc.log
 lualatex uguide.tex >> makelatexdoc.log
-makeindex uguide >> makelatexdoc.log  2&>1
+makeindex uguide >> makelatexdoc.log  2>&1
 bibtex uguide >> makelatexdoc.log
 lualatex uguide.tex >> makelatexdoc.log
 lualatex uguide.tex >> makelatexdoc.log
