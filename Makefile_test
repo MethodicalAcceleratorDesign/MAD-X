@@ -42,7 +42,7 @@
 # tests order
 tests-all = \
 test-table test-table-2 \
-test-memory \
+test-memory test-control \
 \
 test-makethin test-makethin-2 test-makethin-3 test-elseparator\
 test-survey test-survey-2 test-survey-3 \

@@ -69,6 +69,7 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "beam")        == 0) exec_beam(cmd, 0);
   else if (strcmp(toks[k], "beta0")       == 0) store_beta0(cmd);
   else if (strcmp(toks[k], "call")        == 0) exec_call(cmd);
+  else if (strcmp(toks[k], "chdir")       == 0) exec_chdir(cmd);
   else if (strcmp(toks[k], "coguess")     == 0) exec_store_coguess(cmd);
   else if (strcmp(toks[k], "copyfile")    == 0) exec_copyfile(cmd);
   else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
