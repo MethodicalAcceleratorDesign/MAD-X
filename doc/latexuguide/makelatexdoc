@@ -1,9 +1,12 @@
 #!/bin/sh
 echo 'building documentation for MAD-X. Be patient...'
-set -x
+set -ex
 cd figures
 ./generatePlots.sh >  makelatexdoc.log
 cd ..
+
+alias lualatex="lualatex --halt-on-error --interaction=nonstopmode"
+
 lualatex uguide.tex >> makelatexdoc.log
 lualatex uguide.tex >> makelatexdoc.log
 makeindex uguide >> makelatexdoc.log  2&>1
