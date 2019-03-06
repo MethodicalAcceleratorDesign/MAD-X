@@ -81,7 +81,7 @@ attribute is the more efficient way.
 
 Element definitions can be edited freely. The changes only affect
 already defined objects which belong to its
-\hyperref[sec:element-classes]{element class} in case the: \madxmp{option, update_from_parent} is used. 
+\hyperref[sec:element-classes]{element class} in case the: \madxmp{option, update\_from\_parent} is used.
 In case this option is used all elements which belong to that class will be updated. 
 An example is given in \hyperref[sec:element-classes]{element class}.   
 
@@ -129,6 +129,7 @@ The full power of the class concept is revealed when object classes are
 used to select instances of elements for various purposes. Example:  
 
 
+\madxmp{
 SELECT, FLAG=twiss, CLASS = QUADRUPOLE; \=! Select all quadrupoles for the\\
                                         \>! Twiss TFS file
 }
@@ -152,5 +153,5 @@ it works:
  \madxmp{ apertype=ellipse, aperture:={ 1,4 }; }
 
  This, however, does not modify \texttt{mb2}. In case we want \texttt{mb2} to also inherent the change from \texttt{mb} we need to use the
- flag \madxmp{option, update_from_parent}. This should be used with care and is only changing the direct parent.
+ flag \madxmp{option, update\_from\_parent}. This should be used with care and is only changing the direct parent.
 %% EOF
