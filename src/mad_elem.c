@@ -14,7 +14,7 @@ new_element(const char* name)
   return el;
 }
 
-static void
+void
 grow_el_list(struct el_list* p)
 {
   const char *rout_name = "grow_el_list";
