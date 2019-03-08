@@ -3501,7 +3501,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value, get_value
   character(len=name_len) :: name
-  double precision :: bet0, bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
   
@@ -3578,10 +3578,9 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
         pt = orbit(6)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * f_damp_l;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
      endif
 
      !---- Body of the dipole.
@@ -3627,10 +3626,9 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
         pt = orbit(6)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * f_damp_l;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
      endif
      
 end SUBROUTINE tmbend
@@ -4060,7 +4058,7 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
   integer, external :: node_fd_errors
   double precision, external :: node_value, get_value
-  double precision :: bet0, bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
 
@@ -4125,10 +4123,9 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
         pt = orbit(6)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * f_damp_l;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
      endif
 
      !---- Drift to end.
@@ -4141,7 +4138,7 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      if (radiate  .and.  el.ne.zero) then
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * f_damp_l;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
      endif
 
      !---- Half kick at exit.
@@ -4183,7 +4180,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   integer, external :: get_option, node_fd_errors
   double precision, external :: node_value, get_value
-  double precision :: bet0, bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
 
@@ -4290,10 +4287,9 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
         pt = orbit(6)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * f_damp_l;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
      endif
 
      !---- Track orbit.
@@ -4311,7 +4307,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      if (radiate  .and.  elrad.ne.zero) then
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * f_damp_l;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
      endif
 
   else !---- Orbit not wanted.
@@ -4410,7 +4406,7 @@ SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
   integer, external :: node_fd_errors, el_par_vector
   double precision, external :: node_value, get_value
-  double precision :: bet0, bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
   
@@ -4464,10 +4460,9 @@ SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      pt = orbit(6)
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     f_damp_l = (one - rfac) - rfac / bet0;
      orbit(2) = orbit(2) * f_damp_t;
      orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * f_damp_l;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
   !---- First-order terms w.r.t. orbit.
@@ -4520,10 +4515,9 @@ SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      pt = orbit(6)
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     f_damp_l = (one - rfac) - rfac / bet0;
      orbit(2) = orbit(2) * f_damp_t;
      orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * f_damp_l;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
   !---- First-order terms w.r.t. orbit.
@@ -4998,7 +4992,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   integer, external :: node_fd_errors
   integer, external :: el_par_vector
   double precision, external :: node_value, get_value
-  double precision :: bet0, bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
 
@@ -5046,10 +5040,9 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      pt = orbit(6)
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     f_damp_l = (one - rfac) - rfac / bet0;
      orbit(2) = orbit(2) * f_damp_t;
      orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * f_damp_l;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
   call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
@@ -5061,10 +5054,9 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      pt = orbit(6)
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     f_damp_l = (one - rfac) - rfac / bet0;
      orbit(2) = orbit(2) * f_damp_t;
      orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * f_damp_l;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
   if (tilt .ne. zero)  then
@@ -5413,7 +5405,7 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value, get_value
-  double precision :: bet0, bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
 
@@ -5461,10 +5453,9 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      pt = orbit(6)
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     f_damp_l = (one - rfac) - rfac / bet0;
      orbit(2) = orbit(2) * f_damp_t;
      orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * f_damp_l;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
   call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
@@ -5477,10 +5468,9 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
         pt = orbit(6)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * f_damp_l;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
      endif
   endif
 
@@ -5634,7 +5624,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision, external :: node_value, get_value
   double precision, parameter :: ten5m=1d-5
   double precision :: rfac, kx, ky
-  double precision :: pt, bet0, bet_sqr, f_damp_t, f_damp_l
+  double precision :: pt, bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
 
@@ -5669,10 +5659,9 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
      pt = orbit(6);
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     f_damp_l = (one - rfac) - rfac / bet0;
      orbit(2) = orbit(2) * f_damp_t;
      orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * f_damp_l;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
   
   !---- First-order terms.
@@ -5741,10 +5730,9 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
      pt = orbit(6);
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     f_damp_l = (one - rfac) - rfac / bet0;
      orbit(2) = orbit(2) * f_damp_t;
      orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * f_damp_l;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
 end SUBROUTINE tmsol0
@@ -7557,7 +7545,7 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
 
   double precision, external :: node_value, get_value
   double precision :: elrad, rfac, kx, ky
-  double precision :: pt, bet0, bet_sqr, f_damp_t, f_damp_l
+  double precision :: pt, bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
 
@@ -7589,10 +7577,9 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
      pt = orbit(6);
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     f_damp_l = (one - rfac) - rfac / bet0;
      orbit(2) = orbit(2) * f_damp_t;
      orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * f_damp_l;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
   !---- First-order terms.
@@ -7624,10 +7611,9 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
      pt = orbit(6);
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     f_damp_l = (one - rfac) - rfac / bet0;
      orbit(2) = orbit(2) * f_damp_t;
      orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * f_damp_l;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
 end SUBROUTINE tmsol_th
@@ -7756,7 +7742,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   integer, external :: node_fd_errors
   double precision, external :: node_value, get_value
   double complex, parameter :: icomp=(0d0,1d0) ! imaginary
-  double precision :: bet0, bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
 
@@ -7872,10 +7858,9 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
         rfac = arad * gamma**3 * (dpx**2+dpy**2) / (three*elrad)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         px = px * f_damp_t;
         py = py * f_damp_t;
-        pt = pt * f_damp_l;
+        pt = pt * (one - rfac) - rfac / bet0;
      endif
 
      !---- Apply the kick
@@ -7887,7 +7872,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      if (radiate  .and.  elrad .ne. zero) then
         px = px * f_damp_t;
         py = py * f_damp_t;
-        pt = pt * f_damp_l;
+        pt = pt * (one - rfac) - rfac / bet0;
      endif
 
     ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
@@ -8163,7 +8148,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   integer, external :: node_fd_errors
   double precision, external :: node_value, get_value
   double complex, parameter :: icomp=(0d0,1d0) ! imaginary
-  double precision :: bet0, bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
 
@@ -8259,10 +8244,9 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
         rfac = arad * gamma**3 * (dpx**2+dpy**2) / (three*elrad)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         px = px * f_damp_t;
         py = py * f_damp_t;
-        pt = pt * f_damp_l;
+        pt = pt * (one - rfac) - rfac / bet0;
      endif
 
      !---- Apply the kick
@@ -8274,7 +8258,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
      if (radiate  .and.  elrad .ne. zero) then
         px = px * f_damp_t;
         py = py * f_damp_t;
-        pt = pt * f_damp_l;
+        pt = pt * (one - rfac) - rfac / bet0;
      endif
 
     ! apply the transformation P: diag(-1, 1, 1, -1, -1, 1) * X

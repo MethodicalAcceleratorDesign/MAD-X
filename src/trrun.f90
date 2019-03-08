@@ -923,7 +923,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   double precision :: bvk, node_value, ttt
   double precision :: npeak(100), nlag(100), ntune(100), temp, noise
   character(len=name_len) name
-  double precision :: bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet_sqr, f_damp_t
   
   integer :: node_fd_errors, store_no_fd_err, get_option
 
@@ -1075,10 +1075,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
            pt = track(6,jtrk)
            bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-           f_damp_l = (one - rfac) - rfac / bet0;
            track(2,jtrk) = px * f_damp_t;
            track(4,jtrk) = py * f_damp_t;
-           track(6,jtrk) = pt * f_damp_l;
+           track(6,jtrk) = pt * (one - rfac) - rfac / bet0;
         enddo
         !---- Energy loss like for closed orbit.
      else
@@ -1088,10 +1087,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
         pt = track(6,1)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         TRACK(2,:ktrack) = TRACK(2,:ktrack) * f_damp_t;
         TRACK(4,:ktrack) = TRACK(4,:ktrack) * f_damp_t;
-        TRACK(6,:ktrack) = TRACK(6,:ktrack) * f_damp_l;
+        TRACK(6,:ktrack) = TRACK(6,:ktrack) * (one - rfac) - rfac / bet0;
      endif
   endif
 
@@ -1125,10 +1123,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
            pt = track(6,jtrk)
            bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-           f_damp_l = (one - rfac) - rfac / bet0;
            track(2,jtrk) = px * f_damp_t;
            track(4,jtrk) = py * f_damp_t;
-           track(6,jtrk) = pt * f_damp_l;
+           track(6,jtrk) = pt * (one - rfac) - rfac / bet0;
         enddo
 
         !---- Energy loss like for closed orbit.
@@ -1139,10 +1136,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
         pt = track(6,1)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         TRACK(2,:ktrack) = TRACK(2,:ktrack) * f_damp_t;
         TRACK(4,:ktrack) = TRACK(4,:ktrack) * f_damp_t;
-        TRACK(6,:ktrack) = TRACK(6,:ktrack) * f_damp_l;
+        TRACK(6,:ktrack) = TRACK(6,:ktrack) * (one - rfac) - rfac / bet0;
         
      endif
   endif
@@ -1706,7 +1702,7 @@ subroutine ttcorr(el,track,ktrack,turn)
   double precision :: f_errors(0:maxferr), field(2)
   double precision :: dpxx, dpyy
   double precision :: sinpeak, sintune, sinphase
-  double precision :: bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet_sqr, f_damp_t
 
   integer :: node_fd_errors, get_option
   double precision :: get_variable, get_value, node_value
@@ -1794,19 +1790,17 @@ subroutine ttcorr(el,track,ktrack,turn)
            if (quantum) call trphot(el,curv,rfac,pt)
            bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-           f_damp_l = (one - rfac) - rfac / bet0;
            track(2,i) = px * f_damp_t;
            track(4,i) = py * f_damp_t;
-           track(6,i) = pt * f_damp_l;
+           track(6,i) = pt * (one - rfac) - rfac / bet0;
         enddo
      else !---- Energy loss as for closed orbit.
         pt = track(6,1)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         track(2,:ktrack) = track(2,:ktrack) * f_damp_t;
         track(4,:ktrack) = track(4,:ktrack) * f_damp_t;
-        track(6,:ktrack) = track(6,:ktrack) * f_damp_l
+        track(6,:ktrack) = track(6,:ktrack) * (one - rfac) - rfac / bet0
      endif
   endif
 
@@ -1878,19 +1872,17 @@ subroutine ttcorr(el,track,ktrack,turn)
            if (quantum) call trphot(el,curv,rfac,pt)
            bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-           f_damp_l = (one - rfac) - rfac / bet0;
            track(2,i) = track(2,i) * f_damp_t;
            track(4,i) = track(4,i) * f_damp_t;
-           track(6,i) = track(6,i) * f_damp_l;
+           track(6,i) = track(6,i) * (one - rfac) - rfac / bet0;
         enddo
      else !---- Energy loss as for closed orbit.
         pt = track(6,1)
         bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        f_damp_l = (one - rfac) - rfac / bet0;
         track(2,:ktrack) = track(2,:ktrack) * f_damp_t;
         track(4,:ktrack) = track(4,:ktrack) * f_damp_t;
-        track(6,:ktrack) = track(6,:ktrack) * f_damp_l;
+        track(6,:ktrack) = track(6,:ktrack) * (one - rfac) - rfac / bet0;
      endif
   endif
   
@@ -3179,7 +3171,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
   double precision :: pxf_, pyf_
   double precision :: bet, length_, elrad
   double precision :: curv, const, rfac
-  double precision :: bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet_sqr, f_damp_t
 
   !---- Initialize.
   bet0 = get_value('probe ','beta ')
@@ -3245,10 +3237,9 @@ subroutine trsol(track,ktrack,dxt,dyt)
                     pt_ = track(6,i)
                     bet_sqr = (pt_*pt_ + two*pt_/bet0 + one) / (one/bet0 + pt_)**2;
                     f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-                    f_damp_l = (one - rfac) - rfac / bet0;
                     track(2,i) = track(2,i) * f_damp_t;
                     track(4,i) = track(4,i) * f_damp_t;
-                    track(6,i) = track(6,i) * f_damp_l;
+                    track(6,i) = track(6,i) * (one - rfac) - rfac / bet0;
                     !---- Energy loss like for closed orbit.
                  else
                     !---- Store energy loss on closed orbit.
@@ -3256,10 +3247,9 @@ subroutine trsol(track,ktrack,dxt,dyt)
                     pt_ = track(6,1)
                     bet_sqr = (pt_*pt_ + two*pt_/bet0 + one) / (one/bet0 + pt_)**2;
                     f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-                    f_damp_l = (one - rfac) - rfac / bet0;
                     TRACK(2,i) = TRACK(2,i) * f_damp_t;
                     TRACK(4,i) = TRACK(4,i) * f_damp_t;
-                    TRACK(6,i) = TRACK(6,i) * f_damp_l;
+                    TRACK(6,i) = TRACK(6,i) * (one - rfac) - rfac / bet0;
                  endif
               endif
            else !   step.eq.2, body of the solenoid
@@ -3316,20 +3306,18 @@ subroutine trsol(track,ktrack,dxt,dyt)
                        endif
                        bet_sqr = (pt_*pt_ + two*pt_/bet0 + one) / (one/bet0 + pt_)**2;
                        f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-                       f_damp_l = (one - rfac) - rfac / bet0;
                        track(2,i) = track(2,i) * f_damp_t;
                        track(4,i) = track(4,i) * f_damp_t;
-                       track(6,i) = track(6,i) * f_damp_l;
+                       track(6,i) = track(6,i) * (one - rfac) - rfac / bet0;
                        !---- Energy loss like for closed orbit.
                     else
                        !---- Store energy loss on closed orbit.
                        rfac = const * (dxt(1)**2 + dyt(1)**2)
                        bet_sqr = (pt_*pt_ + two*pt_/bet0 + one) / (one/bet0 + pt_)**2;
                        f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-                       f_damp_l = (one - rfac) - rfac / bet0;
                        track(2,i) = track(2,i) * f_damp_t;
                        track(4,i) = track(4,i) * f_damp_t;
-                       track(6,i) = track(6,i) * f_damp_l;
+                       track(6,i) = track(6,i) * (one - rfac) - rfac / bet0;
                     endif
                  endif
               else
@@ -4162,7 +4150,7 @@ subroutine ttrfmult(track, ktrack, turn)
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, volt, lag, harmon
   double precision :: beta, bvk, deltap, elrad
-  double precision :: bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet_sqr, f_damp_t
 
   ! LD: 2016.03.04 - use complex declaration compatible with Lahey
   integer, parameter:: dp=kind(0.d0)
@@ -4264,19 +4252,17 @@ subroutine ttrfmult(track, ktrack, turn)
        if (damp) then
           bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
           f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-          f_damp_l = (one - rfac) - rfac / bet0;
           px = px * f_damp_t;
           py = py * f_damp_t;
-          pt = pt * f_damp_l;
+          pt = pt * (one - rfac) - rfac / bet0;
        else
           if (jtrk.eq.1) then
              bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
              f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-             f_damp_l = (one - rfac) - rfac / bet0;
           endif
           px = px * f_damp_t;
           py = py * f_damp_t;
-          pt = pt * f_damp_l;
+          pt = pt * (one - rfac) - rfac / bet0;
        endif
     endif
 
@@ -4296,19 +4282,17 @@ subroutine ttrfmult(track, ktrack, turn)
        if (damp) then
           bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
           f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-          f_damp_l = (one - rfac) - rfac / bet0;
           px = px * f_damp_t;
           py = py * f_damp_t;
-          pt = pt * f_damp_l;
+          pt = pt * (one - rfac) - rfac / bet0;
        else
           if (jtrk.eq.1) then
              bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
              f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-             f_damp_l = (one - rfac) - rfac / bet0;
           endif
           px = px * f_damp_t;
           py = py * f_damp_t;
-          pt = pt * f_damp_l;
+          pt = pt * (one - rfac) - rfac / bet0;
        endif
     endif
 
@@ -4452,7 +4436,7 @@ subroutine tttquad(track, ktrack)
   double precision :: tmp
 
   double precision :: hx, hy, rfac, gamma, curv
-  double precision :: bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet_sqr, f_damp_t
   integer :: jtrk
 
   double precision, external :: node_value
@@ -4525,19 +4509,17 @@ subroutine tttquad(track, ktrack)
         if (damp) then
            bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-           f_damp_l = (one - rfac) - rfac / bet0;
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * f_damp_l;
+           pt = pt * (one - rfac) - rfac / bet0;
         else
            if (jtrk.eq.1) then
               bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
               f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-              f_damp_l = (one - rfac) - rfac / bet0;
            endif
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * f_damp_l;
+           pt = pt * (one - rfac) - rfac / bet0;
         endif
      endif
      
@@ -4556,19 +4538,17 @@ subroutine tttquad(track, ktrack)
         if (damp) then
            bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-           f_damp_l = (one - rfac) - rfac / bet0;
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * f_damp_l;
+           pt = pt * (one - rfac) - rfac / bet0;
         else
            if (jtrk.eq.1) then
               bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
               f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-              f_damp_l = (one - rfac) - rfac / bet0;
            endif
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * f_damp_l;
+           pt = pt * (one - rfac) - rfac / bet0;
         endif
      endif
 
@@ -4620,7 +4600,7 @@ subroutine tttdipole(track, ktrack)
   double precision :: x, px, y, py, z, pt, delta_plus_1
   double precision :: gamma, hx, hy, rfac, curv
   double precision :: e1, e2, h1, h2, hgap, fint, fintx
-  double precision :: bet_sqr, f_damp_t, f_damp_l
+  double precision :: bet_sqr, f_damp_t
 
   double precision, external :: node_value, get_value
   double precision :: f_errors(0:maxferr)
@@ -4690,19 +4670,17 @@ subroutine tttdipole(track, ktrack)
         if (damp) then
            bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-           f_damp_l = (one - rfac) - rfac / bet0;
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * f_damp_l;
+           pt = pt * (one - rfac) - rfac / bet0;
         else
            if (jtrk.eq.1) then
               bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
               f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-              f_damp_l = (one - rfac) - rfac / bet0;
            endif
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * f_damp_l;
+           pt = pt * (one - rfac) - rfac / bet0;
         endif
      endif
 
@@ -4723,19 +4701,17 @@ subroutine tttdipole(track, ktrack)
         if (damp) then
            bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-           f_damp_l = (one - rfac) - rfac / bet0;
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * f_damp_l;
+           pt = pt * (one - rfac) - rfac / bet0;
         else
            if (jtrk.eq.1) then
               bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
               f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-              f_damp_l = (one - rfac) - rfac / bet0;
            endif
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * f_damp_l;
+           pt = pt * (one - rfac) - rfac / bet0;
         endif
      endif
 
