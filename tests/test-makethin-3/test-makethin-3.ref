@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.13 19:27:14      +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2019.03.06 11:02:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
@@ -106,7 +106,7 @@ final orbit vector:     4.657226E-09 -1.019559E-09  0.000000E+00  0.000000E+00 -
    64.280001     0.000000   595.290022     2.860704 
 
        dxrms       xcomax       xcorms           q2 
-    1.384525     0.000000     0.000000    59.310000 
+    1.379447     0.000000     0.000000    59.310000 
 
          dq2      betymax        dymax        dyrms 
     0.000000   611.782975     0.000000     0.000000 
@@ -126,35 +126,18 @@ save,sequence=lhcb1,file="V6.5.thin.b1.seq";
 
 show mbrc.4r2.b1..1;
 
-+++ dumping element mbrc.4r2.b1..1      parent multipole         
-command: thin_multipole  module: element
-parameter: magnet   double value:     1.000000
-parameter: at   double value:   126.403000
-parameter: l   double value:     0.000000
-parameter: lrad   expression: ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 )  :: value:     2.362500
-double value:     2.362500
-parameter: knl   double array: -3.831264e-04 0.000000e+00 0.000000e+00 0.000000e+00 
-parameter: angle   expression: ( 0 - ad2.r2 ) / ( 4 )  :: value:    -0.000383
-double value:    -0.000383
-parameter: kmax   expression: kmax_mbrc_4.5k  :: value:     3.800000
-double value:     3.800000
-parameter: kmin   expression: kmin_mbrc_4.5k  :: value:     0.086000
-double value:     0.086000
-parameter: calib   expression: kmax_mbrc_4.5k / imax_mbrc_4.5k  :: value:     0.000864
-double value:     0.000864
-parameter: polarity   double value:    -1.000000
-parameter: mech_sep   double value:    -0.188000
+mbrc.4r2.b1..1 not found
 show mqxb.a2l2..2;
 
-+++ dumping element mqxb.a2l2..2        parent mqxb              
-command: thin_multipole  module: element
-parameter: magnet   double value:     1.000000
++++ dumping element mqxb.a2l2..2        parent mqxb..2           
+command: multipole  module: element
 parameter: at   double value:   -34.800000
-parameter: from   string: ip2
 parameter: l   double value:     0.000000
-parameter: lrad   expression: ( l.mqxb ) / ( 4 )  :: value:     1.375000
-double value:     1.375000
-parameter: knl   double array: 0.000000e+00 -1.307600e-02 0.000000e+00 0.000000e+00 
+parameter: noise   double value:     0.000000
+parameter: noisemax   integer:          1
+parameter: npeak   double array: 0.000000e+00 
+parameter: ntune   double array: 0.000000e+00 
+parameter: nlag   double array: 0.000000e+00 
 parameter: kmax   expression: kmax_mqxb  :: value:   205.000000
 double value:   205.000000
 parameter: kmin   expression: kmin_mqxb  :: value:     6.433000
@@ -162,7 +145,36 @@ double value:     6.433000
 parameter: calib   expression: kmax_mqxb / imax_mqxb  :: value:     0.017140
 double value:     0.017140
 parameter: polarity   double value:    -1.000000
+parameter: tilt   double value:     0.000000
+parameter: lrad   expression: ( l.mqxb ) / ( 4 )  :: value:     1.375000
+double value:     1.375000
+parameter: knl   double array: 0.000000e+00 -1.307600e-02 0.000000e+00 0.000000e+00 
+parameter: ksl   double array: 0.000000e+00 
+parameter: angle   double value:     0.000000
+parameter: apertype   string: circle
+parameter: aperture   double array: 0.000000e+00 
+parameter: aper_offset   double array: 0.000000e+00 
+parameter: aper_tol   double array: 0.000000e+00 0.000000e+00 0.000000e+00 
+parameter: slice   integer:          1
+parameter: slot_id   expression: none :: value:     0.000000
+integer:          0
+parameter: assembly_id   expression: none :: value:     0.000000
+integer:          0
 parameter: mech_sep   double value:     0.000000
+parameter: v_pos   double value:     0.000000
+parameter: magnet   integer:          1
+parameter: model   integer:         -1
+parameter: method   integer:         -1
+parameter: exact   integer:         -1
+parameter: nst   integer:         -1
+parameter: from   string: ip2
+parameter: type   string: (null)
+parameter: permfringe   logical: false
+parameter: bend_fringe   logical: false
+parameter: kill_ent_fringe   logical: false
+parameter: kill_exi_fringe   logical: false
+parameter: time_var   logical: false
+parameter: comments   string: (null)
 
 
 stop;
