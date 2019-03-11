@@ -243,7 +243,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: el, tilt, bvk
   double precision :: edg1, edg2, sk1, sk2, hgap, fint, sks, sksol, h, ct
   double precision :: corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
-  double precision :: tedg1, fact1, fact1x, rfac1, drfac1_dx, drfac1_dy
+  double precision :: tedg1, fact1, fact1x, rfac, rfac1, drfac1_dx, drfac1_dy
   double precision :: h2, hcb2, tedg2, fact2, fact2x, rfac2
   double precision :: drfac2_dx, drfac2_dy, bi2gi2, betas, gammas
   double precision :: e5sq1, e5sq2, e5sqs1, e5sqs2, x, y
@@ -251,10 +251,10 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: r1sq, r2sq, fh1, fh2, dr, di, drt
   double precision :: rfv, rff, rfl, time
   double precision :: xkick, ykick, dpx, dpy, an, hyx, hcbs2,hbi
-  double precision :: sk3, rfac, drfac_dx, drfac_dy, fh
+  double precision :: sk3, fh
   double precision :: drfac1_dpx, drfac1_dpy, drfac2_dpx, drfac2_dpy
   double precision :: denominator, denominator1, denominator2
-  double precision :: bet_sqr, bet1_sqr, bet2_sqr, dbet_sqr_dpt, dbet1_sqr_dpt, dbet2_sqr_dpt
+  double precision :: bet1_sqr, bet2_sqr, dbet1_sqr_dpt, dbet2_sqr_dpt
 
   integer, external :: node_fd_errors
   double precision, external  :: node_value, get_value
@@ -597,24 +597,36 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         sum(3) = sum(3) + half*el*h**3 * (em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
 
         !---- Damping matrix, is the same at both ends.
-        rfac  = cg * (dr**2 + di**2) / el
-        drfac_dx = cg * (- dr * re(2,1) + di * re(4,1)) / el
-        drfac_dy = cg * (- dr * re(2,3) + di * re(4,3)) / el
-        bet_sqr = (orb1(6)**2 + two*orb1(6)/betas + one) / (one/betas + orb1(6))**2;
-        denominator = 2*sqrt(((rfac-two)*rfac)/bet_sqr+one);
+        rfac1  = cg * (dr**2 + di**2) / el
+        drfac1_dx = cg * (- dr * re(2,1) + di * re(4,1)) / el
+        drfac1_dy = cg * (- dr * re(2,3) + di * re(4,3)) / el
+
+        !---- Support variables
+        x1 = orb1(1); px1 = orb1(2); y1 = orb1(3); py1 = orb1(4); t1 = orb1(5); pt1 = orb1(6)
+        bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
+        dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
+        denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
         
         RW = EYE
-        rw(2,1) =     - drfac_dx * (one + orb1(6)) * orb1(2)
-        rw(2,2) = one - rfac  * (one + orb1(6))
-        rw(2,3) =     - drfac_dy * (one + orb1(6)) * orb1(2)
-        rw(2,6) =     - rfac                    * orb1(2)
-        rw(4,1) =     - drfac_dx * (one + orb1(6)) * orb1(4)
-        rw(4,3) =     - drfac_dy * (one + orb1(6)) * orb1(4)
-        rw(4,4) = one - rfac  * (one + orb1(6))
-        rw(4,6) =     - rfac                    * orb1(4)
-        rw(6,1) =     - drfac_dx * (one + orb1(6))
-        rw(6,3) =     - drfac_dy * (one + orb1(6))
-        rw(6,6) = one - two * rfac * (one + orb1(6))
+        rw(2,1) = (two*drfac1_dx*px1*rfac1-two*drfac1_dx*px1)/(bet1_sqr*denominator1);
+        rw(2,2) = sqrt(rfac1**2/bet1_sqr-two*rfac1/bet1_sqr+one)+&
+             ((two*drfac1_dpx*px1*rfac1)-(two*drfac1_dpx*px1))/(bet1_sqr*denominator1);
+        rw(2,3) = (two*drfac1_dy*px1*rfac1-two*drfac1_dy*px1)/(bet1_sqr*denominator1);
+        rw(2,4) = (two*drfac1_dpy*px1*rfac1-two*drfac1_dpy*px1)/(bet1_sqr*denominator1);
+        rw(2,6) = -(dbet1_sqr_dpt*px1*rfac1**2-two*dbet1_sqr_dpt*px1*rfac1) / &
+             (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
+        rw(4,1) = (two*drfac1_dx*py1*rfac1-two*drfac1_dx*py1)/(bet1_sqr*denominator1);
+        rw(4,2) = (two*drfac1_dpx*py1*rfac1-two*drfac1_dpx*py1)/(bet1_sqr*denominator1);
+        rw(4,3) = (two*drfac1_dy*py1*rfac1-two*drfac1_dy*py1)/(bet1_sqr*denominator1);
+        rw(4,4) = sqrt(rfac1**2/bet1_sqr-two*rfac1/bet1_sqr+one)+&
+             ((two*drfac1_dpy*py1*rfac1)-(two*drfac1_dpy*py1))/(bet1_sqr*denominator1);
+        rw(4,6) = -(dbet1_sqr_dpt*py1*rfac1**2-two*dbet1_sqr_dpt*py1*rfac1) / &
+             (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
+        rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
+        rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
+        rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
+        rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
+        rw(6,6) = one-rfac1;
 
         ! RE = RW * RE * RW
         RE = matmul(RW, matmul(RE,RW))
