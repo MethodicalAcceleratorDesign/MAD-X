@@ -243,16 +243,18 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: el, tilt, bvk
   double precision :: edg1, edg2, sk1, sk2, hgap, fint, sks, sksol, h, ct
   double precision :: corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
-  double precision :: tedg1, fact1, fact1x, rfac1, rfac1x, rfac1y
+  double precision :: tedg1, fact1, fact1x, rfac1, drfac1_dx, drfac1_dy
   double precision :: h2, hcb2, tedg2, fact2, fact2x, rfac2
-  double precision :: rfac2x, rfac2y, bi2gi2, betas, gammas
+  double precision :: drfac2_dx, drfac2_dy, bi2gi2, betas, gammas
   double precision :: e5sq1, e5sq2, e5sqs1, e5sqs2, x, y
   double precision :: f1, f2, f1s, f2s, twon, str, st
   double precision :: r1sq, r2sq, fh1, fh2, dr, di, drt
   double precision :: rfv, rff, rfl, time
   double precision :: xkick, ykick, dpx, dpy, an, hyx, hcbs2,hbi
-  double precision :: sk3, rfac, rfacx, rfacy, fh
-  double precision :: rfac1px, rfac1py, rfac2px, rfac2py
+  double precision :: sk3, rfac, drfac_dx, drfac_dy, fh
+  double precision :: drfac1_dpx, drfac1_dpy, drfac2_dpx, drfac2_dpy
+  double precision :: denominator, denominator1, denominator2
+  double precision :: bet_sqr, bet1_sqr, bet2_sqr, dbet_sqr_dpt, dbet1_sqr_dpt, dbet2_sqr_dpt
 
   integer, external :: node_fd_errors
   double precision, external  :: node_value, get_value
@@ -355,8 +357,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         fact1  = (one + h*x1) * (one - tedg1*x1)
         fact1x = h - tedg1 - 2.0*h*tedg1*x1
         rfac1  = cg*el*h1**2*fact1
-        rfac1x = cg*el * (two*(hx*hxx+hy*hyx)*fact1 + h1**2*fact1x)
-        rfac1y = cg*el *  two*(hx*hxy+hy*hyy)*fact1
+        drfac1_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact1 + h1**2*fact1x)
+        drfac1_dy = cg*el *  two*(hx*hxy+hy*hyy)*fact1
 
         hx = sk1*x2 + sks*y2 + h + half*sk2 * (x2**2 - y2**2)
         hy = sks*x2 - sk1*y2 - sk2*x2*y2
@@ -373,9 +375,16 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         fact2x = h - tedg2 - 2.0*h*tedg2*x2
 
         rfac2  = cg*el*h2**2*fact2
-        rfac2x = cg*el * (two*(hx*hxx+hy*hyx)*fact2 + h2**2*fact2x)
-        rfac2y = cg*el *  two*(hx*hxy+hy*hyy)*fact2
+        drfac2_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact2 + h2**2*fact2x)
+        drfac2_dy = cg*el *  two*(hx*hxy+hy*hyy)*fact2
 
+        bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
+        bet2_sqr = (pt2*pt2 + two*pt2/betas + one) / (one/betas + pt2)**2;
+        dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
+        dbet2_sqr_dpt = (two/betas+two*pt2)/(pt2+one/betas)**2-(two*((pt2*two)/betas+pt2**2+one))/(pt2+one/betas)**3;
+        denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
+        denominator2 = 2*sqrt(((rfac2-two)*rfac2)/bet2_sqr+one);
+        
         !---- Cubic integration over h**3 * E(i,5) * conjg(E(i,5)).
         bi2gi2 = one / (betas * gammas)**2
         hbi = h / betas
@@ -404,31 +413,48 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         !---- Damping matrices.
         !     Code common to bending magnet and pure multipoles.
         RW = EYE
-        rw(2,1) =     - rfac1x * (one + pt1) * px1
-        rw(2,2) = one - rfac1  * (one + pt1)
-        rw(2,3) =     - rfac1y * (one + pt1) * px1
-        rw(2,6) =     - rfac1                * px1
-        rw(4,1) =     - rfac1x * (one + pt1) * py1
-        rw(4,3) =     - rfac1y * (one + pt1) * py1
-        rw(4,4) = one - rfac1  * (one + pt1)
-        rw(4,6) =     - rfac1                * py1
-        rw(6,1) =     - rfac1x * (one + pt1)**2
-        rw(6,3) =     - rfac1y * (one + pt1)**2
-        rw(6,6) = one - two * rfac1 * (one + pt1)
+        rw(2,1) = (two*drfac1_dx*px1*rfac1-two*drfac1_dx*px1)/(bet1_sqr*denominator1);
+        rw(2,2) = sqrt(rfac1**2/bet1_sqr-two*rfac1/bet1_sqr+one)+&
+             ((two*drfac1_dpx*px1*rfac1)-(two*drfac1_dpx*px1))/(bet1_sqr*denominator1);
+        rw(2,3) = (two*drfac1_dy*px1*rfac1-two*drfac1_dy*px1)/(bet1_sqr*denominator1);
+        rw(2,4) = (two*drfac1_dpy*px1*rfac1-two*drfac1_dpy*px1)/(bet1_sqr*denominator1);
+        rw(2,6) = -(dbet1_sqr_dpt*px1*rfac1**2-two*dbet1_sqr_dpt*px1*rfac1) / &
+             (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
+        rw(4,1) = (two*drfac1_dx*py1*rfac1-two*drfac1_dx*py1)/(bet1_sqr*denominator1);
+        rw(4,2) = (two*drfac1_dpx*py1*rfac1-two*drfac1_dpx*py1)/(bet1_sqr*denominator1);
+        rw(4,3) = (two*drfac1_dy*py1*rfac1-two*drfac1_dy*py1)/(bet1_sqr*denominator1);
+        rw(4,4) = sqrt(rfac1**2/bet1_sqr-two*rfac1/bet1_sqr+one)+&
+             ((two*drfac1_dpy*py1*rfac1)-(two*drfac1_dpy*py1))/(bet1_sqr*denominator1);
+        rw(4,6) = -(dbet1_sqr_dpt*py1*rfac1**2-two*dbet1_sqr_dpt*py1*rfac1) / &
+             (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
+        rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
+        rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
+        rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
+        rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
+        rw(6,6) = one-rfac1;
+
         RE = matmul(RE,RW)
 
         RW = EYE
-        rw(2,1) =     - rfac2x * (one + pt2) * px2
-        rw(2,2) = one - rfac2  * (one + pt2)
-        rw(2,3) =     - rfac2y * (one + pt2) * px2
-        rw(2,6) =     - rfac2                * px2
-        rw(4,1) =     - rfac2x * (one + pt2) * py2
-        rw(4,3) =     - rfac2y * (one + pt2) * py2
-        rw(4,4) = one - rfac2  * (one + pt2)
-        rw(4,6) =     - rfac2                * py2
-        rw(6,1) =     - rfac2x * (one + pt2)**2
-        rw(6,3) =     - rfac2y * (one + pt2)**2
-        rw(6,6) = one - two * rfac2 * (one + pt2)
+        rw(2,1) = (two*drfac2_dx*px2*rfac2-two*drfac2_dx*px2)/(bet2_sqr*denominator1);
+        rw(2,2) = sqrt(rfac2**2/bet2_sqr-two*rfac2/bet2_sqr+one)+&
+             ((two*drfac2_dpx*px2*rfac2)-(two*drfac2_dpx*px2))/(bet2_sqr*denominator1);
+        rw(2,3) = (two*drfac2_dy*px2*rfac2-two*drfac2_dy*px2)/(bet2_sqr*denominator1);
+        rw(2,4) = (two*drfac2_dpy*px2*rfac2-two*drfac2_dpy*px2)/(bet2_sqr*denominator1);
+        rw(2,6) = -(dbet2_sqr_dpt*px2*rfac2**2-two*dbet2_sqr_dpt*px2*rfac2) / &
+             (two*bet2_sqr**2*sqrt((rfac2**2-two*rfac2+bet2_sqr)/bet2_sqr));
+        rw(4,1) = (two*drfac2_dx*py2*rfac2-two*drfac2_dx*py2)/(bet2_sqr*denominator1);
+        rw(4,2) = (two*drfac2_dpx*py2*rfac2-two*drfac2_dpx*py2)/(bet2_sqr*denominator1);
+        rw(4,3) = (two*drfac2_dy*py2*rfac2-two*drfac2_dy*py2)/(bet2_sqr*denominator1);
+        rw(4,4) = sqrt(rfac2**2/bet2_sqr-two*rfac2/bet2_sqr+one)+&
+             ((two*drfac2_dpy*py2*rfac2)-(two*drfac2_dpy*py2))/(bet2_sqr*denominator1);
+        rw(4,6) = -(dbet2_sqr_dpt*py2*rfac2**2-two*dbet2_sqr_dpt*py2*rfac2) / &
+             (two*bet2_sqr**2*sqrt((rfac2**2-two*rfac2+bet2_sqr)/bet2_sqr));
+        rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
+        rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
+        rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
+        rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
+        rw(6,6) = one-rfac2;
         RE = matmul(RW,RE)
 
      case (code_quadrupole , code_sextupole, code_octupole, code_solenoid) !---- Common to all pure multipoles.
@@ -470,14 +496,14 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rfac = cg * str**2 * el
         rfac1 = rfac * r1sq**n + cg * sksol*(sksol*x1-py1) / el + cg * sksol*(sksol*y1+px1) / el;
         rfac2 = rfac * r2sq**n + cg * sksol*(sksol*x2-py2) / el + cg * sksol*(sksol*y2+px2) / el;
-        rfac1x = twon * rfac * r1sq**(n-1) * x1 + (cg*sksol**2)/el
-        rfac2x = twon * rfac * r1sq**(n-1) * x2 + (cg*sksol**2)/el
-        rfac1y = twon * rfac * r1sq**(n-1) * y1 + (cg*sksol**2)/el
-        rfac2y = twon * rfac * r1sq**(n-1) * y2 + (cg*sksol**2)/el
-        rfac1px = cg*sksol/el
-        rfac2px = cg*sksol/el
-        rfac1py = -cg*sksol/el
-        rfac2py = -cg*sksol/el
+        drfac1_dx = twon * rfac * r1sq**(n-1) * x1 + (cg*sksol**2)/el
+        drfac2_dx = twon * rfac * r1sq**(n-1) * x2 + (cg*sksol**2)/el
+        drfac1_dy = twon * rfac * r1sq**(n-1) * y1 + (cg*sksol**2)/el
+        drfac2_dy = twon * rfac * r1sq**(n-1) * y2 + (cg*sksol**2)/el
+        drfac1_dpx = cg*sksol/el
+        drfac2_dpx = cg*sksol/el
+        drfac1_dpy = -cg*sksol/el
+        drfac2_dpy = -cg*sksol/el
 
         !---- Trapezoidal integration over h**3 * E(k,5) * conjg(E(k,5)).
         fh1 = half * el * h1**3
@@ -489,39 +515,48 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         !---- Damping matrices.
         !     Code common to bending magnet and pure multipoles.
         RW = EYE
-        rw(2,1) =     - rfac1x  * (one + pt1) * px1
-        rw(2,2) = one - rfac1   * (one + pt1) - (one + pt1) * px1 * rfac1px;
-        rw(2,3) =     - rfac1y  * (one + pt1) * px1
-        rw(2,4) =     - rfac1py * (one + pt1) * px1
-        rw(2,6) =     - rfac1                 * px1
-        rw(4,1) =     - rfac1x  * (one + pt1) * py1
-        rw(4,2) =     - rfac1px * (one + pt1) * py1
-        rw(4,3) =     - rfac1y  * (one + pt1) * py1
-        rw(4,4) = one - rfac1   * (one + pt1) - (one + pt1) * py1 * rfac1py;
-        rw(4,6) =     - rfac1                 * py1
-        rw(6,1) =     - rfac1x  * (one + pt1)**2
-        rw(6,2) =     - rfac1px * (one + pt1)**2
-        rw(6,3) =     - rfac1y  * (one + pt1)**2
-        rw(6,4) =     - rfac1py * (one + pt1)**2
-        rw(6,6) = one - two * rfac1 * (one + pt1)
+        rw(2,1) = (two*drfac1_dx*px1*rfac1-two*drfac1_dx*px1)/(bet1_sqr*denominator1);
+        rw(2,2) = sqrt(rfac1**2/bet1_sqr-two*rfac1/bet1_sqr+one)+&
+             ((two*drfac1_dpx*px1*rfac1)-(two*drfac1_dpx*px1))/(bet1_sqr*denominator1);
+        rw(2,3) = (two*drfac1_dy*px1*rfac1-two*drfac1_dy*px1)/(bet1_sqr*denominator1);
+        rw(2,4) = (two*drfac1_dpy*px1*rfac1-two*drfac1_dpy*px1)/(bet1_sqr*denominator1);
+        rw(2,6) = -(dbet1_sqr_dpt*px1*rfac1**2-two*dbet1_sqr_dpt*px1*rfac1) / &
+             (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
+        rw(4,1) = (two*drfac1_dx*py1*rfac1-two*drfac1_dx*py1)/(bet1_sqr*denominator1);
+        rw(4,2) = (two*drfac1_dpx*py1*rfac1-two*drfac1_dpx*py1)/(bet1_sqr*denominator1);
+        rw(4,3) = (two*drfac1_dy*py1*rfac1-two*drfac1_dy*py1)/(bet1_sqr*denominator1);
+        rw(4,4) = sqrt(rfac1**2/bet1_sqr-two*rfac1/bet1_sqr+one)+&
+             ((two*drfac1_dpy*py1*rfac1)-(two*drfac1_dpy*py1))/(bet1_sqr*denominator1);
+        rw(4,6) = -(dbet1_sqr_dpt*py1*rfac1**2-two*dbet1_sqr_dpt*py1*rfac1) / &
+             (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
+        rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
+        rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
+        rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
+        rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
+        rw(6,6) = one-rfac1;
+
         RE = matmul(RE,RW)
 
         RW = EYE
-        rw(2,1) =     - rfac2x  * (one + pt2) * px2
-        rw(2,2) = one - rfac2   * (one + pt2) - (one + pt2) * px2 * rfac2px;
-        rw(2,3) =     - rfac2y  * (one + pt2) * px2
-        rw(2,4) =     - rfac2py * (one + pt2) * px2
-        rw(2,6) =     - rfac2                 * px2
-        rw(4,1) =     - rfac2x  * (one + pt2) * py2
-        rw(4,2) =     - rfac2px * (one + pt2) * py2
-        rw(4,3) =     - rfac2y  * (one + pt2) * py2
-        rw(4,4) = one - rfac2   * (one + pt2) - (one + pt2) * py2 * rfac2py;
-        rw(4,6) =     - rfac2                 * py2
-        rw(6,1) =     - rfac2x  * (one + pt2)**2
-        rw(6,2) =     - rfac2px * (one + pt2)**2
-        rw(6,3) =     - rfac2y  * (one + pt2)**2
-        rw(6,4) =     - rfac2py * (one + pt2)**2
-        rw(6,6) = one - two * rfac2 * (one + pt2)
+        rw(2,1) = (two*drfac2_dx*px2*rfac2-two*drfac2_dx*px2)/(bet2_sqr*denominator1);
+        rw(2,2) = sqrt(rfac2**2/bet2_sqr-two*rfac2/bet2_sqr+one)+&
+             ((two*drfac2_dpx*px2*rfac2)-(two*drfac2_dpx*px2))/(bet2_sqr*denominator1);
+        rw(2,3) = (two*drfac2_dy*px2*rfac2-two*drfac2_dy*px2)/(bet2_sqr*denominator1);
+        rw(2,4) = (two*drfac2_dpy*px2*rfac2-two*drfac2_dpy*px2)/(bet2_sqr*denominator1);
+        rw(2,6) = -(dbet2_sqr_dpt*px2*rfac2**2-two*dbet2_sqr_dpt*px2*rfac2) / &
+             (two*bet2_sqr**2*sqrt((rfac2**2-two*rfac2+bet2_sqr)/bet2_sqr));
+        rw(4,1) = (two*drfac2_dx*py2*rfac2-two*drfac2_dx*py2)/(bet2_sqr*denominator1);
+        rw(4,2) = (two*drfac2_dpx*py2*rfac2-two*drfac2_dpx*py2)/(bet2_sqr*denominator1);
+        rw(4,3) = (two*drfac2_dy*py2*rfac2-two*drfac2_dy*py2)/(bet2_sqr*denominator1);
+        rw(4,4) = sqrt(rfac2**2/bet2_sqr-two*rfac2/bet2_sqr+one)+&
+             ((two*drfac2_dpy*py2*rfac2)-(two*drfac2_dpy*py2))/(bet2_sqr*denominator1);
+        rw(4,6) = -(dbet2_sqr_dpt*py2*rfac2**2-two*dbet2_sqr_dpt*py2*rfac2) / &
+             (two*bet2_sqr**2*sqrt((rfac2**2-two*rfac2+bet2_sqr)/bet2_sqr));
+        rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
+        rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
+        rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
+        rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
+        rw(6,6) = one-rfac2;
         RE = matmul(RW,RE)
 
 
@@ -563,20 +598,22 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
         !---- Damping matrix, is the same at both ends.
         rfac  = cg * (dr**2 + di**2) / el
-        rfacx = cg * (- dr * re(2,1) + di * re(4,1)) / el
-        rfacy = cg * (- dr * re(2,3) + di * re(4,3)) / el
-
+        drfac_dx = cg * (- dr * re(2,1) + di * re(4,1)) / el
+        drfac_dy = cg * (- dr * re(2,3) + di * re(4,3)) / el
+        bet_sqr = (orb1(6)**2 + two*orb1(6)/betas + one) / (one/betas + orb1(6))**2;
+        denominator = 2*sqrt(((rfac-two)*rfac)/bet_sqr+one);
+        
         RW = EYE
-        rw(2,1) =     - rfacx * (one + orb1(6)) * orb1(2)
+        rw(2,1) =     - drfac_dx * (one + orb1(6)) * orb1(2)
         rw(2,2) = one - rfac  * (one + orb1(6))
-        rw(2,3) =     - rfacy * (one + orb1(6)) * orb1(2)
+        rw(2,3) =     - drfac_dy * (one + orb1(6)) * orb1(2)
         rw(2,6) =     - rfac                    * orb1(2)
-        rw(4,1) =     - rfacx * (one + orb1(6)) * orb1(4)
-        rw(4,3) =     - rfacy * (one + orb1(6)) * orb1(4)
+        rw(4,1) =     - drfac_dx * (one + orb1(6)) * orb1(4)
+        rw(4,3) =     - drfac_dy * (one + orb1(6)) * orb1(4)
         rw(4,4) = one - rfac  * (one + orb1(6))
         rw(4,6) =     - rfac                    * orb1(4)
-        rw(6,1) =     - rfacx * (one + orb1(6))
-        rw(6,3) =     - rfacy * (one + orb1(6))
+        rw(6,1) =     - drfac_dx * (one + orb1(6))
+        rw(6,3) =     - drfac_dy * (one + orb1(6))
         rw(6,6) = one - two * rfac * (one + orb1(6))
 
         ! RE = RW * RE * RW
@@ -622,6 +659,14 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         hx = abs(dpx) / el
         hy = abs(dpy) / el
         rfac = cg * (hx**2 + hx**2) * el
+        drfac1_dx  = zero;
+        drfac1_dy  = zero;
+        drfac1_dpx = zero;
+        drfac1_dpy = zero;
+        drfac2_dx  = zero;
+        drfac2_dy  = zero;
+        drfac2_dpx = zero;
+        drfac2_dpy = zero;
 
         !---- Trapezoidal integration over h**3*E(k,5)*E*(k,5).
         fh = half * el * sqrt(hx**2 + hy**2)**3
@@ -629,21 +674,61 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         sum(2) = sum(2) + fh * (em1(5,3)**2 + em1(5,4)**2 + em2(5,3)**2 + em2(5,4)**2)
         sum(3) = sum(3) + fh * (em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
 
+        !---- Support variables
+        x1 = orb1(1); px1 = orb1(2); y1 = orb1(3); py1 = orb1(4); t1 = orb1(5); pt1 = orb1(6)
+        x2 = orb2(1); px2 = orb2(2); y2 = orb2(3); py2 = orb2(4); t2 = orb2(5); pt2 = orb2(6)
+        
+        bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
+        bet2_sqr = (pt2*pt2 + two*pt2/betas + one) / (one/betas + pt2)**2;
+        dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
+        dbet2_sqr_dpt = (two/betas+two*pt2)/(pt2+one/betas)**2-(two*((pt2*two)/betas+pt2**2+one))/(pt2+one/betas)**3;
+        denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
+        denominator2 = 2*sqrt(((rfac2-two)*rfac2)/bet2_sqr+one);
+        
         !---- Damping matrices.
         RW = EYE
-        rw(2,2) = one - rfac * (one + orb1(6))
-        rw(2,6) =     - rfac * orb1(2)
-        rw(4,4) = one - rfac * (one + orb1(6))
-        rw(4,6) =     - rfac * orb1(4)
-        rw(6,6) = one - two * rfac * (one + orb1(6))
+        rw(2,1) = (two*drfac1_dx*px1*rfac1-two*drfac1_dx*px1)/(bet1_sqr*denominator1);
+        rw(2,2) = sqrt(rfac1**2/bet1_sqr-two*rfac1/bet1_sqr+one)+&
+             ((two*drfac1_dpx*px1*rfac1)-(two*drfac1_dpx*px1))/(bet1_sqr*denominator1);
+        rw(2,3) = (two*drfac1_dy*px1*rfac1-two*drfac1_dy*px1)/(bet1_sqr*denominator1);
+        rw(2,4) = (two*drfac1_dpy*px1*rfac1-two*drfac1_dpy*px1)/(bet1_sqr*denominator1);
+        rw(2,6) = -(dbet1_sqr_dpt*px1*rfac1**2-two*dbet1_sqr_dpt*px1*rfac1) / &
+             (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
+        rw(4,1) = (two*drfac1_dx*py1*rfac1-two*drfac1_dx*py1)/(bet1_sqr*denominator1);
+        rw(4,2) = (two*drfac1_dpx*py1*rfac1-two*drfac1_dpx*py1)/(bet1_sqr*denominator1);
+        rw(4,3) = (two*drfac1_dy*py1*rfac1-two*drfac1_dy*py1)/(bet1_sqr*denominator1);
+        rw(4,4) = sqrt(rfac1**2/bet1_sqr-two*rfac1/bet1_sqr+one)+&
+             ((two*drfac1_dpy*py1*rfac1)-(two*drfac1_dpy*py1))/(bet1_sqr*denominator1);
+        rw(4,6) = -(dbet1_sqr_dpt*py1*rfac1**2-two*dbet1_sqr_dpt*py1*rfac1) / &
+             (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
+        rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
+        rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
+        rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
+        rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
+        rw(6,6) = one-rfac1;
+
         RE = matmul(RE,RW)
 
         RW = EYE
-        rw(2,2) = one - rfac * (one + orb2(6))
-        rw(2,6) =     - rfac * orb2(2)
-        rw(4,4) = one - rfac * (one + orb2(6))
-        rw(4,6) =     - rfac * orb2(4)
-        rw(6,6) = one - two * rfac * (one + orb2(6))
+        rw(2,1) = (two*drfac2_dx*px2*rfac2-two*drfac2_dx*px2)/(bet2_sqr*denominator1);
+        rw(2,2) = sqrt(rfac2**2/bet2_sqr-two*rfac2/bet2_sqr+one)+&
+             ((two*drfac2_dpx*px2*rfac2)-(two*drfac2_dpx*px2))/(bet2_sqr*denominator1);
+        rw(2,3) = (two*drfac2_dy*px2*rfac2-two*drfac2_dy*px2)/(bet2_sqr*denominator1);
+        rw(2,4) = (two*drfac2_dpy*px2*rfac2-two*drfac2_dpy*px2)/(bet2_sqr*denominator1);
+        rw(2,6) = -(dbet2_sqr_dpt*px2*rfac2**2-two*dbet2_sqr_dpt*px2*rfac2) / &
+             (two*bet2_sqr**2*sqrt((rfac2**2-two*rfac2+bet2_sqr)/bet2_sqr));
+        rw(4,1) = (two*drfac2_dx*py2*rfac2-two*drfac2_dx*py2)/(bet2_sqr*denominator1);
+        rw(4,2) = (two*drfac2_dpx*py2*rfac2-two*drfac2_dpx*py2)/(bet2_sqr*denominator1);
+        rw(4,3) = (two*drfac2_dy*py2*rfac2-two*drfac2_dy*py2)/(bet2_sqr*denominator1);
+        rw(4,4) = sqrt(rfac2**2/bet2_sqr-two*rfac2/bet2_sqr+one)+&
+             ((two*drfac2_dpy*py2*rfac2)-(two*drfac2_dpy*py2))/(bet2_sqr*denominator1);
+        rw(4,6) = -(dbet2_sqr_dpt*py2*rfac2**2-two*dbet2_sqr_dpt*py2*rfac2) / &
+             (two*bet2_sqr**2*sqrt((rfac2**2-two*rfac2+bet2_sqr)/bet2_sqr));
+        rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
+        rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
+        rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
+        rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
+        rw(6,6) = one-rfac2;
         RE = matmul(RW,RE)
 
      case (code_rfmultipole)  !---- thin RF multipole
