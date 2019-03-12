@@ -310,13 +310,13 @@ remove_from_command_list(char* label, struct command_list* list)
 }
 
 void
-get_defined_commands(void)
+get_defined_commands(char *mycommand_def)
   /* reads + stores the commands defined in mad_dict.c */
 {
   const char *rout_name = "get_defined_commands";
-  int n = char_cnt(';', command_def);
+  int n = char_cnt(';', mycommand_def);
   char** p = mymalloc(rout_name, n * sizeof *p);
-  p[0] = strtok(command_def, ";");
+  p[0] = strtok(mycommand_def, ";");
   for (int i = 1; i < n; i++) /* make temporary list - strtok is called again */
     p[i] = strtok(NULL, ";");
   for (int i = 0; i < n; i++)
