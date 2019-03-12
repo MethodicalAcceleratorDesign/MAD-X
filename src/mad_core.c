@@ -62,12 +62,15 @@ mad_init_c(void)
   /* make dynamic copies to avoid sbrk calls on load disliked by Valgrind */
   constant_def = mymalloc_atomic("mad_init_c", strlen(const_constant_def)+1);
   command_def  = mymalloc_atomic("mad_init_c", strlen(const_command_def )+1);
+  element_def  = mymalloc_atomic("mad_init_c", strlen(const_element_def )+1);
   strcpy(constant_def, const_constant_def);
   strcpy(command_def , const_command_def );
+  strcpy(element_def , const_element_def );
 
   deco_init();
   get_defined_constants();
-  get_defined_commands();
+  get_defined_commands(command_def);
+  get_defined_commands(element_def);
   get_sxf_names();
 
   pi = get_variable("pi");
