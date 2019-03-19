@@ -3072,7 +3072,7 @@ write_f3_aper(void)
       if (f3aper_cnt++ == 0)
       {
         f3aper  = fopen("fc.3.aper", "w");
-        fprintf(f3aper,"LIMI\n");
+        // fprintf(f3aper,"LIMI\n");
       }
       if      (current_element->value[1] == 1) strcpy(keyword, "CR") ;
       else if (current_element->value[1] == 2) strcpy(keyword, "RE") ;
@@ -3092,7 +3092,7 @@ write_f3_aper(void)
     }
     current_element = current_element->next;
   }
-  if (f3aper_cnt > 0) fprintf(f3aper,"NEXT\n");
+  // if (f3aper_cnt > 0) fprintf(f3aper,"NEXT\n");
 }
 
 static void
