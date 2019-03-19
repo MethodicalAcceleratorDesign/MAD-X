@@ -455,6 +455,7 @@ static char tmp_name[KEY_LENGTH];
 static char name_format[70];
 static char name_format_short[6];
 static char name_format_error[62];
+static char name_format_aper[61];
 static char name_format_3[40];
 static char name_format_4[40];
 static char name_format_5[40];
@@ -3082,7 +3083,7 @@ write_f3_aper(void)
       else if (current_element->value[1] == 7) strcpy(keyword, "OC") ;
       else strcpy(keyword, "UK") ; // unknown aperture type
 
-      fprintf(f3aper,"%s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n",
+      fprintf(f3aper,name_format_aper,
         current_element->name, keyword,
         current_element->value[2], current_element->value[3],
         current_element->value[4], current_element->value[5],
@@ -3559,24 +3560,25 @@ process_c6t(void)  /* steering routine */
 static void
 setup_output_string(void)
 {
-    if(long_names_flag==1){
+  if(long_names_flag==1){
     strcpy(name_format,"%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n");
     strcpy(name_format_short,"%-48s" );
     strcpy(name_format_error, " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n");
+    strcpy(name_format_aper, "%-48s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n");
     strcpy(name_format_3,  "%-48s%20.10e%20.10e\n");
     strcpy(name_format_4, "%-48s  %14.6e%14.6e%17.9e\n");
     strcpy(name_format_5, "%23.15e %23.15e %23.15e %23.15e\n");
-
   }
     else{
     strcpy(name_format,"%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n");
     strcpy(name_format_short, "%-18s");
     strcpy(name_format_error, " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n");
+    strcpy(name_format_aper, "%-16s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n");
     strcpy(name_format_3,"%-16s%20.10e%20.10e\n");
     strcpy(name_format_4,"%-16s  %14.6e%14.6e%17.9e\n");
     strcpy(name_format_5, "%17.9e %17.9e %17.9e %17.9e\n");
 
-    }
+  }
 }
 void
 conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
