@@ -5,10 +5,10 @@ qf.1_AP            0   0.000000000e+00   0.000000000e+00    0.000000000e+00    0
 drift_1            0   0.000000000e+00   0.000000000e+00    2.265000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
 mscbh              3  -1.091711187e-02   0.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
 d_c6t_1            0   0.000000000e+00   0.000000000e+00    1.704992305e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
-mb_den            24   9.158417797e-07  -9.158417797e-07    0.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
+mb_s_den          24   9.158417797e-07  -9.158417797e-07    0.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
 drift_4            0   0.000000000e+00   0.000000000e+00    7.100007695e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
-mb                11  -5.099988074e-03   1.420001539e+01   -1.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
-mb_AP              0   0.000000000e+00   0.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
+mb_s              11  -5.099988074e-03   1.420001539e+01   -1.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
+mb_s_AP            0   0.000000000e+00   0.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
 drift_6            0   0.000000000e+00   0.000000000e+00    1.459984611e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
 d_c6t_2            0   0.000000000e+00   0.000000000e+00    3.969992305e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
 qd.1               2   2.705609450e-02   0.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00    0.000000000e+00
@@ -35,89 +35,89 @@ NEXT
 STRUCTURE INPUT---------------------------------------------------------
 BLOC1             qf.1              qf.1_AP           
 BLOC2             mscbh             BLOC3             
-mb_den            BLOC4             mb                
-mb_AP             BLOC4             mb_den            
-BLOC5             mb_den            BLOC4             
-mb                mb_AP             BLOC4             
-mb_den            BLOC5             mb_den            
-BLOC4             mb                mb_AP             
-BLOC4             mb_den            BLOC6             
+mb_s_den          BLOC4             mb_s              
+mb_s_AP           BLOC4             mb_s_den          
+BLOC5             mb_s_den          BLOC4             
+mb_s              mb_s_AP           BLOC4             
+mb_s_den          BLOC5             mb_s_den          
+BLOC4             mb_s              mb_s_AP           
+BLOC4             mb_s_den          BLOC6             
 qd.1              qd.1_AP           BLOC2             
-mscbv.1           BLOC3             mb_den            
-BLOC4             mb                mb_AP             
-BLOC4             mb_den            BLOC5             
-mb_den            BLOC4             mb                
-mb_AP             BLOC4             mb_den            
-BLOC5             mb_den            BLOC4             
-mb                mb_AP             BLOC4             
-mb_den            BLOC6             qf.1              
+mscbv.1           BLOC3             mb_s_den          
+BLOC4             mb_s              mb_s_AP           
+BLOC4             mb_s_den          BLOC5             
+mb_s_den          BLOC4             mb_s              
+mb_s_AP           BLOC4             mb_s_den          
+BLOC5             mb_s_den          BLOC4             
+mb_s              mb_s_AP           BLOC4             
+mb_s_den          BLOC6             qf.1              
 qf.2_AP           BLOC2             mscbh             
-BLOC3             mb_den            BLOC4             
-mb                mb_AP             BLOC4             
-mb_den            BLOC5             mb_den            
-BLOC4             mb                mb_AP             
-BLOC4             mb_den            BLOC5             
-mb_den            BLOC4             mb                
-mb_AP             BLOC4             mb_den            
+BLOC3             mb_s_den          BLOC4             
+mb_s              mb_s_AP           BLOC4             
+mb_s_den          BLOC5             mb_s_den          
+BLOC4             mb_s              mb_s_AP           
+BLOC4             mb_s_den          BLOC5             
+mb_s_den          BLOC4             mb_s              
+mb_s_AP           BLOC4             mb_s_den          
 BLOC6             qd.1              qd.2_AP           
 BLOC2             mscbv.1           BLOC3             
-mb_den            BLOC4             mb                
-mb_AP             BLOC4             mb_den            
-BLOC5             mb_den            BLOC4             
-mb                mb_AP             BLOC4             
-mb_den            BLOC5             mb_den            
-BLOC4             mb                mb_AP             
-BLOC4             mb_den            BLOC6             
+mb_s_den          BLOC4             mb_s              
+mb_s_AP           BLOC4             mb_s_den          
+BLOC5             mb_s_den          BLOC4             
+mb_s              mb_s_AP           BLOC4             
+mb_s_den          BLOC5             mb_s_den          
+BLOC4             mb_s              mb_s_AP           
+BLOC4             mb_s_den          BLOC6             
 qf.1              qf.3_AP           BLOC2             
-mscbh             BLOC3             mb_den            
-BLOC4             mb                mb_AP             
-BLOC4             mb_den            BLOC5             
-mb_den            BLOC4             mb                
-mb_AP             BLOC4             mb_den            
-BLOC5             mb_den            BLOC4             
-mb                mb_AP             BLOC4             
-mb_den            BLOC6             qd.1              
+mscbh             BLOC3             mb_s_den          
+BLOC4             mb_s              mb_s_AP           
+BLOC4             mb_s_den          BLOC5             
+mb_s_den          BLOC4             mb_s              
+mb_s_AP           BLOC4             mb_s_den          
+BLOC5             mb_s_den          BLOC4             
+mb_s              mb_s_AP           BLOC4             
+mb_s_den          BLOC6             qd.1              
 qf.1_AP           BLOC2             mscbv.1           
-BLOC3             mb_den            BLOC4             
-mb                mb_AP             BLOC4             
-mb_den            BLOC5             mb_den            
-BLOC4             mb                mb_AP             
-BLOC4             mb_den            BLOC5             
-mb_den            BLOC4             mb                
-mb_AP             BLOC4             mb_den            
+BLOC3             mb_s_den          BLOC4             
+mb_s              mb_s_AP           BLOC4             
+mb_s_den          BLOC5             mb_s_den          
+BLOC4             mb_s              mb_s_AP           
+BLOC4             mb_s_den          BLOC5             
+mb_s_den          BLOC4             mb_s              
+mb_s_AP           BLOC4             mb_s_den          
 BLOC6             qf.1              qf.4_AP           
 BLOC2             mscbh             BLOC3             
-mb_den            BLOC4             mb                
-mb_AP             BLOC4             mb_den            
-BLOC5             mb_den            BLOC4             
-mb                mb_AP             BLOC4             
-mb_den            BLOC5             mb_den            
-BLOC4             mb                mb_AP             
-BLOC4             mb_den            BLOC6             
+mb_s_den          BLOC4             mb_s              
+mb_s_AP           BLOC4             mb_s_den          
+BLOC5             mb_s_den          BLOC4             
+mb_s              mb_s_AP           BLOC4             
+mb_s_den          BLOC5             mb_s_den          
+BLOC4             mb_s              mb_s_AP           
+BLOC4             mb_s_den          BLOC6             
 qd.1              qf.1_AP           BLOC2             
-mscbv.1           BLOC3             mb_den            
-BLOC4             mb                mb_AP             
-BLOC4             mb_den            BLOC5             
-mb_den            BLOC4             mb                
-mb_AP             BLOC4             mb_den            
-BLOC5             mb_den            BLOC4             
-mb                mb_AP             BLOC4             
-mb_den            BLOC6             qf.1              
+mscbv.1           BLOC3             mb_s_den          
+BLOC4             mb_s              mb_s_AP           
+BLOC4             mb_s_den          BLOC5             
+mb_s_den          BLOC4             mb_s              
+mb_s_AP           BLOC4             mb_s_den          
+BLOC5             mb_s_den          BLOC4             
+mb_s              mb_s_AP           BLOC4             
+mb_s_den          BLOC6             qf.1              
 qf.5_AP           BLOC2             mscbh             
-BLOC3             mb_den            BLOC4             
-mb                mb_AP             BLOC4             
-mb_den            BLOC5             mb_den            
-BLOC4             mb                mb_AP             
-BLOC4             mb_den            BLOC5             
-mb_den            BLOC4             mb                
-mb_AP             BLOC4             mb_den            
+BLOC3             mb_s_den          BLOC4             
+mb_s              mb_s_AP           BLOC4             
+mb_s_den          BLOC5             mb_s_den          
+BLOC4             mb_s              mb_s_AP           
+BLOC4             mb_s_den          BLOC5             
+mb_s_den          BLOC4             mb_s              
+mb_s_AP           BLOC4             mb_s_den          
 BLOC6             qd.5              qf.1_AP           
 BLOC2             mscbv.1           BLOC3             
-mb_den            BLOC4             mb                
-mb_AP             BLOC4             mb_den            
-BLOC5             mb_den            BLOC4             
-mb                mb_AP             BLOC4             
-mb_den            BLOC5             mb_den            
-BLOC4             mb                mb_AP             
-BLOC4             mb_den            BLOC7             
+mb_s_den          BLOC4             mb_s              
+mb_s_AP           BLOC4             mb_s_den          
+BLOC5             mb_s_den          BLOC4             
+mb_s              mb_s_AP           BLOC4             
+mb_s_den          BLOC5             mb_s_den          
+BLOC4             mb_s              mb_s_AP           
+BLOC4             mb_s_den          BLOC7             
 NEXT
