@@ -486,7 +486,7 @@ CONTAINS
 
 
     Beam_envelope_with_PTC: IF (beam_envelope) THEN 
-        call fort_warn('ptc_track: ',' Calculation of Equilibrim emittance was moved to ptc_twiss')
+        call fort_warn('ptc_track: ',' Calculation of Equilibrium emittance was moved to ptc_twiss')
     endif Beam_envelope_with_PTC
 
 !     Beam_envelope_with_PTC: IF (beam_envelope) THEN !###############################!
@@ -2555,8 +2555,9 @@ CONTAINS
       character(name_len) ::      local_name
 
       debug_printing_1: if (ptc_track_debug) then
-         Print *, 'Start subr. <Prepare_Observation_points> max_obs=', max_obs
-         Print *, 'x_coord_co_at_START=', x_coord_co_at_START
+         Print *, 'Start subroutine <Prepare_Observation_points> max_obs=', max_obs
+         Print *, 'Closed orbit:'
+         Print *, '      x_coord_co_at_START=', x_coord_co_at_START
       endif debug_printing_1
       ! Define the number of element at observation point
 
@@ -2612,11 +2613,11 @@ CONTAINS
 
          ENDIF
          if (ptc_track_debug) then
-            Print *, 'i_el ', i_ring_element,' num_obs=', number_obs
-            Print *, ' l_c_code=',length_current_element_c,' l_f90=', &
+            Print *, '      i_el ', i_ring_element,' num_obs=', number_obs
+            Print *, '      l_c_code=',length_current_element_c,' l_f90=', &
                  length_current_element_f90, &
                  ' name_c=', local_name, ' &_f90=', current%MAG%name
-            Print *, 'x_coord_co_temp=', x_coord_co_temp
+            Print *, '      x_coord_co_temp=', x_coord_co_temp
 
          endif
 
@@ -2626,19 +2627,24 @@ CONTAINS
          current=>current%next     ! f90-code bring to the next mode
       ENDDO element_number
 
-      debug_print_2: if (ptc_track_debug) then
-         Print *, 'elem_number_at_observ(i_obs)= ', elem_number_at_observ
-         Print *, 'sum_length_at_observ(i_obs)= ', sum_length_at_observ
-         print_CO_for_el_by_el: IF (element_by_element) THEN
-            Print *, ' === CO at observations x_co_at_all_observ(i_coord,number_obs)='
+
+      if (ptc_track_debug) then
+         Print *, ''
+         Print *, 'Observation points:'
+         Print *, '  Indexes of the observation points ', elem_number_at_observ
+         Print *, '  S of the observation points  ', sum_length_at_observ
+         
+         IF (element_by_element) THEN
+            Print *, ''
+            Print *, 'Closed orbit at observation points'
             DO number_obs=1, max_obs
-               Print *, 'number_obs=', number_obs, &
+               Print *, '      number_obs=', number_obs, &
                     ' elem_numb=', elem_number_at_observ(number_obs), &
                     ' name=', name_el_at_obsrv(number_obs)
                Print *, (x_co_at_all_observ(i_coord,number_obs),i_coord=1,6)
             END DO
-         ENDIF  print_CO_for_el_by_el
-      endif debug_print_2
+         ENDIF 
+      endif
 
     END SUBROUTINE Prepare_Observation_points
     !==============================================================================
@@ -3203,16 +3209,16 @@ CONTAINS
       character(120) msg(2) ! text stings for messages
 
       debug_print_1: if (ptc_track_debug) then
-         print *; print *, "<subr. ptc_track_ini_conditions>:"
-         print *,'  Initialise orbit, emittances and eigenvectors etc.'
+         print * 
+         print *, "Subroutine ptc_track_ini_conditions:"
+         print *, '      Initialise orbit, emittances and eigenvectors etc.'
       end if debug_print_1
       !k      j = 0
       j_particle_line_counter=0 !k
 
       debug_print_2: if (ptc_track_debug) then
-         print *, " j_particle_line_counter =", j_particle_line_counter
-         print *, 'Get values and variables:  '
-         print *, ' twopi  =',  twopi
+         print *, "      j_particle_line_counter =", j_particle_line_counter
+         print *, '      Get values and variables:  '
          print *, ''
       end if debug_print_2
 
@@ -3224,10 +3230,9 @@ CONTAINS
                       fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input)    !
 
       if (ptc_track_debug) then                                          !
-         print *, "The next command line from input file is read."                    ! p
-         print *, "The keyword <ptc_start> provides the following data:"              ! a
-         print *, "j_particle_line_counter=",j_particle_line_counter                  ! r
-         print *, "x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit=", &                    ! t
+         print *, "      <ptc_start> provides the following data:"                    ! a
+         print *, "           j_particle_line_counter=",j_particle_line_counter       ! r
+         print *, "           x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit=", &         ! t
               x_input,px_input,y_input,py_input,t_input,deltae_input, &               ! i
               fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input             ! c
       endif                                                             ! l
@@ -3258,14 +3263,17 @@ CONTAINS
             !                                                                 ! c   t   f
 
             if (getdebug() > 2) then
-               print*, 'X_MAD: ', X_MAD
+               print*, '      X_MAD: ', X_MAD
             endif
             
             ! Very dodgy
             ! add momentum offset defined by 'deltap' to all tracks 
+            !print*, "ptc_track_ini_conditions: mytime=",mytime,", closed_orbit=",closed_orbit
             IF(nvariables.gt.4 .AND. (.NOT.closed_orbit)) THEN !--!            ! h   i   o
                if(mytime) then !----------------------!          !              !
+                  !print*, "ptc_track_ini_conditions: mytime=TRUE, calling Convert_dp_to_dt"
                   call Convert_dp_to_dt (deltap, dt)  !          !              !
+                  !print*, "ptc_track_ini_conditions: deltap=",deltap," -> dt=",dt
                else                                   !          !              !
                   dt=deltap                           !          !              !
                endif !--------------------------------!          !              !
