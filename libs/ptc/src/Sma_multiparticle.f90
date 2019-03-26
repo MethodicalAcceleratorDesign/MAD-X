@@ -1017,7 +1017,8 @@ endif
 
       CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
       if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
-        TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+        TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==-1 .OR. &
+           T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos== 0
         if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
       endif
       
@@ -1025,7 +1026,8 @@ endif
       
     CASE(CASEP2)
       if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
-        TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+        TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1 .OR. &
+           T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
         if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
       endif
 
