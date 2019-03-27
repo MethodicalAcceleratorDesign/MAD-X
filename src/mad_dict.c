@@ -464,6 +464,7 @@ const char *const_command_def =
 "split         = [l, false, true], "
 "mangle        = [l, false, true], "
 "long_names    = [l, false, true], "
+"multicol      = [l, false, true], "
 "max_mult_ord  = [i, 11], "
 "six_version   = [i, 0], "
 "radius        = [r, 1]; "
