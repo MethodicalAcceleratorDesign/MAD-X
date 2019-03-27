@@ -4456,9 +4456,14 @@ subroutine tttquad(track, ktrack)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = node_value('k1 ')  + f_errors(2)/length
-  k1s = node_value('k1s ') + f_errors(3)/length
+  k1  = node_value('k1 ')
+  k1s = node_value('k1s ')
 
+  if (length.ne.zero) then
+     k1  = k1  + f_errors(2)/length
+     k1s = k1s + f_errors(3)/length
+  endif
+  
   if (k1s.ne.zero) then
      tilt = -atan2(k1s, k1)/two ! + tilt
      k1 = sqrt(k1**2 + k1s**2)
@@ -4469,6 +4474,11 @@ subroutine tttquad(track, ktrack)
   if (k1.eq.zero) then
      call ttdrf(length,track,ktrack);
      return
+  endif
+
+  if (tilt.ne.zero)  then
+     st = sin(tilt)
+     ct = cos(tilt)
   endif
 
   !---- Prepare to calculate the kick and the matrix elements
@@ -4483,8 +4493,6 @@ subroutine tttquad(track, ktrack)
 
      !---  rotate orbit before entry
      if (tilt .ne. zero)  then
-        st = sin(tilt)
-        ct = cos(tilt)
         tmp = x
         x = ct * tmp + st * y
         y = ct * y   - st * tmp
