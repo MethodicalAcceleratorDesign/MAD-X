@@ -1463,31 +1463,31 @@ dfbxb.3r1: dfbxb,lrad:=l.dfbxb ,mech_sep:= 0.000000;
 dfbxb.3r1_mkex: marker,mech_sep:= 0.000000;
 bpmsy: monitor,l:=l.bpmsy ;
 bpmsy.4r1.b1: bpmsy,slot_id:= 104595,mech_sep:= 0.000000;
-mbxw.a4r1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.a4r1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
 mbxw: multipole,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,lrad:=l.mbxw ;
-mbxw.a4r1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
+mbxw.a4r1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
 ,angle:=- ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.a4r1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.b4r1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.b4r1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
+mbxw.a4r1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.b4r1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.b4r1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
 ,angle:=- ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.b4r1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.c4r1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.c4r1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
+mbxw.b4r1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.c4r1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.c4r1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
 ,angle:=- ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.c4r1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.d4r1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.d4r1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
+mbxw.c4r1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.d4r1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.d4r1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
 ,angle:=- ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.d4r1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.e4r1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.e4r1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
+mbxw.d4r1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.e4r1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.e4r1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
 ,angle:=- ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.e4r1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.f4r1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.f4r1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
+mbxw.e4r1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.f4r1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.f4r1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={( 0 - kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) }
 ,angle:=- ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.f4r1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.f4r1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
 x1fcr: instrument,l:=l.x1fcr ;
 x1fcr.4r1: x1fcr,slot_id:= 378054,assembly_id:= 102108,mech_sep:= 0.000000;
 brana: instrument,l:=l.brana ;
@@ -1504,21 +1504,21 @@ tclp.4r1.b1: tclp,lrad:=l.tclp ;
 tclp.4r1.b1_mkex: marker;
 bpmwb: monitor,l:=l.bpmwb ;
 bpmwb.4r1.b1: bpmwb,slot_id:= 181634,mech_sep:= 0.174000;
-mbrc.4r1.b1_s_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4r1.b1_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
 mbrc..1: multipole,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,lrad:=( l.mbrc ) / ( 4 ) ;
-mbrc.4r1.b1_s..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r1 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.r1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r1 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4r1.b1..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r1 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.r1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r1 ) / ( 4 ) ,mech_sep:= 0.188000;
 mbrc..2: multipole,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,lrad:=( l.mbrc ) / ( 4 ) ;
-mbrc.4r1.b1_s..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r1 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.r1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r1 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4r1.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4r1.b1..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r1 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.r1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r1 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4r1.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
 mbrc..3: multipole,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,lrad:=( l.mbrc ) / ( 4 ) ;
-mbrc.4r1.b1_s..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r1 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.r1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r1 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4r1.b1..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r1 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.r1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r1 ) / ( 4 ) ,mech_sep:= 0.188000;
 mbrc..4: multipole,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,lrad:=( l.mbrc ) / ( 4 ) ;
-mbrc.4r1.b1_s..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r1 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.r1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r1 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4r1.b1_s_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4r1.b1..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r1 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.r1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r1 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4r1.b1_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
 mcbyv.a4r1.b1_mken: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,mech_sep:= 0.194000;
 mcbyv: vcorrector,kmax:=kmax_mcbyv ,kmin:=kmin_mcbyv ,calib:=kmax_mcbyv / imax_mcbyv ,lrad:=l.mcbyv ;
 mcbyv.a4r1.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.r1b1 ,mech_sep:= 0.194000;
@@ -3508,17 +3508,17 @@ mcbyh.4l2.b1_mkex: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=k
 mcbyv.a4l2.b1_mken: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,mech_sep:= 0.194000;
 mcbyv.a4l2.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.l2b1 ,mech_sep:= 0.194000;
 mcbyv.a4l2.b1_mkex: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,mech_sep:= 0.194000;
-mbrc.4l2.b1_s_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
-mbrc.4l2.b1_s..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l2 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.l2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l2 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4l2.b1_s..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l2 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.l2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l2 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4l2.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
-mbrc.4l2.b1_s..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l2 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.l2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l2 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4l2.b1_s..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l2 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.l2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l2 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4l2.b1_s_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4l2.b1_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4l2.b1..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l2 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.l2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l2 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4l2.b1..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l2 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.l2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l2 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4l2.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4l2.b1..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l2 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.l2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l2 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4l2.b1..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l2 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.l2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l2 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4l2.b1_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
 bpmwi: monitor,l:=l.bpmwi ;
 bpmwi.4l2.b1: bpmwi,slot_id:= 104597,mech_sep:= 0.174000;
 tcth.4l2.b1_mken: marker,mech_sep:= 0.168900;
@@ -3547,21 +3547,21 @@ tcdd.4l2: tcdd,lrad:=l.tcdd ,mech_sep:= 0.000000;
 tcdd.4l2_mkex: marker,mech_sep:= 0.000000;
 bpmsx: monitor,l:=l.bpmsx ;
 bpmsx.4l2.b1: bpmsx,slot_id:= 104598,mech_sep:= 0.000000;
-mbx.4l2_s_mken: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbx.4l2_mken: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
 mbx..1: multipole,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,lrad:=( l.mbx ) / ( 4 ) ;
-mbx.4l2_s..1: mbx..1,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5
- ) ) ) ) / ( 4 ) },angle:=( 0 - ad1.l2 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4l2..1: mbx..1,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 )
+ ) ) ) / ( 4 ) },angle:=( 0 - ad1.l2 ) / ( 4 ) ,mech_sep:= 0.000000;
 mbx..2: multipole,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,lrad:=( l.mbx ) / ( 4 ) ;
-mbx.4l2_s..2: mbx..2,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5
- ) ) ) ) / ( 4 ) },angle:=( 0 - ad1.l2 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4l2_s: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbx.4l2..2: mbx..2,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 )
+ ) ) ) / ( 4 ) },angle:=( 0 - ad1.l2 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4l2: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
 mbx..3: multipole,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,lrad:=( l.mbx ) / ( 4 ) ;
-mbx.4l2_s..3: mbx..3,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5
- ) ) ) ) / ( 4 ) },angle:=( 0 - ad1.l2 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4l2..3: mbx..3,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 )
+ ) ) ) / ( 4 ) },angle:=( 0 - ad1.l2 ) / ( 4 ) ,mech_sep:= 0.000000;
 mbx..4: multipole,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,lrad:=( l.mbx ) / ( 4 ) ;
-mbx.4l2_s..4: mbx..4,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5
- ) ) ) ) / ( 4 ) },angle:=( 0 - ad1.l2 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4l2_s_mkex: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbx.4l2..4: mbx..4,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 )
+ ) ) ) / ( 4 ) },angle:=( 0 - ad1.l2 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4l2_mkex: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
 dfbxc.3l2_mken: marker,mech_sep:= 0.000000;
 dfbxc: placeholder,lrad:=l.dfbxc ;
 dfbxc.3l2: dfbxc,lrad:=l.dfbxc ,mech_sep:= 0.000000;
@@ -3681,17 +3681,17 @@ dfbxd.3r2_mken: marker,mech_sep:= 0.000000;
 dfbxd: placeholder,lrad:=l.dfbxd ;
 dfbxd.3r2: dfbxd,lrad:=l.dfbxd ,mech_sep:= 0.000000;
 dfbxd.3r2_mkex: marker,mech_sep:= 0.000000;
-mbx.4r2_s_mken: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbx.4r2_s..1: mbx..1,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) ) / ( 4
- ) },angle:=( ad1.r2 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4r2_s..2: mbx..2,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) ) / ( 4
- ) },angle:=( ad1.r2 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4r2_s: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbx.4r2_s..3: mbx..3,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) ) / ( 4
- ) },angle:=( ad1.r2 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4r2_s..4: mbx..4,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) ) / ( 4
- ) },angle:=( ad1.r2 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4r2_s_mkex: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbx.4r2_mken: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbx.4r2..1: mbx..1,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) ) / ( 4 )
+ },angle:=( ad1.r2 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4r2..2: mbx..2,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) ) / ( 4 )
+ },angle:=( ad1.r2 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4r2: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbx.4r2..3: mbx..3,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) ) / ( 4 )
+ },angle:=( ad1.r2 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4r2..4: mbx..4,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r2 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) ) / ( 4 )
+ },angle:=( ad1.r2 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4r2_mkex: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
 bpmsx.4r2.b1: bpmsx,slot_id:= 104601,mech_sep:= 0.000000;
 tctvb.4r2_mken: marker;
 tctvb.4r2: tctvb,lrad:=l.tctvb ;
@@ -3706,17 +3706,17 @@ x2zdc002: instrument,lrad:=l.x2zdc002 ;
 x2zdc.4r2: x2zdc002,lrad:=l.x2zdc002 ,mech_sep:= 0.000000;
 x2zdc.4r2_mkex: marker,mech_sep:= 0.000000;
 bpmwb.4r2.b1: bpmwb,slot_id:= 104602,mech_sep:= -0.174000;
-mbrc.4r2.b1_s_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
-mbrc.4r2.b1_s..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r2 ) * ( ( l.mbrc ) * (
+mbrc.4r2.b1_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4r2.b1..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r2 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.r2 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4r2.b1_s..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r2 ) * ( ( l.mbrc ) * (
+mbrc.4r2.b1..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r2 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.r2 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4r2.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
-mbrc.4r2.b1_s..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r2 ) * ( ( l.mbrc ) * (
+mbrc.4r2.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4r2.b1..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r2 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.r2 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4r2.b1_s..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r2 ) * ( ( l.mbrc ) * (
+mbrc.4r2.b1..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r2 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.r2 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4r2.b1_s_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4r2.b1_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
 mcbyh.a4r2.b1_mken: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,mech_sep:= -0.194000;
 mcbyh.a4r2.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.r2b1 ,mech_sep:= -0.194000;
 mcbyh.a4r2.b1_mkex: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,mech_sep:= -0.194000;
@@ -5654,19 +5654,19 @@ mqtlh.a6l3.b1: marker,kmax:=kmax_mqtlh_4.5k ,kmin:=kmin_mqtlh_4.5k ,calib:=kmax_
 mqtlh.a6l3.b1..2: mqtlh..2,kmax:=kmax_mqtlh_4.5k ,kmin:=kmin_mqtlh_4.5k ,calib:=kmax_mqtlh_4.5k / imax_mqtlh_4.5k ,polarity:= 1.000000,lrad:=( l.mqtlh ) / ( 2 ) ,knl:={ 0.000000,( ( kq6.l3b1 ) * ( l.mqtlh ) ) / ( 2 ) },mech_sep:= -0.194000;
 mqtlh.a6l3.b1_mkex: marker,kmax:=kmax_mqtlh_4.5k ,kmin:=kmin_mqtlh_4.5k ,calib:=kmax_mqtlh_4.5k / imax_mqtlh_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
 bpm.6l3.b1: bpm,slot_id:= 377943,assembly_id:= 102561,mech_sep:= -0.194000;
-mbw.f6l3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.f6l3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
 mbw: multipole,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,lrad:=l.mbw ;
-mbw.f6l3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3
- ,mech_sep:= -0.194000;
-mbw.f6l3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.e6l3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.e6l3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3
- ,mech_sep:= -0.194000;
-mbw.e6l3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.d6l3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.d6l3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3
- ,mech_sep:= -0.194000;
-mbw.d6l3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.f6l3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3 
+,mech_sep:= -0.194000;
+mbw.f6l3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.e6l3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.e6l3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3 
+,mech_sep:= -0.194000;
+mbw.e6l3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.d6l3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.d6l3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3 
+,mech_sep:= -0.194000;
+mbw.d6l3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
 tcp.6l3.b1_mken: marker,mech_sep:= -0.205500;
 tcp: collimator,lrad:=l.tcp ;
 tcp.6l3.b1: tcp,lrad:=l.tcp ,mech_sep:= -0.205500;
@@ -5679,18 +5679,18 @@ tcapa.6l3.b1_mken: marker,mech_sep:= -0.221000;
 tcapa020: collimator,lrad:=l.tcapa020 ;
 tcapa.6l3.b1: tcapa020,lrad:=l.tcapa020 ,mech_sep:= -0.221000;
 tcapa.6l3.b1_mkex: marker,mech_sep:= -0.221000;
-mbw.c6l3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.c6l3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
+mbw.c6l3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.c6l3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
 ,angle:=- ad34.lr3 ,mech_sep:= -0.224000;
-mbw.c6l3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.b6l3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.b6l3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
+mbw.c6l3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.b6l3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.b6l3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
 ,angle:=- ad34.lr3 ,mech_sep:= -0.224000;
-mbw.b6l3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.a6l3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.a6l3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
+mbw.b6l3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.a6l3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.a6l3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
 ,angle:=- ad34.lr3 ,mech_sep:= -0.224000;
-mbw.a6l3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.a6l3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
 bpmwe008: monitor,l:=l.bpmwe008 ;
 bpmwe.5l3.b1: bpmwe008,slot_id:= 297858,mech_sep:= -0.224000;
 mqwa.e5l3.b1_mken: marker,kmax:=kmax_mqwa ,kmin:=kmin_mqwa ,calib:=kmax_mqwa / imax_mqwa ,polarity:= -1.000000,mech_sep:= -0.224000;
@@ -5879,33 +5879,33 @@ mqwa.e5r3.b1..2: mqwa..2,kmax:=kmax_mqwa ,kmin:=kmin_mqwa ,calib:=kmax_mqwa / im
 mqwa.e5r3.b1_mkex: marker,kmax:=kmax_mqwa ,kmin:=kmin_mqwa ,calib:=kmax_mqwa / imax_mqwa ,polarity:= 1.000000,mech_sep:= -0.224000;
 bpmwe009: monitor,l:=l.bpmwe009 ;
 bpmwe.5r3.b1: bpmwe009,slot_id:= 134742,mech_sep:= -0.224000;
-mbw.a6r3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.a6r3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
+mbw.a6r3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.a6r3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
 ,angle:=- ad34.lr3 ,mech_sep:= -0.224000;
-mbw.a6r3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.b6r3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.b6r3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
+mbw.a6r3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.b6r3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.b6r3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
 ,angle:=- ad34.lr3 ,mech_sep:= -0.224000;
-mbw.b6r3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.c6r3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.c6r3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
+mbw.b6r3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.c6r3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.c6r3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={( 0 - kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) }
 ,angle:=- ad34.lr3 ,mech_sep:= -0.224000;
-mbw.c6r3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.c6r3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
 tcla.6r3.b1_mken: marker,mech_sep:= -0.203000;
 tcla.6r3.b1: tcla,lrad:=l.tcla ,mech_sep:= -0.203000;
 tcla.6r3.b1_mkex: marker,mech_sep:= -0.203000;
-mbw.d6r3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.d6r3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3
- ,mech_sep:= -0.194000;
-mbw.d6r3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.e6r3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.e6r3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3
- ,mech_sep:= -0.194000;
-mbw.e6r3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.f6r3.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.f6r3.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3
- ,mech_sep:= -0.194000;
-mbw.f6r3.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.d6r3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.d6r3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3 
+,mech_sep:= -0.194000;
+mbw.d6r3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.e6r3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.e6r3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3 
+,mech_sep:= -0.194000;
+mbw.e6r3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.f6r3.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.f6r3.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={( kd34.lr3 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) },angle:=ad34.lr3 
+,mech_sep:= -0.194000;
+mbw.f6r3.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
 bpmwc: monitor,l:=l.bpmwc ;
 bpmwc.6r3.b1: bpmwc,slot_id:= 104603,mech_sep:= -0.194000;
 mcbcv.6r3.b1_mken: marker,kmax:=kmax_mcbcv_4.5k ,kmin:=kmin_mcbcv_4.5k ,calib:=kmax_mcbcv / imax_mcbcv ,polarity:= 1.000000,mech_sep:= -0.194000;
@@ -7819,36 +7819,36 @@ mqy.5l4.b1_mkex: marker,kmax:=kmax_mqy_4.5k ,kmin:=kmin_mqy_4.5k ,calib:=kmax_mq
 mcbyh.5l4.b1_mken: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,mech_sep:= -0.194000;
 mcbyh.5l4.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyh5.l4b1 ,mech_sep:= -0.194000;
 mcbyh.5l4.b1_mkex: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbrb.5l4.b1_s_mken: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbrb.5l4.b1_mken: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
 mbrb..1: multipole,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,lrad:=( l.mbrb ) / ( 4 ) ;
-mbrb.5l4.b1_s..1: mbrb..1,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.l4 ) * ( ( l.mbrb ) * ( 1.0 /
- sinc ( ad4.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.l4 ) / ( 4 ) ,mech_sep:= -0.194000;
+mbrb.5l4.b1..1: mbrb..1,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.l4 ) * ( ( l.mbrb ) * ( 1.0 / sinc
+ ( ad4.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.l4 ) / ( 4 ) ,mech_sep:= -0.194000;
 mbrb..2: multipole,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,lrad:=( l.mbrb ) / ( 4 ) ;
-mbrb.5l4.b1_s..2: mbrb..2,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.l4 ) * ( ( l.mbrb ) * ( 1.0 /
- sinc ( ad4.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.l4 ) / ( 4 ) ,mech_sep:= -0.194000;
-mbrb.5l4.b1_s: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbrb.5l4.b1..2: mbrb..2,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.l4 ) * ( ( l.mbrb ) * ( 1.0 / sinc
+ ( ad4.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.l4 ) / ( 4 ) ,mech_sep:= -0.194000;
+mbrb.5l4.b1: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
 mbrb..3: multipole,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,lrad:=( l.mbrb ) / ( 4 ) ;
-mbrb.5l4.b1_s..3: mbrb..3,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.l4 ) * ( ( l.mbrb ) * ( 1.0 /
- sinc ( ad4.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.l4 ) / ( 4 ) ,mech_sep:= -0.194000;
+mbrb.5l4.b1..3: mbrb..3,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.l4 ) * ( ( l.mbrb ) * ( 1.0 / sinc
+ ( ad4.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.l4 ) / ( 4 ) ,mech_sep:= -0.194000;
 mbrb..4: multipole,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,lrad:=( l.mbrb ) / ( 4 ) ;
-mbrb.5l4.b1_s..4: mbrb..4,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.l4 ) * ( ( l.mbrb ) * ( 1.0 /
- sinc ( ad4.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.l4 ) / ( 4 ) ,mech_sep:= -0.194000;
-mbrb.5l4.b1_s_mkex: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbrs.5l4.b1_s_mken: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418100;
+mbrb.5l4.b1..4: mbrb..4,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.l4 ) * ( ( l.mbrb ) * ( 1.0 / sinc
+ ( ad4.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.l4 ) / ( 4 ) ,mech_sep:= -0.194000;
+mbrb.5l4.b1_mkex: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbrs.5l4.b1_mken: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418100;
 mbrs..1: multipole,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,lrad:=( l.mbrs ) / ( 4 ) ;
-mbrs.5l4.b1_s..1: mbrs..1,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.l4 ) * ( ( l.mbrs ) * (
+mbrs.5l4.b1..1: mbrs..1,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.l4 ) * ( ( l.mbrs ) * (
  1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad3.l4 ) / ( 4 ) ,mech_sep:= -0.418100;
 mbrs..2: multipole,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,lrad:=( l.mbrs ) / ( 4 ) ;
-mbrs.5l4.b1_s..2: mbrs..2,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.l4 ) * ( ( l.mbrs ) * (
+mbrs.5l4.b1..2: mbrs..2,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.l4 ) * ( ( l.mbrs ) * (
  1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad3.l4 ) / ( 4 ) ,mech_sep:= -0.418100;
-mbrs.5l4.b1_s: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418100;
+mbrs.5l4.b1: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418100;
 mbrs..3: multipole,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,lrad:=( l.mbrs ) / ( 4 ) ;
-mbrs.5l4.b1_s..3: mbrs..3,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.l4 ) * ( ( l.mbrs ) * (
+mbrs.5l4.b1..3: mbrs..3,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.l4 ) * ( ( l.mbrs ) * (
  1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad3.l4 ) / ( 4 ) ,mech_sep:= -0.418100;
 mbrs..4: multipole,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,lrad:=( l.mbrs ) / ( 4 ) ;
-mbrs.5l4.b1_s..4: mbrs..4,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.l4 ) * ( ( l.mbrs ) * (
+mbrs.5l4.b1..4: mbrs..4,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.l4 ) * ( ( l.mbrs ) * (
  1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad3.l4 ) / ( 4 ) ,mech_sep:= -0.418100;
-mbrs.5l4.b1_s_mkex: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418100;
+mbrs.5l4.b1_mkex: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418100;
 acnca.d5l4.b1_mken: marker,mech_sep:= -0.420000;
 acnca: rfcavity,volt:=vrf200 / 4 ,lag:= 0.500000,harmon:=hrf200 ;
 acnca.d5l4.b1: acnca,volt:=vrf200 / 4 ,lag:= 0.500000,mech_sep:= -0.420000,harmon:=hrf200 ;
@@ -7918,17 +7918,17 @@ mu.c5r4.b1_mkex: marker,polarity:= 1.000000,mech_sep:= -0.420000;
 mu.d5r4.b1_mken: marker,polarity:= 1.000000,mech_sep:= -0.420000;
 mu.d5r4.b1: mu,polarity:= 1.000000,lrad:=l.mu ,hkick:= 0.000000,mech_sep:= -0.420000;
 mu.d5r4.b1_mkex: marker,polarity:= 1.000000,mech_sep:= -0.420000;
-mbrs.5r4.b1_s_mken: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418200;
-mbrs.5r4.b1_s..1: mbrs..1,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.r4 ) * ( ( l.mbrs ) * (
+mbrs.5r4.b1_mken: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418200;
+mbrs.5r4.b1..1: mbrs..1,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.r4 ) * ( ( l.mbrs ) * (
  1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad3.r4 ) / ( 4 ) ,mech_sep:= -0.418200;
-mbrs.5r4.b1_s..2: mbrs..2,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.r4 ) * ( ( l.mbrs ) * (
+mbrs.5r4.b1..2: mbrs..2,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.r4 ) * ( ( l.mbrs ) * (
  1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad3.r4 ) / ( 4 ) ,mech_sep:= -0.418200;
-mbrs.5r4.b1_s: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418200;
-mbrs.5r4.b1_s..3: mbrs..3,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.r4 ) * ( ( l.mbrs ) * (
+mbrs.5r4.b1: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418200;
+mbrs.5r4.b1..3: mbrs..3,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.r4 ) * ( ( l.mbrs ) * (
  1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad3.r4 ) / ( 4 ) ,mech_sep:= -0.418200;
-mbrs.5r4.b1_s..4: mbrs..4,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.r4 ) * ( ( l.mbrs ) * (
+mbrs.5r4.b1..4: mbrs..4,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd3.r4 ) * ( ( l.mbrs ) * (
  1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad3.r4 ) / ( 4 ) ,mech_sep:= -0.418200;
-mbrs.5r4.b1_s_mkex: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418200;
+mbrs.5r4.b1_mkex: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000,mech_sep:= -0.418200;
 bsrta: instrument,l:=l.bsrta ;
 bsrta.5r4.b1: bsrta,slot_id:= 635738,mech_sep:= -0.404000;
 bsrtm: instrument,l:=l.bsrtm ;
@@ -7937,17 +7937,17 @@ bws: instrument,l:=l.bws ;
 bws.5r4.b1: bws,slot_id:= 642430,mech_sep:= -0.318000;
 bqsv: instrument,l:=l.bqsv ;
 bqsv.5r4.b1: bqsv,slot_id:= 635695,mech_sep:= -0.216000;
-mbrb.5r4.b1_s_mken: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbrb.5r4.b1_s..1: mbrb..1,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.r4 ) * ( ( l.mbrb ) * ( 1.0 /
- sinc ( ad4.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.r4 ) / ( 4 ) ,mech_sep:= -0.194000;
-mbrb.5r4.b1_s..2: mbrb..2,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.r4 ) * ( ( l.mbrb ) * ( 1.0 /
- sinc ( ad4.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.r4 ) / ( 4 ) ,mech_sep:= -0.194000;
-mbrb.5r4.b1_s: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbrb.5r4.b1_s..3: mbrb..3,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.r4 ) * ( ( l.mbrb ) * ( 1.0 /
- sinc ( ad4.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.r4 ) / ( 4 ) ,mech_sep:= -0.194000;
-mbrb.5r4.b1_s..4: mbrb..4,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.r4 ) * ( ( l.mbrb ) * ( 1.0 /
- sinc ( ad4.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.r4 ) / ( 4 ) ,mech_sep:= -0.194000;
-mbrb.5r4.b1_s_mkex: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbrb.5r4.b1_mken: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbrb.5r4.b1..1: mbrb..1,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.r4 ) * ( ( l.mbrb ) * ( 1.0 / sinc
+ ( ad4.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.r4 ) / ( 4 ) ,mech_sep:= -0.194000;
+mbrb.5r4.b1..2: mbrb..2,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.r4 ) * ( ( l.mbrb ) * ( 1.0 / sinc
+ ( ad4.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.r4 ) / ( 4 ) ,mech_sep:= -0.194000;
+mbrb.5r4.b1: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbrb.5r4.b1..3: mbrb..3,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.r4 ) * ( ( l.mbrb ) * ( 1.0 / sinc
+ ( ad4.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.r4 ) / ( 4 ) ,mech_sep:= -0.194000;
+mbrb.5r4.b1..4: mbrb..4,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd4.r4 ) * ( ( l.mbrb ) * ( 1.0 / sinc
+ ( ad4.r4 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad4.r4 ) / ( 4 ) ,mech_sep:= -0.194000;
+mbrb.5r4.b1_mkex: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
 mcbyv.5r4.b1_mken: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,mech_sep:= -0.194000;
 mcbyv.5r4.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyv5.r4b1 ,mech_sep:= -0.194000;
 mcbyv.5r4.b1_mkex: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,mech_sep:= -0.194000;
@@ -9843,17 +9843,17 @@ mcbyv.4l5.b1_mkex: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=k
 mcbyh.a4l5.b1_mken: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,mech_sep:= -0.194000;
 mcbyh.a4l5.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.l5b1 ,mech_sep:= -0.194000;
 mcbyh.a4l5.b1_mkex: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbrc.4l5.b1_s_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
-mbrc.4l5.b1_s..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l5 ) * ( ( l.mbrc ) * (
+mbrc.4l5.b1_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4l5.b1..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l5 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.l5 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4l5.b1_s..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l5 ) * ( ( l.mbrc ) * (
+mbrc.4l5.b1..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l5 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.l5 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4l5.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
-mbrc.4l5.b1_s..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l5 ) * ( ( l.mbrc ) * (
+mbrc.4l5.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4l5.b1..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l5 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.l5 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4l5.b1_s..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l5 ) * ( ( l.mbrc ) * (
+mbrc.4l5.b1..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l5 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.l5 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4l5.b1_s_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4l5.b1_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
 bpmwb.4l5.b1: bpmwb,slot_id:= 104608,mech_sep:= -0.174000;
 tcth.4l5.b1_mken: marker,mech_sep:= -0.170500;
 tcth.4l5.b1: tcth,lrad:=l.tcth ,mech_sep:= -0.170500;
@@ -9871,30 +9871,30 @@ x5zdc.a4l5_mken: marker,mech_sep:= 0.000000;
 x5zdc002: instrument,lrad:=l.x5zdc002 ;
 x5zdc.a4l5: x5zdc002,lrad:=l.x5zdc002 ,mech_sep:= 0.000000;
 x5zdc.a4l5_mkex: marker,mech_sep:= 0.000000;
-mbxw.f4l5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.f4l5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) }
-,angle:=ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.f4l5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.e4l5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.e4l5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) }
-,angle:=ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.e4l5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.d4l5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.d4l5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) }
-,angle:=ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.d4l5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.c4l5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.c4l5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) }
-,angle:=ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.c4l5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.b4l5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.b4l5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) }
-,angle:=ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.b4l5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.a4l5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.a4l5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) }
-,angle:=ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.a4l5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.f4l5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.f4l5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) },angle:=ad1.lr5 
+,mech_sep:= 0.000000;
+mbxw.f4l5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.e4l5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.e4l5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) },angle:=ad1.lr5 
+,mech_sep:= 0.000000;
+mbxw.e4l5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.d4l5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.d4l5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) },angle:=ad1.lr5 
+,mech_sep:= 0.000000;
+mbxw.d4l5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.c4l5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.c4l5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) },angle:=ad1.lr5 
+,mech_sep:= 0.000000;
+mbxw.c4l5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.b4l5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.b4l5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) },angle:=ad1.lr5 
+,mech_sep:= 0.000000;
+mbxw.b4l5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.a4l5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.a4l5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={( kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) },angle:=ad1.lr5 
+,mech_sep:= 0.000000;
+mbxw.a4l5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
 bpmsy.4l5.b1: bpmsy,slot_id:= 104609,mech_sep:= 0.000000;
 dfbxe.3l5_mken: marker,mech_sep:= 0.000000;
 dfbxe: placeholder,lrad:=l.dfbxe ;
@@ -10013,30 +10013,30 @@ dfbxf: placeholder,lrad:=l.dfbxf ;
 dfbxf.3r5: dfbxf,lrad:=l.dfbxf ,mech_sep:= 0.000000;
 dfbxf.3r5_mkex: marker,mech_sep:= 0.000000;
 bpmsy.4r5.b1: bpmsy,slot_id:= 104612,mech_sep:= 0.000000;
-mbxw.a4r5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.a4r5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
+mbxw.a4r5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.a4r5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
 ,angle:=- ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.a4r5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.b4r5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.b4r5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
+mbxw.a4r5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.b4r5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.b4r5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
 ,angle:=- ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.b4r5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.c4r5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.c4r5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
+mbxw.b4r5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.c4r5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.c4r5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
 ,angle:=- ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.c4r5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.d4r5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.d4r5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
+mbxw.c4r5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.d4r5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.d4r5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
 ,angle:=- ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.d4r5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.e4r5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.e4r5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
+mbxw.d4r5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.e4r5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.e4r5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
 ,angle:=- ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.e4r5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.f4r5_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbxw.f4r5_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
+mbxw.e4r5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.f4r5_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.f4r5: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={( 0 - kd1.lr5 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) }
 ,angle:=- ad1.lr5 ,mech_sep:= 0.000000;
-mbxw.f4r5_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbxw.f4r5_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000,mech_sep:= 0.000000;
 x5zdc.b4r5_mken: marker,mech_sep:= 0.000000;
 x5zdc.b4r5: x5zdc002,lrad:=l.x5zdc002 ,mech_sep:= 0.000000;
 x5zdc.b4r5_mkex: marker,mech_sep:= 0.000000;
@@ -10055,17 +10055,17 @@ xrph.b4r5.b1: xrph,slot_id:= 826637,assembly_id:= 825715,mech_sep:= 0.194000;
 xrpv.b4r5.b1: xrpv,slot_id:= 826649,assembly_id:= 825715,mech_sep:= 0.194000;
 bpmwt.b4r5.b1: bpmwt,slot_id:= 826625,assembly_id:= 825715,mech_sep:= 0.175800;
 bpmwb.4r5.b1: bpmwb,slot_id:= 181643,mech_sep:= 0.174000;
-mbrc.4r5.b1_s_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
-mbrc.4r5.b1_s..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r5 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.r5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r5 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4r5.b1_s..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r5 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.r5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r5 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4r5.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
-mbrc.4r5.b1_s..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r5 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.r5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r5 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4r5.b1_s..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r5 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.r5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r5 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4r5.b1_s_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4r5.b1_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4r5.b1..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r5 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.r5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r5 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4r5.b1..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r5 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.r5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r5 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4r5.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4r5.b1..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r5 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.r5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r5 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4r5.b1..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.r5 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.r5 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.r5 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4r5.b1_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
 mcbyv.a4r5.b1_mken: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,mech_sep:= 0.194000;
 mcbyv.a4r5.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.r5b1 ,mech_sep:= 0.194000;
 mcbyv.a4r5.b1_mkex: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,mech_sep:= 0.194000;
@@ -13924,14 +13924,14 @@ mcbch.6l7.b1_mken: marker,kmax:=kmax_mcbch_4.5k ,kmin:=kmin_mcbch_4.5k ,calib:=k
 mcbch.6l7.b1: mcbch,kmax:=kmax_mcbch_4.5k ,kmin:=kmin_mcbch_4.5k ,calib:=kmax_mcbch / imax_mcbch ,polarity:= 1.000000,lrad:=l.mcbch ,kick:=acbch6.l7b1 ,mech_sep:= 0.194000;
 mcbch.6l7.b1_mkex: marker,kmax:=kmax_mcbch_4.5k ,kmin:=kmin_mcbch_4.5k ,calib:=kmax_mcbch / imax_mcbch ,polarity:= 1.000000,mech_sep:= 0.194000;
 bpmwc.6l7.b1: bpmwc,slot_id:= 181644,mech_sep:= 0.194000;
-mbw.d6l7.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
-mbw.d6l7.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={( 0 - kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) }
+mbw.d6l7.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.d6l7.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={( 0 - kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) }
 ,angle:=- ad34.lr7 ,mech_sep:= 0.194000;
-mbw.d6l7.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
-mbw.c6l7.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
-mbw.c6l7.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={( 0 - kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) }
+mbw.d6l7.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.c6l7.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.c6l7.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={( 0 - kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) }
 ,angle:=- ad34.lr7 ,mech_sep:= 0.194000;
-mbw.c6l7.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.c6l7.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
 tcp.d6l7.b1_mken: marker,mech_sep:= 0.199500;
 tcp.d6l7.b1: tcp,lrad:=l.tcp ,mech_sep:= 0.199500;
 tcp.d6l7.b1_mkex: marker,mech_sep:= 0.199500;
@@ -13959,18 +13959,18 @@ tcapa.6l7.b1_mken: marker,mech_sep:= 0.222000;
 tcapa019: collimator,lrad:=l.tcapa019 ;
 tcapa.6l7.b1: tcapa019,lrad:=l.tcapa019 ,mech_sep:= 0.222000;
 tcapa.6l7.b1_mkex: marker,mech_sep:= 0.222000;
-mbw.b6l7.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
-mbw.b6l7.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={( kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) },angle:=ad34.lr7
- ,mech_sep:= 0.224000;
-mbw.b6l7.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.b6l7.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.b6l7.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={( kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) },angle:=ad34.lr7 
+,mech_sep:= 0.224000;
+mbw.b6l7.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
 tcapb.6l7.b1_mken: marker,mech_sep:= 0.224000;
 tcapb: collimator,lrad:=l.tcapb ;
 tcapb.6l7.b1: tcapb,lrad:=l.tcapb ,mech_sep:= 0.224000;
 tcapb.6l7.b1_mkex: marker,mech_sep:= 0.224000;
-mbw.a6l7.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
-mbw.a6l7.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={( kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) },angle:=ad34.lr7
- ,mech_sep:= 0.224000;
-mbw.a6l7.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.a6l7.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.a6l7.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={( kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) },angle:=ad34.lr7 
+,mech_sep:= 0.224000;
+mbw.a6l7.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
 tcsg.b6l7.b1_mken: marker,mech_sep:= 0.224000;
 tcsg.b6l7.b1: tcsg,lrad:=l.tcsg ,mech_sep:= 0.224000;
 tcsg.b6l7.b1_mkex: marker,mech_sep:= 0.224000;
@@ -14215,25 +14215,25 @@ tcsm.6r7.b1_mkex: marker,mech_sep:= 0.224000;
 tcla.a6r7.b1_mken: marker,mech_sep:= 0.224000;
 tcla.a6r7.b1: tcla,lrad:=l.tcla ,mech_sep:= 0.224000;
 tcla.a6r7.b1_mkex: marker,mech_sep:= 0.224000;
-mbw.a6r7.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
-mbw.a6r7.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={( kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) },angle:=ad34.lr7
- ,mech_sep:= 0.224000;
-mbw.a6r7.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
-mbw.b6r7.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
-mbw.b6r7.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={( kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) },angle:=ad34.lr7
- ,mech_sep:= 0.224000;
-mbw.b6r7.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.a6r7.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.a6r7.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={( kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) },angle:=ad34.lr7 
+,mech_sep:= 0.224000;
+mbw.a6r7.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.b6r7.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.b6r7.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={( kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) },angle:=ad34.lr7 
+,mech_sep:= 0.224000;
+mbw.b6r7.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
 tcla.b6r7.b1_mken: marker,mech_sep:= 0.214800;
 tcla.b6r7.b1: tcla,lrad:=l.tcla ,mech_sep:= 0.214800;
 tcla.b6r7.b1_mkex: marker,mech_sep:= 0.214800;
-mbw.c6r7.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
-mbw.c6r7.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={( 0 - kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) }
+mbw.c6r7.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.c6r7.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={( 0 - kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) }
 ,angle:=- ad34.lr7 ,mech_sep:= 0.194000;
-mbw.c6r7.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
-mbw.d6r7.b1_s_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
-mbw.d6r7.b1_s: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={( 0 - kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) }
+mbw.c6r7.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.d6r7.b1_mken: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.d6r7.b1: mbw,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={( 0 - kd34.lr7 ) * ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) }
 ,angle:=- ad34.lr7 ,mech_sep:= 0.194000;
-mbw.d6r7.b1_s_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.d6r7.b1_mkex: marker,kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
 tcla.c6r7.b1_mken: marker,mech_sep:= 0.194000;
 tcla.c6r7.b1: tcla,lrad:=l.tcla ,mech_sep:= 0.194000;
 tcla.c6r7.b1_mkex: marker,mech_sep:= 0.194000;
@@ -16177,17 +16177,17 @@ mcbyh.4l8.b1_mkex: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=k
 mcbyv.a4l8.b1_mken: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,mech_sep:= 0.194000;
 mcbyv.a4l8.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.l8b1 ,mech_sep:= 0.194000;
 mcbyv.a4l8.b1_mkex: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=kmax_mcbyv / imax_mcbyv ,polarity:= 1.000000,mech_sep:= 0.194000;
-mbrc.4l8.b1_s_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
-mbrc.4l8.b1_s..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l8 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.l8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l8 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4l8.b1_s..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l8 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.l8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l8 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4l8.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
-mbrc.4l8.b1_s..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l8 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.l8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l8 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4l8.b1_s..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l8 ) * ( ( l.mbrc ) * ( 1.0 /
- sinc ( ad2.l8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l8 ) / ( 4 ) ,mech_sep:= 0.188000;
-mbrc.4l8.b1_s_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4l8.b1_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4l8.b1..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l8 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.l8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l8 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4l8.b1..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l8 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.l8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l8 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4l8.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
+mbrc.4l8.b1..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l8 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.l8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l8 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4l8.b1..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd2.l8 ) * ( ( l.mbrc ) * ( 1.0 / sinc
+ ( ad2.l8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( ad2.l8 ) / ( 4 ) ,mech_sep:= 0.188000;
+mbrc.4l8.b1_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:= 0.188000;
 bpmwb.4l8.b1: bpmwb,slot_id:= 181645,mech_sep:= 0.174000;
 tcth.4l8.b1_mken: marker,mech_sep:= 0.168900;
 tcth.4l8.b1: tcth,lrad:=l.tcth ,mech_sep:= 0.168900;
@@ -16200,17 +16200,17 @@ tctvb.4l8_mken: marker;
 tctvb.4l8: tctvb,lrad:=l.tctvb ;
 tctvb.4l8_mkex: marker;
 bpmsx.4l8.b1: bpmsx,slot_id:= 104616,mech_sep:= 0.000000;
-mbx.4l8_s_mken: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbx.4l8_s..1: mbx..1,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5
- ) ) ) ) / ( 4 ) },angle:=( 0 - ad1.l8 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4l8_s..2: mbx..2,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5
- ) ) ) ) / ( 4 ) },angle:=( 0 - ad1.l8 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4l8_s: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
-mbx.4l8_s..3: mbx..3,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5
- ) ) ) ) / ( 4 ) },angle:=( 0 - ad1.l8 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4l8_s..4: mbx..4,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5
- ) ) ) ) / ( 4 ) },angle:=( 0 - ad1.l8 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4l8_s_mkex: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbx.4l8_mken: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbx.4l8..1: mbx..1,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 )
+ ) ) ) / ( 4 ) },angle:=( 0 - ad1.l8 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4l8..2: mbx..2,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 )
+ ) ) ) / ( 4 ) },angle:=( 0 - ad1.l8 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4l8: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
+mbx.4l8..3: mbx..3,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 )
+ ) ) ) / ( 4 ) },angle:=( 0 - ad1.l8 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4l8..4: mbx..4,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd1.l8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 )
+ ) ) ) / ( 4 ) },angle:=( 0 - ad1.l8 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4l8_mkex: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000,mech_sep:= 0.000000;
 dfbxg.3l8_mken: marker,mech_sep:= 0.000000;
 dfbxg: placeholder,lrad:=l.dfbxg ;
 dfbxg.3l8: dfbxg,lrad:=l.dfbxg ,mech_sep:= 0.000000;
@@ -16323,17 +16323,17 @@ dfbxh.3r8_mken: marker,mech_sep:= 0.000000;
 dfbxh: placeholder,lrad:=l.dfbxh ;
 dfbxh.3r8: dfbxh,lrad:=l.dfbxh ,mech_sep:= 0.000000;
 dfbxh.3r8_mkex: marker,mech_sep:= 0.000000;
-mbx.4r8_s_mken: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbx.4r8_s..1: mbx..1,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) ) / ( 4
- ) },angle:=( ad1.r8 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4r8_s..2: mbx..2,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) ) / ( 4
- ) },angle:=( ad1.r8 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4r8_s: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbx.4r8_s..3: mbx..3,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) ) / ( 4
- ) },angle:=( ad1.r8 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4r8_s..4: mbx..4,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) ) / ( 4
- ) },angle:=( ad1.r8 ) / ( 4 ) ,mech_sep:= 0.000000;
-mbx.4r8_s_mkex: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbx.4r8_mken: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbx.4r8..1: mbx..1,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) ) / ( 4 )
+ },angle:=( ad1.r8 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4r8..2: mbx..2,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) ) / ( 4 )
+ },angle:=( ad1.r8 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4r8: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbx.4r8..3: mbx..3,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) ) / ( 4 )
+ },angle:=( ad1.r8 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4r8..4: mbx..4,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( kd1.r8 ) * ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) ) / ( 4 )
+ },angle:=( ad1.r8 ) / ( 4 ) ,mech_sep:= 0.000000;
+mbx.4r8_mkex: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000,mech_sep:= 0.000000;
 bpmsx.4r8.b1: bpmsx,slot_id:= 104619,mech_sep:= 0.000000;
 tcddm.4r8_mken: marker,mech_sep:= 0.000000;
 tcddm: collimator,lrad:=l.tcddm ;
@@ -16346,17 +16346,17 @@ btvst064: monitor,l:=l.btvst064 ;
 btvst.a4r8: btvst064,slot_id:= 181630,mech_sep:= -0.080000;
 branb.4r8: branb,slot_id:= 377644,mech_sep:= 0.000000;
 bpmwb.4r8.b1: bpmwb,slot_id:= 181646,mech_sep:= -0.174000;
-mbrc.4r8.b1_s_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
-mbrc.4r8.b1_s..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r8 ) * ( ( l.mbrc ) * (
+mbrc.4r8.b1_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4r8.b1..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r8 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.r8 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4r8.b1_s..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r8 ) * ( ( l.mbrc ) * (
+mbrc.4r8.b1..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r8 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.r8 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4r8.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
-mbrc.4r8.b1_s..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r8 ) * ( ( l.mbrc ) * (
+mbrc.4r8.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4r8.b1..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r8 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.r8 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4r8.b1_s..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r8 ) * ( ( l.mbrc ) * (
+mbrc.4r8.b1..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.r8 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.r8 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4r8.b1_s_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4r8.b1_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
 mcbyh.a4r8.b1_mken: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,mech_sep:= -0.194000;
 mcbyh.a4r8.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.r8b1 ,mech_sep:= -0.194000;
 mcbyh.a4r8.b1_mkex: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,mech_sep:= -0.194000;
@@ -18288,17 +18288,17 @@ mcbyv.4l1.b1_mkex: marker,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,calib:=k
 mcbyh.a4l1.b1_mken: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,mech_sep:= -0.194000;
 mcbyh.a4l1.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.l1b1 ,mech_sep:= -0.194000;
 mcbyh.a4l1.b1_mkex: marker,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,calib:=kmax_mcbyh / imax_mcbyh ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbrc.4l1.b1_s_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
-mbrc.4l1.b1_s..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l1 ) * ( ( l.mbrc ) * (
+mbrc.4l1.b1_mken: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4l1.b1..1: mbrc..1,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l1 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.l1 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4l1.b1_s..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l1 ) * ( ( l.mbrc ) * (
+mbrc.4l1.b1..2: mbrc..2,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l1 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.l1 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4l1.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
-mbrc.4l1.b1_s..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l1 ) * ( ( l.mbrc ) * (
+mbrc.4l1.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4l1.b1..3: mbrc..3,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l1 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.l1 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4l1.b1_s..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l1 ) * ( ( l.mbrc ) * (
+mbrc.4l1.b1..4: mbrc..4,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ( 0 - kd2.l1 ) * ( ( l.mbrc ) * (
  1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) ) / ( 4 ) },angle:=( 0 - ad2.l1 ) / ( 4 ) ,mech_sep:= -0.188000;
-mbrc.4l1.b1_s_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
+mbrc.4l1.b1_mkex: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000,mech_sep:= -0.188000;
 bpmwb.4l1.b1: bpmwb,slot_id:= 104621,mech_sep:= -0.174000;
 tcth.4l1.b1_mken: marker,mech_sep:= -0.170500;
 tcth.4l1.b1: tcth,lrad:=l.tcth ,mech_sep:= -0.170500;
@@ -18312,30 +18312,30 @@ x1zdc.a4l1_mkex: marker,mech_sep:= 0.000000;
 brana.4l1: brana,slot_id:= 883499,assembly_id:= 103988,mech_sep:= 0.000000;
 x1fcl: instrument,l:=l.x1fcl ;
 x1fcl.4l1: x1fcl,slot_id:= 378051,assembly_id:= 103988,mech_sep:= 0.000000;
-mbxw.f4l1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.f4l1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) }
-,angle:=ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.f4l1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.e4l1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.e4l1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) }
-,angle:=ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.e4l1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.d4l1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.d4l1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) }
-,angle:=ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.d4l1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.c4l1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.c4l1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) }
-,angle:=ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.c4l1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.b4l1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.b4l1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) }
-,angle:=ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.b4l1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.a4l1_s_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
-mbxw.a4l1_s: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) }
-,angle:=ad1.lr1 ,mech_sep:= 0.000000;
-mbxw.a4l1_s_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.f4l1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.f4l1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) },angle:=ad1.lr1 
+,mech_sep:= 0.000000;
+mbxw.f4l1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.e4l1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.e4l1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) },angle:=ad1.lr1 
+,mech_sep:= 0.000000;
+mbxw.e4l1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.d4l1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.d4l1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) },angle:=ad1.lr1 
+,mech_sep:= 0.000000;
+mbxw.d4l1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.c4l1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.c4l1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) },angle:=ad1.lr1 
+,mech_sep:= 0.000000;
+mbxw.c4l1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.b4l1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.b4l1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) },angle:=ad1.lr1 
+,mech_sep:= 0.000000;
+mbxw.b4l1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.a4l1_mken: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
+mbxw.a4l1: mbxw,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={( kd1.lr1 ) * ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) },angle:=ad1.lr1 
+,mech_sep:= 0.000000;
+mbxw.a4l1_mkex: marker,kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000,mech_sep:= 0.000000;
 bpmsy.4l1.b1: bpmsy,slot_id:= 104622,mech_sep:= 0.000000;
 dfbxa.3l1_mken: marker,mech_sep:= 0.000000;
 dfbxa: placeholder,lrad:=l.dfbxa ;
@@ -18454,24 +18454,24 @@ dfbxb.3r1_mken, at = ( 56.427 ) + ( ( l.dfbxb ) * ( 0 - 0.5 ) ) , from = ip1;
 dfbxb.3r1, at = 56.427000, from = ip1;
 dfbxb.3r1_mkex, at = ( 56.427 ) + ( ( l.dfbxb ) * ( 0.5 ) ) , from = ip1;
 bpmsy.4r1.b1: bpmsy, at = 58.314500, from = ip1,slot_id:= 104595,mech_sep:= 0.000000;
-mbxw.a4r1_s_mken, at = ( 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
-mbxw.a4r1_s, at = ( 61.322 ) + ( 0 ) , from = ip1;
-mbxw.a4r1_s_mkex, at = ( 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
-mbxw.b4r1_s_mken, at = ( 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
-mbxw.b4r1_s, at = ( 65.588 ) + ( 0 ) , from = ip1;
-mbxw.b4r1_s_mkex, at = ( 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
-mbxw.c4r1_s_mken, at = ( 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
-mbxw.c4r1_s, at = ( 69.854 ) + ( 0 ) , from = ip1;
-mbxw.c4r1_s_mkex, at = ( 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
-mbxw.d4r1_s_mken, at = ( 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
-mbxw.d4r1_s, at = ( 74.12 ) + ( 0 ) , from = ip1;
-mbxw.d4r1_s_mkex, at = ( 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
-mbxw.e4r1_s_mken, at = ( 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
-mbxw.e4r1_s, at = ( 78.386 ) + ( 0 ) , from = ip1;
-mbxw.e4r1_s_mkex, at = ( 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
-mbxw.f4r1_s_mken, at = ( 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
-mbxw.f4r1_s, at = ( 82.652 ) + ( 0 ) , from = ip1;
-mbxw.f4r1_s_mkex, at = ( 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
+mbxw.a4r1_mken, at = ( 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
+mbxw.a4r1, at = ( 61.322 ) + ( 0 ) , from = ip1;
+mbxw.a4r1_mkex, at = ( 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
+mbxw.b4r1_mken, at = ( 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
+mbxw.b4r1, at = ( 65.588 ) + ( 0 ) , from = ip1;
+mbxw.b4r1_mkex, at = ( 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
+mbxw.c4r1_mken, at = ( 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
+mbxw.c4r1, at = ( 69.854 ) + ( 0 ) , from = ip1;
+mbxw.c4r1_mkex, at = ( 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
+mbxw.d4r1_mken, at = ( 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
+mbxw.d4r1, at = ( 74.12 ) + ( 0 ) , from = ip1;
+mbxw.d4r1_mkex, at = ( 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
+mbxw.e4r1_mken, at = ( 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
+mbxw.e4r1, at = ( 78.386 ) + ( 0 ) , from = ip1;
+mbxw.e4r1_mkex, at = ( 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
+mbxw.f4r1_mken, at = ( 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
+mbxw.f4r1, at = ( 82.652 ) + ( 0 ) , from = ip1;
+mbxw.f4r1_mkex, at = ( 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
 x1fcr.4r1: x1fcr, at = 141.150000, from = ip1,slot_id:= 378054,assembly_id:= 102108,mech_sep:= 0.000000;
 brana.4r1: brana, at = 141.350000, from = ip1,slot_id:= 883446,assembly_id:= 102108,mech_sep:= 0.000000;
 x1zdc.a4r1_mken, at = ( 141.7 ) + ( ( l.x1zdc001 ) * ( 0 - 0.5 ) ) , from = ip1;
@@ -18482,13 +18482,13 @@ tclp.4r1.b1_mken, at = ( 149.73 ) + ( ( l.tclp ) * ( 0 - 0.5 ) ) , from = ip1;
 tclp.4r1.b1, at = 149.730000, from = ip1;
 tclp.4r1.b1_mkex, at = ( 149.73 ) + ( ( l.tclp ) * ( 0.5 ) ) , from = ip1;
 bpmwb.4r1.b1: bpmwb, at = 151.094500, from = ip1,slot_id:= 181634,mech_sep:= 0.174000;
-mbrc.4r1.b1_s_mken, at = ( 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
-mbrc.4r1.b1_s..1, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip1;
-mbrc.4r1.b1_s..2, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip1;
-mbrc.4r1.b1_s, at = ( 157.9 ) + ( 0 ) , from = ip1;
-mbrc.4r1.b1_s..3, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip1;
-mbrc.4r1.b1_s..4, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip1;
-mbrc.4r1.b1_s_mkex, at = ( 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
+mbrc.4r1.b1_mken, at = ( 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1;
+mbrc.4r1.b1..1, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip1;
+mbrc.4r1.b1..2, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip1;
+mbrc.4r1.b1, at = ( 157.9 ) + ( 0 ) , from = ip1;
+mbrc.4r1.b1..3, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip1;
+mbrc.4r1.b1..4, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip1;
+mbrc.4r1.b1_mkex, at = ( 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1;
 mcbyv.a4r1.b1_mken, at = ( 164.439 ) + ( ( l.mcbyv ) * ( 0 - 0.5 ) ) , from = ip1;
 mcbyv.a4r1.b1, at = 164.439000, from = ip1;
 mcbyv.a4r1.b1_mkex, at = ( 164.439 ) + ( ( l.mcbyv ) * ( 0.5 ) ) , from = ip1;
@@ -20415,13 +20415,13 @@ mcbyh.4l2.b1_mkex, at = ( 0 - 134.096 ) + ( ( l.mcbyh ) * ( 0.5 ) ) , from = ip2
 mcbyv.a4l2.b1_mken, at = ( 0 - 132.95 ) + ( ( l.mcbyv ) * ( 0 - 0.5 ) ) , from = ip2;
 mcbyv.a4l2.b1, at = -132.950000, from = ip2;
 mcbyv.a4l2.b1_mkex, at = ( 0 - 132.95 ) + ( ( l.mcbyv ) * ( 0.5 ) ) , from = ip2;
-mbrc.4l2.b1_s_mken, at = ( 0 - 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip2;
-mbrc.4l2.b1_s..1, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
-mbrc.4l2.b1_s..2, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
-mbrc.4l2.b1_s, at = ( 0 - 126.403 ) + ( 0 ) , from = ip2;
-mbrc.4l2.b1_s..3, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
-mbrc.4l2.b1_s..4, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
-mbrc.4l2.b1_s_mkex, at = ( 0 - 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip2;
+mbrc.4l2.b1_mken, at = ( 0 - 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip2;
+mbrc.4l2.b1..1, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
+mbrc.4l2.b1..2, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
+mbrc.4l2.b1, at = ( 0 - 126.403 ) + ( 0 ) , from = ip2;
+mbrc.4l2.b1..3, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
+mbrc.4l2.b1..4, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
+mbrc.4l2.b1_mkex, at = ( 0 - 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip2;
 bpmwi.4l2.b1: bpmwi, at = -119.597500, from = ip2,slot_id:= 104597,mech_sep:= 0.174000;
 tcth.4l2.b1_mken, at = ( 0 - 118.233 ) + ( ( l.tcth ) * ( 0 - 0.5 ) ) , from = ip2;
 tcth.4l2.b1, at = -118.233000, from = ip2;
@@ -20441,13 +20441,13 @@ tcdd.4l2_mken, at = ( 0 - 71.228 ) + ( ( l.tcdd ) * ( 0 - 0.5 ) ) , from = ip2;
 tcdd.4l2, at = -71.228000, from = ip2;
 tcdd.4l2_mkex, at = ( 0 - 71.228 ) + ( ( l.tcdd ) * ( 0.5 ) ) , from = ip2;
 bpmsx.4l2.b1: bpmsx, at = -69.440500, from = ip2,slot_id:= 104598,mech_sep:= 0.000000;
-mbx.4l2_s_mken, at = ( 0 - 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip2;
-mbx.4l2_s..1, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
-mbx.4l2_s..2, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
-mbx.4l2_s, at = ( 0 - 63.108 ) + ( 0 ) , from = ip2;
-mbx.4l2_s..3, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
-mbx.4l2_s..4, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
-mbx.4l2_s_mkex, at = ( 0 - 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip2;
+mbx.4l2_mken, at = ( 0 - 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip2;
+mbx.4l2..1, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
+mbx.4l2..2, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
+mbx.4l2, at = ( 0 - 63.108 ) + ( 0 ) , from = ip2;
+mbx.4l2..3, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
+mbx.4l2..4, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
+mbx.4l2_mkex, at = ( 0 - 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip2;
 dfbxc.3l2_mken, at = ( 0 - 56.3085 ) + ( ( l.dfbxc ) * ( 0 - 0.5 ) ) , from = ip2;
 dfbxc.3l2, at = -56.308500, from = ip2;
 dfbxc.3l2_mkex, at = ( 0 - 56.3085 ) + ( ( l.dfbxc ) * ( 0.5 ) ) , from = ip2;
@@ -20561,13 +20561,13 @@ mcssx.3r2: mcssx, at = 54.297000, from = ip2,polarity:= 1.000000,ksl:={ 0.000000
 dfbxd.3r2_mken, at = ( 56.3085 ) + ( ( l.dfbxd ) * ( 0 - 0.5 ) ) , from = ip2;
 dfbxd.3r2, at = 56.308500, from = ip2;
 dfbxd.3r2_mkex, at = ( 56.3085 ) + ( ( l.dfbxd ) * ( 0.5 ) ) , from = ip2;
-mbx.4r2_s_mken, at = ( 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip2;
-mbx.4r2_s..1, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
-mbx.4r2_s..2, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
-mbx.4r2_s, at = ( 63.108 ) + ( 0 ) , from = ip2;
-mbx.4r2_s..3, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
-mbx.4r2_s..4, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
-mbx.4r2_s_mkex, at = ( 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip2;
+mbx.4r2_mken, at = ( 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip2;
+mbx.4r2..1, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
+mbx.4r2..2, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
+mbx.4r2, at = ( 63.108 ) + ( 0 ) , from = ip2;
+mbx.4r2..3, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
+mbx.4r2..4, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
+mbx.4r2_mkex, at = ( 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip2;
 bpmsx.4r2.b1: bpmsx, at = 69.440500, from = ip2,slot_id:= 104601,mech_sep:= 0.000000;
 tctvb.4r2_mken, at = ( 73.748 ) + ( ( l.tctvb ) * ( 0 - 0.5 ) ) , from = ip2;
 tctvb.4r2, at = 73.748000, from = ip2;
@@ -20580,13 +20580,13 @@ x2zdc.4r2_mken, at = ( 114.6845 ) + ( ( l.x2zdc002 ) * ( 0 - 0.5 ) ) , from = ip
 x2zdc.4r2, at = 114.684500, from = ip2;
 x2zdc.4r2_mkex, at = ( 114.6845 ) + ( ( l.x2zdc002 ) * ( 0.5 ) ) , from = ip2;
 bpmwb.4r2.b1: bpmwb, at = 119.673500, from = ip2,slot_id:= 104602,mech_sep:= -0.174000;
-mbrc.4r2.b1_s_mken, at = ( 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip2;
-mbrc.4r2.b1_s..1, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
-mbrc.4r2.b1_s..2, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
-mbrc.4r2.b1_s, at = ( 126.403 ) + ( 0 ) , from = ip2;
-mbrc.4r2.b1_s..3, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
-mbrc.4r2.b1_s..4, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
-mbrc.4r2.b1_s_mkex, at = ( 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip2;
+mbrc.4r2.b1_mken, at = ( 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip2;
+mbrc.4r2.b1..1, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
+mbrc.4r2.b1..2, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
+mbrc.4r2.b1, at = ( 126.403 ) + ( 0 ) , from = ip2;
+mbrc.4r2.b1..3, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
+mbrc.4r2.b1..4, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
+mbrc.4r2.b1_mkex, at = ( 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip2;
 mcbyh.a4r2.b1_mken, at = ( 132.95 ) + ( ( l.mcbyh ) * ( 0 - 0.5 ) ) , from = ip2;
 mcbyh.a4r2.b1, at = 132.950000, from = ip2;
 mcbyh.a4r2.b1_mkex, at = ( 132.95 ) + ( ( l.mcbyh ) * ( 0.5 ) ) , from = ip2;
@@ -22494,15 +22494,15 @@ mqtlh.a6l3.b1, at = ( 0 - 197.162 ) + ( 0 ) , from = ip3;
 mqtlh.a6l3.b1..2, at = ( ( 0 - 197.162 ) + ( 0 ) ) + ( ( l.mqtlh ) * ( 0.33333333333333 ) ) , from = ip3;
 mqtlh.a6l3.b1_mkex, at = ( 0 - 197.162 ) + ( ( l.mqtlh ) * ( 0.5 ) ) , from = ip3;
 bpm.6l3.b1: bpm, at = -195.792000, from = ip3,slot_id:= 377943,assembly_id:= 102561,mech_sep:= -0.194000;
-mbw.f6l3.b1_s_mken, at = ( 0 - 191.466 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.f6l3.b1_s, at = ( 0 - 191.466 ) + ( 0 ) , from = ip3;
-mbw.f6l3.b1_s_mkex, at = ( 0 - 191.466 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
-mbw.e6l3.b1_s_mken, at = ( 0 - 187.231 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.e6l3.b1_s, at = ( 0 - 187.231 ) + ( 0 ) , from = ip3;
-mbw.e6l3.b1_s_mkex, at = ( 0 - 187.231 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
-mbw.d6l3.b1_s_mken, at = ( 0 - 182.996 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.d6l3.b1_s, at = ( 0 - 182.996 ) + ( 0 ) , from = ip3;
-mbw.d6l3.b1_s_mkex, at = ( 0 - 182.996 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.f6l3.b1_mken, at = ( 0 - 191.466 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.f6l3.b1, at = ( 0 - 191.466 ) + ( 0 ) , from = ip3;
+mbw.f6l3.b1_mkex, at = ( 0 - 191.466 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.e6l3.b1_mken, at = ( 0 - 187.231 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.e6l3.b1, at = ( 0 - 187.231 ) + ( 0 ) , from = ip3;
+mbw.e6l3.b1_mkex, at = ( 0 - 187.231 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.d6l3.b1_mken, at = ( 0 - 182.996 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.d6l3.b1, at = ( 0 - 182.996 ) + ( 0 ) , from = ip3;
+mbw.d6l3.b1_mkex, at = ( 0 - 182.996 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
 tcp.6l3.b1_mken, at = ( 0 - 177.0495 ) + ( ( l.tcp ) * ( 0 - 0.5 ) ) , from = ip3;
 tcp.6l3.b1, at = -177.049500, from = ip3;
 tcp.6l3.b1_mkex, at = ( 0 - 177.0495 ) + ( ( l.tcp ) * ( 0.5 ) ) , from = ip3;
@@ -22512,15 +22512,15 @@ tchsh.6l3.b1_mkex, at = ( 0 - 175.4495 ) + ( ( l.tchsh ) * ( 0.5 ) ) , from = ip
 tcapa.6l3.b1_mken, at = ( 0 - 168.173 ) + ( ( l.tcapa020 ) * ( 0 - 0.5 ) ) , from = ip3;
 tcapa.6l3.b1, at = -168.173000, from = ip3;
 tcapa.6l3.b1_mkex, at = ( 0 - 168.173 ) + ( ( l.tcapa020 ) * ( 0.5 ) ) , from = ip3;
-mbw.c6l3.b1_s_mken, at = ( 0 - 164.973 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.c6l3.b1_s, at = ( 0 - 164.973 ) + ( 0 ) , from = ip3;
-mbw.c6l3.b1_s_mkex, at = ( 0 - 164.973 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
-mbw.b6l3.b1_s_mken, at = ( 0 - 160.738 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.b6l3.b1_s, at = ( 0 - 160.738 ) + ( 0 ) , from = ip3;
-mbw.b6l3.b1_s_mkex, at = ( 0 - 160.738 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
-mbw.a6l3.b1_s_mken, at = ( 0 - 156.503 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.a6l3.b1_s, at = ( 0 - 156.503 ) + ( 0 ) , from = ip3;
-mbw.a6l3.b1_s_mkex, at = ( 0 - 156.503 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.c6l3.b1_mken, at = ( 0 - 164.973 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.c6l3.b1, at = ( 0 - 164.973 ) + ( 0 ) , from = ip3;
+mbw.c6l3.b1_mkex, at = ( 0 - 164.973 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.b6l3.b1_mken, at = ( 0 - 160.738 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.b6l3.b1, at = ( 0 - 160.738 ) + ( 0 ) , from = ip3;
+mbw.b6l3.b1_mkex, at = ( 0 - 160.738 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.a6l3.b1_mken, at = ( 0 - 156.503 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.a6l3.b1, at = ( 0 - 156.503 ) + ( 0 ) , from = ip3;
+mbw.a6l3.b1_mkex, at = ( 0 - 156.503 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
 bpmwe.5l3.b1: bpmwe008, at = -152.662500, from = ip3,slot_id:= 297858,mech_sep:= -0.224000;
 mqwa.e5l3.b1_mken, at = ( 0 - 150.548 ) + ( ( l.mqwa ) * ( 0 - 0.5 ) ) , from = ip3;
 mqwa.e5l3.b1..1, at = ( ( 0 - 150.548 ) + ( 0 ) ) + ( ( l.mqwa ) * ( 0 - 0.33333333333333 ) ) , from = ip3;
@@ -22692,27 +22692,27 @@ mqwa.e5r3.b1, at = ( 150.548 ) + ( 0 ) , from = ip3;
 mqwa.e5r3.b1..2, at = ( ( 150.548 ) + ( 0 ) ) + ( ( l.mqwa ) * ( 0.33333333333333 ) ) , from = ip3;
 mqwa.e5r3.b1_mkex, at = ( 150.548 ) + ( ( l.mqwa ) * ( 0.5 ) ) , from = ip3;
 bpmwe.5r3.b1: bpmwe009, at = 152.738500, from = ip3,slot_id:= 134742,mech_sep:= -0.224000;
-mbw.a6r3.b1_s_mken, at = ( 156.351 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.a6r3.b1_s, at = ( 156.351 ) + ( 0 ) , from = ip3;
-mbw.a6r3.b1_s_mkex, at = ( 156.351 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
-mbw.b6r3.b1_s_mken, at = ( 160.586 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.b6r3.b1_s, at = ( 160.586 ) + ( 0 ) , from = ip3;
-mbw.b6r3.b1_s_mkex, at = ( 160.586 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
-mbw.c6r3.b1_s_mken, at = ( 164.821 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.c6r3.b1_s, at = ( 164.821 ) + ( 0 ) , from = ip3;
-mbw.c6r3.b1_s_mkex, at = ( 164.821 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.a6r3.b1_mken, at = ( 156.351 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.a6r3.b1, at = ( 156.351 ) + ( 0 ) , from = ip3;
+mbw.a6r3.b1_mkex, at = ( 156.351 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.b6r3.b1_mken, at = ( 160.586 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.b6r3.b1, at = ( 160.586 ) + ( 0 ) , from = ip3;
+mbw.b6r3.b1_mkex, at = ( 160.586 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.c6r3.b1_mken, at = ( 164.821 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.c6r3.b1, at = ( 164.821 ) + ( 0 ) , from = ip3;
+mbw.c6r3.b1_mkex, at = ( 164.821 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
 tcla.6r3.b1_mken, at = ( 179.0495 ) + ( ( l.tcla ) * ( 0 - 0.5 ) ) , from = ip3;
 tcla.6r3.b1, at = 179.049500, from = ip3;
 tcla.6r3.b1_mkex, at = ( 179.0495 ) + ( ( l.tcla ) * ( 0.5 ) ) , from = ip3;
-mbw.d6r3.b1_s_mken, at = ( 182.844 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.d6r3.b1_s, at = ( 182.844 ) + ( 0 ) , from = ip3;
-mbw.d6r3.b1_s_mkex, at = ( 182.844 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
-mbw.e6r3.b1_s_mken, at = ( 187.079 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.e6r3.b1_s, at = ( 187.079 ) + ( 0 ) , from = ip3;
-mbw.e6r3.b1_s_mkex, at = ( 187.079 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
-mbw.f6r3.b1_s_mken, at = ( 191.314 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
-mbw.f6r3.b1_s, at = ( 191.314 ) + ( 0 ) , from = ip3;
-mbw.f6r3.b1_s_mkex, at = ( 191.314 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.d6r3.b1_mken, at = ( 182.844 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.d6r3.b1, at = ( 182.844 ) + ( 0 ) , from = ip3;
+mbw.d6r3.b1_mkex, at = ( 182.844 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.e6r3.b1_mken, at = ( 187.079 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.e6r3.b1, at = ( 187.079 ) + ( 0 ) , from = ip3;
+mbw.e6r3.b1_mkex, at = ( 187.079 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
+mbw.f6r3.b1_mken, at = ( 191.314 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip3;
+mbw.f6r3.b1, at = ( 191.314 ) + ( 0 ) , from = ip3;
+mbw.f6r3.b1_mkex, at = ( 191.314 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip3;
 bpmwc.6r3.b1: bpmwc, at = 193.729500, from = ip3,slot_id:= 104603,mech_sep:= -0.194000;
 mcbcv.6r3.b1_mken, at = ( 195.87 ) + ( ( l.mcbcv ) * ( 0 - 0.5 ) ) , from = ip3;
 mcbcv.6r3.b1, at = 195.870000, from = ip3;
@@ -24583,20 +24583,20 @@ mqy.5l4.b1_mkex, at = ( 0 - 132.62 ) + ( ( l.mqy ) * ( 0.5 ) ) , from = ip4;
 mcbyh.5l4.b1_mken, at = ( 0 - 130.273 ) + ( ( l.mcbyh ) * ( 0 - 0.5 ) ) , from = ip4;
 mcbyh.5l4.b1, at = -130.273000, from = ip4;
 mcbyh.5l4.b1_mkex, at = ( 0 - 130.273 ) + ( ( l.mcbyh ) * ( 0.5 ) ) , from = ip4;
-mbrb.5l4.b1_s_mken, at = ( 0 - 123.684 ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip4;
-mbrb.5l4.b1_s..1, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
-mbrb.5l4.b1_s..2, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
-mbrb.5l4.b1_s, at = ( 0 - 123.684 ) + ( 0 ) , from = ip4;
-mbrb.5l4.b1_s..3, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
-mbrb.5l4.b1_s..4, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
-mbrb.5l4.b1_s_mkex, at = ( 0 - 123.684 ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip4;
-mbrs.5l4.b1_s_mken, at = ( 0 - 51.783 ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip4;
-mbrs.5l4.b1_s..1, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
-mbrs.5l4.b1_s..2, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
-mbrs.5l4.b1_s, at = ( 0 - 51.783 ) + ( 0 ) , from = ip4;
-mbrs.5l4.b1_s..3, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
-mbrs.5l4.b1_s..4, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
-mbrs.5l4.b1_s_mkex, at = ( 0 - 51.783 ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip4;
+mbrb.5l4.b1_mken, at = ( 0 - 123.684 ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip4;
+mbrb.5l4.b1..1, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
+mbrb.5l4.b1..2, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
+mbrb.5l4.b1, at = ( 0 - 123.684 ) + ( 0 ) , from = ip4;
+mbrb.5l4.b1..3, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
+mbrb.5l4.b1..4, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
+mbrb.5l4.b1_mkex, at = ( 0 - 123.684 ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip4;
+mbrs.5l4.b1_mken, at = ( 0 - 51.783 ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip4;
+mbrs.5l4.b1..1, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
+mbrs.5l4.b1..2, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
+mbrs.5l4.b1, at = ( 0 - 51.783 ) + ( 0 ) , from = ip4;
+mbrs.5l4.b1..3, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
+mbrs.5l4.b1..4, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
+mbrs.5l4.b1_mkex, at = ( 0 - 51.783 ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip4;
 acnca.d5l4.b1_mken, at = ( 0 - 41.834 ) + ( ( l.acnca ) * ( 0 - 0.5 ) ) , from = ip4;
 acnca.d5l4.b1, at = -41.834000, from = ip4;
 acnca.d5l4.b1_mkex, at = ( 0 - 41.834 ) + ( ( l.acnca ) * ( 0.5 ) ) , from = ip4;
@@ -24660,24 +24660,24 @@ mu.c5r4.b1_mkex, at = ( 45.911 ) + ( ( l.mu ) * ( 0.5 ) ) , from = ip4;
 mu.d5r4.b1_mken, at = ( 46.051 ) + ( ( l.mu ) * ( 0 - 0.5 ) ) , from = ip4;
 mu.d5r4.b1, at = 46.051000, from = ip4;
 mu.d5r4.b1_mkex, at = ( 46.051 ) + ( ( l.mu ) * ( 0.5 ) ) , from = ip4;
-mbrs.5r4.b1_s_mken, at = ( 51.783 ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip4;
-mbrs.5r4.b1_s..1, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
-mbrs.5r4.b1_s..2, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
-mbrs.5r4.b1_s, at = ( 51.783 ) + ( 0 ) , from = ip4;
-mbrs.5r4.b1_s..3, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
-mbrs.5r4.b1_s..4, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
-mbrs.5r4.b1_s_mkex, at = ( 51.783 ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip4;
+mbrs.5r4.b1_mken, at = ( 51.783 ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip4;
+mbrs.5r4.b1..1, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
+mbrs.5r4.b1..2, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
+mbrs.5r4.b1, at = ( 51.783 ) + ( 0 ) , from = ip4;
+mbrs.5r4.b1..3, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
+mbrs.5r4.b1..4, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
+mbrs.5r4.b1_mkex, at = ( 51.783 ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip4;
 bsrta.5r4.b1: bsrta, at = 58.781000, from = ip4,slot_id:= 635738,mech_sep:= -0.404000;
 bsrtm.5r4.b1: bsrtm, at = 73.081000, from = ip4,slot_id:= 635739,mech_sep:= -0.376000;
 bws.5r4.b1: bws, at = 84.876000, from = ip4,slot_id:= 642430,mech_sep:= -0.318000;
 bqsv.5r4.b1: bqsv, at = 116.109000, from = ip4,slot_id:= 635695,mech_sep:= -0.216000;
-mbrb.5r4.b1_s_mken, at = ( 123.684 ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip4;
-mbrb.5r4.b1_s..1, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
-mbrb.5r4.b1_s..2, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
-mbrb.5r4.b1_s, at = ( 123.684 ) + ( 0 ) , from = ip4;
-mbrb.5r4.b1_s..3, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
-mbrb.5r4.b1_s..4, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
-mbrb.5r4.b1_s_mkex, at = ( 123.684 ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip4;
+mbrb.5r4.b1_mken, at = ( 123.684 ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip4;
+mbrb.5r4.b1..1, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
+mbrb.5r4.b1..2, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
+mbrb.5r4.b1, at = ( 123.684 ) + ( 0 ) , from = ip4;
+mbrb.5r4.b1..3, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
+mbrb.5r4.b1..4, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
+mbrb.5r4.b1_mkex, at = ( 123.684 ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip4;
 mcbyv.5r4.b1_mken, at = ( 130.273 ) + ( ( l.mcbyv ) * ( 0 - 0.5 ) ) , from = ip4;
 mcbyv.5r4.b1, at = 130.273000, from = ip4;
 mcbyv.5r4.b1_mkex, at = ( 130.273 ) + ( ( l.mcbyv ) * ( 0.5 ) ) , from = ip4;
@@ -26542,13 +26542,13 @@ mcbyv.4l5.b1_mkex, at = ( 0 - 165.735 ) + ( ( l.mcbyv ) * ( 0.5 ) ) , from = ip5
 mcbyh.a4l5.b1_mken, at = ( 0 - 164.439 ) + ( ( l.mcbyh ) * ( 0 - 0.5 ) ) , from = ip5;
 mcbyh.a4l5.b1, at = -164.439000, from = ip5;
 mcbyh.a4l5.b1_mkex, at = ( 0 - 164.439 ) + ( ( l.mcbyh ) * ( 0.5 ) ) , from = ip5;
-mbrc.4l5.b1_s_mken, at = ( 0 - 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbrc.4l5.b1_s..1, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip5;
-mbrc.4l5.b1_s..2, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip5;
-mbrc.4l5.b1_s, at = ( 0 - 157.9 ) + ( 0 ) , from = ip5;
-mbrc.4l5.b1_s..3, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip5;
-mbrc.4l5.b1_s..4, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip5;
-mbrc.4l5.b1_s_mkex, at = ( 0 - 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbrc.4l5.b1_mken, at = ( 0 - 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbrc.4l5.b1..1, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip5;
+mbrc.4l5.b1..2, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip5;
+mbrc.4l5.b1, at = ( 0 - 157.9 ) + ( 0 ) , from = ip5;
+mbrc.4l5.b1..3, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip5;
+mbrc.4l5.b1..4, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip5;
+mbrc.4l5.b1_mkex, at = ( 0 - 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
 bpmwb.4l5.b1: bpmwb, at = -151.094500, from = ip5,slot_id:= 104608,mech_sep:= -0.174000;
 tcth.4l5.b1_mken, at = ( 0 - 147.52 ) + ( ( l.tcth ) * ( 0 - 0.5 ) ) , from = ip5;
 tcth.4l5.b1, at = -147.520000, from = ip5;
@@ -26562,24 +26562,24 @@ brana.4l5: brana, at = -141.175000, from = ip5,slot_id:= 883709,assembly_id:= 10
 x5zdc.a4l5_mken, at = ( 0 - 141.0625 ) + ( ( l.x5zdc002 ) * ( 0 - 0.5 ) ) , from = ip5;
 x5zdc.a4l5, at = -141.062500, from = ip5;
 x5zdc.a4l5_mkex, at = ( 0 - 141.0625 ) + ( ( l.x5zdc002 ) * ( 0.5 ) ) , from = ip5;
-mbxw.f4l5_s_mken, at = ( 0 - 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.f4l5_s, at = ( 0 - 82.652 ) + ( 0 ) , from = ip5;
-mbxw.f4l5_s_mkex, at = ( 0 - 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
-mbxw.e4l5_s_mken, at = ( 0 - 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.e4l5_s, at = ( 0 - 78.386 ) + ( 0 ) , from = ip5;
-mbxw.e4l5_s_mkex, at = ( 0 - 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
-mbxw.d4l5_s_mken, at = ( 0 - 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.d4l5_s, at = ( 0 - 74.12 ) + ( 0 ) , from = ip5;
-mbxw.d4l5_s_mkex, at = ( 0 - 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
-mbxw.c4l5_s_mken, at = ( 0 - 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.c4l5_s, at = ( 0 - 69.854 ) + ( 0 ) , from = ip5;
-mbxw.c4l5_s_mkex, at = ( 0 - 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
-mbxw.b4l5_s_mken, at = ( 0 - 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.b4l5_s, at = ( 0 - 65.588 ) + ( 0 ) , from = ip5;
-mbxw.b4l5_s_mkex, at = ( 0 - 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
-mbxw.a4l5_s_mken, at = ( 0 - 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.a4l5_s, at = ( 0 - 61.322 ) + ( 0 ) , from = ip5;
-mbxw.a4l5_s_mkex, at = ( 0 - 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.f4l5_mken, at = ( 0 - 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.f4l5, at = ( 0 - 82.652 ) + ( 0 ) , from = ip5;
+mbxw.f4l5_mkex, at = ( 0 - 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.e4l5_mken, at = ( 0 - 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.e4l5, at = ( 0 - 78.386 ) + ( 0 ) , from = ip5;
+mbxw.e4l5_mkex, at = ( 0 - 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.d4l5_mken, at = ( 0 - 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.d4l5, at = ( 0 - 74.12 ) + ( 0 ) , from = ip5;
+mbxw.d4l5_mkex, at = ( 0 - 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.c4l5_mken, at = ( 0 - 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.c4l5, at = ( 0 - 69.854 ) + ( 0 ) , from = ip5;
+mbxw.c4l5_mkex, at = ( 0 - 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.b4l5_mken, at = ( 0 - 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.b4l5, at = ( 0 - 65.588 ) + ( 0 ) , from = ip5;
+mbxw.b4l5_mkex, at = ( 0 - 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.a4l5_mken, at = ( 0 - 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.a4l5, at = ( 0 - 61.322 ) + ( 0 ) , from = ip5;
+mbxw.a4l5_mkex, at = ( 0 - 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
 bpmsy.4l5.b1: bpmsy, at = -58.314500, from = ip5,slot_id:= 104609,mech_sep:= 0.000000;
 dfbxe.3l5_mken, at = ( 0 - 56.427 ) + ( ( l.dfbxe ) * ( 0 - 0.5 ) ) , from = ip5;
 dfbxe.3l5, at = -56.427000, from = ip5;
@@ -26695,24 +26695,24 @@ dfbxf.3r5_mken, at = ( 56.427 ) + ( ( l.dfbxf ) * ( 0 - 0.5 ) ) , from = ip5;
 dfbxf.3r5, at = 56.427000, from = ip5;
 dfbxf.3r5_mkex, at = ( 56.427 ) + ( ( l.dfbxf ) * ( 0.5 ) ) , from = ip5;
 bpmsy.4r5.b1: bpmsy, at = 58.314500, from = ip5,slot_id:= 104612,mech_sep:= 0.000000;
-mbxw.a4r5_s_mken, at = ( 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.a4r5_s, at = ( 61.322 ) + ( 0 ) , from = ip5;
-mbxw.a4r5_s_mkex, at = ( 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
-mbxw.b4r5_s_mken, at = ( 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.b4r5_s, at = ( 65.588 ) + ( 0 ) , from = ip5;
-mbxw.b4r5_s_mkex, at = ( 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
-mbxw.c4r5_s_mken, at = ( 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.c4r5_s, at = ( 69.854 ) + ( 0 ) , from = ip5;
-mbxw.c4r5_s_mkex, at = ( 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
-mbxw.d4r5_s_mken, at = ( 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.d4r5_s, at = ( 74.12 ) + ( 0 ) , from = ip5;
-mbxw.d4r5_s_mkex, at = ( 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
-mbxw.e4r5_s_mken, at = ( 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.e4r5_s, at = ( 78.386 ) + ( 0 ) , from = ip5;
-mbxw.e4r5_s_mkex, at = ( 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
-mbxw.f4r5_s_mken, at = ( 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbxw.f4r5_s, at = ( 82.652 ) + ( 0 ) , from = ip5;
-mbxw.f4r5_s_mkex, at = ( 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.a4r5_mken, at = ( 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.a4r5, at = ( 61.322 ) + ( 0 ) , from = ip5;
+mbxw.a4r5_mkex, at = ( 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.b4r5_mken, at = ( 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.b4r5, at = ( 65.588 ) + ( 0 ) , from = ip5;
+mbxw.b4r5_mkex, at = ( 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.c4r5_mken, at = ( 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.c4r5, at = ( 69.854 ) + ( 0 ) , from = ip5;
+mbxw.c4r5_mkex, at = ( 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.d4r5_mken, at = ( 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.d4r5, at = ( 74.12 ) + ( 0 ) , from = ip5;
+mbxw.d4r5_mkex, at = ( 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.e4r5_mken, at = ( 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.e4r5, at = ( 78.386 ) + ( 0 ) , from = ip5;
+mbxw.e4r5_mkex, at = ( 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbxw.f4r5_mken, at = ( 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbxw.f4r5, at = ( 82.652 ) + ( 0 ) , from = ip5;
+mbxw.f4r5_mkex, at = ( 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
 x5zdc.b4r5_mken, at = ( 141.0625 ) + ( ( l.x5zdc002 ) * ( 0 - 0.5 ) ) , from = ip5;
 x5zdc.b4r5, at = 141.062500, from = ip5;
 x5zdc.b4r5_mkex, at = ( 141.0625 ) + ( ( l.x5zdc002 ) * ( 0.5 ) ) , from = ip5;
@@ -26728,13 +26728,13 @@ xrph.b4r5.b1: xrph, at = 150.027000, from = ip5,slot_id:= 826637,assembly_id:= 8
 xrpv.b4r5.b1: xrpv, at = 150.476000, from = ip5,slot_id:= 826649,assembly_id:= 825715,mech_sep:= 0.194000;
 bpmwt.b4r5.b1: bpmwt, at = 150.701000, from = ip5,slot_id:= 826625,assembly_id:= 825715,mech_sep:= 0.175800;
 bpmwb.4r5.b1: bpmwb, at = 151.094500, from = ip5,slot_id:= 181643,mech_sep:= 0.174000;
-mbrc.4r5.b1_s_mken, at = ( 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
-mbrc.4r5.b1_s..1, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip5;
-mbrc.4r5.b1_s..2, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip5;
-mbrc.4r5.b1_s, at = ( 157.9 ) + ( 0 ) , from = ip5;
-mbrc.4r5.b1_s..3, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip5;
-mbrc.4r5.b1_s..4, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip5;
-mbrc.4r5.b1_s_mkex, at = ( 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
+mbrc.4r5.b1_mken, at = ( 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip5;
+mbrc.4r5.b1..1, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip5;
+mbrc.4r5.b1..2, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip5;
+mbrc.4r5.b1, at = ( 157.9 ) + ( 0 ) , from = ip5;
+mbrc.4r5.b1..3, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip5;
+mbrc.4r5.b1..4, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip5;
+mbrc.4r5.b1_mkex, at = ( 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip5;
 mcbyv.a4r5.b1_mken, at = ( 164.439 ) + ( ( l.mcbyv ) * ( 0 - 0.5 ) ) , from = ip5;
 mcbyv.a4r5.b1, at = 164.439000, from = ip5;
 mcbyv.a4r5.b1_mkex, at = ( 164.439 ) + ( ( l.mcbyv ) * ( 0.5 ) ) , from = ip5;
@@ -30530,12 +30530,12 @@ mcbch.6l7.b1_mken, at = ( 0 - 223.675 ) + ( ( l.mcbch ) * ( 0 - 0.5 ) ) , from =
 mcbch.6l7.b1, at = -223.675000, from = ip7;
 mcbch.6l7.b1_mkex, at = ( 0 - 223.675 ) + ( ( l.mcbch ) * ( 0.5 ) ) , from = ip7;
 bpmwc.6l7.b1: bpmwc, at = -221.510500, from = ip7,slot_id:= 181644,mech_sep:= 0.194000;
-mbw.d6l7.b1_s_mken, at = ( 0 - 214.413 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
-mbw.d6l7.b1_s, at = ( 0 - 214.413 ) + ( 0 ) , from = ip7;
-mbw.d6l7.b1_s_mkex, at = ( 0 - 214.413 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
-mbw.c6l7.b1_s_mken, at = ( 0 - 210.178 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
-mbw.c6l7.b1_s, at = ( 0 - 210.178 ) + ( 0 ) , from = ip7;
-mbw.c6l7.b1_s_mkex, at = ( 0 - 210.178 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
+mbw.d6l7.b1_mken, at = ( 0 - 214.413 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
+mbw.d6l7.b1, at = ( 0 - 214.413 ) + ( 0 ) , from = ip7;
+mbw.d6l7.b1_mkex, at = ( 0 - 214.413 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
+mbw.c6l7.b1_mken, at = ( 0 - 210.178 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
+mbw.c6l7.b1, at = ( 0 - 210.178 ) + ( 0 ) , from = ip7;
+mbw.c6l7.b1_mkex, at = ( 0 - 210.178 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
 tcp.d6l7.b1_mken, at = ( 0 - 204.978 ) + ( ( l.tcp ) * ( 0 - 0.5 ) ) , from = ip7;
 tcp.d6l7.b1, at = -204.978000, from = ip7;
 tcp.d6l7.b1_mkex, at = ( 0 - 204.978 ) + ( ( l.tcp ) * ( 0.5 ) ) , from = ip7;
@@ -30560,15 +30560,15 @@ tchss.6l7.b1_mkex, at = ( 0 - 194.978 ) + ( ( l.tchss ) * ( 0.5 ) ) , from = ip7
 tcapa.6l7.b1_mken, at = ( 0 - 177.9735 ) + ( ( l.tcapa019 ) * ( 0 - 0.5 ) ) , from = ip7;
 tcapa.6l7.b1, at = -177.973500, from = ip7;
 tcapa.6l7.b1_mkex, at = ( 0 - 177.9735 ) + ( ( l.tcapa019 ) * ( 0.5 ) ) , from = ip7;
-mbw.b6l7.b1_s_mken, at = ( 0 - 175.0235 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
-mbw.b6l7.b1_s, at = ( 0 - 175.0235 ) + ( 0 ) , from = ip7;
-mbw.b6l7.b1_s_mkex, at = ( 0 - 175.0235 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
+mbw.b6l7.b1_mken, at = ( 0 - 175.0235 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
+mbw.b6l7.b1, at = ( 0 - 175.0235 ) + ( 0 ) , from = ip7;
+mbw.b6l7.b1_mkex, at = ( 0 - 175.0235 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
 tcapb.6l7.b1_mken, at = ( 0 - 172.4885 ) + ( ( l.tcapb ) * ( 0 - 0.5 ) ) , from = ip7;
 tcapb.6l7.b1, at = -172.488500, from = ip7;
 tcapb.6l7.b1_mkex, at = ( 0 - 172.4885 ) + ( ( l.tcapb ) * ( 0.5 ) ) , from = ip7;
-mbw.a6l7.b1_s_mken, at = ( 0 - 170.0885 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
-mbw.a6l7.b1_s, at = ( 0 - 170.0885 ) + ( 0 ) , from = ip7;
-mbw.a6l7.b1_s_mkex, at = ( 0 - 170.0885 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
+mbw.a6l7.b1_mken, at = ( 0 - 170.0885 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
+mbw.a6l7.b1, at = ( 0 - 170.0885 ) + ( 0 ) , from = ip7;
+mbw.a6l7.b1_mkex, at = ( 0 - 170.0885 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
 tcsg.b6l7.b1_mken, at = ( 0 - 165.4835 ) + ( ( l.tcsg ) * ( 0 - 0.5 ) ) , from = ip7;
 tcsg.b6l7.b1, at = -165.483500, from = ip7;
 tcsg.b6l7.b1_mkex, at = ( 0 - 165.4835 ) + ( ( l.tcsg ) * ( 0.5 ) ) , from = ip7;
@@ -30812,21 +30812,21 @@ tcsm.6r7.b1_mkex, at = ( 148.861 ) + ( ( l.tcsm ) * ( 0.5 ) ) , from = ip7;
 tcla.a6r7.b1_mken, at = ( 153.927 ) + ( ( l.tcla ) * ( 0 - 0.5 ) ) , from = ip7;
 tcla.a6r7.b1, at = 153.927000, from = ip7;
 tcla.a6r7.b1_mkex, at = ( 153.927 ) + ( ( l.tcla ) * ( 0.5 ) ) , from = ip7;
-mbw.a6r7.b1_s_mken, at = ( 170.0885 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
-mbw.a6r7.b1_s, at = ( 170.0885 ) + ( 0 ) , from = ip7;
-mbw.a6r7.b1_s_mkex, at = ( 170.0885 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
-mbw.b6r7.b1_s_mken, at = ( 175.0235 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
-mbw.b6r7.b1_s, at = ( 175.0235 ) + ( 0 ) , from = ip7;
-mbw.b6r7.b1_s_mkex, at = ( 175.0235 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
+mbw.a6r7.b1_mken, at = ( 170.0885 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
+mbw.a6r7.b1, at = ( 170.0885 ) + ( 0 ) , from = ip7;
+mbw.a6r7.b1_mkex, at = ( 170.0885 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
+mbw.b6r7.b1_mken, at = ( 175.0235 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
+mbw.b6r7.b1, at = ( 175.0235 ) + ( 0 ) , from = ip7;
+mbw.b6r7.b1_mkex, at = ( 175.0235 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
 tcla.b6r7.b1_mken, at = ( 184.801 ) + ( ( l.tcla ) * ( 0 - 0.5 ) ) , from = ip7;
 tcla.b6r7.b1, at = 184.801000, from = ip7;
 tcla.b6r7.b1_mkex, at = ( 184.801 ) + ( ( l.tcla ) * ( 0.5 ) ) , from = ip7;
-mbw.c6r7.b1_s_mken, at = ( 210.178 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
-mbw.c6r7.b1_s, at = ( 210.178 ) + ( 0 ) , from = ip7;
-mbw.c6r7.b1_s_mkex, at = ( 210.178 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
-mbw.d6r7.b1_s_mken, at = ( 214.413 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
-mbw.d6r7.b1_s, at = ( 214.413 ) + ( 0 ) , from = ip7;
-mbw.d6r7.b1_s_mkex, at = ( 214.413 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
+mbw.c6r7.b1_mken, at = ( 210.178 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
+mbw.c6r7.b1, at = ( 210.178 ) + ( 0 ) , from = ip7;
+mbw.c6r7.b1_mkex, at = ( 210.178 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
+mbw.d6r7.b1_mken, at = ( 214.413 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip7;
+mbw.d6r7.b1, at = ( 214.413 ) + ( 0 ) , from = ip7;
+mbw.d6r7.b1_mkex, at = ( 214.413 ) + ( ( ( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip7;
 tcla.c6r7.b1_mken, at = ( 218.07 ) + ( ( l.tcla ) * ( 0 - 0.5 ) ) , from = ip7;
 tcla.c6r7.b1, at = 218.070000, from = ip7;
 tcla.c6r7.b1_mkex, at = ( 218.07 ) + ( ( l.tcla ) * ( 0.5 ) ) , from = ip7;
@@ -32746,13 +32746,13 @@ mcbyh.4l8.b1_mkex, at = ( 0 - 134.096 ) + ( ( l.mcbyh ) * ( 0.5 ) ) , from = ip8
 mcbyv.a4l8.b1_mken, at = ( 0 - 132.95 ) + ( ( l.mcbyv ) * ( 0 - 0.5 ) ) , from = ip8;
 mcbyv.a4l8.b1, at = -132.950000, from = ip8;
 mcbyv.a4l8.b1_mkex, at = ( 0 - 132.95 ) + ( ( l.mcbyv ) * ( 0.5 ) ) , from = ip8;
-mbrc.4l8.b1_s_mken, at = ( 0 - 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip8;
-mbrc.4l8.b1_s..1, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
-mbrc.4l8.b1_s..2, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
-mbrc.4l8.b1_s, at = ( 0 - 126.403 ) + ( 0 ) , from = ip8;
-mbrc.4l8.b1_s..3, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
-mbrc.4l8.b1_s..4, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
-mbrc.4l8.b1_s_mkex, at = ( 0 - 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip8;
+mbrc.4l8.b1_mken, at = ( 0 - 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip8;
+mbrc.4l8.b1..1, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
+mbrc.4l8.b1..2, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
+mbrc.4l8.b1, at = ( 0 - 126.403 ) + ( 0 ) , from = ip8;
+mbrc.4l8.b1..3, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
+mbrc.4l8.b1..4, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
+mbrc.4l8.b1_mkex, at = ( 0 - 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip8;
 bpmwb.4l8.b1: bpmwb, at = -119.673500, from = ip8,slot_id:= 181645,mech_sep:= 0.174000;
 tcth.4l8.b1_mken, at = ( 0 - 118.233 ) + ( ( l.tcth ) * ( 0 - 0.5 ) ) , from = ip8;
 tcth.4l8.b1, at = -118.233000, from = ip8;
@@ -32765,13 +32765,13 @@ tctvb.4l8_mken, at = ( 0 - 73.748 ) + ( ( l.tctvb ) * ( 0 - 0.5 ) ) , from = ip8
 tctvb.4l8, at = -73.748000, from = ip8;
 tctvb.4l8_mkex, at = ( 0 - 73.748 ) + ( ( l.tctvb ) * ( 0.5 ) ) , from = ip8;
 bpmsx.4l8.b1: bpmsx, at = -69.440500, from = ip8,slot_id:= 104616,mech_sep:= 0.000000;
-mbx.4l8_s_mken, at = ( 0 - 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip8;
-mbx.4l8_s..1, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
-mbx.4l8_s..2, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
-mbx.4l8_s, at = ( 0 - 63.108 ) + ( 0 ) , from = ip8;
-mbx.4l8_s..3, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
-mbx.4l8_s..4, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
-mbx.4l8_s_mkex, at = ( 0 - 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip8;
+mbx.4l8_mken, at = ( 0 - 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip8;
+mbx.4l8..1, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
+mbx.4l8..2, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
+mbx.4l8, at = ( 0 - 63.108 ) + ( 0 ) , from = ip8;
+mbx.4l8..3, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
+mbx.4l8..4, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
+mbx.4l8_mkex, at = ( 0 - 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip8;
 dfbxg.3l8_mken, at = ( 0 - 56.3085 ) + ( ( l.dfbxg ) * ( 0 - 0.5 ) ) , from = ip8;
 dfbxg.3l8, at = -56.308500, from = ip8;
 dfbxg.3l8_mkex, at = ( 0 - 56.3085 ) + ( ( l.dfbxg ) * ( 0.5 ) ) , from = ip8;
@@ -32879,13 +32879,13 @@ mcssx.3r8: mcssx, at = 54.297000, from = ip8,polarity:= 1.000000,ksl:={ 0.000000
 dfbxh.3r8_mken, at = ( 56.3085 ) + ( ( l.dfbxh ) * ( 0 - 0.5 ) ) , from = ip8;
 dfbxh.3r8, at = 56.308500, from = ip8;
 dfbxh.3r8_mkex, at = ( 56.3085 ) + ( ( l.dfbxh ) * ( 0.5 ) ) , from = ip8;
-mbx.4r8_s_mken, at = ( 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip8;
-mbx.4r8_s..1, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
-mbx.4r8_s..2, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
-mbx.4r8_s, at = ( 63.108 ) + ( 0 ) , from = ip8;
-mbx.4r8_s..3, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
-mbx.4r8_s..4, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
-mbx.4r8_s_mkex, at = ( 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip8;
+mbx.4r8_mken, at = ( 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip8;
+mbx.4r8..1, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
+mbx.4r8..2, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
+mbx.4r8, at = ( 63.108 ) + ( 0 ) , from = ip8;
+mbx.4r8..3, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
+mbx.4r8..4, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
+mbx.4r8_mkex, at = ( 63.108 ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip8;
 bpmsx.4r8.b1: bpmsx, at = 69.440500, from = ip8,slot_id:= 104619,mech_sep:= 0.000000;
 tcddm.4r8_mken, at = ( 71.358 ) + ( ( l.tcddm ) * ( 0 - 0.5 ) ) , from = ip8;
 tcddm.4r8, at = 71.358000, from = ip8;
@@ -32896,13 +32896,13 @@ tctvb.4r8_mkex, at = ( 73.748 ) + ( ( l.tctvb ) * ( 0.5 ) ) , from = ip8;
 btvst.a4r8: btvst064, at = 85.441000, from = ip8,slot_id:= 181630,mech_sep:= -0.080000;
 branb.4r8: branb, at = 114.108000, from = ip8,slot_id:= 377644,mech_sep:= 0.000000;
 bpmwb.4r8.b1: bpmwb, at = 119.597500, from = ip8,slot_id:= 181646,mech_sep:= -0.174000;
-mbrc.4r8.b1_s_mken, at = ( 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip8;
-mbrc.4r8.b1_s..1, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
-mbrc.4r8.b1_s..2, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
-mbrc.4r8.b1_s, at = ( 126.403 ) + ( 0 ) , from = ip8;
-mbrc.4r8.b1_s..3, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
-mbrc.4r8.b1_s..4, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
-mbrc.4r8.b1_s_mkex, at = ( 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip8;
+mbrc.4r8.b1_mken, at = ( 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip8;
+mbrc.4r8.b1..1, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
+mbrc.4r8.b1..2, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
+mbrc.4r8.b1, at = ( 126.403 ) + ( 0 ) , from = ip8;
+mbrc.4r8.b1..3, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
+mbrc.4r8.b1..4, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
+mbrc.4r8.b1_mkex, at = ( 126.403 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip8;
 mcbyh.a4r8.b1_mken, at = ( 132.95 ) + ( ( l.mcbyh ) * ( 0 - 0.5 ) ) , from = ip8;
 mcbyh.a4r8.b1, at = 132.950000, from = ip8;
 mcbyh.a4r8.b1_mkex, at = ( 132.95 ) + ( ( l.mcbyh ) * ( 0.5 ) ) , from = ip8;
@@ -34811,13 +34811,13 @@ mcbyv.4l1.b1_mkex, at = ( 0 - 165.735 ) + ( ( l.mcbyv ) * ( 0.5 ) ) , from = ip1
 mcbyh.a4l1.b1_mken, at = ( 0 - 164.439 ) + ( ( l.mcbyh ) * ( 0 - 0.5 ) ) , from = ip1.l1;
 mcbyh.a4l1.b1, at = -164.439000, from = ip1.l1;
 mcbyh.a4l1.b1_mkex, at = ( 0 - 164.439 ) + ( ( l.mcbyh ) * ( 0.5 ) ) , from = ip1.l1;
-mbrc.4l1.b1_s_mken, at = ( 0 - 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
-mbrc.4l1.b1_s..1, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip1.l1;
-mbrc.4l1.b1_s..2, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip1.l1;
-mbrc.4l1.b1_s, at = ( 0 - 157.9 ) + ( 0 ) , from = ip1.l1;
-mbrc.4l1.b1_s..3, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip1.l1;
-mbrc.4l1.b1_s..4, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip1.l1;
-mbrc.4l1.b1_s_mkex, at = ( 0 - 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
+mbrc.4l1.b1_mken, at = ( 0 - 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
+mbrc.4l1.b1..1, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip1.l1;
+mbrc.4l1.b1..2, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip1.l1;
+mbrc.4l1.b1, at = ( 0 - 157.9 ) + ( 0 ) , from = ip1.l1;
+mbrc.4l1.b1..3, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip1.l1;
+mbrc.4l1.b1..4, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip1.l1;
+mbrc.4l1.b1_mkex, at = ( 0 - 157.9 ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
 bpmwb.4l1.b1: bpmwb, at = -151.094500, from = ip1.l1,slot_id:= 104621,mech_sep:= -0.174000;
 tcth.4l1.b1_mken, at = ( 0 - 147.52 ) + ( ( l.tcth ) * ( 0 - 0.5 ) ) , from = ip1.l1;
 tcth.4l1.b1, at = -147.520000, from = ip1.l1;
@@ -34829,24 +34829,24 @@ x1zdc.a4l1, at = -141.700000, from = ip1.l1;
 x1zdc.a4l1_mkex, at = ( 0 - 141.7 ) + ( ( l.x1zdc001 ) * ( 0.5 ) ) , from = ip1.l1;
 brana.4l1: brana, at = -141.350000, from = ip1.l1,slot_id:= 883499,assembly_id:= 103988,mech_sep:= 0.000000;
 x1fcl.4l1: x1fcl, at = -141.150000, from = ip1.l1,slot_id:= 378051,assembly_id:= 103988,mech_sep:= 0.000000;
-mbxw.f4l1_s_mken, at = ( 0 - 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
-mbxw.f4l1_s, at = ( 0 - 82.652 ) + ( 0 ) , from = ip1.l1;
-mbxw.f4l1_s_mkex, at = ( 0 - 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
-mbxw.e4l1_s_mken, at = ( 0 - 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
-mbxw.e4l1_s, at = ( 0 - 78.386 ) + ( 0 ) , from = ip1.l1;
-mbxw.e4l1_s_mkex, at = ( 0 - 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
-mbxw.d4l1_s_mken, at = ( 0 - 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
-mbxw.d4l1_s, at = ( 0 - 74.12 ) + ( 0 ) , from = ip1.l1;
-mbxw.d4l1_s_mkex, at = ( 0 - 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
-mbxw.c4l1_s_mken, at = ( 0 - 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
-mbxw.c4l1_s, at = ( 0 - 69.854 ) + ( 0 ) , from = ip1.l1;
-mbxw.c4l1_s_mkex, at = ( 0 - 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
-mbxw.b4l1_s_mken, at = ( 0 - 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
-mbxw.b4l1_s, at = ( 0 - 65.588 ) + ( 0 ) , from = ip1.l1;
-mbxw.b4l1_s_mkex, at = ( 0 - 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
-mbxw.a4l1_s_mken, at = ( 0 - 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
-mbxw.a4l1_s, at = ( 0 - 61.322 ) + ( 0 ) , from = ip1.l1;
-mbxw.a4l1_s_mkex, at = ( 0 - 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
+mbxw.f4l1_mken, at = ( 0 - 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
+mbxw.f4l1, at = ( 0 - 82.652 ) + ( 0 ) , from = ip1.l1;
+mbxw.f4l1_mkex, at = ( 0 - 82.652 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
+mbxw.e4l1_mken, at = ( 0 - 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
+mbxw.e4l1, at = ( 0 - 78.386 ) + ( 0 ) , from = ip1.l1;
+mbxw.e4l1_mkex, at = ( 0 - 78.386 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
+mbxw.d4l1_mken, at = ( 0 - 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
+mbxw.d4l1, at = ( 0 - 74.12 ) + ( 0 ) , from = ip1.l1;
+mbxw.d4l1_mkex, at = ( 0 - 74.12 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
+mbxw.c4l1_mken, at = ( 0 - 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
+mbxw.c4l1, at = ( 0 - 69.854 ) + ( 0 ) , from = ip1.l1;
+mbxw.c4l1_mkex, at = ( 0 - 69.854 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
+mbxw.b4l1_mken, at = ( 0 - 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
+mbxw.b4l1, at = ( 0 - 65.588 ) + ( 0 ) , from = ip1.l1;
+mbxw.b4l1_mkex, at = ( 0 - 65.588 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
+mbxw.a4l1_mken, at = ( 0 - 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0 - 0.5 ) ) , from = ip1.l1;
+mbxw.a4l1, at = ( 0 - 61.322 ) + ( 0 ) , from = ip1.l1;
+mbxw.a4l1_mkex, at = ( 0 - 61.322 ) + ( ( ( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ) * ( 0.5 ) ) , from = ip1.l1;
 bpmsy.4l1.b1: bpmsy, at = -58.314500, from = ip1.l1,slot_id:= 104622,mech_sep:= 0.000000;
 dfbxa.3l1_mken, at = ( 0 - 56.427 ) + ( ( l.dfbxa ) * ( 0 - 0.5 ) ) , from = ip1.l1;
 dfbxa.3l1, at = -56.427000, from = ip1.l1;
