@@ -9,7 +9,7 @@ module S_extend_poly
   type(real_8) e_muon_scale,a_spin_scale
 
   ! LD: 22.03.2019 (see Sc_euclidean.f90, Sh_def_kinf.f90 and Sr_spin.f90)
-  character(len=150) :: ELEM_NAME
+  character(len=150) :: ELEM_NAME = "UNKNOWN"
   logical(lp)        :: NODUMP = .true. ! .false./.true. enable/disable PRTP
 
 CONTAINS
