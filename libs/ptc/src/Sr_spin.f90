@@ -2556,7 +2556,7 @@ call kill(vm,phi,z)
 
 
   SUBROUTINE TRACK_NODE_LAYOUT_FLAG_pr_s12_P(R,XS,k,I1,I2) ! Tracks double from i1 to i2 in state k
-    use s_def_kind, only : elem_name ! LD: 22.03.2019
+    use s_extend_poly, only : elem_name ! LD: 22.03.2019
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     TYPE(probe_8), INTENT(INOUT):: XS

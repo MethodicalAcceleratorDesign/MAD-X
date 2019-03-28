@@ -2,6 +2,7 @@
 !Copyright (C) Etienne Forest and CERN
 module S_euclidean
   use S_extend_poly
+  use s_extend_poly, only : PRTP ! LD: 22.03.2019
   implicit none
   public
 
@@ -383,7 +384,6 @@ end subroutine zero_E_GENERAL_s
   END SUBROUTINE ROT_YZR
 
   SUBROUTINE ROT_YZP(A,X,b,EXACT,ctime)
-    use s_def_kind, only : PRTP ! LD: 22.03.2019
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8) XN(6)
@@ -450,7 +450,6 @@ end subroutine zero_E_GENERAL_s
   END SUBROUTINE TRANSR
 
   SUBROUTINE TRANSP(A,X,b,EXACT,ctime)
-    use s_def_kind, only : PRTP ! LD: 22.03.2019
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8) PZ
@@ -522,7 +521,6 @@ end subroutine zero_E_GENERAL_s
   END SUBROUTINE ROT_XYR
 
   SUBROUTINE ROT_XYP(A,X)
-    use s_def_kind, only : PRTP ! LD: 22.03.2019
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8) XN(4)
@@ -605,7 +603,6 @@ end subroutine zero_E_GENERAL_s
   END SUBROUTINE ROT_XZR
 
   SUBROUTINE ROT_XZP(A,X,b,EXACT,ctime)
-    use s_def_kind, only : PRTP ! LD: 22.03.2019
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8) XN(6),PZ,PT

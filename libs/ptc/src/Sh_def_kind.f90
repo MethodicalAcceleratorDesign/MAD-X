@@ -3,6 +3,7 @@
 
 MODULE S_DEF_KIND
   USE S_def_all_kinds   ! not needed because of things below
+  use s_extend_poly, only : PRTP ! LD: 22.03.2019
   public
   PRIVATE DRIFTP  !,DRIFT   ! ,DRIFTR
   PRIVATE SPARR,SPARP !,SPAR
@@ -904,37 +905,7 @@ integer :: tot_t=1
      MODULE PROCEDURE KICKP_HE
   END INTERFACE
 
-  ! LD: 22.03.2019 (see Sr_spin.f90 and Sc_euclidean.f90)
-  character(len=150) :: ELEM_NAME
-  logical(lp)        :: NODUMP = .true. ! .false./.true. enable/disable PRTP
-
 CONTAINS !----------------------------------------------------------------------
-
-  ! LD: 22.03.2019
-  SUBROUTINE PRTP(S, X)
-    IMPLICIT NONE
-    CHARACTER(*), INTENT(IN):: S
-    TYPE(REAL_8), OPTIONAL, INTENT(IN):: X(6)
-
-    ! cancel all PRTP
-    if (NODUMP) return
-
-    ! special case: display only string without X
-    if (.not. PRESENT(X)) then
-      WRITE(*, '(a,a)') '@@ ', S
-      return
-    endif
-
-    ! @@ + elem + func + 42 columns
-    WRITE(*, '(a,a15,a,a15,42E25.16)') '@@ ', ELEM_NAME, ' ', S &
-      , X(1).sub.'000000', X(2).sub.'000000', X(3).sub.'000000', X(4).sub.'000000',-X(6).sub.'000000', X(5).sub.'000000'&
-      , X(1).sub.'100000', X(1).sub.'010000', X(1).sub.'001000', X(1).sub.'000100',-X(1).sub.'000001', X(1).sub.'000010'&
-      , X(2).sub.'100000', X(2).sub.'010000', X(2).sub.'001000', X(2).sub.'000100',-X(2).sub.'000001', X(2).sub.'000010'&
-      , X(3).sub.'100000', X(3).sub.'010000', X(3).sub.'001000', X(3).sub.'000100',-X(3).sub.'000001', X(3).sub.'000010'&
-      , X(4).sub.'100000', X(4).sub.'010000', X(4).sub.'001000', X(4).sub.'000100',-X(4).sub.'000001', X(4).sub.'000010'&
-      ,-X(6).sub.'100000',-X(6).sub.'010000',-X(6).sub.'001000',-X(6).sub.'000100', X(6).sub.'000001',-X(6).sub.'000010'&
-      , X(5).sub.'100000', X(5).sub.'010000', X(5).sub.'001000', X(5).sub.'000100',-X(5).sub.'000001', X(5).sub.'000010'
-  END SUBROUTINE PRTP
 
   SUBROUTINE PATCH_driftR(C,X,k,exact,dir)
     implicit none
