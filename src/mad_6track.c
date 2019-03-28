@@ -477,6 +477,7 @@ static int
   cavall_flag = 0,     /* if 0 dump all cavities into first */
   markall_flag = 0,    /* if 1 dump all markers into first */
   long_names_flag = 0,    /* if 1 dump all markers into first */
+  multicol_flag = 0,   /* if 1 dump multi-column STRUCTURE block */
   aperture_flag = 0,   /* if 1 insert apertures into structure */
 //  radius_flag = 0, // not used    /* change the default reference radius */
   split_flag = 0,      /* if 1 keep zero multipoles after split */
@@ -1758,6 +1759,8 @@ get_args(struct in_cmd* my_cmd)
     put_info("c6t - mangle flag selected","");
   if ((long_names_flag = command_par_value("long_names", my_cmd->clone)))
     put_info("c6t - long names flag selected","");
+  if ((multicol_flag = command_par_value("multicol", my_cmd->clone)))
+    put_info("c6t - multicol flag selected","");
   if ((six_version = command_par_value("six_version", my_cmd->clone)))
     printf("SixTrack Version of (or higher is assumed): %f\n",six_version);
   if (mult_auto_off &&
@@ -3336,6 +3339,9 @@ write_struct(void)
     "STRUCTURE INPUT---------------------------------------------------------";
 
   fprintf(f2, "%s\n", title);
+  if(multicol_flag == 1) {
+    fprintf(f2, "%s\n", "MULTICOL");
+  }
   while (p != NULL)
   {
     char name[256] = "";
@@ -3349,17 +3355,21 @@ write_struct(void)
     else
       strcpy(name,p->equiv->name);
 
-    if (lc++ == LINES_MAX)
-    {
-      fprintf(f2,"\n"); lc = 1;
-    }
-    if(long_names_flag==1)
-    {
-      fprintf(f2, "%-48s ", name);
-    }
-    else
-    {
-      fprintf(f2, "%-17s ", name);
+    if(multicol_flag == 1) {
+      if(long_names_flag==1) {
+        fprintf(f2, "%-48s %-48s %17.9f\n", p->first->name, name, p->first->position);
+      } else {
+        fprintf(f2, "%-20s %-20s %17.9f\n", p->first->name, name, p->first->position);
+      }
+    } else {
+      if (lc++ == LINES_MAX) {
+        fprintf(f2,"\n"); lc = 1;
+      }
+      if(long_names_flag==1) {
+        fprintf(f2, "%-48s ", name);
+      } else {
+        fprintf(f2, "%-17s ", name);
+      }
     }
     
     p = p->next;
