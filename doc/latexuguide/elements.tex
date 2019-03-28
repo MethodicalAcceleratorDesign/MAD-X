@@ -935,8 +935,7 @@ cavity is a Cartesian coordinate system.
 
 \madbox{
 label: TWCAVITY, \= L=real, VOLT=real, FREQ=real, LAG=real, \\
-                 \> PSI=real, DELTA\_LAG=real \\
-                 \> N\_BESSEL=integer, NO\_CAVITY\_TOTALPATH=logical;
+                 \> PSI=real, DELTA\_LAG=real ;
 }
 
 The travelling wave cavities model the accelerating structures of linacs
@@ -954,7 +953,7 @@ and can not be varied.
 
    \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0). Zero lag means the highest acceleration,
                 i.e. the reference particle (starting at x=0, px=0, y=0, py=0,t=0, pt=0)
-                is on the crest of the wave. Please not that it is different from
+                is on the crest of the wave. Please note that it is different from
                 the \texttt{RFCAVITY} nomenclature.
 
    \ttitem{PSI}
@@ -1781,13 +1780,10 @@ The element \texttt{TRANSLATION} changes the
 by applying a translation of the reference system.
 
 \madbox{
-label: TRANSLATION, \= X=real,  \= Y=real,  \= T=real, \\
-                    \> PX=real, \> PY=real, \> PT=real;
+label: TRANSLATION, \= X=real,  \= Y=real,  \= S=real;
 }
 
-\texttt{TRANSLATION} has no effect on the beam, but it causes the beam to be
-referred to the new coordinate system translated by the vector given.
-
+\texttt{TRANSLATION} moves the coordinate system. \texttt{X} and \texttt{Y} will translate the position and \texttt{S} will introduce a virtual drift.
 
 \section{Change of reference system}
 \label{sec:changeref}

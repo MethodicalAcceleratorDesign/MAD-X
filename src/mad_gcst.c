@@ -183,7 +183,7 @@ const char* const sxf_table_names[] =
   "lag","harmon","betrf","pg",
   "shunt","tfill","eloss","ex","ey",
   "hkick","vkick","xsize","ysize","sigx",
-  "sigy","xma","yma","charge",
+  "sigy","xma","yma","charge", "freq",
   " " /* blank terminates */
 };
 

@@ -40,6 +40,8 @@ struct element* make_element(const char* name, const char* parent, struct comman
 struct element* clone_element(struct element*);
 struct element* delete_element(struct element*);
 void            update_element(struct element*, struct command* update);
+void            update_element_children(struct element*, struct command* update);
+
 void            dump_element(struct element*);
 void            export_el_def(struct element*, char* string, int noexpr);
 void            export_el_def_8(struct element*, char* string);
@@ -59,14 +61,14 @@ void    element_name(char* name, int* l);
 double  element_value(const struct node*, const char* par);
 int     element_vector(const struct element*, const char* par, double* vector);
 
-int     belongs_to_class(struct element*, char*);
+int     belongs_to_class(struct element*, const char*);
 void    get_node_vector(const char* par, int* length, double* vector);
 int     el_par_vector(int* total, double* vect);
 double  el_par_value(const char* par, const struct element*);
 double  el_par_value_recurse(const char* par, const struct element*);
 void    fill_elem_var_list(struct element*, struct el_list*, struct var_list*);
 void    add_to_el_list(struct element**, int inf, struct el_list*, int flag);
-
+void    grow_el_list(struct el_list*);
 // used by mad_mkthin.c
 struct command_parameter* return_param(const char* par, const struct element*);
 struct command_parameter* return_param_recurse(const char* par, const struct element*);

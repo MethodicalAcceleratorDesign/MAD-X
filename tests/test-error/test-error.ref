@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:57:41      +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2019.02.20 09:54:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option,debug;
 
@@ -17,6 +17,7 @@ q2:quadrupole, l=0.1,k1:=2.2453*0.5*fact;
 
 q3:multipole, l=0.2, knl:={0,-.896051*0.34*fact};
 
+++++++ warning: Multipole defined with non-zero length: q3
 q4:quadrupole, l=0.1,  k1:=1.80457*0.5*fact;
 
 q5:multipole, knl:={0,-1.11814*0.17*fact};
@@ -98,6 +99,30 @@ parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00
 parameter: n1min   double value:                 -1
 option,-debug,-echo;
 
+++++++ warning: Multipole defined with non-zero length: q3___________1
+++++++ warning: Multipole defined with non-zero length: q3___________2
+++++++ warning: Multipole defined with non-zero length: q3___________3
+++++++ warning: Multipole defined with non-zero length: q3___________4
+++++++ warning: Multipole defined with non-zero length: q3___________5
+++++++ warning: Multipole defined with non-zero length: q3___________6
+++++++ warning: Multipole defined with non-zero length: q3___________7
+++++++ warning: Multipole defined with non-zero length: q3___________8
+++++++ warning: Multipole defined with non-zero length: q3___________9
+++++++ warning: Multipole defined with non-zero length: q3__________10
+++++++ warning: Multipole defined with non-zero length: q3__________11
+++++++ warning: Multipole defined with non-zero length: q3__________12
+++++++ warning: Multipole defined with non-zero length: q3__________13
+++++++ warning: Multipole defined with non-zero length: q3__________14
+++++++ warning: Multipole defined with non-zero length: q3__________15
+++++++ warning: Multipole defined with non-zero length: q3__________16
+++++++ warning: Multipole defined with non-zero length: q3__________17
+++++++ warning: Multipole defined with non-zero length: q3__________18
+++++++ warning: Multipole defined with non-zero length: q3__________19
+++++++ warning: Multipole defined with non-zero length: q3__________20
+++++++ warning: Multipole defined with non-zero length: q3__________21
+++++++ warning: Multipole defined with non-zero length: q3__________22
+++++++ warning: Multipole defined with non-zero length: q3__________23
+++++++ warning: Multipole defined with non-zero length: q3__________24
 bed__________1->k0 =                  0 ;
 bed->k0            =                  0 ;
 bed__________1->k0l =                  0 ;
@@ -110,7 +135,8 @@ Assigned field errors to 144 elements
 Added field errors to 144 elements
 Added field errors to 24 elements
 
-  Number of warnings: 0
+  Number of warnings: 25
+25 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

@@ -3435,7 +3435,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmdpdg(ftrk,orbit,fmap,ek,re,te)
 
      case (code_translation)
-        call tmtrans(ftrk,orbit)
+        call tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
 
       case(code_changeref)
         call fort_warn('TWISS: ','Changeref is nto implemented for MAD-X twiss.')
@@ -5670,7 +5670,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
 end SUBROUTINE tmsol0
 
-SUBROUTINE tmtrans(ftrk,orbit)
+SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   use twissbeamfi, only : beta
   implicit none
@@ -5688,31 +5688,24 @@ SUBROUTINE tmtrans(ftrk,orbit)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: ftrk, fmap
+  logical :: ftrk, fmap,fsec
   double precision :: orbit(6);
 
-  double precision :: x, px, y, py, t, pt
-  double precision :: node_value
+  double precision :: x, y, z 
+  double precision :: node_value, ek(6), re(6,6), te(6,6,6)
 
 
  !---- Get translation parameters
  x    = node_value('x ')
- px   = node_value('px ')
  y    = node_value('y ')
- py   = node_value('py ')
- t    = node_value('t ')
- pt   = node_value('pt ')
-
- !re(1,1) =  t_x
- orbit(1) = orbit(1) + x
- orbit(2) = orbit(2) + px
- orbit(3) = orbit(3) + y
- orbit(4) = orbit(4) + py
- orbit(5) = orbit(5) + t
- orbit(6) = orbit(6) + pt
-
+ z    = node_value('z ')
+ 
+ call tmdrf(fsec,ftrk,orbit,fmap,-z,ek,re,te)
+ 
+ ek(1) = ek(1) - x
+ ek(3) = ek(3) - y
   !---- Track orbit.
-  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+ if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmtrans
 

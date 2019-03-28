@@ -42,7 +42,7 @@
 # tests order
 tests-all = \
 test-table test-table-2 \
-test-memory \
+test-memory test-control \
 \
 test-makethin test-makethin-2 test-makethin-3 test-elseparator\
 test-survey test-survey-2 test-survey-3 \
@@ -56,7 +56,7 @@ test-interpolate\
 test-cororbit test-cororbit-2 test-cororbit-3 test-cororbit-4 \
 test-emit test-emit-2 \
 test-ibs test-ibs-2 test-ibs-3 test-ibs-4 \
-test-error test-error-2 test-error-3 \
+test-error test-error-2 test-error-3  test-error-4 \
 test-dynap \
 test-c6t test-c6t-2 test-c6t-3 test-c6t-4 test-c6t-5 \
 test-thick-quad test-thick-quad-2 test-thick-quad-3 \
@@ -81,7 +81,7 @@ test-ptc-trackline test-ptc-trackline-2 test-ptc-trackline-3 \
 test-ptc-align test-ptc-align-2 \
 test-rfmultipole-ptc-1 \
 test-touschek test-touschek-2 \
-test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 test-sequence-7 test-sequence-8 \
+test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 test-sequence-7 test-sequence-8 test-sequence-9\
 test-line \
 test-plot test-plot-2 \
 test-setknob test-fillknob\

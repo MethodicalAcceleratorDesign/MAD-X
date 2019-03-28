@@ -1,0 +1,74 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2019.02.07 16:34:55      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+circum=20;
+
+
+
+
+
+beam, particle=proton, energy = 5;
+
+qf: MULTIPOLE, TILT=0, KNL={0,0.11755705}, KSL={0,0};
+
+qd: MULTIPOLE, TILT=0, KNL={0,-0.11755705}, KSL={0,0};
+
+kicking: HKICKER,L=1, KICK=0.01, TILT=PI/2;
+
+
+
+seq: sequence, refer=entry, l=circum;
+
+qd: qd, at = 10;
+
+qf: qf, at = 19.9999;
+
+endsequence;
+
+
+
+use, sequence=seq;
+
+
+
+SELECT, FLAG=ERROR, PATTERN=qd; 
+
+EALIGN, DX=0.1;
+
+Assigned alignment errors to 1 elements
+
+
+select,flag=mye, column=name, k0l, k1s, DX;
+
+ETABLE, TABLE=mye;
+
+
+
+
+
+SELECT, FLAG=ERROR, clear;
+
+write, table=mye, file="mye.err";
+
+SETERR, TABLE=mye;
+
+Want to use named table: mye
+The table ==> mye <=== was found 
+SELECT, FLAG=ERROR, FULL; 
+
+esave, file="esave.err";
+
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

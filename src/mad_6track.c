@@ -455,6 +455,7 @@ static char tmp_name[KEY_LENGTH];
 static char name_format[70];
 static char name_format_short[6];
 static char name_format_error[62];
+static char name_format_aper[61];
 static char name_format_3[40];
 static char name_format_4[40];
 static char name_format_5[40];
@@ -476,6 +477,7 @@ static int
   cavall_flag = 0,     /* if 0 dump all cavities into first */
   markall_flag = 0,    /* if 1 dump all markers into first */
   long_names_flag = 0,    /* if 1 dump all markers into first */
+  multicol_flag = 0,   /* if 1 dump multi-column STRUCTURE block */
   aperture_flag = 0,   /* if 1 insert apertures into structure */
 //  radius_flag = 0, // not used    /* change the default reference radius */
   split_flag = 0,      /* if 1 keep zero multipoles after split */
@@ -1757,6 +1759,8 @@ get_args(struct in_cmd* my_cmd)
     put_info("c6t - mangle flag selected","");
   if ((long_names_flag = command_par_value("long_names", my_cmd->clone)))
     put_info("c6t - long names flag selected","");
+  if ((multicol_flag = command_par_value("multicol", my_cmd->clone)))
+    put_info("c6t - multicol flag selected","");
   if ((six_version = command_par_value("six_version", my_cmd->clone)))
     printf("SixTrack Version of (or higher is assumed): %f\n",six_version);
   if (mult_auto_off &&
@@ -2422,6 +2426,8 @@ pro_elem(struct node* cnode)
   // check whether the element is long and has an aperture, and therefore
   // whether we should insert an aperture marker before the current element
   if (strcmp(keyword,"00") != 0 && current_element->value[0] > 0.) {
+
+
     tmp_element = current_element;
     tag_element = create_aperture(tag_aperture.name, keyword,
             tag_aperture.value[1], tag_aperture.value[2],
@@ -2451,22 +2457,31 @@ pro_elem(struct node* cnode)
 
 
   /* add aperture element if necessary */
-  if (strcmp(keyword,"00") != 0) {
-    tag_element = create_aperture(tag_aperture.name, keyword,
-          tag_aperture.value[1], tag_aperture.value[2],
-          tag_aperture.value[3], tag_aperture.value[4],
-          tag_aperture.value[5], tag_aperture.value[6],
-          tag_aperture.value[7],
-          cnode->p_al_err);
-    tag_element->previous = current_element;
-    tag_element->next = current_element->next;
-    current_element->next = tag_element;
+  if (strcmp(keyword,"00") != 0) 
+    {
+    if(tag_aperture.value[1] > 0 || tag_aperture.value[2] > 0 || tag_aperture.value[3] > 0)
+    {
+      tag_element = create_aperture(tag_aperture.name, keyword,
+      tag_aperture.value[1], tag_aperture.value[2],
+      tag_aperture.value[3], tag_aperture.value[4],
+      tag_aperture.value[5], tag_aperture.value[6],
+      tag_aperture.value[7],
+      cnode->p_al_err);
+      tag_element->previous = current_element;
+      tag_element->next = current_element->next;
+      current_element->next = tag_element;
 
-    prev_element = current_element;
-    current_element = tag_element;
-    // 2015-Oct-13  15:45:58  ghislain: add half the prev_element length to account for thick elements
-    current_element->position = cnode->position + prev_element->value[0] / 2.;
-    add_to_ellist(current_element);
+      prev_element = current_element;
+      current_element = tag_element;
+      // 2015-Oct-13  15:45:58  ghislain: add half the prev_element length to account for thick elements
+      current_element->position = cnode->position + prev_element->value[0] / 2.;
+      add_to_ellist(current_element);
+    }
+    else
+    {
+      warning("An aperture type has been defined without any settings. It will NOT be converted:",
+      tag_aperture.name);
+    }
   }
 }
 
@@ -3060,7 +3075,7 @@ write_f3_aper(void)
       if (f3aper_cnt++ == 0)
       {
         f3aper  = fopen("fc.3.aper", "w");
-        fprintf(f3aper,"LIMI\n");
+        // fprintf(f3aper,"LIMI\n");
       }
       if      (current_element->value[1] == 1) strcpy(keyword, "CR") ;
       else if (current_element->value[1] == 2) strcpy(keyword, "RE") ;
@@ -3071,7 +3086,7 @@ write_f3_aper(void)
       else if (current_element->value[1] == 7) strcpy(keyword, "OC") ;
       else strcpy(keyword, "UK") ; // unknown aperture type
 
-      fprintf(f3aper,"%s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n",
+      fprintf(f3aper,name_format_aper,
         current_element->name, keyword,
         current_element->value[2], current_element->value[3],
         current_element->value[4], current_element->value[5],
@@ -3080,7 +3095,7 @@ write_f3_aper(void)
     }
     current_element = current_element->next;
   }
-  if (f3aper_cnt > 0) fprintf(f3aper,"NEXT\n");
+  // if (f3aper_cnt > 0) fprintf(f3aper,"NEXT\n");
 }
 
 static void
@@ -3324,6 +3339,9 @@ write_struct(void)
     "STRUCTURE INPUT---------------------------------------------------------";
 
   fprintf(f2, "%s\n", title);
+  if(multicol_flag == 1) {
+    fprintf(f2, "%s\n", "MULTICOL");
+  }
   while (p != NULL)
   {
     char name[256] = "";
@@ -3337,17 +3355,21 @@ write_struct(void)
     else
       strcpy(name,p->equiv->name);
 
-    if (lc++ == LINES_MAX)
-    {
-      fprintf(f2,"\n"); lc = 1;
-    }
-    if(long_names_flag==1)
-    {
-      fprintf(f2, "%-48s ", name);
-    }
-    else
-    {
-      fprintf(f2, "%-17s ", name);
+    if(multicol_flag == 1) {
+      if(long_names_flag==1) {
+        fprintf(f2, "%-48s %-48s %17.9f\n", p->first->name, name, p->first->position);
+      } else {
+        fprintf(f2, "%-20s %-20s %17.9f\n", p->first->name, name, p->first->position);
+      }
+    } else {
+      if (lc++ == LINES_MAX) {
+        fprintf(f2,"\n"); lc = 1;
+      }
+      if(long_names_flag==1) {
+        fprintf(f2, "%-48s ", name);
+      } else {
+        fprintf(f2, "%-17s ", name);
+      }
     }
     
     p = p->next;
@@ -3548,24 +3570,25 @@ process_c6t(void)  /* steering routine */
 static void
 setup_output_string(void)
 {
-    if(long_names_flag==1){
+  if(long_names_flag==1){
     strcpy(name_format,"%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n");
     strcpy(name_format_short,"%-48s" );
     strcpy(name_format_error, " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n");
+    strcpy(name_format_aper, "%-48s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n");
     strcpy(name_format_3,  "%-48s%20.10e%20.10e\n");
     strcpy(name_format_4, "%-48s  %14.6e%14.6e%17.9e\n");
     strcpy(name_format_5, "%23.15e %23.15e %23.15e %23.15e\n");
-
   }
     else{
     strcpy(name_format,"%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n");
     strcpy(name_format_short, "%-18s");
     strcpy(name_format_error, " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n");
+    strcpy(name_format_aper, "%-16s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n");
     strcpy(name_format_3,"%-16s%20.10e%20.10e\n");
     strcpy(name_format_4,"%-16s  %14.6e%14.6e%17.9e\n");
     strcpy(name_format_5, "%17.9e %17.9e %17.9e %17.9e\n");
 
-    }
+  }
 }
 void
 conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */

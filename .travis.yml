@@ -12,6 +12,10 @@ script:
     NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
     [[ $NUM_FAILED -eq 0 ]]
 
+  - (cd doc/latexuguide && ./makelatexdoc) ||
+    (cat doc/latexuguide/makelatexdoc.log && false)
+
+
 after_success:
   - coveralls --include src -x .c -x .cpp
 
@@ -21,6 +25,10 @@ addons:
     packages:
     - gfortran
     - gnuplot
+    - texlive-latex-base
+    - texlive-latex-extra
+    - texlive-fonts-recommended
+    - latex-xcolor
 
 git:
   # Limit cloning depth to reduce download bandwidth:
