@@ -97,17 +97,17 @@ CAVITY_TOTALPATH=0
 !===================================================
 !get initial twiss at entrance of the ring
 !===================================================
-      subroutine ptc_get_twiss_init(bx,by,ax,ay,ex,epx)
+      subroutine ptc_get_twiss_init(bx,by,ax,ay,ex,epx,ey,epy,ox,opx,oy,opy)
 
         USE orbit_ptc
         IMPLICIT NONE
         REAL(DP) bx,by,ax,ay,ex,epx
-
+        REAL(DP) ey,epy,ox,opx,oy,opy
         INTEGER i 
         REAL(DP) length 
 
         call GET_N_NODE(i)
-        call GET_info(i,length,bx,by,ax,ay,ex,epx)
+        call GET_info(i,length,bx,by,ax,ay,ex,epx,ey,epy,ox,opx,oy,opy)
 
       return
       end
@@ -154,16 +154,17 @@ CAVITY_TOTALPATH=0
 !===================================================
 !get twiss and length for a node with index
 !===================================================
-      subroutine ptc_get_twiss_for_node(node_index, node_length, bx,by,ax,ay,ex,epx)
+      subroutine ptc_get_twiss_for_node(node_index, node_length, bx,by,ax,ay,ex,epx,ey,epy,ox,opx,oy,opy)
 
         USE orbit_ptc
         IMPLICIT NONE
         REAL(DP) node_length, bx,by,ax,ay,ex,epx
+        REAL(DP) ey,epy,ox,opx,oy,opy
         INTEGER node_index
 
         INTEGER i
         i = node_index + 1
-        call GET_info(i,node_length,bx,by,ax,ay,ex,epx)
+        call GET_info(i,node_length,bx,by,ax,ay,ex,epx,ey,epy,ox,opx,oy,opy)
 
       return
       end
