@@ -199,7 +199,7 @@ CONTAINS
        call TRACK(EL%AB,X,k,MID)
 
     case default
- 
+
        write(6,'(1x,i4,a21)') el%kind," not supported TRACKR"
        ! call !write_e(0)
     END SELECT
@@ -369,7 +369,7 @@ CONTAINS
     implicit none
     type (work),INTENT(inOUT):: S2
     integer,INTENT(IN):: mf
-    
+
     write(mf,*) "Beta0 = ",s2%beta0
     write(mf,*) "Mass  = ",s2%mass
     write(mf,*) "Energy = ",s2%Energy
@@ -485,7 +485,7 @@ CONTAINS
     implicit none
     integer, intent(in) :: i,j
     integer k
- 
+
     k=i
     if(i<1) then
        do while(k<1)
@@ -511,9 +511,9 @@ CONTAINS
        s2%nmul=S1
        s2%ADD=0
     ELSEIF(S1>NMAX) THEN
- 
+
        write(6,'(A38,1X,I4)') " NMAX NOT BIG ENOUGH: PLEASE INCREASE ",NMAX
- 
+
     ELSE
       stop 135
     ENDIF
@@ -1098,6 +1098,7 @@ CONTAINS
        EL%C4%VOLT=>EL%VOLT
        EL%C4%FREQ=>EL%FREQ
        EL%C4%PHAS=>EL%PHAS
+
        !       EL%C4%P0C=>EL%P0C
        EL%C4%DELTA_E=>EL%DELTA_E
        EL%C4%THIN=>EL%THIN
@@ -1322,7 +1323,7 @@ CONTAINS
 
         ALLOCATE(EL%TP10%BF_X(S_E%N_MONO))
         ALLOCATE(EL%TP10%BF_Y(S_E%N_MONO))
- 
+
 
         NULLIFY(EL%TP10%VM);ALLOCATE(EL%TP10%VM(S_E%N_MONO))
 
@@ -1348,7 +1349,7 @@ CONTAINS
         EL%TP10%BE=0.0_DP;
         call GETAEBE(EL%TP10) ! not efective here because ae=be=0 but need on magnetic field
  !      ELSE
- !       call GETANBN(EL%TP10)  
+ !       call GETANBN(EL%TP10)
  !      endif
 
        NULLIFY(EL%TP10%F);ALLOCATE(EL%TP10%F);EL%TP10%F=1;
@@ -1474,15 +1475,15 @@ CONTAINS
        EL%ab%BN=>el%BN
    !real(dp), POINTER :: DZ => null(), T(:) => null()
    !complex(dp), POINTER :: B(:,:) => null()
-   !INTEGER , POINTER :: N,M => null()  
+   !INTEGER , POINTER :: N,M => null()
 
        ALLOCATE(EL%ab%m);EL%ab%m=m_abell;
        ALLOCATE(EL%ab%n);EL%ab%n=n_abell;
        ALLOCATE(EL%ab%dz(0:m_abell));EL%ab%dz=0
        ALLOCATE(EL%ab%t(0:m_abell));EL%ab%t=0.0_dp;
-       ALLOCATE(EL%ab%b(0:m_abell,-n_abell/2:n_abell/2-1));EL%ab%b=0.0_dp; 
+       ALLOCATE(EL%ab%b(0:m_abell,-n_abell/2:n_abell/2-1));EL%ab%b=0.0_dp;
        ALLOCATE(EL%ab%tE(0:m_abell));EL%ab%tE=0.0_dp;
-       ALLOCATE(EL%ab%E(0:m_abell,-n_abell/2:n_abell/2-1));EL%ab%E=0.0_dp; 
+       ALLOCATE(EL%ab%E(0:m_abell,-n_abell/2:n_abell/2-1));EL%ab%E=0.0_dp;
        CALL POINTERS_abell(EL%ab) !,angc,xc,dc,h) !,t_ax,t_ay)
     END SELECT
   END SUBROUTINE SETFAMILYR
@@ -1565,7 +1566,7 @@ CONTAINS
        ENDIF
        EL%SDR%P=>EL%P
        EL%SDR%L=>EL%L
- 
+
        ALLOCATE(EL%SDR%a_x1);EL%SDR%a_x1=1.0_dp;
        ALLOCATE(EL%SDR%a_x2);EL%SDR%a_x2=1.0_dp;
        ALLOCATE(EL%SDR%D(3));EL%SDR%D=0.0_dp;
@@ -1802,7 +1803,7 @@ CONTAINS
        EL%TP10%H2=>EL%H2
        EL%TP10%VA=>EL%VA
        EL%TP10%VS=>EL%VS
-       NULLIFY(EL%TP10%BF_X); 
+       NULLIFY(EL%TP10%BF_X);
        NULLIFY(EL%TP10%BF_Y);
        EL%TP10%ELECTRIC=>EL%ELECTRIC
         ALLOCATE(EL%TP10%BF_X(S_B_FROM_V%N_MONO))
@@ -1818,8 +1819,8 @@ CONTAINS
         NULLIFY(EL%TP10%E_Y);ALLOCATE(EL%TP10%E_Y(S_E%N_MONO))
         NULLIFY(EL%TP10%PHI);ALLOCATE(EL%TP10%PHI(S_E%N_MONO))
 
-        NULLIFY(EL%TP10%AE);ALLOCATE(EL%TP10%AE(SECTOR_NMUL_max)); 
-        NULLIFY(EL%TP10%BE);ALLOCATE(EL%TP10%BE(SECTOR_NMUL_max)); 
+        NULLIFY(EL%TP10%AE);ALLOCATE(EL%TP10%AE(SECTOR_NMUL_max));
+        NULLIFY(EL%TP10%BE);ALLOCATE(EL%TP10%BE(SECTOR_NMUL_max));
 
         call alloc(EL%TP10)
         call GETAEBE(EL%TP10) ! not efective here because ae=be=0 but need on magnetic field
@@ -1954,16 +1955,16 @@ CONTAINS
        EL%ab%BN=>el%BN
    !real(dp), POINTER :: DZ => null(), T(:) => null()
    !complex(dp), POINTER :: B(:,:) => null()
-   !INTEGER , POINTER :: N,M => null()  
+   !INTEGER , POINTER :: N,M => null()
 
 
        ALLOCATE(EL%ab%m);EL%ab%m=m_abell;
        ALLOCATE(EL%ab%n);EL%ab%n=n_abell;
        ALLOCATE(EL%ab%dz(0:m_abell));EL%ab%dz=0
        ALLOCATE(EL%ab%t(0:m_abell));EL%ab%t=0.0_dp;
-       ALLOCATE(EL%ab%b(0:m_abell,-n_abell/2:n_abell/2-1));EL%ab%b=0.0_dp; 
+       ALLOCATE(EL%ab%b(0:m_abell,-n_abell/2:n_abell/2-1));EL%ab%b=0.0_dp;
        ALLOCATE(EL%ab%tE(0:m_abell));EL%ab%tE=0.0_dp;
-       ALLOCATE(EL%ab%E(0:m_abell,-n_abell/2:n_abell/2-1));EL%ab%E=0.0_dp; 
+       ALLOCATE(EL%ab%E(0:m_abell,-n_abell/2:n_abell/2-1));EL%ab%E=0.0_dp;
        CALL POINTERS_abell(EL%ab) !,angc,xc,dc,h) !,t_ax,t_ay)
     END SELECT
 
@@ -2018,20 +2019,20 @@ CONTAINS
     if(EL%KIND==kind1) return
 
     if(associated(EL%ramp)) then
-    
+
       if(EL%KIND/=kind15) then
           do n=1,EL%P%NMUL
              EL%BN(N)= EL%ramp%table(0)%bn(n)
              EL%AN(N)= EL%ramp%table(0)%an(n)
              ELP%BN(N)= ELP%ramp%table(0)%bn(n)
              ELP%AN(N)= ELP%ramp%table(0)%an(n)
-          enddo  
+          enddo
       else
             EL%VOLT=EL%ramp%table(0)%bn(1)*COS(twopi*EL%ramp%table(0)%an(1)*T/clight+EL%ramp%table(0)%bn(2))+EL%ramp%table(0)%an(2)
            ELP%VOLT=EL%ramp%table(0)%bn(1)*COS(twopi*EL%ramp%table(0)%an(1)*T/clight+EL%ramp%table(0)%bn(2))+EL%ramp%table(0)%an(2)
          write(6,*) " volt ",el%volt,EL%ramp%table(0)%bn(1)
       endif
-      
+
       if(EL%ramp%table(0)%b_t/=0.0_dp) then
           if(EL%parent_fibre%PATCH%TIME==0) EL%parent_fibre%PATCH%TIME=2
           if(EL%parent_fibre%PATCH%TIME==1) EL%parent_fibre%PATCH%TIME=3
@@ -2041,13 +2042,13 @@ CONTAINS
           if(EL%parent_fibre%PATCH%TIME==3) EL%parent_fibre%PATCH%TIME=1
         EL%parent_fibre%PATCH%b_T=0.0_dp
       endif
-          
+
     else
 
       IF(EL%P%NMUL>=1) THEN
         if(present(VR))then
           do n=1,EL%P%NMUL
-             EL%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N) 
+             EL%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
              EL%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
              ELP%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
              ELP%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
@@ -2060,9 +2061,9 @@ CONTAINS
              ELP%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
           enddo
        endif
-    
-    
-     endif 
+
+
+     endif
    endif
        if(el%kind==kind10) then
           call GETANBN(EL%TP10)
@@ -2516,7 +2517,7 @@ nullify(EL%filef,el%fileb);
     nullify(EL%SIAMESE_FRAME);
     nullify(EL%girder_FRAME);
     nullify(EL%doko);
-    nullify(EL%forward,EL%backWARD,el%usef,el%useb,el%skip_ptc_f,el%skip_ptc_b,el%do1mapf,el%do1mapb);   
+    nullify(EL%forward,EL%backWARD,el%usef,el%useb,el%skip_ptc_f,el%skip_ptc_b,el%do1mapf,el%do1mapb);
   end SUBROUTINE null_EL
 
   SUBROUTINE null_ELp(EL)
@@ -2706,13 +2707,13 @@ nullify(EL%filef,el%fileb);
        ENDIF
 
        IF(ASSOCIATED(EL%forward))        then
-          call kill(EL%forward)     
+          call kill(EL%forward)
           DEALLOCATE(EL%forward)
        ENDIF
 
 
        IF(ASSOCIATED(EL%backWARD))        then
-          call kill(EL%backWARD)     
+          call kill(EL%backWARD)
           DEALLOCATE(EL%backWARD)
        ENDIF
 
@@ -2932,17 +2933,17 @@ nullify(EL%filef,el%fileb);
        ENDIF
 
        IF(ASSOCIATED(EL%forward))        then
-          call kill(EL%forward)     
+          call kill(EL%forward)
           DEALLOCATE(EL%forward)
        ENDIF
 
        IF(ASSOCIATED(EL%backWARD))        then
-          call kill(EL%backWARD)     
+          call kill(EL%backWARD)
           DEALLOCATE(EL%backWARD)
        ENDIF
 
     IF(ASSOCIATED(EL%skip_ptc_f))DEALLOCATE(EL%skip_ptc_f)
-    IF(ASSOCIATED(EL%skip_ptc_b))DEALLOCATE(EL%skip_ptc_b)    
+    IF(ASSOCIATED(EL%skip_ptc_b))DEALLOCATE(EL%skip_ptc_b)
     IF(ASSOCIATED(el%do1mapb))DEALLOCATE(el%do1mapb)
     IF(ASSOCIATED(el%do1mapf))DEALLOCATE(el%do1mapf)
     IF(ASSOCIATED(el%usef))DEALLOCATE(el%usef)
@@ -3303,7 +3304,7 @@ nullify(EL%filef,el%fileb);
        ELP%FREQ = EL%FREQ
        ELP%PHAS = EL%PHAS
        CALL SETFAMILY(ELP)
-       ELp%HE22%N_BESSEL=EL%HE22%N_BESSEL 
+       ELp%HE22%N_BESSEL=EL%HE22%N_BESSEL
        do i=1,6
         ELp%HE22%fake_shift(i)=EL%HE22%fake_shift(i)
        enddo
@@ -3364,11 +3365,11 @@ nullify(EL%filef,el%fileb);
  !       ELP%TP10%PHI(I)=EL%TP10%PHI(I)
  !     enddo
 
-        DO I=1,SECTOR_NMUL_max     
-         ELP%TP10%AE(I)=EL%TP10%AE(I)     
-         ELP%TP10%BE(I)=EL%TP10%BE(I)     
-        enddo   
-        call GETAEBE(ELP%TP10)     
+        DO I=1,SECTOR_NMUL_max
+         ELP%TP10%AE(I)=EL%TP10%AE(I)
+         ELP%TP10%BE(I)=EL%TP10%BE(I)
+        enddo
+        call GETAEBE(ELP%TP10)
        ENDIF
     ENDIF
 
@@ -3416,14 +3417,14 @@ nullify(EL%filef,el%fileb);
     IF(ASSOCIATED(EL%RAMP)) THEN         !
        CALL COPY_RAMPING(EL%RAMP,ELP%RAMP)
     ENDIF
-    
-    
-    
+
+
+
     IF(EL%KIND==KINDPA) THEN         !
        CALL SETFAMILY(ELP,t=EL%PA%B)  !,EL%PA%angc,EL%PA%xc,EL%PA%dc,EL%PA%h)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
-    IF(EL%KIND==KINDABELL) THEN 
+    IF(EL%KIND==KINDABELL) THEN
        M_ABELL=EL%ab%M
        N_ABELL=EL%ab%N       !
        CALL SETFAMILY(ELP)  !,EL%PA%angc,EL%PA%xc,EL%PA%dc,EL%PA%h)  !,EL%PA%ax,EL%PA%ay)
@@ -3435,7 +3436,7 @@ nullify(EL%filef,el%fileb);
 
        IF(ASSOCIATED(EL%backWARD))        then
          if(associated(elp%backWARD)) then
-          call kill(ELp%backWARD)     
+          call kill(ELp%backWARD)
           DEALLOCATE(ELp%backWARD)
          endif
          allocate(ELp%backWARD(3))
@@ -3449,7 +3450,7 @@ nullify(EL%filef,el%fileb);
 
        IF(ASSOCIATED(EL%forward))        then
          if(associated(elp%forward)) then
-          call kill(ELp%forward)     
+          call kill(ELp%forward)
           DEALLOCATE(ELp%forward)
          endif
          allocate(elp%forward(3))
@@ -3678,7 +3679,7 @@ nullify(EL%filef,el%fileb);
        if(.not.ASSOCIATED(ELP%S5)) ALLOCATE(ELP%S5)
        if(.not.ASSOCIATED(ELP%B_SOL)) ALLOCATE(ELP%B_SOL       )
 
-       ELP%S5=0 ! 2014.8.5      
+       ELP%S5=0 ! 2014.8.5
        ELP%B_SOL = EL%B_SOL
        CALL SETFAMILY(ELP)
        ELP%S5%DX=EL%S5%DX
@@ -3749,13 +3750,13 @@ nullify(EL%filef,el%fileb);
  !       ELP%TP10%PHI(I)=EL%TP10%PHI(I)
  !     enddo
 
-        DO I=1,SECTOR_NMUL_max     
-         ELP%TP10%AE(I)=EL%TP10%AE(I)     
-         ELP%TP10%BE(I)=EL%TP10%BE(I)     
-        enddo 
-        call GETAEBE(ELP%TP10)         
+        DO I=1,SECTOR_NMUL_max
+         ELP%TP10%AE(I)=EL%TP10%AE(I)
+         ELP%TP10%BE(I)=EL%TP10%BE(I)
+        enddo
+        call GETAEBE(ELP%TP10)
        ENDIF
-       
+
     ENDIF
 
     IF(EL%KIND>=KIND11.AND.EL%KIND<=KIND14) THEN
@@ -3797,17 +3798,17 @@ nullify(EL%filef,el%fileb);
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
-    
+
        IF(ASSOCIATED(EL%RAMP)) THEN         !
        CALL COPY_RAMPING(EL%RAMP,ELP%RAMP)
     ENDIF
- 
+
     IF(EL%KIND==KINDPA) THEN         !
        CALL SETFAMILY(ELP,t=EL%PA%B) !,EL%PA%angc,EL%PA%xc,EL%PA%dc,EL%PA%h)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
 
-    IF(EL%KIND==KINDABELL) THEN 
+    IF(EL%KIND==KINDABELL) THEN
        M_ABELL=EL%ab%M
        N_ABELL=EL%ab%N        !
        CALL SETFAMILY(ELP)  !,EL%PA%angc,EL%PA%xc,EL%PA%dc,EL%PA%h)  !,EL%PA%ax,EL%PA%ay)
@@ -3816,7 +3817,7 @@ nullify(EL%filef,el%fileb);
 
        IF(ASSOCIATED(EL%backWARD))        then
          if(associated(elp%backWARD)) then
-          call kill(ELp%backWARD)     
+          call kill(ELp%backWARD)
           DEALLOCATE(ELp%backWARD)
          endif
          allocate(ELp%backWARD(3))
@@ -3824,13 +3825,13 @@ nullify(EL%filef,el%fileb);
          call alloc_tree(ELp%backWARD(i),EL%backWARD(i)%n,EL%backWARD(i)%np)
          enddo
          call COPY_TREE_N(EL%backWARD,ELp%backWARD)
- 
+
        ENDIF
- 
+
 
        IF(ASSOCIATED(EL%forward))        then
          if(associated(elp%forward)) then
-          call kill(ELp%forward)     
+          call kill(ELp%forward)
           DEALLOCATE(ELp%forward)
          endif
          allocate(ELp%forward(3))
@@ -3838,7 +3839,7 @@ nullify(EL%filef,el%fileb);
          call alloc_tree(ELp%forward(i),EL%forward(i)%n,EL%forward(i)%np)
          enddo
          call COPY_TREE_N(EL%forward,ELp%forward)
- 
+
        ENDIF
        ELp%skip_ptc_f=EL%skip_ptc_f
        ELp%skip_ptc_b=EL%skip_ptc_b
@@ -4135,11 +4136,11 @@ nullify(EL%filef,el%fileb);
  !       ELP%TP10%PHI(I)=EL%TP10%PHI(I)
  !     enddo
 
-        DO I=1,SECTOR_NMUL_max     
-         ELP%TP10%AE(I)=EL%TP10%AE(I)     
-         ELP%TP10%BE(I)=EL%TP10%BE(I)     
-        enddo  
-        call GETAEBE(ELP%TP10)         
+        DO I=1,SECTOR_NMUL_max
+         ELP%TP10%AE(I)=EL%TP10%AE(I)
+         ELP%TP10%BE(I)=EL%TP10%BE(I)
+        enddo
+        call GETAEBE(ELP%TP10)
        ENDIF
     ENDIF
 
@@ -4185,13 +4186,13 @@ nullify(EL%filef,el%fileb);
 
     IF(ASSOCIATED(EL%RAMP)) THEN         !
        CALL COPY_RAMPING(EL%RAMP,ELP%RAMP)
-    ENDIF    
-    
+    ENDIF
+
     IF(EL%KIND==KINDPA) THEN         !
        CALL SETFAMILY(ELP,t=EL%PA%B) !,EL%PA%angc,EL%PA%xc,EL%PA%dc,EL%PA%h)   !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
-    IF(EL%KIND==KINDABELL) THEN 
+    IF(EL%KIND==KINDABELL) THEN
        M_ABELL=EL%ab%M
        N_ABELL=EL%ab%N        !
        CALL SETFAMILY(ELP)  !,EL%PA%angc,EL%PA%xc,EL%PA%dc,EL%PA%h)  !,EL%PA%ax,EL%PA%ay)
@@ -4204,7 +4205,7 @@ nullify(EL%filef,el%fileb);
 
        IF(ASSOCIATED(EL%backWARD))        then
          if(associated(elp%backWARD)) then
-          call kill(ELp%backWARD)     
+          call kill(ELp%backWARD)
           DEALLOCATE(ELp%backWARD)
          endif
          allocate(ELp%backWARD(3))
@@ -4214,11 +4215,11 @@ nullify(EL%filef,el%fileb);
          call COPY_TREE_N(EL%backWARD,ELp%backWARD)
 
        ENDIF
- 
+
 
        IF(ASSOCIATED(EL%forward))        then
          if(associated(elp%forward)) then
-          call kill(ELp%forward)     
+          call kill(ELp%forward)
           DEALLOCATE(ELp%forward)
          endif
          allocate(ELp%forward(3))
@@ -4422,7 +4423,7 @@ nullify(EL%filef,el%fileb);
     BETa01=SQRT(kinetic1**2+2.0_dp*kinetic1*XMC2)/erg
     beta0i=1.0_dp/BETa01
     GAMMA0=erg/XMC2
- 
+
     CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/pmae**3
 !    CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/XMC2**3
     CRAD=CGAM*TWOPII   !*ERG**3
@@ -4435,7 +4436,7 @@ nullify(EL%filef,el%fileb);
        write(6,*)' BRHO = ',brho1
       write(6,*)"CRAD AND CFLUC ", crad ,CFLUC
     endif
- 
+
     gamma0I=XMC2*BETa01/p0c1
     GAMBET=(XMC2/p0c1)**2
 
@@ -4561,12 +4562,12 @@ nullify(EL%filef,el%fileb);
        print*,"this is KINDABELL"
 
     case default
- 
+
        write(6,'(1x,i4,a21)') el%kind," not supported decode_element"
        ! call !write_e(0)
     END SELECT
-     
-    
+
+
   end SUBROUTINE decode_element
 
 END MODULE S_DEF_ELEMENT

@@ -16,7 +16,7 @@ module ptc_multiparticle
   private MAKE_NODE_LAYOUT_2 !,DRIFT_TO_TIME
   PRIVATE MODULATE_R,MODULATE_P
   PRIVATE TRACK_MODULATION_R,TRACK_MODULATION_P
- LOGICAL :: no_mis=.TRUE. 
+ LOGICAL :: no_mis=.TRUE.
   !  LOGICAL :: OLD_MOD=.TRUE.
 
   logical(lp),private, parameter :: dobb=.true.
@@ -64,7 +64,7 @@ module ptc_multiparticle
      MODULE PROCEDURE TRACK_FIBRE_BACKP
   END INTERFACE
 
- 
+
   INTERFACE OPERATOR (.feq.)
      MODULE PROCEDURE fuzzy_eq
   END INTERFACE
@@ -115,16 +115,16 @@ CONTAINS
 
     IF(K%MODULATION) THEN
       n=el%slow_ac
-      
+
       if (modulationtype == 1) then
          V=zero
          DV=el%D_ac*XS%AC(n)%X(2)
-      else 
+      else
 
          DV=(XS%AC(n)%X(1)*COS(EL%theta_ac)-XS%AC(n)%X(2)*SIN(EL%theta_ac))
          V=EL%DC_ac+EL%A_ac*DV
          DV=el%D_ac*DV
-      endif   
+      endif
      else
        V=0.0_dp
        DV=0.0_dp
@@ -134,7 +134,7 @@ CONTAINS
 
 
   END   SUBROUTINE MODULATE_R
-  
+
    SUBROUTINE do_ramping_R(C,t,K)
     IMPLICIT NONE
     type(INTEGRATION_NODE), pointer :: C
@@ -156,7 +156,7 @@ CONTAINS
 
 
   END   SUBROUTINE do_ramping_R
-  
+
    SUBROUTINE DO_Ramping_p(C,t,K)
     IMPLICIT NONE
     type(INTEGRATION_NODE), pointer :: C
@@ -168,7 +168,7 @@ CONTAINS
 
     EL=>C%PARENT_FIBRE%MAG
     ELP=>C%PARENT_FIBRE%MAGP
-    
+
     if(.not.associated(EL%ramp)) return
 
     CALL ALLOC(V)
@@ -194,21 +194,21 @@ CONTAINS
     integer i
     REAL(DP) v,dv
     v=0.0_dp
-    dv=0.0_dp     
+    dv=0.0_dp
      p=>r%start
      do i=1,r%n
-     
+
       if(associated(p%mag%ramp)) then
        call set_ramp(p%t1,x_orbit_sync(6))
        CALL transfer_ANBN(p%mag,p%magp,VR=V,DVR=DV)
 
-      endif 
-     
+      endif
+
       p=>p%next
-     enddo      
-     
+     enddo
+
     end SUBROUTINE set_all_ramp
-     
+
   SUBROUTINE set_ramp(t,t0)
     IMPLICIT NONE
     TYPE(INTEGRATION_NODE), POINTER  :: T
@@ -216,25 +216,25 @@ CONTAINS
     real(dp) r,ti,rat,dtot
     type(ramping), pointer :: a
     real(dp) an,bn,t0
-    
+
 
  !   if(t%pos_in_fibre==1) return
-    
+
     a=>t%parent_fibre%mag%ramp
-    
+
 
     dtot=(a%table(a%n)%time-a%table(1)%time)  !/(a%n-1)
-    
+
  !   ti=XSM0%ac%t/clight/a%unit_time    ! time in milliseconds
     ti=t0/clight    !/a%unit_time    ! time in milliseconds
-    
+
 !    if(ti>a%t_max.or.ti<a%table(1)%time) then
 !    if(ti>a%table(a%n)%time.or.ti<a%table(1)%time) then
 !     return
 !    endif
-     
 
-     
+
+
     if(ti>=a%t_max.or.ti<a%table(1)%time) then
 !    if(ti>a%table(a%n)%time.or.ti<a%table(1)%time) then
       if(ti>=a%t_max) then
@@ -243,7 +243,7 @@ CONTAINS
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(a%n)%bn(i)*a%r
            a%table(0)%an(i)= a%table(a%n)%an(i)*a%r
-          enddo 
+          enddo
             a%table(0)%b_t= a%table(a%n)%b_t
            a=>t%parent_fibre%magp%ramp
            a%table(0)%bn=0.0_dp
@@ -251,7 +251,7 @@ CONTAINS
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(a%n)%bn(i)*a%r
            a%table(0)%an(i)= a%table(a%n)%an(i)*a%r
-          enddo 
+          enddo
           a%table(0)%b_t= a%table(a%n)%b_t
       else
            a%table(0)%bn=0.0_dp
@@ -259,7 +259,7 @@ CONTAINS
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(1)%bn(i)*a%r
            a%table(0)%an(i)= a%table(1)%an(i)*a%r
-          enddo 
+          enddo
          a%table(0)%b_t= a%table(1)%b_t
           a=>t%parent_fibre%magp%ramp
            a%table(0)%bn=0.0_dp
@@ -267,30 +267,30 @@ CONTAINS
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(1)%bn(i)*a%r
            a%table(0)%an(i)= a%table(1)%an(i)*a%r
-          enddo 
+          enddo
           a%table(0)%b_t= a%table(1)%b_t
-     
+
       endif
 
     else
-    
+
          ti=ti-a%table(1)%time
          ti=mod(ti,dtot)+a%table(1)%time
           dtot=dtot/(a%n-1)
           ti=(ti-a%table(1)%time)/dtot+1
-           
+
           it=int(ti)
 !          it=idint(ti)
-          
-           rat=(ti-it)    
-           
+
+           rat=(ti-it)
+
 
            a%table(0)%bn=0.0_dp
            a%table(0)%an=0.0_dp
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
            a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
-          enddo 
+          enddo
            a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
 
           a=>t%parent_fibre%magp%ramp
@@ -299,12 +299,12 @@ CONTAINS
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
            a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
-          enddo 
+          enddo
            a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
-          
+
     endif
   end SUBROUTINE set_ramp
-  
+
   SUBROUTINE MODULATE_P(C,XS,K)
     IMPLICIT NONE
     type(INTEGRATION_NODE), pointer :: C
@@ -331,12 +331,12 @@ CONTAINS
         V=ELP%DC_ac+ELP%A_ac*DV
         DV=elp%D_ac*DV
       endif
-      
+
     else  ! ramp
       V=0.0_dp
       DV=0.0_dp
     endif
- 
+
     CALL transfer_ANBN(EL,ELP,VP=V,DVP=DV)
 
     CALL KILL(V)
@@ -345,7 +345,7 @@ CONTAINS
 
   END   SUBROUTINE MODULATE_P
 
-  
+
   SUBROUTINE TRACK_MODULATION_R(C,XS,K)
     IMPLICIT NONE
     type(INTEGRATION_NODE), pointer :: C
@@ -587,7 +587,7 @@ CONTAINS
           IF(CN%PATCH%ENERGY==0.or.CN%PATCH%ENERGY==1.or.CN%PATCH%ENERGY==4) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAG%P%P0C
              B0=>CN%MAG%P%BETA0
- 
+
              X(2)=X(2)*P0/C%MAG%P%P0C
              X(4)=X(4)*P0/C%MAG%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
@@ -598,10 +598,10 @@ CONTAINS
                 X(5)=(1.0_dp+X(5))*P0/C%MAG%P%P0C-1.0_dp
              ENDIF
           ENDIF ! No need to patch
-       else  ! associated   
+       else  ! associated
              P0=>C%PATCH%P0b
              B0=>C%PATCH%B0b
- 
+
              X(2)=X(2)*P0/C%MAG%P%P0C
              X(4)=X(4)*P0/C%MAG%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
@@ -610,9 +610,9 @@ CONTAINS
                 X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/C%MAG%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAG%P%BETA0)
              ELSE
                 X(5)=(1.0_dp+X(5))*P0/C%MAG%P%P0C-1.0_dp
-             ENDIF           
+             ENDIF
        ENDIF ! ASSOCIATED
- 
+
     ENDIF
 
     ! The chart frame of reference is located here implicitely
@@ -625,7 +625,7 @@ CONTAINS
       if(K%time) then
        X(6)=X(6)-C%PATCH%a_T  !/c%beta0
       else
-       X(6)=X(6)-C%PATCH%a_L 
+       X(6)=X(6)-C%PATCH%a_L
       endif
     ENDIF
 
@@ -637,7 +637,7 @@ CONTAINS
        ou = ALWAYS_EXACTMIS  !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
- 
+
   END SUBROUTINE TRACK_FIBRE_FRONTR
 
   SUBROUTINE TRACK_FIBRE_FRONTP(C,X,K)
@@ -673,8 +673,8 @@ CONTAINS
           IF(CN%PATCH%ENERGY==0.or.CN%PATCH%ENERGY==1.or.CN%PATCH%ENERGY==4) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAGP%P%P0C
              B0=>CN%MAGP%P%BETA0
- 
- 
+
+
              X(2)=X(2)*P0/C%MAGP%P%P0C
              X(4)=X(4)*P0/C%MAGP%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
@@ -685,10 +685,10 @@ CONTAINS
                 X(5)=(1.0_dp+X(5))*P0/C%MAGP%P%P0C-1.0_dp
              ENDIF
           ENDIF ! No need to patch
-       else  ! associated 
+       else  ! associated
              P0=>C%PATCH%P0b
              B0=>C%PATCH%B0b
- 
+
              X(2)=X(2)*P0/C%MAGP%P%P0C
              X(4)=X(4)*P0/C%MAGP%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
@@ -697,9 +697,9 @@ CONTAINS
                 X(5)=(2.0_dp*X(5)+X(5)**2)/(SQRT(1.0_dp/C%MAGP%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAGP%P%BETA0)
              ELSE
                 X(5)=(1.0_dp+X(5))*P0/C%MAGP%P%P0C-1.0_dp
-             ENDIF           
+             ENDIF
        ENDIF ! ASSOCIATED
- 
+
     ENDIF
 
     ! The chart frame of reference is located here implicitely
@@ -725,7 +725,7 @@ CONTAINS
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
 
- 
+
   END SUBROUTINE TRACK_FIBRE_FRONTP
 
 
@@ -750,7 +750,7 @@ CONTAINS
        PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
 
- 
+
     IF(C%MAG%MIS) THEN
        ou = ALWAYS_EXACTMIS  !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITF)
@@ -776,7 +776,7 @@ CONTAINS
 
     IF(PATCHE/=0.AND.PATCHE/=1.AND.PATCHE/=4) THEN
        NULLIFY(P0);NULLIFY(B0);
-       CN=>C%NEXT 
+       CN=>C%NEXT
 !       IF(.NOT.ASSOCIATED(CN)) CN=>C
        IF(ASSOCIATED(CN).AND.PATCHE/=5) then
        !       P0=>CN%MAG%P%P0C
@@ -793,7 +793,7 @@ CONTAINS
        ELSE
           X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp
        ENDIF
-    
+
     else
              P0=>C%PATCH%P0b
              B0=>C%PATCH%B0b
@@ -806,12 +806,12 @@ CONTAINS
               X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/B0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/B0)   ! 8/31/2016
              ELSE
                X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp   ! 8/31/2016
-             ENDIF      
+             ENDIF
     endif
 ENDIF
 
- 
-  
+
+
   END SUBROUTINE TRACK_FIBRE_BACKR
 
   SUBROUTINE TRACK_FIBRE_BACKP(C,X,K)
@@ -838,7 +838,7 @@ ENDIF
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
 
-    
+
     ! The magnet frame of reference is located here implicitely before misalignments
     CALL DTILTD(C%MAGP%P%TILTD,2,X)
 
@@ -877,7 +877,7 @@ ENDIF
        ELSE
           X(5)=(1.0_dp+X(5))*C%MAGP%P%P0C/P0-1.0_dp
        ENDIF
-    
+
     else
              P0=>C%PATCH%P0b
              B0=>C%PATCH%B0b
@@ -890,11 +890,11 @@ ENDIF
               X(5)=(2.0_dp*X(5)+X(5)**2)/(sqrt(1.0_dp/B0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/B0)   ! 8/31/2016
              ELSE
                X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp   ! 8/31/2016
-             ENDIF               
+             ENDIF
     ENDIF
-    
+
 endif
- 
+
 
   END SUBROUTINE TRACK_FIBRE_BACKP
 
@@ -1024,7 +1024,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
   !     el=>T%PARENT_FIBRE%MAG
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE.and.t%cas==case2) &
             call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
- 
+
        SELECT CASE(EL%KIND)
        CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19)
        case(KIND2)
@@ -1073,7 +1073,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
           else
             call ADJUST_LIKE_ABELL(EL%wi,X,k,1)
           endif
-          CALL ADJUST_WI(EL%WI,X,k,T%CAS) 
+          CALL ADJUST_WI(EL%WI,X,k,T%CAS)
           ENDIF
 
   ! ONLY DOES SOMETHING IF J==2
@@ -1100,7 +1100,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
           if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
 
        endif
- 
+
        SELECT CASE(EL%KIND)
        CASE(KIND0)
          global_e= x(5)*el%p%p0c
@@ -1220,7 +1220,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     IF(.NOT.CHECK_STABLE) return
     !       CALL RESET_APERTURE_FLAG
     !    endif
-    
+
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then
        messageLOST="exceed absolute_aperture in TRACKP_NODE_SINGLE"
        lost_node=>t
@@ -1241,6 +1241,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
        el=>T%PARENT_FIBRE%MAGP
 
 
+
     SELECT CASE(T%CAS)
     CASE(CASEP1)
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
@@ -1251,8 +1252,8 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
        endif
           global_e= x(5)*el%p%p0c
     CASE(CASEP2)
-    
-  
+
+
        if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
           TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1 .OR.  &
                  T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
@@ -1262,7 +1263,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
        global_e= x(5)*el%p%p0c
 
-  
+
     CASE(CASE1,CASE2)
 !       el=>T%PARENT_FIBRE%MAGP
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE.and.t%cas==case2) &
@@ -1314,11 +1315,11 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
           else
             call ADJUST_LIKE_ABELL(EL%wi,X,k,1)
           endif
-          CALL ADJUST_WI(EL%WI,X,k,T%CAS) 
+          CALL ADJUST_WI(EL%WI,X,k,T%CAS)
           ENDIF
 
        case(KINDPA)
-          CALL ADJUST_PANCAKE(EL%PA,X,k,T%CAS)    
+          CALL ADJUST_PANCAKE(EL%PA,X,k,T%CAS)
        case(KINDabell)
           CALL ADJUST_ABELL(EL%AB,X,k,T%CAS)
  !      global_e= x(5)*el%p%p0c treat like electric
@@ -1593,7 +1594,7 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
         LI=(j0*p%mag%L)/(p%mag%p%nst)
         uj=[li,0.0_dp]
         uj=uj+u0
-         
+
         uj(2)=uj(2)+sqrt(r0**2-uj(1)**2)-u0(2)
         n0=sqrt(ub(1)**2+ub(2)**2)
         nj=sqrt(uj(1)**2+uj(2)**2)
@@ -2146,10 +2147,10 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
      b0=b1
     else
      b0=1
-    endif 
+    endif
 
      if(tangent) then
-      t=sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2)/sqrt(1.0_dp+z(2)**2+z(4)**2) 
+      t=sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2)/sqrt(1.0_dp+z(2)**2+z(4)**2)
       z(2)=z(2)*t
       z(4)=z(4)*t
      else
@@ -2170,12 +2171,12 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
      b0=b1
     else
      b0=1
-    endif 
+    endif
 
      call alloc(t)
 
      if(tangent) then
-      t=sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2)/sqrt(1.0_dp+z(2)**2+z(4)**2) 
+      t=sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2)/sqrt(1.0_dp+z(2)**2+z(4)**2)
       z(2)=z(2)*t
       z(4)=z(4)*t
      else
@@ -2186,7 +2187,7 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
      endif
      call kill(t)
 
-     end subroutine convert_bmad_to_ptcap 
+     end subroutine convert_bmad_to_ptcap
 
     subroutine convert_ptc_to_bmadar(z,b1,time,LD)
     IMPLICIT NONE
@@ -2197,28 +2198,28 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
     l=0
     if(present(ld)) l=ld
     if(time) then
-     b0=b1 
+     b0=b1
      l=l/b1
     else
      b0=1
-    endif 
+    endif
 
      if(tangent) then
-      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2-z(2)**2-z(4)**2) 
+      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2-z(2)**2-z(4)**2)
       z(2)=z(2)*t
       z(4)=z(4)*t
      else
       t=z(5)
       z(5)=-(z(6)-l)*sqrt(1.d0 +2*t/b0+t**2)/(1.d0/b0+t)
-      z(6)=sqrt(1.0_dp +2*t/b0+t**2)-1.d0 
+      z(6)=sqrt(1.0_dp +2*t/b0+t**2)-1.d0
      endif
-     end subroutine convert_ptc_to_bmadar   
+     end subroutine convert_ptc_to_bmadar
 
 
     subroutine convert_ptc_to_bmadap(z,b1,time,ld)
     IMPLICIT NONE
     type(real_8),target,intent(INOUT) ::  z(6)
-    type(real_8) t 
+    type(real_8) t
      real(dp), optional :: LD
      real(dp) b0,b1,l
      logical(lp)  time
@@ -2230,22 +2231,22 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
      l=l/b1
     else
      b0=1
-    endif 
+    endif
 
-    
+
      call alloc(t)
      if(tangent) then
-      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2-z(2)**2-z(4)**2) 
+      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2-z(2)**2-z(4)**2)
       z(2)=z(2)*t
       z(4)=z(4)*t
      else
       t=z(5)
       z(5)=-(z(6)-l)*sqrt(1.0_dp+2*t/b0+t**2)/(1.0_dp/b0+t)
-      z(6)=sqrt(1.0_dp +2*t/b0+t**2)-1.0_dp 
+      z(6)=sqrt(1.0_dp +2*t/b0+t**2)-1.0_dp
      endif
      call kill(t)
 
-     end subroutine convert_ptc_to_bmadap  
+     end subroutine convert_ptc_to_bmadap
 
 
     subroutine convert_bmad_to_ptcr(z,b1,time)
@@ -2258,9 +2259,9 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
      b0=b1
     else
      b0=1
-    endif 
+    endif
      if(tangent) then
-      t=sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2)/sqrt(1.0_dp+z%x(2)**2+z%x(4)**2) 
+      t=sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2)/sqrt(1.0_dp+z%x(2)**2+z%x(4)**2)
       z%x(2)=z%x(2)*t
       z%x(4)=z%x(4)*t
      else
@@ -2268,7 +2269,7 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
       z%x(6)=-z%x(5)*sqrt(1.0_dp/b0**2+2*t+t**2)/(1.0_dp+t)
       z%x(5)=sqrt(1.0_dp/b0**2+2*t+t**2)-1.0_dp/b0
      endif
-     end subroutine convert_bmad_to_ptcr   
+     end subroutine convert_bmad_to_ptcr
 
 
     subroutine convert_bmad_to_ptcp(z,b1,time)
@@ -2281,11 +2282,11 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
      b0=b1
     else
      b0=1
-    endif 
+    endif
      call alloc(t)
 
      if(tangent) then
-      t=sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2)/sqrt(1.0_dp+z%x(2)**2+z%x(4)**2) 
+      t=sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2)/sqrt(1.0_dp+z%x(2)**2+z%x(4)**2)
       z%x(2)=z%x(2)*t
       z%x(4)=z%x(4)*t
      else
@@ -2293,11 +2294,11 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
 
      z%x(6)=-z%x(5)*sqrt(1.d0/b0**2+2*t+t**2)/(1.0_dp+t)
      z%x(5)=sqrt(1.0_dp/b0**2+2*t+t**2)-1.0_dp/b0
-    endif 
+    endif
 
      call kill(t)
 
-     end subroutine convert_bmad_to_ptcp   
+     end subroutine convert_bmad_to_ptcp
 
     subroutine convert_ptc_to_bmadr(z,b1,time,LD)
     IMPLICIT NONE
@@ -2313,17 +2314,17 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
      l=l/b1
     else
      b0=1
-    endif 
+    endif
      if(tangent) then
-      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2-z%x(2)**2-z%x(4)**2) 
+      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2-z%x(2)**2-z%x(4)**2)
       z%x(2)=z%x(2)*t
       z%x(4)=z%x(4)*t
      else
      t=z%x(5)
       z%x(5)=-(z%x(6)-l)*sqrt(1.0_dp +2*t/b0+t**2)/(1.0_dp/b0+t)
-      z%x(6)=sqrt(1.0_dp+2*t/b0+t**2)-1.0_dp 
+      z%x(6)=sqrt(1.0_dp+2*t/b0+t**2)-1.0_dp
      endif
-     end subroutine convert_ptc_to_bmadr   
+     end subroutine convert_ptc_to_bmadr
 
 
    subroutine convert_ptc_to_bmadp(z,b1,time,LD)
@@ -2341,44 +2342,44 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
      l=l/b1
     else
      b0=1
-    endif 
+    endif
      call alloc(t)
 
      if(tangent) then
-      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2-z%x(2)**2-z%x(4)**2) 
+      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2-z%x(2)**2-z%x(4)**2)
       z%x(2)=z%x(2)*t
       z%x(4)=z%x(4)*t
      else
       t=z%x(5)
       z%x(5)=-(z%x(6)-l)*sqrt(1.0_dp +2*t/b0+t**2)/(1.0_dp/b0+t)
-      z%x(6)=sqrt(1.0_dp +2*t/b0+t**2)-1.d0 
+      z%x(6)=sqrt(1.0_dp +2*t/b0+t**2)-1.d0
      endif
      call kill(t)
 
 
-     end subroutine convert_ptc_to_bmadp 
+     end subroutine convert_ptc_to_bmadp
 
      subroutine in_bmad_units
-     implicit none  
+     implicit none
       use_bmad_units=.true.
       ndpt_bmad=1
      end subroutine in_bmad_units
 
      subroutine in_ptc_units
-     implicit none  
+     implicit none
       use_bmad_units=.false.
       ndpt_bmad=0
      end subroutine in_ptc_units
 
      subroutine in_noncanonical_units
-     implicit none  
+     implicit none
       use_bmad_units=.true.
       tangent=.true.
       ndpt_bmad=0
      end subroutine in_noncanonical_units
 
      subroutine in_canonical_units
-     implicit none  
+     implicit none
       use_bmad_units=.false.
       tangent=.false.
       ndpt_bmad=0
@@ -2420,7 +2421,7 @@ endif
 do while(.not.associated(p2,p1))
 
 call survey_integration_fibre(p1,p1%previous%chart%f%b,p1%previous%chart%f%exi)
- 
+
 p1=>p1%next
 enddo
 !write(6,*) p1%previous%mag%name
@@ -2435,7 +2436,7 @@ type(fibre), target :: p
 type(integration_node), pointer :: t
 integer i
 type(layout), pointer  :: r
-real(dp),intent(in):: b0(3),exi0(3,3) 
+real(dp),intent(in):: b0(3),exi0(3,3)
 real(dp) a0(3),ent0(3,3),ang(3)
 a0=b0
 ent0=exi0
@@ -2447,7 +2448,7 @@ if(.not.associated(r%t)) then
 ! call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
 endif
 if(.not.associated(p%t1%a))     CALL  allocate_node_frame( R)   !call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
- 
+
 
 
 
@@ -2470,7 +2471,7 @@ call survey_integration_fringe(t,a0,ent0)
 t=>t%next
 call survey_integration_node_p2(t,a0,ent0)
 
- 
+
 !!! entrance chart
  CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,p%chart%f%exi,ANG)
 p%chart%f%mid=p%chart%f%ent
@@ -2479,7 +2480,7 @@ p%chart%f%mid=p%chart%f%ent
 ang=ang/2
 p%chart%f%o=0.5_dp*(p%chart%f%a+p%chart%f%b)
 CALL GEO_ROT(p%chart%f%mid,ANG,1,basis=p%chart%f%ent)
- 
+
 CALL COMPUTE_ENTRANCE_ANGLE(p%mag%p%f%ent,p%mag%p%f%exi,ANG)
 p%mag%p%f%mid=p%mag%p%f%ent
 ang=ang/2
@@ -2491,7 +2492,7 @@ p%magp%p%f%o=p%mag%p%f%o
  ! p%mag%p%f%o=t%b
  ! p%magp%p%f%mid=t%exi
  ! p%magp%p%f%o=t%b
- 
+
 
 
 end subroutine survey_integration_fibre
@@ -2539,8 +2540,8 @@ p=>m%p
 t%a=b0
 t%ent=ent0
 exi0=t%ent
- 
-select case(m%kind) 
+
+select case(m%kind)
 
 CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND22,kindwiggler,kindsuperdrift)
    h=p%lc/p%nst
@@ -2638,7 +2639,7 @@ if(f%patch%A_X2==-1) pix2(1)=pi
 !
 call GEO_ROT(exi0,pix1,1, ent0)
 call GEO_ROT(exi0,f%patch%a_ang,1, exi0)
-call TRANSLATE_point(a0,f%patch%A_D,1,exi0)  
+call TRANSLATE_point(a0,f%patch%A_D,1,exi0)
 call GEO_ROT(exi0,pix2,1, exi0)
 
 !!! entrance chart
@@ -2668,7 +2669,7 @@ endif
     IF(f%MAG%MIS) THEN
       call MIS_survey(a0,exi0,f,a0,exi0,ENTERING)
     ENDIF
- 
+
 if(f%mag%kind==kindpa) then
 
 call ADJUST_PANCAKE_frame(f%mag%pa,a0,exi0,1)
@@ -2680,7 +2681,7 @@ if(f%mag%kind==kindabell) then
 call ADJUST_abell_frame(f%mag%ab,a0,exi0,1)
 !
 write(6,*) " I am here in survey_integration_node_p1 "
-endif  
+endif
 t%b=a0
 !t%ent=ent0   ! mistake????
 t%exi=exi0
@@ -2703,7 +2704,7 @@ endif
 
 !t%next%a=t%b
 !t%next%ent=t%exi
- 
+
 
 end subroutine survey_integration_node_p1
 
@@ -2716,7 +2717,7 @@ type(superdrift),pointer :: el
 real(dp) pix1(3) ,pix2(3) ,a0(3),exi0(3,3),ent0(3,3)
 logical(lp) :: ENTERING=my_false
 
- 
+
 
 f=>t%parent_fibre
 el=>f%mag%sdr
@@ -2752,7 +2753,7 @@ call GEO_ROT(exi0,pix1,1, ent0) ! new
  pix1=0
  pix1(3)=el%ang(3)
  call GEO_ROT(exi0,pix1,1, exi0)
-call TRANSLATE_point(a0,el%D,1,exi0)  
+call TRANSLATE_point(a0,el%D,1,exi0)
 call GEO_ROT(exi0,pix2,1, exi0)  ! new
 !if(.not.entering) then
 ! f%chart%f%ent=exi0
@@ -2784,8 +2785,8 @@ call GEO_ROT(exi0,pix2,1, ent0)  ! new
 
  el%D(1)=-el%D(1)
  el%D(2)=-el%D(2)
- !  call TRANSLATE_point(a0,el%D,1,ent0)  
-  call TRANSLATE_point(a0,el%D,1,exi0)  
+ !  call TRANSLATE_point(a0,el%D,1,ent0)
+  call TRANSLATE_point(a0,el%D,1,exi0)
  el%D(1)=-el%D(1)
  el%D(2)=-el%D(2)
  pix1=0
@@ -2839,27 +2840,27 @@ end subroutine survey_integration_special_superdrift
     if(el%hc==0.0_dp) then  !<------ Rectangular geometry
 
     IF(J==1) then
-    d(1)=el%xc; d(3)=el%dc; d(2)=el%vc; 
+    d(1)=el%xc; d(3)=el%dc; d(2)=el%vc;
         ang(2)=el%angc
         call GEO_ROT(exi0,ang,1, exi0)
-        call TRANSLATE_point(a0,D,1,exi0)  
+        call TRANSLATE_point(a0,D,1,exi0)
     else
     d(1)=-el%xc ;d(3)=el%dc;d(2)=-el%vc;
         ang(2)=el%angc
-        call TRANSLATE_point(a0,D,1,exi0)  
+        call TRANSLATE_point(a0,D,1,exi0)
         call GEO_ROT(exi0,ang,1, exi0)
     endif
     else  !<------ Sector geometry
     IF(J==1) then
     d(1)=el%xc; d(3)=el%dc;d(2)=el%vc;
         ang(2)=el%angc
-        call TRANSLATE_point(a0,D,1,exi0)  
+        call TRANSLATE_point(a0,D,1,exi0)
         call GEO_ROT(exi0,ang,1, exi0)
     else
     d(1)=-el%xc; d(3)=el%dc;d(2)=-el%vc;
          ang(2)=el%angc
         call GEO_ROT(exi0,ang,1, exi0)
-        call TRANSLATE_point(a0,D,1,exi0)  
+        call TRANSLATE_point(a0,D,1,exi0)
     endif
     endif
   END SUBROUTINE ADJUST_PANCAKE_frame
@@ -2875,27 +2876,27 @@ end subroutine survey_integration_special_superdrift
     if(el%hc==0.0_dp) then  !<------ Rectangular geometry
 
     IF(J==1) then
-    d(1)=el%xc; d(3)=el%dc; d(2)=el%vc; 
+    d(1)=el%xc; d(3)=el%dc; d(2)=el%vc;
         ang(2)=el%angc
         call GEO_ROT(exi0,ang,1, exi0)
-        call TRANSLATE_point(a0,D,1,exi0)  
+        call TRANSLATE_point(a0,D,1,exi0)
     else
     d(1)=-el%xc ;d(3)=el%dc;d(2)=-el%vc;
         ang(2)=el%angc
-        call TRANSLATE_point(a0,D,1,exi0)  
+        call TRANSLATE_point(a0,D,1,exi0)
         call GEO_ROT(exi0,ang,1, exi0)
     endif
     else  !<------ Sector geometry
     IF(J==1) then
     d(1)=el%xc; d(3)=el%dc;d(2)=el%vc;
         ang(2)=el%angc
-        call TRANSLATE_point(a0,D,1,exi0)  
+        call TRANSLATE_point(a0,D,1,exi0)
         call GEO_ROT(exi0,ang,1, exi0)
     else
     d(1)=-el%xc; d(3)=el%dc;d(2)=-el%vc;
          ang(2)=el%angc
         call GEO_ROT(exi0,ang,1, exi0)
-        call TRANSLATE_point(a0,D,1,exi0)  
+        call TRANSLATE_point(a0,D,1,exi0)
     endif
     endif
   END SUBROUTINE ADJUST_abell_frame
@@ -2909,7 +2910,7 @@ logical(lp) :: ENTERING=my_FALSE
 
 f=>t%parent_fibre
 
- 
+
 t%a=a0
 t%ent=ent0
 exi0=t%ent
@@ -2942,14 +2943,14 @@ if(f%mag%kind==kindpa) then
 call ADJUST_PANCAKE_frame(f%mag%pa,a0,exi0,2)
 !
 write(6,*) " I am here in survey_integration_node_p1 "
-endif 
+endif
 
 if(f%mag%kind==kindabell) then
 
 call ADJUST_abell_frame(f%mag%ab,a0,exi0,2)
 !
 write(6,*) " I am here in survey_integration_node_p1 "
-endif  
+endif
 
     IF(f%MAG%MIS) THEN
       call MIS_survey(a0,exi0,f,a0,exi0,ENTERING)
@@ -2972,7 +2973,7 @@ if(f%patch%B_X2==-1) pix2(1)=pi
 !
 call GEO_ROT(exi0,pix1,1, ent0)
 call GEO_ROT(exi0,f%patch%B_ang,1, exi0)
-call TRANSLATE_point(a0,f%patch%b_D,1,exi0)  
+call TRANSLATE_point(a0,f%patch%b_D,1,exi0)
 call GEO_ROT(exi0,pix2,1, exi0)
 
 
@@ -3010,7 +3011,7 @@ end subroutine survey_integration_node_p2
   !           CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,k%TIME)   ! ROTATIONS
   !           CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,k%TIME)
   !           CALL ROT_XY(C%CHART%ANG_IN(3),X)  !,OU)
-            call TRANSLATE_point(b0,c%chart%D_IN,1,exi0)  
+            call TRANSLATE_point(b0,c%chart%D_IN,1,exi0)
   !           CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,k%TIME)         ! TRANSLATION
           ELSE
              call GEO_ROT(exi0,c%chart%ANG_OUT,1, exi0)
@@ -3018,7 +3019,7 @@ end subroutine survey_integration_node_p2
   !           CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,k%TIME)
   !           CALL ROT_XY(C%CHART%ANG_OUT(3),X)  !,OU)
   !           CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,k%TIME)        ! TRANSLATION
-            call TRANSLATE_point(b0,c%chart%D_OUT,1,exi0) 
+            call TRANSLATE_point(b0,c%chart%D_OUT,1,exi0)
           ENDIF
        ELSE
           IF(ENTERING) THEN  ! BACKWARD PROPAGATION
@@ -3028,7 +3029,7 @@ end subroutine survey_integration_node_p2
              C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
              C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
 
-             call TRANSLATE_point(b0,d,-1,exi0)  
+             call TRANSLATE_point(b0,d,-1,exi0)
 !             CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,k%TIME)        ! TRANSLATION
 !             CALL ROT_XY(C%CHART%ANG_OUT(3),X)  !,OU)
 !             CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,k%TIME)
@@ -3036,10 +3037,10 @@ end subroutine survey_integration_node_p2
              d=ang
              ang=0.d0
              ang(3)=-d(3)
-             call GEO_ROT(exi0,ang,1, exi0)  
+             call GEO_ROT(exi0,ang,1, exi0)
              ang=0.d0
              ang(2)=-d(2)
-             call GEO_ROT(exi0,ang,1, exi0)  
+             call GEO_ROT(exi0,ang,1, exi0)
              ang=0.d0
              ang(1)=-d(1)
              call GEO_ROT(exi0,ang,1, exi0)
@@ -3060,10 +3061,10 @@ end subroutine survey_integration_node_p2
              d=ang
              ang=0.d0
              ang(3)=-d(3)
-             call GEO_ROT(exi0,ang,1, exi0)  
+             call GEO_ROT(exi0,ang,1, exi0)
              ang=0.d0
              ang(2)=-d(2)
-             call GEO_ROT(exi0,ang,1, exi0)  
+             call GEO_ROT(exi0,ang,1, exi0)
              ang=0.d0
              ang(1)=-d(1)
              call GEO_ROT(exi0,ang,1, exi0)
@@ -3077,10 +3078,10 @@ end subroutine survey_integration_node_p2
 
   subroutine set_aperture_all_case0(flag)
     implicit none
-    logical flag 
-    
+    logical flag
+
     aperture_all_case0 = flag
-    
+
   end subroutine set_aperture_all_case0
 
 !!!!!!!!!!!!!!!!!!!
@@ -3092,7 +3093,7 @@ type(fibre), target :: p
 type(integration_node), pointer :: t
 integer i
 type(layout), pointer  :: r
-real(dp),intent(in):: b0(3),exi0(3,3) 
+real(dp),intent(in):: b0(3),exi0(3,3)
 real(dp) a0(3),ent0(3,3),ang(3)
 a0=b0
 ent0=exi0
@@ -3104,7 +3105,7 @@ if(.not.associated(r%t)) then
 ! call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
 endif
 if(.not.associated(p%t1%a))     CALL  allocate_node_frame( R)   !call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
- 
+
 
 
 !t=>p%t1
@@ -3121,7 +3122,7 @@ call survey_integration_fringe(t,a0,ent0)
 !t=>t%next
 !call survey_integration_node_p2(t,a0,ent0)
 
- 
+
 !!! entrance chart
  CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,p%chart%f%exi,ANG)
 p%chart%f%mid=p%chart%f%ent
@@ -3130,7 +3131,7 @@ p%chart%f%mid=p%chart%f%ent
 ang=ang/2
 p%chart%f%o=0.5_dp*(p%chart%f%a+p%chart%f%b)
 CALL GEO_ROT(p%chart%f%mid,ANG,1,basis=p%chart%f%ent)
- 
+
 CALL COMPUTE_ENTRANCE_ANGLE(p%mag%p%f%ent,p%mag%p%f%exi,ANG)
 p%mag%p%f%mid=p%mag%p%f%ent
 ang=ang/2
@@ -3139,8 +3140,8 @@ CALL GEO_ROT(p%mag%p%f%mid,ANG,1,basis=p%mag%p%f%ent)
 p%magp%p%f%mid=p%mag%p%f%mid
 p%magp%p%f%o=p%mag%p%f%o
 
- 
-! I am here 
+
+! I am here
 !etienne
 
 end subroutine survey_integration_fibre_no_patch

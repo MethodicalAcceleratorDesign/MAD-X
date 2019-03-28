@@ -79,7 +79,7 @@ module Mad_like
      REAL(DP) DPHAS,PSI,dvds
      logical(lp) usethin
      INTEGER N_BESSEL
-     INTEGER n_ac  ! number of oscillating multipoles 
+     INTEGER n_ac  ! number of oscillating multipoles
      REAL(DP) d_bn(NMAX), d_an(NMAX) ! oscillation amplitudes of multipoles
      REAL(DP) D_ac        ! factor for oscillation amplitude set by d_bn and d_an
      REAL(DP) DC_ac, A_ac ! factors for base field oscillation (D0_BN) : BN(N) = (DC_AC+A_AC*clock)*D0_BN(N) + D_AC*clock*D_BN(N)
@@ -266,11 +266,11 @@ module Mad_like
      MODULE PROCEDURE BLTILT
   end  INTERFACE
 
-  INTERFACE superdrift 
+  INTERFACE superdrift
      MODULE PROCEDURE superdrft
   end  INTERFACE
 
-  INTERFACE multipole 
+  INTERFACE multipole
      MODULE PROCEDURE BLTILT
   end  INTERFACE
 
@@ -740,7 +740,7 @@ CONTAINS
        s2%n_ac = 0
        s2%d_bn(:) = 0.0_dp
        s2%d_an(:) = 0.0_dp
-       s2%D_ac  = 0.0_dp 
+       s2%D_ac  = 0.0_dp
        s2%DC_ac = 0.0_dp
        s2%A_ac  = 0.0_dp
        s2%theta_ac  = 0.0_dp
@@ -1022,7 +1022,7 @@ CONTAINS
        BLTILT%KIND=kind3
        BLTILT%nmul=1
        if(present(k1l)) then
-          BLTILT%nmul=2      
+          BLTILT%nmul=2
           BLTILT%K(2)=k1l
        endif
        if(present(k0l)) BLTILT%K(1)=k0l
@@ -1197,8 +1197,8 @@ CONTAINS
           GKICKTILT%tilt=t%tilt(0)
        ENDIF
     ENDIF
-    
-    
+
+
     IF(LEN(NAME)>nlp) THEN
        !w_p=0
        !w_p%nc=2
@@ -2573,9 +2573,9 @@ CONTAINS
     ELSE
        TWCAVITYL%NAME=NAME
     ENDIF
- 
+
      TWCAVITYL%VOLT=VOLT1*volt_i
- 
+
     TWCAVITYL%LAG=LAG1
     TWCAVITYL%HARMON=HARMON1
     TWCAVITYL%FREQ0=FREQ01
@@ -2612,7 +2612,7 @@ CONTAINS
     ELSESTILT%LC=L1
 
          ELSESTILT%VOLT=K11*volt_i
- 
+
     ELSESTILT%KIND=KIND15
     ELSESTILT%NST=1
     ELSESTILT%METHOD=2
@@ -2686,7 +2686,7 @@ CONTAINS
 
        subroutine nullify_for_madx(s22)
        implicit none
-       type (fibre),target,INTENT(inOUT)::s22    
+       type (fibre),target,INTENT(inOUT)::s22
 
        nullify(s22%mag); nullify(s22%magp);
        allocate(s22%mag);allocate(s22%magp);
@@ -2715,7 +2715,7 @@ CONTAINS
   !     nullify(S22%t2);
   !     nullify(S22%pos);
   !     nullify(S22%loc);
- 
+
 
   end subroutine nullify_for_madx
 
@@ -3042,12 +3042,12 @@ CONTAINS
        if(S2%KIND==KIND18) then
           S2%p%aperture%KIND=2
          S2%p%aperture%X=ABSOLUTE_APERTURE
-         S2%p%aperture%Y=ABSOLUTE_APERTURE   
+         S2%p%aperture%Y=ABSOLUTE_APERTURE
        endif
       if(S2%KIND==KIND19) then
           S2%p%aperture%KIND=1
          S2%p%aperture%r(1)=ABSOLUTE_APERTURE
-         S2%p%aperture%r(2)=ABSOLUTE_APERTURE   
+         S2%p%aperture%r(2)=ABSOLUTE_APERTURE
        endif
      set_ap=MY_FALSE
     endif
@@ -3059,7 +3059,7 @@ CONTAINS
     ! SLOW AC MODULATION this must be after copy
     !print*,S2%NAME, " N_AC ", s1%n_ac
     if(s1%n_ac > 0) then
-      !print*, "EL_Q ", s1%n_ac       
+      !print*, "EL_Q ", s1%n_ac
       allocate(S2%DC_ac)
       allocate(S2%A_ac)
       allocate(S2%theta_ac)
@@ -3081,7 +3081,7 @@ CONTAINS
       S2%A_ac     = s1%A_ac
       S2%theta_ac = s1%theta_ac*twopi
       S2%slow_ac  = s1%clockno_ac
-      
+
       s2p%D_ac     = s1%D_ac
       s2p%DC_ac    = s1%DC_ac
       s2p%A_ac     = s1%A_ac
@@ -3122,14 +3122,14 @@ CONTAINS
       enddo
 
       do i=1,s1%n_ac
-      
+
          !print*,"skowron: ", S2%NAME, " ACD ", i, " AN ",s1%d_an(i), " BN ", s1%d_bn(i)
          S2%d_an(i) =s1%d_an(i)
          S2%d_bn(i) =s1%d_bn(i)
 
          S2p%d_an(i) =s1%d_an(i)
          S2p%d_bn(i) =s1%d_bn(i)
-         
+
       enddo
       !
     else
@@ -3567,7 +3567,7 @@ CONTAINS
    filec=filec0
    xprime_pancake=xprime0
    nstc=nst0
-   end subroutine set_pancake_constants 
+   end subroutine set_pancake_constants
 
    subroutine set_abell_constants(angc0,xc0,dc0,vc0,hc0,xprime0,m_abell0,n_abell0)
    implicit none
@@ -3582,8 +3582,8 @@ CONTAINS
    xprime_pancake=xprime0
    m_abell=m_abell0
    n_abell=n_abell0
-   end subroutine set_abell_constants 
-  
+   end subroutine set_abell_constants
+
   ! linked
 
  FUNCTION  pancake_tilt(NAME,file,T,br)
@@ -3617,7 +3617,7 @@ if(present(file)) then
     call kanalnummer(mf)
     open(unit=mf,file=file)
     read(mf,*) LD,hD  !,REPEAT   ! L and Hc are geometric
-    read(mf,*) nstc, ORDER 
+    read(mf,*) nstc, ORDER
     read(mf,*) LC,hc
     read(mf,*) dc,vc,xc
     read(mf,*) angc
@@ -3625,11 +3625,11 @@ endif
     ds=LC/nstc
     ii=0
 !    if(present(no)) order=no
- 
+
 
 
 if(.not.present(br)) then
-    order=order+1   
+    order=order+1
  CALL INIT(ORDER,1,0,0)
 endif
 
@@ -3637,21 +3637,21 @@ endif
     CALL ALLOC(Bf)
     CALL ALLOC(Ba)
     CALL ALLOC(Bn)
-    call alloc(it) 
+    call alloc(it)
 bf(1)=0.0_dp;bf(2)=0.0_dp;bf(3)=0.0_dp;
 ba(1)=0.0_dp;ba(2)=0.0_dp;ba(3)=0.0_dp;
 
 
 !    IF(REPEAT.AND.NST==0) NST=NSTD
 
-    ALLOCATE(t_em(NSTc))  
+    ALLOCATE(t_em(NSTc))
 if(present(br)) then
 ii=ii+1
 bf(1)=br(1,ii)
 bf(2)=br(2,ii)
 bf(3)=br(3,ii)
 else
-    read(mf,*) ii 
+    read(mf,*) ii
           CALL READ(Bf(1),mf);CALL READ(Bf(2),mf);CALL READ(Bf(3),mf);
 endif
           Bf(1)=Bf(1)/BRHO
@@ -3663,7 +3663,7 @@ ba(1)=br(1,ii)
 ba(2)=br(2,ii)
 ba(3)=br(3,ii)
 else
-    read(mf,*) ii 
+    read(mf,*) ii
           CALL READ(Ba(1),mf);CALL READ(Ba(2),mf);CALL READ(Ba(3),mf);
 endif
 
@@ -3671,7 +3671,7 @@ endif
           Ba(2)=Ba(2)/BRHO
           Ba(3)=Ba(3)/BRHO
 
-    DO I=3,NSTc 
+    DO I=3,NSTc
 
 
 if(present(br)) then
@@ -3680,11 +3680,11 @@ b(1)=br(1,ii)
 b(2)=br(2,ii)
 b(3)=br(3,ii)
 else
-    read(mf,*) ii 
+    read(mf,*) ii
           CALL READ(B(1),mf);CALL READ(B(2),mf);CALL READ(B(3),mf);
 endif
 
- 
+
           B(1)=B(1)/BRHO
           B(2)=B(2)/BRHO
           B(3)=B(3)/BRHO
@@ -3695,10 +3695,10 @@ endif
           Bn(3)=Bf(3)
           bn(4)=-(bn(3).i.2)  ! ax
           it=1.0_dp+hc*(1.0_dp.mono.1)
-          bn(5)=(4*b(4)-ba(4)-3*bf(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s 
-          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s  
+          bn(5)=(4*b(4)-ba(4)-3*bf(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s
+          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s
           bn(7)=bn(4).d.1   !  d/dx Ax
-          bn(8)=bn(4).d.2   !  d/dy Ax   
+          bn(8)=bn(4).d.2   !  d/dy Ax
           CALL SET_TREE_g(t_em(1),Bn)
          elseif(i==nstc) then
           Bn(1)=B(1)
@@ -3706,10 +3706,10 @@ endif
           Bn(3)=B(3)
           bn(4)=-(bn(3).i.2)  ! ax
           it=1.0_dp+hc*(1.0_dp.mono.1)
-          bn(5)=(3*b(4)+bf(4)-4*ba(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s 
-          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s  
+          bn(5)=(3*b(4)+bf(4)-4*ba(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s
+          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s
           bn(7)=bn(4).d.1   !  d/dx Ax
-          bn(8)=bn(4).d.2   !  d/dy Ax   
+          bn(8)=bn(4).d.2   !  d/dy Ax
           CALL SET_TREE_g(t_em(i),Bn)
          endif
 
@@ -3718,21 +3718,21 @@ endif
           Bn(3)=Ba(3)
           bn(4)=-(bn(3).i.2)  ! ax
           it=1.0_dp+hc*(1.0_dp.mono.1)
-          bn(5)=(b(4)-bf(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s 
-          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s  
+          bn(5)=(b(4)-bf(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s
+          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s
           bn(7)=bn(4).d.1   !  d/dx Ax
-          bn(8)=bn(4).d.2   !  d/dy Ax   
+          bn(8)=bn(4).d.2   !  d/dy Ax
           CALL SET_TREE_g(t_em(i-1),Bn)
- 
+
           Bf(1)=Ba(1)
           Bf(2)=Ba(2)
-          Bf(3)=Ba(3)  
+          Bf(3)=Ba(3)
           Bf(4)=Ba(4)
           Bf(5)=Ba(5)
           Bf(6)=Ba(6)
           Bf(7)=Ba(7)
-          Bf(8)=Ba(8)    
-  
+          Bf(8)=Ba(8)
+
           Ba(1)=B(1)
           Ba(2)=B(2)
           Ba(3)=B(3)
@@ -3747,7 +3747,7 @@ endif
     call KILL(Bf)
     call KILL(Ba)
     call KILL(Bn)
-    call KILL(it) 
+    call KILL(it)
 
 
  if(present(file))    close(MF)
@@ -3778,7 +3778,7 @@ endif
     ELSE
        pancake_tilt%NAME=NAME
     ENDIF
-    
+
     IF(NSTc<3.OR.MOD(NSTc,2)/=1) THEN
        WRITE(6,*) "NUMBER OF SLICES IN 'pancake'  MUST BE ODD AND >= 3 ",NSTc
        STOP 101
@@ -3800,7 +3800,7 @@ implicit none
 type(taylor), allocatable :: br(:,:)
 integer i,j
 allocate(br(3,nstc))
- 
+
 do i=1,3
 do j=1,nstc
  call alloc(br(i,j))
@@ -3814,7 +3814,7 @@ implicit none
 type(taylor), allocatable :: br(:,:)
 integer i,j
 
- 
+
 do i=1,size(br,1)
 do j=1,size(br,2)
  call kill(br(i,j))

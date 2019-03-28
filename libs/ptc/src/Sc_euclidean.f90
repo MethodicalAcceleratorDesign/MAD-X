@@ -95,11 +95,11 @@ CONTAINS
       write(mf,*) " coeff of (1+delta)  "
       write(mf,*) e%t3%dl
       if(e%t3%SIXTRACK ) then
-       write(mf,*) " L_DESIGN, DL_SIXTRACK  " 
+       write(mf,*) " L_DESIGN, DL_SIXTRACK  "
        write(mf,*) e%t3%L_DESIGN , e%t3%DL_SIXTRACK
       else
-       write(mf,*) " L_DESIGN  " 
-       write(mf,*) e%t3%L_DESIGN  
+       write(mf,*) " L_DESIGN  "
+       write(mf,*) e%t3%L_DESIGN
       endif
     endif
 
@@ -127,7 +127,7 @@ subroutine zero_T_XYZ(t)
       t%DL=0
       t%D=0
 end subroutine zero_T_XYZ
- 
+
 
 subroutine zero_E_GENERAL(t,i)
  implicit none
@@ -144,7 +144,7 @@ end subroutine zero_E_GENERAL
 subroutine zero_E_GENERAL_s(t)
  implicit none
  TYPE(E_GENERAL) t(:)
- integer i 
+ integer i
 
 do i=1,size(t)
    call init(t(i),0)
@@ -383,11 +383,15 @@ end subroutine zero_E_GENERAL_s
   END SUBROUTINE ROT_YZR
 
   SUBROUTINE ROT_YZP(A,X,b,EXACT,ctime)
+    use s_def_kind, only : PRTP ! LD: 22.03.2019
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8) XN(6)
     real(dp),INTENT(IN):: A,b
     LOGICAL(lp),INTENT(IN):: EXACT,ctime
+
+    call PRTP("ROT_YZ:0", X)
+
     CALL ALLOC(XN,6)
     XN(1)=X(3)
     XN(2)=X(4)
@@ -403,6 +407,9 @@ end subroutine zero_E_GENERAL_s
     X(5)=XN(5)
     X(6)=XN(6)
     CALL KILL(XN,6)
+
+    call PRTP("ROT_YZ:1", X)
+
   END SUBROUTINE ROT_YZP
 
   SUBROUTINE TRANSR(A,X,b,EXACT,ctime)
@@ -443,11 +450,14 @@ end subroutine zero_E_GENERAL_s
   END SUBROUTINE TRANSR
 
   SUBROUTINE TRANSP(A,X,b,EXACT,ctime)
+    use s_def_kind, only : PRTP ! LD: 22.03.2019
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8) PZ
     real(dp),INTENT(IN):: A(3),b
     LOGICAL(lp),INTENT(IN):: EXACT,ctime
+
+    call PRTP("TRANS:0", X)
 
     X(1)=X(1)-A(1)
     X(3)=X(3)-A(2)
@@ -477,6 +487,8 @@ end subroutine zero_E_GENERAL_s
           X(6)=X(6)+(A(3)/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+a(3)
        endif
     ENDIF
+
+    call PRTP("TRANS:1", X)
 
   END SUBROUTINE TRANSP
 
@@ -510,18 +522,21 @@ end subroutine zero_E_GENERAL_s
   END SUBROUTINE ROT_XYR
 
   SUBROUTINE ROT_XYP(A,X)
+    use s_def_kind, only : PRTP ! LD: 22.03.2019
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8) XN(4)
     real(dp),INTENT(IN):: A
     real(dp)           :: cosa, sina
-    
+
+    call PRTP("ROT_XY:0", X)
+
     cosa = COS(A)
     sina = SIN(A)
-    
+
     !    IF(EXACT) THEN
     CALL ALLOC(XN,4)
-    
+
     XN(1)=COSA*X(1)+SINA*X(3)
     XN(3)=COSA*X(3)-SINA*X(1)
     XN(2)=COSA*X(2)+SINA*X(4)
@@ -531,14 +546,17 @@ end subroutine zero_E_GENERAL_s
     X(3)=XN(3)
     X(4)=XN(4)
     CALL KILL(XN,4)
-    
-    
+
+
     !    ELSE
     !       X(1)=X(1)+A*X(3)
     !       X(4)=X(4)-A*X(2)
     !       X(2)=X(2)+A*X(4)
     !       X(3)=X(3)-A*X(1)
     !    ENDIF
+
+    call PRTP("ROT_XY:1", X)
+
   END SUBROUTINE ROT_XYP
 
 
@@ -587,12 +605,15 @@ end subroutine zero_E_GENERAL_s
   END SUBROUTINE ROT_XZR
 
   SUBROUTINE ROT_XZP(A,X,b,EXACT,ctime)
+    use s_def_kind, only : PRTP ! LD: 22.03.2019
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8) XN(6),PZ,PT
     real(dp),INTENT(IN):: A,b
     real(dp) sina, cosa, tana
     LOGICAL(lp),INTENT(IN):: EXACT,ctime
+
+    call PRTP("ROT_XZ:0", X)
 
     IF(EXACT) THEN
        COSA = COS(A)
@@ -627,7 +648,7 @@ end subroutine zero_E_GENERAL_s
        CALL KILL(PZ)
        CALL KILL(PT)
     ELSE
-       
+
        if(ctime) then
           CALL ALLOC(PZ)
           PZ=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2)
@@ -638,9 +659,11 @@ end subroutine zero_E_GENERAL_s
           X(2)=X(2)+A*(1.0_dp+X(5))
           X(6)=X(6)+A*X(1)
        endif
-       
+
 
     ENDIF
+
+    call PRTP("ROT_XZ:1", X)
 
   END SUBROUTINE ROT_XZP
 
