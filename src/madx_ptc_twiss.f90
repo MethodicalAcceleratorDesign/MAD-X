@@ -716,14 +716,14 @@ contains
     orbit(3)=get_value('ptc_twiss ','y ')
     orbit(4)=get_value('ptc_twiss ','py ')
     orbit(6)=-get_value('ptc_twiss ','t ') ! swap of t sign
-    orbit(5)=orbit(5)+get_value('ptc_twiss ','pt ')
+    orbit(5)=get_value('ptc_twiss ','pt ')
 
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
     else
        dt=deltap
     endif
-    if(icase.eq.5 .or. icase.eq.56) orbit(5)=dt
+    if(icase.eq.5 .or. icase.eq.56) orbit(5) = dt + orbit(5)
     
     closed_orbit = get_value('ptc_twiss ','closed_orbit ') .ne. 0
 
