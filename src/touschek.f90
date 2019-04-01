@@ -309,7 +309,6 @@ subroutine cavtouschek (um,uloss,iflag)
   if (uloss.ne.zero) then
       ! C. Steier, et al., "Measuring and optimizing the momentum aperture in a particle accelerator"
       ! https://journals.aps.org/pre/pdf/10.1103/PhysRevE.65.056506 
-     !fq = (two*vrfsum)*(sqrt(one - one/qover**2)) - two*uloss*acos(one/qover)
      fq = two * (sqrt(one - one/qover**2) * vrfsum * harmonlm - uloss * acos(one/qover))
      um = ten3m / (harmonlm * eta * pi) * fq / (pc * (one + deltap))
   else
