@@ -295,8 +295,8 @@ subroutine cavtouschek (um,uloss,iflag)
      if (cos(phirf) .lt. 0) vrf = -vrf
      eta = alfa - one / gammas**2
      if (uloss .ne. zero) then
-        qover = qover + charge * rfv/uloss
-        vrfsum = vrfsum + charge * rfv/harmonl
+        qover = qover +  rfv/uloss
+        vrfsum = vrfsum +  rfv !Charge is not inccluded sine it is not used in twiss or track for the rf-cavity 
         harmonlm = min(harmonl, harmonlm)
      else
         umt = umt + (two * c0) / (harmonl * eta * pi)
@@ -307,8 +307,10 @@ subroutine cavtouschek (um,uloss,iflag)
 11 if (advance_node().ne.0)  goto 10
 
   if (uloss.ne.zero) then
-     fq = two * (sqrt(one - one/qover**2) * vrfsum * harmonlm - uloss * acos(one/qover))
-     um = ten3m / (harmonlm * eta * pi) * fq / (pc * (one + deltap))
+      ! C. Steier, et al., "Measuring and optimizing the momentum aperture in a particle accelerator"
+      ! https://journals.aps.org/pre/pdf/10.1103/PhysRevE.65.056506 
+     fq = (two*uloss)*(sqrt(qover**2 - one) - acos(one/qover))
+     um = fq*ten3m/(pi*alfa*harmonlm*(pc*(one+deltap)/beta))
   else
      um = umt
   endif
