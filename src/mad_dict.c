@@ -1786,6 +1786,7 @@ const char *const_element_def =
 "ksl      = [r, {0}], "
 "slice    = [i, 1],  "
 "thick    = [l, false, true], " /*hbu */
+
 "apertype = [s, circle, circle], "
 "aperture = [r, {0}], "
 "aper_offset = [r, {0}], "
@@ -1797,6 +1798,8 @@ const char *const_element_def =
 "v_pos = [r, 0], "
 "model           = [i, -1], "
 "method          = [i, -1], "
+"xtilt       = [r, 0],  "
+"rot_start   = [r, 0],  "
 "exact           = [i, -1, 1], "
 "nst             = [i, -1], "
 "from     = [s, none], "
