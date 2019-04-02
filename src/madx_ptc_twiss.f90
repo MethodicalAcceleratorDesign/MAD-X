@@ -716,14 +716,14 @@ contains
     orbit(3)=get_value('ptc_twiss ','y ')
     orbit(4)=get_value('ptc_twiss ','py ')
     orbit(6)=-get_value('ptc_twiss ','t ') ! swap of t sign
-    orbit(5)=orbit(5)+get_value('ptc_twiss ','pt ')
+    orbit(5)=get_value('ptc_twiss ','pt ')
 
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
     else
        dt=deltap
     endif
-    if(icase.eq.5 .or. icase.eq.56) orbit(5)=dt
+    if(icase.eq.5 .or. icase.eq.56) orbit(5) = dt + orbit(5)
     
     closed_orbit = get_value('ptc_twiss ','closed_orbit ') .ne. 0
 
@@ -902,13 +902,24 @@ contains
       !we do not need the full thing to fill usertable
       ! currently we save only the first order map (i.e. matrix)
       ! we can consider saving the map in universal taylor, if this still pays back
+
+      if (getdebug() > 1) then
+        print*, "There is no user tables (ptc_select or ptc_knobs), we can eventually skip the TM tracking"  
+        print*, "FLAGS: isTMsave  slice  rmatrix isRing"
+        print*, isTMsave,  slice , rmatrix, isRing
+        ! isTMsave - tells if Transfer Matrix was saved; true if A_ initized from closed solution 
+        ! slice - 
+        ! rmatrix - user requests rmatrix in the twiss table
+        ! isRing - request closed solution to twiss table
+      endif  
       
-      if ( isTMsave .and. ( (slice .eqv. .false.) .and. (rmatrix .eqv. .true.) ) ) then
+      if ( isTMsave .and.  (slice .eqv. .false.) ) then
         !the matrix was tracked in the initmap, and slice is off (it is saved only for each element)
         ! in the future should do support for slicing 
         doTMtrack = .false.
       endif
-
+      
+      
       !another independent condition
       if ( (isRing .eqv. .false.) .and. (rmatrix .eqv. .false.) ) then
         !we do not have to do the normal form at the end (isRing false)
@@ -1632,7 +1643,7 @@ contains
             call print(theTransferMap,mf)
             close(mf)
             
-            print*,"Initializing map from one turn map. One Turn Map"
+            print*,"Initializing map from One Turn Map."
          endif
 
          isTMsave = .true.

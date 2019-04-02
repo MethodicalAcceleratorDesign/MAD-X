@@ -1,0 +1,29 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2019.03.06 15:00:59      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+chdir, dir="../..";
+
+call, file="tests/test-control/callee.madx";
+
+print, text="hello here!";
+
+hello here!
+
+
+chdir, dir="tests/test-control";
+
+call, file="callee.madx";
+
+print, text="hello here!";
+
+hello here!
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

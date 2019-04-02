@@ -33,6 +33,16 @@ then read until a \texttt{RETURN} statement is encountered, or until the
 End\_Of\_File; The file being "called" may in turn contain any number of
 \texttt{CALL} statements itself, and so on to any depth.
 
+
+\section{CHDIR}
+\label{sec:chdir}
+\madbox{
+CHDIR, DIR="path/to/folder";
+}
+changes the current working directory to the specified folder. Both relative
+and absolute pathes are possible.
+
+
 \section{RETURN}
 \label{Sec:return}
 \madbox{

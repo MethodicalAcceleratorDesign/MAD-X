@@ -238,37 +238,43 @@ CONTAINS
     if(ti>=a%t_max.or.ti<a%table(1)%time) then
 !    if(ti>a%table(a%n)%time.or.ti<a%table(1)%time) then
       if(ti>=a%t_max) then
-           a%table(0)%bn=0.0_dp
-           a%table(0)%an=0.0_dp
-          do i=1,size(a%table(0)%bn)
+         a%table(0)%bn=0.0_dp
+         a%table(0)%an=0.0_dp
+         do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(a%n)%bn(i)*a%r
            a%table(0)%an(i)= a%table(a%n)%an(i)*a%r
-          enddo 
-            a%table(0)%b_t= a%table(a%n)%b_t
-           a=>t%parent_fibre%magp%ramp
-           a%table(0)%bn=0.0_dp
-           a%table(0)%an=0.0_dp
-          do i=1,size(a%table(0)%bn)
+         enddo 
+        
+         a%table(0)%b_t= a%table(a%n)%b_t
+         a=>t%parent_fibre%magp%ramp
+         a%table(0)%bn=0.0_dp
+         a%table(0)%an=0.0_dp
+        
+         do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(a%n)%bn(i)*a%r
            a%table(0)%an(i)= a%table(a%n)%an(i)*a%r
-          enddo 
-          a%table(0)%b_t= a%table(a%n)%b_t
+         enddo 
+         a%table(0)%b_t= a%table(a%n)%b_t
       else
-           a%table(0)%bn=0.0_dp
-           a%table(0)%an=0.0_dp
-          do i=1,size(a%table(0)%bn)
+         a%table(0)%bn=0.0_dp
+         a%table(0)%an=0.0_dp
+         
+         do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(1)%bn(i)*a%r
            a%table(0)%an(i)= a%table(1)%an(i)*a%r
-          enddo 
+         enddo 
+         
          a%table(0)%b_t= a%table(1)%b_t
-          a=>t%parent_fibre%magp%ramp
-           a%table(0)%bn=0.0_dp
-           a%table(0)%an=0.0_dp
-          do i=1,size(a%table(0)%bn)
+         a=>t%parent_fibre%magp%ramp
+         a%table(0)%bn=0.0_dp
+         a%table(0)%an=0.0_dp
+         
+         do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(1)%bn(i)*a%r
            a%table(0)%an(i)= a%table(1)%an(i)*a%r
-          enddo 
-          a%table(0)%b_t= a%table(1)%b_t
+         enddo 
+         
+         a%table(0)%b_t= a%table(1)%b_t
      
       endif
 
@@ -276,31 +282,33 @@ CONTAINS
     
          ti=ti-a%table(1)%time
          ti=mod(ti,dtot)+a%table(1)%time
-          dtot=dtot/(a%n-1)
-          ti=(ti-a%table(1)%time)/dtot+1
+         dtot=dtot/(a%n-1)
+         ti=(ti-a%table(1)%time)/dtot+1
            
-          it=int(ti)
+         it=int(ti)
 !          it=idint(ti)
           
-           rat=(ti-it)    
+         rat=(ti-it)    
            
 
-           a%table(0)%bn=0.0_dp
-           a%table(0)%an=0.0_dp
-          do i=1,size(a%table(0)%bn)
-           a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
+         a%table(0)%bn=0.0_dp
+         a%table(0)%an=0.0_dp
+         do i=1,size(a%table(0)%bn)
+           a%table(0)%bn(i)= ((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
            a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
-          enddo 
-           a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
+         enddo 
+         a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
 
-          a=>t%parent_fibre%magp%ramp
-           a%table(0)%bn=0.0_dp
-           a%table(0)%an=0.0_dp
-          do i=1,size(a%table(0)%bn)
+         a=>t%parent_fibre%magp%ramp
+         a%table(0)%bn=0.0_dp
+         a%table(0)%an=0.0_dp
+ 
+         do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
            a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
-          enddo 
-           a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
+         enddo 
+ 
+         a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
           
     endif
   end SUBROUTINE set_ramp
@@ -1007,19 +1015,25 @@ endif
     SELECT CASE(T%CAS)
     CASE(CASEP1)
 
-       CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
-     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
-TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
-          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
-     endif
-         global_e= x(5)*el%p%p0c
+      CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
+      if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
+        TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==-1 .OR. &
+           T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos== 0
+        if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+      endif
+      
+      global_e= x(5)*el%p%p0c
+      
     CASE(CASEP2)
-     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
-TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
-          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
-     endif
-       CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
-         global_e= x(5)*el%p%p0c
+      if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
+        TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1 .OR. &
+           T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+        if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+      endif
+
+      CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
+      global_e= x(5)*el%p%p0c
+    
     CASE(CASE1,CASE2)
   !     el=>T%PARENT_FIBRE%MAG
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE.and.t%cas==case2) &
