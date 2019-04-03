@@ -5558,7 +5558,7 @@ SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 end SUBROUTINE tmsol
 
 SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
-  use twissbeamfi, only : deltap, beta, gamma, dtbyds
+  use twissbeamfi, only : radiate, deltap, beta, gamma, dtbyds, arad
   use math_constfi, only : zero, one, two, three, six
     use matrices, only : EYE
   implicit none
@@ -5588,6 +5588,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   double precision, external :: node_value, get_value 
   double precision, parameter :: ten5m=1d-5
+  double precision :: rfac, kx, ky
 
   beta0   = get_value('probe ','beta ')
 
@@ -5626,6 +5627,16 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
      sibk = si/sk
   endif
 
+  !---- Half radiation effect at entry.
+  if (radiate .and. ftrk) then
+     kx = ((sk**2)*orbit(1)-sk*orbit(4))*el;
+     ky = ((sk**2)*orbit(3)+sk*orbit(2))*el;
+     rfac = (arad * gamma**3 / three) * (kx**2 + ky**2) / el;
+     orbit(2) = orbit(2) - rfac * (one + orbit(6)) * orbit(2)
+     orbit(4) = orbit(4) - rfac * (one + orbit(6)) * orbit(4)
+     orbit(6) = orbit(6) - rfac * (one + orbit(6)) ** 2
+  endif
+  
   !---- First-order terms.
   re_s(1,1) = co**2
   re_s(2,2) = re_s(1,1)
@@ -5727,6 +5738,16 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
     te=te_s
   endif
 
+
+  !---- Half radiation effect at exit.
+  if (radiate .and. ftrk) then
+     kx = ((sk**2)*orbit(1)-sk*orbit(4))*el;
+     ky = ((sk**2)*orbit(3)+sk*orbit(2))*el;
+     rfac = (arad * gamma**3 / three) * (kx**2 + ky**2) / el;
+     orbit(2) = orbit(2) - rfac * (one + orbit(6)) * orbit(2)
+     orbit(4) = orbit(4) - rfac * (one + orbit(6)) * orbit(4)
+     orbit(6) = orbit(6) - rfac * (one + orbit(6)) ** 2
+  endif
 
 end SUBROUTINE tmsol0
 
@@ -7508,8 +7529,8 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
 end SUBROUTINE tmdpdg
 
 SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
-  use twissbeamfi, only : deltap
-  use math_constfi, only : zero, one, two
+  use twissbeamfi, only : deltap, radiate, gamma, arad
+  use math_constfi, only : zero, one, two, three
   implicit none
   !     Stolen from trrun.F courtesy Alex Koschick
   !----------------------------------------------------------------------*
@@ -7531,13 +7552,15 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
   double precision :: bvk, sk, skl, sks, sksl, cosTh, sinTh, Q0, Q
 
   double precision, external :: node_value
+  double precision :: elrad, rfac, kx, ky
 
   fmap = .true.
 
   !---- Get solenoid parameters
   sksl    = node_value('ksi ')
   sks     = node_value('ks ')
-
+  elrad  = node_value('lrad ')
+  
   !---- BV flag
   bvk = node_value('other_bv ')
   sks = sks * bvk
@@ -7550,6 +7573,16 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
   cosTh = cos(Q0)
   sinTh = sin(Q0)
   Q = -sk*Q0
+
+  !---- Half radiation effect at entry.
+  if (radiate .and. ftrk) then
+     kx = ((sk**2)*orbit(1)-sk*orbit(4))*elrad;
+     ky = ((sk**2)*orbit(3)+sk*orbit(2))*elrad;
+     rfac = (arad * gamma**3 / three) * (kx**2 + ky**2) / elrad;
+     orbit(2) = orbit(2) - rfac * (one + orbit(6)) * orbit(2)
+     orbit(4) = orbit(4) - rfac * (one + orbit(6)) * orbit(4)
+     orbit(6) = orbit(6) - rfac * (one + orbit(6)) ** 2
+  endif
 
   !---- First-order terms.
   re(1,1) = cosTh
@@ -7571,6 +7604,16 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
 
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
+  !---- Half radiation effect at exit.
+  if (radiate .and. ftrk) then
+     kx = ((sk**2)*orbit(1)-sk*orbit(4))*elrad;
+     ky = ((sk**2)*orbit(3)+sk*orbit(2))*elrad;
+     rfac = (arad * gamma**3 / three) * (kx**2 + ky**2) / elrad;
+     orbit(2) = orbit(2) - rfac * (one + orbit(6)) * orbit(2)
+     orbit(4) = orbit(4) - rfac * (one + orbit(6)) * orbit(4)
+     orbit(6) = orbit(6) - rfac * (one + orbit(6)) ** 2
+  endif
 
 end SUBROUTINE tmsol_th
 

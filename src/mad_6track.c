@@ -262,7 +262,7 @@ struct object
 
 /* already defined as 42 in fulll.h */
 /*#define FIELD_MAX 40*/        /* field error array length */
-#define KEY_LENGTH 48       /* from DOOM */
+#define KEY_LENGTH 100      /* from DOOM */
 #define MM_KEEP 2           /* no. of element name starts to keep */
 #define MULTI_MAX 24        /* element array length for multipoles */
 #define NT34 5              /* no. of element types in special fort.34 */
