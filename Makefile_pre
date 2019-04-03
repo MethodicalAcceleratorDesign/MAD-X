@@ -20,7 +20,7 @@ SED    = sed
 GREP   = grep
 
 ifeq ($(USEGC),yes)
-GCDIR := gc-7.2f
+GCDIR := gc-8.0.2
 endif
 
 # end of makefile

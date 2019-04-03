@@ -3354,30 +3354,24 @@ subroutine tttrans(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: t_x, t_px, t_y, t_py, t_sig, t_psig
+  double precision :: t_x, t_y, t_z
   double precision :: node_value
 
   !---- Get translation parameters
   t_x    = node_value('x ')
-  t_px   = node_value('px ')
   t_y    = node_value('y ')
-  t_py   = node_value('py ')
-  t_sig  = node_value('t ')
-  t_psig = node_value('pt ')
+  t_z    = node_value('z ')
 
   !---- Loop over particles
 !$OMP PARALLEL PRIVATE(i)
 !$OMP DO
+  call ttdrf(-t_z,track,ktrack)
   do  i = 1, ktrack
      ! Add vector to particle coordinates
-     track(1,i) = track(1,i) + t_x
-     track(2,i) = track(2,i) + t_px
-     track(3,i) = track(3,i) + t_y
-     track(4,i) = track(4,i) + t_py
-     track(5,i) = track(5,i) + t_sig
-     track(6,i) = track(6,i) + t_psig
-     !
+     track(1,i) = track(1,i) - t_x
+     track(3,i) = track(3,i) - t_y
   enddo
+
 !$OMP END DO
 !$OMP END PARALLEL
 end subroutine tttrans
@@ -4627,12 +4621,12 @@ subroutine tttdipole(track, ktrack)
   hgap  = node_value('hgap ')
   fint  = node_value('fint ')
   fintx = node_value('fintx ')
-  length = node_value('l ');
-  angle = node_value('angle ');
-  rho = abs(length/angle);
-  h = angle/length;
-  k0 = h;
-  k1 = node_value('k1 ');
+  length = node_value('l ')
+  angle = node_value('angle ')
+  rho = abs(length/angle)
+  h = angle/length
+  k0 = node_value('k0 ') ! was h
+  k1 = node_value('k1 ')
 
   if (code .eq. code_rbend) then
      e1 = e1 + angle / two;
@@ -4642,7 +4636,11 @@ subroutine tttdipole(track, ktrack)
   !---- Apply errors
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  if (k0.ne.0) f_errors(0) = f_errors(0) + k0*length - angle;
+  if (k0.ne.0) then 
+    f_errors(0) = f_errors(0) + k0*length - angle
+  else
+    k0 = h
+  endif
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 

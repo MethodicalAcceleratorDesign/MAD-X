@@ -1134,12 +1134,24 @@ CONTAINS
        key%list%freq0=freq
        key%list%n_bessel=node_value('n_bessel ')
        key%list%harmon=one ! it is ignored by PTC because it does not know the circumference
-       if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
+
+       if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) then
+         icav=1
+         if (getdebug() > 2) then
+            print*,"icav set to 1, RF Cavity detected with Volt ",key%list%volt, " and Freq ", key%list%freq0
+         endif
+       !else
+       !  if (getdebug() > 2) then
+       !     print*,"RF Cavity with zero voltage or frequency"
+       !  endif
+       endif
+
        !  case(11)
        !     key%magnet="elseparator"
        !     key%list%volt=node_value('ex ')
        !     key%list%lag=atan2(node_value('ey '),node_value('ex '))
        !     key%tiltd=node_value('tilt ')
+
        m_u%end%HARMONIC_NUMBER=node_value('harmon ')   ! etienne_harmon
        no_cavity_totalpath=node_value('no_cavity_totalpath ').ne.0
        if(no_cavity_totalpath) then

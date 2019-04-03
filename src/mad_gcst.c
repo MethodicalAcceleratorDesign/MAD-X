@@ -104,7 +104,7 @@ const int survey_table_types[] =
   2, 2, 2, 2, 2, 2,
   1, 1, 2,
   /*== dealt with the new property v_pos as for mech_sep */
-  2
+  2,3
   /*==*/
 };
 
@@ -114,7 +114,7 @@ const char* const survey_table_cols[] =
   "y", "z", "theta", "phi", "psi", "globaltilt",
   "slot_id", "assembly_id", "mech_sep",
   /*== dealt with the new property v_pos as for mech_sep */
-  "v_pos",
+  "v_pos", "comments",
   /*==*/
   " "  /* blank terminates */
 };
@@ -183,7 +183,7 @@ const char* const sxf_table_names[] =
   "lag","harmon","betrf","pg",
   "shunt","tfill","eloss","ex","ey",
   "hkick","vkick","xsize","ysize","sigx",
-  "sigy","xma","yma","charge",
+  "sigy","xma","yma","charge", "freq",
   " " /* blank terminates */
 };
 

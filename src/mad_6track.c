@@ -377,6 +377,7 @@ static void write_f3_mult(struct c6t_element*);
 static void write_f34_special(void);
 static void write_struct(void);
 static void setup_output_string(void);
+static void write_f3_rfmultipoles(struct c6t_element*);
 static int my_table_row(struct table*, char*);
 
 /* routines used from makethin.c */
@@ -454,8 +455,11 @@ static char tmp_name[KEY_LENGTH];
 static char name_format[70];
 static char name_format_short[6];
 static char name_format_error[62];
+static char name_format_aper[61];
 static char name_format_3[40];
 static char name_format_4[40];
+static char name_format_5[40];
+static int general_rf_req = 50299 ;
 //static char name_format[80]; /*This is used by fprint to determin the length of the names"*/
 
 static int
@@ -473,6 +477,7 @@ static int
   cavall_flag = 0,     /* if 0 dump all cavities into first */
   markall_flag = 0,    /* if 1 dump all markers into first */
   long_names_flag = 0,    /* if 1 dump all markers into first */
+  multicol_flag = 0,   /* if 1 dump multi-column STRUCTURE block */
   aperture_flag = 0,   /* if 1 insert apertures into structure */
 //  radius_flag = 0, // not used    /* change the default reference radius */
   split_flag = 0,      /* if 1 keep zero multipoles after split */
@@ -500,6 +505,7 @@ static const double eps_6 = 1.e-6;
 static const double eps_9 = 1.e-9;
 static const double eps_12 = 1.e-12;
 static double ref_def = 0.017;
+static double six_version = 0;
 
 static FILE *f2, *f3, *f3aux, *f3aper, *f8, *f16, *f34;
 
@@ -1426,7 +1432,7 @@ convert_madx_to_c6t(struct node* p)
   }
   else if (strcmp(p->base_name,"rfmultipole") == 0)
   {
-    int maxkn=0, maxks=0, maxpn=0, maxps=0;
+    int maxkn=0, maxks=0, maxpn=0, maxps=0, mmult=0;
     if ((index = name_list_pos("knl",p->p_elem->def->par_names))>-1)
     {
       kn_param = p->p_elem->def->par->parameters[index];
@@ -1447,77 +1453,68 @@ convert_madx_to_c6t(struct node* p)
       ps_param = p->p_elem->def->par->parameters[index];
       maxps=ks_param->double_array->curr;
     }
-    if (maxkn>3 || maxks>3) {
-      printf("warning while converting rfmultipole: components beyond octupole are ignored\n");
+
+    if(six_version < general_rf_req)
+    {
+      if (maxkn>3 || maxks>3) {
+        printf("warning while converting rfmultipole: components beyond octupole are ignored\n");
+      }
+
+      c6t_elem = new_c6t_element(19,t_name,p->base_name);
+      clean_c6t_element(c6t_elem);
+      strcpy(c6t_elem->org_name,t_name);
+      // rf & general params
+      c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+      c6t_elem->value[1] = el_par_value_recurse("volt",p->p_elem);
+      c6t_elem->value[2] = el_par_value_recurse("tilt",p->p_elem);
+      c6t_elem->value[3] = el_par_value_recurse("freq",p->p_elem);
+      // normal components
+      c6t_elem->value[4] = maxkn>0?(kn_param->double_array->a[0]):0.0;
+      c6t_elem->value[5] = maxkn>1?(kn_param->double_array->a[1]):0.0;
+      c6t_elem->value[6] = maxkn>2?(kn_param->double_array->a[2]):0.0;
+      c6t_elem->value[7] = maxkn>3?(kn_param->double_array->a[3]):0.0;
+      c6t_elem->value[8] = maxpn>0?(pn_param->double_array->a[0]):0.0;
+      c6t_elem->value[9] = maxpn>1?(pn_param->double_array->a[1]):0.0;
+      c6t_elem->value[10] = maxpn>2?(pn_param->double_array->a[2]):0.0;
+      c6t_elem->value[11] = maxpn>3?(pn_param->double_array->a[3]):0.0;
+      // skew component
+      c6t_elem->value[18] = maxks>0?(ks_param->double_array->a[0]):0.0;
+      c6t_elem->value[12] = maxks>1?(ks_param->double_array->a[1]):0.0;
+      c6t_elem->value[13] = maxks>2?(ks_param->double_array->a[2]):0.0;
+      c6t_elem->value[14] = maxks>3?(ks_param->double_array->a[3]):0.0;
+      c6t_elem->value[19] = maxps>0?(ps_param->double_array->a[0]):0.0;
+      c6t_elem->value[15] = maxps>1?(ps_param->double_array->a[1]):0.0;
+      c6t_elem->value[16] = maxps>2?(ps_param->double_array->a[2]):0.0;
+      c6t_elem->value[17] = maxps>3?(ps_param->double_array->a[3]):0.0;
+        
     }
+    else 
+    { //This is the new RF-multipoles
+      if(maxkn >=maxks){
+        mmult = maxkn;
+      }
+      else{
+        mmult = maxks;
+      }
 
-    /*
-    ** In particular, for the RF multipoles:
-    ** Name: any name
-    ** type: (-)23, (-)26, (-)27 or (-)28
-    **       for dipole, quadrupole, sextupole and octupole, respectively.
-    ** n1: Integrated multipole strength in the same units as the normal sixtrack elements
-    ** n2: Frequency in MHz
-    ** n3: RF phase in radians
-    */
+      c6t_elem = new_c6t_element(11+mmult*4,t_name,p->base_name);
+      clean_c6t_element(c6t_elem);
+      strcpy(c6t_elem->org_name,t_name);
 
-    /*
-    ** we have 19 parameters
-    ** value[0]  = el_par_value_recurse("l",p->p_elem);
-    ** value[1]  = el_par_value_recurse("volt",p->p_elem);
-    ** value[2]  = el_par_value_recurse("tilt",p->p_elem);
-    ** value[3]  = frequency in MHz
-    ** value[4]  = integrated dipole strength
-    ** value[5]  = integrated quadrupole strength
-    ** value[6]  = integrated sextupole strength
-    ** value[7]  = integrated octupole strength
-    ** value[8]  = phase for dipole
-    ** value[9]  = phase for quadrupole
-    ** value[10] = phase for sextupole
-    ** value[11] = phase for octupole
-    ** value[18] = integrated skew dipole strength
-    ** value[12] = integrated skew quadrupole strength
-    ** value[13] = integrated skew sextupole strength
-    ** value[14] = integrated skew octupole strength
-    ** value[19] = phase for skew dipole
-    ** value[15] = phase for skew quadrupole
-    ** value[16] = phase for skew sextupole
-    ** value[17] = phase for skew octupole
-    */
+      c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+      c6t_elem->value[1] = el_par_value_recurse("volt",p->p_elem);
+      c6t_elem->value[2] = el_par_value_recurse("freq",p->p_elem);
+      c6t_elem->value[3] = mmult;
+      c6t_elem->value[6] = el_par_value_recurse("tilt",p->p_elem);
 
-    c6t_elem = new_c6t_element(19,t_name,p->base_name);
-    clean_c6t_element(c6t_elem);
-    strcpy(c6t_elem->org_name,t_name);
-    // rf & general params
-    c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
-    c6t_elem->value[1] = el_par_value_recurse("volt",p->p_elem);
-    c6t_elem->value[2] = el_par_value_recurse("tilt",p->p_elem);
-    c6t_elem->value[3] = el_par_value_recurse("freq",p->p_elem);
-    // normal components
-    c6t_elem->value[4] = maxkn>0?(kn_param->double_array->a[0]):0.0;
-    c6t_elem->value[5] = maxkn>1?(kn_param->double_array->a[1]):0.0;
-    c6t_elem->value[6] = maxkn>2?(kn_param->double_array->a[2]):0.0;
-    c6t_elem->value[7] = maxkn>3?(kn_param->double_array->a[3]):0.0;
-    c6t_elem->value[8] = maxpn>0?(pn_param->double_array->a[0]):0.0;
-    c6t_elem->value[9] = maxpn>1?(pn_param->double_array->a[1]):0.0;
-    c6t_elem->value[10] = maxpn>2?(pn_param->double_array->a[2]):0.0;
-    c6t_elem->value[11] = maxpn>3?(pn_param->double_array->a[3]):0.0;
-    // skew component
-    c6t_elem->value[18] = maxks>0?(ks_param->double_array->a[0]):0.0;
-    c6t_elem->value[12] = maxks>1?(ks_param->double_array->a[1]):0.0;
-    c6t_elem->value[13] = maxks>2?(ks_param->double_array->a[2]):0.0;
-    c6t_elem->value[14] = maxks>3?(ks_param->double_array->a[3]):0.0;
-    c6t_elem->value[19] = maxps>0?(ps_param->double_array->a[0]):0.0;
-    c6t_elem->value[15] = maxps>1?(ps_param->double_array->a[1]):0.0;
-    c6t_elem->value[16] = maxps>2?(ps_param->double_array->a[2]):0.0;
-    c6t_elem->value[17] = maxps>3?(ps_param->double_array->a[3]):0.0;
 
-    /*
-    printf("\t KN= %e %e %e %e (%i)\n",kn_param->double_array->a[0], kn_param->double_array->a[1], kn_param->double_array->a[2], kn_param->double_array->a[3], maxkn);
-    printf("\t PN= %e %e %e %e (%i)\n",pn_param->double_array->a[0], pn_param->double_array->a[1], pn_param->double_array->a[2], pn_param->double_array->a[3], maxpn);
-    printf("\t KS= %e %e %e %e (%i)\n",ks_param->double_array->a[0], ks_param->double_array->a[1], ks_param->double_array->a[2], ks_param->double_array->a[3], maxks);
-    printf("\t PS= %e %e %e %e (%i)\n",ps_param->double_array->a[0], ps_param->double_array->a[1], ps_param->double_array->a[2], ps_param->double_array->a[3], maxps);
-    */
+      for (int i=0; i<mmult; i++){
+        c6t_elem->value[7+i*4] = kn_param->double_array->a[i];
+        c6t_elem->value[8+i*4] = pn_param->double_array->a[i];
+        c6t_elem->value[9+i*4] = ks_param->double_array->a[i];
+        c6t_elem->value[10+i*4] = ps_param->double_array->a[i];  
+      }
+    }
   }
   else
   {
@@ -1762,6 +1759,10 @@ get_args(struct in_cmd* my_cmd)
     put_info("c6t - mangle flag selected","");
   if ((long_names_flag = command_par_value("long_names", my_cmd->clone)))
     put_info("c6t - long names flag selected","");
+  if ((multicol_flag = command_par_value("multicol", my_cmd->clone)))
+    put_info("c6t - multicol flag selected","");
+  if ((six_version = command_par_value("six_version", my_cmd->clone)))
+    printf("SixTrack Version of (or higher is assumed): %f\n",six_version);
   if (mult_auto_off &&
      (tmp_max_mult_ord = command_par_value("max_mult_ord", my_cmd->clone))>0)
   {
@@ -2425,6 +2426,8 @@ pro_elem(struct node* cnode)
   // check whether the element is long and has an aperture, and therefore
   // whether we should insert an aperture marker before the current element
   if (strcmp(keyword,"00") != 0 && current_element->value[0] > 0.) {
+
+
     tmp_element = current_element;
     tag_element = create_aperture(tag_aperture.name, keyword,
             tag_aperture.value[1], tag_aperture.value[2],
@@ -2454,22 +2457,31 @@ pro_elem(struct node* cnode)
 
 
   /* add aperture element if necessary */
-  if (strcmp(keyword,"00") != 0) {
-    tag_element = create_aperture(tag_aperture.name, keyword,
-          tag_aperture.value[1], tag_aperture.value[2],
-          tag_aperture.value[3], tag_aperture.value[4],
-          tag_aperture.value[5], tag_aperture.value[6],
-          tag_aperture.value[7],
-          cnode->p_al_err);
-    tag_element->previous = current_element;
-    tag_element->next = current_element->next;
-    current_element->next = tag_element;
+  if (strcmp(keyword,"00") != 0) 
+    {
+    if(tag_aperture.value[1] > 0 || tag_aperture.value[2] > 0 || tag_aperture.value[3] > 0)
+    {
+      tag_element = create_aperture(tag_aperture.name, keyword,
+      tag_aperture.value[1], tag_aperture.value[2],
+      tag_aperture.value[3], tag_aperture.value[4],
+      tag_aperture.value[5], tag_aperture.value[6],
+      tag_aperture.value[7],
+      cnode->p_al_err);
+      tag_element->previous = current_element;
+      tag_element->next = current_element->next;
+      current_element->next = tag_element;
 
-    prev_element = current_element;
-    current_element = tag_element;
-    // 2015-Oct-13  15:45:58  ghislain: add half the prev_element length to account for thick elements
-    current_element->position = cnode->position + prev_element->value[0] / 2.;
-    add_to_ellist(current_element);
+      prev_element = current_element;
+      current_element = tag_element;
+      // 2015-Oct-13  15:45:58  ghislain: add half the prev_element length to account for thick elements
+      current_element->position = cnode->position + prev_element->value[0] / 2.;
+      add_to_ellist(current_element);
+    }
+    else
+    {
+      warning("An aperture type has been defined without any settings. It will NOT be converted:",
+      tag_aperture.name);
+    }
   }
 }
 
@@ -2731,111 +2743,120 @@ write_all_el(void)
 
 static void write_rfmultipole(struct c6t_element* el)
 {
-  const double knl[] = {
-    el->value[4],
-    el->value[5],
-    el->value[6],
-    el->value[7]
-  };
-  const double ksl[] = {
-    el->value[18],
-    el->value[12],
-    el->value[13],
-    el->value[14]
-  };
-  double tilt = el->value[2];
-  double freq = el->value[3];
-  char name[48];
+  if(six_version < general_rf_req)
+  {
+    const double knl[] = {
+      el->value[4],
+      el->value[5],
+      el->value[6],
+      el->value[7]
+    };
+    const double ksl[] = {
+      el->value[18],
+      el->value[12],
+      el->value[13],
+      el->value[14]
+    };
+    double tilt = el->value[2];
+    double freq = el->value[3];
+    char name[48];
 
-  if (fabs(knl[0])>eps_9) {
-    double lag = 0.25-el->value[8];
-    double pc0 = get_value("beam", "pc"); // GeV/c
-    el->out_1 = fabs(tilt - M_PI/2)<eps_9 ? -23 : 23; // ID
-    el->out_2 = knl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "d");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    if (fabs(knl[0])>eps_9) {
+      double lag = 0.25-el->value[8];
+      double pc0 = get_value("beam", "pc"); // GeV/c
+      el->out_1 = fabs(tilt - M_PI/2)<eps_9 ? -23 : 23; // ID
+      el->out_2 = knl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "d");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(knl[1])>eps_9) {
+      double lag = -el->value[9];
+      el->out_1 = 26; // ID
+      el->out_2 = -knl[1]; // 1/m
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "q");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(knl[2])>eps_9) {
+      double lag = -el->value[10];
+      el->out_1 = 27; // ID
+      el->out_2 = -knl[2] / 2.0; // 1/m^2
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "s");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(knl[3])>eps_9) {
+      double lag = -el->value[11];
+      el->out_1 = 28; // ID
+      el->out_2 = -knl[3] / 6.0; // 1/m^3
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "o");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(ksl[0])>eps_9) {
+      double lag = -0.25-el->value[19];
+      double pc0 = get_value("beam", "pc"); // GeV/c
+      el->out_1 = -23; // ID
+      el->out_2 = ksl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "ds");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(ksl[1])>eps_9) {
+      double lag = -el->value[15];
+      el->out_1 = -26; // ID
+      el->out_2 = ksl[1]; // 1/m
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "qs");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(ksl[2])>eps_9) {
+      double lag = -el->value[16];
+      el->out_1 = -27; // ID
+      el->out_2 = ksl[2] / 2.0; // 1/m^2
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "ss");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+    if (fabs(ksl[3])>eps_9) {
+      double lag = -el->value[17];
+      el->out_1 = -28; // ID
+      el->out_2 = ksl[3] / 6.0; // 1/m^3
+      el->out_3 = freq; // freq
+      el->out_4 = 2.0 * M_PI * lag; // rad
+      strcpy(name, el->name);
+      strcat(name, "os");
+      fprintf(f2, name_format,
+        name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
   }
-  if (fabs(knl[1])>eps_9) {
-    double lag = -el->value[9];
-    el->out_1 = 26; // ID
-    el->out_2 = -knl[1]; // 1/m
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "q");
+  else{
+    el->out_1 = 41; // ID
     fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(knl[2])>eps_9) {
-    double lag = -el->value[10];
-    el->out_1 = 27; // ID
-    el->out_2 = -knl[2] / 2.0; // 1/m^2
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "s");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(knl[3])>eps_9) {
-    double lag = -el->value[11];
-    el->out_1 = 28; // ID
-    el->out_2 = -knl[3] / 6.0; // 1/m^3
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "o");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(ksl[0])>eps_9) {
-    double lag = -0.25-el->value[19];
-    double pc0 = get_value("beam", "pc"); // GeV/c
-    el->out_1 = -23; // ID
-    el->out_2 = ksl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "ds");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(ksl[1])>eps_9) {
-    double lag = -el->value[15];
-    el->out_1 = -26; // ID
-    el->out_2 = ksl[1]; // 1/m
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "qs");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(ksl[2])>eps_9) {
-    double lag = -el->value[16];
-    el->out_1 = -27; // ID
-    el->out_2 = ksl[2] / 2.0; // 1/m^2
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "ss");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
-  }
-  if (fabs(ksl[3])>eps_9) {
-    double lag = -el->value[17];
-    el->out_1 = -28; // ID
-    el->out_2 = ksl[3] / 6.0; // 1/m^3
-    el->out_3 = freq; // freq
-    el->out_4 = 2.0 * M_PI * lag; // rad
-    strcpy(name, el->name);
-    strcat(name, "os");
-    fprintf(f2, name_format,
-      name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    write_f3_rfmultipoles(el);
   }
 }
 
@@ -3054,7 +3075,7 @@ write_f3_aper(void)
       if (f3aper_cnt++ == 0)
       {
         f3aper  = fopen("fc.3.aper", "w");
-        fprintf(f3aper,"LIMI\n");
+        // fprintf(f3aper,"LIMI\n");
       }
       if      (current_element->value[1] == 1) strcpy(keyword, "CR") ;
       else if (current_element->value[1] == 2) strcpy(keyword, "RE") ;
@@ -3065,7 +3086,7 @@ write_f3_aper(void)
       else if (current_element->value[1] == 7) strcpy(keyword, "OC") ;
       else strcpy(keyword, "UK") ; // unknown aperture type
 
-      fprintf(f3aper,"%s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n",
+      fprintf(f3aper,name_format_aper,
         current_element->name, keyword,
         current_element->value[2], current_element->value[3],
         current_element->value[4], current_element->value[5],
@@ -3074,7 +3095,7 @@ write_f3_aper(void)
     }
     current_element = current_element->next;
   }
-  if (f3aper_cnt > 0) fprintf(f3aper,"NEXT\n");
+  // if (f3aper_cnt > 0) fprintf(f3aper,"NEXT\n");
 }
 
 static void
@@ -3180,7 +3201,7 @@ write_f3_matrix(void)
 static void
 write_f3_entry(const char* option, struct c6t_element* el)
 {
-  if (f3_cnt++ == 0) f3 = fopen("fc.3", "w");
+  if (f3_cnt++ == 0 && !f3) f3 = fopen("fc.3", "w");
   if (strcmp(option, "multipole") == 0) write_f3_mult(el);
 }
 
@@ -3232,6 +3253,24 @@ write_f3_mult(struct c6t_element* el)
   fprintf(f3,"NEXT\n");
 }
 
+static void
+write_f3_rfmultipoles(struct c6t_element* current_element)
+{
+
+  if (!f3) f3 = fopen("fc.3", "w");
+
+  if (strcmp(current_element->base_name, "rfmultipole") == 0)
+  {
+    fprintf(f3,"RFMULTIPOLE\n");
+    fprintf(f3, "%s %f \n", current_element->name,current_element->value[2]);
+    
+    for (int i=0; i < current_element->value[3]; i++){
+      fprintf(f3, name_format_5, current_element->value[i*4+7], current_element->value[i*4+8],
+        current_element->value[i*4+9], current_element->value[i*4+10]);
+    }
+    fprintf(f3,"NEXT\n");
+  }
+}
 static void
 rfmultipole_name(char *name, struct c6t_element* el)
 {
@@ -3300,12 +3339,15 @@ write_struct(void)
     "STRUCTURE INPUT---------------------------------------------------------";
 
   fprintf(f2, "%s\n", title);
+  if(multicol_flag == 1) {
+    fprintf(f2, "%s\n", "MULTICOL");
+  }
   while (p != NULL)
   {
     char name[256] = "";
 
     if (p->flag == 0) {
-      if (strcmp(p->first->equiv->base_name,"rfmultipole") == 0)
+      if (strcmp(p->first->equiv->base_name,"rfmultipole") == 0 && six_version < general_rf_req)
         rfmultipole_name(name, p->first->equiv);
       else
         strcpy(name, p->first->equiv->name);
@@ -3313,17 +3355,21 @@ write_struct(void)
     else
       strcpy(name,p->equiv->name);
 
-    if (lc++ == LINES_MAX)
-    {
-      fprintf(f2,"\n"); lc = 1;
-    }
-    if(long_names_flag==1)
-    {
-      fprintf(f2, "%-48s ", name);
-    }
-    else
-    {
-      fprintf(f2, "%-17s ", name);
+    if(multicol_flag == 1) {
+      if(long_names_flag==1) {
+        fprintf(f2, "%-48s %-48s %17.9f\n", p->first->name, name, p->first->position);
+      } else {
+        fprintf(f2, "%-20s %-20s %17.9f\n", p->first->name, name, p->first->position);
+      }
+    } else {
+      if (lc++ == LINES_MAX) {
+        fprintf(f2,"\n"); lc = 1;
+      }
+      if(long_names_flag==1) {
+        fprintf(f2, "%-48s ", name);
+      } else {
+        fprintf(f2, "%-17s ", name);
+      }
     }
     
     p = p->next;
@@ -3524,22 +3570,25 @@ process_c6t(void)  /* steering routine */
 static void
 setup_output_string(void)
 {
-    if(long_names_flag==1){
+  if(long_names_flag==1){
     strcpy(name_format,"%-48s %3d  %23.15e %23.15e  %23.15e  %23.15e  %23.15e  %23.15e\n");
     strcpy(name_format_short,"%-48s" );
     strcpy(name_format_error, " %23.15e  %-48s %3d %23.15e %23.15e %23.15e %23.15e %23.15e\n");
+    strcpy(name_format_aper, "%-48s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n");
     strcpy(name_format_3,  "%-48s%20.10e%20.10e\n");
     strcpy(name_format_4, "%-48s  %14.6e%14.6e%17.9e\n");
-
+    strcpy(name_format_5, "%23.15e %23.15e %23.15e %23.15e\n");
   }
     else{
     strcpy(name_format,"%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n");
     strcpy(name_format_short, "%-18s");
     strcpy(name_format_error, " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n");
+    strcpy(name_format_aper, "%-16s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n");
     strcpy(name_format_3,"%-16s%20.10e%20.10e\n");
     strcpy(name_format_4,"%-16s  %14.6e%14.6e%17.9e\n");
+    strcpy(name_format_5, "%17.9e %17.9e %17.9e %17.9e\n");
 
-    }
+  }
 }
 void
 conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
