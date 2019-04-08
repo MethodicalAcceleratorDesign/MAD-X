@@ -442,7 +442,7 @@ adjust_probe(double delta_p)
     else if (sigt > zero && sige > zero) {
       et = sige * sigt;
     }
-    else if (sigt > zero) {
+    else if (sigt > zero && sigt!=1) {
       sige = sigt / fact;
       et = sige * sigt;
     }
