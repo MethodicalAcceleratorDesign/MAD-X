@@ -650,6 +650,7 @@ const char *const_command_def =
 "re64     = [r, 0], re65     = [r, 0], re66     = [r, 1], "
 "betz     = [r, 0], alfz     = [r, 0], muz      = [r, 0], "
 "maptable = [l, false, true], "
+"nodump   = [i, 1], "
 "beta0    = [s, none, beta0]; "
 " "
 "ptc_moments: ptc_moments none 0 0 "
@@ -682,6 +683,7 @@ const char *const_command_def =
 "maptable = [l, false, true], "
 "time = [l, false, true], "
 "deltap = [r, 0], "
+"nodump   = [i, 1], "
 "x        = [r, 0], "
 "px       = [r, 0], "
 "y        = [r, 0], "
@@ -1387,7 +1389,7 @@ const char *const_command_def =
 "row = [i, 0]; "
 " "
 ;
-const char *const_element_def = 
+const char *const_element_def =
 "drift: element none 0 1 "
 "at       = [r, 1.e20], "
 "l        = [r, 0], "
