@@ -391,6 +391,7 @@ static void
 adjust_probe(double delta_p)
   /* adjusts beam parameters to the current deltap */
 {
+
   double etas, slope, qs, fact, tmp, ds;
   double alfa, beta, gamma, dtbyds, circ, freq0;
   double betas, gammas, et, sigt, sige;
@@ -434,9 +435,12 @@ adjust_probe(double delta_p)
 
   if (qs != zero) {
     fact = (tmp * circ) / (twopi * qs);
-    if (et > zero) {
+    if (et > zero && et!=0.001) {
       sigt = sqrt(fabs(et * fact));
       sige = sqrt(fabs(et / fact));
+    }
+    else if (sigt > zero && sige > zero) {
+      et = sige * sigt;
     }
     else if (sigt > zero) {
       sige = sigt / fact;
