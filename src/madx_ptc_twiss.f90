@@ -530,7 +530,6 @@ contains
 
   subroutine ptc_twiss(tab_name,summary_tab_name)
     use twissafi
-    use s_extend_poly, only : NODUMP ! LD:29.03.2019
     implicit none
     logical(lp)             :: closed_orbit,beta_flg, slice, goslice
     integer                 :: k,i,ii
@@ -605,9 +604,6 @@ contains
     do i=1,6
        unimap(i) = zero
     enddo
-
-    ! LD:29.03.2019
-    nodump = get_value('ptc_twiss ','mapdump ') .eq. 0
 
     if (getdebug() > 1) then
         print*,"ptc_twiss"

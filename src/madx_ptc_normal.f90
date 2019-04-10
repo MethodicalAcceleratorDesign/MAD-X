@@ -28,7 +28,6 @@ contains
   SUBROUTINE ptc_normal()
     USE ptc_results
     USE madx_ptc_intstate_module
-    use s_extend_poly, only : NODUMP ! LD:29.03.2019
     implicit none
     logical(lp) closed_orbit,normal,maptable
     integer mft ! debug file handle
@@ -75,9 +74,6 @@ contains
     endif
 
     call cleartables() !defined in madx_ptc_knobs
-
-    ! LD:29.03.2019
-    nodump = get_value('ptc_normal ','mapdump ') .eq. 0
 
     nda=0
 
