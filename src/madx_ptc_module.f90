@@ -1116,11 +1116,6 @@ CONTAINS
 
        key%list%lag = -node_value('lag ')*twopi
 
-       ! correction for time of flight through cavity
-       ! we want particle with t=0 to be not accelerated
-       key%list%lag = key%list%lag + twopi*freq*(l/2d0)/(clight*beta0)
-
-! print*,"@@ RF frequency ", freq," Hz, lag ", key%list%lag, " [radian]", node_value('lag ')
 
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
@@ -1158,13 +1153,18 @@ CONTAINS
           key%list%cavity_totalpath=0
        else
           key%list%cavity_totalpath=1
+          ! correction for time of flight through cavity
+          ! we want particle with t=0 to be not accelerated
+          key%list%lag = key%list%lag + twopi*freq*(l/2d0)/(clight*beta0)
        endif
+
+       ! LD: 09.04.2019
+!       write (*,'(3(a,E25.16))') "@@ RF freq= ", freq," lag= ", key%list%lag, " lag= ", node_value('lag ')
 
 !       print*,"madx_ptc_module::input volt: ", key%list%volt, &
 !                                    " lag : ", key%list%lag, &
 !                                    " harm: ", key%list%harmon, &
 !                                    " freq: ", key%list%freq0
-
 
     case(12)
        ! actually our SROT element
@@ -1397,12 +1397,10 @@ CONTAINS
 
 
     case(43)
-       key%magnet="rfcavity"
+       key%magnet="rfcavity" ! RFMULTIPOLE
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
        key%list%lag=-node_value('lag ')*twopi
-
-       print*,"RF frequency " , freq," Hz, lag ", key%list%lag, " [radian]"
 
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
