@@ -104,7 +104,7 @@ const int survey_table_types[] =
   2, 2, 2, 2, 2, 2,
   1, 1, 2,
   /*== dealt with the new property v_pos as for mech_sep */
-  2
+  2,3
   /*==*/
 };
 
@@ -114,7 +114,7 @@ const char* const survey_table_cols[] =
   "y", "z", "theta", "phi", "psi", "globaltilt",
   "slot_id", "assembly_id", "mech_sep",
   /*== dealt with the new property v_pos as for mech_sep */
-  "v_pos",
+  "v_pos", "comments",
   /*==*/
   " "  /* blank terminates */
 };

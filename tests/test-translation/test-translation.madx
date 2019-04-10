@@ -2,7 +2,7 @@ circum=2;
 beam, particle=proton, energy = 5500;
 
 
-newquad:  MULTIPOLE, KNL={0.00, 0.001};
+newquad:  MULTIPOLE, KNL={0.00, 0.001}, comments="testing the comments";
 trans: TRANSLATION, X=0.01, Y=0.002, z=0.1;
 
 seq: sequence, refer=center, l=circum;
