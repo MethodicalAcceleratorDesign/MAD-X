@@ -2478,8 +2478,6 @@ call kill(vm,phi,z)
        endif
     endif
 
-    elem_name = C%PARENT_FIBRE%MAGP%name  ! LD: 22.03.2019
-
 
  !   DO  WHILE(.not.ASSOCIATED(C,n2))
 
@@ -2505,6 +2503,7 @@ call kill(vm,phi,z)
         C=>C%NEXT
      ENDDO
      if(associated(last).and.check_stable) then
+       elem_name = C%PARENT_FIBRE%MAGP%name  ! LD: 22.03.2019
        CALL TRACK_NODE_PROBE(last,XS,K)
      endif
     endif
@@ -2583,12 +2582,12 @@ call kill(vm,phi,z)
        i22=r%T%n+i2
     endif
 
-    elem_name = C%PARENT_FIBRE%MAGP%name  ! LD: 22.03.2019
 
     J=I1
 
     DO  WHILE(J<I22.AND.ASSOCIATED(C))
 
+       elem_name = C%PARENT_FIBRE%MAGP%name  ! LD: 22.03.2019
        CALL TRACK_NODE_PROBE(C,XS,K)  !,R%charge)
 
        if(.not.check_stable) exit
