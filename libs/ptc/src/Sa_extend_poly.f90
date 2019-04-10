@@ -10,7 +10,7 @@ module S_extend_poly
 
   ! LD: 22.03.2019 (see Sc_euclidean.f90, Sh_def_kinf.f90 and Sr_spin.f90)
   character(len=150) :: ELEM_NAME = "UNKNOWN"
-  logical(lp)        :: NODUMP = .false. ! .false./.true. enable/disable PRTP
+  integer            :: MAPDUMP = 0 ! 0 or 1 enable/disable PRTP
 
 CONTAINS
 
@@ -21,7 +21,7 @@ CONTAINS
     TYPE(REAL_8), INTENT(IN):: X
 
     ! cancel all PRTP
-    if (NODUMP) return
+    if (MAPDUMP .eq. 0) return
 
     ! @@ + elem + func + 7 columns
     WRITE(*, '(a,a15,a,a15,7E25.16)') '@@ ', ELEM_NAME, ' ', S, X.sub.'000000'&
@@ -36,11 +36,18 @@ CONTAINS
     TYPE(REAL_8), OPTIONAL, INTENT(IN):: X(6)
 
     ! cancel all PRTP
-    if (NODUMP) return
+    if (MAPDUMP .eq. 0) return
 
     ! special case: display only string without X
     if (.not. PRESENT(X)) then
       WRITE(*, '(a,a)') '@@ ', S
+      return
+    endif
+
+    ! @@ + elem + func + 6 columns
+    if (MAPDUMP .eq. 1) then
+      WRITE(*, '(a,a15,a,a15,6E25.16)') '@@ ', ELEM_NAME, ' ', S &
+        , X(1).sub.'000000', X(2).sub.'000000', X(3).sub.'000000', X(4).sub.'000000',-X(6).sub.'000000', X(5).sub.'000000'
       return
     endif
 
