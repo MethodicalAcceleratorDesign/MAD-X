@@ -3709,7 +3709,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6),YL
     TYPE(CAV4P),INTENT(INOUT):: EL
-    TYPE(REAL_8) DF,R2,F,DR2,O,VL
+    TYPE(REAL_8) DF,R2,F,DR2,O,VL,C1
     INTEGER I,it
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     TYPE(REAL_8) BBYTWT,BBXTW,BBYTW,x1,x3
@@ -3720,7 +3720,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     call PRTP("KICKCAV:0", X)
 
-    CALL ALLOC(DF,R2,F,DR2,O,VL)
+    CALL ALLOC(DF,R2,F,DR2,O,VL,C1)
     call alloc(BBYTWT,BBXTW,BBYTW,x1,x3)
     it=tot_t*k%totalpath+(1-tot_t)
     DIR=EL%P%DIR*EL%P%CHARGE
@@ -3736,6 +3736,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     endif
 
     VL=dir*YL*EL%volt*volt_c/EL%P%P0C
+
+    ! Ph0 = Pi
+!    write (*,'(5(a,E25.16))') '@@ VL= ', VL%r, ' O= ', O%r, ' Ph= ', EL%PHAS%r, ' YL= ', YL%r, ' IT= ', IT*1.0_dp
 
     do ko=1,el%nf    ! over modes
 
@@ -3754,10 +3757,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        !    EL%DELTA_E=x(5)
 
        IF(EL%N_BESSEL>0) THEN
-          X(2)=X(2)-X(1)*el%f(ko)*DF*VL*COS(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
-          X(4)=X(4)-X(3)*el%f(ko)*DF*VL*COS(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
+          C1 = el%f(ko)*DF*VL*COS(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
+          X(2)=X(2)-X(1)*C1
+          X(4)=X(4)-X(3)*C1
+!          call PRTP1("C1", C1)
        ENDIF
 
+!      write (*,'(6(a,E25.16))') '@@ KO= ', ko*1.0_dp, ' F= ', F%r, ' F(KO)= ', el%f(ko)%r, ' P(KO)= ', EL%PH(KO)%r, ' T= ', EL%t
 
        x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
@@ -3809,7 +3815,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*EL%R*sin(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
     enddo    ! over modes
-    CALL kill(DF,R2,F,DR2,O,VL)
+    CALL kill(DF,R2,F,DR2,O,VL,C1)
     call kill(BBYTWT,BBXTW,BBYTW,x1,x3)
 
     call PRTP("KICKCAV:1", X)
