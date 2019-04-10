@@ -607,7 +607,7 @@ contains
     enddo
 
     ! LD:29.03.2019
-    nodump = get_value('ptc_twiss ','nodump ') .ne. 0
+    nodump = get_value('ptc_twiss ','mapdump ') .eq. 0
 
     if (getdebug() > 1) then
         print*,"ptc_twiss"

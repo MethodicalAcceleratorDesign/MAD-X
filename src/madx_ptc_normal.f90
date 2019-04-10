@@ -77,7 +77,7 @@ contains
     call cleartables() !defined in madx_ptc_knobs
 
     ! LD:29.03.2019
-    nodump = get_value('ptc_normal ','nodump ') .ne. 0
+    nodump = get_value('ptc_normal ','mapdump ') .eq. 0
 
     nda=0
 

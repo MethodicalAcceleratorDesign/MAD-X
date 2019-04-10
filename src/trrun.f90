@@ -4540,7 +4540,7 @@ subroutine tttdipole(track, ktrack)
   !---- Apply errors
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  if (k0.ne.0) then 
+  if (k0.ne.0) then
     f_errors(0) = f_errors(0) + k0*length - angle
   else
     k0 = h
@@ -4744,7 +4744,7 @@ subroutine trphot(el,curv,rfac,pt)
 
   gamma = (betas*pt + one)*gammas;
   delta_plus_1 = sqrt(pt*pt + two*pt/betas + one);
-  
+
   !---- AMEAN is the average number of photons emitted.,
   !     NPHOT is the integer number generated from Poisson's law.
   !-AL- AMEAN implicitly takes el / 2 (half the element length)
