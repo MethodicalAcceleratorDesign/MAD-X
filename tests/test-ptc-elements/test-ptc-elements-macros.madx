@@ -1,4 +1,4 @@
-! used by trackAllKind.madx
+! used by test-ptc-elements.madx
 
 prtp(TTTT): macro = {
   create, table=TTTT, column={_name,"cfgid",
@@ -99,13 +99,13 @@ rchk(TTTT, MMMM): macro = {
     ptc_create_universe ;
     ptc_create_layout, model=model, method=method, nst=nst, time=true, exact=true ;
     ptc_setswitch, debuglevel=debug, mapdump=mapdump, exact_mis=true, time=true, totalpath=false ;
-    if (mapdump == 1) { printf, text="%%%% mmmm CFGID=%g", value={cfgid} ; }
-    if (dotwiss == 0) {
-       ptc_normal, closed_orbit=false, no=no, icase=icase,
-                   x=x, px=px, y=y, py=py, t=t, pt=pt ;
-    } else {
+    if (mapdump > 0) { printf, text="%%%% mmmm CFGID=%g", value={cfgid} ; }
+    if (dotwiss > 0 || mapdump == 0) {
        ptc_twiss, closed_orbit=false, no=no, icase=icase,
                   x=x,px=px,y=y,py=py,t=t,pt=pt, betx=betx,bety=bety,betz=betz ;
+    } else {
+       ptc_normal, closed_orbit=false, no=no, icase=icase,
+                   x=x, px=px, y=y, py=py, t=t, pt=pt ;
     }
     ptc_end ;
 
