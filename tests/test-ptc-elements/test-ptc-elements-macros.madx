@@ -1,0 +1,115 @@
+! used by trackAllKind.madx
+
+prtp(TTTT): macro = {
+  create, table=TTTT, column={_name,"cfgid",
+     "c10","c20","c30","c40","c50","c60",
+     "c11","c12","c13","c14","c15","c16",
+     "c21","c22","c23","c24","c25","c26",
+     "c31","c32","c33","c34","c35","c36",
+     "c41","c42","c43","c44","c45","c46",
+     "c51","c52","c53","c54","c55","c56",
+     "c61","c62","c63","c64","c65","c66"} ;
+
+  create, table=TTTT_cfg, column={
+    "cfgid","model","energy","method","nst"
+  } ;
+
+  create, table=TTTT_tmp, column={_name,
+     "c10","c20","c30","c40","c50","c60",
+     "c11","c12","c13","c14","c15","c16",
+     "c21","c22","c23","c24","c25","c26",
+     "c31","c32","c33","c34","c35","c36",
+     "c41","c42","c43","c44","c45","c46",
+     "c51","c52","c53","c54","c55","c56",
+     "c61","c62","c63","c64","c65","c66"} ;
+
+  ptc_select, table=TTTT_tmp, column="c10", polynomial=1, monomial="000000";
+  ptc_select, table=TTTT_tmp, column="c11", polynomial=1, monomial="100000";
+  ptc_select, table=TTTT_tmp, column="c12", polynomial=1, monomial="010000";
+  ptc_select, table=TTTT_tmp, column="c13", polynomial=1, monomial="001000";
+  ptc_select, table=TTTT_tmp, column="c14", polynomial=1, monomial="000100";
+  ptc_select, table=TTTT_tmp, column="c15", polynomial=1, monomial="000010";
+  ptc_select, table=TTTT_tmp, column="c16", polynomial=1, monomial="000001";
+
+  ptc_select, table=TTTT_tmp, column="c20", polynomial=2, monomial="000000";
+  ptc_select, table=TTTT_tmp, column="c21", polynomial=2, monomial="100000";
+  ptc_select, table=TTTT_tmp, column="c22", polynomial=2, monomial="010000";
+  ptc_select, table=TTTT_tmp, column="c23", polynomial=2, monomial="001000";
+  ptc_select, table=TTTT_tmp, column="c24", polynomial=2, monomial="000100";
+  ptc_select, table=TTTT_tmp, column="c25", polynomial=2, monomial="000010";
+  ptc_select, table=TTTT_tmp, column="c26", polynomial=2, monomial="000001";
+
+  ptc_select, table=TTTT_tmp, column="c30", polynomial=3, monomial="000000";
+  ptc_select, table=TTTT_tmp, column="c31", polynomial=3, monomial="100000";
+  ptc_select, table=TTTT_tmp, column="c32", polynomial=3, monomial="010000";
+  ptc_select, table=TTTT_tmp, column="c33", polynomial=3, monomial="001000";
+  ptc_select, table=TTTT_tmp, column="c34", polynomial=3, monomial="000100";
+  ptc_select, table=TTTT_tmp, column="c35", polynomial=3, monomial="000010";
+  ptc_select, table=TTTT_tmp, column="c36", polynomial=3, monomial="000001";
+
+  ptc_select, table=TTTT_tmp, column="c40", polynomial=4, monomial="000000";
+  ptc_select, table=TTTT_tmp, column="c41", polynomial=4, monomial="100000";
+  ptc_select, table=TTTT_tmp, column="c42", polynomial=4, monomial="010000";
+  ptc_select, table=TTTT_tmp, column="c43", polynomial=4, monomial="001000";
+  ptc_select, table=TTTT_tmp, column="c44", polynomial=4, monomial="000100";
+  ptc_select, table=TTTT_tmp, column="c45", polynomial=4, monomial="000010";
+  ptc_select, table=TTTT_tmp, column="c46", polynomial=4, monomial="000001";
+
+  ptc_select, table=TTTT_tmp, column="c50", polynomial=5, monomial="000000";
+  ptc_select, table=TTTT_tmp, column="c51", polynomial=5, monomial="100000";
+  ptc_select, table=TTTT_tmp, column="c52", polynomial=5, monomial="010000";
+  ptc_select, table=TTTT_tmp, column="c53", polynomial=5, monomial="001000";
+  ptc_select, table=TTTT_tmp, column="c54", polynomial=5, monomial="000100";
+  ptc_select, table=TTTT_tmp, column="c55", polynomial=5, monomial="000010";
+  ptc_select, table=TTTT_tmp, column="c56", polynomial=5, monomial="000001";
+
+  ptc_select, table=TTTT_tmp, column="c60", polynomial=6, monomial="000000";
+  ptc_select, table=TTTT_tmp, column="c61", polynomial=6, monomial="100000";
+  ptc_select, table=TTTT_tmp, column="c62", polynomial=6, monomial="010000";
+  ptc_select, table=TTTT_tmp, column="c63", polynomial=6, monomial="001000";
+  ptc_select, table=TTTT_tmp, column="c64", polynomial=6, monomial="000100";
+  ptc_select, table=TTTT_tmp, column="c65", polynomial=6, monomial="000010";
+  ptc_select, table=TTTT_tmp, column="c66", polynomial=6, monomial="000001";
+}
+
+tsav(TTTT): macro = {
+  tsav.__i = 1 ;
+  tsav.__n = table(TTTT_tmp, tablelength) ;
+  while (tsav.__i <= tsav.__n) {
+    setvars, table=TTTT_tmp, row=tsav.__i ;
+    fill, table=TTTT ;
+    tsav.__i = tsav.__i+1 ;
+  }
+
+  ! save table in case of trouble, overwrite at each iteration...
+  ! write, table=TTTT, file="tttt.txt" ;
+}
+
+rchk(TTTT, MMMM): macro = {
+  tcfg.__i = 1 ;
+  tcfg.__n = table(TTTT_cfg, tablelength) ;
+
+  ! loop over settings
+  while (tcfg.__i <= tcfg.__n) {
+    setvars, table=TTTT_cfg, row=tcfg.__i ; ! load settings
+
+    beam, sequence=seqMMMM, particle=proton, energy=energy ;
+    use , sequence=seqMMMM ;
+
+    ptc_create_universe ;
+    ptc_create_layout, model=model, method=method, nst=nst, time=true, exact=true ;
+    ptc_setswitch, debuglevel=debug, mapdump=mapdump, exact_mis=true, time=true, totalpath=false ;
+    if (mapdump == 1) { printf, text="%%%% mmmm CFGID=%g", value={cfgid} ; }
+    if (dotwiss == 0) {
+       ptc_normal, closed_orbit=false, no=no, icase=icase,
+                   x=x, px=px, y=y, py=py, t=t, pt=pt ;
+    } else {
+       ptc_twiss, closed_orbit=false, no=no, icase=icase,
+                  x=x,px=px,y=y,py=py,t=t,pt=pt, betx=betx,bety=bety,betz=betz ;
+    }
+    ptc_end ;
+
+    exec, tsav(TTTT) ;
+    tcfg.__i = tcfg.__i+1 ;
+  }
+}
