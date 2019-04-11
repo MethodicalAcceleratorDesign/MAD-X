@@ -435,7 +435,11 @@ adjust_probe(double delta_p)
 
   if (qs != zero) {
     fact = (tmp * circ) / (twopi * qs);
-    if (et > zero && et!=0.001) {
+    if(et!=0.001 && sigt!=1 && sige!=0.001) {
+      //Do nothing
+      //If all of them are set we trust that the user has chosen it in such a way. 
+    }
+    else if (et > zero && et!=0.001) {
       sigt = sqrt(fabs(et * fact));
       sige = sqrt(fabs(et / fact));
     }
