@@ -241,7 +241,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: x2, y2, t2, px2, py2, pt2
 
   double precision :: el, tilt, bvk
-  double precision :: edg1, edg2, sk1, sk2, hgap, fint, sks, h, ct
+  double precision :: edg1, edg2, sk1, sk2, hgap, fint, sks, sksol, h, ct
   double precision :: corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
   double precision :: tedg1, fact1, fact1x, rfac1, rfac1x, rfac1y
   double precision :: h2, hcb2, tedg2, fact2, fact2x, rfac2
@@ -252,6 +252,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: rfv, rff, rfl, time
   double precision :: xkick, ykick, dpx, dpy, an, hyx, hcbs2,hbi
   double precision :: sk3, rfac, rfacx, rfacy, fh
+  double precision :: rfac1px, rfac1py, rfac2px, rfac2py
 
   integer, external :: node_fd_errors
   double precision, external  :: node_value, get_value
@@ -286,6 +287,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         hgap = node_value('hgap ')
         fint = node_value('fint ')
         sks = zero
+        sksol = zero
         h = an / el
 
         !---- Refer orbit and eigenvectors to magnet midplane.
@@ -344,7 +346,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         hxx = sk1 + sk2*x1
         hxy = sks - sk2*y1
         hyx = hxy
-        hyy = - hxx
+        hyy = -hxx
         h1 = sqrt(hx**2 + hy**2)
         hcb1 = h1**3
         hcbs1 = three*h1 * (hx * (hxx*px1 + hxy*py1) + hy * (hxy*px1 + hyy*py1))
@@ -429,7 +431,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,6) = one - two * rfac2 * (one + pt2)
         RE = matmul(RW,RE)
 
-     case (code_quadrupole , code_sextupole, code_octupole) !---- Common to all pure multipoles.
+     case (code_quadrupole , code_sextupole, code_octupole, code_solenoid) !---- Common to all pure multipoles.
         select case (code)
         case (code_quadrupole)  !---- Quadrupole
            sk1 = bvk * node_value('k1 ')
@@ -446,6 +448,11 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
            str  = sk3 / six
            n    = 3
            twon = six
+        case (code_solenoid)  !---- Solenoid
+           sksol = node_value('ks ');
+           str   = zero
+           n     = 0
+           twon  = 0
         end select
 
         O1 = ORB1; O2 = ORB2
@@ -458,15 +465,19 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         !---- Local curvature.
         r1sq = x1**2 + y1**2
         r2sq = x2**2 + y2**2
-        h1 = abs(str) * sqrt(r1sq)**n
-        h2 = abs(str) * sqrt(r2sq)**n
+        h1 = abs(str) * sqrt(r1sq)**n + sksol*(sksol*x1-py1) + sksol*(sksol*y1+px1)
+        h2 = abs(str) * sqrt(r2sq)**n + sksol*(sksol*x2-py2) + sksol*(sksol*y2+px2)
         rfac = cg * str**2 * el
-        rfac1 = rfac * r1sq**n
-        rfac2 = rfac * r2sq**n
-        rfac1x = twon * rfac * r1sq**(n-1) * x1
-        rfac2x = twon * rfac * r1sq**(n-1) * x2
-        rfac1y = twon * rfac * r1sq**(n-1) * y1
-        rfac2y = twon * rfac * r1sq**(n-1) * y2
+        rfac1 = rfac * r1sq**n + cg * sksol*(sksol*x1-py1) / el + cg * sksol*(sksol*y1+px1) / el;
+        rfac2 = rfac * r2sq**n + cg * sksol*(sksol*x2-py2) / el + cg * sksol*(sksol*y2+px2) / el;
+        rfac1x = twon * rfac * r1sq**(n-1) * x1 + (cg*sksol**2)/el
+        rfac2x = twon * rfac * r1sq**(n-1) * x2 + (cg*sksol**2)/el
+        rfac1y = twon * rfac * r1sq**(n-1) * y1 + (cg*sksol**2)/el
+        rfac2y = twon * rfac * r1sq**(n-1) * y2 + (cg*sksol**2)/el
+        rfac1px = cg*sksol/el
+        rfac2px = cg*sksol/el
+        rfac1py = -cg*sksol/el
+        rfac2py = -cg*sksol/el
 
         !---- Trapezoidal integration over h**3 * E(k,5) * conjg(E(k,5)).
         fh1 = half * el * h1**3
@@ -478,30 +489,38 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         !---- Damping matrices.
         !     Code common to bending magnet and pure multipoles.
         RW = EYE
-        rw(2,1) =     - rfac1x * (one + pt1) * px1
-        rw(2,2) = one - rfac1  * (one + pt1)
-        rw(2,3) =     - rfac1y * (one + pt1) * px1
-        rw(2,6) =     - rfac1                * px1
-        rw(4,1) =     - rfac1x * (one + pt1) * py1
-        rw(4,3) =     - rfac1y * (one + pt1) * py1
-        rw(4,4) = one - rfac1  * (one + pt1)
-        rw(4,6) =     - rfac1                * py1
-        rw(6,1) =     - rfac1x * (one + pt1)**2
-        rw(6,3) =     - rfac1y * (one + pt1)**2
+        rw(2,1) =     - rfac1x  * (one + pt1) * px1
+        rw(2,2) = one - rfac1   * (one + pt1) - (one + pt1) * px1 * rfac1px;
+        rw(2,3) =     - rfac1y  * (one + pt1) * px1
+        rw(2,4) =     - rfac1py * (one + pt1) * px1
+        rw(2,6) =     - rfac1                 * px1
+        rw(4,1) =     - rfac1x  * (one + pt1) * py1
+        rw(4,2) =     - rfac1px * (one + pt1) * py1
+        rw(4,3) =     - rfac1y  * (one + pt1) * py1
+        rw(4,4) = one - rfac1   * (one + pt1) - (one + pt1) * py1 * rfac1py;
+        rw(4,6) =     - rfac1                 * py1
+        rw(6,1) =     - rfac1x  * (one + pt1)**2
+        rw(6,2) =     - rfac1px * (one + pt1)**2
+        rw(6,3) =     - rfac1y  * (one + pt1)**2
+        rw(6,4) =     - rfac1py * (one + pt1)**2
         rw(6,6) = one - two * rfac1 * (one + pt1)
         RE = matmul(RE,RW)
 
         RW = EYE
-        rw(2,1) =     - rfac2x * (one + pt2) * px2
-        rw(2,2) = one - rfac2  * (one + pt2)
-        rw(2,3) =     - rfac2y * (one + pt2) * px2
-        rw(2,6) =     - rfac2                * px2
-        rw(4,1) =     - rfac2x * (one + pt2) * py2
-        rw(4,3) =     - rfac2y * (one + pt2) * py2
-        rw(4,4) = one - rfac2  * (one + pt2)
-        rw(4,6) =     - rfac2                * py2
-        rw(6,1) =     - rfac2x * (one + pt2)**2
-        rw(6,3) =     - rfac2y * (one + pt2)**2
+        rw(2,1) =     - rfac2x  * (one + pt2) * px2
+        rw(2,2) = one - rfac2   * (one + pt2) - (one + pt2) * px2 * rfac2px;
+        rw(2,3) =     - rfac2y  * (one + pt2) * px2
+        rw(2,4) =     - rfac2py * (one + pt2) * px2
+        rw(2,6) =     - rfac2                 * px2
+        rw(4,1) =     - rfac2x  * (one + pt2) * py2
+        rw(4,2) =     - rfac2px * (one + pt2) * py2
+        rw(4,3) =     - rfac2y  * (one + pt2) * py2
+        rw(4,4) = one - rfac2   * (one + pt2) - (one + pt2) * py2 * rfac2py;
+        rw(4,6) =     - rfac2                 * py2
+        rw(6,1) =     - rfac2x  * (one + pt2)**2
+        rw(6,2) =     - rfac2px * (one + pt2)**2
+        rw(6,3) =     - rfac2y  * (one + pt2)**2
+        rw(6,4) =     - rfac2py * (one + pt2)**2
         rw(6,6) = one - two * rfac2 * (one + pt2)
         RE = matmul(RW,RE)
 

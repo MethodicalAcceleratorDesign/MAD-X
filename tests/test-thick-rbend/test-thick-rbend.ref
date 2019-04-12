@@ -5,38 +5,10 @@
   + Release   date: 2018.10.03               +
   + Execution date: 2019.01.14 16:54:20      +
   ++++++++++++++++++++++++++++++++++++++++++++
-option, -debug, -echo;
+option, -debug, -echo, -info;
 
 enter TRACK module
 one pass is on
- TWDISP: Unable to compute intial dispersion --- dispersion set to zero.
- TWDISP: Unable to compute intial dispersion --- dispersion set to zero.
-
-++++++ table: tracksumm
-
-    number       turn                  x                 px 
-         1          0                  0                  0 
-         2          0                  0                  0 
-         3          0                  0                  0 
-         1          1   -0.0005550457922   -0.0009983173484 
-         2          1                  0                  0 
-         3          1    0.0005440646768    0.0009983506517 
-
-                 y                 py                  t                 pt 
-             1e-06                  0                  0              -0.01 
-             1e-06                  0                  0                  0 
-             1e-06                  0                  0               0.01 
-             1e-06                  0    1.663843534e-05              -0.01 
-             1e-06                  0                  0                  0 
-             1e-06                  0   -1.668780949e-05               0.01 
-
-                 s                  e 
-                 0                  0 
-                 0                  0 
-                 0                  0 
-               1.1                  0 
-               1.1                  0 
-               1.1                  0 
 exit TRACK module
 
 

@@ -1,4 +1,4 @@
-option, -debug, -echo;
+option, -debug, -echo, -info;
 
 title, "thick-rbend tracking test";
 

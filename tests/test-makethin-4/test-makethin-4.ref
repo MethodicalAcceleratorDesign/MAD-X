@@ -3,7 +3,7 @@
   +     MAD-X 5.04.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2018.10.03               +
-  + Execution date: 2019.03.28 11:13:01      +
+  + Execution date: 2019.03.28 11:09:48      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! H. Burkhardt.  Updated for improved makethin select in summer 2005
 
@@ -15,9 +15,7 @@ title,"Five cell test";
 
 
 
-
-
-!---- COLLIM
+!---- Default with other options activated 
 
 
 
@@ -62,9 +60,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
 
-makethin,sequence=fivecell, style=COLLIM, makedipedge=false;
+makethin,sequence=fivecell, style=hybrid, minimizeparents=true, makedipedge=true, makeconsistent=true;
 
-makethin: style chosen : collim
+makethin: style chosen : hybrid
 makethin: slicing sequence : fivecell
 makethin: slicing sequence : ins
 use,sequence=fivecell;      ! use the thin sequence
@@ -79,16 +77,16 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-             534.6                 -0    0.0004440537628        47.45502677 
+             534.6                 -0    0.0004392424449        47.71422233 
 
                 q1                dq1            betxmax              dxmax 
-       1.253604547        1.086218195        187.3204395        2.217970572 
+       1.250007074        1.044570163        187.8526848        2.201170473 
 
              dxrms             xcomax             xcorms                 q2 
-       1.693252101                  0                  0        1.242220473 
+       1.651738826                  0                  0        1.261340529 
 
                dq2            betymax              dymax              dyrms 
-        1.08670099         181.327329      0.09324096501      0.07010806005 
+       1.042225692        181.7022833      0.09016236407      0.06633164427 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -98,7 +96,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
             nflips 
                  0 
-save,sequence=fivecell,file="fivecell_thin_collim.seq";
+save,sequence=fivecell,file="fivecell_thin_options.seq";
 
 ++++++ warning: SAVE makes all previous USE invalid !  
 ++++++ warning: structured sequence flattened: fivecell
@@ -106,10 +104,8 @@ qx = table(summ,q1); qy = table(summ,q2);
 
 value, qx-qxref, qy-qyref;
 
-qx-qxref           =        1.253604547 ;
-qy-qyref           =        1.242220473 ;
-
-
+qx-qxref           =        1.250007074 ;
+qy-qyref           =        1.261340529 ;
 
 
 stop;
