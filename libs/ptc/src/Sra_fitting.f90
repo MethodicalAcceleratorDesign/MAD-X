@@ -10,7 +10,7 @@ module S_fitting_new
   integer:: m_turn,m_skip=0
   integer :: with_c=1
   integer ::  other_fix=0
-  logical :: check_longitudinal=.true.,piotr_fix=.true.
+  logical :: check_longitudinal=.false.,piotr_fix=.true.
 
   TYPE fibre_monitor_data
      type(fibre), pointer :: p    ! fibre location

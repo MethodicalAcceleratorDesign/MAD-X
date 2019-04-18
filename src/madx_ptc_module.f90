@@ -93,7 +93,10 @@ CONTAINS
 
     use_quaternion=.true.
     
-    piotr_freq=.true. ! flag introduced in PTC cavity tracking to have correct phasing with time=false
+    piotr_freq=.true. ! PTC flag in cavity tracking to have correct phasing with time=false
+    
+    check_longitudinal = .true. ! PTC flag to check stability of the closed orbit in longitudinal
+                                ! to prevent finding unstable fixed point
     
     call set_aperture_all_case0(.true.)
     
