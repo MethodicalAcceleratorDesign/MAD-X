@@ -1,0 +1,119 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2019.03.28 11:09:48      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+! H. Burkhardt.  Updated for improved makethin select in summer 2005
+
+
+
+title,"Five cell test";
+
+
+
+
+
+!---- Default with other options activated 
+
+
+
+option,-echo,-warn;
+
+
+
+beam;
+
+use,sequence=fivecell;      ! for twiss and makethin
+
+twiss,sequence=fivecell;
+
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000443530778        47.48299658 
+
+                q1                dq1            betxmax              dxmax 
+       1.248722214        1.053600864        183.8515851        2.181076135 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.660602214                  0                  0        1.260064776 
+
+               dq2            betymax              dymax              dyrms 
+       1.050583704        177.9027092      0.09011673644      0.06712058421 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+
+
+select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
+
+makethin,sequence=fivecell, style=hybrid, minimizeparents=true, makedipedge=true, makeconsistent=true;
+
+makethin: style chosen : hybrid
+makethin: slicing sequence : fivecell
+makethin: slicing sequence : ins
+use,sequence=fivecell;      ! use the thin sequence
+
+twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
+
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0    0.0004392424449        47.71422233 
+
+                q1                dq1            betxmax              dxmax 
+       1.250007074        1.044570163        187.8526848        2.201170473 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.651738826                  0                  0        1.261340529 
+
+               dq2            betymax              dymax              dyrms 
+       1.042225692        181.7022833      0.09016236407      0.06633164427 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+save,sequence=fivecell,file="fivecell_thin_options.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+++++++ warning: structured sequence flattened: fivecell
+qx = table(summ,q1); qy = table(summ,q2);
+
+value, qx-qxref, qy-qyref;
+
+qx-qxref           =        1.250007074 ;
+qy-qyref           =        1.261340529 ;
+
+
+stop;
+
+
+  Number of warnings: 2
+2 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

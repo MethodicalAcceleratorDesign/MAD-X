@@ -206,7 +206,7 @@ subroutine suelem(el, ve, we, tilt)
   double precision, intent(OUT) :: ve(3), we(3,3), tilt
 
   integer :: code, nn, ns
-  double precision :: angle, cospsi, costhe, sinpsi, sinthe, ds, dx, dy, bv,x_t,y_t
+  double precision :: angle, cospsi, costhe, sinpsi, sinthe, ds, dx, dy, bv, x_t, y_t, z_t
   double precision :: normal(0:maxmul), skew(0:maxmul)
 
   double precision, external :: node_value
@@ -278,19 +278,6 @@ subroutine suelem(el, ve, we, tilt)
         we(2,3) = - we(3,2)
         we(3,3) = costhe
 
-     case (code_srotation) !---- Rotation around S-axis. SPECIAL CASE
-        tilt = node_value('angle ') * bv
-        we(1,1) =  cos(tilt)
-        we(2,1) =  sin(tilt) !should be - according to convention in MAD8 PhysG. or MADX manual?
-        we(1,2) = -sin(tilt) !should be + according to convention in MAD8 PhysG. or MADX manual?
-        we(2,2) =  cos(tilt)
-
-     case (code_yrotation) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
-        dx = node_value('angle ') * bv
-        we(1,1) =  cos(dx)
-        we(3,1) =  sin(dx)
-        we(1,3) = -sin(dx)
-        we(3,3) =  cos(dx)
 
      case (code_xrotation) !---- Rotation around X-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
         dy = node_value('angle ') * bv
@@ -299,11 +286,29 @@ subroutine suelem(el, ve, we, tilt)
         we(2,3) = -sin(dy)
         we(3,3) =  cos(dy)
 
+
+     case (code_yrotation) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
+        dx = node_value('angle ') * bv
+        we(1,1) =  cos(dx)
+        we(3,1) = -sin(dx)
+        we(1,3) =  sin(dx)
+        we(3,3) =  cos(dx)
+
+     case (code_srotation) !---- Rotation around S-axis. SPECIAL CASE
+        tilt = node_value('angle ') * bv
+        we(1,1) =  cos(tilt)
+        we(2,1) =  sin(tilt) !should be - according to convention in MAD8 PhysG. or MADX manual?
+        we(1,2) = -sin(tilt) !should be + according to convention in MAD8 PhysG. or MADX manual?
+        we(2,2) =  cos(tilt)
+
+
      case(code_translation) !  Translation of the reference system.
         x_t = node_value('x ')
         y_t = node_value('y ')
-        ve(1) = -x_t
-        ve(2) = -y_t
+        z_t = node_value('z ')
+        ve(1) =  x_t
+        ve(2) =  y_t
+        ve(3) =  z_t
 
 
      case default
@@ -337,6 +342,7 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   el = node_value('l ')
   call string_to_table_curr('survey ', 'name ', 'name ')
   call string_to_table_curr('survey ', 'keyword ', 'base_name ')
+  call string_to_table_curr('survey ', 'comments ', 'comments ')
   call double_to_table_curr('survey ', 's ',suml )
   call double_to_table_curr('survey ', 'l ',el )
   call double_to_table_curr('survey ', 'x ',v(1) )

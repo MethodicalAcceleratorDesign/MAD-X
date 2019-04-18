@@ -2165,6 +2165,8 @@ string_to_table_curr(const char* table, const char* name, const char* string)
     tbl->s_cols[col][tbl->curr] = tmpbuff(current_node->name);
   else if (strcmp(buf, "base_name") == 0)
     tbl->s_cols[col][tbl->curr] = tmpbuff(current_node->base_name);
+  else if (strcmp(buf, "comments") == 0)
+    tbl->s_cols[col][tbl->curr] = command_par_string("comments",current_node->p_elem->def);
   else
     tbl->s_cols[col][tbl->curr] = tmpbuff(buf);
   return 0;
