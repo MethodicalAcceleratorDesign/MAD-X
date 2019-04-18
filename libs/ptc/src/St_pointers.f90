@@ -24,7 +24,7 @@ module pointer_lattice
   character(255), private :: file_zher,filezhe, name_zhe
   integer, private :: k_zhe,number_zhe_maps
   integer last_npara 
-  integer :: i_layout=0,i_layout_t=1
+  integer :: i_layout=0,i_layout_t=1,pos_layout=1
   integer my_lost_position
   private thin
   real(dp) thin
@@ -51,7 +51,7 @@ module pointer_lattice
   real(dp), allocatable :: a_f(:),a_f0(:),yfit(:),dyfit(:,:)
   integer sizeind1
   logical :: onefunc = .true.,skipzero=.false.,skipcomplex=.true.
- 
+ type(probe), pointer :: xs0g(:) => null()
 
    
   INTERFACE SCRIPT
@@ -200,8 +200,10 @@ endif
     type(fibre),pointer ::p,f1,f2,ft
     ! TRACKING RAYS
     INTEGER IBN,N_name
-    REAL(DP) X(6),DT(3),x_ref(6),sc,NLAM,A1,B1,HPHA,B_TESLA,CUR1,CUR2
-    REAL(DP)VOLT,PHASE
+    REAL(DP) X(6),DT(3),sc,NLAM,A1,B1,HPHA,B_TESLA,CUR1,CUR2
+    REAL(DP)VOLT,PHASE,x_ref(6),x_ref0(6)
+    type(internal_state) state0
+    logical do_state0
     INTEGER HARMONIC_NUMBER
     ! changing magnet
     logical(lp) bend_like
@@ -412,11 +414,11 @@ endif
            call context(name)
            orbitname(i1)=name
           enddo
-!       case('SETORBITPHASORFREQUENCY')
-!          read(mf,*) xsm%ac%om
-!          xsm0%ac%om=xsm%ac%om
-!          ptc_node_old=-1
-!          first_particle=my_false
+       case('USER1')
+         call my_user_routine1
+       case('SPINTWISSCAS')
+           read(mf,*) no,noca   !  order and general canonise
+         call SMALL_CODE_TWISS(my_ering,no,noca)
        case('SETORBITPHASORTIME','ORBITTIME')
           read(mf,*) xsmt
           xsm0t=xsmt
@@ -715,6 +717,13 @@ endif
        case("PRINTSTATEONSCREEN")
          CALL print(MY_ESTATE,6)
 
+       case("KILLPROBE","KILLPROBES")
+        deallocate(xs0g)
+        nullify(xs0g)
+       case("READPROBE","READPROBES")
+        read(mf,*) file_zher
+        call  read_ptc_rays(file_zher)
+
        case('BERZ','GERMANIC','MARTIN')
           CALL change_package(2)
        case('YANG','CHINESE','LINGYUN')
@@ -888,6 +897,16 @@ endif
                 TL=>TL%NEXT
              ENDDO
           endif
+       case('E1CAS','E1WM')
+       read(MF,*) sc
+       if(sc/=e1_cas) then
+         write(6,*) "E1 of the wonderful magnet company was ", e1_cas
+         write(6,*) "                     |  "
+         write(6,*) "                     |  "
+         write(6,*) "                    \|/  "
+           e1_cas=sc
+         write(6,*) "E1 of the wonderful magnet company is now ", e1_cas     
+        endif
        case('BEAMBEAM')
           READ(MF,*) SC,pos,patchbb
           read(mf,*) X_ref(1), X_ref(2), X_ref(3), X_ref(4)
@@ -1345,8 +1364,12 @@ endif
       !    endif
        case('MAPSFORZHE')
           READ(MF,*) i11,I22,number_zhe_maps ,hgap ! position  i1=i2 one turn map,  fact is precision of stochastic kick
-          READ(MF,*) MY_A_NO   ! ORDER OF THE MAP  
+          READ(MF,*) MY_A_NO,do_state0   ! ORDER OF THE MAP  
           READ(MF,*) filename
+          state0=my_estate-radiation0-envelope0
+          if(do_state0) then
+           do_state0=my_estate%radiation.or.my_estate%envelope
+          endif
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
           if(i11==i22) i22=i11+my_ering%n
           di12=float(i22-i11)/number_zhe_maps
@@ -1382,10 +1405,15 @@ endif
 
 
 if(.not.my_estate%envelope) hgap=-1
- if(my_a_no>0)            call FIND_ORBIT_x(x_ref,my_estate,1.d-7,fibre1=f1)
+            call FIND_ORBIT_x(x_ref,my_estate,1.d-7,fibre1=f1)
+ if(do_state0)            call FIND_ORBIT_x(x_ref0,state0,1.d-7,fibre1=f1)
 
-              call fill_tree_element_line_zhe(my_estate,f1,f2,iabs(MY_A_NO),x_ref,file_zher,stochprec=hgap) 
+ if(do_state0)   then
+              call fill_tree_element_line_zhe0(state0,my_estate,f1,f2,MY_A_NO,x_ref0,x_ref,file_zher,stochprec=hgap) 
 
+ else
+              call fill_tree_element_line_zhe(my_estate,f1,f2,MY_A_NO,x_ref,file_zher,stochprec=hgap) 
+ endif
 
 write(6,*) " State used "
           call print(my_estate,6)
@@ -3140,546 +3168,37 @@ endif
  
 
 
-!!!!!!!  stuff sodomite !!!!!!!
 
 
- subroutine data_normal_form_fourier_c_quaternion(fq,r)
- implicit none
- type(layout), target :: r
- type(c_quaternion_fourier) fq
- type(c_damap) c_map,id_s
- type(c_normal_form) c_n
- type(probe_8) xs
- type(probe) xs0
- type(internal_state) state
-type(c_fourier_index) , pointer ::p
- integer i,j,n(2),count
- real(dp) x(6),phi(2)
-type(c_ray) cray
-
-CALL FIND_ORBIT(r,fq%closed_orbit,fq%pos,fq%STATE,c_1d_5)  ! (3)
- 
-XS0=fq%closed_orbit
- 
-write(6,'(6(1x,g20.13))')fq%closed_orbit
-
-state=fq%state+spin0
-
-
-call init_all(STATE,fq%no,0)
-
-call alloc(c_map,id_s)
-call alloc(c_n)
-call alloc(xs)
-
-id_s=1
-
-xs=xs0 + id_s
-
- CALL propagate(r,XS,STATE,FIBRE1=fq%pos)  ! (4)
-
-c_map=xs
-call  c_normal(c_map,c_n,dospin=my_true) 
-
-fq%mux=c_n%tune(1)*twopi 
-fq%muy=c_n%tune(2)*twopi 
-
-
-fq%a=c_n%atot
-fq%ai=c_n%atot**(-1)
- 
-
-x=0
-
-x(1)= fq%rx
-x(3)= fq%ry 
-if(fq%no==1) then
-
- x(1:4)=matmul(fq%a,x(1:4)) 
-else
- cray%x=0
- cray%x(1:6)=x(1:6)
-
- cray=c_n%a_t.o.cray
-
-  x = cray%x(1:6)
-
-endif
-fq%x(1:6,0)=x 
-write(6,*) " closed "
-write(6,'(6(1x,g20.13))')fq%closed_orbit
-write(6,'(6(1x,g20.13))')fq%x(1:6,0)
-!write(6,*) " start 0"
-
-if(fq%nray==0) then
-
-do i=0,fq%nphix
-do j=0,fq%nphiy
-x=0
-
-x(1)= fq%rx*cos(i*fq%dphix)
-x(2)=-fq%rx*sin(i*fq%dphix)
-x(3)= fq%ry*cos(j*fq%dphiy)
-x(4)=-fq%ry*sin(j*fq%dphiy)
-
-if(fq%no==1) then
- x(1:4)=matmul(fq%a,x(1:4)) 
-else
- cray%x=0
- cray%x(1:6)=x(1:6)
-
- cray=c_n%a_t.o.cray
-
-  x = cray%x(1:6)
-
-endif
-
-
-
-
-x=x+fq%closed_orbit
-
-XS0%x=x
-XS0%q=1.0_dp
-
- CALL propagate(r,XS0,STATE,FIBRE1=1) 
- 
-fq%qd(i,j)=XS0%q
- 
-!write(6,'(6(1x,g20.13))') xs0%x(1:6)
-enddo
-enddo
-!write(6,*) " end 0"
-
-call kill(c_map,id_s)
-call kill(c_n)
-call kill(xs)
-
-
-else 
-
-write(6,*) " initial ray around the closed orbit "
-write(6,*) x
-write(6,*) " ######################################"
-state=fq%state-spin0
-
-XS0%x=fq%x(1:6,0)+fq%closed_orbit
- 
-do i=0,fq%nray
-
- CALL propagate(r,XS0,STATE,FIBRE1=1) 
- if(i/=fq%nray) then
-  fq%x(1:6,i+1)=xs0%x-fq%closed_orbit
-  fq%x(5:6,i+1)=0
- endif
-enddo
-call find_tunes(fq)
-
-count=0
-  call locate_phi(fq,0,phi,n,count)
- 
-do i=0,fq%nray
-
- if(i/=fq%nray) then
-  fq%x(1:6,i+1)=xs0%x-fq%closed_orbit
-  fq%x(5:6,i+1)=0
-  call locate_phi(fq,i+1,phi,n,count)
- endif
- if( count==fq%nphix*fq%nphiy) exit
-
-
-! call locate_phi(fq,i,phi,n)
- !if(fq%nd/=0) write(6,*) i,"fq%nd ", fq%nd
-
- if(.not.check_stable) then
- write(6,*) xs0%x
-  stop 666
- endif
-
-enddo
-
-
-call kill(c_map,id_s)
-call kill(c_n)
-call kill(xs)
-
- call c_phi(fq)
-
-
-
-
- 
-fq%f(0,0)%r(1:6)=fq%x(1:6,0)
-
-if(.true.) then
-
-state=fq%state+spin0
-!write(6,*) " closed "
-!write(6,'(6(1x,g20.13))')fq%closed_orbit
-!write(6,*) " start "
-do i=0,fq%nphix-1
-do j=0,fq%nphiy-1
-
-
-XS0%x=fq%f( i,j)%r+fq%closed_orbit
-XS0%q=1.0_dp
-
- CALL propagate(r,XS0,STATE,FIBRE1=1) 
-! write(6,'(6(1x,g20.13))')  xs0%x(1:6)
- if(.not.check_stable) then
- write(6,*) i,j
- write(6,*) fq%r(1:6, i,j)
- write(6,*) xs0%x
- stop 666
-endif
-
- fq%qd(i,j)=XS0%q
- 
-enddo
-enddo
-
-write(6,*) " end "
-endif ! false
-
-endif
-
-
- end subroutine data_normal_form_fourier_c_quaternion
-
-subroutine c_phi(fq)
+subroutine read_ptc_rays(filename)
 implicit none
-type(c_quaternion_fourier) fq
-type(c_fourier_index) , pointer ::p
-integer i,j,k,nx,ny,l,inx
-type(taylor) g,h,f(4)
-type(gmap) gm
- 
+character(*) filename
+integer mf,nr,i
+type(probe) r0
+real(dp) X(6)
 
-call init(2,2,0,0)
-call alloc(gm)
-call alloc(g,h)
-call alloc(f)
+call kanalnummer(mf,filename)
+r0=0
+X=0
+R0=X
 
-nx=fq%nphix
-ny=fq%nphiy
+read(mf,*) nr,r0%nac
 
-do i=0,nx-1
-do j=0,ny-1
- fq%f(i,j)%r=0.0_dp
-do inx=1,4
-p=> fq%f(i,j)
- h=0.0_dp
-f(inx)=0.0_dp
-do k=1,fq%f(i,j)%i
-p=>p%next
- 
-  g=dz_t(1)+dz_t(2)*p%ph(1)+dz_t(3)*p%ph(2) !+dz_t(4)*p%ph(1)**2 + &
-   !+dz_t(5)*p%ph(1)*p%ph(2) +dz_t(6)*p%ph(2)**2 
-  f(inx)=0.5_dp*(p%x(inx) - g)**2 + f(inx)
+allocate(xs0g(nr))
+
+do i=1,r0%nac
+ read(mf,*) r0%ac(i)%om
+ read(mf,*) r0%ac(i)%x
 enddo
- 
- 
- do l=1,3  !6
-  gm%v(l)=f(inx).d.l
- enddo
-gm%v(4)=1.d0.mono.4
- 
-  gm=gm.oo.(-1)
-  fq%f(i,j)%r(inx)=gm%v(1).sub.'0'
- 
-enddo ! inx
 
-enddo 
- enddo
-
-call kill(gm)
-call kill(g,h)
-
-end subroutine c_phi
-
-subroutine locate_phi(fq,i,phi,n,count)
-implicit none
-type(c_quaternion_fourier) fq
-type(c_fourier_index) , pointer ::p
-integer i,n(2) ,count
-real(dp) phi(2),nx,ny,d
-
-nx=fq%nphix
-ny=fq%nphiy
-
-phi(1)=mod(i*fq%mux/fq%dphix,nx)
-phi(2)=mod(i*fq%muy/fq%dphiy,ny)
-
-if(nx-0.5d0<phi(1)) phi(1)=phi(1)-nx
-if(ny-0.5d0<phi(2)) phi(2)=phi(2)-ny
-n(1)=nint(phi(1))
-n(2)=nint(phi(2))
-d=sqrt( (n(1)-phi(1))**2+ (n(2)-phi(2))**2)
- 
-if(fq%found(n(1),n(2))) then
- if(d<fq%d(n(1),n(2))) then
-  fq%d(n(1),n(2))=d
-  fq%p(n(1),n(2))=i
-  fq%ph(1,n(1),n(2))=-n(1)+phi(1)
-  fq%ph(2,n(1),n(2))=-n(2)+phi(2)
-  fq%f(n(1),n(2))%ph=-n(1:2)+phi(1:2)
-  fq%f(n(1),n(2))%x=fq%x(1:6,i)
-!   write(6,*) n(1),n(2),d
- endif
- 
-     allocate(fq%f(n(1),n(2))%last%next)
-     fq%f(n(1),n(2))%last=>fq%f(n(1),n(2))%last%next
-     p=>fq%f(n(1),n(2))%last
-     allocate(p%i)
-     allocate(p%x(6))
-     allocate(p%ph(2))
-     p%ph(1:2)=-n(1:2)+phi(1:2)
-     p%x=fq%x(1:6,i)
-     p%i=fq%f(n(1),n(2))%i+1
-   if(p%i==fq%countmax) count=count+1
-     fq%f(n(1),n(2))%i=fq%f(n(1),n(2))%i+1
- 
-else
- fq%found(n(1),n(2))=.true.
- fq%d(n(1),n(2))=d
- fq%p(n(1),n(2))=i
- fq%nd=fq%nd-1
-  fq%ph(1,n(1),n(2))=-n(1)+phi(1)
-  fq%ph(2,n(1),n(2))=-n(2)+phi(2)
- !  if(n(1)+n(2)/=0) then
-     allocate(fq%f(n(1),n(2))%next)
-     fq%f(n(1),n(2))%last=>fq%f(n(1),n(2))%next
-     p=>fq%f(n(1),n(2))%next
-     allocate(p%i)
-     allocate(p%x(6))
-     allocate(p%ph(2))
-     p%ph(1:2)=-n(1:2)+phi(1:2)
-     p%x=fq%x(1:6,i)
-     p%i=1
-     fq%f(n(1),n(2))%i=1
- ! endif
-
-endif
-
-end subroutine locate_phi
-
-subroutine find_tunes(fq)
-implicit none
-type(c_quaternion_fourier) fq
-integer i,j
- real(dp)  d(3),w(6),r(6),c,s
- 
-  d=0
-
- r=0
- w=0
- r=fq%x(1:6,0)
- r(1:4)=matmul(fq%ai,r(1:4)) 
- do i=1,fq%nray
-  w=fq%x(1:6,i)
- w(1:4)=matmul(fq%ai,w(1:4)) 
- do j=1,2
-  c=(w(2*j-1)*r(2*j-1)+w(2*j)*r(2*j)) 
-  s=(w(2*j-1)*r(2*j)-w(2*j)*r(2*j-1)) 
-  c=atan2(s,c)
-  if(c<0) c=c+twopi
-  d(j)=d(j)+c
- enddo
-  r=w
- enddo
- d=d/fq%nray
-write(6,*) d(1:2)
-write(6,*) fq%mux,fq%muy
-write(6,*) " replace "
-read(5,*) i
-if(i==1) then
- fq%mux=d(1)
- fq%muy=d(2)
-endif
- end subroutine find_tunes
-
-subroutine create_phi(fq)
-implicit none
-type(c_quaternion_fourier) fq
-integer k1,k2,pos,k11,pos11,k22,pos22,k
- real(dp) dxx,dxy,dyx,dyy,d(2)
- type(c_damap) a,b
-
- call alloc(a,b)
-
-do k1=0, fq%nphix-1
-do k2=0, fq%nphiy-1
-
-pos=0
-if(k1==0.and.k2==0) cycle
-
-!  1  1
-b=0
-pos=fq%p(k1,k2)
-k11=k1+1
-if(k11==fq%nphix) k11=0
-pos11=fq%p(k11,k2)
-! write(6,*) " *** ",k11,k2
-!write(6,*) fq%ph(1,k11,k2), fq%ph(2,k11,k2)
-dxx=fq%ph(1,k11,k2)+1-fq%ph(1,k1,k2)
-dxy=fq%ph(2,k11,k2)-fq%ph(2,k1,k2)
-k22=k2+1
-if(k22==fq%nphiy) k22=0
-pos22=fq%p(k1,k22)
-! write(6,*) " *** ",k1,k22
-!write(6,*) fq%ph(1,k1,k22), fq%ph(2,k1,k22)
-dyx=fq%ph(1,k1,k22)-fq%ph(1,k1,k2)
-dyy=fq%ph(2,k1,k22)+1-fq%ph(2,k1,k2)
-! write(6,*) " deltas "
-!write(6,*) dxx,dxy
-!write(6,*) dyx,dyy
-
-do k=1,4
- a=1
- a%v(1)=(dxx.cmono.1)+(dxy.cmono.2)
- a%v(2)=(dyx.cmono.1)+(dyy.cmono.2)
- a=a**(-1)
- b%v(1)=fq%x(k,pos11)-fq%x(k,pos)
- b%v(2)=fq%x(k,pos22)-fq%x(k,pos)
- b=a.o.b
-
- d(1)=b%v(1)
- d(2)=b%v(2)
- !    allocate(f%r(1:6,0:f%nphix-1,0:f%nphiy-1))
- fq%r(k, k1,k2)= fq%x(k,pos) - d(1)*fq%ph(1,k1,k2)- d(2)*fq%ph(2,k1,k2)
-! write(6,*) fq%r(k, k1,k2) ,fq%x(k,pos) 
+do i=1,nr
+ xs0g(i)=0
+ xs0g(i)=r0
+ read(mf,*) xs0g(i)%x
 enddo
- if(nophase) fq%r(1:6, k1,k2)=fq%x(1:6,pos)
-fq%r(1:6, 0,0)=fq%x(1:6,0)
-!else
+close(mf)
 
-! -1 -1
-b=0
-pos=fq%p(k1,k2)
-k11=k1-1
-if(k11==-1) k11=fq%nphix-1
-pos11=fq%p(k11,k2)
-! write(6,*) " *** ",k11,k2
-!write(6,*) fq%ph(1,k11,k2), fq%ph(2,k11,k2)
-dxx=fq%ph(1,k11,k2)-1-fq%ph(1,k1,k2)
-dxy=fq%ph(2,k11,k2)-fq%ph(2,k1,k2)
-k22=k2-1
-if(k22==-1) k22=fq%nphiy-1
-pos22=fq%p(k1,k22)
-! write(6,*) " *** ",k1,k22
-!write(6,*) fq%ph(1,k1,k22), fq%ph(2,k1,k22)
-dyx=fq%ph(1,k1,k22)-fq%ph(1,k1,k2)
-dyy=fq%ph(2,k1,k22)-1-fq%ph(2,k1,k2)
-! write(6,*) " deltas "
-!write(6,*) dxx,dxy
-!write(6,*) dyx,dyy
-
-do k=1,4
- a=1
- a%v(1)=(dxx.cmono.1)+(dxy.cmono.2)
- a%v(2)=(dyx.cmono.1)+(dyy.cmono.2)
- a=a**(-1)
- b%v(1)=fq%x(k,pos11)-fq%x(k,pos)
- b%v(2)=fq%x(k,pos22)-fq%x(k,pos)
- b=a.o.b
-
- d(1)=b%v(1)
- d(2)=b%v(2)
- !    allocate(f%r(1:6,0:f%nphix-1,0:f%nphiy-1))
- fq%r(k, k1,k2)=fq%r(k, k1,k2)+ fq%x(k,pos) - d(1)*fq%ph(1,k1,k2)- d(2)*fq%ph(2,k1,k2)
-!fq%r(k, k1,k2)=fq%r(k, k1,k2)/2.0_dp
-! write(6,*) fq%r(k, k1,k2) ,fq%x(k,pos) 
-enddo
- if(nophase) fq%r(1:6, k1,k2)=fq%x(1:6,pos)
-
-
-!   1 -1
-b=0
-pos=fq%p(k1,k2)
-k11=k1+1
-if(k11==fq%nphix) k11=0
-pos11=fq%p(k11,k2)
-! write(6,*) " *** ",k11,k2
-!write(6,*) fq%ph(1,k11,k2), fq%ph(2,k11,k2)
-dxx=fq%ph(1,k11,k2)+1-fq%ph(1,k1,k2)
-dxy=fq%ph(2,k11,k2)-fq%ph(2,k1,k2)
-k22=k2-1
-if(k22==-1) k22=fq%nphiy-1
-pos22=fq%p(k1,k22)
-! write(6,*) " *** ",k1,k22
-!write(6,*) fq%ph(1,k1,k22), fq%ph(2,k1,k22)
-dyx=fq%ph(1,k1,k22)-fq%ph(1,k1,k2)
-dyy=fq%ph(2,k1,k22)-1-fq%ph(2,k1,k2)
-! write(6,*) " deltas "
-!write(6,*) dxx,dxy
-!write(6,*) dyx,dyy
-
-do k=1,4
- a=1
- a%v(1)=(dxx.cmono.1)+(dxy.cmono.2)
- a%v(2)=(dyx.cmono.1)+(dyy.cmono.2)
- a=a**(-1)
- b%v(1)=fq%x(k,pos11)-fq%x(k,pos)
- b%v(2)=fq%x(k,pos22)-fq%x(k,pos)
- b=a.o.b
-
- d(1)=b%v(1)
- d(2)=b%v(2)
- !    allocate(f%r(1:6,0:f%nphix-1,0:f%nphiy-1))
- fq%r(k, k1,k2)=fq%r(k, k1,k2)+ fq%x(k,pos) - d(1)*fq%ph(1,k1,k2)- d(2)*fq%ph(2,k1,k2)
-!fq%r(k, k1,k2)=fq%r(k, k1,k2)/2.0_dp
-! write(6,*) fq%r(k, k1,k2) ,fq%x(k,pos) 
-enddo
- if(nophase) fq%r(1:6, k1,k2)=fq%x(1:6,pos)
-
-! -1 1
-b=0
-pos=fq%p(k1,k2)
-k11=k1-1
-if(k11==-1) k11=fq%nphix-1
-pos11=fq%p(k11,k2)
-! write(6,*) " *** ",k11,k2
-!write(6,*) fq%ph(1,k11,k2), fq%ph(2,k11,k2)
-dxx=fq%ph(1,k11,k2)-1-fq%ph(1,k1,k2)
-dxy=fq%ph(2,k11,k2)-fq%ph(2,k1,k2)
-k22=k2+1
-if(k22==fq%nphiy) k22=0
-pos22=fq%p(k1,k22)
-! write(6,*) " *** ",k1,k22
-!write(6,*) fq%ph(1,k1,k22), fq%ph(2,k1,k22)
-dyx=fq%ph(1,k1,k22)-fq%ph(1,k1,k2)
-dyy=fq%ph(2,k1,k22)+1-fq%ph(2,k1,k2)
-! write(6,*) " deltas "
-!write(6,*) dxx,dxy
-!write(6,*) dyx,dyy
-
-do k=1,4
- a=1
- a%v(1)=(dxx.cmono.1)+(dxy.cmono.2)
- a%v(2)=(dyx.cmono.1)+(dyy.cmono.2)
- a=a**(-1)
- b%v(1)=fq%x(k,pos11)-fq%x(k,pos)
- b%v(2)=fq%x(k,pos22)-fq%x(k,pos)
- b=a.o.b
-
- d(1)=b%v(1)
- d(2)=b%v(2)
- !    allocate(f%r(1:6,0:f%nphix-1,0:f%nphiy-1))
- fq%r(k, k1,k2)=fq%r(k, k1,k2)+ fq%x(k,pos) - d(1)*fq%ph(1,k1,k2)- d(2)*fq%ph(2,k1,k2)
- fq%r(k, k1,k2)=fq%r(k, k1,k2)/4.0_dp
-! write(6,*) fq%r(k, k1,k2) ,fq%x(k,pos) 
-enddo
- if(nophase) fq%r(1:6, k1,k2)=fq%x(1:6,pos)
-
-
-
-
-fq%r(1:6, 0,0)=fq%x(1:6,0)
-!endif
-enddo
-enddo
-call kill(a,b)
-end subroutine create_phi
+end subroutine read_ptc_rays
 
 
 
@@ -3758,3 +3277,125 @@ subroutine read_mad_command77(ptc_fichier)
 
 end  subroutine read_mad_command77
 
+subroutine my_user_routine1 
+use madx_ptc_module
+!use pointer_lattice
+!use duan_zhe_map, probe_zhe=>probe,tree_element_zhe=>tree_element,dp_zhe=>dp, & 
+!DEFAULT0_zhe=>DEFAULT0,TOTALPATH0_zhe=>TOTALPATH0,TIME0_zhe=>TIME0,ONLY_4d0_zhe=>ONLY_4d0,RADIATION0_zhe=>RADIATION0, &
+!NOCAVITY0_zhe=>NOCAVITY0,FRINGE0_zhe=>FRINGE0,STOCHASTIC0_zhe=>STOCHASTIC0,ENVELOPE0_zhe=>ENVELOPE0, &
+!DELTA0_zhe=>DELTA0,SPIN0_zhe=>SPIN0,MODULATION0_zhe=>MODULATION0,only_2d0_zhe=>only_2d0 , &
+!INTERNAL_STATE_zhe=>INTERNAL_STATE
+implicit none
+ 
+type(layout),pointer :: fodo
+type(c_normal_form) normal_form
+integer pos,no,np,mf,i
+real(dp) closed_orbit(6)
+type(probe) xs0
+type(probe_8) xs
+type(c_damap) id,one_turn_map,a_cs,a0,a1,a2,a
+type(c_taylor) x2div2,x2div2_f,phase(3),phase_one_turn_map(3)
+type(internal_state) state
+type(fibre), pointer :: f
+
+
+
+ 
+!!!! reading the flat file produced by MAD-X
+!call ptc_ini_no_append
+call read_lattice_append(M_U,"../../files_for_cas/guido_fodo/flat.txt")
+!call read_lattice_append(M_U,"C:\msys64\home\Etienne\MAD-X\files_for_cas\guido_fodo\flat.txt")
+!call read_lattice_append(M_U,"guido_fodo_ubuntu.txt")
+fodo=>m_u%end
+
+
+call in_bmad_units   ! units similar to MAD-X
+ 
+
+! finds the closed orbit at position 1 (should be (0,0,0,0,0,0))
+pos=1
+closed_orbit=0.d0;  
+                                                
+call find_orbit_x(fodo,closed_orbit(1:6),STATE,1.e-8_dp,fibre1=pos)  
+ 
+state=nocavity   ! state that produces map with delta dependence
+no=3
+np=0
+call init_all(state,no,np)
+ 
+
+!   create these TPSA objects
+call alloc(id,one_turn_map,a_cs,a0,a1,a2,a)
+call alloc(xs)
+call alloc(normal_form)
+call alloc(x2div2,x2div2_f)
+call alloc(phase)
+call alloc(phase_one_turn_map)
+
+xs0=closed_orbit   ! xs0 contains orbit and spin 
+id=1   !    identity map
+xs=id+xs0   !  xs is a probe_8 which can become a Taylor series
+ 
+ 
+call propagate(fodo,xs,state,fibre1=pos) ! computes one turn map around closed orbit
+ 
+one_turn_map=xs
+ 
+ 
+call c_normal(one_turn_map,normal_form,phase=phase_one_turn_map)  ! one_turn_map= normal_form%atot o  rotation o  normal_form%atot^-1
+ 
+call c_canonise(normal_form%atot,a_cs,a0,a1,a2) 
+
+xs =  a_cs +xs0
+
+call kanalnummer(mf,"twiss_from_guido.txt")
+
+phase=0.0_dp
+x2div2=2.0_dp*(1.0_dp.cmono.1)**2
+call C_AVERAGE(x2div2,a1,x2div2_f)  
+
+write(mf,*) " Phase advance in x "
+call clean(phase,phase,prec=1.d-10)
+call print(phase(1),mf)
+write(mf,*) " Beginning of lattice "
+call print(x2div2_f,mf)
+
+f=>fodo%start
+do i=1,fodo%n
+ call propagate(fodo,xs,state,fibre1=i,fibre2=i+1)
+
+write(mf,*) " end of Magnet ",f%mag%name
+
+ a=xs  ! creates tracked canonical transformation
+ xs0=xs
+call c_canonise(a,a_cs,a0,a1,a2,phase) ;call clean(a1,a1,prec=1.d-10);
+ 
+call C_AVERAGE(x2div2,a1,x2div2_f)  
+
+write(mf,*) " Phase advance in x "
+call clean(phase,phase,prec=1.d-10)
+call print(phase(1),mf)
+write(mf,*) " 2(x^2> ~ beta"
+call print(x2div2_f,mf)
+
+xs=xs0+a_cs
+
+f=>f%next
+enddo
+
+
+write(mf,*) " Tune in x from one turn map"
+call clean(phase_one_turn_map,phase_one_turn_map,prec=1.d-10)
+call print(phase_one_turn_map(1),mf)
+
+close(mf)
+
+call kill(id,one_turn_map,a_cs,a0,a1,a2,a)
+call kill(xs)
+call kill(normal_form)
+call kill(x2div2,x2div2_f)
+call kill(phase)
+call kill(phase_one_turn_map)
+
+
+end  subroutine my_user_routine1

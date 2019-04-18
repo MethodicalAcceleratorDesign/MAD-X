@@ -512,10 +512,7 @@ CONTAINS
     TYPE (quaternion), INTENT (IN) :: S1
  
 
-    IF(.NOT.C_%STABLE_DA) then
-     unaryADDq%x=0
-     RETURN
-    endif
+ 
 
 
     unaryADDq=s1
@@ -526,13 +523,9 @@ CONTAINS
     implicit none
     TYPE (quaternion) unarySUBq
     TYPE (quaternion), INTENT (IN) :: S1
+ 
 
-    IF(.NOT.C_%STABLE_DA) then
-     unarySUBq%x=0
-     RETURN
-    endif
-
-         unarySUBq%x= -unarySUBq%x
+         unarySUBq%x= -s1%x
 
   END FUNCTION unarySUBq
 
@@ -543,10 +536,7 @@ CONTAINS
     TYPE (quaternion), INTENT (IN) :: S1
     real(dp) norm
      integer i
-    IF(.NOT.C_%STABLE_DA) then
-     invq%x=0
-     RETURN
-    endif
+  
               invq=s1
               do i=1,3
                 invq%x(i)=-invq%x(i)
@@ -565,10 +555,7 @@ CONTAINS
     TYPE (quaternion), INTENT (IN) :: S1
     integer i
 
-    IF(.NOT.C_%STABLE_DA) then
-     absq=0
-     RETURN
-    endif
+ 
    
      absq=sqrt(abs_square(s1))
   END FUNCTION absq
@@ -580,10 +567,7 @@ CONTAINS
     TYPE (quaternion), INTENT (IN) :: S1
     integer i
 
-    IF(.NOT.C_%STABLE_DA) then
-     absq2=0
-     RETURN
-    endif
+  
            absq2=0
        do i=0,3
          absq2 = s1%x(i)**2+absq2
@@ -599,11 +583,7 @@ CONTAINS
     TYPE (complex_quaternion), INTENT (IN) :: S1
  
 
-    IF(.NOT.C_%STABLE_DA) then
-     cunaryADDq%x=0
-     RETURN
-    endif
-
+ 
 
     cunaryADDq=s1
 
@@ -613,13 +593,9 @@ CONTAINS
     implicit none
     TYPE (complex_quaternion) cunarySUBq
     TYPE (complex_quaternion), INTENT (IN) :: S1
+ 
 
-    IF(.NOT.C_%STABLE_DA) then
-     cunarySUBq%x=0
-     RETURN
-    endif
-
-         cunarySUBq%x= -cunarySUBq%x
+         cunarySUBq%x= -s1%x
 
   END FUNCTION cunarySUBq
 
@@ -630,10 +606,7 @@ CONTAINS
     TYPE (complex_quaternion), INTENT (IN) :: S1
     real(dp) norm
      integer i
-    IF(.NOT.C_%STABLE_DA) then
-     cinvq%x=0
-     RETURN
-    endif
+ 
               cinvq=s1
               do i=1,3
                 cinvq%x(i)=-cinvq%x(i)
@@ -652,10 +625,7 @@ CONTAINS
     TYPE (complex_quaternion), INTENT (IN) :: S1
     integer i
 
-    IF(.NOT.C_%STABLE_DA) then
-     cabsq=0
-     RETURN
-    endif
+ 
    
      cabsq=sqrt(abs_square(s1))
   END FUNCTION cabsq
@@ -667,10 +637,7 @@ CONTAINS
     TYPE (complex_quaternion), INTENT (IN) :: S1
     integer i
 
-    IF(.NOT.C_%STABLE_DA) then
-     cabsq2=0
-     RETURN
-    endif
+  
            cabsq2=0
        do i=0,3
          cabsq2 = abs(s1%x(i))**2+cabsq2
@@ -761,11 +728,7 @@ write(6,*) " no convergence  in  log_quaternion"
     complex(dp) c
     logical check
 
-    IF(.NOT.C_STABLE_DA) then
-     c_exp_quaternion%x(1)=0
-     RETURN
-     endif
-
+  
 
 
     check=.true.
@@ -1005,7 +968,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (quaternion),INTENT(inOUT)::S2
     type (quaternion),INTENT(IN)::S1
     integer i
-    IF(.NOT.C_%STABLE_DA) RETURN
+ 
     
     do i=0,3
     s2%x(i)=s1%x(i)
@@ -1019,7 +982,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (complex_quaternion),INTENT(inOUT)::S2
     type (complex_quaternion),INTENT(IN)::S1
     integer i
-    IF(.NOT.C_%STABLE_DA) RETURN
+ 
     
     do i=0,3
     s2%x(i)=s1%x(i)
@@ -1033,8 +996,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (complex_quaternion),INTENT(inOUT)::S2
     type (quaternion),INTENT(IN)::S1
     integer i
-    IF(.NOT.C_%STABLE_DA) RETURN
-    
+     
     do i=0,3
     s2%x(i)=s1%x(i)
     enddo
@@ -1046,7 +1008,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (quaternion),INTENT(inOUT)::S2
     type (complex_quaternion),INTENT(IN)::S1
     integer i
-    IF(.NOT.C_%STABLE_DA) RETURN
+ 
     
     do i=0,3
     s2%x(i)=s1%x(i)
@@ -1059,7 +1021,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (quaternion),INTENT(inOUT)::S2
     real(dp),INTENT(IN)::S1
     integer i
-    IF(.NOT.C_%STABLE_DA) RETURN
+ 
 
     do i=0,3
     s2%x(i)=0
@@ -1073,7 +1035,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (complex_quaternion),INTENT(inOUT)::S2
     real(dp),INTENT(IN)::S1
     integer i
-    IF(.NOT.C_%STABLE_DA) RETURN
+ 
 
     do i=0,3
     s2%x(i)=0
@@ -1086,7 +1048,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (quaternion),INTENT(inOUT)::S2
     integer,INTENT(IN)::S1
     integer i
-    IF(.NOT.C_%STABLE_DA) RETURN
+ 
 
     do i=0,3
     s2%x(i)=0
@@ -1100,7 +1062,6 @@ write(6,*) " no convergence  in  log_quaternion"
     type (complex_quaternion),INTENT(inOUT)::S2
     integer,INTENT(IN)::S1
     integer i
-    IF(.NOT.C_%STABLE_DA) RETURN
 
     do i=0,3
     s2%x(i)=0
@@ -1997,10 +1958,7 @@ endif
     INTEGER, INTENT (IN) :: R2
     INTEGER I,R22
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) then
-       POWq%x=0
-      RETURN
-    endif
+ 
     temp=1.0_dp
 
     R22=IABS(R2)
@@ -2022,10 +1980,7 @@ endif
     INTEGER, INTENT (IN) :: R2
     INTEGER I,R22
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) then
-       cPOWq%x=0
-      RETURN
-    endif
+ 
     temp=1.0_dp
 
     R22=IABS(R2)
@@ -2522,10 +2477,7 @@ endif
     TYPE (quaternion) addq
     TYPE (quaternion), INTENT (IN) :: S1, S2
 
-    IF(.NOT.C_%STABLE_DA) then
-       addq%x=0
-      RETURN
-    endif 
+ 
        addq%x=s1%x+s2%x
   END FUNCTION addq
 
@@ -2534,11 +2486,7 @@ endif
     implicit none
     TYPE (quaternion) subq
     TYPE (quaternion), INTENT (IN) :: S1, S2
-
-    IF(.NOT.C_%STABLE_DA) then
-       subq%x=0
-      RETURN
-    endif 
+ 
           subq%x=s1%x-s2%x
 
   END FUNCTION subq
@@ -2549,10 +2497,7 @@ endif
     TYPE (quaternion), INTENT (IN) :: S1, S2
     integer i
 
-    IF(.NOT.C_%STABLE_DA) then
-       mulq%x=0
-      RETURN
-    endif 
+  
           mulq=0.0_dp
 
           mulq%x(0)=s1%x(0)*s2%x(0)-s1%x(1)*s2%x(1)-s1%x(2)*s2%x(2)-s1%x(3)*s2%x(3)
@@ -2572,10 +2517,7 @@ endif
     TYPE (quaternion) divq
     TYPE (quaternion), INTENT (IN) :: S1, S2
 
-    IF(.NOT.C_%STABLE_DA) then
-       divq%x=0
-      RETURN
-    endif 
+ 
         
        divq=s1*invq(s2)
 
@@ -2589,10 +2531,7 @@ endif
     TYPE (complex_quaternion) caddq
     TYPE (complex_quaternion), INTENT (IN) :: S1, S2
 
-    IF(.NOT.C_%STABLE_DA) then
-       caddq%x=0
-      RETURN
-    endif 
+   
        caddq%x=s1%x+s2%x
   END FUNCTION caddq
 
@@ -2602,10 +2541,7 @@ endif
     TYPE (complex_quaternion) csubq
     TYPE (complex_quaternion), INTENT (IN) :: S1, S2
 
-    IF(.NOT.C_%STABLE_DA) then
-       csubq%x=0
-      RETURN
-    endif 
+  
           csubq%x=s1%x-s2%x
 
   END FUNCTION csubq
@@ -2616,10 +2552,7 @@ endif
     TYPE (complex_quaternion), INTENT (IN) :: S1, S2
     integer i
 
-    IF(.NOT.C_%STABLE_DA) then
-       cmulq%x=0
-      RETURN
-    endif 
+   
           cmulq=0.0_dp
 
           cmulq%x(0)=s1%x(0)*s2%x(0)-s1%x(1)*s2%x(1)-s1%x(2)*s2%x(2)-s1%x(3)*s2%x(3)
@@ -2640,11 +2573,7 @@ endif
     TYPE (complex_quaternion), INTENT (IN) :: S1
     complex(dp), INTENT (IN) :: c
     integer i
-
-    IF(.NOT.C_%STABLE_DA) then
-       cmulqc%x=0
-      RETURN
-    endif 
+ 
 
           cmulqc%x= s1%x*c
 
@@ -2656,12 +2585,7 @@ endif
     TYPE (complex_quaternion), INTENT (IN) :: S1
     complex(dp), INTENT (IN) :: c
     integer i
-
-    IF(.NOT.C_%STABLE_DA) then
-       ccmulq%x=0
-      RETURN
-    endif 
-
+ 
           ccmulq%x= s1%x*c
 
   END FUNCTION ccmulq
@@ -2672,11 +2596,7 @@ endif
     TYPE (complex_quaternion), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: c
     integer i
-
-    IF(.NOT.C_%STABLE_DA) then
-       cmulqr%x=0
-      RETURN
-    endif 
+  
 
           cmulqr%x= s1%x*c
 
@@ -2689,10 +2609,7 @@ endif
     real(dp), INTENT (IN) :: c
     integer i
 
-    IF(.NOT.C_%STABLE_DA) then
-       rcmulq%x=0
-      RETURN
-    endif 
+  
 
           rcmulq%x= s1%x*c
 
@@ -2704,10 +2621,7 @@ endif
     TYPE (complex_quaternion) cdivq
     TYPE (complex_quaternion), INTENT (IN) :: S1, S2
 
-    IF(.NOT.C_%STABLE_DA) then
-       cdivq%x=0
-      RETURN
-    endif 
+  
         
        cdivq=s1*cinvq(s2)
 
@@ -3657,18 +3571,39 @@ endif
   END SUBROUTINE printq
 
 
-  SUBROUTINE  cprintq(S1,MFILE,PREC)
+  SUBROUTINE  cprintq(S1,MFILE,PREC,pr)
     implicit none
     INTEGER,OPTIONAL,INTENT(IN)::MFILE
     type (complex_quaternion),INTENT(IN)::S1
     REAL(DP),OPTIONAL,INTENT(IN)::PREC
+    logical,OPTIONAL,INTENT(INout)::pr
+    real(dp) norm
     INTEGER I,mfi
      mfi=6
      if(present(mfile)) mfi=mfile
+     if(present(prec) ) then
+     norm=0
+      do i=0,3
+       norm=norm+abs(s1%x(i))
+      enddo
+     if(norm>prec) then
+     if(present(pr))pr=.true.
+     if(mfi/=0) then
+     write(mfi,*) " complex_quaternion "
+       DO I=0,3
+         write(mfi,*) s1%x(i)
+       ENDDO
+      endif
+      else
+            if(present(pr))pr=.false.
+      endif
+     else 
+
       write(mfi,*) " complex_quaternion "
     DO I=0,3
       write(mfi,*) s1%x(i)
     ENDDO
+   endif
   END SUBROUTINE cprintq
 
   SUBROUTINE  print_for_bmad_parse(S1,MFILE,prec,ind)
@@ -4002,7 +3937,7 @@ endif
   subroutine crap1(STRING)
     implicit none
     CHARACTER(*) STRING
-
+ 
  
       write(6,*) "ERROR IN :"
       write(6,*) STRING

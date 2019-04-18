@@ -229,6 +229,7 @@ closed_orbit=0.d0
 
 call find_orbit_x(kekb,closed_orbit,STATE,1.e-8_dp,fibre1=1)  
 
+cc=0
 !call propagate(kekb,closed_orbit,state,fibre1=1)
 closed_orbit(6)=0.d0
 
@@ -4744,4 +4745,279 @@ end subroutine untaper
      endif
   
   END FUNCTION is_ORBIT_STABLE
+
+subroutine SMALL_CODE_TWISS(ring,no,general)
+implicit none
+integer no,np,mf,MFM,i,k
+real(dp) fix(6),s(3,3,0:6)
+type(internal_state), target  :: state,state_graph
+type(layout), target  :: ring
+type(c_damap) id,m,a_cs,disp,A_L,A_NL,a_spin,eval
+type(probe) r0
+type(probe_8) r
+type(c_normal_form) normal
+type(c_taylor) phase(3),phase_spin,betaxx,betaxy,x,c_spin_tune,d_CS,h,hb,pb_field
+type(fibre),pointer :: f,sf,ff
+integer, allocatable :: j1(:)
+real(dp) phaser(3),spin_tune(2),damping(3),betx(2),dnu_dko,phx,a(6,6),mux,betasfx
+type(q_linear)  q_c,q_ptc,q_rot
+logical general
+type(c_spinor) e_y,isf
+type(c_vector_field) field
+complex(dp)  f4,f4green,f2,f2green
+!   MAD-X LATTICE
+!   L : drift, L= 0.2;
+!   alpha= .3141592653589793238462643383279502;
+! QF : SBEND,L= 1.0, ANGLE=ALPHA,k1=1.0;   
+! QD : SBEND,L= 1.0, ANGLE=ALPHA,k1=-1.0;   
+!   Oct : octupole,  K3= 0.0;
+!lattice : LINE=  (QF,Oct,L,QD,Oct,L);
+
+use_quaternion=.true.
+!write(6,*) " General algorithm "
+!read(5,*) general
+
+!write(6,*) " give e1: 0 (normal quadrupole) or WM.INC secret value (0.25 for example)"
+!read(5,*) e1_cas
+
+
+
+MF=16
+MFM=17
+if(general) then
+ call kanalnummer(mf,"TWISS.TXT")
+ call kanalnummer(mf,"MAPS.TXT")
+else
+ call kanalnummer(mf,"TWISS_FAST.TXT")
+ call kanalnummer(mf,"MAPS_FAST.TXT")
+endif
+ WRITE(MF,'(A4,6X,A7,7X,3X,A15,3X,4X,A14,9X,A10,9X,A11)')  &
+"NAME", "PHASE_X", "DPHASE_X/DDELTA","DPHASE_X/DR2_X","   BETA   ","   ALPHA   "
+ WRITE(MF,*) " "
+ 
+phaser=0
+
+ 
+
+
+np=0
+
+ state=nocavity0+spin0
+ 
+
+call init_all(state,no,np)
+
+allocate(j1(c_%nd2t))
+
+ eval%n=c_%nv
+call alloc(r)
+call alloc(id,m,a_cs,disp,A_L,A_NL,a_spin,eval)
+call alloc(normal)
+call alloc(phase_spin,betaxx,betaxy,x,d_CS,h,hb,pb_field)
+call alloc(phase); call alloc(field)  
+call alloc(e_y);call alloc(isf);
+
+FIX=0.0_DP  ! FIXED POINT
+fix(5)=0.00d0
+call find_orbit(ring,fix(1:6),1,state,1.d-5)   
+ write(6,*)
+ write(6,'(a12,5(1x,g12.5))')"Closed Orbit",  FIX(1:5)
+ write(6,*)
+! INITIALIZE THE RAY AS  --> 
+!RAY = FIXED POINT + IDENTITY (TAYLOR MAP)
+r0=fix
+
+ID=1
+R=r0+ID 
+
+!  COMPUTING A ONE-TURN MAP TO ORDER MY_ORDER
+
+call propagate(ring,r,state,fibre1=1)
+
+
+M=R    
+
+ CALL c_normal(M,NORMAL,phase=phase,nu_spin=phase_spin,dospin=state%spin)   
+ write(6,'(a12,4(1x,g12.5))') "Linear tune ", NORMAL%tune(1:c_%nd),normal%spin_tune
+ mux=NORMAL%tune(1)*twopi
+
+
+
+ write(mf,*) "TOTAL TUNES "
+ call print(phase(1:c_%nd),mf)
+
+
+ if(state%spin) then
+    call clean(phase_spin,phase_spin,prec=1.d-10)
+    write(mf,*) " Spin tune "
+   call print(phase_spin,mf)
+ endif
+ 
+
+if(general) then
+ call c_full_canonise(NORMAL%Atot,a_cs,a_spin,disp,A_L,A_NL)
+else
+ call c_fast_canonise(NORMAL%Atot,a_cs,dospin=state%spin)
+endif
+ 
+
+phase=0.0_dp
+phaser=0
+spin_tune=0
+damping=0
+phase_spin=0.0_dp
+dnu_dko=0
+d_CS=0.0_dp
+h =(1.0_dp.cmono.1)+i_*(1.0_dp.cmono.2)
+hb=(1.0_dp.cmono.1)-i_*(1.0_dp.cmono.2)
+f=>ring%start
+r=a_cs+r0
+eval=1
+eval%v(3)=0.0d0
+eval%v(4)=0.0d0
+eval%v(5)=0.0d0
+
+d_CS=h*hb
+d_cs=d_cs*NORMAL%Atot**(-1)
+call print(d_cs)
+
+ do i=1,ring%n
+
+call propagate(ring,r,+state,fibre1=i,fibre2=i+1)
+
+ write(6,*) I,f%mag%name
+
+a_cs=r
+if(general) then
+ call c_full_canonise(a_cs,a_cs,a_spin, &
+  disp,A_L,A_NL,phase=phase,nu_spin=phase_spin)
+else
+ call c_fast_canonise(a_cs,a_cs,phaser,damping,q_c=q_c,q_ptc=q_ptc, &
+ q_rot=q_rot,spin_tune=spin_tune ,dospin=state%spin)
+endif
+
+r0=r
+r=a_cs+r0
+
+
+!!!!!!!!!!!!! Do something !!!!!!!!!!!!!!!!!!!!!
+write(mf,*) f%mag%name
+if(general) then
+ j1=0
+ j1(1)=1
+ betaxx=(A_L%v(1).par.j1)**2
+ j1=0
+ j1(2)=1
+ betaxx=betaxx + (A_L%v(1).par.j1)**2
+ write(mf,*) " Betax_1 "
+ call print(betaxx,mf)
+ j1=0
+ j1(3)=1
+ betaxy=(A_L%v(1).par.j1)**2
+ j1=0
+ j1(4)=1
+ betaxy=betaxy + (A_L%v(1).par.j1)**2
+ write(mf,*) " Betax_2 "
+ call print(betaxy,mf)
+write(mf,*) " ISF "
+ e_y=2
+ call makeso3(a_spin)
+ isf=a_spin%s*e_y
+ call clean(isf,isf,prec=1.d-10)
+ call print(isf,mf)
+
+ betx(1)=betaxx
+ write(mf,*) " phases  "
+ call clean(phase(1:c_%nd),phase(1:c_%nd),prec=1.d-10)
+ call print(phase(1:c_%nd),mf)
+ if(state%spin) then
+  write(mf,*) " spin tune "
+  call clean(phase_spin,phase_spin,prec=1.d-10)
+  call print(phase_spin,mf)
+ endif
+else
+ betx(1)=q_ptc%mat(1,1)**2+q_ptc%mat(1,2)**2
+ betx(2)=q_ptc%mat(1,3)**2+q_ptc%mat(1,3)**2
+ write(mf,*) " Betax_1 , Betax_2"
+ write(mf,*) betx
+ write(mf,*) " Phases "
+ write(mf,*) phaser
+
+ if(state%spin) then
+  write(mf,*) " spin tune "
+  write(mf,*) spin_tune
+  write(mf,*) " ISF "
+  call MAKESO3(q_c,s)
+
+  write(mf,'(10x,a4,15x,a7,16x,a9,12x,a7,15x,a9,11x,a11)') 'n0_x','dn_x/dx','dn_x/dp_x','dn_x/dy','dn_x/dp_y','dn_x/ddelta' 
+  write(mf,'(6(1x,G21.14))') s(1,2,0:5)
+  write(mf,'(10x,a4,15x,a7,16x,a9,12x,a7,15x,a9,11x,a11)') 'n0_y','dn_y/dx','dn_y/dp_x','dn_y/dy','dn_y/dp_y','dn_y/ddelta' 
+  write(mf,'(6(1x,G21.14))') s(2,2,0:5)
+  write(mf,'(10x,a4,15x,a7,16x,a9,12x,a7,15x,a9,11x,a11)') 'n0_z','dn_z/dx','dn_z/dp_x','dn_z/dy','dn_z/dp_y','dn_z/ddelta' 
+  write(mf,'(6(1x,G21.14))') s(3,2,0:5)
+ endif
+
+
+ endif
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  
+ 
+
+!!!!!!!!!!!!  Analytical  !!!!!!!!!!!!!!!!!!!!
+
+
+
+Write(mf,*) " change in invariant due to octupole : TPSA "
+d_CS=(h*hb)*a_cs**(-1)
+d_cs=d_cs-(d_cs.cut.5)
+d_cs=(d_cs.o.eval).d.c_%nv
+call clean(d_cs,d_cs,prec=1.d-10)
+call print(d_cs,mf)
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+f=>f%next
+enddo
+
+
+
+
+mux=phase(1)
+mux=mux*twopi
+Write(mf,*) " phase, total phase and beta "
+ write(mf,*) phx,mux,betx(1)
+
+phx=phx*twopi
+d_CS=8*i_*exp(-i_*4*phx)/(1.0_dp-exp(-i_*4.0_dp*mux))*h**4+16*i_*exp(-i_*2*phx)/(1.0_dp-exp(-i_*2.0_dp*mux))*h**3*hb
+d_cs=d_cs*(a_cs.cut.2)**(-1)
+d_cs=2.0_dp*real(d_cs)*betasfx**2/64.0_dp
+d_cs=d_cs.o.eval
+call clean(d_cs,d_cs,prec=1.d-10)
+Write(mf,*) " change in invariant due to octupole : analytical "
+call print(d_cs,mf)
+
+
+write(6,*) "dnu_dko = ",dnu_dko
+ write(mf,*) " <x^2> "
+   x=2.d0*(1d0.cmono.1)**2
+   call average(x,a_l,x)
+   call print(x,mf)
+ 
+ WRITE(MF,'(A4,6X,A7,7X,3X,A15,3X,4X,A14,9X,A10,9X,A11)')  &
+"NAME", "PHASE_X", "DPHASE_X/DDELTA","DPHASE_X/DR2_X","   BETA   ","   ALPHA   "
+
+!!!!!! compute guignard  !!!!!!
+
+
+
+ 
+223 CLOSE(MF)
+CLOSE(MFM) 
+
+END subroutine SMALL_CODE_TWISS
+
+
+
 end module S_fitting_new

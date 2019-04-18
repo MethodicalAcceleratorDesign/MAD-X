@@ -1275,9 +1275,14 @@ ffl=(index(LINEt,"FFL")/=0).or.(index(LINEt,"TFL")/=0).or. &
      endif
 
     READ(MF,'(a255)') LINE
+!write(6,'(a255)') line 
  !   READ(MF,*) M%FINT,M%HGAP,M%H1,M%H2
     if(index(LINE,"VA")==0 ) then
-     READ(line,*) M%FINT,M%HGAP,M%H1,M%H2
+    ! READ(line,*) M%FINT,M%HGAP,M%H1,M%H2
+M%FINT=0.5d0
+M%HGAP=0
+M%H1=0
+M%H2=0
      else
      READ(line,*) M%FINT,M%HGAP,M%H1,M%H2,m%VA,m%VS
     endif

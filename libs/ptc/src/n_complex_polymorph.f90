@@ -4712,7 +4712,15 @@ contains
        iscmul%r=s1%r*REAL(s2,kind=DP)
        iscmul%kind=1
     case(m2)
-
+       if(s2/=0) then
+        localmaster=master
+        call ass(iscmul)
+        iscmul%t= s1%t*REAL(s2,kind=DP)
+        master=localmaster
+       else
+        iscmul%r=0.0_dp
+        iscmul%     kind=1
+       endif
     case(m3)
        if(knob) then
           localmaster=master

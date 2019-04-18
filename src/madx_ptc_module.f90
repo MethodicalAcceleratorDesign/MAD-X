@@ -91,6 +91,7 @@ CONTAINS
     real(kind(1d0)) get_value
     integer maxnmul
 
+    use_quaternion=.true.
     
     piotr_freq=.true. ! flag introduced in PTC cavity tracking to have correct phasing with time=false
     
@@ -2558,7 +2559,9 @@ CONTAINS
 
     !    call killparresult()
     call resetknobs()  !remove the knobs
-
+    
+    call kill_map_cp()
+     
     if ( associated(m_u%n) .eqv. .false. ) then
        print*, "We attempt to kill not initialized universe!"
     endif

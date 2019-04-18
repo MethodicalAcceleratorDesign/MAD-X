@@ -185,7 +185,7 @@ module precision_constants
   real(dp) :: lmax=1.e38_dp
   logical(lp) :: printdainfo=my_false
   integer   lielib_print(15)
-  DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0,1,0,1,1/
+  DATA lielib_print /0,0,0,1,0,0,0,0,0,0,0,1,0,1,1/
   integer :: SECTOR_NMUL_MAX=22
   INTEGER, target :: SECTOR_NMUL = 11
  
@@ -199,11 +199,12 @@ module precision_constants
   integer,TARGET :: HIGHEST_FRINGE=2
   logical :: use_quaternion = .false.
   logical :: use_tpsa = .false.
+  logical :: conversion_xprime_in_abell=.true.
   !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence
   !  lielib_print(3)=1   Shows details in flofacg
-  !  lielib_print(4)=1   tunes and damping
+  !  lielib_print(4)=1   prints thin layout information
   !  lielib_print(5)=1  order in orbital normal form
   !  lielib_print(6)=1  symplectic condition
   !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
@@ -237,9 +238,16 @@ module precision_constants
      integer,pointer :: nspin => null()       ! number of spin variables (0 or 3)
      integer,pointer :: SPIN_pos => null()       ! position of spin variables (0 or 3)
      integer,pointer :: ndpt     => null() ! constant energy variable position is different from zero
+     integer,pointer ::ndptb  => null()  
      integer,pointer :: NPARA    => null() ! PARAMETER LOCATION IN PTC in fpp
      integer,pointer :: npara_fpp=> null()     ! PARAMETER LOCATION IN FPP or PTC
      integer,pointer :: np_pol   => null()  ! parameters produced through pol_block
+     integer,pointer :: nd2t   => null()  ! harmonic planes minus clocks
+     integer,pointer :: nd2harm   => null()  ! harmonic plane
+     integer,pointer :: ndc2t   => null()  ! 0 or 2 : jordan planes     
+     integer,pointer :: pos_of_delta   => null()  !  constant delta
+     integer,pointer :: rf   => null()  !   # of modulated planes
+
      logical(lp),pointer :: knob => null()
      logical(lp),pointer :: valishev => null()
      !     integer, pointer :: NDPT_OTHER

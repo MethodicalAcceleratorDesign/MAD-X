@@ -9,7 +9,7 @@ module tree_element_MODULE
 
   PRIVATE track_TREE,track_TREEP,KILL_TREE,KILL_TREE_N   !,SET_TREE
   PRIVATE track_TREE_G,track_TREEP_g
-  PRIVATE ALLOC_SPINOR_8,ALLOC_probe_8
+  PRIVATE ALLOC_SPINOR_8,ALLOC_probe_8,r_AVERAGE
   PRIVATE KILL_SPINOR_8,KILL_probe_8
   PRIVATE EQUAL_SPINOR8_SPINOR8,EQUAL_IDENTITY_SPINOR_8 !,EQUAL_SPINOR8_RAY8,EQUAL_RAY8_SPINOR8,
   PRIVATE  EQUAL_IDENTITY_probe_8
@@ -101,7 +101,6 @@ module tree_element_MODULE
      MODULE PROCEDURE cross_spinor8
   END  INTERFACE
 
-
   INTERFACE operator (+)
      MODULE PROCEDURE scdaddo
      MODULE PROCEDURE daddsco
@@ -156,6 +155,10 @@ module tree_element_MODULE
   INTERFACE KILL
      MODULE PROCEDURE KILL_TREE
      MODULE PROCEDURE KILL_TREE_N
+  END INTERFACE
+
+  INTERFACE AVERAGE
+     MODULE PROCEDURE r_AVERAGE
   END INTERFACE
 
 
@@ -1638,7 +1641,7 @@ CONTAINS
  
 !!! Some useful routines
 
-  subroutine AVERAGE(F,A,F_floquet,F_xp,use_J)
+  subroutine r_AVERAGE(F,A,F_floquet,F_xp,use_J)
     implicit none
     type(damap) A
     TYPE(TAYLOR), intent(inout):: F
@@ -1710,7 +1713,7 @@ CONTAINS
     call kill(fq)
 
 
-  end subroutine AVERAGE
+  end subroutine r_AVERAGE
 
   ! remove small numbers
 

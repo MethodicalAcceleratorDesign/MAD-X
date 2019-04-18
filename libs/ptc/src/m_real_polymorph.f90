@@ -3032,7 +3032,7 @@ contains
     TYPE (quaternion_8) invq
     TYPE (quaternion_8), INTENT (IN) :: S1
     type(real_8) norm
-    type(real_8) temp(4)
+    type(real_8) temp(0:3)
     integer i,localmaster
 
     IF(.NOT.C_%STABLE_DA) then

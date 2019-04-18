@@ -44,7 +44,7 @@ module ptc_spin
   REAL(DP) :: bran_init=pi  
   logical :: locate_with_no_cavity = .false.,full_way=.true.
   integer  :: item_min=3,mfdebug
-
+ 
   !  INTEGER, PRIVATE :: ISPIN0P=0,ISPIN1P=3
   
 
@@ -5739,6 +5739,136 @@ call kill(xs);call kill(m)
 end subroutine fill_tree_element_line
 
 !!!!!!!!!!!!!!!!!!!!   stuff for Zhe  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+subroutine fill_tree_element_line_zhe0(state_0,state,f1,f2,no,fix0_0,fix0,filef,stochprec,sagan_tree)   ! fix0 is the initial condition for the maps
+implicit none
+type(fibre), target :: f1,f2 
+type(layout), pointer :: r
+TYPE(INTEGRATION_NODE),POINTER:: t1c,t2c
+TYPE (NODE_LAYOUT), POINTER :: t
+type(internal_state), intent(in):: state,state_0
+real(dp) fixr(6),fixs(6),fix(6),fix0(6),fix0_0(6),mat(6,6),xn,stoch,fix_0(6)
+real(dp), optional :: stochprec
+ 
+type(probe) xs0,xs0_0
+type(probe_8) xs,xs_0
+type(c_damap) m,mr,m_0
+integer no,i,inf
+type(fibre), pointer :: p
+type(tree_element), pointer :: forward(:) =>null()
+character(*),optional :: filef
+type(tree_element),optional, target :: sagan_tree(3)
+
+ 
+
+if(present(sagan_tree)) then
+ forward=>sagan_tree
+else
+  allocate(forward(3))
+endif
+if(.not.associated(f1%parent_layout)) then
+ write(6,*) " parent layout not associated "
+ stop
+else
+ r=>f1%parent_layout
+endif
+
+ t=>f1%parent_layout%t
+ t1c=>f1%t1 !%next
+ t2c=>f2%t1
+
+
+mat=0
+do i=1,size(mat,1)
+mat(i,i)=1
+enddo
+
+ 
+call init_all(state,no,0)
+call alloc(xs);call alloc(m,m_0);call alloc(mr)
+ call alloc(xs_0);
+
+
+xs0=fix0
+m=1
+xs=xs0+m
+if(associated(t1c,t2c)) then
+ call propagate(xs,state,node1=t1c)
+else
+ call propagate(xs,state,node1=t1c,node2=t2c)
+endif
+ 
+
+
+xs0_0=fix0_0
+m=1
+xs_0=xs0_0+m
+if(associated(t1c,t2c)) then
+ call propagate(xs_0,state_0,node1=t1c)
+else
+ call propagate(xs_0,state_0,node1=t1c,node2=t2c)
+endif
+ 
+! For David
+!!  The full nonlinear map m is computed and the final orbit
+!!  
+fix=xs%x  ! <---   
+m=xs  ! <---   
+ 
+do i=1,6
+ m%v(i)=m%v(i)-(m%v(i).sub.0)
+enddo 
+
+fix_0=xs_0%x  ! <---   
+m_0=xs_0 ! <---   
+ 
+do i=1,6
+ m_0%v(i)=m_0%v(i)-(m_0%v(i).sub.0)
+enddo 
+
+ 
+
+ 
+call SET_TREE_G_complex_zhe0(forward,m,m_0)
+
+  stoch=-1.0_dp
+if(present(stochprec)) stoch=stochprec
+
+if(stoch>=0) then
+  call c_stochastic_kick(m,forward(2)%rad,forward(2)%fix0,stoch)  
+endif
+
+ 
+forward(1)%rad=mat
+forward(1)%fix0(1:6)=fix0
+forward(1)%fixr(1:6)=fix
+forward(1)%fix(1:6)=fix    ! always same fixed point
+ 
+ 
+forward(3)%fix0(1:6)=fix0_0
+forward(3)%fixr(1:6)=fix_0
+forward(3)%fix(1:6)=fix_0    ! always same fixed point
+
+
+ forward(1)%ds=0.0_dp
+ p=>f1
+ do while(.not.associated(p,f2))
+  forward(1)%ds=p%mag%p%ld +forward(1)%ds
+  p=>p%next
+ enddo
+forward(1)%beta0=f1%beta0
+
+ if(present(filef)) then
+  call kanalnummer(inf,filef)
+    call print_tree_elements(forward,inf)
+   close(inf)
+  call KILL(forward)
+  deallocate(forward)
+endif
+
+call kill(xs);call kill(m);call kill(mr)
+ 
+end subroutine fill_tree_element_line_zhe0
+
 subroutine fill_tree_element_line_zhe(state,f1,f2,no,fix0,filef,stochprec,sagan_tree)   ! fix0 is the initial condition for the maps
 implicit none
 type(fibre), target :: f1,f2 
@@ -5983,6 +6113,141 @@ endif
 
   END SUBROUTINE SET_TREE_G_complex_zhe
 
+  SUBROUTINE SET_TREE_G_complex_zhe0(T,Ma,ma_0)
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(INOUT) :: T(:)
+    TYPE(c_damap), INTENT(INOUT) :: Ma,ma_0
+    INTEGER N,NP,i,k,j,kq
+ 
+    real(dp) norm,mat(6,6)
+    TYPE(taylor), ALLOCATABLE :: M(:), MG(:)
+    TYPE(damap) ms
+    integer js(6)
+    type(c_damap) L_ns , N_pure_ns , N_s , L_s
+
+
+ 
+
+    call alloc(L_ns , N_pure_ns , N_s , L_s)
+    
+    call symplectify_for_zhe0(ma,ma_0,L_ns , N_pure_ns, L_s , N_s )
+    
+!    np=ma%n+18
+    if(ma%n/=6) then
+     write(6,*) " you need a 6-d map in SET_TREE_G_complex for PTC "
+     stop
+    endif
+    np=size_tree
+! initialized in ptc ini
+ !   ind_spin(1,1)=1+ma%n;ind_spin(1,2)=2+ma%n;ind_spin(1,3)=3+ma%n;
+ !   ind_spin(2,1)=4+ma%n;ind_spin(2,2)=5+ma%n;ind_spin(2,3)=6+ma%n;
+ !   ind_spin(3,1)=7+ma%n;ind_spin(3,2)=8+ma%n;ind_spin(3,3)=9+ma%n;    
+ !   k1_spin(1)=1;k2_spin(1)=1;
+ !   k1_spin(2)=1;k2_spin(2)=2;
+ !   k1_spin(3)=1;k2_spin(3)=3;
+ !   k1_spin(4)=2;k2_spin(4)=1;
+ !   k1_spin(5)=2;k2_spin(5)=2;
+ !   k1_spin(6)=2;k2_spin(6)=3;
+ !   k1_spin(7)=3;k2_spin(7)=1;
+ !   k1_spin(8)=3;k2_spin(8)=2;
+ !   k1_spin(9)=3;k2_spin(9)=3;
+
+   
+    ALLOCATE(M(NP))
+    CALL ALLOC(M,NP)
+    ALLOCATE(Mg(NP))
+    CALL ALLOC(mg,NP)
+    do i=1,np
+     m(i)=0.e0_dp
+     mg(i)=0.e0_dp
+    enddo
+     
+      L_ns = L_ns*N_pure_ns
+
+     do i=1,L_ns%n
+      m(i)=L_ns%v(i)   ! orbital part
+     enddo
+
+    call c_full_norm_spin(Ma%s,k,norm)
+
+
+if(use_quaternion) then
+    call c_full_norm_quaternion(Ma%q,kq,norm)
+    if(kq==-1) then
+      do i=0,3
+        m(ind_spin(1,1)+i)=ma%q%x(i)
+      enddo
+    elseif(kq/=-1) then
+      m(ind_spin(1,1))=1.0_dp
+      do i=ind_spin(1,1)+1,size_tree
+        m(i)=0.0_dp
+      enddo
+    endif
+else
+    if(k==-1) then
+      do i=1,3
+      do j=1,3
+        m(ind_spin(i,j))=ma%s%s(i,j)
+      enddo
+      enddo
+    else
+      do i=1,3
+        m(ind_spin(i,i))=1.0e0_dp
+      enddo
+    endif
+endif
+      js=0
+     js(1)=1;js(3)=1;js(5)=1; ! q_i(q_f,p_i) and p_f(q_f,p_i)
+     call alloc(ms)
+
+ 
+       ms=n_s
+ 
+ 
+
+     ms=ms**js
+!     do i=1,3
+!      mg(i)=ms%v(2*i-1)   !  q_i(q_f,p_i)
+!      mg(3+i)=ms%v(2*i)   !  p_f(q_f,p_i)
+!     enddo
+     do i=1,6
+      mg(i)=ms%v(i) 
+     enddo
+     do i=1,3
+     do j=1,3
+       mg(ind_spin(i,j))=ms%v(2*i-1).d.(2*j-1)  !   Jacobian for Newton search
+     enddo
+     enddo
+          call kill(ms)  
+
+     call SET_TREE_g(T(1),m(1:6))
+ !    do i=1,ma%n
+ !     m(i)=1.0_dp.cmono.i
+ !    enddo 
+ !    do i=ma%n+1,6
+ !     m(i)=0.0_dp
+ !    enddo
+     call SET_TREE_g(T(2),m(7:15))
+ 
+ !    call SET_TREE_g(T(2),m(1:size_tree))
+     call SET_TREE_g(T(3),mg(1:size_tree))
+
+!T(3)%ng=mul
+!     write(6,*) " mul ",mul
+      t(3)%rad=L_s
+ 
+
+       mat=ma**(-1)
+       t(1)%e_ij=ma%e_ij     !matmul(matmul(mat,ma%e_ij),transpose(mat))  not necessary I think
+
+  
+
+    call kill(m); call kill(mg);
+    deallocate(M);    deallocate(Mg);
+    call kill(L_ns , N_pure_ns , N_s , L_s)
+
+  END SUBROUTINE SET_TREE_G_complex_zhe0
+
 
 
 subroutine symplectify_for_zhe(m,L_ns , N_pure_ns , L_s, N_s )
@@ -6081,6 +6346,7 @@ enddo
 
 N_s=exp(fs)
 N_pure_ns= mt*N_s**(-1)
+
 N_s= L_s**(-1)*N_s*L_s 
 
 !norma=1.d0/mul
@@ -6093,6 +6359,122 @@ deallocate(je);deallocate(s,id);
 call kill(t,dt);call kill(mt);
 deallocate(mat)
 end subroutine symplectify_for_zhe
+
+subroutine symplectify_for_zhe0(m,m0,L_ns , N_pure_ns , L_s, N_s )
+implicit none
+TYPE(c_damap),intent(inout):: m ,m0,L_ns , N_pure_ns , N_s , L_s
+type(c_vector_field) f,fs
+complex(dp) v
+type(c_taylor) t,dt
+real(dp),allocatable::  mat(:,:)
+integer i,j,k,n(11),nv,nd2,al,ii,a,mul
+integer, allocatable :: je(:)
+real(dp) dm,norm,normb,norma
+TYPE(c_damap) mt
+real(dp),allocatable::   S(:,:),id(:,:)
+
+! m = L_ns o N_pure_ns o L_s o N_s
+! d= = L_ns o N_pure_ns
+! ms= L_s o N_s
+
+allocate(S(m%n,m%n),id(m%n,m%n))
+
+call c_get_indices(n,0)
+nv=n(4)
+nd2=n(3)
+
+S=0
+id=0
+do i=1,nd2/2
+ S(2*I-1,2*I)=1 ; S(2*I,2*I-1)=-1;
+ Id(2*I-1,2*I-1)=1 ; id(2*I,2*I)=1;
+enddo
+
+
+
+
+ call alloc(f);call alloc(fs);
+call alloc(t,dt);call alloc(mt);
+
+allocate(mat(m%n,m%n))
+
+mat=0
+
+
+
+if(nv-nd2==0) then
+mat=m0.sub.1
+else
+write(6,*) " this map should not have parameters or modulated magnets "
+stop 444
+endif
+
+
+! constructing Furman's contracting matrix from my review sec.3.8.2
+
+call furman_symp(mat)
+L_s=mat
+
+N_s=m0*L_s**(-1)
+
+!goto 1111
+f=log(N_s)
+ 
+fs=0
+
+! Integrating a symplectic operator using the hypercube's diagonal
+
+allocate(je(nv))
+je=0
+do i=1,f%n
+
+       j=1
+
+        do while(.true.) 
+
+          call  c_cycle(f%v(i),j,v ,je); if(j==0) exit;
+         dm=1
+         do ii=1,nd2
+          dm=dm+je(ii)
+         enddo
+        t=v.cmono.je
+        do a=1,nd2
+         dt=t.d.a
+        do al=1,nd2
+        do k=1,nd2
+          fs%v(al)=fs%v(al)+s(a,al)*s(k,i)*(id(k,a)*t+(1.0_dp.cmono.k)*dt)/dm
+        enddo ! k
+        enddo ! al
+        enddo ! a
+        enddo
+
+enddo
+ 
+
+
+N_s=exp(fs)
+
+
+!1111 continue 
+
+
+N_pure_ns= m*m0**(-1)
+
+L_ns=N_pure_ns.sub.1
+
+N_pure_ns=  L_ns**(-1)*N_pure_ns
+
+N_s= L_s**(-1)*N_s*L_s 
+
+ 
+ 
+
+deallocate(je);deallocate(s,id);
+ call kill(f);call kill(fs);
+call kill(t,dt);call kill(mt);
+deallocate(mat)
+end subroutine symplectify_for_zhe0
+
 
 
   SUBROUTINE furman_symp(r)
