@@ -128,13 +128,13 @@ update_beam(struct command* comm)
     else { /* unknown particle, then mass and charge must be given as well */
       if (par_present("mass", comm)) mass = command_par_value("mass", comm);
       else { // default is emass
-	warning("emass given to unknown particle:", name);
-	mass = get_variable("emass");
+        warning("emass given to unknown particle:", name);
+        mass = get_variable("emass");
       }
       if (par_present("charge", comm)) charge = command_par_value("charge", comm);
       else { //default is charge +1
-	warning("charge +1 given to unknown particle:", name);
-	charge = 1;
+        warning("charge +1 given to unknown particle:", name);
+        charge = 1;
       }
     }
   }
@@ -163,29 +163,61 @@ update_beam(struct command* comm)
 
   // energy related
   if (par_present("energy", comm)) {
-    energy = command_par_value("energy", comm);
-    if (energy <= mass) fatal_error("energy must be","> mass");
+    int inform = -1; // Set to 1 in set_defaults to indicate that it is marked as read;
+                     // otherwise inform == 2
+    if ((inform=par_present("pc", comm))    && inform!=1)
+      warning("Both energy and pc specified;",    "pc was ignored.");
+    if ((inform=par_present("gamma", comm)) && inform!=1)
+      warning("Both energy and gamma specified;", "gamma was ignored.");
+    if ((inform=par_present("beta", comm))  && inform!=1)
+      warning("Both energy and beta specified;",  "beta was ignored.");
+    if ((inform=par_present("brho", comm))  && inform!=1)
+      warning("Both energy and bhro specified;",  "brho was ignored.");
+
+    if ((energy = command_par_value("energy", comm)) <= mass) fatal_error("energy must be","> mass");
+
     pc = sqrt(energy*energy - mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if(par_present("pc", comm)) {
-    pc = command_par_value("pc", comm);
+    int inform = -1;
+    if ((inform=par_present("gamma", comm)) && inform != 1)
+      warning("Both pc and gamma specified;", "gamma was ignored.");
+    if ((inform=par_present("beta", comm))   && inform != 1)
+      warning("Both pc and beta specified;",  "beta was ignored.");
+    if ((inform=par_present("brho", comm)) && inform != 1)
+      warning("Both pc and brho specified;",  "brho was ignored.");
+
+    if ((pc = command_par_value("pc", comm)) <= 0.0) fatal_error("pc must be", "> 0.0");
+
     energy = sqrt(pc*pc + mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if(par_present("gamma", comm)) {
+    int inform = -1;
+    if ((inform=par_present("beta", comm)) && inform != 1)
+      warning("Both gamma and beta specified;",  "beta was ignored.");
+    if ((inform=par_present("brho", comm)) && inform != 1)
+      warning("Both gamma and brho specified;",  "brho was ignored.");
+
     if ((gamma = command_par_value("gamma", comm)) <= one) fatal_error("gamma must be","> 1");
+
     energy = gamma * mass;
     pc = sqrt(energy*energy - mass*mass);
     beta = pc / energy;
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if(par_present("beta", comm)) {
+    int inform = -1;
+    if ((inform=par_present("brho", comm)) && inform != 1)
+      warning("Both beta and brho specified;",  "brho was ignored.");
+
     if ((beta = command_par_value("beta", comm)) >= one) fatal_error("beta must be","< 1");
+
     gamma = one / sqrt(one - beta*beta);
     energy = gamma * mass;
     pc = sqrt(energy*energy - mass*mass);
@@ -193,14 +225,15 @@ update_beam(struct command* comm)
   }
   else if(par_present("brho", comm)) {
     if ((brho = command_par_value("brho", comm)) < zero) fatal_error("brho must be","> 0");
+
     pc = brho * fabs(charge) * clight * 1.e-9;
     energy = sqrt(pc*pc + mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
   }
   else {
-    energy = command_par_value("energy", current_beam);
-    if (energy <= mass) fatal_error("energy must be","> mass");
+    if ((energy = command_par_value("energy", current_beam)) <= mass) fatal_error("energy must be","> mass");
+
     pc = sqrt(energy*energy - mass*mass);
     gamma = energy / mass;
     beta = pc / energy;

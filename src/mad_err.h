@@ -22,4 +22,3 @@ void  mad_error   (const char* t1, const char* fmt, ...);
 void  mad_err_getwarn(int* cwarn, int* fwarn);
 
 #endif // MAD_ERR_H
-

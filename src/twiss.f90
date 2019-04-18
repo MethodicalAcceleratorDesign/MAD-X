@@ -1172,12 +1172,18 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   reval = zero
   aival = zero
 
-  call laseig(r_eig, reval, aival, em)
 
-  cosmu1_eig = ( reval(1)+ aival(1) + reval(2) + aival(2) )/ 2
-  cosmu2_eig = ( reval(3)+ aival(3) + reval(4) + aival(4) )/ 2
-  if (get_option('info  ') .ne. 0) then
-     if (.not. ((abs(cosmux - cosmu1_eig) .lt. diff_cos .and. abs(cosmuy - cosmu2_eig) .lt. diff_cos) .or.  &
+  if (get_option('debug ') .ne. 0) then
+    call laseig(r_eig, reval, aival, em)
+    cosmu1_eig = ( reval(1)+ aival(1) + reval(2) + aival(2) )/ 2
+    cosmu2_eig = ( reval(3)+ aival(3) + reval(4) + aival(4) )/ 2
+
+    write (warnstr,'(a,e13.6,a,e13.6)') "cosmux =  ", cosmux, ", cosmuy =", cosmuy
+    call fort_warn('TWCPIN: ', warnstr)
+    write (warnstr,'(a,e13.6,a,e13.6)')  "cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
+    call fort_warn('TWCPIN: ', warnstr)
+
+    if (.not. ((abs(cosmux - cosmu1_eig) .lt. diff_cos .and. abs(cosmuy - cosmu2_eig) .lt. diff_cos) .or.  &
           (abs(cosmuy - cosmu1_eig) .lt. diff_cos .and. abs(cosmux - cosmu2_eig) .lt. diff_cos))) then
         write (warnstr,'(a)') "Difference in the calculation of cosmux/cosmuy based of R_EIG eigen values!  "
         call fort_warn('TWCPIN: ', warnstr)
@@ -1185,11 +1191,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
         call fort_warn('TWCPIN: ', warnstr)
         write (warnstr,'(a,e13.6, a, e13.6)') "cosmuy-cosmu1_eig =", cosmuy-cosmu1_eig, "cosmuy-cosmu2_eig =", cosmuy-cosmu2_eig
         call fort_warn('TWCPIN: ', warnstr)
-        write (warnstr,'(a,e13.6,a,e13.6)') "cosmux =  ", cosmux, ", cosmuy =", cosmuy
-        call fort_warn('TWCPIN: ', warnstr)
-        write (warnstr,'(a,e13.6,a,e13.6)')  "cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
-        call fort_warn('TWCPIN: ', warnstr)
-     endif
+    endif
   endif
 
   ! call twcpin_print(rt,r0mat)
@@ -5799,7 +5801,7 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   ta = tan(angle)
 
   ek(4) = sa
-  
+
   !---- Transfer matrix.
   re(3,3) = 1/ca
   re(4,4) =   ca

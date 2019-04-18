@@ -7,6 +7,7 @@ for FILE in manual.html; do
 	#sed -i 's/\.<\/span><\/td\>/\\<\/span\>\<\/td\>/g' $FILE
 	sed -i 's/\.<\/span><\/td>/\<\/span><\/td>/g' $FILE
 	sed -i 's/Untitled Document/MAD-X guide/g' $FILE
+        sed -i 's/Untitled Document/MAD-X guide/g' $FILE
 
 	
 done
