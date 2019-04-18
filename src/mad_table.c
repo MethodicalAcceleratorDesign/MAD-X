@@ -1972,8 +1972,11 @@ double_to_table_curr2(const char* table, const char* name, const double* val)
     warning("double_to_table_curr2: table not found:", tbl_s);
     return -1;
   }
+  
   mycpy(col_s, name);
-  if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
+  
+  if ( (col = name_list_pos(col_s, tbl->columns)) < 0 ) 
+  {
     
     /*limit to a reasonable number of columns*/
     if (tbl->num_cols > 10000)
@@ -1988,7 +1991,7 @@ double_to_table_curr2(const char* table, const char* name, const double* val)
     add_to_name_list(permbuff(col_s), 2, tbl->columns );
     
     /*Copy the old columns*/
-    d_cols = mycalloc(rout_name, tbl->num_cols, sizeof *tbl->d_cols);
+    d_cols = mycalloc(rout_name, tbl->num_cols + 1, sizeof *tbl->d_cols);
     for (int i=0; i<tbl->num_cols; i++)
      {
        d_cols[i] = tbl->d_cols[i];
@@ -1998,8 +2001,12 @@ double_to_table_curr2(const char* table, const char* name, const double* val)
     d_cols[tbl->num_cols] = mycalloc_atomic(rout_name, tbl->max - 1, sizeof *d_cols[0]);
     /*zero the new array to assure previous rows are not random*/
     memset(d_cols[tbl->num_cols], 0, (tbl->max - 1)* (sizeof *d_cols[0])); 
-    
+    /*
+    printf("double_to_table_curr2: adding to table %s column %s \n",table, name);
+    printf("double_to_table_curr2: tbl->d_cols %p \n",tbl->d_cols);
+    */
     myfree(rout_name,tbl->d_cols);
+    
     tbl->d_cols = d_cols;
     tbl->num_cols++;
     tbl->org_cols++;
@@ -2012,14 +2019,16 @@ double_to_table_curr2(const char* table, const char* name, const double* val)
       warning("double_to_table_curr2: Failed to add column:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
       return -2;
     }
-    
   }
   
-  if (tbl->columns->inform[col] >= 3) {
+  if (tbl->columns->inform[col] >= 3) 
+  {
     warning("double_to_table_curr2: invalid column type:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
     return -2;
   }
-  if (tbl->curr >= tbl->max) {
+  
+  if (tbl->curr >= tbl->max) 
+  {
     warning("double_to_table_curr2: row out of range (need expansion):", (sprintf(buf,"%s->%s[%d<%d]",tbl_s,col_s,tbl->curr,tbl->max),buf));
     return -3;
   }
