@@ -758,8 +758,8 @@ CONTAINS
           s2%AN(I)%I=S1%IAN(I)+S1%NPARA
           s2%AN(I)%S=S1%SAN(I)
           s2%AN(I)%KIND=3
-          s2%AN(I)%g=S1%g
-          s2%AN(I)%nb=S1%nb
+!          s2%AN(I)%g=S1%g
+!          s2%AN(I)%nb=S1%nb
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%aN(I)%R=s2%aN(I)%R+scale_tpsafit*s2%AN(I)%S*s1%TPSAFIT(S1%IAN(I))
@@ -772,8 +772,8 @@ CONTAINS
           s2%BN(I)%I=S1%IBN(I)+S1%NPARA
           s2%BN(I)%S=S1%SBN(I)
           s2%BN(I)%KIND=3
-          s2%BN(I)%g=S1%g
-          s2%BN(I)%nb=S1%nb
+!          s2%BN(I)%g=S1%g
+!          s2%BN(I)%nb=S1%nb
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%BN(I)%R=s2%BN(I)%R+scale_tpsafit*s2%BN(I)%S*s1%TPSAFIT(S1%IBN(I))
@@ -792,8 +792,8 @@ CONTAINS
           s2%VOLT%I=S1%IVOLT+S1%NPARA
           s2%VOLT%S=S1%SVOLT
           s2%VOLT%KIND=3
-          s2%VOLT%g=S1%g
-          s2%VOLT%nb=S1%nb
+!          s2%VOLT%g=S1%g
+!          s2%VOLT%nb=S1%nb
           DONEIT=.TRUE.
           if(S1%IVOLT>c_%np_pol) c_%np_pol=S1%IVOLT
           IF(S1%SET_TPSAFIT) THEN
@@ -806,8 +806,8 @@ CONTAINS
        IF(S1%IFREQ>0) THEN
           s2%FREQ%I=S1%IFREQ+S1%NPARA
           s2%FREQ%S=S1%SFREQ
-          s2%FREQ%g=S1%g
-          s2%FREQ%nb=S1%nb
+!          s2%FREQ%g=S1%g
+!          s2%FREQ%nb=S1%nb
           s2%FREQ%KIND=3
           if(S1%IFREQ>c_%np_pol) c_%np_pol=S1%IFREQ
           IF(S1%SET_TPSAFIT) THEN
@@ -822,8 +822,8 @@ CONTAINS
           s2%PHAS%I=S1%IPHAS+S1%NPARA
           s2%PHAS%S=S1%SPHAS
           s2%PHAS%KIND=3
-          s2%PHAS%g=S1%g
-          s2%PHAS%nb=S1%nb
+ !         s2%PHAS%g=S1%g
+ !         s2%PHAS%nb=S1%nb
           DONEIT=.TRUE.
           if(S1%IPHAS>c_%np_pol) c_%np_pol=S1%IPHAS
           IF(S1%SET_TPSAFIT) THEN
@@ -839,8 +839,8 @@ CONTAINS
        IF(S1%IVOLT>0) THEN
           s2%VOLT%I=S1%IVOLT+S1%NPARA
           s2%VOLT%S=S1%SVOLT
-          s2%PHAS%g=S1%g
-          s2%PHAS%nb=S1%nb
+!          s2%PHAS%g=S1%g
+!          s2%PHAS%nb=S1%nb
           s2%VOLT%KIND=3
           if(S1%IVOLT>c_%np_pol) c_%np_pol=S1%IVOLT
           DONEIT=.TRUE.
@@ -854,8 +854,8 @@ CONTAINS
        IF(S1%IFREQ>0) THEN
           s2%FREQ%I=S1%IFREQ+S1%NPARA
           s2%FREQ%S=S1%SFREQ
-          s2%FREQ%g=S1%g
-          s2%FREQ%nb=S1%nb
+!          s2%FREQ%g=S1%g
+!          s2%FREQ%nb=S1%nb
           s2%FREQ%KIND=3
           if(S1%IFREQ>c_%np_pol) c_%np_pol=S1%IFREQ
           IF(S1%SET_TPSAFIT) THEN
@@ -869,8 +869,8 @@ CONTAINS
        IF(S1%IPHAS>0) THEN
           s2%PHAS%I=S1%IPHAS+S1%NPARA
           s2%PHAS%S=S1%SPHAS
-          s2%PHAS%g=S1%g
-          s2%PHAS%nb=S1%nb
+  !        s2%PHAS%g=S1%g
+  !        s2%PHAS%nb=S1%nb
           s2%PHAS%KIND=3
           if(S1%IPHAS>c_%np_pol) c_%np_pol=S1%IPHAS
           DONEIT=.TRUE.
@@ -887,8 +887,8 @@ CONTAINS
        IF(S1%IB_SOL>0) THEN
           s2%B_SOL%I=S1%IB_SOL+S1%NPARA
           s2%B_SOL%S=S1%SB_SOL
-          s2%B_SOL%g=S1%g
-          s2%B_SOL%nb=S1%nb
+    !      s2%B_SOL%g=S1%g
+    !      s2%B_SOL%nb=S1%nb
           s2%B_SOL%KIND=3
           DONEIT=.TRUE.
           if(S1%IB_SOL>c_%np_pol) c_%np_pol=S1%IB_SOL
@@ -2014,6 +2014,10 @@ CONTAINS
     TYPE(REAL_8),OPTIONAL :: VP
     TYPE(REAL_8),OPTIONAL :: DVP
     INTEGER N
+    !     DV=(XS%AC(n)%X(1)*COS(EL%theta_ac)-XS%AC(n)%X(2)*SIN(EL%theta_ac))
+    !     V=EL%DC_ac+EL%A_ac*DV
+    !     DV=el%D_ac*DV
+    !CALL transfer_ANBN(EL,ELP,VR=V,DVR=DV)
 
     if(EL%KIND==kind1) return
 

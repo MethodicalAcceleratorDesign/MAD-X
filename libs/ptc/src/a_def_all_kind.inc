@@ -10,7 +10,8 @@
   TYPE acceleration
      integer,pointer :: n=> null(),POS=> null(),nst => null()
      real(dp), pointer :: r=> null(),de(:)=> null(),e_in(:)=> null()  !, unit_time
-     type(work),pointer :: w1=> null(),w2 => null()
+     type(work),pointer :: w1=> null() 
+     type(work),pointer :: w2 => null()
      TYPE(FIBRE), pointer :: PREVIOUS => null()
      TYPE(FIBRE), pointer :: NEXT  => null()   
      type(temps_energie),pointer :: tableau(:) => null()

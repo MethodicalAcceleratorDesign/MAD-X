@@ -438,34 +438,7 @@ contains
     C%MAG%P%CHARGE=>c%CHARGE
     ! DIRECTIONAL VARIABLE
     C%MAG%P%DIR=>C%DIR
-    ! if(present(charge)) then
-    !    C%MAG%P%CHARGE=>CHARGE
-    ! endif
-    !  C%MAG=K
 
-    !    if(c_%x_prime) then
-    !       P0=>C%MAG%P%P0C
-    !       B0=>C%MAG%P%BETA0
-    !       IF(C%MAG%P%exact)THEN
-    !          IF(k%TIME)THEN
-    !             xp=x(2)/root(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
-    !             x(4)=x(4)/root(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
-    !             x(2)=xp
-    !          else
-    !             xp=x(2)/root((one+x(5))**2-x(2)**2-x(4)**2)
-    !             x(4)=x(4)/root((one+x(5))**2-x(2)**2-x(4)**2)
-    !             x(2)=xp
-    !          endif
-    !       else
-    !          IF(k%TIME)THEN
-    !             x(2)=x(2)/root(one+two*X(5)/B0+X(5)**2)
-    !             x(4)=x(4)/root(one+two*X(5)/B0+X(5)**2)
-    !          else
-    !             x(2)=x(2)/(one+x(5))
-    !             x(4)=x(4)/(one+x(5))
-    !          endif
-    !       endif
-    !    endif
 
 
     IF(PRESENT(X_IN)) then

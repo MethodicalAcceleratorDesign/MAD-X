@@ -3483,6 +3483,113 @@ endif
 
 
 
+subroutine dipole_check_step(m,n,L,b0,k1,x)
+implicit none
+integer m,n,i,j
+real(dp) L,b0,k1,h,x(2)
+real(dp) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
+
+x=0
+ 
+h=b0
+
+    SELECT CASE(m)
+ 
+    CASE(2)
+       DH=L/2.0_dp/n
+       D=L/n
+do i=1,n
+       call prot_drift(dh,X,h)
+       CALL SKICKt(x,D,b0,k1,h)
+       call prot_drift(dh,X,h)
+enddo
+    CASE(4)
+
+       D1=L*FD1/n
+       D2=L*FD2/n
+       DK1=L*FK1/n
+       DK2=L*FK2/n
+do i=1,n
+       call prot_drift(D1,X,h)
+       CALL SKICKt (x,DK1,b0,k1,h)
+       call prot_drift(D2,X,h)
+       CALL SKICKt (x,DK2,b0,k1,h)
+
+       call prot_drift(D2,X,h)
+ 
+       CALL SKICKt (x,DK1,b0,k1,h)
+       call prot_drift(D1,X,h)
+enddo
+
+    CASE(6)
+       DO I =1,4
+          DF(I)=L*YOSD(I)/n
+          DK(I)=L*YOSK(I)/n
+       ENDDO
+do i=1,n
+       DO J=4,2,-1
+       call prot_drift(Df(j),X,h)
+       CALL SKICKt (x,DK(J),b0,k1,h)
+       ENDDO
+ 
+       call prot_drift(Df(1),X,h)
+       CALL SKICKt (x,DK(1),b0,k1,h)
+
+       call prot_drift(Df(1),X,h)
+       DO J=2,4
+          CALL SKICKt (x,DK(J),b0,k1,h)
+       call prot_drift(Df(j),X,h)
+       ENDDO
+enddo
+
+
+    CASE DEFAULT
+       !w_p=0
+       !w_p%nc=1
+       !w_p%fc='(1(1X,A72))'
+         write(6,'(a12,1x,i4,1x,a17)') " THE METHOD ",m," IS NOT SUPPORTED"
+       ! call !write_e(357)
+    END SELECT
+
+end subroutine dipole_check_step
+
+subroutine SKICKt(x,yL,b0,k1,h)
+implicit none
+real(dp) yL,b0,k1,h,x(2)
+
+
+x(2)=x(2)-yL*(b0*(1.0_dp+h*x(1))+k1*x(1))
+
+end subroutine SKICKt
+
+  SUBROUTINE prot_drift(YL,X,h)
+    IMPLICIT NONE
+    real(dp) X(2)
+    real(dp) YL,h
+ 
+    real(dp) XN(2),PZ,pt
+    real(dp)  A,R
+           PZ=sqrt(1.0_dp-X(2)**2)
+    if(h/=0.0_dp) then
+       A=YL*h
+       R=1.0_dp/h
+ 
+ 
+
+          PT=1.0_dp-X(2)*TAN(A)/PZ
+          !       XN(1)=(X(1)+R)/COS(A)/PT-R
+          XN(1)=(X(1)+R*(2.0_dp*sin(a/2.0_dp)**2+X(2)*sin(A)/PZ))/COS(A)/PT
+          XN(2)=X(2)*COS(A)+SIN(A)*PZ
+ 
+    
+       X(1)=XN(1)
+       X(2)=XN(2)
+    else
+     x(1)=x(1)+x(2)*yl/pz
+    endif
+
+  END SUBROUTINE prot_drift
+
 
 
   SUBROUTINE  check_bend(xl,ggi,rhoi,xbend1,gf,met) ! A re-splitting routine

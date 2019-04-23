@@ -26,10 +26,10 @@ module polymorphic_complextaylor
   private cpmulsc,cpscmul,cpaddsc,cpscadd,cpsubsc,cpscsub ,cpdivsc,cpscdiv
   private div,cdivsc,cscdiv,ddivsc,dscdiv,divsc,scdiv,idivsc,iscdiv
   private POW,POWR,POWR8
-  private dexpt,dcost,dsint,dlogt,dsqrtt,abst,CONJGT
+  private dexpt,dcost,dsint,dlogt,dsqrtt,abst,CONJGT,print6
   PRIVATE dimagt,drealt,dcmplxt,GETint,GETORDER,CUTORDER,getchar,GETCHARnd2,GETintnd2
   !
-  private asscp
+  private asscp,make_it_knobc,kill_knobc
   private line
   character(120) line
 
@@ -902,8 +902,10 @@ module polymorphic_complextaylor
 
   INTERFACE daprint
      MODULE PROCEDURE printpoly
+     MODULE PROCEDURE print6
   END INTERFACE
   INTERFACE print
+     MODULE PROCEDURE print6
      MODULE PROCEDURE printpoly
   END INTERFACE
 
@@ -925,6 +927,17 @@ module polymorphic_complextaylor
      MODULE PROCEDURE resetpoly
      MODULE PROCEDURE resetpolyn
   END INTERFACE
+
+
+interface make_it_knob
+module procedure make_it_knobc
+end INTERFACE
+
+interface kill_knob
+module procedure kill_knobc
+end INTERFACE
+
+
   ! end Constructors and Destructors
 
 
@@ -940,7 +953,7 @@ contains
 
   FUNCTION polymorpht( S1 )
     implicit none
-    TYPE (double_complex) polymorpht
+    TYPE (complex_8) polymorpht
     TYPE (complextaylor), INTENT (IN) :: S1
     integer localmaster
 
@@ -996,7 +1009,19 @@ contains
     integer,optional ::  NDPT1
     logical(lp),optional :: PACKAGE
     logical(lp) PACKAGE1
-    integer ndptt
+    integer ndptt,i
+ 
+     if(associated(dz_8)) then
+      call kill(dz_8)
+      deallocate(dz_8)
+      nullify(dz_8)
+     endif
+     if(associated(dz_t)) then
+      call kill(dz_t)
+      deallocate(dz_t)
+      nullify(dz_t)
+     endif
+
     package1=.true.
     ndptt=0
     if(present(PACKAGE)) PACKAGE1=PACKAGE
@@ -1006,13 +1031,36 @@ contains
     call init_map_p(NO1,ND1,NP1,ndptt,PACKAGE1)
     call set_in_poly(PACKAGE1)
     call set_in_polyp(PACKAGE1)
+
+    allocate(dz_8(nv))
+    call alloc(dz_8)
+    allocate(dz_t(nv))
+    call alloc(dz_t)
+
+    do i=1,nv
+     dz_8(i)=morph(1.0_dp.mono.i)   
+    enddo
+    do i=1,nv
+     dz_t(i)=1.0_dp.mono.i   
+    enddo
+
   end subroutine  init_map_cp
 
   subroutine init_tpsa_cp(NO1,NV1,PACKAGE)
     implicit none
-    integer NO1,NV1
+    integer NO1,NV1,i
     logical(lp),optional :: PACKAGE
     logical(lp) PACKAGE1
+     if(associated(dz_8)) then
+      call kill(dz_8)
+      deallocate(dz_8)
+      nullify(dz_8)
+     endif
+     if(associated(dz_t)) then
+      call kill(dz_t)
+      deallocate(dz_t)
+      nullify(dz_t)
+     endif
     package1=.true.
     if(present(PACKAGE)) PACKAGE1=PACKAGE
     !w_p=>W_I                  ! default output, comment out if necessary
@@ -1020,6 +1068,18 @@ contains
     call init_tpsa_p(NO1,NV1,PACKAGE1)
     call set_in_poly(PACKAGE1)
     call set_in_polyp(PACKAGE1)
+
+    allocate(dz_8(nv))
+    call alloc(dz_8)
+    allocate(dz_t(nv))
+    call alloc(dz_t)
+
+    do i=1,nv
+     dz_8(i)=morph(1.0_dp.mono.i)   
+    enddo
+    do i=1,nv
+     dz_t(i)=1.0_dp.mono.i   
+    enddo
   end subroutine  init_tpsa_cp
 
 
@@ -1040,7 +1100,7 @@ contains
 
   SUBROUTINE  resetpoly(S2)
     implicit none
-    type (double_complex),INTENT(INOUT)::S2
+    type (complex_8),INTENT(INOUT)::S2
 
     if(s2%alloc) call killcomplex(s2%t)
     s2%alloc=f
@@ -1054,7 +1114,7 @@ contains
 
   SUBROUTINE  resetpolyn(S2,K)
     implicit none
-    type (double_complex),INTENT(INOUT),dimension(:)::S2
+    type (complex_8),INTENT(INOUT),dimension(:)::S2
     INTEGER,optional,INTENT(IN)::k
     INTEGER J,i,N
 
@@ -1074,7 +1134,7 @@ contains
 
   SUBROUTINE  resetpoly0(S2)
     implicit none
-    type (double_complex),INTENT(INOUT)::S2
+    type (complex_8),INTENT(INOUT)::S2
 
     if(s2%alloc) call killcomplex(s2%t)
     s2%alloc=f
@@ -1089,7 +1149,7 @@ contains
   !  FUNCTION GETchar( S1, S2 )
   !    implicit none
   !    complex(dp) GETchar
-  !    TYPE (double_complex), INTENT (IN) :: S1
+  !    TYPE (complex_8), INTENT (IN) :: S1
   !    CHARACTER(*)  , INTENT (IN) ::  S2
   !
   !    if(s1%kind==m2) then
@@ -1104,7 +1164,7 @@ contains
   !  FUNCTION GETint( S1, S2 )
   !    implicit none
   !    complex(dp) GETint
-  !    TYPE (double_complex), INTENT (IN) :: S1
+  !    TYPE (complex_8), INTENT (IN) :: S1
   !    integer  , INTENT (IN) ::  S2(:)
   !    !  integer localmaster
   !
@@ -1119,8 +1179,8 @@ contains
   !
   !  FUNCTION GETORDER( S1, S2 )
   !    implicit none
-  !    TYPE (double_complex) GETORDER
-  !    TYPE (double_complex), INTENT (IN) :: S1
+  !    TYPE (complex_8) GETORDER
+  !    TYPE (complex_8), INTENT (IN) :: S1
   !    integer  , INTENT (IN) ::  S2
   !
   !    if(s1%kind==m2) then
@@ -1137,8 +1197,8 @@ contains
   !
   !  FUNCTION CUTORDER( S1, S2 )
   !    implicit none
-  !    TYPE (double_complex) CUTORDER
-  !    TYPE (double_complex), INTENT (IN) :: S1
+  !    TYPE (complex_8) CUTORDER
+  !    TYPE (complex_8), INTENT (IN) :: S1
   !    integer  , INTENT (IN) ::  S2
   !
   !    if(s1%kind==m2) then
@@ -1154,8 +1214,8 @@ contains
 
   FUNCTION GETCHARnd2( S1, S2 )
     implicit none
-    TYPE (double_complex) GETCHARnd2
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) GETCHARnd2
+    TYPE (complex_8), INTENT (IN) :: S1
     CHARACTER(*)  , INTENT (IN) ::  S2
     integer localmaster
     type(complextaylor) t
@@ -1184,8 +1244,8 @@ contains
 
   FUNCTION GETintnd2( S1, S2 )
     implicit none
-    TYPE (double_complex) GETintnd2
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) GETintnd2
+    TYPE (complex_8), INTENT (IN) :: S1
     integer, INTENT (IN) ::  S2(:)
     integer localmaster
     type(complextaylor) t
@@ -1216,7 +1276,7 @@ contains
   FUNCTION GETchar( S1, S2 )
     implicit none
     complex(dp) GETchar
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8), INTENT (IN) :: S1
     CHARACTER(*)  , INTENT (IN) ::  S2
     integer i,j
     !  integer localmaster
@@ -1242,7 +1302,7 @@ contains
   FUNCTION GETint( S1, S2 )
     implicit none
     complex(dp) GETint
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8), INTENT (IN) :: S1
     integer  , INTENT (IN) ::  S2(:)
     integer i
 
@@ -1264,8 +1324,8 @@ contains
 
   FUNCTION GETORDER( S1, S2 )
     implicit none
-    TYPE (double_complex) GETORDER
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) GETORDER
+    TYPE (complex_8), INTENT (IN) :: S1
     integer  , INTENT (IN) ::  S2
     integer localmaster
 
@@ -1287,8 +1347,8 @@ contains
 
   FUNCTION CUTORDER( S1, S2 )
     implicit none
-    TYPE (double_complex) CUTORDER
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) CUTORDER
+    TYPE (complex_8), INTENT (IN) :: S1
     integer  , INTENT (IN) ::  S2
     integer localmaster
 
@@ -1312,8 +1372,8 @@ contains
 
   SUBROUTINE  A_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
     implicit none
-    type (double_complex),INTENT(INout)::S1
-    type (double_complex),optional, INTENT(INout):: S2,s3,s4,s5,s6,s7,s8,s9,s10
+    type (complex_8),INTENT(INout)::S1
+    type (complex_8),optional, INTENT(INout):: S2,s3,s4,s5,s6,s7,s8,s9,s10
     call allocpoly(s1)
     if(present(s2)) call allocpoly(s2)
     if(present(s3)) call allocpoly(s3)
@@ -1328,8 +1388,8 @@ contains
 
   SUBROUTINE  K_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
     implicit none
-    type (double_complex),INTENT(INout)::S1
-    type (double_complex),optional, INTENT(INout):: S2,s3,s4,s5,s6,s7,s8,s9,s10
+    type (complex_8),INTENT(INout)::S1
+    type (complex_8),optional, INTENT(INout):: S2,s3,s4,s5,s6,s7,s8,s9,s10
     call resetpoly0(s1)
     if(present(s2)) call resetpoly0(s2)
     if(present(s3)) call resetpoly0(s3)
@@ -1344,7 +1404,7 @@ contains
 
   SUBROUTINE  resetpolyn0(S2,K)
     implicit none
-    type (double_complex),INTENT(INOUT),dimension(:)::S2
+    type (complex_8),INTENT(INOUT),dimension(:)::S2
     INTEGER,optional,INTENT(IN)::k
     INTEGER J,i,N
 
@@ -1364,7 +1424,7 @@ contains
 
   SUBROUTINE  resetpoly_R(S2,FL)  !   STAYS REAL
     implicit none
-    type (double_complex),INTENT(INOUT)::S2
+    type (complex_8),INTENT(INOUT)::S2
     logical(lp),INTENT(IN)::FL
 
     if(s2%alloc) call killcomplex(s2%t)
@@ -1381,7 +1441,7 @@ contains
 
   SUBROUTINE  resetpoly_RN(S2,FL,K)
     implicit none
-    type (double_complex),INTENT(INOUT),dimension(:)::S2
+    type (complex_8),INTENT(INOUT),dimension(:)::S2
     logical(lp),INTENT(IN)::FL
 
     INTEGER,optional,INTENT(IN)::k
@@ -1406,7 +1466,7 @@ contains
 
   SUBROUTINE  allocpoly(S2)
     implicit none
-    type (double_complex),INTENT(INOUT)::S2
+    type (complex_8),INTENT(INOUT)::S2
 
     !  if(s2%alloc) call killcomplex(s2%t)
     s2%alloc=f
@@ -1414,14 +1474,14 @@ contains
     s2%r=0.0_dp
     s2%i=0
     s2%j=0
-    s2%g=0
+!    s2%g=0
     s2%s=1.0_dp
 
   END SUBROUTINE allocpoly
 
   SUBROUTINE  allocpolyn(S2,K)
     implicit none
-    type (double_complex),INTENT(INOUT),dimension(:)::S2
+    type (complex_8),INTENT(INOUT),dimension(:)::S2
     INTEGER,optional,INTENT(IN)::k
     INTEGER J,i,N
 
@@ -1441,13 +1501,14 @@ contains
 
   SUBROUTINE  printpoly(S2,mf)
     implicit none
-    type (double_complex),INTENT(INOUT)::S2
+    type (complex_8),INTENT(INOUT)::S2
     integer ipause,mypauses
     integer,optional :: mf
     integer i
+    character(255) line
     i=6
     if(present(mf)) i=mf
-
+          write(i,*) " printing a complex polymorph (complex_8)"
     if(s2%kind/=0) then
 
        select  case (s2%kind)
@@ -1456,10 +1517,21 @@ contains
        case(m2)
           call printcomplex(S2%t,i)
        case(m3)
-          write(i,*) s2%r
-          if(s2%i>0) then
-             write(i,*) "  +",s2%s,"  (x_",s2%i,"+ i","*x_",s2%j,")"
+
+          if(s2%i>0.and.s2%j>0) then
+             write(line,*) s2%r,"  +",s2%s,"  (x_",s2%i,"+ i","*x_",s2%j,")"
+          elseif(s2%i>0)then
+             write(line,*) s2%r,"  +",s2%s,"  (x_",s2%i,")"
+
+           elseif(s2%j>0)then
+             write(line,*) s2%r,"  +",s2%s,"  ( ","i*x_",s2%j,")"
+
+           else
+            write(line,*) s2%r
           endif
+             call context(line,maj=.false.)
+             write(i,'(a)') adjustr(line(1:len_trim(line)))
+        
        end   select
     else
 
@@ -1470,13 +1542,28 @@ contains
 
   END SUBROUTINE printpoly
 
-
+  SUBROUTINE  print6(S1,mf)
+    implicit none
+    type (complex_8),INTENT(INout)::S1(:)
+    integer,optional :: mf
+    integer        i
+    
+ !   if(size(s1)==6) then
+ !    do i=1,ndd
+ !       call print(s1(i),mf)
+ !    enddo
+ !   else
+     do i=lbound(s1,1),ubound(s1,1)
+        call print(s1(i),mf)
+     enddo
+ !   endif
+  END SUBROUTINE print6
 
   SUBROUTINE EQUAL(S2,S1)
     implicit none
     integer ipause, mypauses
-    type (double_complex),INTENT(inOUT)::S2
-    type (double_complex),INTENT(IN)::S1
+    type (complex_8),INTENT(inOUT)::S2
+    type (complex_8),INTENT(IN)::S1
     !    integer localmaster
 
     if(s1%kind==0) then
@@ -1594,7 +1681,7 @@ contains
   SUBROUTINE  EQUALRP(S2,S1)
     implicit none
     integer ipause, mypauses
-    type (double_complex),INTENT(inOUT)::S2
+    type (complex_8),INTENT(inOUT)::S2
     type (REAL_8),INTENT(IN)::S1
     !    integer localmaster
 
@@ -1712,7 +1799,7 @@ contains
     implicit none
     integer ipause, mypauses
     type (REAL_8),INTENT(inOUT)::S2
-    type (double_complex),INTENT(IN)::S1
+    type (complex_8),INTENT(IN)::S1
     !    integer localmaster
 
     if(s1%kind==0) then
@@ -1826,7 +1913,7 @@ contains
   FUNCTION drealt( S1 )
     implicit none
     TYPE (real_8) drealt
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8), INTENT (IN) :: S1
     integer localmaster
 
     select case(s1%kind)
@@ -1865,7 +1952,7 @@ contains
   FUNCTION dimagt( S1 )
     implicit none
     TYPE (real_8) dimagt
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8), INTENT (IN) :: S1
     integer localmaster
     select case(s1%kind)
     case(m1)
@@ -1901,7 +1988,7 @@ contains
 
   FUNCTION dcmplxt( S1,s2 )
     implicit none
-    TYPE (double_complex) dcmplxt
+    TYPE (complex_8) dcmplxt
     TYPE (real_8), INTENT (IN) :: S1,s2
     integer localmaster
     select case(s1%kind+ms*s2%kind)
@@ -2004,7 +2091,7 @@ contains
   SUBROUTINE  complexEQUAL(S2,S1)
     implicit none
     complex(dp) ,INTENT(inout)::S2
-    type (double_complex),INTENT(IN)::S1
+    type (complex_8),INTENT(IN)::S1
     !    integer localmaster
 
 
@@ -2035,7 +2122,7 @@ contains
   SUBROUTINE  EQUALcomplext(S2,S1)
     implicit none
     integer ipause, mypauses
-    type (double_complex),INTENT(inOUT)::S2
+    type (complex_8),INTENT(inOUT)::S2
     type (complextaylor),INTENT(IN)::S1
     !    integer localmaster
 
@@ -2063,7 +2150,7 @@ contains
 
   SUBROUTINE  complextEQUAL(S1,S2)
     implicit none
-    type (double_complex),INTENT(in)::S2
+    type (complex_8),INTENT(in)::S2
     type (complextaylor),INTENT(inout)::S1
     !    integer localmaster
 
@@ -2105,7 +2192,7 @@ contains
   SUBROUTINE  Dequaldacon(S2,R1)
     implicit none
     integer ipause, mypauses
-    type (double_complex),INTENT(inOUT)::S2
+    type (complex_8),INTENT(inOUT)::S2
     real(dp),INTENT(IN)::R1
 
     IF(S2%KIND==M3) THEN
@@ -2156,7 +2243,7 @@ contains
   SUBROUTINE  equaldacon(S2,R1)
     implicit none
     integer ipause, mypauses
-    type (double_complex),INTENT(inOUT)::S2
+    type (complex_8),INTENT(inOUT)::S2
     real(sp),INTENT(IN)::R1
 
     if(real_warning) call real_stop
@@ -2207,7 +2294,7 @@ contains
   SUBROUTINE  iequaldacon(S2,R1)
     implicit none
     integer ipause, mypauses
-    type (double_complex),INTENT(inOUT)::S2
+    type (complex_8),INTENT(inOUT)::S2
     integer,INTENT(IN)::R1
 
     IF(S2%KIND==M3) THEN
@@ -2258,7 +2345,7 @@ contains
   SUBROUTINE  cequaldacon(S2,R1)
     implicit none
     integer ipause, mypauses
-    type (double_complex),INTENT(inOUT)::S2
+    type (complex_8),INTENT(inOUT)::S2
     complex(dp),INTENT(IN)::R1
 
     IF(S2%KIND==M3) THEN
@@ -2307,8 +2394,8 @@ contains
 
   FUNCTION add( S1, S2 )
     implicit none
-    TYPE (double_complex) add
-    TYPE (double_complex), INTENT (IN) :: S1, S2
+    TYPE (complex_8) add
+    TYPE (complex_8), INTENT (IN) :: S1, S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -2398,8 +2485,8 @@ contains
 
   FUNCTION unaryADD( S1 )
     implicit none
-    TYPE (double_complex) unaryADD
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) unaryADD
+    TYPE (complex_8), INTENT (IN) :: S1
     integer localmaster
 
     select case(s1%kind)
@@ -2436,8 +2523,8 @@ contains
 
   FUNCTION daddsc( S1, S2 )
     implicit none
-    TYPE (double_complex) daddsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) daddsc
+    TYPE (complex_8), INTENT (IN) :: S1
     real(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -2475,8 +2562,8 @@ contains
 
   FUNCTION caddsc( S1, S2 )
     implicit none
-    TYPE (double_complex) caddsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) caddsc
+    TYPE (complex_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -2514,8 +2601,8 @@ contains
 
   FUNCTION dscadd( S2, S1 )
     implicit none
-    TYPE (double_complex) dscadd
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dscadd
+    TYPE (complex_8), INTENT (IN) :: S1
     real(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -2553,8 +2640,8 @@ contains
 
   FUNCTION cscadd( S2, S1 )
     implicit none
-    TYPE (double_complex) cscadd
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) cscadd
+    TYPE (complex_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -2592,8 +2679,8 @@ contains
 
   FUNCTION addsc( S1, S2 )
     implicit none
-    TYPE (double_complex) addsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) addsc
+    TYPE (complex_8), INTENT (IN) :: S1
     real(sp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -2632,8 +2719,8 @@ contains
 
   FUNCTION scadd( S2, S1  )
     implicit none
-    TYPE (double_complex) scadd
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) scadd
+    TYPE (complex_8), INTENT (IN) :: S1
     real(sp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -2672,8 +2759,8 @@ contains
 
   FUNCTION iaddsc( S1, S2 )
     implicit none
-    TYPE (double_complex) iaddsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) iaddsc
+    TYPE (complex_8), INTENT (IN) :: S1
     integer , INTENT (IN) :: S2
     integer localmaster
 
@@ -2711,8 +2798,8 @@ contains
 
   FUNCTION iscadd( S2, S1 )
     implicit none
-    TYPE (double_complex) iscadd
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) iscadd
+    TYPE (complex_8), INTENT (IN) :: S1
     integer, INTENT (IN) :: S2
     integer localmaster
 
@@ -2750,8 +2837,8 @@ contains
 
   FUNCTION subs( S1, S2 )
     implicit none
-    TYPE (double_complex) subs
-    TYPE (double_complex), INTENT (IN) :: S1, S2
+    TYPE (complex_8) subs
+    TYPE (complex_8), INTENT (IN) :: S1, S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -2841,8 +2928,8 @@ contains
 
   FUNCTION unarySUB( S1 )
     implicit none
-    TYPE (double_complex) unarySUB
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) unarySUB
+    TYPE (complex_8), INTENT (IN) :: S1
     integer localmaster
 
     select case(s1%kind)
@@ -2879,8 +2966,8 @@ contains
 
   FUNCTION dsubsc( S1, S2 )
     implicit none
-    TYPE (double_complex) dsubsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dsubsc
+    TYPE (complex_8), INTENT (IN) :: S1
     real(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -2918,8 +3005,8 @@ contains
 
   FUNCTION dscsub( S2, S1 )
     implicit none
-    TYPE (double_complex) dscsub
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dscsub
+    TYPE (complex_8), INTENT (IN) :: S1
     real(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -2957,8 +3044,8 @@ contains
 
   FUNCTION csubsc( S1, S2 )
     implicit none
-    TYPE (double_complex) csubsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) csubsc
+    TYPE (complex_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -2996,8 +3083,8 @@ contains
 
   FUNCTION cscsub( S2, S1 )
     implicit none
-    TYPE (double_complex) cscsub
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) cscsub
+    TYPE (complex_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -3035,8 +3122,8 @@ contains
 
   FUNCTION subsc( S1, S2 )
     implicit none
-    TYPE (double_complex) subsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) subsc
+    TYPE (complex_8), INTENT (IN) :: S1
     real(sp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -3075,8 +3162,8 @@ contains
 
   FUNCTION scsub( S2, S1 )
     implicit none
-    TYPE (double_complex) scsub
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) scsub
+    TYPE (complex_8), INTENT (IN) :: S1
     real(sp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -3115,8 +3202,8 @@ contains
 
   FUNCTION isubsc( S1, S2 )
     implicit none
-    TYPE (double_complex) isubsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) isubsc
+    TYPE (complex_8), INTENT (IN) :: S1
     integer , INTENT (IN) :: S2
     integer localmaster
 
@@ -3154,8 +3241,8 @@ contains
 
   FUNCTION iscsub( S2, S1 )
     implicit none
-    TYPE (double_complex) iscsub
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) iscsub
+    TYPE (complex_8), INTENT (IN) :: S1
     integer , INTENT (IN) :: S2
     integer localmaster
 
@@ -3193,8 +3280,8 @@ contains
 
   FUNCTION mul( S1, S2 )
     implicit none
-    TYPE (double_complex) mul
-    TYPE (double_complex), INTENT (IN) :: S1, S2
+    TYPE (complex_8) mul
+    TYPE (complex_8), INTENT (IN) :: S1, S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -3285,9 +3372,9 @@ contains
 
   FUNCTION pmul( S1, S2 )
     implicit none
-    TYPE (double_complex) pmul
+    TYPE (complex_8) pmul
     TYPE (real_8), INTENT (IN) :: S1
-    TYPE (double_complex), INTENT (IN) :: S2
+    TYPE (complex_8), INTENT (IN) :: S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -3377,9 +3464,9 @@ contains
 
   FUNCTION mulp( S1, S2 )
     implicit none
-    TYPE (double_complex) mulp
+    TYPE (complex_8) mulp
     TYPE (real_8), INTENT (IN) :: S2
-    TYPE (double_complex), INTENT (IN) ::  S1
+    TYPE (complex_8), INTENT (IN) ::  S1
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -3469,9 +3556,9 @@ contains
 
   FUNCTION padd( S1, S2 )
     implicit none
-    TYPE (double_complex) padd
+    TYPE (complex_8) padd
     TYPE (real_8), INTENT (IN) :: S1
-    TYPE (double_complex), INTENT (IN) :: S2
+    TYPE (complex_8), INTENT (IN) :: S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -3561,9 +3648,9 @@ contains
 
   FUNCTION addp( S2, S1 )
     implicit none
-    TYPE (double_complex) addp
+    TYPE (complex_8) addp
     TYPE (real_8), INTENT (IN) :: S1
-    TYPE (double_complex), INTENT (IN) :: S2
+    TYPE (complex_8), INTENT (IN) :: S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -3653,9 +3740,9 @@ contains
 
   FUNCTION psub( S1, S2 )
     implicit none
-    TYPE (double_complex) psub
+    TYPE (complex_8) psub
     TYPE (real_8), INTENT (IN) :: S1
-    TYPE (double_complex), INTENT (IN) :: S2
+    TYPE (complex_8), INTENT (IN) :: S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -3745,9 +3832,9 @@ contains
 
   FUNCTION subp(S2 , S1 )
     implicit none
-    TYPE (double_complex) subp
+    TYPE (complex_8) subp
     TYPE (real_8), INTENT (IN) :: S1
-    TYPE (double_complex), INTENT (IN) :: S2
+    TYPE (complex_8), INTENT (IN) :: S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -3837,9 +3924,9 @@ contains
 
   FUNCTION pdiv( S1, S2 )
     implicit none
-    TYPE (double_complex) pdiv
+    TYPE (complex_8) pdiv
     TYPE (real_8), INTENT (IN) :: S1
-    TYPE (double_complex), INTENT (IN) :: S2
+    TYPE (complex_8), INTENT (IN) :: S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -3929,9 +4016,9 @@ contains
 
   FUNCTION divp(S2 , S1 )
     implicit none
-    TYPE (double_complex) divp
+    TYPE (complex_8) divp
     TYPE (real_8), INTENT (IN) :: S1
-    TYPE (double_complex), INTENT (IN) :: S2
+    TYPE (complex_8), INTENT (IN) :: S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -4022,8 +4109,8 @@ contains
 
   FUNCTION cmulsc( S1, S2 )
     implicit none
-    TYPE (double_complex) cmulsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) cmulsc
+    TYPE (complex_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4061,8 +4148,8 @@ contains
 
   FUNCTION cscmul( S2, S1 )
     implicit none
-    TYPE (double_complex) cscmul
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) cscmul
+    TYPE (complex_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4100,7 +4187,7 @@ contains
 
   FUNCTION cpmulsc( S1, S2 )
     implicit none
-    TYPE (double_complex) cpmulsc
+    TYPE (complex_8) cpmulsc
     TYPE (real_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
@@ -4139,7 +4226,7 @@ contains
 
   FUNCTION cpscmul(S2 , S1 )
     implicit none
-    TYPE (double_complex) cpscmul
+    TYPE (complex_8) cpscmul
     TYPE (real_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
@@ -4179,7 +4266,7 @@ contains
 
   FUNCTION cpaddsc( S1, S2 )
     implicit none
-    TYPE (double_complex) cpaddsc
+    TYPE (complex_8) cpaddsc
     TYPE (real_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
@@ -4218,7 +4305,7 @@ contains
 
   FUNCTION cpscadd( S2  ,S1)
     implicit none
-    TYPE (double_complex) cpscadd
+    TYPE (complex_8) cpscadd
     TYPE (real_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
@@ -4257,7 +4344,7 @@ contains
 
   FUNCTION cpsubsc( S1, S2 )
     implicit none
-    TYPE (double_complex) cpsubsc
+    TYPE (complex_8) cpsubsc
     TYPE (real_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
@@ -4296,7 +4383,7 @@ contains
 
   FUNCTION cpscsub( S2  ,S1)
     implicit none
-    TYPE (double_complex) cpscsub
+    TYPE (complex_8) cpscsub
     TYPE (real_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
@@ -4335,7 +4422,7 @@ contains
 
   FUNCTION cpdivsc( S1, S2 )
     implicit none
-    TYPE (double_complex) cpdivsc
+    TYPE (complex_8) cpdivsc
     TYPE (real_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
@@ -4374,7 +4461,7 @@ contains
 
   FUNCTION cpscdiv( S2  ,S1)
     implicit none
-    TYPE (double_complex) cpscdiv
+    TYPE (complex_8) cpscdiv
     TYPE (real_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
@@ -4413,8 +4500,8 @@ contains
 
   FUNCTION dmulsc( S1, S2 )
     implicit none
-    TYPE (double_complex) dmulsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dmulsc
+    TYPE (complex_8), INTENT (IN) :: S1
     real(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4452,8 +4539,8 @@ contains
 
   FUNCTION dscmul( S2, S1 )
     implicit none
-    TYPE (double_complex) dscmul
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dscmul
+    TYPE (complex_8), INTENT (IN) :: S1
     real(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4491,8 +4578,8 @@ contains
 
   FUNCTION mulsc( S1, S2 )
     implicit none
-    TYPE (double_complex) mulsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) mulsc
+    TYPE (complex_8), INTENT (IN) :: S1
     real(sp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4531,8 +4618,8 @@ contains
 
   FUNCTION scmul( S2, S1 )
     implicit none
-    TYPE (double_complex) scmul
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) scmul
+    TYPE (complex_8), INTENT (IN) :: S1
     real(sp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4571,8 +4658,8 @@ contains
 
   FUNCTION imulsc( S1, S2 )
     implicit none
-    TYPE (double_complex) imulsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) imulsc
+    TYPE (complex_8), INTENT (IN) :: S1
     integer , INTENT (IN) :: S2
     integer localmaster
 
@@ -4581,10 +4668,15 @@ contains
        imulsc%r=s1%r*REAL(s2,kind=DP)
        imulsc%kind=1
     case(m2)
-       localmaster=master
-       call ass(imulsc)
-       imulsc%t= s1%t*REAL(s2,kind=DP)
-       master=localmaster
+       if(s2/=0) then
+        localmaster=master
+        call ass(imulsc)
+        imulsc%t= s1%t*REAL(s2,kind=DP)
+        master=localmaster
+       else
+        imulsc%r=0.0_dp
+        imulsc%kind=1
+       endif
     case(m3)
        if(knob) then
           localmaster=master
@@ -4610,8 +4702,8 @@ contains
 
   FUNCTION iscmul( S2, S1 )
     implicit none
-    TYPE (double_complex) iscmul
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) iscmul
+    TYPE (complex_8), INTENT (IN) :: S1
     integer , INTENT (IN) :: S2
     integer localmaster
 
@@ -4620,10 +4712,15 @@ contains
        iscmul%r=s1%r*REAL(s2,kind=DP)
        iscmul%kind=1
     case(m2)
-       localmaster=master
-       call ass(iscmul)
-       iscmul%t= s1%t*REAL(s2,kind=DP)
-       master=localmaster
+       if(s2/=0) then
+        localmaster=master
+        call ass(iscmul)
+        iscmul%t= s1%t*REAL(s2,kind=DP)
+        master=localmaster
+       else
+        iscmul%r=0.0_dp
+        iscmul%     kind=1
+       endif
     case(m3)
        if(knob) then
           localmaster=master
@@ -4649,8 +4746,8 @@ contains
 
   FUNCTION div( S1, S2 )
     implicit none
-    TYPE (double_complex) div
-    TYPE (double_complex), INTENT (IN) :: S1, S2
+    TYPE (complex_8) div
+    TYPE (complex_8), INTENT (IN) :: S1, S2
     integer localmaster
 
     select case(s1%kind+ms*s2%kind)
@@ -4740,8 +4837,8 @@ contains
 
   FUNCTION ddivsc( S1, S2 )
     implicit none
-    TYPE (double_complex) ddivsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) ddivsc
+    TYPE (complex_8), INTENT (IN) :: S1
     real(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4779,8 +4876,8 @@ contains
 
   FUNCTION dscdiv( S2, S1 )
     implicit none
-    TYPE (double_complex) dscdiv
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dscdiv
+    TYPE (complex_8), INTENT (IN) :: S1
     real(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4818,8 +4915,8 @@ contains
 
   FUNCTION cdivsc( S1, S2 )
     implicit none
-    TYPE (double_complex) cdivsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) cdivsc
+    TYPE (complex_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4857,8 +4954,8 @@ contains
 
   FUNCTION cscdiv( S2, S1 )
     implicit none
-    TYPE (double_complex) cscdiv
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) cscdiv
+    TYPE (complex_8), INTENT (IN) :: S1
     complex(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4896,8 +4993,8 @@ contains
 
   FUNCTION divsc( S1, S2 )
     implicit none
-    TYPE (double_complex) divsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) divsc
+    TYPE (complex_8), INTENT (IN) :: S1
     real(sp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4936,8 +5033,8 @@ contains
 
   FUNCTION scdiv( S2, S1 )
     implicit none
-    TYPE (double_complex) scdiv
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) scdiv
+    TYPE (complex_8), INTENT (IN) :: S1
     real(sp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -4976,8 +5073,8 @@ contains
 
   FUNCTION idivsc( S1, S2 )
     implicit none
-    TYPE (double_complex) idivsc
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) idivsc
+    TYPE (complex_8), INTENT (IN) :: S1
     integer , INTENT (IN) :: S2
     integer localmaster
 
@@ -5015,8 +5112,8 @@ contains
 
   FUNCTION iscdiv( S2, S1 )
     implicit none
-    TYPE (double_complex) iscdiv
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) iscdiv
+    TYPE (complex_8), INTENT (IN) :: S1
     integer , INTENT (IN) :: S2
     integer localmaster
 
@@ -5054,8 +5151,8 @@ contains
 
   FUNCTION POW( S1, S2 )
     implicit none
-    TYPE (double_complex) POW
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) POW
+    TYPE (complex_8), INTENT (IN) :: S1
     integer , INTENT (IN) :: S2
     integer localmaster
 
@@ -5093,8 +5190,8 @@ contains
 
   FUNCTION POWR( S1, S2 )
     implicit none
-    TYPE (double_complex) POWR
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) POWR
+    TYPE (complex_8), INTENT (IN) :: S1
     REAL(SP) , INTENT (IN) :: S2
     integer localmaster
 
@@ -5133,8 +5230,8 @@ contains
 
   FUNCTION POWR8( S1, S2 )
     implicit none
-    TYPE (double_complex) POWR8
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) POWR8
+    TYPE (complex_8), INTENT (IN) :: S1
     real(dp) , INTENT (IN) :: S2
     integer localmaster
 
@@ -5172,8 +5269,8 @@ contains
 
   FUNCTION dexpt( S1 )
     implicit none
-    TYPE (double_complex) dexpt
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dexpt
+    TYPE (complex_8), INTENT (IN) :: S1
     integer localmaster
 
     select case(s1%kind)
@@ -5210,8 +5307,8 @@ contains
 
   FUNCTION CONJGT( S1 )
     implicit none
-    TYPE (double_complex) CONJGT
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) CONJGT
+    TYPE (complex_8), INTENT (IN) :: S1
     integer localmaster
 
     select case(s1%kind)
@@ -5248,8 +5345,8 @@ contains
 
   FUNCTION dcost( S1 )
     implicit none
-    TYPE (double_complex) dcost
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dcost
+    TYPE (complex_8), INTENT (IN) :: S1
     integer localmaster
 
     select case(s1%kind)
@@ -5286,8 +5383,8 @@ contains
 
   FUNCTION dsint( S1 )
     implicit none
-    TYPE (double_complex) dsint
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dsint
+    TYPE (complex_8), INTENT (IN) :: S1
     integer localmaster
 
     select case(s1%kind)
@@ -5325,8 +5422,8 @@ contains
 
   FUNCTION dlogt( S1 )
     implicit none
-    TYPE (double_complex) dlogt
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dlogt
+    TYPE (complex_8), INTENT (IN) :: S1
     integer localmaster
 
     select case(s1%kind)
@@ -5363,8 +5460,8 @@ contains
 
   FUNCTION dsqrtt( S1 )
     implicit none
-    TYPE (double_complex) dsqrtt
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8) dsqrtt
+    TYPE (complex_8), INTENT (IN) :: S1
     integer localmaster
 
     select case(s1%kind)
@@ -5402,7 +5499,7 @@ contains
   FUNCTION abst( S1 )
     implicit none
     real(dp) abst
-    TYPE (double_complex), INTENT (IN) :: S1
+    TYPE (complex_8), INTENT (IN) :: S1
 
 
 
@@ -5426,7 +5523,7 @@ contains
 
   subroutine asscp(s1)
     implicit none
-    TYPE (double_complex) s1
+    TYPE (complex_8) s1
     integer ipause,mypauses
 
     select case(master)
@@ -5465,56 +5562,76 @@ contains
 
   !  end subroutine asscp0
 
+  subroutine make_it_knobc(k,i,j,s)
+    implicit none
+    TYPE (complex_8), intent(inout) :: k
+    complex(dp), optional :: s
+    integer, intent(in) :: i,j
+    if(i==0.and.j==0) return
+    k%s=1.0_dp
+    if(present(s)) k%s=s
+    k%i=i
+    k%j=j
+    k%kind=3
+  end subroutine make_it_knobc
 
+  subroutine kill_knobc(k)
+    implicit none
+    TYPE (complex_8), intent(inout) :: k
+    k%s=1.0_dp
+    k%i=0
+    k%j=0
+    k%kind=1
+  end subroutine kill_knobc
 
   SUBROUTINE  varck1(S2)
     implicit none
-    type (double_complex)  S2
+    type (complex_8)  S2
 
     if(knob) then
-       if(nb_==0) then
+    !   if(nb_==0) then
           varc1=(/S2%R,S2%S/).var.(/s2%i+npara_fpp,s2%j+npara_fpp/)
-       elseif(s2%nb==nb_) then
-          varc1=(/S2%R,S2%S/).var.(/s2%i+npara_fpp-s2%g+1,s2%j+npara_fpp-s2%g+1/)
-       else
-          varc1=S2%R
-       endif
+     !  elseif(s2%nb==nb_) then
+     !     varc1=(/S2%R,S2%S/).var.(/s2%i+npara_fpp-s2%g+1,s2%j+npara_fpp-s2%g+1/)
+     !  else
+      !    varc1=S2%R
+     !  endif
     else ! Not a knob
        stop 3330   ! buggy never used
-       varc1=(/S2%R,S2%S/).var.(/0,0/)
+    !   varc1=(/S2%R,S2%S/).var.(/0,0/)
     endif
 
   end SUBROUTINE  varck1
 
   SUBROUTINE  varck2(S2)
     implicit none
-    type (double_complex)  S2
+    type (complex_8)  S2
 
 
     if(knob) then
-       if(nb_==0) then
+   !    if(nb_==0) then
           varc2=(/S2%R,S2%S/).var.(/s2%i+npara_fpp,s2%j+npara_fpp/)
-       elseif(s2%nb==nb_) then
-          varc2=(/S2%R,S2%S/).var.(/s2%i+npara_fpp-s2%g+1,s2%j+npara_fpp-s2%g+1/)
-       else
-          varc2=S2%R
-       endif
+    !   elseif(s2%nb==nb_) then
+    !      varc2=(/S2%R,S2%S/).var.(/s2%i+npara_fpp-s2%g+1,s2%j+npara_fpp-s2%g+1/)
+    !   else
+    !      varc2=S2%R
+    !   endif
     else ! Not a knob
        stop 3331   ! buggy never used
-       varc2=(/S2%R,S2%S/).var.(/0,0/)
+    !   varc2=(/S2%R,S2%S/).var.(/0,0/)
     endif
 
   end SUBROUTINE  varck2
 
   ! remove small numbers
 
-  SUBROUTINE  clean_double_complex(S1,S2,prec)
+  SUBROUTINE  clean_complex_8(S1,S2,prec)
     implicit none
-    type (double_complex),INTENT(INOUT)::S2
-    type (double_complex), intent(INOUT):: s1
+    type (complex_8),INTENT(INOUT)::S2
+    type (complex_8), intent(INOUT):: s1
     real(dp) prec
  
-    type(double_complex) t
+    type(complex_8) t
 
     call alloc(t)
     t=s1
@@ -5532,7 +5649,7 @@ contains
        !w_p%nc=2
        !w_p%fc='((1X,A72,/,1x,a72))'
        !w_p%fi='(2((1X,i4)))'
-         write(6,*) " trouble in clean_double_complex "
+         write(6,*) " trouble in clean_complex_8 "
          write(6,*) "s1%kind   "
        !w_p=(/s1%kind  /)
        ! call !write_e(0)
@@ -5541,7 +5658,7 @@ contains
     call kill(t)
 
 
-  END SUBROUTINE clean_double_complex
+  END SUBROUTINE clean_complex_8
 
 
 
