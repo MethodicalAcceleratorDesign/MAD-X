@@ -70,6 +70,8 @@ test-beam \
 \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 test-rfmultipole-7 \
 \
+test-ptc-elements \
+test-rfmultipole-ptc-1 \
 test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 test-ptc-twiss-4 \
 test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 test-ptc-twiss-old6 test-ptc-twiss-old7 \
 test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D test-ptc-twiss-6D-ALS \
@@ -79,13 +81,12 @@ test-ptc-track test-ptc-track-2 test-ptc-track-3 test-ptc-track-4 test-ptc-track
 test-ptc-track-acd test-ptc-track-acd-2 test-ptc-track-6Dtl-acd \
 test-ptc-trackline test-ptc-trackline-2 test-ptc-trackline-3 \
 test-ptc-align test-ptc-align-2 \
-test-rfmultipole-ptc-1 \
 test-touschek test-touschek-2 \
 test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 test-sequence-7 test-sequence-8 test-sequence-9\
 test-line \
 test-plot test-plot-2 \
-test-setknob test-fillknob\
-test-coupling test-coupling-2\
+test-setknob test-fillknob \
+test-coupling test-coupling-2 \
 \
 $(call onlxi64,$(user-cases),)
 
