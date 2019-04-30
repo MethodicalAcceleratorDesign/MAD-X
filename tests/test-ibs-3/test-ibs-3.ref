@@ -3,7 +3,7 @@
   +     MAD-X 5.04.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2018.10.03               +
-  + Execution date: 2019.04.30 14:24:47      +
+  + Execution date: 2019.04.30 17:23:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -147,7 +147,7 @@ orbit:   2.225068E-06  3.094154E-07  0.000000E+00  0.000000E+00  1.311525E-02  1
                  0 
 ibs,file=ibs-table.tfs;
 
- sige    4.1398738927900091E-003
+ sige    1.5000000478849695E-002
  Twiss was calculated at the center of the elements. No interpolation is used
 
  Global parameters for the machine: 
@@ -161,26 +161,26 @@ radiate = T:
 
  Emittances:
 
-     Ex            0.125070E+01 pi*mm*mrad     sigx            2.579938 mm
+     Ex            0.125070E+01 pi*mm*mrad     sigx            2.579966 mm
      Ey            0.125070E+04 pi*mm*mrad     sigy           88.883452 mm
-     Et            0.750000E+02 pi*mm*mrad     sigt           18.116494 mm             sigE          4.139874 1/1000
+     Et            0.750000E+02 pi*mm*mrad     sigt            9.000000 mm             sigE         15.000000 1/1000
 
 sequence name: pdr
 
 rf  0.100000E-04   10.0000       999.950      0.500000       0.00000    
 
-     CONST               =   9.010820E-12
+     CONST               =   5.050282E-12
 
      ENERGY              =       2.860000 GeV
      BETA                =       1.000000
      GAMMA               =       5596.880
-     COULOMB LOG         =         24.337
+     COULOMB LOG         =         24.552
 
      X-emittance         =   1.250699E-06 m*rad
      Y-emittance         =   1.250699E-03 m*rad
 
-     Momentum spread     =   4.139874E-03
-     Bunch length        =       0.018116 m
+     Momentum spread     =   1.500000E-02
+     Bunch length        =       0.009000 m
 
      Particles per bunch =   4.500000E+11
      Bunch current       =   5.554262E-02 A
@@ -192,14 +192,14 @@ rf  0.100000E-04   10.0000       999.950      0.500000       0.00000
      1/betx =   2.64019E-01    1/bety =   1.96289E-01
 
      (Weighted) average rates (1/sec):
-     Longitudinal=    5.658544E-08
-     Horizontal  =    1.373764E-08
-     Vertical    =   -2.134084E-16
+     Longitudinal=    6.358057E-09
+     Horizontal  =    1.349270E-08
+     Vertical    =   -3.271759E-16
 
      (Weighted) average lifetimes (sec):
-     Longitudinal=    1.767239E+07
-     Horizontal  =    7.279273E+07
-     Vertical    =   -4.685852E+15
+     Longitudinal=    1.572808E+08
+     Horizontal  =    7.411413E+07
+     Vertical    =   -3.056460E+15
 
 
 

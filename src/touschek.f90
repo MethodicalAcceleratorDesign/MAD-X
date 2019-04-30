@@ -291,18 +291,20 @@ subroutine cavtouschek (um,uloss,iflag)
 
      flagerr = double_from_table_row('twiss ','t ',1,orbit5)
      phirf = rfl * twopi - omega * orbit5
-     c0    = vrf * charge
+     c0    = vrf * abs(charge)
      if (cos(phirf) .lt. 0) vrf = -vrf
      eta = alfa - one / gammas**2
      if (uloss .ne. zero) then
-        qover = qover +  rfv/uloss
-        vrfsum = vrfsum +  rfv/harmonl !Charge is not inccluded sine it is not used in twiss or track for the rf-cavity 
+        qover = qover +  abs(charge)*rfv/uloss
+        vrfsum = vrfsum +  abs(charge)*rfv/harmonl !Charge is not inccluded sine it is not used in twiss or track for the rf-cavity 
         harmonlm = min(harmonl, harmonlm)
      else
         umt = umt + (two * c0) / (harmonl * eta * pi)
      endif
 
   endif
+
+
 
 11 if (advance_node().ne.0)  goto 10
 
