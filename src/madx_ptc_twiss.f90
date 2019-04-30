@@ -15,7 +15,7 @@ module madx_ptc_twiss_module
   save
 
 
-    
+
   !============================================================================================
   !  PUBLIC INTERFACE
   public                         :: twiss,ptc_twiss
@@ -88,7 +88,7 @@ module madx_ptc_twiss_module
   logical     :: slice_magnets, center_magnets, deltap_dependency, isRing
 
   logical     :: resetBetaExtrema;
-  
+
 
   real(dp)    :: minBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table
   real(dp)    :: maxBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table)
@@ -96,25 +96,25 @@ module madx_ptc_twiss_module
   real(dp)    :: maxBetX      ! Edwards-Teng betas
   real(dp)    :: minBetY      ! Edwards-Teng betas
   real(dp)    :: maxBetY      ! Edwards-Teng betas
-  real(dp)    :: minDisp(4)  
-  real(dp)    :: maxDisp(4)  
+  real(dp)    :: minDisp(4)
+  real(dp)    :: maxDisp(4)
 
   logical     :: resetOrbitExtrema
-  real(dp)    :: minOrbit(6)  
+  real(dp)    :: minOrbit(6)
   real(dp)    :: maxOrbit(6)
   real(dp)    :: sum2Orbit(6) ! sum of squares for rms calculatios
   integer     :: nobsOrbit    ! counter of observation points for rms calculation
-  
+
   ! slice tracking displays many points at the same position
-  ! for rms only the last should be taken 
+  ! for rms only the last should be taken
   real(dp)    :: prevOrbit(6)
   real(dp)    :: prevS(6)
-  
+
   character(2000), private  :: whymsg
-  
+
   character(48)           :: nl_table_name='nonlin'
   character(48)           :: rdt_table_name='twissrdt'
-  
+
   !============================================================================================
   !  PRIVATE
   !    routines
@@ -124,7 +124,7 @@ module madx_ptc_twiss_module
 
 contains
   !____________________________________________________________________________________________
-  
+
   subroutine initIaaMatrix()
     implicit none
     integer i
@@ -133,9 +133,9 @@ contains
     do i=1,3
       Iaa(2*i-1,2*i-1,i) =1;  Iaa(2*i,2*i,i)   = 1;
     enddo
-    
+
   end subroutine initIaaMatrix
-  
+
   subroutine dispersion6D(A_script,disp)
     implicit none
 !    type(probe_8), intent(in)::A_script_probe
@@ -145,36 +145,36 @@ contains
     real(dp) ::amatrix_inv(6,6),Ha(6,6,3)
     integer i,j, inverr
     ! H based dispersion as in Chao-Sands paper
-    
+
     do i=1,6
       do j=1,6
         amatrix(i,j) = A_script(i).sub.fo(j,:)
       enddo
     enddo
-    
+
     inverr = 0
     call matinv(amatrix, amatrix_inv,6,6,inverr) ! amap**(-1) ! and invert it and copy to 6:6 matrix
     if (inverr .ne. 0) then
       call fort_warn('ptc_twiss::dispersion6D ',' Can not invert A_script linear')
       disp = zero;
     endif
-    
-    
+
+
     do i=1,c_%nd
-   
+
       Ha(1:6,1:6,i)=matmul(matmul(amatrix,Iaa(1:6,1:6,i)),amatrix_inv)  ! (15b)
-     
+
     enddo
 
    do i=1,4
      disp(i) = Ha(i,5,3)/Ha(5,5,3)
-   enddo    
-    
-   
+   enddo
+
+
   end subroutine dispersion6D
 
- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-  
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   !version on polynomials to non-linear dispersion
   subroutine dispersion6Dp(A_script,disp)
     implicit none
@@ -182,13 +182,13 @@ contains
     real(dp), intent(out)  :: disp(4)
     type(taylor)  dispT(4)
     type(damap)  :: amap, dispMap
-    type(damap)  :: Iaa_map 
+    type(damap)  :: Iaa_map
     real(dp)  :: amatrix(6,6)
     real(dp) ::amatrix_inv(6,6),Ha(6,6,3), v
     integer i,j,k
     ! H based dispersion as in Chao-Sands paper
 
-    
+
     call alloc(dispMap)
     call alloc(dispT)
     call alloc(amap)
@@ -197,18 +197,18 @@ contains
     print*,"++++++++++++++"
     print*, "amap"
     call print(amap,6)
-    
+
     amatrix    =amap       ! now we can copy to simple 6:6 matrix
     amatrix_inv=amap**(-1) ! and invert it and copy to 6:6 matrixs
-    
+
     call alloc(Iaa_map)
-        
+
     do i=1,c_%nd
-   
+
       Ha(1:6,1:6,i)=matmul(matmul(amatrix,Iaa(1:6,1:6,i)),amatrix_inv)  ! (15b)
 
     enddo
-      
+
     do i=3,3 ! i=1,c_%nd
       Iaa_map = zero;
       do j=1,6
@@ -217,46 +217,46 @@ contains
           v = Iaa(j,k,i)
           Iaa_map%v(j) = Iaa_map%v(j) + v*(1.0_dp.mono.fo(k,:))
         enddo
-      enddo 
+      enddo
       print*,"++++++++++++++"
       print*, "Iaa ", i
       call print(Iaa_map,6)
-      
+
       dispMap = amap * Iaa_map * amap**(-1)
-      
-     
+
+
       !do ii=1,6
       !  print*,"        ",Ha(1:6,ii,i)
       !enddo
-     
+
     enddo
 
-   
+
    dispMap = dispMap * (1.0_dp /  Ha(5,5,3));
 
    ! print*,"++++++++++++++"
    ! print*, "dispMap"
    !call print(dispMap,6)
-   
+
 
    do i=1,4
      disp(i) = Ha(i,5,3)/Ha(5,5,3)
-     
+
      dispT(i) = dispMap%v(i).par.fo(5,:)
-     
+
      if (getdebug() > 2) then
        print*, 'Disp ', i, ' R', disp(i) , ' Map ', dispMap%v(i).sub.fo(5,:)
        print*, "Taylor "
        call print(dispT(i),6)
      endif
-     
-   enddo    
-    
-   call kill(amap) 
-   
+
+   enddo
+
+   call kill(amap)
+
   end subroutine dispersion6Dp
-    
- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine equaltwiss(s1,A_script)
     implicit none
@@ -277,25 +277,25 @@ contains
       call seterrorflag(10,"equaltwiss CHECK 0 ",whymsg)
       return
     endif
-    
-    
+
+
     lat = zero
-    
+
     ndel=0
     if(c_%ndpt/=0 .and. isRing )  then
       ! in case of icase=56 the closed solution in long is not searched
        !print*, "We are at the mode 6D + nocav"
        ndel=1  !this is 6D without cavity (MADX icase=56) for a ring
     endif
-    ! calculation of alpha, beta, gamma 
+    ! calculation of alpha, beta, gamma
     J=0;
-    
+
     !print*, "EqualTwiss nd=",c_%nd," nd2=",c_%nd2, " ndel=", ndel
 
     beta(1) = (A_script(1).sub.'100000')**2 + (A_script(1).sub.'010000')**2
     beta(2) = (A_script(3).sub.'001000')**2 + (A_script(3).sub.'000100')**2
     if ( c_%nd > 2 ) beta(3) = (A_script(6).sub.'000010')**2 + (A_script(6).sub.'000001')**2
-    
+
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
       write(whymsg,*) ' check_stable ',check_stable,' c_%stable_da ',c_%stable_da,' PTC msg: ', &
                        messagelost(:len_trim(messagelost))
@@ -304,8 +304,8 @@ contains
       return
     endif
 
-    !print*, " Skowron 1 EqTwiss ", beta    
-    
+    !print*, " Skowron 1 EqTwiss ", beta
+
     do i=1,c_%nd2-2*ndel
        do jj=i,c_%nd2-2*ndel
           do k=1,c_%nd-ndel
@@ -319,9 +319,9 @@ contains
           enddo
        enddo
     enddo
-    
+
     !print*,"BETZ=",(A_script(6).sub.'000010')**2 + (A_script(6).sub.'000001')**2
-    
+
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
       write(whymsg,*) ' check_stable ',check_stable,' c_%stable_da ',c_%stable_da,' PTC msg: ', &
                        messagelost(:len_trim(messagelost))
@@ -329,7 +329,7 @@ contains
       call seterrorflag(10,"equaltwiss CHECK 2 ",whymsg)
       return
     endif
-    
+
     J=0
     !here ND2=4 and delta is present      nd2=6 and delta is a constant
     !      print*,"nv",c_%nv,"nd2",c_%nd2,"np",c_%np,"ndpt",c_%ndpt ,"=>",c_%nv-c_%nd2-c_%np
@@ -339,9 +339,9 @@ contains
           lat(0,i,1)=(A_script(i).sub.J5)
        enddo
     elseif (c_%nd2 == 6) then
-      
+
       call dispersion6D(A_script,lat(0,1:4,1))
-    
+
     else
        do i=1,4
           lat(0,i,1)=zero
@@ -413,7 +413,7 @@ contains
           s1%gama(k,i)= lat(2*k  ,2*k  ,i)
        enddo
     enddo
-    
+
     !print*, " Skowron EqTwiss ", s1%beta
     ! --- derivatives of the Twiss parameters w.r.t delta_p
     if (deltap_dependency) then
@@ -555,7 +555,7 @@ contains
     logical(lp)             :: maptable
     logical(lp)             :: ring_parameters  !! forces isRing variable to true, i.e. calclulation of closed solution
     logical(lp)             :: doNormal         !! do normal form analysis
-    logical(lp)             :: doRDTtracking    !! 
+    logical(lp)             :: doRDTtracking    !!
     logical(lp)             :: isstochastic  !! tempurary veriable used in switching off stochastic in closed orbit search
     type(c_damap)           :: AscriptInPhasor, dummyMap  !! maps for RDTs calculations
     type(c_vector_field)    :: vectorField                !! defined here to avoid every step alloc and kill
@@ -566,13 +566,13 @@ contains
     logical(lp)             :: isTMsave ! flag that TM was recorded during pre-run for closed solution search
     logical(lp)             :: doTMtrack ! true if rmatrix==true .and. isRing==true . do not track theTransferMap and save time
                                            !      .or. already tracked form closed solution search
-    logical(lp)             :: usertableActive = .false.  ! flag to mark that there was something requested with ptc_select 
+    logical(lp)             :: usertableActive = .false.  ! flag to mark that there was something requested with ptc_select
     integer                 :: countSkipped
     character(48)           :: summary_table_name
     character(12)           :: tmfile='transfer.map'
     character(48)           :: charconv !routine
-    
-     
+
+
     if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
        call seterrorflag(1,"ptc_twiss ","no universe created till now");
@@ -583,7 +583,7 @@ contains
        call seterrorflag(2,"ptc_twiss ","no layout created till now");
        return
     endif
-    
+
     if (getdebug() > 1) then
       if(.not.associated(MY_RING%t)) then
         print*,"ptc_twiss: NODE LAYOUT ALREADY CREATED"
@@ -594,10 +594,10 @@ contains
 
     call resetBetaExtremas()
     call initIaaMatrix()
-    
+
     !skipnormalform = my_false
     countSkipped = 0
-    
+
     !all zeroing
     testold = zero
     phase = zero
@@ -625,7 +625,7 @@ contains
 
     nda = getnknobsall() !defined in madx_ptc_knobs
     suml=zero
-    
+
     rmatrix = get_value('ptc_twiss ','rmatrix ') .ne. 0
     if ( (getnknobsall() + getnpushes()) < 1) then
       usertableActive = .false.
@@ -633,9 +633,9 @@ contains
       usertableActive = .true.
       rmatrix = .true. ! for the time being force if ptc_select or ptc_knob was defined
     endif
-    
+
     isTMsave = .false.
-        
+
     no = get_value('ptc_twiss ','no ')
     if ( no .lt. 1 ) then
        call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in twiss is smaller then 1')
@@ -668,7 +668,7 @@ contains
     deltap_dependency = get_value('ptc_twiss ','deltap_dependency ') .ne. 0
 
     if (deltap_dependency) then
-    
+
       if (.not.((icase.eq.5) .or. (icase.eq.56))) then
          call fort_warn('ptc_twiss: ','derivation w.r.t deltap assume deltap is fixed parameter')
          call fort_warn('ptc_twiss: ','derivation w.r.t deltap assume icase=5 (formula differentiation) or icase=56 (from map)')
@@ -685,9 +685,9 @@ contains
      if (no < 4) then
        call fort_warn("ptc_twiss ","For dispersion's 3rd order derivatives w.r.t delta-p there must be no>=4 ")
      endif
-    
+
     endif
-    
+
     !############################################################################
     !############################################################################
     !############################################################################
@@ -696,18 +696,18 @@ contains
     center_magnets = get_value('ptc_twiss ','center_magnets ') .ne. 0
 
     slice = slice_magnets .or. center_magnets
-        
+
     if ( slice) then
-     call make_node_layout(my_ring) 
+     call make_node_layout(my_ring)
      call getBeamBeam()
-    endif 
-    
+    endif
+
 
     !############################################################################
     !############################################################################
     !############################################################################
 
-    
+
     orbit(:)=zero
     ! read the orbit
     ! if closed orbit is to be found pass it as the starting point for the searcher
@@ -724,7 +724,7 @@ contains
        dt=deltap
     endif
     if(icase.eq.5 .or. icase.eq.56) orbit(5) = dt + orbit(5)
-    
+
     closed_orbit = get_value('ptc_twiss ','closed_orbit ') .ne. 0
 
     if( closed_orbit .and. (icav .gt. 0) .and. (my_ring%closed .eqv. .false.)) then
@@ -750,17 +750,17 @@ contains
          call print(default,6)
        endif
 
-       ! disable stochastic for closed orbit seach       
+       ! disable stochastic for closed orbit seach
        isstochastic = default%stochastic
-       default%stochastic = .false. 
-       
+       default%stochastic = .false.
+
        current=>my_ring%start
        !global_verbose = .true.
        call FIND_ORBIT_x(orbit,default,c_1d_8,fibre1=current)
        !global_verbose = .false.
-       
+
        default%stochastic = isstochastic
-       
+
        if ( .not. check_stable) then
           write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
           call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
@@ -768,7 +768,7 @@ contains
           call tidy()
           return
        endif
-       
+
       if (getdebug() > 1) then
          CALL write_closed_orbit(icase,orbit)
       endif
@@ -778,14 +778,14 @@ contains
        !CALL write_closed_orbit(icase,x) at this position it isn't read
     endif
 
-    
+
     orbit_probe = orbit
-    
+
     mynd2 = 0
     npara = 0
-    
+
     writetmap = get_value('ptc_twiss ','writetmap ') .ne. 0
-    
+
     !this must be before initialization of the Bertz
 
     initial_distrib_manual = get_value('ptc_twiss ','initial_moments_manual ') .ne. 0
@@ -796,21 +796,23 @@ contains
        call readinitialdistrib()
     endif
 
+
     ! old PTC
     !call init(default,no,nda,BERZ,mynd2,npara)
-    
+
     !new complex PTC
     call init_all(default,no,nda,BERZ,mynd2,npara,nclocks) ! need to add number of clocks
     c_verbose=.false.
-    
+
     i_piotr(:) = 0
     i_piotr(1)=1; i_piotr(2)=3; i_piotr(3)=5;
-    
+
     c_normal_auto=.true.;
+
 
 !    call init_all(default,no,nda)
     ! mynd2 and npara are outputs
-    
+
     if (getdebug() > 2) then
        print *, "ptc_twiss: internal state after init:"
        call print(default,6)
@@ -839,13 +841,12 @@ contains
     A_script_probe%x=npara
     A_script_probe%x=orbit
 
+
     !This must be before init map
     call alloc(theTransferMap)
     theTransferMap%u = .false.
     theTransferMap%x = npara
     theTransferMap%x = orbit
-
-
 
     !############################################################################
     !############################################################################
@@ -855,7 +856,6 @@ contains
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !
     call initmap(dt,slice)
-
 
     if (geterrorflag() /= 0) then
        !if arror occured then return
@@ -871,11 +871,10 @@ contains
       call tidy()
       return
     endif
-    
-    !############################################################################
-    !############################################################################
-    !############################################################################
 
+    !############################################################################
+    !############################################################################
+    !############################################################################
 
        doRDTtracking = get_value('ptc_twiss ','trackrdts ') .ne. 0
        if (doRDTtracking) then
@@ -884,19 +883,19 @@ contains
           call alloc(AscriptInPhasor)
           call alloc(dummyMap)
        endif
-       
 
-     
+
+
 
     !############################################################################
     !############################################################################
     !############################################################################
-    
-    
-    
+
+
+
     ! assume that we track the transfer map
     doTMtrack = .true.
-    
+
     !and check now if we could skip it and save time
     if ((usertableActive .eqv. .false.) ) then
       !we do not need the full thing to fill usertable
@@ -904,35 +903,34 @@ contains
       ! we can consider saving the map in universal taylor, if this still pays back
 
       if (getdebug() > 1) then
-        print*, "There is no user tables (ptc_select or ptc_knobs), we can eventually skip the TM tracking"  
+        print*, "There is no user tables (ptc_select or ptc_knobs), we can eventually skip the TM tracking"
         print*, "FLAGS: isTMsave  slice  rmatrix isRing"
         print*, isTMsave,  slice , rmatrix, isRing
-        ! isTMsave - tells if Transfer Matrix was saved; true if A_ initized from closed solution 
-        ! slice - 
+        ! isTMsave - tells if Transfer Matrix was saved; true if A_ initized from closed solution
+        ! slice -
         ! rmatrix - user requests rmatrix in the twiss table
         ! isRing - request closed solution to twiss table
-      endif  
-      
+      endif
+
       if ( isTMsave .and.  (slice .eqv. .false.) ) then
         !the matrix was tracked in the initmap, and slice is off (it is saved only for each element)
-        ! in the future should do support for slicing 
+        ! in the future should do support for slicing
         doTMtrack = .false.
       endif
-      
-      
+
+
       !another independent condition
       if ( (isRing .eqv. .false.) .and. (rmatrix .eqv. .false.) ) then
         !we do not have to do the normal form at the end (isRing false)
         ! and
-        !the user does not want transfer maps (rmatrix false) 
+        !the user does not want transfer maps (rmatrix false)
         !
         doTMtrack = .false.
-      endif  
-      
-     
-     endif 
-    
-    
+      endif
+
+
+     endif
+
     if (doTMtrack) then
       !we will be tracking theTransferMap
       ! get clean initialization after initmap
@@ -941,25 +939,23 @@ contains
       theTransferMap%u = .false.
       theTransferMap%x = npara
       theTransferMap%x = orbit
-      
+
       if (getdebug() > 1) then
-        print*, "doTMtrack=true, theTransferMap is new"  
-      endif  
-      
-    elseif (getdebug() > 1) then  
-        print*, "doTMtrack=false, theTransferMap stays as it was"  
-      
+        print*, "doTMtrack=true, theTransferMap is new"
+      endif
+
+    elseif (getdebug() > 1) then
+        print*, "doTMtrack=false, theTransferMap stays as it was"
+
     endif
 
 
-
-    
     !############################################################################
     !############################################################################
     !############################################################################
 
 
-    
+
     call alloc(tw)
 
     !Y
@@ -971,7 +967,7 @@ contains
        call tidy()
        return
     endif
-   
+
     phase = zero !we have to do it after the very initial twiss params calculation above
     current=>MY_RING%start
     startfen = 0
@@ -1011,7 +1007,7 @@ contains
     else
        nullify(maps) !assurance
     endif
-    
+
     resetBetaExtrema = .true.;
     resetOrbitExtrema = .true.;
 
@@ -1023,18 +1019,18 @@ contains
       call tidy()
       return
     endif
-    
+
     allocate(j(c_%npara)) ! used in puttwisstable for defining monomials to peek
 
-    
+
     if (geterrorflag() /= 0) then
        call fort_warn('ptc_twiss: ','equaltwiss at the beginning of the line returned with error')
        call tidy()
        return
     endif
 
-   
-   
+
+
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
    !                              !
    !  T H E   M A I N   L O O P   !
@@ -1070,7 +1066,7 @@ contains
       !     goslice = .false.
       !   elseif(current%mag%kind==kind14) then ! this is a INSTRUMENT, they go in one step anyway
       !     goslice = .false.
-      !   endif          
+      !   endif
       !endif
 
       if (slice .and. goslice) then
@@ -1089,9 +1085,9 @@ contains
           stopNode => current%next%t1
         else
           stopNode => current%t2
-        endif  
+        endif
 
-        do while ( .not. (associated(nodePtr, stopNode)) ) 
+        do while ( .not. (associated(nodePtr, stopNode)) )
 
           s = nodePtr%next%s(1) ! s(1) is the total arc-length, s(3) the total integration-distance
 
@@ -1104,19 +1100,19 @@ contains
              write(6,*) "##### SLICE MAGNETS NODE ",&
                       & nodePtr%pos," => ",nodePtr%pos+1," s=",s
           endif
-          
+
           ! CALL PROPAGATE WITH PROPER OPTIONS
           call propagateswy()
-          
+
 
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-             
+
              write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
                              ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
 	         ' step ',nodePtr%pos,' PTC msg: ',messagelost(:len_trim(messagelost))
              call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
              call seterrorflag(10,"ptc_twiss ",whymsg);
-             
+
              if (getdebug() > 2) close(mf1)
              call tidy()
              return
@@ -1153,7 +1149,7 @@ contains
               else ! this element has an even number of slices
                  isputdata = .true.
               endif
-            endif  
+            endif
           else
             if (nodePtr%next%cas==case0) then
               !not center_magnets, take every reasonable node
@@ -1173,7 +1169,7 @@ contains
             endif
 
             tw = A_script_probe%x ! set the twiss parameters, with y being equal to the A_ phase advance
-            suml = s; 
+            suml = s;
 
             call puttwisstable(theTransferMap%x)
             if(doRDTtracking)   call putrdttable(current)
@@ -1184,7 +1180,7 @@ contains
           endif
 
           nodePtr => nodePtr%next
-        enddo    
+        enddo
 
         if (isputdata .eqv. .false.) then ! always save the last point if it was not yet saved
           !write(6,*) "                                                  END OF ELEMENT Saving data"
@@ -1195,7 +1191,7 @@ contains
 
           tw = A_script_probe%x ! set the twiss parameters
           if (s > suml) then !work around against last element having s=0
-            suml = s; 
+            suml = s;
           endif
 
           call puttwisstable(theTransferMap%x)
@@ -1216,12 +1212,12 @@ contains
            if (doTMtrack) then
              call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
            endif
-           
+
         endif
 
 
         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-           
+
            write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
                            ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
 	       ' PTC msg: ',messagelost(:len_trim(messagelost))
@@ -1245,14 +1241,14 @@ contains
            write(mf1,*) "##########################################"
            write(mf1,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
            call print(A_script_probe,mf1)
-        
+
            if (current%mag%kind==kind4) then
              print*,"CAVITY at s=",suml,"freq ", current%mag%freq,&
                     	"lag ", current%mag%lag, &
                     	"volt ", current%mag%volt
             endif
         endif
-        
+
         suml=suml+current%MAG%P%ld
 
         if (savemaps) then
@@ -1279,10 +1275,10 @@ contains
           call puttwisstable(theTransferMap%x,transfermapSaved=savedTM(i,:,:))
         else
           call puttwisstable(theTransferMap%x)
-        endif 
-        
+        endif
+
         !print*,"Skowron 6 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
-        
+
         if(doRDTtracking)   call putrdttable(current)
         if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x,A_script_probe%x)
 
@@ -1313,7 +1309,7 @@ contains
     print77=.false.
     read77=.false.
 
-    
+
     if (writetmap) then
        !'===      TRANSFER MAP      ==='
        call kanalnummer(mf2)
@@ -1321,7 +1317,7 @@ contains
        call print(theTransferMap%x,mf2)
        close(mf2)
     endif
-    
+
     if (getdebug() > 2) then
 
 
@@ -1368,7 +1364,7 @@ contains
 
 
     call set_option('ptc_twiss_summary ',1)
-    
+
 
 
     if (getdebug() > 1) then
@@ -1391,15 +1387,15 @@ contains
        if (getnmoments() > 0) call ptc_moments(no*2) !calcualate moments with the maximum available order
     endif
 
-    
+
     call tidy()
-       
+
 ! f90flush is not portable, and useless...
 !    call f90flush(20,my_false)
 
     if (getdebug() > 2) close(mf1)
 
-     
+
     !****************************************************************************************
     !*********  E N D   O F   PTC_TWISS      ************************************************
     !****************************************************************************************
@@ -1410,7 +1406,7 @@ contains
 
     subroutine propagateswy()
       implicit none
-    
+
        if (nda > 0) then
           call propagate(my_ring,A_script_probe,+default, & ! +default in case of extra parameters !?
                & node1=nodePtr%pos,node2=nodePtr%pos+1)
@@ -1427,12 +1423,12 @@ contains
                   & node1=nodePtr%pos,node2=nodePtr%pos+1)
           endif
         endif
-    
+
     end subroutine propagateswy
-    
+
     !____________________________________________________________________________________________
     subroutine tidy()
-      ! deallocates all the variables 
+      ! deallocates all the variables
       implicit none
 
       call kill(tw)
@@ -1443,12 +1439,12 @@ contains
       do i=1,6
          call kill(unimap(i))
       enddo
-    
+
 
       if (allocated(j)) deallocate(j)
 
       if (allocated(savedTM)) deallocate(savedTM)
-    
+
     end subroutine tidy
 
     !____________________________________________________________________________________________
@@ -1509,7 +1505,7 @@ contains
             if (getdebug() > 2) then
               print*,"Can not read NV from map_table. Exiting."
             endif
-            
+
             call seterrorflag(10,"ptc_twiss initmap","Can not read NV from map_table. Exiting. ");
             return
          endif
@@ -1584,24 +1580,25 @@ contains
       else
 
          isRing = .true. ! compute momemtum compaction factor, tunes, chromaticies for ring
-         
-         
+
+
          if (getdebug() > 1) then
             print*,"Initializing map from one turn map: Start Map"
             call print(theTransferMap,6)
-         
+
             print*,"Tracking identity map to get closed solution. STATE:"
             call print(default,6)
 
          endif
-         
+
          if (getdebug() > 2) then
            print*, "printing the initial map"
            call print(theTransferMap,17)
          endif
 
          allocate(savedTM(my_ring%n,6,6))
-         
+
+
          do i=1,MY_RING%n
 
            call propagate(my_ring,theTransferMap,default, fibre1=i,fibre2=i+1)
@@ -1627,33 +1624,30 @@ contains
               c_%watch_user=.false.
               return
            endif
-           
+
            do j=1,6
              do k=1,6
                savedTM(i,j,k) = theTransferMap%x(j).sub.fo(k,:)
-             enddo  
-           enddo  
-           
+             enddo
+           enddo
+
          enddo
-         
-         
+
          if (getdebug() > 2) then
             call print(theTransferMap,18)
             call kanalnummer(mf,file="theOneTurnMap.txt")
             call print(theTransferMap,mf)
             close(mf)
-            
+
             print*,"Initializing map from One Turn Map."
          endif
 
-         isTMsave = .true.
-         
-         call maptoascript()
+        isTMsave = .true.
 
-         call reademittance()
-
+        call maptoascript()
+        call reademittance()
       endif
-      
+
     end subroutine initmap
     !____________________________________________________________________________________________
 
@@ -1683,7 +1677,7 @@ contains
       endif
 
       getdeltae = cfen%energy/startfen%energy
-      
+
       relativisticBeta = cfen%beta0
 
       if (getdebug() > 2) then
@@ -1708,7 +1702,7 @@ contains
       ! to convert between Ripken and Edwards-Teng parametrization
       real(dp) :: kappa,u,ax,ay,kx,ky,kxy2,usqrt,bx,by,cx,cy,cosvp,sinvp,cosvm,sinvm,cosv2,sinv2,cosv1,sinv1
       real(dp) :: deltaeValue
-      
+
       if (getdebug() > 2) then
          write(mf1,*) "##########################################"
          write(mf1,*) ""
@@ -1730,34 +1724,34 @@ contains
 
       call liepeek(iia,icoast)
       j(:)=0
-      
+
       do ii=1,c_%npara ! fish
          opt_fun(ii)=A_script_probe%x(ii).sub.j
       enddo
- 
+
       call trackOrbitExtremaAndRms(opt_fun(1:6))
 
       ! swap t and pt
       myx=opt_fun(6)
       opt_fun(6)=opt_fun(5)
       opt_fun(5)=-myx
-      
-      
+
+
       ioptfun=6
       call vector_to_table_curr(table_name, 'x ', opt_fun(1), ioptfun)
       opt_fun(:)=zero ! reset it
-      
+
       if (rmatrix) then
         if (present(transfermapSaved)) then
           ! we have to swap 5 and 6, and to avoid confusion, I do it on a copy (original would be swapped, and if used again...)
-          
+
           tmpa66 = transfermapSaved
-           
+
           tmpa6 = tmpa66(:,6)
           tmpa66(:,6) = tmpa66(:,5)
           tmpa66(:,5) = tmpa6
-          
-          
+
+
           opt_fun( 1:6 ) = tmpa66(1,:)
           opt_fun( 7:12) = tmpa66(2,:)
           opt_fun(13:18) = tmpa66(3,:)
@@ -1819,7 +1813,7 @@ contains
         opt_fun(:)=zero ! reset it
 
       endif
-      
+
       deltap = A_script_probe%x(5).sub.'0'
       deltae = deltae * (1.0 + deltap)
 
@@ -1897,8 +1891,8 @@ contains
       ! write(0,*),"DEBUG = ", tw%mu(3) ! should give Qs
       if ( default%time ) then
         tw%disp(:) = tw%disp(:) * relativisticBeta
-      endif  
-      
+      endif
+
       opt_fun(disp1)=tw%disp(1) ! was 31 instead of 57
       opt_fun(disp2)=tw%disp(2) ! was 32 instead of 58
       opt_fun(disp3)=tw%disp(3) ! was 33 instead of 59
@@ -1922,7 +1916,7 @@ contains
          opt_fun(disp4p3) = tw%disp_p3(4)
       endif
 
-      
+
       !skowron: 2017 Jan, twiss table has sigma matrix in this place
       !
       !     opt_fun(62+4+8+6)=zero ! was 36 instead of 62 => on 9 march add 4 => on 3 July 2009 add 4 => on 3 November 2010 add 6
@@ -1951,8 +1945,8 @@ contains
       !
       !        enddo
       !     enddo
-      
-      
+
+
       if (getdebug() > 2)  then
          ! this part of the code is out of sync with the rest
          !j(:)=0
@@ -1966,7 +1960,7 @@ contains
          write(6,'(a,4(f11.4,1x))')  "orbit transv.", A_script_probe%x(1).sub.'0',A_script_probe%x(2).sub.'0', &
                                                       A_script_probe%x(3).sub.'0',A_script_probe%x(4).sub.'0'
          write(6,'(a,2(f11.4,1x))')  "dp/p, T      ", A_script_probe%x(5).sub.'0',A_script_probe%x(6).sub.'0'
-         
+
       endif
 
       ! the following works : we see the list of all elements in sequence - what about twiss_ptc_line & twiss_ptc_ring?
@@ -1988,8 +1982,8 @@ contains
       !      eigenvalue seems to be retrieved ~50 lines above...
       ioptfun = 18*3+16+3+36+1 ! = 110
       call vector_to_table_curr(table_name, 'beta11 ', opt_fun(1), ioptfun)
-      opt_fun(:)=zero 
-      
+      opt_fun(:)=zero
+
       ! convert between the Ripken and Edwards-Teng parametrization
       ! according to the formulas in "BETATRON MOTION WITH COUPLING OF HORIZONTAL AND VERTICAL DEGREES OF FREEDOM"
       ! from V. A. Lebedev    and  S. A. Bogacz
@@ -2024,8 +2018,8 @@ contains
          ! hence we reflect this in the formula from Lebedev
          ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky;
          kxy2=kx*kx*ky*ky;
-         
-         
+
+
          if((abs(kx*kx-ky*ky).gt.TINY(ONE)).and.(abs(one-kxy2).gt.TINY(ONE))) then
             usqrt=kxy2*(one+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
             if(usqrt.gt.TINY(ONE)) then
@@ -2076,11 +2070,11 @@ contains
             call fort_warn("ptc_twiss","Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) smaller than TINY")
             print*,"Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) is: ",&
                  kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
-                 
+
             print*, "kx=",kx
             print*, "ky=",ky
             print*, "kxy2=",kxy2
-                 
+
             betx = tw%beta(1,1) * deltaeValue
             bety = tw%beta(2,2) * deltaeValue
             alfx = tw%alfa(1,1) * deltaeValue
@@ -2108,7 +2102,7 @@ contains
 
     end subroutine puttwisstable
     !____________________________________________________________________________________________
-    
+
     subroutine putrdttable(fib)
       implicit none
       type(fibre), POINTER    :: fib
@@ -2116,23 +2110,23 @@ contains
       real(dp)    :: im_val, re_val, d_val,  eps=1e-6
       integer     :: ind(10), i, mynres, order,rrr
       character(len=18):: nick
-        
+
         dummyMap=A_script_probe%x
         call c_canonise(dummyMap,AscriptInPhasor)
-        
+
         AscriptInPhasor=to_phasor() * AscriptInPhasor * from_phasor()
-        call c_factor_map(AscriptInPhasor,dummyMap,vectorField,0) 
+        call c_factor_map(AscriptInPhasor,dummyMap,vectorField,0)
 
         theRDTs = cgetpb(vectorField)
-   
+
         call string_to_table_curr(rdt_table_name,"name ","name ")
         call double_to_table_curr(rdt_table_name, 's ', suml)
-           
- 
+
+
         call c_taylor_cycle(theRDTs,size=mynres)
 
         do rrr=1,mynres
-            
+
             ind = 0
             call c_taylor_cycle(theRDTs,ii=rrr,value=c_val,j=ind(1:c_%nv))
 
@@ -2150,25 +2144,25 @@ contains
               if (getdebug()>2) print*,"putGnormaltable idx=",rrr," ",d_val," smaller then eps=",eps, " skipping "
               cycle
             endif
-           
+
            write(nick,'(a4,6(a1,i1))') 'gnfa','_',ind(1),'_',ind(2),'_',ind(3), &
                     	      '_',ind(4),'_',ind(5),'_',ind(6)
            call double_to_table_curr2(rdt_table_name, nick, d_val )
-           
+
            nick(4:4) = 'c'
            call double_to_table_curr2(rdt_table_name, nick, re_val )
            nick(4:4) = 's'
            call double_to_table_curr2(rdt_table_name, nick, im_val )
-           
+
 
           ! write(*,*) nick, " = ", d_val
-         
-       enddo
-        
-       if (fib%mag%p%nmul > 0) then 
-       endif  
 
-       if (fib%mag%p%nmul > 1) then 
+       enddo
+
+       if (fib%mag%p%nmul > 0) then
+       endif
+
+       if (fib%mag%p%nmul > 1) then
          if (fib%mag%l > 0) then
            call double_to_table_curr2(rdt_table_name,'k1l ', fib%mag%bn(2)*fib%mag%l)
            call double_to_table_curr2(rdt_table_name,'k1sl ',fib%mag%an(2)*fib%mag%l)
@@ -2176,7 +2170,7 @@ contains
            call double_to_table_curr2(rdt_table_name,'k1l ', fib%mag%bn(2))
            call double_to_table_curr2(rdt_table_name,'k1sl ',fib%mag%an(2))
          endif
-       endif  
+       endif
 
        if (fib%mag%p%nmul > 2) then
          if (fib%mag%l > 0) then
@@ -2186,8 +2180,8 @@ contains
            call double_to_table_curr(rdt_table_name,'k2l ', fib%mag%bn(3))
            call double_to_table_curr(rdt_table_name,'k2sl ',fib%mag%an(3))
          endif
-           
-       endif  
+
+       endif
 
        if (fib%mag%p%nmul > 3) then
          if (fib%mag%l > 0) then
@@ -2196,14 +2190,14 @@ contains
          else
            call double_to_table_curr(rdt_table_name,'k3l ', fib%mag%bn(4))
            call double_to_table_curr(rdt_table_name,'k3sl ',fib%mag%an(4))
-         endif  
-       endif  
+         endif
+       endif
 
        call augment_count(rdt_table_name)
        ! write(*,*)
-   
+
     end subroutine putrdttable
-    
+
     !____________________________________________________________________________________________
 
     subroutine readrematrix
@@ -2262,7 +2256,7 @@ contains
       orbit(6)=-get_value('ptc_twiss ','t ')
 
       if(icase.eq.5 .or. icase.eq.56 ) orbit(5) = orbit(5) + dt
-      
+
       orbit_probe = orbit
     end subroutine readreforbit
     !_________________________________________________________________
@@ -2279,7 +2273,7 @@ contains
       print*, r(4,:)
       print*, r(5,:)
       print*, r(6,:)
-     
+
      do i=1,6
        do j=i,6
          if ( abs( r(i,j) - r(j,i) ) > 1e-24 ) then
@@ -2293,10 +2287,10 @@ contains
          endif
        enddo
      enddo
-     
-     
+
+
     end function checksymmetric
-    
+
     subroutine readinitialdistrib
       !reads covariance matrix of the initial distribution
       implicit none
@@ -2343,12 +2337,12 @@ contains
       print*, re(4,:)
       print*, re(5,:)
       print*, re(6,:)
-      
+
       if ( checksymmetric(re(:6,:6)) ) then
         call seterrorflag(11,"ptc_twiss ","The covariance matrix is not symmetric, bailing out.");
         return;
       endif
-      
+
 
 
       nd=2
@@ -2372,24 +2366,24 @@ contains
 
       do i = 1,nd_m*2
          do ii = 1,nd_m*2
-            
+
             if (abs(re(i,ii)) > 1e-24) then
                ht0 =  re(i,ii)* (-1)**(ii+i) *(1.0_dp.mono.jc(i))*(1.0_dp.mono.jc(ii))
                !print*,'(',i,ii,')'
                !call daprint(ht0,6)
                ht=ht + ht0
-            endif           
+            endif
          enddo
       enddo
       ht=-ht*pi
 
       lam=ten*full_abs(ht)
       ht=ht/lam
-      
+
       if(flat_longi) then !1959 is the yearh of birth of Etienne (just a number)
          ht=ht+(0.1959e0_dp.mono.'000020')+(0.1959e0_dp.mono.'000002')
       endif
-      
+
       h=ht
       id=1
       id=texp(h,id)
@@ -2432,12 +2426,12 @@ contains
       real(dp),dimension(ndim2)::reval,aieval
       real(dp),dimension(ndim2,ndim2)::revec,aievec
       real(dp):: checkvalue
-      
-      
+
+
       order = get_value('ptc_twiss ','no ')
 
       row = 1 ! starts at one
-      
+
       nrows = table_length("map_table ")
 
       do while(row .le. nrows) ! k=0 when read okay. k=-3 when the table has no row
@@ -2488,15 +2482,15 @@ contains
       enddo
 
 !      call daprint(A_script_probe,28) ! to be compared with fort.18 created by ptc_normal
-      
+
       ignore_map_orbit = get_value('ptc_twiss ','ignore_map_orbit ') .ne. 0
-      
+
       if ( .not. ignore_map_orbit ) then
         do row=1,6
           orbit(row) = theTransferMap%x(row).sub.'0'
         enddo
-        
-        orbit_probe = orbit 
+
+        orbit_probe = orbit
       endif
 
       call maptoascript()
@@ -2511,29 +2505,29 @@ contains
       logical(lp) :: ignore_map_orbit
       ! call readMapFromFort18(y)
       call alloc(map)
-      
+
       ! I don't know why, but between initialization, when these flags are set to false, and this point they are flipped to true
       read77  = .false.
       print77 = .false.
       !print*,"read77=", read77
       call dainput(map,18)
       close(18)
-      
+
       theTransferMap%x = map
       call kill(map)
-      
+
 
       ignore_map_orbit = get_value('ptc_twiss ','ignore_map_orbit ') .ne. 0
-      
+
       if ( .not. ignore_map_orbit ) then
         do row=1,6
           orbit(row) = theTransferMap%x(row).sub.'0'
         enddo
-        
-        orbit_probe = orbit 
+
+        orbit_probe = orbit
       endif
-      
-      
+
+
       call maptoascript()
       call reademittance()
     end subroutine readinitialmap
@@ -2592,7 +2586,7 @@ contains
       real(dp):: checkvalue
       real(dp) :: orbit(6)
       type(taylor) :: t
-      
+
       call alloc(t)
 
       allocate(j(6))
@@ -2601,14 +2595,14 @@ contains
       do i=1,c_%npara
         orbit(i) = theTransferMap%x(i).sub.j
       enddo
-      
+
   !    call kill(theTransferMap)
   !    call alloc(theTransferMap)
   !
      ! theTransferMap%u = .false.
      ! theTransferMap%x = c_%npara
      ! theTransferMap%x = orbit
-      
+
 
       call liepeek(iia,icoast)
       if (getdebug() > 1) then
@@ -2618,26 +2612,26 @@ contains
       endif
 
       do i = 1,6
-        
+
         t = orbit(i)
-        
+
         do ii = 1,c_%npara
             j(ii)=1
-            
+
             r=re(i,ii)
             t = t+(r.mono.j)
-            
+
             if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-              write(*,*) 'DA got unstable during Setup of transfer map i=',i,' ii=',ii 
+              write(*,*) 'DA got unstable during Setup of transfer map i=',i,' ii=',ii
             endif
 
             j(ii)=0
          enddo
-         
+
          theTransferMap%x(i) = t
       enddo
-    
-      
+
+
       if (getdebug() > 2) then
         print*,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
         print*,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
@@ -2648,27 +2642,27 @@ contains
         print*,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
       endif
       deallocate(j)
-      
+
 !      call daprint(A_script_probe,29) ! to be compared with fort.18 created by ptc_normal and fort.28
-     
-     
+
+
       call eig6(re,reval,aieval,revec,aievec)
       do i=1,iia(4)-icoast(2)
          checkvalue = abs(reval(i)**2+aieval(i)**2 - one)
-         
+
          if(checkvalue .gt.c_1d_10) then
             write(whymsg,*) "Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane = ",i, &
-                            " r^2 = ", reval(i)**2+aieval(i)**2, " delta = ",checkvalue 
+                            " r^2 = ", reval(i)**2+aieval(i)**2, " delta = ",checkvalue
             call fort_warn("ptc_twiss",whymsg(:len_trim(whymsg)))
-   
+
             if(checkvalue .gt.c_1d_8) then
-            
+
               write(whymsg,*) "ERROR: Provided matrix has eigenvalue more than 1e-8 off the unit circle ! plane = ",i, &
-                              " r^2 = ", reval(i)**2+aieval(i)**2, " delta = ",checkvalue 
+                              " r^2 = ", reval(i)**2+aieval(i)**2, " delta = ",checkvalue
               call seterrorflag(10,"ptc_twiss",whymsg);
               return;
-            endif 
-            
+            endif
+
          endif
       enddo
     end subroutine initmapfrommatrix
@@ -2678,16 +2672,16 @@ contains
       !Performes normal form on a map, and plugs A_ in its place
       implicit none
       type(c_normal_form) theNormalForm
-      type(c_damap)  :: c_Map, a_cs 
+      type(c_damap)  :: c_Map, a_cs
       integer :: mf
-      
+
       if (getdebug() > 2) then
          print*,"maptoascript: doing normal form"
       endif
 
       call alloc(c_Map)
       c_Map = theTransferMap
-      
+
       call alloc(theNormalForm)
       call  c_normal(c_Map,theNormalForm)       ! (4)
 
@@ -2702,30 +2696,29 @@ contains
          endif
 
          call seterrorflag(10,"ptc_twiss::maptoascript ",whymsg);
-         
+
          return
       endif
-      
-      
+
+
       if (getdebug() > 2) then
          print*,"maptoascript: normal form done"
          call print(theNormalForm%a_t,19)
-         
+
       endif
-      
+
       !print*, "maptoascript: TUNES    NF ", theNormalForm%tune
-  
+
       call kill(A_script_probe)
       call alloc(A_script_probe)
-      
-      
+
       A_script_probe%u=my_false
 
       !use Courant Snyder
       call alloc(a_cs)
       call c_full_canonise(theNormalForm%atot,a_cs)   ! (0)
       A_script_probe = orbit_probe +  a_cs
-      
+
      ! A_script_probe =  orbit_probe + theNormalForm%a_t
 
       if (getdebug() > 2) then
@@ -2743,7 +2736,7 @@ contains
         close(mf)
 
       endif
-      
+
       call kill(theNormalForm)
       call kill(c_Map)
       call kill(a_cs)
@@ -2794,9 +2787,9 @@ contains
 
 
       orbit(:)=zero
-      
+
       call readreforbit()
-             
+
       if (getdebug() > 0 ) then
          CALL write_closed_orbit(icase,orbit)
       endif
@@ -2878,9 +2871,9 @@ contains
 
       !--moments--!
       if( (c_%npara==5)   ) then
-         
+
          !print*, "c_%npara ",c_%npara, " c_%ndpt ", c_%ndpt
-         
+
          if ( (beta(3) .gt. zero) .and. (c_%ndpt/=0) ) then
 
             !Option one: sigma(5) is sqrt of emittance as in other two dimensions
@@ -2963,9 +2956,9 @@ contains
       real(dp) :: suml ! cumulative length along the ring
       real(dp) :: rdp_mmilion ! float with zero (0)
       real(dp) :: deltap ! float with zero (0)
-      
+
       rdp_mmilion= -1e6;
-      
+
       call double_to_table_curr( summary_table_name, 'length ', suml ) ! total length of the machine
 
       call double_to_table_curr( summary_table_name, 'alpha_c ',    rdp_mmilion ) ! momemtum compaction factor
@@ -2994,13 +2987,13 @@ contains
 
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-    
+
     subroutine oneTurnSummary(oneTurnMap,theAscript,startorbit,suml)
 
       implicit none
       type(real_8),target :: theAscript(6)
       type(probe_8),target :: oneTurnMap
-      real(dp),    target :: startorbit(6) 
+      real(dp),    target :: startorbit(6)
       real(dp) :: suml ! cumulative length along the ring
       type(fibre), pointer :: fibrePtr
       real(dp) :: alpha_c, eta_c ! momentum-compaction factor & phase-slip factor
@@ -3028,8 +3021,8 @@ contains
       type(c_damap)        :: rotationMap, theA_CS, theA_Spin, theA0, theA1, theA2, theRot
       type(c_taylor)       :: thePhaseAndSlip(3), theNuSpin
       type(c_normal_form)  :: theNormalForm
-      
-      
+
+
       order = get_value('ptc_twiss ', 'no ')
 
       ! should end-up gracefully here in case the topology of the lattice is not those of a closed-ring
@@ -3052,9 +3045,9 @@ contains
          enddo
          flush(21)
       endif
-      
-      
-      
+
+
+
       if (getdebug() > 1) then
         write(6,*) "Doing normal form ... "
       endif
@@ -3066,7 +3059,7 @@ contains
       !print*,"Skowron 3 ", check_stable, c_%stable_da
 
       call alloc(c_Map)
- 
+
       !print*,"Skowron 4 ", check_stable, c_%stable_da
 
       c_Map = oneTurnMap
@@ -3090,7 +3083,7 @@ contains
 
          return
       endif
-      
+
       call alloc(theNormalForm)
       call  c_normal(c_Map,theNormalForm)       ! (4)
 
@@ -3116,8 +3109,8 @@ contains
       if (getdebug() > 1) then
         write(6,*) "Doing normal form ... Done"
       endif
-      
-      
+
+
       if (debugFiles .eq. 1) then
 
         call kanalnummer(mf,file="NormalFormA_t.summ.txt")
@@ -3131,24 +3124,24 @@ contains
       endif
 
       !********************************************!
-      ! new all-in-ine algorithm to get normal form goodies 
-      ! unstable for 6D 
+      ! new all-in-ine algorithm to get normal form goodies
+      ! unstable for 6D
 !       call alloc(rotationMap)
-! 
+!
 !       rotationMap=theNormalForm%atot**(-1)*c_Map*theNormalForm%atot ! (7a)
-! 
+!
 !       call alloc(theA_CS)
 !       call alloc(theA_Spin)
 !       call alloc(theA0)
-!       call alloc(theA1) 
-!       call alloc(theA2) 
+!       call alloc(theA1)
+!       call alloc(theA2)
 !       call alloc(theRot)
-!       
+!
 !       call alloc(thePhaseAndSlip)
 !       call alloc(theNuSpin)
-!       
-!       call c_full_canonise(rotationMap,theA_CS,theA_Spin,theA0,theA1,theA2,theRot,phase=thePhaseAndSlip,nu_spin=theNuSpin)  
-! 
+!
+!       call c_full_canonise(rotationMap,theA_CS,theA_Spin,theA0,theA1,theA2,theRot,phase=thePhaseAndSlip,nu_spin=theNuSpin)
+!
 !       call print(thePhaseAndSlip(1),6)
 !       call print(thePhaseAndSlip(2),6)
 !       call print(thePhaseAndSlip(3),6)
@@ -3156,7 +3149,7 @@ contains
       !********************************************!
       !skowron: old ptc
       !print*, "Cplx dispersion A1(1,5)", theNormalForm%A1%v(1).sub.'000010'
-      
+
 
       if( (c_%npara==5)       .or.  (c_%ndpt/=0)  ) then
          !when there is no cavity it gives us dispersions
@@ -3168,20 +3161,20 @@ contains
         !faster to use the A_script then normal form
         ! because the normal form A_t must be canonised to C-S and moved from cmplx to real_8
         call dispersion6D(theAscript,dispersion)
-        
+
       else
          do i=1,4
             dispersion(i)=zero
          enddo
       endif
-      
-      
+
+
       if (debugFiles .eq. 1) then
          do i=1,4
             write(21,*) "dispersion(",i,")=", dispersion(i)
          enddo
       endif
-       
+
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!!!!!!!!!!!                                       !!!!!!!!!!!!!!!!
@@ -3189,29 +3182,29 @@ contains
       !!!!!!!!!!!! GAMMA TRANSITION, SLIP FACTOR         !!!!!!!!!!!!!!!!
       !!!!!!!!!!!!                                       !!!!!!!!!!!!!!!!
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     
 
-       
+
+
       ! in 4D we have no knowledge of longitudinal dynamics, it is not calculated
       ! the same 5D with time=false
-      
+
       eta_c = rdp_mmilion
       alpha_c = rdp_mmilion
       gamma_tr = rdp_mmilion
-      
+
       alpha_c_p = rdp_mmilion
       alpha_c_p2 = rdp_mmilion
       alpha_c_p3 = rdp_mmilion
-      
-      !call daprint(theNormalForm%dhdj,6) 
+
+      !call daprint(theNormalForm%dhdj,6)
 
       gamma_tr = zero
-      
+
       if ( icase.gt.4 ) then
         if ( default%time ) then
          ! ALL cases with time=true
          ! Here R56 is dT/ddelta
-         ! 5. apply formulas from twiss.F: 
+         ! 5. apply formulas from twiss.F:
          !sd = r(5,6)+r(5,1)*disp(1)+...+r(5,4)*disp(4)
          !print*,"ALPHA_C, GAMMA TR : TIME ON"
 
@@ -3224,83 +3217,83 @@ contains
          enddo
          !print*,'sd(f)',sd
 
-         eta_c = -sd * betaRelativistic**2 / suml 
-         
+         eta_c = -sd * betaRelativistic**2 / suml
+
          alpha_c = one / gammaRelativistic**2 + eta_c
 
          if (icase.eq.56) then
-           
+
            ! non lin way
-        
+
            yy%n = 6
            call alloc(yy)
 
-           do i=1,6 
+           do i=1,6
               yy%v(i) = oneTurnMap%x(i)%t
            enddo
 
            yy = theNormalForm%A_t**(-1) * yy * theNormalForm%A_t ! takes away all dispersion dependency
-        
-        
+
+
            t1 = yy%v(6).sub.'000010'
-           
-           
+
+
            b = betaRelativistic
-             
-          !   print*, 'First order alpha_c ',alpha_c 
+
+          !   print*, 'First order alpha_c ',alpha_c
 
              alpha_c = (suml - b**2*suml + b**2*t1)/suml
-             
-           !  print*, 'New alpha_c ',alpha_c 
-             
+
+           !  print*, 'New alpha_c ',alpha_c
+
            ! algorithm from F.Schmidt
-             
+
 
            if (order.ge.2) then
              t2 = yy%v(6).sub.'000020'
              alpha_c_p = b**2*(3*(-1 + b**2)*suml - 3*(-1 + b**2)*t1 + 2*b*t2)
              alpha_c_p = alpha_c_p / suml
            endif
-           
+
            if (order.ge.3) then
              t3 = yy%v(6).sub.'000030'
              alpha_c_p2 = 3*b**2*((-1 + 6*b**2 - 5*b**4)*suml + t1 - 6*b**2*t1 + 5*b**4*t1 + &
                           4*b*t2 - 4*b**3*t2 + 2*b**2*t3)
              alpha_c_p2 = alpha_c_p2 / suml
            endif
-           
+
            if (order.ge.4) then
              t4 = yy%v(6).sub.'000040'
              alpha_c_p3 = 3*b**3*(35*b**5*(suml - t1) + 10*t2 + 30*b**4*t2 - &
                           10*b**3*(5*suml - 5*t1 + 2*t3) + 5*b*(3*suml - 3*t1 + 4*t3) + &
                           8*b**2*(-5*t2 + t4))
              alpha_c_p3 = alpha_c_p3 / suml
-           endif       
+           endif
 
- 
-            
+
+
             ! l5= (-15*b**3*(63*b**7*(suml - t1) - 2*t2 + 56*b**6*t2 - &
             !     21*b**5*(5*suml - 5*t1 + 2*t3) - 3*b*(suml - t1 + 6*t3) + &
             !     12*b**2*(3*t2 - 2*t4) + b**4*(-90*t2 + 24*t4) + &
             !     b**3*(45*suml - 45*t1 + 60*t3 - 8*t5)))/120d0
-           
+
            call kill(yy)
 
          endif
-         
-        else 
-         
+
+        else
+
           if (icase.eq.6 .or. icase.eq.5)  then
             sd = -1.0*(oneTurnMap%x(6).sub.fo(5,:)) ! 5/6 swap MADX/PTC
             do i=1,4
                sd = sd - (oneTurnMap%x(6).sub.fo(i,:))*dispersion(i)
             enddo
-            
+
            alpha_c = -sd/suml
            eta_c = alpha_c - one / gammaRelativistic**2
-        
-        
-             
+
+
+
           else !5D or 6D
            !!!!!!!!!!!!!!!!!!!!1
            !56D
@@ -3308,7 +3301,7 @@ contains
              yy%n = 6
              call alloc(yy)
 
-             do i=1,6 
+             do i=1,6
                 yy%v(i) = oneTurnMap%x(i)%t
              enddo
 
@@ -3320,7 +3313,7 @@ contains
 
              if (order.ge.2) then
                 alpha_c_p  = 2.0*(yy%v(6).sub.'000020')/suml
-             endif  
+             endif
 
              if (order.ge.3) then
                 alpha_c_p2 = 6.0*(yy%v(6).sub.'000030')/suml
@@ -3337,42 +3330,42 @@ contains
            endif ! 5D or 56D
         endif !time=false
       endif !icase=4
-      
+
       if (alpha_c .gt. zero) then
         gamma_tr = one / sqrt(alpha_c)
       endif
-      
+
      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      !!!! HIGHER ORDERS IN dP/P in time true  !!!!
-     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-      ! this algorithm does not work, for low energy (beta0 << 1) it 
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      ! this algorithm does not work, for low energy (beta0 << 1) it
       ! obtains 2nd order time slip factor not alpha_c and the conversion is not straight forward
 
- !    if ( (icase.eq.5) .and. (default%time .eqv. .true.) ) then 
+ !    if ( (icase.eq.5) .and. (default%time .eqv. .true.) ) then
       !
       !    !print*,"ALPHA_C dp/dp derivatives : 5D TIME ON"
-      !   
+      !
       !    ! compute delta-p/p dependency of alpha_c
       !    ! first order derivatives of the dispersions
       !    ! assuming icase=5
       !    !call daprint(oneTurnMap%x,88)
-      ! 
+      !
       !    ! always assume time=true, so that the fifth phase-space variable is deltap instead of pt!
       !    ! otherwise should issue a warning or an error!
-      ! 
+      !
       !    ! proceed slightly differently to retreive the dispersion's derivatives
       !    ! (so far only managed to get the dispersion on the normal form, but not its derivatives)
-      !    
+      !
       !    ! note: should reuse information computed previously than redo this...
       !    ! if icase=5, Taylor series expansion disp = disp + delta_p
       !    do i=1,4
       !       ! apparently, we are up by a factor two
       !       dispersion_p(i) = 2.0*(theAscript(i).sub.'000020')  ! as usual in this file
-      ! 
+      !
       !    enddo
-      !    
+      !
       !    ! compute derivative of the formula for eta_c
-      ! 
+      !
       !    sd = 0.0
       !    ! first dr65/ddeltap
       !    sd = sd - 1.0*(oneTurnMap%x(6).sub.'100010')*dispersion(1) &
@@ -3410,19 +3403,19 @@ contains
       !         &  - 2.0*(oneTurnMap%x(6).sub.'000200')*dispersion(4)**2 &
       !	            ! new
       !         &  - 1*(oneTurnMap%x(6).sub.'000110')*dispersion(4)
-      ! 
+      !
       !    ! terms involving derivatives of the dispersions
       !    do i=1,4
       !        print*, 'sd=',sd,' disp=',dispersion_p(i)
       !       sd = sd - (oneTurnMap%x(6).sub.fo(i,:))*dispersion_p(i)
       !    enddo
-      ! 
+      !
       !     print*, 'sd=',sd
       !    alpha_c_p = -sd * (betaRelativistic**2) / suml
 
       !    eventually, one could differentiate the above formula to obtain alpha_c_p2
       !     but for the time-being, expect icase to be 56 to compute alpha_c_p2 and alpha_c_p3.
-             
+
   !   elseif ( (icase.eq.56) .and. (default%time .eqv. .true.) ) then ! here one may obtain the pathlength derivatives from the map
        ! here we get directly eta_c with all higher order terms
        ! converting them to alpha_c is not obvious. Run time false to get higher order alpha_c
@@ -3442,8 +3435,8 @@ contains
       ! also output the tunes ...
       fractionalTunes(1) = tuneFromComplexVF(vf_kernel%v(1).sub.'1000') ! as in So_fitting.f90
       fractionalTunes(2) = tuneFromComplexVF(vf_kernel%v(3).sub.'0010') ! as in So_fitting.f90
-      
-      
+
+
       ! 26 november 2009
       if (icase.eq.6) then
          fractionalTunes(3) = tuneFromComplexVF(vf_kernel%v(6).sub.'000001') ! to enter here icase must be 6 but not only:
@@ -3493,9 +3486,9 @@ contains
         close(mf)
 
       endif
-       
+
       call kill(vf_kernel)
-       
+
       call kill(theNormalForm)
       call kill(c_Map)
 
@@ -3524,9 +3517,9 @@ contains
       ! 26 november 2009
       call double_to_table_curr( summary_table_name, 'qs ', fractionalTunes(3))
       ! write the extremas of the Twiss functions
-      
-      
-      
+
+
+
       call double_to_table_curr( summary_table_name, 'deltap ', deltap)
 
       call putMinMaxRmses(summary_table_name, startorbit)
@@ -3539,14 +3532,14 @@ contains
 
   END subroutine ptc_twiss
   !____________________________________________________________________________________________
-  
-  
+
+
   subroutine putMinMaxRmses(summary_table_name,startorbit)
     implicit none
     character(48) :: summary_table_name
     real(dp) :: startorbit(6)
     real(dp) :: xrms(6)
-    
+
       call double_to_table_curr( summary_table_name, 'beta_x_min ', minBetX)
       call double_to_table_curr( summary_table_name, 'beta_x_max ', maxBetX)
       call double_to_table_curr( summary_table_name, 'beta_y_min ', minBetY)
@@ -3597,7 +3590,7 @@ contains
       call double_to_table_curr( summary_table_name,'orbit_t ',-startorbit(6))
 
       xrms = sqrt(sum2Orbit / nobsOrbit)
-      
+
        call double_to_table_curr(summary_table_name,'xcorms ', xrms(1))
        call double_to_table_curr(summary_table_name,'pxcorms ',xrms(2))
        call double_to_table_curr(summary_table_name,'ycorms ', xrms(3))
@@ -3618,20 +3611,20 @@ contains
        call double_to_table_curr(summary_table_name,'pycomax ',maxOrbit(4))
        call double_to_table_curr(summary_table_name,'ptcomax ',maxOrbit(5))
 
-       
+
        if( (default%totalpath .eq. 0) ) then
          call double_to_table_curr(summary_table_name,'tcomin ' ,-maxOrbit(6)) !change of sign to MADX
          call double_to_table_curr(summary_table_name,'tcomax ' ,-minOrbit(6)) !change of sign to MADX
        else
          !this breakes MADX notation that particles arriving earlier have negative T
          !but otherwise the total time/pathlengh gets megative
-         ! to do it correctly we should use nominal particle time + diff 
+         ! to do it correctly we should use nominal particle time + diff
          call double_to_table_curr(summary_table_name,'tcomin ' ,minOrbit(6)) !change of sign to MADX
          call double_to_table_curr(summary_table_name,'tcomax ' ,maxOrbit(6)) !change of sign to MADX
-       endif       
+       endif
 
-     
-      
+
+
 
   end subroutine putMinMaxRmses
 
@@ -3799,19 +3792,19 @@ contains
   subroutine resetBetaExtremas()
       resetBetaExtrema = .true.
   end subroutine resetBetaExtremas
-  
+
   subroutine trackBetaExtrema(betas,den, betx, bety, disp)
     implicit none
     real(dp) :: betas(3,3)
-    real(dp) :: den   ! delta energy from acceleration 
+    real(dp) :: den   ! delta energy from acceleration
     real(dp) :: betx
     real(dp) :: bety
     real(dp) :: disp(4)
     integer  :: i,j ! iterators
     real(dp) :: value ! auxiliary variable
-    
+
     if (resetBetaExtrema) then
-    
+
        resetBetaExtrema = .false.
        do i=1,3
          do j=1,3
@@ -3829,7 +3822,7 @@ contains
        enddo
        return
     endif
-    
+
 
     do i=1,3
       do j=1,3
@@ -3841,12 +3834,12 @@ contains
         endif
       enddo
     enddo
-    
+
     if (minBetX .gt. betx) minBetX = betx
     if (maxBetX .lt. betx) maxBetX = betx
     if (minBetY .gt. bety) minBetY = bety
     if (maxBetY .lt. bety) maxBetY = bety
-    
+
     do i=1,4
       if (minDisp(i) .gt. disp(i)) then
          minDisp(i) = disp(i)
@@ -3859,15 +3852,15 @@ contains
   ! --- end of set of routines
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-  
+
   subroutine trackOrbitExtremaAndRms(orbit)
     implicit none
     real(dp) :: orbit(6)
     integer  :: i
-    
-    
+
+
     if (resetOrbitExtrema) then
-      
+
       resetOrbitExtrema = .false.
       nobsOrbit = 1
 
@@ -3876,8 +3869,8 @@ contains
         maxOrbit(i)  = orbit(i)
         sum2Orbit(i) = orbit(i)*orbit(i)
       enddo
-      
-      return      
+
+      return
     endif
 
     nobsOrbit = nobsOrbit + 1
@@ -3902,9 +3895,9 @@ contains
    double precision, external :: node_value  !/*returns value for parameter par of current element */
    type(fibre), pointer    :: p
    real (dp)               :: fk
-   
+
    TYPE(INTEGRATION_NODE),POINTER :: CURR_SLICE
-   
+
    e=restart_sequ()
    p=>my_ring%start
    do e=1, my_ring%n !in slices e goes to nelem + 1 because the last slice is the fist one.
@@ -3950,7 +3943,7 @@ contains
 
         else
           call fort_warn('getBeamBeam: ','Bad node case for BeamBeam')
-        endif 
+        endif
 
       endif
 
@@ -3961,12 +3954,12 @@ contains
   end subroutine getBeamBeam
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        
+
   subroutine normalFormAnalysis(oneTurnMap,theAscript,startorbit)
     use resindexfi
     implicit none
     type(probe_8),target :: oneTurnMap,theAscript
-    real(dp),    target :: startorbit(6) 
+    real(dp),    target :: startorbit(6)
     real(dp)  :: prec ! for printing in files
     real(dp) :: disp1stOrder(4) ! for 6D algo
     type(c_taylor) :: tempTaylor ! for 6D algo
@@ -3978,14 +3971,14 @@ contains
     type(c_damap)  :: c_Map, c_Map2, q_Map, a_cs, a_cs_1
     type(c_taylor)  :: nrmlzdPseudoHam, g_io
     type(c_vector_field) vf, vf_kernel
-     
+
      !use_complex_in_ptc=my_true
-     
+
      call alloc(c_Map)
-     
+
      c_Map = oneTurnMap;
-     
-     call alloc(theNormalForm) 
+
+     call alloc(theNormalForm)
 
      call  c_normal(c_Map,theNormalForm)       ! (4)
 
@@ -3998,7 +3991,7 @@ contains
         call seterrorflag(10,"ptc_normal ",whymsg);
         return
      endif
-     
+
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     !!
     if (getdebug()>2) then
@@ -4017,10 +4010,10 @@ contains
        write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NSPIN'),    '%9d', c_%nspin
        write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('SPIN_POS'), '%9d', c_%SPIN_pos
 
-       !! make space for knobs, to be completed with proper handling of T and PT if absent           
+       !! make space for knobs, to be completed with proper handling of T and PT if absent
        i=1+c_%nv
        if (i .lt. 7) i=7
-       write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',i,'(1x,i16))' 
+       write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',i,'(1x,i16))'
        !write (fmt,'(a)')  '(a2,2(a16,1x),ES16.8,'
 
        write(mf,'(a2,a16,9(1x,a16))') '* ',ch16lft('NAME'),ch16lft('NICKNAME'), &
@@ -4034,35 +4027,35 @@ contains
                                       '%le','%le', &
                                       '%le','%le'
     endif
-    
-   
+
+
    !!!!!!!!!!!!!!!!!!!!!!!!!!
-   !! TUNES 
+   !! TUNES
 
    if (no > 1) then
      ! this algorithm cuts one order of magnitude so for order 1 does not work at all
-     
+
       call alloc(vf_kernel)
       vf_kernel=0
       call flatten_c_factored_lie(theNormalForm%ker,vf_kernel)
 
-      call putQnormaltable(vf_kernel%v(1),1) 
+      call putQnormaltable(vf_kernel%v(1),1)
       call putQnormaltable(vf_kernel%v(3),2)
       if (c_%nd2 == 6) then
         call putQnormaltable(vf_kernel%v(5),3)
       endif
-    
+
       call kill(vf_kernel)
-    
+
     else
       ! This puts only the linear part
       call putTunesNormalTable(theNormalForm%tune)
-      
+
     endif
-    
+
    !!!!!!!!!!!!!!!!!!!!!!!!!!
-   !! DISPERSION 
-    
+   !! DISPERSION
+
     if (c_%nd2 == 6) then
       ! to be implemented
       call dispersion6D(theAscript%x,disp1stOrder)
@@ -4071,13 +4064,13 @@ contains
         tempTaylor = disp1stOrder(i)
         call putDnormaltable(tempTaylor,i)
       enddo
-      
+
      ! call dispersion6Dp(theAscript%x,disp1stOrder)
-      
+
       call kill(tempTaylor)
-      
+
     else
-      !this does not work with 6D dispersion 
+      !this does not work with 6D dispersion
       do i=1,4
         call putDnormaltable(theNormalForm%A_t%V(i),i)
       enddo
@@ -4086,42 +4079,42 @@ contains
    !!!!!!!!!!!!!!!!!!!!!!!!!!
    !! EQUILIBRIUM EMITTANCE
    !! only if radiation present
-   
+
    if ( default%radiation .and. default%envelope) then
 
      !Emittances
      call putEmiNormalTable(theNormalForm%s_ijr)
      !Equilibrium Beam Sizes (Sigmas)
-     call putESigNormalTable(theNormalForm%s_ij0) 
+     call putESigNormalTable(theNormalForm%s_ij0)
      !Damping decrements
-     call putDampingNormalTable(theNormalForm%damping) 
-     
-   endif  
-   
+     call putDampingNormalTable(theNormalForm%damping)
+
+   endif
+
 
 
    !!!!!!!!!!!!!!!!!!!!!!!!!!
    !! EIGEN VALUES
 
 
-    call alloc(a_CS) 
+    call alloc(a_CS)
 
     ! raw transformation are subject to random rotations due to numerical instabilities
     ! c_canonise fixes them straight to fit the Courant Snyder format
     call c_canonise(theNormalForm%atot,a_CS)
 
     do i=1,c_%nd2 !from damap type def: Ndim2=6 but allocated to nd2=2,4,6
-      
+
       !call putEnormaltable(theNormalForm%A_t%V(i),i)
       call putEnormaltable(a_CS%V(i),i)
-      
+
     enddo
 
-    
+
     !!!!!!!!!!!!!!!!!!!!!!
     !Generating functions
-    
-    !n%g is the vecotor field for the transformation 
+
+    !n%g is the vecotor field for the transformation
     !from resonance basis (action angle coordinate system, (x+ipx),(x-ipx)) back to cartesion X,Y
     !the ndim polynomials need to be flattened to get RDT's
 
@@ -4132,32 +4125,32 @@ contains
 
 
     !!!!!!!!!!!!!!!!!!!
-    ! 
+    !
     ! the OLD algoritm
     ! call alloc(vf);
     ! call alloc(g_io);
     ! call flatten_c_factored_lie(theNormalForm%G,vf)
     ! g_io =-cgetpb(vf)
-    !  
-    !!!!!!!!!!!!!!!!!!!  
-    
+    !
+    !!!!!!!!!!!!!!!!!!!
+
     call alloc(vf)
     call alloc(g_io)
     call alloc(a_CS_1)
 
-    
-    
+
+
     a_CS=to_phasor()*a_CS*from_phasor()
-    call c_factor_map(a_CS,a_CS_1,vf,0) 
+    call c_factor_map(a_CS,a_CS_1,vf,0)
 
     g_io = cgetpb(vf)
 
     call putGnormaltable(g_io)
-    
-      
+
+
     !!!!!!!!!!!!!!!!!!!!!!
     !HAMILTONIAN
-    !!!!!!!!!!!!!! Normalised Pseudo-Hamiltonian !!!!!!!!!!!!!!!        
+    !!!!!!!!!!!!!! Normalised Pseudo-Hamiltonian !!!!!!!!!!!!!!!
 
     call c_canonise(theNormalForm%a_t,a_CS)
 
@@ -4168,7 +4161,7 @@ contains
     c_Map2 = a_CS**(-1)*c_Map*a_CS
 
     call alloc(q_Map)
-    call c_factor_map(c_Map2,q_Map,vf,dir=1) 
+    call c_factor_map(c_Map2,q_Map,vf,dir=1)
 
 
     vf=from_phasor()*vf
@@ -4176,33 +4169,33 @@ contains
     call alloc(nrmlzdPseudoHam)
     nrmlzdPseudoHam = cgetpb(vf)
     call putHnormaltable(nrmlzdPseudoHam)
-  
+
     !!!!!!!!!!!!!!!!!!!!!!
     !ONE TURN MAP
-    
+
     call putMnormaltable(oneTurnMap%x)
-    
+
     !!!!!!!!!!!!!!!!!!!!!!
     !CLEANING
-    
-    call kill(vf)  
+
+    call kill(vf)
     call kill(g_io)
-    
+
     call kill(c_Map)
     call kill(c_Map2)
     call kill(q_Map)
-    call kill(a_CS) 
-    call kill(a_CS_1) 
-       
+    call kill(a_CS)
+    call kill(a_CS_1)
+
     call kill(nrmlzdPseudoHam)
-    
+
     call kill(theNormalForm)
    !if (icase.eq.5 .or. icase.eq.56) then
    !
    ! endif
-    
 
-  contains   
+
+  contains
 
     !left just of max 16 char string (+1 for C null termination)
     function ch16lft(in)
@@ -4213,8 +4206,8 @@ contains
      write(ch16lft,'(a16)') in
      ch16lft = adjustl(ch16lft)
     end function ch16lft
-    
-    !terminates string with null for C     
+
+    !terminates string with null for C
     subroutine ch16cterm(in)
      implicit none
      character(len=17) :: in
@@ -4230,14 +4223,14 @@ contains
       character(len=17):: name, nick, basevar
       real(dp)    :: d_val
       integer     :: ind(10), order
-      
+
       !print*,"Nick in:  ", nick
       call ch16cterm(name)
       call ch16cterm(nick)
       call ch16cterm(basevar)
       !print*,"Nick out: ", nick
       !print*,"name nick basevar Nick out: ", name, nick, basevar
-      
+
       call string_to_table_curr(nl_table_name, 'name ', name)
       call string_to_table_curr(nl_table_name, 'nickname ', nick)
       call string_to_table_curr(nl_table_name, 'basevariable ', basevar)
@@ -4258,35 +4251,35 @@ contains
       d_val = ind(6)
       call double_to_table_curr(nl_table_name, 'order_t ', d_val)
       call augment_count(nl_table_name)
-      
+
     end  subroutine puttonormaltable
-    
+
     subroutine putMnormaltable(vv)
       implicit none
       type(real_8) :: vv(6)
       integer planei !1...6, 1=dx, 2=dpx
       character(len=1) :: planec
-      character(len=2) :: planel 
+      character(len=2) :: planel
       character(len=1) :: d='M'
       character(len=17):: parname
       character(len=17):: nn, nick,basevar
       integer     :: ind(10), cnv, illa, n,nw, order, i,j
       real(dp)    :: d_val
 
-       
-      !print*,"Putting one turn map inside " 
+
+      !print*,"Putting one turn map inside "
       ind(:) = 0
-    
+
       do j=1,c_%nv
 
-        nw = 0      
+        nw = 0
         i=1
-        
+
         if (vv(j)%alloc) then
-          
+
 
           call dacycle(vv(j)%t%i,i,d_val,n)
-          
+
           !print*, "MAP j=",j," has ",n," coefs"
 
           do i=1,N
@@ -4296,27 +4289,27 @@ contains
 
              !print*, 'M',j,'_',ind(1),'_',ind(2),'_',ind(3), &
              !              '_',ind(4),'_',ind(5),'_',ind(6), d_val
-             
+
              write(basevar,'(a1,i1)') 'm',j
              write(nn,'(a1,i1,6(a1,i1))') 'm',j,'_',ind(1),'_',ind(2),'_',ind(3), &
                                                 '_',ind(4),'_',ind(5),'_',ind(6)
-             
+
              if (getdebug() > 2) then
                write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
                                   d_val, order, ind(1:6)
              endif
-             
+
              call puttonormaltable(nn,nn,basevar,d_val,order,ind)
-             
+
           enddo
         else
           if (vv(j)%kind == 0) then
              write(nn,'(a4,i1,a12)') 'm',j,'_0_0_0_0_0_0'
-            
+
           endif
-        endif        
+        endif
       enddo
-    
+
     end subroutine putMnormaltable
 
     ! when switched to real table from file mf, move it out of "contains"
@@ -4325,7 +4318,7 @@ contains
       type(c_taylor) :: v
       integer planei !1...6, 1=dx, 2=dpx
       character(len=1) :: planec
-      character(len=17) :: planel 
+      character(len=17) :: planel
       character(len=4) :: d='disp'
       character(len=17):: parname
       character(len=17):: nn, ni
@@ -4334,35 +4327,35 @@ contains
       complex(dp) :: c_val
 
      ! print*, 'putDnormaltable, plane=',planei
-      
+
       cnv = c_%nv
       if (cnv .lt.6)  cnv=6
       if (cnv .gt.10) cnv=10
       ind(:) = 0
-      
+
       write(planec,'(i1)') planei
       select case(planei)
        case(1)
          planec='1'
-         planel='x'   
+         planel='x'
        case(2)
          planec='2'
-         planel='px'   
+         planel='px'
        case(3)
          planec='3'
-         planel='y'   
+         planel='y'
        case(4)
          planec='4'
-         planel='py'   
+         planel='py'
       end select
 
       parname = ch16lft(d//planec)
-      
-      nw = 0      
+
+      nw = 0
       i=1
-      
+
       call c_taylor_cycle(v,size=N)
-      
+
       !print*, "There is ", N ," coefficients of dispersion plane ", planei
       do i=1,N
 
@@ -4372,28 +4365,28 @@ contains
          if (abs(d_val) < 1.e-15_dp) cycle ! skip this component, it is basically zero
 
          order = sum(ind(1:cnv))
-         
+
          !print*, 'putDnormaltable, plane=',planei,' i=',i,' order=',order,' ind(5)=',ind(5)
-         
+
          if (order /= ind(5)) then
            !it is the first order term that stays in the calculation with 1.0 coeff
            cycle
          endif
 
          !print*, 'putDnormaltable, plane=',planei,' i=',i,' Value=',d_val,  ind(1:c_%nv)
-         
+
          nn = parname
          ni = 'd'//trim(planel)
-  
-         if (order > 1) then 
+
+         if (order > 1) then
            nn = trim(nn) // '_p'
            ni = trim(ni) // '_p'
-         endif  
-         if (order > 2) then  
+         endif
+         if (order > 2) then
            write(nn,'(a,i1)') trim(nn),order-1
            write(ni,'(a,i1)') trim(ni),order-1
          endif
-         
+
          !print*,nn,ni
          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(ni), &
          !              d_val, sum(ind(1:cnv)), ind(1:cnv)
@@ -4401,28 +4394,28 @@ contains
          call puttonormaltable(nn,ni,planel,d_val,order,ind)
 
          nw = nw + 1
-      enddo 
-      
+      enddo
+
       if (nw == 0) then
          !print*,"there was nothing written, it means there is no dispersion. Put zero to the table"
          ni = 'd'//trim(planel)
          ind(:)=0
          ind(5)=1
-         
+
          if (getdebug() > 2) then
            write(mf,fmt) '  ',ch16lft(parname),  ch16lft(ni), &
                           0.0, 1, ind(1:cnv)
          endif
-         
+
          d_val = 0.0
          call puttonormaltable(parname,ni,planel,d_val,1,ind)
       endif
-     
+
       !print*, 'putDnormaltable DONE'
-      
+
     end subroutine putDnormaltable
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-    
+
     subroutine putHnormaltable(nrmlzdPseudoHam)
       implicit none
       type(c_taylor) :: nrmlzdPseudoHam
@@ -4436,11 +4429,11 @@ contains
       integer     	:: i,r, myn1,myn2,indexa(mnres,4),mynres
       complex(dp)   :: c_val
       real(dp)    :: im_val, re_val, d_val, eps=1e-6
-      integer     :: maxorder,o 
+      integer     :: maxorder,o
       double precision :: get_value ! C-function
-      
+
       maxorder = get_value('ptc_twiss ', 'no ')
-      
+
       ind(:) = 0
       myn1 = 0
       myn2 = 0
@@ -4451,28 +4444,28 @@ contains
     do o=1,maxorder !print order by order, I don't know how to sort c_taylor (piotr)
 
       do r=1,mynres
-        
+
         call c_taylor_cycle(nrmlzdPseudoHam,ii=r,value=c_val,j=ind(1:c_%nv))
- 
+
         order = sum(ind(1:6))
 
         if ( order .ne. o) then
           cycle
         endif
-        
+
         re_val = real(c_val)
         im_val = imag(c_val)
         d_val  = hypot(re_val, im_val)
 
         ! if amplitude is close to zero then it is not worth to output
         if (d_val .lt. eps) then
-         
+
           if (getdebug()>2) then
             print*,"putHnormaltable idx=",r," ",d_val," smaller then eps=",eps, " skipping "
-          endif  
-         
+          endif
+
           cycle
-        
+
         endif
 
 
@@ -4543,7 +4536,7 @@ contains
       real(dp)    :: im_val, re_val, d_val,  eps=1e-6
       integer     :: maxorder
       double precision :: get_value ! C-function
-      
+
       maxorder = get_value('ptc_twiss ', 'no ')
 
       ind(:) = 0
@@ -4553,7 +4546,7 @@ contains
       i=1
       call c_taylor_cycle(gen,size=mynres)
 
-    
+
       do o=1,maxorder !print order by order, I don't know how to sort c_taylor (piotr)
 
         do r=1,mynres
@@ -4614,26 +4607,26 @@ contains
 
         enddo
       enddo
-      
+
       myn1 = 0
       myn2 = 0
       mynres = 0
-      
-    
+
+
     end subroutine putGnormaltable
 
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
     subroutine putEmiNormalTable(va)
-    !gets Emittances 
+    !gets Emittances
       implicit none
       complex(dp) :: va(6,6), v
       integer     :: ind(10), i ! ind has 10 elements for extension to knobs and clocks
       real(dp)    :: d_val, emi(3)
       character(len=17):: nn
       character(len=17):: bv = 'emi'
-      
+
 
       do i=1,3
 
@@ -4656,7 +4649,7 @@ contains
         ind(:) = 0
 
       enddo
-      
+
     end subroutine putEmiNormalTable
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
@@ -4670,7 +4663,7 @@ contains
       character(len=17):: nn
       character(len=17):: bv = 'EquilSigma'
 
-      
+
       do j=1,c_%nd2
 
       ind(:) = 0
@@ -4697,14 +4690,14 @@ contains
           call puttonormaltable(nn,nn,bv,d_val,2,ind)
 
           ind(:) = 0
-         
+
         enddo
       enddo
-      
+
     end subroutine putESignormaltable
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-    
+
     subroutine putEnormaltable(v,planei)
     !gets eigenvectors that are the linear part of A_t
       implicit none
@@ -4714,39 +4707,39 @@ contains
       real(dp)    :: d_val
       character(len=17):: nn
       character(len=17):: bv = 'a_t'
-      
+
       ind(:) = 0
       do i=1,c_%nv
          ind(i)=1
          d_val = real(v.sub.ind(1:6))
-         
+
         ! if (planei == 3 .and. i == 3) then
         !   call print(v,6)
         !   print*, "skowron 33 real 1 ", d_val
         !   print*, "skowron 33 complex 1 ", v.sub.'001000'
         ! endif
-         
+
          write(nn,'(a4,2i1)') 'eign',planei,i
-         
+
          if (getdebug() > 2) then
             write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
                           d_val, 1, ind(1:6)
          endif
-         
-         
+
+
          call puttonormaltable(nn,nn,bv,d_val,1,ind)
 
          ind(i)=0
-         
+
       enddo
-      
+
     end subroutine putEnormaltable
 
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     subroutine putDampingNormalTable(va)
-    !gets Emittances 
+    !gets Emittances
       implicit none
       real(dp) :: va(3)
       integer     :: ind(10), i ! ind has 10 elements for extension to knobs and clocks
@@ -4755,7 +4748,7 @@ contains
       character(len=17):: bv = 'damping'
 
       ind(:) = 0
-      
+
       do i=1,c_%nd
 
         d_val = va(i)
@@ -4770,11 +4763,11 @@ contains
         call puttonormaltable(nn,nn,bv,d_val,0,ind)
 
       enddo
-      
+
     end subroutine putDampingNormalTable
 
     subroutine putTunesNormalTable(va)
-    !gets Emittances 
+    !gets Emittances
       implicit none
       real(dp) :: va(3)
       integer     :: ind(10), i ! ind has 10 elements for extension to knobs and clocks
@@ -4783,7 +4776,7 @@ contains
       character(len=17):: bv = 'q'
 
       ind(:) = 0
-      
+
       do i=1,c_%nd
 
         d_val = va(i)
@@ -4798,7 +4791,7 @@ contains
         call puttonormaltable(nn,nn,bv,d_val,0,ind)
 
       enddo
-      
+
     end subroutine putTunesNormalTable
 
 
@@ -4809,7 +4802,7 @@ contains
       implicit none
       type(c_taylor) :: v
       integer planei
-      character(len=1) :: planec,planel 
+      character(len=1) :: planec,planel
       character(len=1) :: q='q', u='_'
       character(len=17):: parname
       character(len=17):: nn, nick, bv
@@ -4818,31 +4811,31 @@ contains
       complex(dp) :: c_val
       integer     :: i, ii, ioa, n, order, orderX, orderY, orderPT, orderT
       integer     :: cnv
-      
+
       cnv = c_%nv
       if (cnv .lt.6)  cnv=6
       if (cnv .gt.10) cnv=10
       ind(:) = 0
-      
+
       write(planec,'(i1)') planei
       select case(planei)
        case(1)
          planec='1'
-         planel='x'   
+         planel='x'
        case(2)
          planec='2'
-         planel='y'   
+         planel='y'
        case(3)
          planec='3'
-         planel='s'   
+         planel='s'
       end select
 
       parname = ch16lft(q//planec)
       bv = ch16lft(q//planec)
      !!!!!!!!!!!!!!!!!!!!!
-      
+
       N=-1
-      
+
       i=1
       call c_taylor_cycle(v,size=N)
 
@@ -4864,7 +4857,7 @@ contains
 
          !PTC gives the same order in x and px to mark Jx and Jy, i.e.
          ! dQx/dJx has index 210000 ; after substracting the extra exponent in the plane of variable it is 110000
-         ! dQy/dJy has index 002100 
+         ! dQy/dJy has index 002100
          ! we prefer to fix px and py to zero so order = sum(ind(:)) is consistent
          ind(2) = 0
          ind(4) = 0
@@ -4874,20 +4867,20 @@ contains
             !it should be always even
             call fort_warn('ptc_twiss: ',' strange dependence of tune on longitudinal coordinates')
           endif
-          ind(5) = 0  
+          ind(5) = 0
          endif
-         
+
          order = sum(ind(1:cnv))
-         
+
          nn = parname
 
          if (order == 0 ) then
            ! O R D R E R   Z E R O
-           
+
            nick = parname  ! tune  q1
            !tune sometimes comes negative, add one in this case
            if (d_val .lt. zero) d_val = d_val + one
-         
+
          else
 
 
@@ -4906,19 +4899,19 @@ contains
             ! 6D case, we get Jt in longitudinal plane
             if (orderT > 0) nn = trim(nn) // '_jt'
             if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
-             
-             
+
+
            else
              if (orderPT> 0) nn = trim(nn) // '_p'
              if (orderPT > 1) write(nn,'(a,i1)') trim(nn),orderPT
              if (orderT> 0) nn = trim(nn) // '_t'
              if (orderT > 1) write(nn,'(a,i1)') trim(nn),orderT
            endif
-           
+
            nick = nn
-           
+
            if (order == ind(5) ) then
-             ! chroma or higher order in momentum 
+             ! chroma or higher order in momentum
              if (order == 1) then
                nick = 'd'//trim(parname) ! chroma dqN
              else
@@ -4932,21 +4925,21 @@ contains
              if (order > 1) then
                 write(nick,'(a,a1,i1)') trim(nick),'_',order !qN_JxM
              endif
-           else 
+           else
              if ( (order==1) .and. (sum(ind(5:6)) == 0) ) then
-                nick = 'anhc' 
+                nick = 'anhc'
              endif
            endif
 
-        endif !else order==0  
+        endif !else order==0
 
          if (getdebug() > 2) then
             write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
                           d_val, order, ind(1:cnv)
          endif
-                  
+
          call puttonormaltable(nn,nick,bv,d_val,order,ind)
-            
+
       ENDDO
 
      !!!!!!!!!!!!!!!!!!!!!!
@@ -4958,22 +4951,22 @@ contains
 
 
   end subroutine normalFormAnalysis
-  
-  
+
+
   real(dp) function tuneFromComplexVF(c_val)
    implicit none
    complex(dp) :: c_val
-   
+
    tuneFromComplexVF = -aimag(c_val)/(2.*pi)
-   
+
 !   call print(c_val,6)
 
   end function tuneFromComplexVF
-  
+
 !function buildVariableName(base, ind )
 !  implicit none
 !  character(*) :: base
-!  
+!
 !end function buildVariableName
 
 end module madx_ptc_twiss_module

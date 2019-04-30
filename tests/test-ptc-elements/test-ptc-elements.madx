@@ -1,0 +1,213 @@
+option, -info, -echo, -rbarc ;
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!
+!! setup
+!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+call, file="test-ptc-elements-macros.madx" ;
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!
+!! prepare tables: Cptc, Cptc_cfg and Cptc_tmp
+!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+exec, prtp(Cptc) ;
+
+! manual settings (can be changed between tests)
+no=2; icase=56; debug=0; mapdump=0; dotwiss=1;
+x=3e-3; px=-2e-4; y=-2e-3; py=3e-4; t=1e-5; pt=2e-5; betx=1; bety=1; betz=1;
+
+! fill Cptc_cfg:
+! "cfgid","model","energy","method","nst"
+
+cfgid  = 1;
+model  = 1;  while (model  <= 2   ) {
+energy = 1;  while (energy <= 6500) {
+method = 2;  while (method <= 6   ) {
+nst    = 1;  while (nst    <= 3   ) {
+
+  fill, table = Cptc_cfg ; cfgid = cfgid + 1;
+
+nst    = nst    + 1;    }
+method = method + 2;    }
+energy = energy + 6499; }
+model  = model  + 1;    }
+
+! save Cptc_cfg
+set, format=" -8.4g" ;
+write, table=Cptc_cfg, file="Cptc_cfg.tsf" ;
+set, format=" -.16e" ;
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!
+!! run the tests from Cptc_cfg, save the results in Cptc.tsf
+!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! TODO: trueRBEND, RFMULTIPOLE, CRABCAVITY, BEAMBEAM, ELSEPARATOR, WIGGLER, ...
+! TODO: all versions with knl, ksl...
+
+seqDRIFT: sequence, l=5 ;
+  DRIFT1: drift, at=0.75, l=1.5 ;
+  DRIFT2: drift, at=3.25, l=1.5 ;
+endsequence ;
+
+! ------
+
+seqSBEND: sequence, l=5 ;
+  SBEND1: sbend, at=0.75, l=1.5, k0= 0.05, angle= 0.05*1.5, kill_ent_fringe=true, kill_exi_fringe=true ;
+  SBEND2: sbend, at=3.25, l=1.5, k0=-0.05, angle=-0.05*1.5, kill_ent_fringe=true, kill_exi_fringe=true ;
+endsequence ;
+
+! ------
+
+seqSBENDfr: sequence, l=5 ;
+  SBENDfr1: sbend, at=0.75, l=1.5, k0= 0.05, angle= 0.05*1.5 ;
+  SBENDfr2: sbend, at=3.25, l=1.5, k0=-0.05, angle=-0.05*1.5 ;
+endsequence ;
+
+! ------
+
+seqSBENDfh: sequence, l=5 ;
+  SBENDfh1: sbend, at=0.75, l=1.5, k0= 0.05, angle= 0.05*1.5, e1= 0.05*1.5/2, e2= 0.05*1.5/1.5, hgap=0.03, fint=0.5 ;
+  SBENDfh2: sbend, at=3.25, l=1.5, k0=-0.05, angle=-0.05*1.5, e1=-0.05*1.5/2, e2=-0.05*1.5/1.5, hgap=0.03, fint=0.5 ;
+endsequence ;
+
+! ------
+
+seqRBEND: sequence, l=5 ;
+  RBEND1: rbend, at=0.75, l=1.5, k0= 0.05, angle= 0.05*1.5, kill_ent_fringe=true, kill_exi_fringe=true ;
+  RBEND2: rbend, at=3.25, l=1.5, k0=-0.05, angle=-0.05*1.5, kill_ent_fringe=true, kill_exi_fringe=true ;
+endsequence ;
+
+! ------
+
+seqRBENDfr: sequence, l=5 ;
+  RBENDfr1: rbend, at=0.75, l=1.5, k0= 0.05, angle= 0.05*1.5 ;
+  RBENDfr2: rbend, at=3.25, l=1.5, k0=-0.05, angle=-0.05*1.5 ;
+endsequence ;
+
+! ------
+
+seqQUAD: sequence, l=5 ;
+  QUAD1: quadrupole, at=0.75, l=1.5, k1= 0.25 ;
+  QUAD2: quadrupole, at=3.25, l=1.5, k1=-0.25 ;
+endsequence ;
+
+! ------
+
+seqSEXT: sequence, l=5 ;
+  SEXT1: sextupole, at=0.75, l=1.5, k2= 0.25 ;
+  SEXT2: sextupole, at=3.25, l=1.5, k2=-0.25 ;
+endsequence ;
+
+! ------
+
+seqOCTU: sequence, l=5 ;
+  OCTU1: octupole, at=0.75, l=1.5, k3= 0.25 ;
+  OCTU2: octupole, at=3.25, l=1.5, k3=-0.25 ;
+endsequence ;
+
+! ------
+
+seqDECA: sequence, l=5 ;
+  DECA1: multipole, at=0.75, lrad=1.5, knl={0,0,0,0, 0.25*1.5} ;
+  DECA2: multipole, at=3.25, lrad=1.5, knl={0,0,0,0,-0.25*1.5} ;
+endsequence ;
+
+! ------
+
+seqDODECA: sequence, l=5 ;
+  DODECA1: multipole, at=0.75, lrad=1.5, knl={0,0,0,0,0, 0.25*1.5} ;
+  DODECA2: multipole, at=3.25, lrad=1.5, knl={0,0,0,0,0,-0.25*1.5} ;
+endsequence ;
+
+! ------
+
+seqMULT: sequence, l=5 ;
+  MULT1: multipole, at=0.75, lrad=1.5, knl={ 0.05*1.5, 0.25*1.5}, angle= 0.05*1.5 ;
+  MULT2: multipole, at=3.25, lrad=1.5, knl={-0.05*1.5,-0.25*1.5}, angle=-0.05*1.5 ;
+endsequence ;
+
+! ------
+
+seqKICK: sequence, l=5 ;
+  KICK1: kicker, at=0.75, l=1.5, hkick= 0.25e-3, vkick=-0.25e-3 ;
+  KICK2: kicker, at=3.25, l=1.5, hkick=-0.25e-3, vkick= 0.25e-3 ;
+endsequence ;
+
+! ------
+
+seqSOL: sequence, l=5 ;
+  SOL1: solenoid, at=0.75, l=1.5, ks= 0.25 ;
+  SOL2: solenoid, at=3.25, l=1.5, ks=-0.25 ;
+endsequence ;
+
+! ------
+
+seqCAV: sequence, l=5 ;
+  CAV1: rfcavity, at=0.75, l=1.5, volt=8, freq=400, lag=0.5, no_cavity_totalpath=true ;
+  CAV2: rfcavity, at=3.75, l=1.5, volt=8, freq=400, lag=0.5, no_cavity_totalpath=true ;
+endsequence ;
+
+! ------
+
+seqCAVt: sequence, l=5 ;
+  CAVt1: rfcavity, at=0.75, l=1.5, volt=8, freq=400, lag=0.5 ;
+  CAVt2: rfcavity, at=3.75, l=1.5, volt=8, freq=400, lag=0.5 ;
+endsequence ;
+
+! ------
+
+seqCAVh: sequence, l=5 ;
+  CAVh1: rfcavity, at=0.75, l=1.5, volt=8, harmon=2, lag=0.5 ;
+  CAVh2: rfcavity, at=3.75, l=1.5, volt=8, harmon=2, lag=0.5 ;
+endsequence ;
+
+! ------
+
+seqCAVb: sequence, l=5 ;
+  CAVb1: rfcavity, at=0.75, l=1.5, volt=8, freq=400, lag=0.5, n_bessel=3 ;
+  CAVb2: rfcavity, at=3.75, l=1.5, volt=8, freq=400, lag=0.5, n_bessel=3 ;
+endsequence ;
+
+! ------
+
+exec, rchk(Cptc, DRIFT) ;
+exec, rchk(Cptc, SBEND) ;
+exec, rchk(Cptc, SBENDfr) ; ! fringe
+exec, rchk(Cptc, SBENDfh) ; ! fringe, fint, hgap, e1, e2
+exec, rchk(Cptc, RBEND) ;
+exec, rchk(Cptc, RBENDfr) ; ! fringe
+exec, rchk(Cptc, QUAD) ;
+exec, rchk(Cptc, MULT) ;
+exec, rchk(Cptc, KICK) ;
+exec, rchk(Cptc, SOL) ;
+
+! switch to 6D for cavities
+icase = 6;
+exec, rchk(Cptc, CAV) ;
+exec, rchk(Cptc, CAVt) ;
+exec, rchk(Cptc, CAVh) ;
+exec, rchk(Cptc, CAVb) ;
+icase = 56;
+
+! remove TKT model
+len = table(Cptc_cfg,tablelength) ;
+shrink, table=Cptc_cfg, row=len/2 ;
+
+exec, rchk(Cptc, SEXT) ;
+exec, rchk(Cptc, OCTU) ;
+exec, rchk(Cptc, DECA) ;
+exec, rchk(Cptc, DODECA) ;
+
+set, format=" -.16e" ;
+write, table=Cptc, file="Cptc.tsf" ;
+
+removefile, file="internal_mag_pot.txt" ;
+if (dotwiss == 0) { removefile, file="fort.18" ; }
+
+stop;

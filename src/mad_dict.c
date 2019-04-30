@@ -720,6 +720,7 @@ const char *const_command_def =
 " "
 "ptc_setswitch: ptc_setswitch none 0 0 "
 "debuglevel = [i,1], "/*sets the level of debugging printout 0 none, 4 everything */
+"mapdump  = [i, 0], " /*sets the level of map dump printout in all tracking codes 0: none, 1: order 0, 2: order 1 */
 "seed     = [i, 123456789], "
 "maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
 "exact_mis = [l, false, true], " /* switch to ensure exact misaligment treatment */
@@ -1387,7 +1388,7 @@ const char *const_command_def =
 "row = [i, 0]; "
 " "
 ;
-const char *const_element_def = 
+const char *const_element_def =
 "drift: element none 0 1 "
 "at       = [r, 1.e20], "
 "l        = [r, 0], "
