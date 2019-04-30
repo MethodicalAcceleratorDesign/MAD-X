@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:57:34      +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2019.04.30 17:20:01      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -61,29 +61,29 @@ twiss,sequence=PDR,file=pdr-twiss.tfs;
 
 enter Twiss module
   
-iteration:   1 error:   9.381691E-04 deltap:   0.000000E+00
-orbit:   5.003563E-06  2.670364E-07  0.000000E+00  0.000000E+00  1.292993E-02  1.758789E-04
+iteration:   1 error:   9.386147E-04 deltap:   0.000000E+00
+orbit:   5.006843E-06  2.672273E-07  0.000000E+00  0.000000E+00  1.293603E-02  1.758935E-04
   
-iteration:   2 error:   1.322422E-05 deltap:   0.000000E+00
-orbit:   2.225485E-06  3.094462E-07  0.000000E+00  0.000000E+00  1.311738E-02  1.758098E-04
+iteration:   2 error:   1.263169E-05 deltap:   0.000000E+00
+orbit:   2.226206E-06  3.094142E-07  0.000000E+00  0.000000E+00  1.311507E-02  1.758232E-04
   
-iteration:   3 error:   1.998537E-08 deltap:   0.000000E+00
-orbit:   2.224308E-06  3.094510E-07  0.000000E+00  0.000000E+00  1.311766E-02  1.758089E-04
+iteration:   3 error:   1.276835E-08 deltap:   0.000000E+00
+orbit:   2.225068E-06  3.094154E-07  0.000000E+00  0.000000E+00  1.311525E-02  1.758228E-04
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       389.1501964     -0.01311765988      0.00360977122        16.64409404 
+       389.1501964     -0.01311525378      0.00360976986        16.64409718 
 
                 q1                dq1            betxmax              dxmax 
-       16.38588229    4.111917142e-05        26.59603801       0.4543718251 
+       16.38588252    4.120905924e-05        26.59605695       0.4543718468 
 
              dxrms             xcomax             xcorms                 q2 
-      0.1473892005    0.0001340827389    3.582790704e-05        12.26536813 
+      0.1473892004    0.0001340897447    3.582791807e-05        12.26536843 
 
                dq2            betymax              dymax              dyrms 
-    -0.00289468346        25.38936532                 -0                  0 
+   -0.002893777128        25.38937613                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -105,8 +105,8 @@ Qy=table(summ,q2);
 
 show, Qx, Qy;
 
-qx                  =        16.38588229 ;
-qy                  =        12.26536813 ;
+qx                  =        16.38588252 ;
+qy                  =        12.26536843 ;
 
 
 emit;
@@ -122,32 +122,32 @@ enter EMIT module
  Npart                4.5e+11 /bunch     Energy                  2.86 GeV 
  gamma            5596.880428            beta             0.999999984
  dtbyds                     0
-     U0              2.749528 [MeV/turn]
+     U0              2.749044 [MeV/turn]
  
                                                   M o d e   1         M o d e   2         M o d e   3
- Fractional tunes            undamped              0.38588229          0.26536813          0.05093380
-                             damped                0.38588325          0.26536693          0.05092451
+ Fractional tunes            undamped              0.38588251          0.26536843          0.05093417
+                             damped                0.38588347          0.26536723          0.05092957
  
- beta* [m]                   x                 0.12841002E+02      0.96658447E-41      0.12899125E-06
-                             y                 0.15254430E-33      0.31177802E+01      0.23287300E-30
-                             t                 0.13985471E-06      0.22538047E-32      0.44652504E+01
+ beta* [m]                   x                 0.12841001E+02      0.50445342E-40      0.12899777E-06
+                             y                 0.29754557E-34      0.31177821E+01      0.33557086E-32
+                             t                 0.13986509E-06      0.11761676E-31      0.44652174E+01
  
- gamma* [1/m]                px                0.77875626E-01      0.57445605E-42      0.16679608E-09
-                             py                0.24018534E-35      0.32074111E+00      0.25546065E-31
-                             pt                0.14573063E-08      0.13394709E-33      0.22395160E+00
+ gamma* [1/m]                px                0.77875632E-01      0.17517945E-41      0.16680878E-09
+                             py                0.26224184E-36      0.32074091E+00      0.41458571E-32
+                             pt                0.14573763E-08      0.40844285E-33      0.22395326E+00
  
- beta(max) [m]               x                 0.26596038E+02      0.78246757E-40      0.37501618E-01
-                             y                 0.73234479E-32      0.25389365E+02      0.36289440E-30
-                             t                 0.46241705E-01      0.18244956E-31      0.45822048E+01
+ beta(max) [m]               x                 0.26596057E+02      0.27955539E-39      0.37501614E-01
+                             y                 0.83997912E-33      0.25389376E+02      0.16728020E-31
+                             t                 0.46242052E-01      0.65180249E-31      0.45821726E+01
  
- gamma(max) [1/m]            px                0.86212909E+01      0.20350093E-40      0.16679608E-09
-                             py                0.33281427E-32      0.45265526E+01      0.25546065E-31
-                             pt                0.21279821E-01      0.47450727E-32      0.22395160E+00
+ gamma(max) [1/m]            px                0.86212969E+01      0.83608795E-40      0.16680878E-09
+                             py                0.41135086E-33      0.45265546E+01      0.41458571E-32
+                             pt                0.21279980E-01      0.19493962E-31      0.22395326E+00
  
- Damping partition numbers                         0.99327480          0.99982370          2.00619710
- Damping constants [1/s]                           0.36781974E+03      0.37024486E+03      0.74291515E+03
- Damping times [s]                                 0.27187230E-02      0.27009152E-02      0.13460487E-02
- Emittances [pi micro m]                       0.96264785E-02      0.69781978E-30      0.48338886E+01
+ Damping partition numbers                         0.99327543          0.99982421          1.00637296
+ Damping constants [1/s]                           0.36775512E+03      0.37017977E+03      0.37260441E+03
+ Damping times [s]                                 0.27192008E-02      0.27013902E-02      0.26838115E-02
+ Emittances [pi micro m]                       0.96281701E-02      0.25546536E-31      0.96379513E+01
 
  EMIT: beam parameters have been updated.
 
@@ -164,29 +164,29 @@ twiss,centre;
 
 enter Twiss module
   
-iteration:   1 error:   9.381691E-04 deltap:   0.000000E+00
-orbit:   5.003563E-06  2.670364E-07  0.000000E+00  0.000000E+00  1.292993E-02  1.758789E-04
+iteration:   1 error:   9.386147E-04 deltap:   0.000000E+00
+orbit:   5.006843E-06  2.672273E-07  0.000000E+00  0.000000E+00  1.293603E-02  1.758935E-04
   
-iteration:   2 error:   1.322422E-05 deltap:   0.000000E+00
-orbit:   2.225485E-06  3.094462E-07  0.000000E+00  0.000000E+00  1.311738E-02  1.758098E-04
+iteration:   2 error:   1.263169E-05 deltap:   0.000000E+00
+orbit:   2.226206E-06  3.094142E-07  0.000000E+00  0.000000E+00  1.311507E-02  1.758232E-04
   
-iteration:   3 error:   1.998537E-08 deltap:   0.000000E+00
-orbit:   2.224308E-06  3.094510E-07  0.000000E+00  0.000000E+00  1.311766E-02  1.758089E-04
+iteration:   3 error:   1.276835E-08 deltap:   0.000000E+00
+orbit:   2.225068E-06  3.094154E-07  0.000000E+00  0.000000E+00  1.311525E-02  1.758228E-04
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       389.1501964     -0.01311765988      0.00360977122        16.64409404 
+       389.1501964     -0.01311525378      0.00360976986        16.64409718 
 
                 q1                dq1            betxmax              dxmax 
-       16.38588229    4.111917142e-05        26.59603801       0.4610523252 
+       16.38588252    4.120905924e-05        26.59605695        0.461052348 
 
              dxrms             xcomax             xcorms                 q2 
-      0.1473892005    0.0001361357092    3.582790704e-05        12.26536813 
+      0.1473892004    0.0001361428131    3.582791807e-05        12.26536843 
 
                dq2            betymax              dymax              dyrms 
-    -0.00289468346        25.78242614                 -0                  0 
+   -0.002893777128        25.78243728                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -198,7 +198,7 @@ orbit:   2.224308E-06  3.094510E-07  0.000000E+00  0.000000E+00  1.311766E-02  1
                  0 
 ibs,file=ibs-table.tfs;
 
- sige    1.0510050385737612E-003
+ sige    1.4691666918180584E-003
  Twiss was calculated at the center of the elements. No interpolation is used
 
  Global parameters for the machine: 
@@ -212,26 +212,26 @@ radiate = T:
 
  Emittances:
 
-     Ex            0.962648E-02 pi*mm*mrad     sigx            0.226344 mm
+     Ex            0.962817E-02 pi*mm*mrad     sigx            0.226366 mm
      Ey            0.536000E-06 pi*mm*mrad     sigy            0.001840 mm
-     Et            0.483389E+01 pi*mm*mrad     sigt            4.599301 mm             sigE          1.051005 1/1000
+     Et            0.963795E+01 pi*mm*mrad     sigt            6.560148 mm             sigE          1.469167 1/1000
 
 sequence name: pdr
 
 rf  0.100000E-04   10.0000       999.950      0.500000       0.00000    
 
-     CONST               =   2.954504E+01
+     CONST               =   1.502254E+01
 
      ENERGY              =       2.860000 GeV
      BETA                =       1.000000
      GAMMA               =       5596.880
-     COULOMB LOG         =         16.964
+     COULOMB LOG         =         17.201
 
-     X-emittance         =   9.626479E-09 m*rad
+     X-emittance         =   9.628170E-09 m*rad
      Y-emittance         =   5.360000E-13 m*rad
 
-     Momentum spread     =   1.051005E-03
-     Bunch length        =       0.004599 m
+     Momentum spread     =   1.469167E-03
+     Bunch length        =       0.006560 m
 
      Particles per bunch =   4.500000E+11
      Bunch current       =   5.554262E-02 A
@@ -239,18 +239,18 @@ rf  0.100000E-04   10.0000       999.950      0.500000       0.00000
  Ring average values (m) 
 
      betx   =   5.32188E+00    bety   =   6.31668E+00    Dx  =  1.34257E-01    Dy  =  0.00000E+00
-     alfx   =  -5.83138E-06    alfy   =  -1.65833E-05    Dpx =  1.80481E-06    Dpy =  0.00000E+00
+     alfx   =  -5.83355E-06    alfy   =  -1.65822E-05    Dpx =  1.80480E-06    Dpy =  0.00000E+00
      1/betx =   2.64019E-01    1/bety =   1.96289E-01
 
      (Weighted) average rates (1/sec):
-     Longitudinal=    3.539085E+02
-     Horizontal  =    4.977838E+02
-     Vertical    =    1.128949E+02
+     Longitudinal=    1.098909E+02
+     Horizontal  =    2.664321E+02
+     Vertical    =    7.585559E+01
 
      (Weighted) average lifetimes (sec):
-     Longitudinal=    2.825589E-03
-     Horizontal  =    2.008904E-03
-     Vertical    =    8.857794E-03
+     Longitudinal=    9.099937E-03
+     Horizontal  =    3.753302E-03
+     Vertical    =    1.318294E-02
 
 
 

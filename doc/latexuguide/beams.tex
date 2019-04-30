@@ -88,6 +88,8 @@ in separate \texttt{BEAM} commands, the energy is left unchanged and the momentu
 
 The order of precedence for arguments is: \texttt{ex->exn}, \texttt{ey->eyn}.
 
+The order of precedens for the logitudinal emittance is in the following order \texttt{ET->(SIGT and SIGE)}, \texttt{(SIGT and SIGE)->ET}, \texttt{(SIGT)->(ET and SIGE}, \texttt{(SIGE)->(ET and SIGT}. This means that if you define a \texttt{ET} this values will be used to override any value that you might have set for \texttt{SIGT and SIGE}.  
+
 Note that up to version 5.02.04 the definition of normalised emittance used in 
 \madx was referring to the so-called 2-sigma geometric emittance:
 $\epsilon_{n} = 4 \sqrt{\gamma^2 - 1} \ \epsilon = 4 \beta \gamma\ \epsilon$ 
