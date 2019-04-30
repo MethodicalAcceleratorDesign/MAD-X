@@ -88,7 +88,7 @@ test-plot test-plot-2 \
 test-setknob test-fillknob \
 test-coupling test-coupling-2 \
 \
-$(call onlxi64,$(user-cases),)
+$(call onlx64,$(user-cases),)
 
 # same order as tests-all, tests that take +10 seconds
 # to know the timing: make tests-all TIMER=time (on Unixes)
@@ -102,7 +102,7 @@ test-ptc-twiss-2 \
 test-ptc-twiss-old6 test-ptc-twiss-old7 \
 test-touschek test-touschek-2 \
 \
-$(call onlxi64,$(user-cases),)
+$(call onlx64,$(user-cases),)
 
 # user-cases are run only with tests-all on Lxplus + AFS + Gnu 64 bit
 user-cases = \
@@ -160,15 +160,17 @@ test-twiss:          TESTSUITE := Twiss testsuite
 #################################################
 
 # useful macros
-onwin    = $(if       $(call eq,$(OSTYPE),Windows),$1,$2)
-onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux),\
+onwin  = $(if       $(call eq,$(OSTYPE),Windows),$1,$2)
+onlxp  = $(if $(and $(call eq,$(OSTYPE),Linux),\
                       $(findstring lxplus,$(HOSTNAME)),\
                       $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
-onlxi64  = $(if $(and $(call eq,$(COMP),gnu),\
-                      $(call eq,$(ARCH),64),\
-                      $(call eq,$(OSTYPE),Linux),\
-                      $(findstring lxplus,$(HOSTNAME)),\
-                      $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
+onlx64 = $(if $(and $(call eq,$(ARCH),64),\
+                    $(call eq,$(OSTYPE),Linux),\
+                    $(findstring lxplus,$(HOSTNAME)),\
+                    $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
+
+# info on macros above
+# $(info $(ARCH) $(OSTYPE) $(HOSTNAME) $(wildcard /afs/cern.ch/eng/lhc/optics))
 
 # madx supported command for tests
 ifndef MADX
@@ -179,7 +181,7 @@ endif
 TESTCMD = $(TIMER) $(MADX) $(@F).madx
 
 ifneq ($(filter tests%,$(MAKECMDGOALS)),)
-$(info on lxplus with gnu64? $(call onlxi64,will run tests: $(user-cases),no))
+$(info on lxplus with gnu64? $(call onlx64,will run tests: $(user-cases),no))
 endif
 
 # end of makefile
