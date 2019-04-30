@@ -192,6 +192,10 @@ fi
 make madx-linux64-gnu > /dev/null
 check_error "unable to restore the default version" "no-exit"
 
+# alias linux to lxplus7
+ln -sf madx-linux64-gnu    madx-lxplus764-gnu
+ln -sf numdiff-linux64-gnu numdiff-lxplus764-gnu
+
 # date & end marker
 echo -e "\nFinish: `date`"
 echo -e "\n===== End of build and tests ====="

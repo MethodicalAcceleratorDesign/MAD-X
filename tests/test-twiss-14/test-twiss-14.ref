@@ -1,0 +1,177 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.04.02  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2019.03.22 10:22:31      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+filename(nn): macro = {
+
+	twiss,chrom,sequence=RING,file=twiss_nn.tfs;
+
+	SAVE,sequence=RING,file=seq_nn.seq;
+
+}
+
+
+
+callfilename(nnn): macro = {
+
+	call,file="seq_nnn.seq";
+
+	
+
+}
+
+
+
+En=2.86;
+
+ang=2*pi/(90*2);
+
+Ldip=0.58/2;
+
+
+
+thek=0;
+
+!thek=-1.1;
+
+
+
+GTMEL: SBEND, L=Ldip, ANGLE=ang, K1=thek; 
+
+GTMER: SBEND, L=Ldip, ANGLE=ang, K1=thek; 						
+
+								
+
+GTMELDS= GTMEL;
+
+GTMERDS= GTMER;
+
+
+
+D1: DRIFT, L=0.28+0.095;
+
+D2: DRIFT, L=0.18+2*0.095;	
+
+D3: DRIFT, L=0.18+0.095;
+
+LQ=0.01;        
+
+ 
+
+GQF1: QUADRUPOLE, L=LQ, K1:=KQF1;
+
+GQF2: QUADRUPOLE, L=LQ, K1:=KQF2;
+
+
+
+         
+
+TME: LINE = (GTMER, D1, GQF1, D2, GQF2, D3, D3, GQF2, D2, GQF1, D1,GTMEL);
+
+!TME: LINE = (GTMEL, GTMER);
+
+beam, particle=positron, energy=En;
+
+
+
+SELECT,FLAG=TWISS,RANGE=#S/#E, COLUMN=NAME, KEYWORD, S, L, ANGLE, K1L, BETX, ALFX, MUX, BETY, ALFY, MUY, DX, DPX, DY, DPY;
+
+
+
+KQF1= -147; 
+
+KQF2= 125;
+
+
+
+use period=TME;
+
+
+
+!savebeta,label=betatme,place=#e,sequence=TME;
+
+!use period=TME;
+
+!use,sequence=TME;
+
+!beam,radiate=TRUE;
+
+
+
+twiss,chrom,sequence=TME,file=unitwiss.tfs;
+
+enter Twiss module
+  
+iteration:   1 error:   2.878166E-08 deltap:   1.000000E-06
+orbit:   2.049400E-08  7.648782E-18  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+              2.66                 -0    0.0005820417683        41.44984628 
+
+                q1                dq1            betxmax              dxmax 
+      0.3162594615      -0.6032990119        4.629453593      0.07371094893 
+
+             dxrms             xcomax             xcorms                 q2 
+     0.05046472404                  0                  0       0.3680673109 
+
+               dq2            betymax              dymax              dyrms 
+      -0.425053144        2.361547952                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0     0.001548231104 
+
+           synch_2            synch_3            synch_4            synch_5 
+    0.008403239167     0.001011477181    2.243130388e-05    8.091411766e-07 
+
+            nflips 
+                 0 
+
+
+I1=table(summ,synch_1);
+
+I2=table(summ,synch_2);
+
+I3=table(summ,synch_3);
+
+I4=table(summ,synch_4);
+
+I5=table(summ,synch_5);
+
+RCIR=table(summ,length);
+
+ap=table(summ,alfa);
+
+Cgg=0.0000884628;
+
+
+
+
+
+!show, ex0, ey0, sp0, ss0; 
+
+theratio=I5/(I2-I4);
+
+show, I1, I2, I3, I4, I5, theratio; 
+
+i1                  =     0.001548231104 ;
+i2                  =     0.008403239167 ;
+i3                  =     0.001011477181 ;
+i4                  =    2.243130388e-05 ;
+i5                  =    8.091411766e-07 ;
+theratio            =    9.654691885e-05 ;
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
