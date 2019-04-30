@@ -469,13 +469,11 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            l_buf(nlm+1) = el
            call element_name(el_name,len(el_name))
 
-           if ( code.ne.code_drift .and. &
-                code.ne.code_quadrupole .and. &
-                code.ne.code_rbend .and. &
-                code.ne.code_sbend .and. &
-                code.ne.code_matrix .and. &
-                code.ne.code_solenoid .and. &
-                el.ne.zero ) then
+           if ((code.eq.code_sextupole .or. &
+              code.eq.code_octupole .or. &
+              code.eq.code_elseparator .or. &
+              code.eq.code_rfcavity .or. &
+              code.eq.code_crabcavity) .and. el.ne.zero) then
               !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
               print *," "
               print *,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
@@ -833,11 +831,11 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
     case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
        call ttcorr(el, track, ktrack, turn)
 
-    case (code_ecollimator)
-       call fort_warn('TRRUN: ','found deprecated ECOLLIMATOR element; should be replaced by COLLIMATOR')
+    !case (code_ecollimator)
+    !   call fort_warn('TRRUN: ','found deprecated ECOLLIMATOR element; should be replaced by COLLIMATOR')
 
-    case (code_rcollimator)
-       call fort_warn('TRRUN: ','found deprecated RCOLLIMATOR element; should be replaced by COLLIMATOR')
+   ! case (code_rcollimator)
+   !    call fort_warn('TRRUN: ','found deprecated RCOLLIMATOR element; should be replaced by COLLIMATOR')
 
     case (code_beambeam)
        call ttbb(track, ktrack)
@@ -865,7 +863,10 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
 
     case (code_rfmultipole)
        call ttrfmult(track,ktrack,turn)
-
+    
+    case (code_hmonitor:code_rcollimator, code_instrument, &
+        code_slmonitor:code_imonitor, code_placeholder, code_collimator)
+        if(el .gt. 0) call ttdrf(el,track,ktrack)
     case default ! The rest: do nothing
 
   end select
@@ -3521,17 +3522,24 @@ subroutine trclor(switch,orbit0)
 !        if (code .eq. code_tkicker)     code = code_kicker
         if (code .eq. code_placeholder) code = code_instrument
         el      = node_value('l ')
+      !  if (itra .eq. 1 .and. &
+      !      code.ne.code_drift .and. &
+      !      code.ne.code_quadrupole .and. &
+      !      code.ne.code_rbend .and. &
+      !      code.ne.code_sbend .and. &
+      !      code.ne.code_matrix .and. el.ne.zero ) then
         if (itra .eq. 1 .and. &
-            code.ne.code_drift .and. &
-            code.ne.code_quadrupole .and. &
-            code.ne.code_rbend .and. &
-            code.ne.code_sbend .and. &
-            code.ne.code_matrix .and. el.ne.zero ) then
+            (code.eq.code_sextupole .or. &
+            code.eq.code_octupole .or. &
+            code.eq.code_elseparator .or. &
+            code.eq.code_rfcavity .or. &
+            code.eq.code_crabcavity) .and. el.ne.zero) then
            !  .not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
            print *,"\ncode: ",code," el: ",el,"   THICK ELEMENT FOUND\n"
            print *,"Track dies nicely"
            print *,"Thick lenses will get nowhere"
            print *,"MAKETHIN will save you\n\n"
+           print *, code_sextupole, code_octupole
            call fort_fail('TRRUN: Fatal ','----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
         endif
 
