@@ -1215,8 +1215,8 @@ static int set_selected_elements(el_list* the_element_list) //  modify the_eleme
         { // the element el_j passes the selection
           if(el_j_slice_pos > -1) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; // Set the element slice number to the number of slices given in the select statement.
           if(el_j_thick_pos > -1) el_j->def->par->parameters[el_j_thick_pos]->double_value=pl->parameters[pos_thick]->double_value; // Set the element thick flag to what is given in the select statement
-          if(slice>1) nl->inform[el_j_slice_pos]=1; // negative drift to start
-          nl->inform[el_j_thick_pos]=1;
+          if(slice>1 && el_j_slice_pos > -1 ) nl->inform[el_j_slice_pos]=1; // negative drift to start
+          if(el_j_thick_pos> -1) nl->inform[el_j_thick_pos]=1;
         } // selection
       } // loop over the_element_list
     } // range_fl
