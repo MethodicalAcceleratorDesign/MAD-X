@@ -108,6 +108,8 @@ contains
        endif
       endif
     endif
+
+    call kill_map_cp()
     call kill_universe(m_t)
     call kill_universe(m_u)
     call kill_tpsa
@@ -123,6 +125,8 @@ contains
     firsttime_coef=.true.
 
   end subroutine ptc_end
+
+
 
 
 end module madx_ptc_module

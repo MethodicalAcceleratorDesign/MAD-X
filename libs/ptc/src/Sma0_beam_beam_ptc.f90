@@ -468,7 +468,7 @@ contains
     !   wx, wy    (double)    real + imag function result                  *
     !----------------------------------------------------------------------*
     TYPE(REAL_8),INTENT(INOUT):: xx,yy,wx,wy
-    TYPE(double_complex) z,zt,w
+    TYPE(complex_8) z,zt,w
     complex(dp) z0,w0,w1,wt0
     real(dp) xx0, yy0, wx0, wy0
     integer i

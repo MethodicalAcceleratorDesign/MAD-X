@@ -36,7 +36,7 @@ module c_da_arrays
   integer c_nst0,c_nomax,c_nvmax,c_nmmax,c_nocut,c_lfi
  ! real(dp) c_facint(0:c_lno)
   integer c_nhole
-  integer,TARGET :: c_lda_used =20000
+  integer,TARGET :: c_lda_used =15000
 
 contains
 
@@ -463,7 +463,7 @@ c_idall=0
           do j=ii,i-1
              sum = sum-a(i,j)*b(j)
           enddo
-       else if (sum.ne.0.0_dp) then
+       else if (abs(sum).ne.0.0_dp) then
           ii = i
        endif
        b(i)=sum

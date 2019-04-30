@@ -476,7 +476,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               code.eq.code_crabcavity) .and. el.ne.zero) then
               !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
               print *," "
-              print *,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
+              print *,el_name, "code: ",code," el: ",el,"   THICK ELEMENT FOUND"
               print *," "
               print *,"Track dies nicely"
               print *,"Thick lenses will get nowhere"
@@ -1404,7 +1404,7 @@ subroutine ttrf(track,ktrack)
   phirf = rfl * twopi
   ! dl    = el / two
   ! bi2gi2 = one / (betas * gammas) ** 2
-
+  
   TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
 
   !*---- If there were wakefields, track the wakes and then the 2nd half
@@ -4564,7 +4564,7 @@ subroutine tttquad(track, ktrack)
            pt = pt * (one - rfac) - rfac / beta;
         endif
      endif
-
+     
      !---  rotate orbit at exit
      if (tilt .ne. zero)  then
         tmp = x

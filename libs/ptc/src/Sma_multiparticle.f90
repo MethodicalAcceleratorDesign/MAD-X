@@ -25,7 +25,7 @@ module ptc_multiparticle
   real(dp) :: xsm0t=0.0_dp,xsmt=0.0_dp
   !real(dp) :: unit_time =1.0e-3_dp
   REAL(dp) :: x_orbit_sync(6)= 0.0_dp,dt_orbit_sync=0.0_dp
-    logical(lp) :: use_bmad_units=.false.
+    logical(lp) :: use_bmad_units=.false.,inside_bmad=.false.
 
   INTERFACE TRACK_NODE_SINGLE
      MODULE PROCEDURE TRACK_NODE_SINGLER     !@1  t,x,state,charge
@@ -1684,12 +1684,13 @@ doit=p%mag%kind==kind16.and.p%mag%p%b0/=0.0_dp
     implicit none
     TYPE (NODE_LAYOUT), pointer :: L
 
+  if(lielib_print(4)==1) then
     WRITE(6,*)  " PARENT LAYOUT NAME :", L%PARENT_LAYOUT%NAME(1:len_trim(L%PARENT_LAYOUT%NAME))
     WRITE(6,*) " NUMBER OF ORIGINAL LAYOUT ELEMENTS :", L%PARENT_LAYOUT%N
     WRITE(6,*) " NUMBER OF THIN OBJECTS :", L%N
     WRITE(6,*) " TOTAL IDEAL LENGTH OF STRUCTURE :", L%END%S(1)
     WRITE(6,*) " TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :", L%END%S(3)
-
+  endif
   end SUBROUTINE stat_NODE_LAYOUT
 
 
@@ -2410,36 +2411,41 @@ type(fibre),target, optional:: f
 type(fibre),pointer :: p1,p2
 real(dp), optional, intent(in):: a(3),ent(3,3)
 real(dp)  a0(3),ent0(3,3)
-
+ 
 if(present(a)) then
  a0=a
 else
- a0=global_origin
+ !a0=global_origin
+ a0=p%chart%f%a          !global_origin
 endif
 if(present(ent)) then
  ent0=ent
 else
- ent0=global_FRAME
+ !ent0=global_FRAME
+ ent0=p%chart%f%ent !global_FRAME
 endif
 
+ 
 call survey_integration_fibre(p,a0,ent0)
-
+ 
+ 
 p1=>p%next
 if(present(f)) then
  p2=>f
 else
  p2=>p
 endif
-
+ 
 do while(.not.associated(p2,p1))
-
-call survey_integration_fibre(p1,p1%previous%chart%f%b,p1%previous%chart%f%exi)
+ 
+ 
+call survey_integration_fibre(p1,p1%previous%t2%b,p1%previous%t2%exi)
+ 
+!call survey_integration_fibre(p1,p1%previous%chart%f%b,p1%previous%chart%f%exi)
  
 p1=>p1%next
 enddo
-!write(6,*) p1%previous%mag%name
-!write(6,*) p1%previous%chart%f%a
-!write(6,*) p1%previous%chart%f%b
+ 
 end subroutine survey_integration_layout
 
 
@@ -2449,8 +2455,8 @@ type(fibre), target :: p
 type(integration_node), pointer :: t
 integer i
 type(layout), pointer  :: r
-real(dp),intent(in):: b0(3),exi0(3,3) 
-real(dp) a0(3),ent0(3,3),ang(3)
+real(dp),intent(in):: b0(3),exi0(3,3)
+real(dp) a0(3),ent0(3,3),ang(3) 
 a0=b0
 ent0=exi0
 r=>p%parent_layout
@@ -2462,16 +2468,13 @@ if(.not.associated(r%t)) then
 endif
 if(.not.associated(p%t1%a))     CALL  allocate_node_frame( R)   !call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
  
-
-
-
-!  p%mag%p%f%ent=ent0
-!  p%mag%p%f%a=a0
-!  p%magp%p%f%ent=ent0
-!  p%magp%p%f%a=a0
-
+ 
 t=>p%t1
+ 
+ 
 call survey_integration_node_p1(t,a0,ent0)
+
+
 t=>t%next
 call survey_integration_fringe(t,a0,ent0)
 
@@ -2485,11 +2488,12 @@ t=>t%next
 call survey_integration_node_p2(t,a0,ent0)
 
  
+
+ 
 !!! entrance chart
  CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,p%chart%f%exi,ANG)
 p%chart%f%mid=p%chart%f%ent
-!write(6,*) p%mag%name
-!write(6,*) ang
+ 
 ang=ang/2
 p%chart%f%o=0.5_dp*(p%chart%f%a+p%chart%f%b)
 CALL GEO_ROT(p%chart%f%mid,ANG,1,basis=p%chart%f%ent)
@@ -2501,10 +2505,7 @@ p%mag%p%f%o=0.5_dp*(p%mag%p%f%a+p%mag%p%f%b)
 CALL GEO_ROT(p%mag%p%f%mid,ANG,1,basis=p%mag%p%f%ent)
 p%magp%p%f%mid=p%mag%p%f%mid
 p%magp%p%f%o=p%mag%p%f%o
- ! p%mag%p%f%mid=t%exi
- ! p%mag%p%f%o=t%b
- ! p%magp%p%f%mid=t%exi
- ! p%magp%p%f%o=t%b
+
  
 
 
@@ -2668,7 +2669,7 @@ pix1(3)=f%MAG%P%TILTD
 
 
 pix1=0.0_dp
-if(f%mag%p%exact) then
+if(f%mag%p%exact.and.(f%mag%kind/=kind10)) then
 if(f%dir==1) then
  pix1(2)=f%MAG%P%edge(1)
 else
@@ -2942,7 +2943,7 @@ endif
 
 
 pix1=0.0_dp
-if(f%mag%p%exact) then
+if(f%mag%p%exact.and.(f%mag%kind/=kind10)) then
 if(f%dir==1) then
  pix1(2)=f%MAG%P%edge(2)
 else
@@ -2998,6 +2999,8 @@ t%exi=exi0
 ent0=exi0
 !t%next%a=t%b
 !t%next%ent=t%exi
+
+
 
 !       X(3)=C%PATCH%B_X1*X(3);X(4)=C%PATCH%B_X1*X(4);
 !       CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,k%TIME)
@@ -3121,7 +3124,7 @@ if(.not.associated(p%t1%a))     CALL  allocate_node_frame( R)   !call FILL_SURVE
  
 
 
-!t=>p%t1
+t=>p%t1
 !call survey_integration_node_p1(t,a0,ent0)
 t=>t%next
 call survey_integration_fringe(t,a0,ent0)
