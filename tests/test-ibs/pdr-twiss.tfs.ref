@@ -43,7 +43,7 @@
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.04.02 Linux 64"
 @ DATE             %08s "30/04/19"
-@ TIME             %08s "14.24.46"
+@ TIME             %08s "17.20.01"
 * NAME               KEYWORD                             S                  L              ANGLE                K1L               BETX               ALFX                MUX               BETY               ALFY                MUY                 DX                DPX                 DY                DPY 
 $ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "PDR$START"         "MARKER"                             0                  0                  0                  0        12.84100095     0.001035343209                  0         3.11778207    0.0005139491631                  0    -0.000740973638   -8.078835582e-05                 -0                 -0
