@@ -109,6 +109,13 @@ subroutine w_ptc_setdebuglevel(level)
   call ptc_setdebuglevel(level)
 end subroutine w_ptc_setdebuglevel
 
+subroutine w_ptc_setmapdumplevel(level)
+  use madx_ptc_intstate_module
+  implicit none
+  integer level
+  call ptc_setmapdumplevel(level)
+end subroutine w_ptc_setmapdumplevel
+
 subroutine w_ptc_setseed(seed)
   use madx_ptc_intstate_module
   implicit none
@@ -296,7 +303,7 @@ subroutine w_ptc_printframes(filename)
      endif
      my_ering => m_u%end
   endif
-  
+
   call printframes(filename)
 end subroutine w_ptc_printframes
 
