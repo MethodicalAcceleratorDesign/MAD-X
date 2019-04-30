@@ -14,7 +14,7 @@ new_element(const char* name)
   return el;
 }
 
-static void
+void
 grow_el_list(struct el_list* p)
 {
   const char *rout_name = "grow_el_list";
@@ -259,6 +259,8 @@ make_element(const char* name, const char* parent, struct command* def, int flag
     if((el->parent = find_element(parent, element_list)) == NULL)
       fatal_error("unknown class type:", parent);
     el->base_type = el->parent->base_type;
+    if(command_par_value("l",def) !=0 && belongs_to_class(el,"multipole"))
+      warning("Multipole defined with non-zero length:", el->name);
     el->length = el_par_value("l", el);
   }
   add_to_el_list(&el, def->mad8_type, element_list, flag);
@@ -443,7 +445,7 @@ export_el_def_8(struct element* el, char* string)
 }
 
 int
-belongs_to_class(struct element* el, char* class)
+belongs_to_class(struct element* el, const char* class)
   /* returns 1 if an element belongs to a class, else 0 */
 {
   int in = 0;
@@ -770,6 +772,7 @@ void
 update_element(struct element* el, struct command* update)
   /* updates the parameters of el from those read into update */
 {
+
   struct command_parameter_list* e_pl = el->def->par;
   struct command_parameter_list* pl = update->par;
   struct command_parameter *e_par, *par;
@@ -805,6 +808,18 @@ update_element(struct element* el, struct command* update)
   }
 }
 
+void
+update_element_children(struct element* el, struct command* update)
+  /* updates the parameters of the children to el. Note that it is only updating one layer (not recursive) */
+{
+
+  for(int i=0; i<element_list->max;i++){
+    if(element_list->elem[i]==NULL) break;
+
+    if(strcmp(el->name,element_list->elem[i]->parent->name)==0)
+      update_element(element_list->elem[i], update);
+  }
+}
 void
 add_to_el_list( /* adds element to alphabetic element list */
   struct element** el, int inf, struct el_list* ell, int flag)

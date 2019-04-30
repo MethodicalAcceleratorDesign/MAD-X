@@ -3354,30 +3354,24 @@ subroutine tttrans(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: t_x, t_px, t_y, t_py, t_sig, t_psig
+  double precision :: t_x, t_y, t_z
   double precision :: node_value
 
   !---- Get translation parameters
   t_x    = node_value('x ')
-  t_px   = node_value('px ')
   t_y    = node_value('y ')
-  t_py   = node_value('py ')
-  t_sig  = node_value('t ')
-  t_psig = node_value('pt ')
+  t_z    = node_value('z ')
 
   !---- Loop over particles
 !$OMP PARALLEL PRIVATE(i)
 !$OMP DO
+  call ttdrf(-t_z,track,ktrack)
   do  i = 1, ktrack
      ! Add vector to particle coordinates
-     track(1,i) = track(1,i) + t_x
-     track(2,i) = track(2,i) + t_px
-     track(3,i) = track(3,i) + t_y
-     track(4,i) = track(4,i) + t_py
-     track(5,i) = track(5,i) + t_sig
-     track(6,i) = track(6,i) + t_psig
-     !
+     track(1,i) = track(1,i) - t_x
+     track(3,i) = track(3,i) - t_y
   enddo
+
 !$OMP END DO
 !$OMP END PARALLEL
 end subroutine tttrans
@@ -4457,9 +4451,14 @@ subroutine tttquad(track, ktrack)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = node_value('k1 ')  + f_errors(2)/length
-  k1s = node_value('k1s ') + f_errors(3)/length
+  k1  = node_value('k1 ')
+  k1s = node_value('k1s ')
 
+  if (length.ne.zero) then
+     k1  = k1  + f_errors(2)/length
+     k1s = k1s + f_errors(3)/length
+  endif
+  
   if (k1s.ne.zero) then
      tilt = -atan2(k1s, k1)/two ! + tilt
      k1 = sqrt(k1**2 + k1s**2)
@@ -4470,6 +4469,11 @@ subroutine tttquad(track, ktrack)
   if (k1.eq.zero) then
      call ttdrf(length,track,ktrack);
      return
+  endif
+
+  if (tilt.ne.zero)  then
+     st = sin(tilt)
+     ct = cos(tilt)
   endif
 
   !---- Prepare to calculate the kick and the matrix elements
@@ -4484,8 +4488,6 @@ subroutine tttquad(track, ktrack)
 
      !---  rotate orbit before entry
      if (tilt .ne. zero)  then
-        st = sin(tilt)
-        ct = cos(tilt)
         tmp = x
         x = ct * tmp + st * y
         y = ct * y   - st * tmp
@@ -4624,12 +4626,12 @@ subroutine tttdipole(track, ktrack)
   hgap  = node_value('hgap ')
   fint  = node_value('fint ')
   fintx = node_value('fintx ')
-  length = node_value('l ');
-  angle = node_value('angle ');
-  rho = abs(length/angle);
-  h = angle/length;
-  k0 = h;
-  k1 = node_value('k1 ');
+  length = node_value('l ')
+  angle = node_value('angle ')
+  rho = abs(length/angle)
+  h = angle/length
+  k0 = node_value('k0 ') ! was h
+  k1 = node_value('k1 ')
 
   if (code .eq. code_rbend) then
      e1 = e1 + angle / two;
@@ -4639,7 +4641,11 @@ subroutine tttdipole(track, ktrack)
   !---- Apply errors
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  if (k0.ne.0) f_errors(0) = f_errors(0) + k0*length - angle;
+  if (k0.ne.0) then
+    f_errors(0) = f_errors(0) + k0*length - angle
+  else
+    k0 = h
+  endif
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
@@ -4843,7 +4849,7 @@ subroutine trphot(el,curv,rfac,pt)
 
   gamma = (betas*pt + one)*gammas;
   delta_plus_1 = sqrt(pt*pt + two*pt/betas + one);
-  
+
   !---- AMEAN is the average number of photons emitted.,
   !     NPHOT is the integer number generated from Poisson's law.
   !-AL- AMEAN implicitly takes el / 2 (half the element length)

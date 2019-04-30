@@ -110,19 +110,24 @@ contains
 
   END SUBROUTINE GET_task
 
-  SUBROUTINE GET_info(i_node,dl,betax,betay,alphax,alphay,etax,etaxp)
+  SUBROUTINE GET_info(i_node,dl,betax,betay,alphax,alphay,etax,etaxp,etay,etayp,orbitx,orbitxp,orbity,orbityp)
     IMPLICIT NONE
     INTEGER  i_node
-    real(dp) dl,betax,betay,alphax,alphay,etax,etaxp
+    real(dp) dl,betax,betay,alphax,alphay,etax,etaxp,etay,etayp,orbitx,orbitxp,orbity,orbityp
 
-    dl    =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(1)
-    betax =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(2)
-    betay =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(3)
-    alphax=my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(4)
-    alphay=my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(5)
-    etax  =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(6)
-    etaxp =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(7)
-
+    dl     =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(1)
+    betax  =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(2)
+    betay  =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(3)
+    alphax =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(4)
+    alphay =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(5)
+    etax   =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(6)
+    etaxp  =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(7)
+    etay   =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(8)
+    etayp  =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(9)
+    orbitx =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(10)
+    orbitxp=my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(11)
+    orbity =my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(12)
+    orbityp=my_ORBIT_LATTICE%ORBIT_NODES(i_node)%lattice(13)
   END SUBROUTINE GET_info
 
 
@@ -486,7 +491,7 @@ contains
        endif
 
        if(RAMP.and.first_particle) then !modulate
-          if(t%parent_fibre%mag%slow_ac/=0.and.t%cas==CASEP1) CALL do_ramping_r(T,x_orbit_sync(6),STATE0) !modulate
+          if(t%parent_fibre%mag%slow_ac/=0 .and. t%cas==CASEP1) CALL do_ramping_r(T,x_orbit_sync(6),STATE0) !modulate
        endif !modulate
 
        if(u) exit
@@ -495,14 +500,15 @@ contains
        if(.not.CHECK_STABLE) then
           CALL RESET_APERTURE_FLAG
           u=my_true
- !         x(1)=XBIG
+! EB - comment by Elena Benedetto - Only the 4 transverse coordinates are multiplied by xbig, 
+! to avoid loosing the information on the phase (when the mod 2pi is taken)
+         ! x(1)=XBIG
           x(1:4) =x(1:4)*XBIG
           if(wherelost==1) then
              t%lost=t%lost+1
           endif
           exit
        endif
-
 
 
        if(first_particle.and.(accelerate.or.ramp)) then !accelerate
@@ -523,6 +529,7 @@ contains
           write(mbugplot,*) t%pos,t%cas,t%parent_fibre%mag%name
           write(mbugplot,'(4(1X,D18.11))') x(1:2),x(5:6)  !, dt_orbit_sync
        endif
+       
        if(fill_patch.and.associated(t,my_ORBIT_LATTICE%tp)) then
           n_fill_patch=n_fill_patch+1
           my_ORBIT_LATTICE%dt(n_fill_patch)=x(6)
@@ -565,7 +572,7 @@ contains
     freqs=1.e38_dp
     werk=0
     travail=0
-    t0=x_orbit_sync(6)
+    t0=x_orbit_sync(6) ! read from the initial_settings file and multiplied by clight
     if(present(t)) t0=t
     if(fill_patch) then
        write(6,*) " filling patches with t= x0 from main program "
@@ -597,12 +604,23 @@ contains
     enddo
     if(freqs/=0.and.found) then
        my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*freqs/CLIGHT
+
+! EB  beginning - added by Elena Benedetto - to have correct energy already at the beginning
+       my_ORBIT_LATTICE%ORBIT_P0C=werk%P0C
+       my_ORBIT_LATTICE%ORBIT_kinetic=werk%kinetic
+       my_ORBIT_LATTICE%orbit_beta0=werk%beta0
+       my_ORBIT_LATTICE%orbit_brho=werk%brho
+       my_ORBIT_LATTICE%orbit_energy=werk%energy
+       my_ORBIT_LATTICE%orbit_gamma=1.0_dp/werk%gamma0i
+! EB end - added by Elena Benedetto
+
     else
        write(6,*) " cavity with frequency problems ", freqs,found
        stop
     endif
     write(6,*) "Final Frequency of First Cavity", paccfirst%mag%c4%freq
     write(6,*) "Initial and Final beta0 ",travail%beta0,werk%beta0
+    write(6,*) "Starting time of simulations =",t0/clight ," and kinetic energy =",my_ORBIT_LATTICE%ORBIT_kinetic
 
   end subroutine energize_ORBIT_lattice
 
@@ -637,7 +655,17 @@ contains
     enddo
 
     if(freqs/=0.and.found) then
-       my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*freqs/CLIGHT
+      my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*freqs/CLIGHT
+
+! EB beginning - added by Elena Benedetto - to pass the correct energy from PTC RF table to Orbit
+       my_ORBIT_LATTICE%ORBIT_P0C=a%w2%P0C
+       my_ORBIT_LATTICE%ORBIT_kinetic=a%w2%kinetic
+       my_ORBIT_LATTICE%orbit_beta0=a%w2%beta0
+       my_ORBIT_LATTICE%orbit_brho=a%w2%brho
+       my_ORBIT_LATTICE%orbit_energy=a%w2%energy
+       my_ORBIT_LATTICE%orbit_gamma=1.0_dp/a%w2%gamma0i       
+! EB end - added by Elena Benedetto
+
     else
        write(6,*) " ORBIT_up_grade_mag ", freqs,found
        write(6,*) " cavity with frequency problems ", freqs,found
@@ -1066,7 +1094,7 @@ contains
 
 
        DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
-          IF(T%PARENT_FIBRE%MAG%slow_ac/=0) THEN
+          IF(T%PARENT_FIBRE%MAG%slow_ac /= 0) THEN
              !         if(old_mod) then
              !          CALL restore_ANBN(T%PARENT_FIBRE%MAG,T%PARENT_FIBRE%MAGP,1)
              !         else
@@ -1087,7 +1115,7 @@ contains
   SUBROUTINE ORBIT_TRACK_NODEP(K,X,STATE)
     IMPLICIT NONE
     type(real_8),  INTENT(INOUT) :: X(6)
-    INTEGER K,I
+    INTEGER K,I,j
     LOGICAL(LP) U
     type(real_8) X5
     TYPE(INTEGRATION_NODE), POINTER  :: T
@@ -1128,7 +1156,12 @@ contains
        if(.not.CHECK_STABLE) then
           !          CALL RESET_APERTURE_FLAG
           u=my_true
-          x(1)=XBIG
+! EB - comment by Elena Benedetto - Only the 4 transverse coordinates are multiplied by xbig, 
+! to avoid loosing the information on the phase (when the mod 2pi is taken)
+        !  x(1)=XBIG
+          do j=1,4
+            x(j)=x(j)*XBIG
+          enddo
           exit
        endif
        T=>T%NEXT
@@ -1192,7 +1225,7 @@ contains
     TYPE(DAMAP) ID
     TYPE(NORMALFORM) NORM
     TYPE(REAL_8) Y(6)
-    REAL(DP) BET(2),ALF(2),ETA,ETAP
+    REAL(DP) BET(2),ALF(2),ETA(2),ETAP(2)
     TYPE(ORBIT_NODE), pointer :: ORBIT_NODES(:)
     logical(lp) doit,cav
      integer mf,i1
@@ -1209,7 +1242,6 @@ contains
        my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*FREQ/CLIGHT
     ELSE
        WRITE(6,*) " COULD NOT LOCALIZE NON 0.0_dp CAVITY FREQUENCY "
-       WRITE(6,*) "  ORBIT_OMEGA set to 1 "
        my_ORBIT_LATTICE%ORBIT_OMEGA=1.0_dp
        my_ORBIT_LATTICE%ORBIT_WARNING=1
     ENDIF
@@ -1217,7 +1249,7 @@ contains
     !    my_ORBIT_LATTICE%ORBIT_BETA0=R%START%mag%P%BETA0
     my_ORBIT_LATTICE%ORBIT_BETA0=R%START%BETA0
 
-    NL=7
+    NL=13
     K=1
     DLMAX=0.D0
     L=0.0_dp
@@ -1390,6 +1422,7 @@ enddo
 close(mf)
 !pause 123
 
+	CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
     ID=1
     Y=CLOSED+ID
     CALL TRACK(R,Y,1,STATE)
@@ -1401,30 +1434,44 @@ close(mf)
     BET(2)=(Y(3).SUB.'001')**2+(Y(3).SUB.'0001')**2
     ALF(1)=-((Y(1).SUB.'1')*(Y(2).SUB.'1')+(Y(1).SUB.'01')*(Y(2).SUB.'01'))
     ALF(2)=-((Y(3).SUB.'001')*(Y(4).SUB.'001')+(Y(3).SUB.'0001')*(Y(4).SUB.'0001'))
-    ETA=Y(1).SUB.'00001'
-    ETAP=Y(2).SUB.'00001'
+    ETA(1)=Y(1).SUB.'00001'
+    ETA(2)=Y(3).SUB.'00001'
+    ETAP(1)=Y(2).SUB.'00001'
+    ETAP(2)=Y(4).SUB.'00001'
 
     WRITE(6,*) "TWISS PARAMETERS AT THE ENTRANCE"
     WRITE(6,*) "BETAS ", BET
     WRITE(6,*) "ALPHAS ",ALF
-    WRITE(6,*) "ETA, ETAP ",ETA,ETAP
+    WRITE(6,*) "ETAS ", ETA
+    WRITE(6,*) "ETAPS ", ETAP
+    
     DO K=1,my_ORBIT_LATTICE%ORBIT_N_NODE
        CALL ORBIT_TRACK_NODE(K,Y,STATE)
+       CALL ORBIT_TRACK_NODE(K,CLOSED,STATE)
        BET(1)=(Y(1).SUB.'1')**2+(Y(1).SUB.'01')**2
        BET(2)=(Y(3).SUB.'001')**2+(Y(3).SUB.'0001')**2
        ALF(1)=-((Y(1).SUB.'1')*(Y(2).SUB.'1')+(Y(1).SUB.'01')*(Y(2).SUB.'01'))
        ALF(2)=-((Y(3).SUB.'001')*(Y(4).SUB.'001')+(Y(3).SUB.'0001')*(Y(4).SUB.'0001'))
-       ETA=Y(1).SUB.'00001'
-       ETAP=Y(2).SUB.'00001'
+       ETA(1)=Y(1).SUB.'00001'
+       ETAP(1)=Y(2).SUB.'00001'
+       ETA(2)=Y(3).SUB.'00001'
+       ETAP(2)=Y(4).SUB.'00001'
        ORBIT_NODES(K)%LATTICE(2:3)=BET
        ORBIT_NODES(K)%LATTICE(4:5)=ALF
-       ORBIT_NODES(K)%LATTICE(6)=ETA
-       ORBIT_NODES(K)%LATTICE(7)=ETAP
+       ORBIT_NODES(K)%LATTICE(6)=ETA(1)
+       ORBIT_NODES(K)%LATTICE(7)=ETAP(1)
+       ORBIT_NODES(K)%LATTICE(8)=ETA(2)
+       ORBIT_NODES(K)%LATTICE(9)=ETAP(2)
+       ORBIT_NODES(K)%LATTICE(10)=CLOSED(1)
+       ORBIT_NODES(K)%LATTICE(11)=CLOSED(2)
+       ORBIT_NODES(K)%LATTICE(12)=CLOSED(3)
+       ORBIT_NODES(K)%LATTICE(13)=CLOSED(4)
     ENDDO
     WRITE(6,*) "TWISS PARAMETERS AT THE EXIT"
     WRITE(6,*) "BETAS ", BET
     WRITE(6,*) "ALPHAS ",ALF
-    WRITE(6,*) "ETA, ETAP ",ETA,ETAP
+    WRITE(6,*) "ETAS ", ETA
+    WRITE(6,*) "ETAPS ", ETAP
 
 
     my_ORBIT_LATTICE%ORBIT_L=r%t%end%s(1)
@@ -1480,7 +1527,7 @@ close(mf)
     TYPE(DAMAP) ID
     TYPE(NORMALFORM) NORM
     TYPE(REAL_8) Y(6)
-    REAL(DP) BET(2),ALF(2),ETA,ETAP
+    REAL(DP) BET(2),ALF(2),ETA(2),ETAP(2)
     TYPE(ORBIT_NODE), pointer :: ORBIT_NODES(:)
 
     
@@ -1510,31 +1557,42 @@ close(mf)
     BET(2)=(Y(3).SUB.'001')**2+(Y(3).SUB.'0001')**2
     ALF(1)=-((Y(1).SUB.'1')*(Y(2).SUB.'1')+(Y(1).SUB.'01')*(Y(2).SUB.'01'))
     ALF(2)=-((Y(3).SUB.'001')*(Y(4).SUB.'001')+(Y(3).SUB.'0001')*(Y(4).SUB.'0001'))
-    ETA=Y(1).SUB.'00001'
-    ETAP=Y(2).SUB.'00001'
-
+    ETA(1)=Y(1).SUB.'00001'
+    ETAP(1)=Y(2).SUB.'00001'
+    
     WRITE(6,*) "TWISS PARAMETERS AT THE ENTRANCE"
     WRITE(6,*) "BETAS ", BET
     WRITE(6,*) "ALPHAS ",ALF
-    WRITE(6,*) "ETA, ETAP ",ETA,ETAP
+    WRITE(6,*) "ETAS ", ETA
+    WRITE(6,*) "ETAPS ", ETAP
     DO K=1,my_ORBIT_LATTICE%ORBIT_N_NODE
        CALL ORBIT_TRACK_NODE(K,Y,STATE)
+       CALL ORBIT_TRACK_NODE(K,CLOSED,STATE)
        BET(1)=(Y(1).SUB.'1')**2+(Y(1).SUB.'01')**2
        BET(2)=(Y(3).SUB.'001')**2+(Y(3).SUB.'0001')**2
        ALF(1)=-((Y(1).SUB.'1')*(Y(2).SUB.'1')+(Y(1).SUB.'01')*(Y(2).SUB.'01'))
        ALF(2)=-((Y(3).SUB.'001')*(Y(4).SUB.'001')+(Y(3).SUB.'0001')*(Y(4).SUB.'0001'))
-       ETA=Y(1).SUB.'00001'
-       ETAP=Y(2).SUB.'00001'
+       ETA(1)=Y(1).SUB.'00001'
+       ETA(2)=Y(3).SUB.'00001'
+       ETAP(1)=Y(2).SUB.'00001'
+       ETAP(2)=Y(4).SUB.'00001'
        ORBIT_NODES(K)%LATTICE(2:3)=BET
        ORBIT_NODES(K)%LATTICE(4:5)=ALF
-       ORBIT_NODES(K)%LATTICE(6)=ETA
-       ORBIT_NODES(K)%LATTICE(7)=ETAP
+       ORBIT_NODES(K)%LATTICE(6)=ETA(1)
+       ORBIT_NODES(K)%LATTICE(7)=ETAP(1)
+       ORBIT_NODES(K)%LATTICE(8)=ETA(2)
+       ORBIT_NODES(K)%LATTICE(9)=ETAP(2)
+       ORBIT_NODES(K)%LATTICE(10)=CLOSED(1)
+       ORBIT_NODES(K)%LATTICE(11)=CLOSED(2)
+       ORBIT_NODES(K)%LATTICE(12)=CLOSED(3)
+       ORBIT_NODES(K)%LATTICE(13)=CLOSED(4)
     ENDDO
     WRITE(6,*) "TWISS PARAMETERS AT THE EXIT"
     WRITE(6,*) "BETAS ", BET
     WRITE(6,*) "ALPHAS ",ALF
-    WRITE(6,*) "ETA, ETAP ",ETA,ETAP
-
+    WRITE(6,*) "ETAS ", ETA
+    WRITE(6,*) "ETAPS ", ETAP
+    
     my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=my_true
  
     end SUBROUTINE update_twiss_for_orbit 

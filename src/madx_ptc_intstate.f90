@@ -14,6 +14,7 @@ module madx_ptc_intstate_module
   public                            :: getenforce6D
   public                            :: setenforce6D
   public                            :: ptc_setdebuglevel
+  public                            :: ptc_setmapdumplevel
   public                            :: ptc_setseed
   public                            :: ptc_setaccel_method
   public                            :: ptc_setexactmis
@@ -124,6 +125,21 @@ contains
   !____________________________________________________________________________________________
 
 
+  subroutine ptc_setmapdumplevel(level)
+    use s_extend_poly, only : mapdump ! LD:29.03.2019
+    implicit none
+    integer     :: level
+
+    if (level > 0) then
+        print *, "Setting mapdump level to", level
+    end if
+    mapdump = level
+
+  end subroutine ptc_setmapdumplevel
+
+  !____________________________________________________________________________________________
+
+
   subroutine ptc_setseed(seed)
     USE gauss_dis
     implicit none
@@ -132,7 +148,7 @@ contains
     if (getdebug() > 0) then
         print *, "Setting seed to", seed
     end if
-    
+
      CALL gaussian_seed(seed)
 
   end subroutine ptc_setseed
@@ -193,7 +209,7 @@ contains
        end if
        always_exactmis=.true.
     else
-       if (getdebug() > 1) then 
+       if (getdebug() > 1) then
            print *, "Switching OFF exact missaligment"
        end if
        always_exactmis=.false.
@@ -213,12 +229,12 @@ contains
        if (getdebug() > 1) then
            print *, "Switching ON radiation"
        end if
-       intstate = intstate + radiation0 
+       intstate = intstate + radiation0
     else
        if (getdebug() > 1) then
            print *, "Switching OFF radiation"
        end if
-       intstate = intstate - radiation0 
+       intstate = intstate - radiation0
     endif
     default = intstate
     call update_states
@@ -235,12 +251,12 @@ contains
        if (getdebug() > 1) then
            print *, "Switching ON modulation"
        end if
-       intstate = intstate + modulation0 
+       intstate = intstate + modulation0
     else
        if (getdebug() > 1) then
            print *, "Switching OFF modulation"
        end if
-       intstate = intstate - modulation0 
+       intstate = intstate - modulation0
     endif
     default = intstate
     call update_states
@@ -258,7 +274,7 @@ contains
        end if
        intstate = intstate + stochastic0
     else
-       if (getdebug() > 1) then 
+       if (getdebug() > 1) then
            print *, "Switching OFF stochastic"
        end if
        intstate = intstate - stochastic0
@@ -282,7 +298,7 @@ contains
        end if
        intstate = intstate + envelope0
     else
-       if (getdebug() > 1) then 
+       if (getdebug() > 1) then
            print *, "Switching OFF envelope"
        end if
        intstate = intstate - envelope0
@@ -305,7 +321,7 @@ contains
        end if
        intstate = intstate + fringe0
     else
-       if (getdebug() > 1) then 
+       if (getdebug() > 1) then
            print *, "Switching OFF fringe"
        end if
        intstate = intstate - fringe0

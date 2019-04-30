@@ -3,7 +3,7 @@
   +     MAD-X 5.04.02  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2018.10.03               +
-  + Execution date: 2018.12.14 16:11:51      +
+  + Execution date: 2019.01.16 15:40:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 n=5 ;
 
@@ -39,7 +39,7 @@ endsequence ;
 
 !!! sbend-like chicane using patches for survey z vs x,y
 
-bend1: sequence, l=dl ;
+pbend1: sequence, l=dl ;
 
 mt11: srotation, at= 0, angle=tlt;
 
@@ -53,7 +53,7 @@ endsequence ;
 
 
 
-bend2: sequence, l=dl ;
+pbend2: sequence, l=dl ;
 
 mt21: srotation, at= 0, angle=tlt;
 
@@ -67,17 +67,17 @@ endsequence ;
 
 
 
-seq2: sequence, l=(2*n-1)*el ;
+seq2: sequence, l=(2*n-1)*el-4*(el-dl) ;
 
 !s2: srotation, at=0, angle=-tlt;
 
-bend1, at=cl+1*el ;
+pbend1, at=cl+dl+(el-dl)/2 ;
 
-bend2, at=cl+3*el ;
+pbend2, at=cl+dl+(el-dl)/2+1*(el+dl) ;
 
-bend2, at=cl+5*el ;
+pbend2, at=cl+dl+(el-dl)/2+2*(el+dl) ;
 
-bend1, at=cl+7*el ;
+pbend1, at=cl+dl+(el-dl)/2+3*(el+dl) ;
 
 endsequence ;
 

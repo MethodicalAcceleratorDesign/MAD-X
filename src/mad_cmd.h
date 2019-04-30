@@ -64,7 +64,7 @@ void    print_command(struct command*);
 void    store_command_def(char* cmd_string);  /* processes command definition */
 int     make_line(char* statement);
 int     get_stmt(FILE* file, int supp_flag);
-void    get_defined_commands(void);
+void    get_defined_commands(char *);
 void    remove_from_command_list(char* label, struct command_list*);
 
 #endif // MAD_CMD_H

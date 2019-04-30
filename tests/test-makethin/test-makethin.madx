@@ -2,70 +2,7 @@
 
 title,"Five cell test";
 
-!---- Default
 
-option,-echo,-warn;
-call,file="../share/fivecell/fivecell.seq";   ! load the sequence
-option,echo,warn,info;
-
-beam;
-use,sequence=fivecell;      ! for twiss and makethin
-twiss,sequence=fivecell;
-qxref = table(summ,q1); qyref = table(summ,q2); 
-value, qxref, qyref;
-
-select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
-makethin,sequence=fivecell,style=HYBRID, makedipedge=false;
-use,sequence=fivecell;      ! use the thin sequence
-twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
-save,sequence=fivecell,file="fivecell_thin.seq";
-
-use,sequence=fivecell;      ! for twiss and makethin
-twiss,sequence=fivecell;
-qx = table(summ,q1); qy = table(summ,q2);
-value, qx-qxref, qy-qyref;
-
-!---- TEAPOT
-
-option,-echo,-warn;
-call,file="../share/fivecell/fivecell.seq";   ! load the sequence
-option,echo,warn,info;
-
-beam;
-use,sequence=fivecell;      ! for twiss and makethin
-twiss,sequence=fivecell;
-
-select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
-makethin,sequence=fivecell, style=TEAPOT, makedipedge=false;
-use,sequence=fivecell;      ! use the thin sequence
-twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
-save,sequence=fivecell,file="fivecell_thin_teapot.seq";
-
-use,sequence=fivecell;      ! for twiss and makethin
-twiss,sequence=fivecell;
-qx = table(summ,q1); qy = table(summ,q2);
-value, qx-qxref, qy-qyref;
-
-!---- SIMPLE
-
-option,-echo,-warn;
-call,file="../share/fivecell/fivecell.seq";   ! load the sequence
-option,echo,warn,info;
-
-beam;
-use,sequence=fivecell;      ! for twiss and makethin
-twiss,sequence=fivecell;
-
-select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
-makethin,sequence=fivecell, style=SIMPLE, makedipedge=false;
-use,sequence=fivecell;      ! use the thin sequence
-twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
-save,sequence=fivecell,file="fivecell_thin_simple.seq";
-
-use,sequence=fivecell;      ! for twiss and makethin
-twiss,sequence=fivecell;
-qx = table(summ,q1); qy = table(summ,q2);
-value, qx-qxref, qy-qyref;
 
 !---- COLLIM
 
@@ -85,22 +22,5 @@ save,sequence=fivecell,file="fivecell_thin_collim.seq";
 qx = table(summ,q1); qy = table(summ,q2);
 value, qx-qxref, qy-qyref;
 
-!---- Default with other options activated 
-
-option,-echo,-warn;
-call,file="../share/fivecell/fivecell.seq";   ! load the sequence
-option,echo,warn,info;
-
-beam;
-use,sequence=fivecell;      ! for twiss and makethin
-twiss,sequence=fivecell;
-
-select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
-makethin,sequence=fivecell, style=hybrid, minimizeparents=true, makedipedge=true, makeconsistent=true;
-use,sequence=fivecell;      ! use the thin sequence
-twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
-save,sequence=fivecell,file="fivecell_thin_options.seq";
-qx = table(summ,q1); qy = table(summ,q2);
-value, qx-qxref, qy-qyref;
 
 stop;
