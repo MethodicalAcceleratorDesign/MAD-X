@@ -289,7 +289,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         hgap = node_value('hgap ')
         fint = node_value('fint ')
         sks = zero
-        sksol = zero
         h = an / el
 
         !---- Refer orbit and eigenvectors to magnet midplane.
@@ -458,6 +457,10 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         RE = matmul(RW,RE)
 
      case (code_quadrupole , code_sextupole, code_octupole, code_solenoid) !---- Common to all pure multipoles.
+        sk1 = zero
+        sk2 = zero
+        sk3 = zero
+        sksol = zero
         select case (code)
         case (code_quadrupole)  !---- Quadrupole
            sk1 = bvk * node_value('k1 ')
@@ -478,7 +481,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
            sksol = node_value('ks ');
            str   = zero
            n     = 0
-           twon  = 0
+           twon  = zero
         end select
 
         O1 = ORB1; O2 = ORB2
