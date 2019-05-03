@@ -3,7 +3,7 @@
   +     MAD-X 5.04.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2018.10.03               +
-  + Execution date: 2019.04.30 17:20:01      +
+  + Execution date: 2019.05.03 17:28:58      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -144,10 +144,10 @@ enter EMIT module
                              py                0.41135086E-33      0.45265546E+01      0.41458571E-32
                              pt                0.21279980E-01      0.19493962E-31      0.22395326E+00
  
- Damping partition numbers                         0.99327543          0.99982421          1.00637296
- Damping constants [1/s]                           0.36775512E+03      0.37017977E+03      0.37260441E+03
- Damping times [s]                                 0.27192008E-02      0.27013902E-02      0.26838115E-02
- Emittances [pi micro m]                       0.96281701E-02      0.25546536E-31      0.96379513E+01
+ Damping partition numbers                         0.99327493          0.99982421          1.00637345
+ Damping constants [1/s]                           0.36775493E+03      0.37017977E+03      0.37260459E+03
+ Damping times [s]                                 0.27192022E-02      0.27013902E-02      0.26838102E-02
+ Emittances [pi micro m]                       0.96281750E-02      0.25546536E-31      0.96379466E+01
 
  EMIT: beam parameters have been updated.
 
@@ -198,7 +198,7 @@ orbit:   2.225068E-06  3.094154E-07  0.000000E+00  0.000000E+00  1.311525E-02  1
                  0 
 ibs,file=ibs-table.tfs;
 
- sige    1.4691666918180584E-003
+ sige    1.4691663300041608E-003
  Twiss was calculated at the center of the elements. No interpolation is used
 
  Global parameters for the machine: 
@@ -212,9 +212,9 @@ radiate = T:
 
  Emittances:
 
-     Ex            0.962817E-02 pi*mm*mrad     sigx            0.226366 mm
+     Ex            0.962818E-02 pi*mm*mrad     sigx            0.226366 mm
      Ey            0.536000E-06 pi*mm*mrad     sigy            0.001840 mm
-     Et            0.963795E+01 pi*mm*mrad     sigt            6.560148 mm             sigE          1.469167 1/1000
+     Et            0.963795E+01 pi*mm*mrad     sigt            6.560147 mm             sigE          1.469166 1/1000
 
 sequence name: pdr
 
@@ -227,10 +227,10 @@ rf  0.100000E-04   10.0000       999.950      0.500000       0.00000
      GAMMA               =       5596.880
      COULOMB LOG         =         17.201
 
-     X-emittance         =   9.628170E-09 m*rad
+     X-emittance         =   9.628175E-09 m*rad
      Y-emittance         =   5.360000E-13 m*rad
 
-     Momentum spread     =   1.469167E-03
+     Momentum spread     =   1.469166E-03
      Bunch length        =       0.006560 m
 
      Particles per bunch =   4.500000E+11
@@ -244,12 +244,12 @@ rf  0.100000E-04   10.0000       999.950      0.500000       0.00000
 
      (Weighted) average rates (1/sec):
      Longitudinal=    1.098909E+02
-     Horizontal  =    2.664321E+02
+     Horizontal  =    2.664320E+02
      Vertical    =    7.585559E+01
 
      (Weighted) average lifetimes (sec):
-     Longitudinal=    9.099937E-03
-     Horizontal  =    3.753302E-03
+     Longitudinal=    9.099933E-03
+     Horizontal  =    3.753303E-03
      Vertical    =    1.318294E-02
 
 
