@@ -13,6 +13,91 @@
 <hr class="h1">
 <!-- -------- -->
 
+
+
+<h3>MAD-X release 5.05.00 (2019.05.09)</h3>
+<h4>Backward incompatibilties with previous releases</h4>
+<ul>
+<li> Changes the sign of the y-rotation in the survey.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/729">#729</a>. (Tobias, Laurent)
+<li> Prevents energy spread always beeing recalculated from the longitudinal emittance.   
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/755">#755</a>. (Tobias)
+<li> 
+</ul>
+
+<h4>Bug Fixes</h4>
+<ul>
+<li> Bug fix in RF-cavity lag adjustment for no_cavity_totalpath=true.   
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/759">#759</a>. (Laurent)
+<li> Touchek lifetime bug when negative charge was used.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/754">#754</a>. (Tobias)
+<li> Fixed bug in PTC_TWISS and PTC_NORMAL that did not add deltap to the user orbit.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/751">#751</a>. (Piotr, Laurent)
+<li> Prevents conversion of an aperture in case no size has been given.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/736">#736</a>. (Tobias)
+<li> Bugfix for coasting beam in the IBS module.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/735">#735</a>. (Angela)
+<li> Frequency was not output in SXFwrite.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/734">#734</a>. (Tobias)
+<li> Fixed a problem with readtable/write tables.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/720">#720</a>. (Laurent)
+<li> MKTHIN was previously disregarding disregards E1 and E2 of RBEND.   
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/710">#710</a>. (Helmut, Tobias)
+<li> The thick quadrupole was tilted twice in TRACK when k1s was not equal to 0.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/706">#706</a>. (Laurent)
+<li> Fix selecting by class=variable and class=sequence. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/696">#696</a>. (Thomas)
+<li> A bug when cycling the lattice that created a negative drift with exactly the length of the sequence. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/683">#683</a>. (Tobias)
+</ul>
+
+<h4>Added features/checks/functionalities</h4>
+<ul>
+<li> New PTC version (2019.04.18).  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/760">#760</a>. (Piotr)
+<li> Mapdump added to PTC.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/759">#759</a>. (Laurent)
+<li> New regression tests for all elements in PTC for many configurations.   
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/759">#759</a>. (Laurent)
+<li> Comments implemented in survey.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/755">#755</a>. (Tobias)
+<li> New flag in SixTrack converter for more info in file fc.2.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/749">#749</a>. (Veronika)
+<li> Fixed synchrotron radiation equations to be fully relativistic, in TWISS, TRACK, and EMIT. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/762">#762</a>. (Andrea)
+<li>  Fixed momentum damping equations in TWISS, TRACK, and EMIT.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/762">#762</a>. (Andrea)
+<li> Adds element solenoid to module EMIT and added synrad to solenoid in TWISS.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/748">#748</a>. (Andrea)
+<li> Prevents conversion of an aperture in case no size has been given.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/736">#736</a>. (Tobias)
+<li> SixTrack converter: Long names for aper file.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/746">#746</a>. (Veronika) 
+<li> New version of MAKETHIN.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/753">#753</a>. (Helmut, Tobias) 
+<li> Add `chdir` command to change directory.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/741">#741</a>. (Thomas)
+<li> Tilted solenoid in TWISS.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/737">#737</a>. (Tobias, Helmut) 
+<li> Option to update element based on changes from a parent element.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/733">#733</a>. (Tobias)  
+<li> Translate command does now work as a virtual drift.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/727">#727</a>. (Tobias)
+<li> Added the support to retrive the errors as an internal table.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/725">#725</a>. (Tobias)
+<li> Added conversion of the generalized RF-multipoles.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/714">#714</a>. (Tobias)
+<li> Added support for thick RBEND in TRACK.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/697">#697</a>. (Andrea)
+<li> Move command now keeps variables when the sequence is saved. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/692">#692</a>. (Tobias)
+<li> Added beam sanity checks such as checking that the energy is > 0. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/689">#689</a>. (Kyrre)
+</ul>
+
+
+
+
 <h3>MAD-X release 5.04.02 (2018.10.03)</h3>
 
 <ul>
