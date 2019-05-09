@@ -188,7 +188,7 @@ void
 exec_chdir(struct in_cmd* cmd)
 /* change directory */
 {
-  int top = in->curr;
+
   char* dir = command_par_string_user("dir", cmd->clone);
   if (dir) {
     chdir(dir);

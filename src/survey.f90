@@ -303,9 +303,9 @@ subroutine suelem(el, ve, we, tilt)
 
 
      case(code_translation) !  Translation of the reference system.
-        x_t = node_value('x ')
-        y_t = node_value('y ')
-        z_t = node_value('z ')
+        x_t = node_value('dx ')
+        y_t = node_value('dy ')
+        z_t = node_value('ds ')
         ve(1) =  x_t
         ve(2) =  y_t
         ve(3) =  z_t
