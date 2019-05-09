@@ -15,7 +15,7 @@
 
 
 
-<h3>MAD-X release 5.05.01 (2019.05.09)</h3>
+<h3>MAD-X release 5.05.00 (2019.05.09)</h3>
 <h4>Backward incompatibilties with previous releases</h4>
 <ul>
 <li> Changes the sign of the y-rotation in the survey.  
@@ -27,16 +27,16 @@
 
 <h4>Bug Fixes</h4>
 <ul>
-<li> Bug fix in PTC NORMAL.   
+<li> Bug fix in RF-cavity lag adjustment for no_cavity_totalpath=true.   
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/759">#759</a>. (Laurent)
 <li> Touchek lifetime bug when negative charge was used.  
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/754">#754</a>. (Tobias)
-<li> Fixed bug in ptc_twiss that did not add deltap to the user orbit.  
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/751">#751</a>. (Piotr)
+<li> Fixed bug in PTC_TWISS and PTC_NORMAL that did not add deltap to the user orbit.  
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/751">#751</a>. (Piotr, Laurent)
 <li> Prevents conversion of an aperture in case no size has been given.  
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/736">#736</a>. (Tobias)
 <li> Bugfix for coasting beam in the IBS module.  
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/735">#735</a>. (???)
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/735">#735</a>. (Angela)
 <li> Frequency was not output in SXFwrite.  
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/734">#734</a>. (Tobias)
 <li> Fixed a problem with readtable/write tables.  
@@ -51,14 +51,14 @@
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/issues/683">#683</a>. (Tobias)
 </ul>
 
-
-
 <h4>Added features/checks/functionalities</h4>
 <ul>
 <li> New PTC version (2019.04.18).  
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/760">#760</a>. (Piotr)
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/760">#7?</a>. (Piotr)
 <li> Mapdump added to PTC.  
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/760">#760</a>. (Laurent)
+<li> New regression tests for all elements in PTC for many configurations.   
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/759">#759</a>. (Laurent)
 <li> Comments implemented in survey.  
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/755">#755</a>. (Tobias)
 <li> New flag in SixTrack converter for more info in file fc.2.
