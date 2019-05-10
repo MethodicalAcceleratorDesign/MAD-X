@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 
-PROJECT(madX LANGUAGES C CXX Fortran)
+PROJECT(madX C CXX Fortran)
 
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
-  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.0)
+  if(${CMAKE_VERSION} VERSION_GREATER 2.99999)
     cmake_policy(SET CMP0042 NEW)
   endif()
 endif()
