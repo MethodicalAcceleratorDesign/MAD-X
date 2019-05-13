@@ -5823,9 +5823,9 @@ SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
 
 
  !---- Get translation parameters
- x    = node_value('x ')
- y    = node_value('y ')
- z    = node_value('z ')
+ x    = node_value('dx ')
+ y    = node_value('dy ')
+ z    = node_value('ds ')
  
  call tmdrf(fsec,ftrk,orbit,fmap,-z,ek,re,te)
  

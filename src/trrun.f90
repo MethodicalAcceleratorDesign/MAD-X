@@ -3359,9 +3359,9 @@ subroutine tttrans(track,ktrack)
   double precision :: node_value
 
   !---- Get translation parameters
-  t_x    = node_value('x ')
-  t_y    = node_value('y ')
-  t_z    = node_value('z ')
+  t_x    = node_value('dx ')
+  t_y    = node_value('dy ')
+  t_z    = node_value('ds ')
 
   !---- Loop over particles
 !$OMP PARALLEL PRIVATE(i)
