@@ -1297,7 +1297,7 @@ read_table(struct in_cmd* cmd)
 
   int error = 0;
   while (!error && fgets(aux_buff->c, aux_buff->max, tab_file)) {
-    myrepl("\"\"", "mytempreplace", tmpbuff(aux_buff->c), aux_buff->c);
+    myrepl("\"\"", "__mytempreplace__", tmpbuff(aux_buff->c), aux_buff->c);
     supp_char('\r', aux_buff->c);
     cc = strtok(aux_buff->c, " \"\n");
     if (*cc == '@') {                                   // HEADER
@@ -1373,11 +1373,11 @@ read_table(struct in_cmd* cmd)
         tmp = tcpa->p[i];
 
         if (strcmp(tmp,"%s") == 0) {
-          if(strcmp(cc,"mytempreplace")==0)
+          if(strcmp(cc,"__mytempreplace__")==0)
             t->s_cols[i][t->curr] = tmpbuff("");
           else
             t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
-          
+
         } else
         if (strcmp(tmp,"%d") == 0) {
           int k;
