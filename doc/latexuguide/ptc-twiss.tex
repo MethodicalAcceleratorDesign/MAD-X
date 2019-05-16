@@ -154,7 +154,7 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\
             \>INITIAL\_MATRIX\_TABLE=logical, INITIAL\_MATRIX\_MANUAL=logical,  \\
             \>INITIAL\_MAP\_MANUAL=logical, BETA0=string, MAPTABLE=logical, \\
             \>IGNORE\_MAP\_ORBIT=logical, RING\_PARAMETERS=logical, \\
-            \>NORMAL=logical, \\
+            \>NORMAL=logical, TRACKRDTS=logical,\\
             \>BETX=real, ALFX=real, MUX=real, \\
             \>BETY=real, ALFY=real, MUY=real, \\
             \>BETZ=real, ALFZ=real,  \\
@@ -341,7 +341,21 @@ The attributes are:
    different by relativistic beta factor. Similarly, the T coordinate is time times the speed of light 
    instead of path length times the speed of light.
    
-  
+   \ttitem{TRACKRDTS} a logical flag that triggers tracking of Resonance Driving Terms (RDTs).
+   For each element all RDTs from order 3 up to value defined by switch \texttt{NO} are saved 
+   in \texttt{TWISSRDT} table. 
+   This table contains also auxiliary columns as s position, element names, strengths and lengths 
+   such that RDT values can be plotted the same way as values from \texttt{TWISS} table.
+   RDTs are elements of the generating function (GFN) of the normalization transformation
+   and for compatibility with \texttt{PTC\_NORMAL} notation the columns are prefixed with GNF.
+   Because they are complex numbers 3 values are saved: real part (GNFC), imaginary part (GNFS) and amplitude (GNFA).
+   For example, RDT $f_{300000}$ will be saved in columns 
+   \texttt{GNFC\_3\_0\_0\_0\_0\_0}, \texttt{GNFS\_3\_0\_0\_0\_0\_0} and \texttt{GNFA\_3\_0\_0\_0\_0\_0}.
+   Currently the indexes can be only single digit numbers.
+   If amplitude of an RDT is smaller than 1e-12, it is saved as zero.
+   RDTs that have zero amplitude for all elements are not saved in the table.
+   
+   
 \end{madlist}
 
 
