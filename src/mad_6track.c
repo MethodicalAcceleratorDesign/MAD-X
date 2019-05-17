@@ -1509,10 +1509,10 @@ convert_madx_to_c6t(struct node* p)
 
 
       for (int i=0; i<mmult; i++){
-        c6t_elem->value[7+i*4] = kn_param->double_array->a[i];
-        c6t_elem->value[8+i*4] = pn_param->double_array->a[i];
-        c6t_elem->value[9+i*4] = ks_param->double_array->a[i];
-        c6t_elem->value[10+i*4] = ps_param->double_array->a[i];  
+        c6t_elem->value[7+i*4]  = maxkn>i?(kn_param->double_array->a[i]):0.0;
+        c6t_elem->value[8+i*4]  = maxpn>i?(pn_param->double_array->a[i]):0.0;
+        c6t_elem->value[9+i*4]  = maxks>i?(ks_param->double_array->a[i]):0.0;
+        c6t_elem->value[10+i*4] = maxps>i?(ps_param->double_array->a[i]):0.0;
       }
     }
   }
