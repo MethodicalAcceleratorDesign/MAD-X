@@ -243,8 +243,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: el, tilt, bvk
   double precision :: edg1, edg2, sk1, sk2, hgap, fint, sks, sksol, h, ct
   double precision :: corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
-  double precision :: tedg1, fact1, fact1x, rfac, rfac1, drfac1_dx, drfac1_dy
-  double precision :: h2, hcb2, tedg2, fact2, fact2x, rfac2
+  double precision :: tedg1, fact1, dfact1_dx, rfac, rfac1, drfac1_dx, drfac1_dy
+  double precision :: h2, hcb2, tedg2, fact2, dfact2_dx, rfac2
   double precision :: drfac2_dx, drfac2_dy, bi2gi2, betas, gammas
   double precision :: e5sq1, e5sq2, e5sqs1, e5sqs2, x, y
   double precision :: f1, f2, f1s, f2s, twon, str, st
@@ -354,9 +354,9 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
         tedg1  = tan(edg1)
         fact1  = (one + h*x1) * (one - tedg1*x1)
-        fact1x = h - tedg1 - 2.0*h*tedg1*x1
+        dfact1_dx = h - tedg1 - two*h*tedg1*x1
         rfac1  = cg*el*h1**2*fact1
-        drfac1_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact1 + h1**2*fact1x)
+        drfac1_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact1 + h1**2*dfact1_dx)
         drfac1_dy = cg*el *  two*(hx*hxy+hy*hyy)*fact1
 
         hx = sk1*x2 + sks*y2 + h + half*sk2 * (x2**2 - y2**2)
@@ -371,18 +371,18 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
         tedg2  = tan(edg2)
         fact2  = (one + h*x2) * (one - tedg2*x2)
-        fact2x = h - tedg2 - 2.0*h*tedg2*x2
+        dfact2_dx = h - tedg2 - two*h*tedg2*x2
 
         rfac2  = cg*el*h2**2*fact2
-        drfac2_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact2 + h2**2*fact2x)
+        drfac2_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact2 + h2**2*dfact2_dx)
         drfac2_dy = cg*el *  two*(hx*hxy+hy*hyy)*fact2
 
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
         bet2_sqr = (pt2*pt2 + two*pt2/betas + one) / (one/betas + pt2)**2;
         dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
         dbet2_sqr_dpt = (two/betas+two*pt2)/(pt2+one/betas)**2-(two*((pt2*two)/betas+pt2**2+one))/(pt2+one/betas)**3;
-        denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
-        denominator2 = 2*sqrt(((rfac2-two)*rfac2)/bet2_sqr+one);
+        denominator1 = two*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
+        denominator2 = two*sqrt(((rfac2-two)*rfac2)/bet2_sqr+one);
         
         !---- Cubic integration over h**3 * E(i,5) * conjg(E(i,5)).
         bi2gi2 = one / (betas * gammas)**2
@@ -431,7 +431,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
         rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
         rw(6,6) = one-rfac1;
-
         RE = matmul(RE,RW)
 
         RW = EYE
@@ -455,7 +454,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
         rw(6,6) = one-rfac2;
         RE = matmul(RW,RE)
-
+        
      case (code_quadrupole , code_sextupole, code_octupole, code_solenoid) !---- Common to all pure multipoles.
         sk1 = zero
         sk2 = zero
@@ -543,7 +542,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
         rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
         rw(6,6) = one-rfac1;
-
         RE = matmul(RE,RW)
 
         RW = EYE
