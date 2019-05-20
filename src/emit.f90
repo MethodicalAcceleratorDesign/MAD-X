@@ -255,6 +255,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: drfac1_dpx, drfac1_dpy, drfac2_dpx, drfac2_dpy
   double precision :: denominator1, denominator2
   double precision :: bet1_sqr, bet2_sqr, dbet1_sqr_dpt, dbet2_sqr_dpt
+  double precision :: p1, p2
 
   integer, external :: node_fd_errors
   double precision, external  :: node_value, get_value
@@ -377,6 +378,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         drfac2_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact2 + h2**2*dfact2_dx)
         drfac2_dy = cg*el *  two*(hx*hxy+hy*hyy)*fact2
 
+        p1 = sqrt(pt1*pt1 + two*pt1/betas + one) ! delta + 1
+        p2 = sqrt(pt2*pt2 + two*pt2/betas + one) ! delta + 1
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
         bet2_sqr = (pt2*pt2 + two*pt2/betas + one) / (one/betas + pt2)**2;
         dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
@@ -430,7 +433,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
         rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
         rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
-        rw(6,6) = one-rfac1;
+        rw(6,6) = one - two * rfac1 * p1;
         RE = matmul(RE,RW)
 
         RW = EYE
@@ -452,7 +455,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
         rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
         rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
-        rw(6,6) = one-rfac2;
+        rw(6,6) = one - two * rfac2 * p2;
         RE = matmul(RW,RE)
         
      case (code_quadrupole , code_sextupole, code_octupole, code_solenoid) !---- Common to all pure multipoles.
@@ -508,6 +511,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         drfac2_dpy = -cg*sksol/el
 
         !
+        p1 = sqrt(pt1*pt1 + two*pt1/betas + one) ! delta + 1
+        p2 = sqrt(pt2*pt2 + two*pt2/betas + one) ! delta + 1
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
         bet2_sqr = (pt2*pt2 + two*pt2/betas + one) / (one/betas + pt2)**2;
         denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
@@ -541,7 +546,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
         rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
         rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
-        rw(6,6) = one-rfac1;
+        rw(6,6) = one - two * rfac1 * p1;
         RE = matmul(RE,RW)
 
         RW = EYE
@@ -563,7 +568,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
         rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
         rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
-        rw(6,6) = one-rfac2;
+        rw(6,6) = one - two * rfac1 * p2;
         RE = matmul(RW,RE)
 
      case (code_multipole) !---- Thin multipoles
@@ -609,6 +614,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
         !---- Support variables
         x1 = orb1(1); px1 = orb1(2); y1 = orb1(3); py1 = orb1(4); t1 = orb1(5); pt1 = orb1(6)
+        p1 = sqrt(pt1*pt1 + two*pt1/betas + one) ! delta + 1
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
         dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
         denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
@@ -632,7 +638,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
         rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
         rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
-        rw(6,6) = one-rfac1;
+        rw(6,6) = one - two * rfac1 * p1;
 
         ! RE = RW * RE * RW
         RE = matmul(RW, matmul(RE,RW))
@@ -696,6 +702,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         x1 = orb1(1); px1 = orb1(2); y1 = orb1(3); py1 = orb1(4); t1 = orb1(5); pt1 = orb1(6)
         x2 = orb2(1); px2 = orb2(2); y2 = orb2(3); py2 = orb2(4); t2 = orb2(5); pt2 = orb2(6)
         
+        p1 = sqrt(pt1*pt1 + two*pt1/betas + one)
+        p2 = sqrt(pt2*pt2 + two*pt2/betas + one)
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
         bet2_sqr = (pt2*pt2 + two*pt2/betas + one) / (one/betas + pt2)**2;
         dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
@@ -723,7 +731,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
         rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
         rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
-        rw(6,6) = one-rfac1;
+        rw(6,6) = one - two * rfac1 * p1;
 
         RE = matmul(RE,RW)
 
@@ -746,7 +754,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
         rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
         rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
-        rw(6,6) = one-rfac2;
+        rw(6,6) = one - two * rfac1 * p2;
         RE = matmul(RW,RE)
 
      case (code_rfmultipole)  !---- thin RF multipole
