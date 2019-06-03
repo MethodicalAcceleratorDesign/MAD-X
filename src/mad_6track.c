@@ -441,7 +441,9 @@ static char el_info[][60] = /* see type_info definition */
  "rfdipole     2       0       2       0       0       2",
  "rfquadrupole 2       0       2       0       0       2",
  "rfsextupole  2       0       2       0       0       2",
- "rfoctupole   2       0       2       0       0       2"
+ "rfoctupole   2       0       2       0       0       2",
+ "xrotation    2       0       2       0       0       0",
+ "yrotation    2       0       2       0       0       0"
 };
 
 /* no. of valid element types */
@@ -905,14 +907,16 @@ att_dipedge(struct c6t_element* el)
 static void
 att_xrotation(struct c6t_element* el)
 {
+  printf("heeereeee");
   el->out_1 = 43;
+  el->out_2 = el->value[1] ;
   
 }
 static void
 att_yrotation(struct c6t_element* el)
 {
-  el->out_1 = 43;
-  
+  el->out_1 = 44;
+  el->out_2 = el->value[1] ;
 }
 static void
 att_solenoid(struct c6t_element* el)
@@ -1094,8 +1098,10 @@ conv_elem(void)
   {
     for (j = 0; j < N_TYPES; j++)
     {
+        printf("aaaaaa \n %s, %s",types.member[i]->base_name,  t_info[j]->name );
       if (strcmp(types.member[i]->base_name, t_info[j]->name) == 0)
       {
+
         type = t_info[j]; break;
       }
     }
