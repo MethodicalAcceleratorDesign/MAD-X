@@ -530,6 +530,7 @@ contains
 
   subroutine ptc_twiss(tab_name,summary_tab_name)
     use twissafi
+    use s_extend_poly, only : MAPDUMP ! LD: 04.06.2019
     implicit none
     logical(lp)             :: closed_orbit,beta_flg, slice, goslice
     integer                 :: k,i,ii
@@ -571,7 +572,7 @@ contains
     character(48)           :: summary_table_name
     character(12)           :: tmfile='transfer.map'
     character(48)           :: charconv !routine
-
+    integer                 :: mapdumpbak ! LD: 04.06.2019
 
     if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
@@ -1203,13 +1204,21 @@ contains
       else
         ! ELEMENT AT ONCE MODE
         if (nda > 0) then
-           call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
-           if (doTMtrack) then
+           if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
+             mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
+             call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
+             mapdump = mapdumpbak
+           endif
+           if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
              call propagate(my_ring,theTransferMap,+default,fibre1=i,fibre2=i+1)
            endif
         else
-           call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
-           if (doTMtrack) then
+           if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
+             mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
+             call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
+             mapdump = mapdumpbak
+           endif
+           if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
              call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
            endif
 
@@ -1410,19 +1419,22 @@ contains
       implicit none
 
        if (nda > 0) then
-          call propagate(my_ring,A_script_probe,+default, & ! +default in case of extra parameters !?
-               & node1=nodePtr%pos,node2=nodePtr%pos+1)
-
-          if (doTMtrack) then
-             call propagate(my_ring,theTransferMap,+default, & ! +default in case of extra parameters !?
-                  & node1=nodePtr%pos,node2=nodePtr%pos+1)
+          if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
+            mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
+            call propagate(my_ring,A_script_probe,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
+            mapdump = mapdumpbak
+          endif
+          if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
+            call propagate(my_ring,theTransferMap,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
           endif
         else
-          call propagate(my_ring,A_script_probe,default, &
-               & node1=nodePtr%pos,node2=nodePtr%pos+1)
-          if (doTMtrack) then
-             call propagate(my_ring,theTransferMap,default, &
-                  & node1=nodePtr%pos,node2=nodePtr%pos+1)
+          if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
+            mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
+            call propagate(my_ring,A_script_probe,default,node1=nodePtr%pos,node2=nodePtr%pos+1)
+            mapdump = mapdumpbak
+          endif
+          if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
+            call propagate(my_ring,theTransferMap,default,node1=nodePtr%pos,node2=nodePtr%pos+1)
           endif
         endif
 

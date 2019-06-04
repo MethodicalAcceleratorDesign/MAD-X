@@ -10,7 +10,7 @@ module S_extend_poly
 
   ! LD: 22.03.2019 (see Sc_euclidean.f90, Sh_def_kinf.f90 and Sr_spin.f90)
   character(len=150) :: ELEM_NAME = "UNKNOWN"
-  integer            :: MAPDUMP = 0 ! 0 or 1 enable/disable PRTP
+  integer            :: MAPDUMP = 0 ! 0: no dump, 1: dump no=0, 2: dump no=1
 
 CONTAINS
 
