@@ -300,6 +300,9 @@ static void att_sbend(struct c6t_element*);
 static void att_sextupole(struct c6t_element*);
 static void att_vkicker(struct c6t_element*);
 static void att_rfmultipole(struct c6t_element*);
+static void att_xrotation(struct c6t_element*);
+static void att_yrotation(struct c6t_element*);
+static void att_srotation(struct c6t_element*);
 static void att_undefined(struct c6t_element*);
 static void clean_c6t_element(struct c6t_element*);
 static struct c6t_element* create_aperture(const char* ,const char* ,double, double, double, double, double, double, double,
@@ -439,7 +442,10 @@ static char el_info[][60] = /* see type_info definition */
  "rfdipole     2       0       2       0       0       2",
  "rfquadrupole 2       0       2       0       0       2",
  "rfsextupole  2       0       2       0       0       2",
- "rfoctupole   2       0       2       0       0       2"
+ "rfoctupole   2       0       2       0       0       2",
+ "xrotation    2       2       2       0       0       0",
+ "yrotation    2       2       2       0       0       0",
+ "srotation    2       2       2       0       0       0"
 };
 
 /* no. of valid element types */
@@ -655,6 +661,9 @@ assign_att(void)
         else if (strcmp(el->base_name, "sextupole") == 0) att_sextupole(el);
         else if (strcmp(el->base_name, "vkicker") == 0) att_vkicker(el);
         else if (strcmp(el->base_name, "rfmultipole") == 0) att_rfmultipole(el);
+        else if (strcmp(el->base_name, "xrotation") == 0) att_xrotation(el);
+        else if (strcmp(el->base_name, "yrotation") == 0) att_yrotation(el);
+        else if (strcmp(el->base_name, "srotation") == 0) att_srotation(el);
         else att_undefined(el);
       }
     }
@@ -899,6 +908,25 @@ att_dipedge(struct c6t_element* el)
 }
 
 static void
+att_xrotation(struct c6t_element* el)
+{
+  el->out_1 = 43;
+  el->out_2 = el->value[1] ; 
+}
+static void
+att_yrotation(struct c6t_element* el)
+{
+  el->out_1 = 44;
+  el->out_2 = el->value[1] ;
+}
+static void
+att_srotation(struct c6t_element* el)
+{
+  el->out_1 = 45;
+  el->out_2 = el->value[1] ;
+}
+
+static void
 att_solenoid(struct c6t_element* el)
 {
   el->out_1 = 25;
@@ -1078,8 +1106,10 @@ conv_elem(void)
   {
     for (j = 0; j < N_TYPES; j++)
     {
+
       if (strcmp(types.member[i]->base_name, t_info[j]->name) == 0)
       {
+
         type = t_info[j]; break;
       }
     }
@@ -1422,6 +1452,13 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
     c6t_elem->value[2] = el_par_value_recurse("ex",p->p_elem);
     c6t_elem->value[3] = el_par_value_recurse("ey",p->p_elem);
+  }
+  else if((strcmp(p->base_name,"xrotation") == 0  || (strcmp(p->base_name,"yrotation") == 0) || (strcmp(p->base_name,"srotation") == 0)))
+  {
+    c6t_elem = new_c6t_element(3,t_name,p->base_name);
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+    c6t_elem->value[1] = el_par_value_recurse("angle",p->p_elem);
   }
   else if (strcmp(p->base_name,"drift") == 0)
   {
