@@ -432,7 +432,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - drfac1_dx * p1**2
         rw(6,3) =     - drfac1_dy * p1**2
         rw(6,6) = one - two * rfac1 * (one + pt1)
-        !! if the sixth variable was pt, the equations would look like
+        !! if the sixth variable was pt, the RW(6,*) equations would look like
         !rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
         !rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
         !rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
@@ -458,7 +458,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - drfac2_dx * p2**2
         rw(6,3) =     - drfac2_dy * p2**2
         rw(6,6) = one - two * rfac2 * (one + pt2)
-        !! if the sixth variable was pt, the equations would look like
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
         !rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
         !rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
         !rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
@@ -553,7 +553,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - drfac1_dx * p1**2
         rw(6,3) =     - drfac1_dy * p1**2
         rw(6,6) = one - two * rfac1 * (one + pt1)
-        !! if the sixth variable was pt, the equations would look like
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
         !rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
         !rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
         !rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
@@ -579,7 +579,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - drfac2_dx * p2**2
         rw(6,3) =     - drfac2_dy * p2**2
         rw(6,6) = one - two * rfac2 * (one + pt2)
-        !! if the sixth variable was pt, the equations would look like
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
         !rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
         !rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
         !rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
@@ -653,7 +653,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - drfac1_dx * p1**2
         rw(6,3) =     - drfac1_dy * p1**2
         rw(6,6) = one - two * rfac1 * (one + pt1)
-        !! if the sixth variable was pt, the equations would look like
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
         !rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
         !rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
         !rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
@@ -750,7 +750,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - drfac1_dx * p1**2
         rw(6,3) =     - drfac1_dy * p1**2
         rw(6,6) = one - two * rfac1 * (one + pt1)
-        !! if the sixth variable was pt, the equations would look like
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
         !rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
         !rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
         !rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
@@ -776,7 +776,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - drfac2_dx * p2**2
         rw(6,3) =     - drfac2_dy * p2**2
         rw(6,6) = one - two * rfac2 * (one + pt2)
-        !! if the sixth variable was pt, the equations would look like
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
         !rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
         !rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
         !rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
