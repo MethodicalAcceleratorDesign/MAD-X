@@ -1636,7 +1636,7 @@ void SeqElList::kn_ks_from_thick_elem(const element* thick_elem,command_paramete
   }
   const struct command_parameter* p;
   const std::vector<std::string> kn_name={"k0", "k1", "k2", "k3"};
-  const std::vector<std::string> ks_name={"k0s","k1s","k2s","k3"};
+  const std::vector<std::string> ks_name={"k0s","k1s","k2s","k3s"};
   for(unsigned int i=0;i<kn_name.size();++i) kn_pars[i] = (p=return_param_recurse(kn_name[i].c_str() ,thick_elem)) ? clone_command_parameter(p) : nullptr;
   for(unsigned int i=0;i<ks_name.size();++i) ks_pars[i] = (p=return_param_recurse(ks_name[i].c_str() ,thick_elem)) ? clone_command_parameter(p) : nullptr;
 }
