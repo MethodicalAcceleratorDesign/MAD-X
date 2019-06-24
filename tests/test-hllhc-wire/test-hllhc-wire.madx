@@ -1056,7 +1056,7 @@ if( ON_BB_SWITCH == 1){
 
 
 select, flag=twiss, clear;
-select, flag=twiss, pattern=MQ.;
+select, flag=twiss, pattern=MQTL;
 twiss,file="last_twiss.1";
 
 stop; 
