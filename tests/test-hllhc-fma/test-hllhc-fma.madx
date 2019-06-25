@@ -6,7 +6,7 @@
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 Option,  warn,info;
 !System,"rm -rf temp";
-System,"mkdir temp";
+System,"mkdir -p temp";
 System,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/runIII lhc";
 System,"ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.3 slhc";
