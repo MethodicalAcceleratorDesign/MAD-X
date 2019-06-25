@@ -11,7 +11,6 @@ system,"ln -fns /afs/cern.ch/eng/lhc/optics/runIII lhc";
 System,"ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.3 slhc";
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705 wise";
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/WISE/After_sector_3-4_repair fidel";
-system,"ln -fns /afs/cern.ch/user/n/nkarast/public/MADXTests/macro macro";
 option,-echo,-info;
 
 !---------------------------------------------------------------;

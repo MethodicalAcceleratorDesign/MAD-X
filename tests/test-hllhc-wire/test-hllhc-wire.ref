@@ -3,7 +3,7 @@
   +     MAD-X 5.05.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.06.07               +
-  + Execution date: 2019.06.24 17:29:55      +
+  + Execution date: 2019.06.25 10:22:16      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2009
 
@@ -30,8 +30,6 @@ System,"ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.3 slhc";
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705 wise";
 
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/WISE/After_sector_3-4_repair fidel";
-
-system,"ln -fns /afs/cern.ch/user/n/nkarast/public/MADXTests/macro macro";
 
 option,-echo,-info;
 
@@ -504,8 +502,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "24/06/19"
-@ TIME             %08s "17.30.07"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.22.29"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.5684327563 0.150000000792417 0.14999999999774 4.56963895388558e-08 3.12481956538397e-11 -3.00095723353517e-10 5.197962119126e-09 15.0109070352973 14.5393647705992
@@ -584,8 +582,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "24/06/19"
-@ TIME             %08s "17.30.09"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.22.31"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.8731672437 0.149999995141886 0.149999999999552 2.96974407962579e-08 1.77484857230974e-12 7.57660281774061e-10 -3.83457255542615e-09 15.1385489606468 14.4448340932668
@@ -667,8 +665,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "24/06/19"
-@ TIME             %08s "17.30.10"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.22.32"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.5684327563 -2.82901667781991e-09 0.000749978480249974 0.00025010849452088 4.65249475680409e-08
@@ -750,8 +748,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "24/06/19"
-@ TIME             %08s "17.30.11"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.22.34"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.8731672437 -7.03201360400911e-09 -0.000749972214158974 -0.000250143361576922 -7.61144269306663e-08
@@ -1244,8 +1242,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "24/06/19"
-@ TIME             %08s "17.30.27"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.22.49"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6589.76797484384 "BBMK_PAR.L5B1_20"  7622.2497088737 18877.4942351402 -27.962554051404 -123.745094130392 14.7611042830482 14.2892911116376 -0.00819083991970955 -1.82576128377267e-07 -9.91507173528639e-05 -1.21216643739877e-09
@@ -1402,8 +1400,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "24/06/19"
-@ TIME             %08s "17.30.28"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.22.50"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6590.07270933124 "BBMK_PAR.L5B2_20"  18877.5620255472 7622.30024415611 -123.745532243348 -27.9627367957384 14.8884750853143 14.195030911358 0.0130325898442521 -6.75010905420021e-08 0.00016160158720931 -2.72808461396781e-10
@@ -1560,8 +1558,8 @@ nflips
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "24/06/19"
-@ TIME             %08s "17.30.29"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.22.51"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6664.5009327563 "BB_HO.L5B1_5"      0.18037563849102 0.180375724729782 0.449997993731438 0.4499998347403 14.9436075276585 14.4720652521897 -1.68760914173303e-05 -1.04833569022814e-09 0.000249992196228867 3.43354747344199e-09
