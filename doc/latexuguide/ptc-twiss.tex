@@ -61,16 +61,17 @@ coupling matrix: \texttt{R11, R12, R21} and \texttt{R22}. In absence of
 coupling, the following holds: \texttt{betx = beta11}, \texttt{bety = beta22},
 \texttt{alfx = alfa11} and \texttt{alfy = alfa22}.
 
-\texttt{PTC\_TWISS} can also compute the deltap/p 
-(or deltaE/E if time=TRUE) dependency 
+\texttt{PTC\_TWISS} can also compute the $\Delta p/p_0$ 
+(or $\Delta E/p_0 c$ if time=TRUE) dependency 
 of the Twiss parameters. The column names \texttt{beta11p, ..., beta33p,
   alfa11p, ..., alfa33p, gama11p, ..., gama33p} denote the derivatives of
-the optics parameters with respect to deltap/p (or deltaE/E if time=TRUE). 
+the optics parameters with respect to $\Delta p/p_0$ (or $\Delta E/p_0 c$ if time=TRUE). 
 
-In order to evaluate the deltap/p-dependency of the Twiss parameters,
+In order to evaluate the $\Delta p/p_0$-dependency of the Twiss parameters,
 the order (\texttt{NO}) of the map must set to at least 2.  
 
-The derivatives of the dispersion with respect to deltap/p (or deltaE/E if time=TRUE)
+The derivatives of the dispersion with respect to $\Delta p/p_0$ 
+(or $\Delta E/p_0 c$ if time=TRUE)
 have column names: \texttt{disp1p, ..., disp4p}. 
 Second and third order derivatives have respective column names:  
 \texttt{disp1p2, ..., disp4p2} for the second order, and 
@@ -78,7 +79,7 @@ Second and third order derivatives have respective column names:
 
 In addition, \ptc computes the momentum compaction factor $\alpha_c$ (\texttt{ALPHA\_C}) and time 
 slip factor $\eta_c$. Higher order derivatives of compaction factor  
-with respect to deltap/p up to urder 4  (\texttt{ALPHA\_C\_P}, \texttt{ALPHA\_C\_P2} and \texttt{ALPHA\_C\_P3})
+with respect to $\Delta p/p_0$ up to urder 4  (\texttt{ALPHA\_C\_P}, \texttt{ALPHA\_C\_P2} and \texttt{ALPHA\_C\_P3})
 are computed  f \texttt{ICASE=56} and \texttt{time=false}, prividing the order of 
 calculation as defined by \texttt{NO} switch is high enough.
 The values appear in the header of the \texttt{PTC\_TWISS} output file, 
@@ -178,7 +179,7 @@ The attributes are:
 
   \ttitem{NO} 
   the order of the map. (Default:~1)\\ For evaluating the
-  derivatives of the Twiss parameter w.r.t. deltap/p, e.g. for
+  derivatives of the Twiss parameter w.r.t. $\Delta p/p_0$, e.g. for
   evaluating the chromaticities, the order must be at least equal to 2.
 
   \ttitem{DELTAP}   
@@ -191,8 +192,8 @@ The attributes are:
 
   \ttitem{DELTAP\_DEPENDENCY}  
   a logical switch to trigger the computation of the Twiss and
-  dispersion derivatives w.r.t. deltap/p. Derivation formula assume that
-  \texttt{ICASE $\ge$ 5}, so that deltap/p is supplied as a parameter. \\
+  dispersion derivatives w.r.t. $\Delta p/p_0$. Derivation formula assume that
+  \texttt{ICASE $\ge$ 5}, so that $\Delta p/p_0$ is supplied as a parameter. \\
   (Default: false)
 
   \ttitem{SLICE\_MAGNETS}
@@ -336,8 +337,8 @@ The attributes are:
    which in turn always gives values of the partial derivatives.
    Therefore, in order to obtain values of the partial derivatives the respective factorials 
    and binomial coefficients need to be factored out by the user. 
-   Also, if TIME=true the chromatic variables are NOT transformed into usual deltap/p dependence
-   and in this case they are related to deltaE/E. For example, dispersions and chormaticities will be 
+   Also, if TIME=true the chromatic variables are NOT transformed into usual $\Delta p/p_0$ dependence
+   and in this case they are related to $\Delta E/p_0 c$. For example, dispersions and chormaticities will be 
    different by relativistic beta factor. Similarly, the T coordinate is time times the speed of light 
    instead of path length times the speed of light.
    
