@@ -3,7 +3,7 @@
   +     MAD-X 5.05.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.06.07               +
-  + Execution date: 2019.06.25 09:44:27      +
+  + Execution date: 2019.06.25 11:36:12      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -6038,7 +6038,9 @@ c6t terminated - total number of elements: 23489
 
 select, flag=twiss, clear;
 
-twiss,file="last_twiss.20";
+select, flag=twiss, pattern=MQTL;
+
+twiss,file="last_twiss.1";
 
 enter Twiss module
   
@@ -6071,8 +6073,6 @@ orbit:   3.366700E-06 -1.485125E-07 -3.333459E-06 -4.071400E-08  4.905970E-06  4
 
             nflips 
                  0 
-!system,"gzip -f last_twiss.20";
-
 
 
 ! cleaning files
