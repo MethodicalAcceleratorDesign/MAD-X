@@ -1,0 +1,3606 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.05.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2019.06.07               +
+  + Execution date: 2019.06.25 10:56:56      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+! S. Fartoukh March 2009
+
+! Ref sample job for tracking with multipole field imperfection in nominal 
+
+! LHC magnets using V6.503 in collision
+
+! M. Giovannozzi November 2010
+
+
+
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
+
+Option,  warn,info;
+
+!System,"rm -rf temp";
+
+System,"mkdir temp";
+
+mkdir: cannot create directory ‘temp’: File exists
+System,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runIII lhc";
+
+System,"ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.3 slhc";
+
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705 wise";
+
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/WISE/After_sector_3-4_repair fidel";
+
+option,-echo,-info;
+
+++++++ warning: implicit element re-definition ignored: marks.l1
+++++++ warning: implicit element re-definition ignored: marke.l1
+++++++ warning: implicit element re-definition ignored: marke.r1
+++++++ warning: implicit element re-definition ignored: marks.r1
+++++++ warning: implicit element re-definition ignored: marks.l5
+++++++ warning: implicit element re-definition ignored: marke.l5
+++++++ warning: implicit element re-definition ignored: marke.r5
+++++++ warning: implicit element re-definition ignored: marks.r5
+++++++ warning: ignored because of unknown element: ms.10l1.b1
+++++++ warning: ignored because of unknown element: ms.10r1.b1
+++++++ warning: ignored because of unknown element: ms.10l5.b1
+++++++ warning: ignored because of unknown element: ms.10r5.b1
+++++++ warning: ignored because of unknown element: mcbh.10l1.b1
+++++++ warning: ignored because of unknown element: mcbv.10r1.b1
+++++++ warning: ignored because of unknown element: mcbh.10l5.b1
+++++++ warning: ignored because of unknown element: mcbv.10r5.b1
+++++++ warning: implicit element re-definition ignored: marks.l1
+++++++ warning: implicit element re-definition ignored: marke.l1
+++++++ warning: implicit element re-definition ignored: marke.r1
+++++++ warning: implicit element re-definition ignored: marks.r1
+++++++ warning: implicit element re-definition ignored: marks.l5
+++++++ warning: implicit element re-definition ignored: marke.l5
+++++++ warning: implicit element re-definition ignored: marke.r5
+++++++ warning: implicit element re-definition ignored: marks.r5
+++++++ warning: ignored because of unknown element: ms.10l1.b2
+++++++ warning: ignored because of unknown element: ms.10r1.b2
+++++++ warning: ignored because of unknown element: ms.10l5.b2
+++++++ warning: ignored because of unknown element: ms.10r5.b2
+++++++ warning: ignored because of unknown element: mcbv.10l1.b2
+++++++ warning: ignored because of unknown element: mcbh.10r1.b2
+++++++ warning: ignored because of unknown element: mcbv.10l5.b2
+++++++ warning: ignored because of unknown element: mcbh.10r5.b2
+postas             =              19.95 ;
+posq1a             =              25.02 ;
+posq1b             =             29.826 ;
+posq2a             =             39.129 ;
+posq2b             =             48.387 ;
+posq3a             =              57.69 ;
+posq3b             =             62.496 ;
+posq1a             =              25.02 ;
+posq1b             =             29.826 ;
+posq2a             =             39.129 ;
+posq2b             =             48.387 ;
+posq3a             =              57.69 ;
+posq3b             =             62.496 ;
+kmax_mcbxfb        =        2.083333333 ;
+posmcbxfba         =             34.466 ;
+posmcbxfba         =             34.466 ;
+posmcbxfbb         =              53.05 ;
+posmcbxfbb         =              53.05 ;
+posmcbxfa          =             68.443 ;
+posmqsxf           =             70.249 ;
+posmctxf           =             71.021 ;
+posmctsxf          =             71.431 ;
+posmcdxf           =              71.67 ;
+posmcdsxf          =             71.912 ;
+posmcoxf           =             72.154 ;
+posmcosxf          =             72.396 ;
+posmcsxf           =             72.644 ;
+posmcssxf          =             72.898 ;
+posmcbxfa          =             68.443 ;
+posmcbxfa          =             68.443 ;
+posmqsxf           =             70.249 ;
+posmctxf           =             71.021 ;
+posmctsxf          =             71.431 ;
+posmcdxf           =              71.67 ;
+posmcdsxf          =             71.912 ;
+posmcoxf           =             72.154 ;
+posmcosxf          =             72.396 ;
+posmcsxf           =             72.644 ;
+posmcssxf          =             72.898 ;
+posd1              =             77.782 ;
+posdfxj            =             83.956 ;
+posbpm1            =             21.853 ;
+posbpm2            =             33.073 ;
+posbpm3            =             43.858 ;
+posbpm4            =             54.643 ;
+posbpm5            =             65.743 ;
+posbpm6            =             73.697 ;
+posbpm7            =             86.845 ;
+posbpm1            =             21.853 ;
+posbpm2            =             33.073 ;
+posbpm3            =             43.858 ;
+posbpm4            =             54.643 ;
+posbpm5            =             65.743 ;
+posbpm6            =             73.697 ;
+posbpm7            =             86.845 ;
+posd1              =             77.782 ;
+posd2              =            142.513 ;
+posd2-posd1        =             64.731 ;
+posmcbrda          =            147.713 ;
+posmcbrdb          =            149.968 ;
+posbpmwq           =           136.7955 ;
+sepbpmwq           =              0.177 ;
+ad1.lr1            =     0.001498508093 ;
+l.mbxf             =               6.27 ;
+ad1.lr1/l.mbxf*brho =        5.580305347 ;
+ad1.lr1*brho       =        34.98851453 ;
+ad2.l1             =     0.001498508093 ;
+l.mbrd             =               7.78 ;
+ad2.l1/l.mbrd*brho =        4.497238371 ;
+ad2.l1*brho        =        34.98851453 ;
+posd2              =            142.513 ;
+posbpmwq           =           136.7955 ;
+posmcbrda          =            147.713 ;
+posmcbrdb          =            149.968 ;
+posmcbrdb          =            149.968 ;
+posmcbrda          =            147.713 ;
+posq4              =              179.6 ;
+posmcby.a4         =            177.252 ;
+posmcby.b4         =            176.015 ;
+posmcby.c4         =            174.778 ;
+posmcby.d4         =            173.541 ;
+posbpmya.4         =            182.104 ;
+posq4              =              179.6 ;
+posmcby.c4         =            174.778 ;
+posmcby.d4         =            173.541 ;
+posmcby.d4         =            173.541 ;
+posmcby.c4         =            174.778 ;
+posmcby.a4         =            177.252 ;
+posmcby.b4         =            176.015 ;
+posmcby.b4         =            176.015 ;
+posmcby.a4         =            177.252 ;
+posq5              =             207.49 ;
+posq5              =             207.49 ;
+dposbpmy.5         =              2.674 ;
+dposmcby.b5        =              2.522 ;
+dposmcby.5         =              3.818 ;
+dposmcby.a5        =              5.114 ;
+posq6              =             228.39 ;
+dposmcbc           =              3.042 ;
+dposbpm            =              3.145 ;
+posq6              =             228.39 ;
+posmsq10           =              2.745 ;
+posmcbq10          =              3.338 ;
+on_cutms.10        =                  0 ;
+on_cutms.14        =                  0 ;
+++++++ warning: ignored because of unknown element: acfca.al5.b1
+++++++ warning: ignored because of unknown element: acfca.ar5.b1
+++++++ warning: ignored because of unknown element: acfca.al1.b1
+++++++ warning: ignored because of unknown element: acfca.ar1.b1
+++++++ warning: ignored because of unknown element: vacfca.al5.b1
+++++++ warning: ignored because of unknown element: vacfca.ar5.b1
+++++++ warning: ignored because of unknown element: vacfca.al1.b1
+++++++ warning: ignored because of unknown element: vacfca.ar1.b1
+++++++ warning: ignored because of unknown element: acfca.al5.b2
+++++++ warning: ignored because of unknown element: acfca.ar5.b2
+++++++ warning: ignored because of unknown element: acfca.al1.b2
+++++++ warning: ignored because of unknown element: acfca.ar1.b2
+++++++ warning: ignored because of unknown element: vacfca.al5.b2
+++++++ warning: ignored because of unknown element: vacfca.ar5.b2
+++++++ warning: ignored because of unknown element: vacfca.al1.b2
+++++++ warning: ignored because of unknown element: vacfca.ar1.b2
+++++++ warning: ignored because of unknown element: acfca.bl5.b1
+++++++ warning: ignored because of unknown element: acfca.br5.b1
+++++++ warning: ignored because of unknown element: acfca.bl1.b1
+++++++ warning: ignored because of unknown element: acfca.br1.b1
+++++++ warning: ignored because of unknown element: vacfca.bl5.b1
+++++++ warning: ignored because of unknown element: vacfca.br5.b1
+++++++ warning: ignored because of unknown element: vacfca.bl1.b1
+++++++ warning: ignored because of unknown element: vacfca.br1.b1
+++++++ warning: ignored because of unknown element: acfca.bl5.b2
+++++++ warning: ignored because of unknown element: acfca.br5.b2
+++++++ warning: ignored because of unknown element: acfca.bl1.b2
+++++++ warning: ignored because of unknown element: acfca.br1.b2
+++++++ warning: ignored because of unknown element: vacfca.bl5.b2
+++++++ warning: ignored because of unknown element: vacfca.br5.b2
+++++++ warning: ignored because of unknown element: vacfca.bl1.b2
+++++++ warning: ignored because of unknown element: vacfca.br1.b2
+++++++ warning: ignored because of unknown element: acfca.cl5.b1
+++++++ warning: ignored because of unknown element: acfca.cr5.b1
+++++++ warning: ignored because of unknown element: acfca.cl1.b1
+++++++ warning: ignored because of unknown element: acfca.cr1.b1
+++++++ warning: ignored because of unknown element: vacfca.cl5.b1
+++++++ warning: ignored because of unknown element: vacfca.cr5.b1
+++++++ warning: ignored because of unknown element: vacfca.cl1.b1
+++++++ warning: ignored because of unknown element: vacfca.cr1.b1
+++++++ warning: ignored because of unknown element: acfca.cl5.b2
+++++++ warning: ignored because of unknown element: acfca.cr5.b2
+++++++ warning: ignored because of unknown element: acfca.cl1.b2
+++++++ warning: ignored because of unknown element: acfca.cr1.b2
+++++++ warning: ignored because of unknown element: vacfca.cl5.b2
+++++++ warning: ignored because of unknown element: vacfca.cr5.b2
+++++++ warning: ignored because of unknown element: vacfca.cl1.b2
+++++++ warning: ignored because of unknown element: vacfca.cr1.b2
+++++++ warning: ignored because of unknown element: acfca.dl5.b1
+++++++ warning: ignored because of unknown element: acfca.dr5.b1
+++++++ warning: ignored because of unknown element: acfca.dl1.b1
+++++++ warning: ignored because of unknown element: acfca.dr1.b1
+++++++ warning: ignored because of unknown element: vacfca.dl5.b1
+++++++ warning: ignored because of unknown element: vacfca.dr5.b1
+++++++ warning: ignored because of unknown element: vacfca.dl1.b1
+++++++ warning: ignored because of unknown element: vacfca.dr1.b1
+++++++ warning: ignored because of unknown element: acfca.dl5.b2
+++++++ warning: ignored because of unknown element: acfca.dr5.b2
+++++++ warning: ignored because of unknown element: acfca.dl1.b2
+++++++ warning: ignored because of unknown element: acfca.dr1.b2
+++++++ warning: ignored because of unknown element: vacfca.dl5.b2
+++++++ warning: ignored because of unknown element: vacfca.dr5.b2
+++++++ warning: ignored because of unknown element: vacfca.dl1.b2
+++++++ warning: ignored because of unknown element: vacfca.dr1.b2
+poscraba1          =            154.817 ;
+poscrabb1          =            155.867 ;
+poscrabc1          =            162.257 ;
+poscrabd1          =            163.307 ;
+poscraba2          =            158.637 ;
+poscrabb2          =            159.687 ;
+poscrabc2          =            166.077 ;
+poscrabd2          =            167.127 ;
+poscraba1          =            154.817 ;
+poscraba2          =            158.637 ;
+poscrabb1          =            155.867 ;
+poscrabb2          =            159.687 ;
+poscrabc1          =            162.257 ;
+poscrabc2          =            166.077 ;
+poscrabd1          =            163.307 ;
+poscrabd2          =            167.127 ;
+postclmb.4c        =            170.756 ;
+postclmb.4c        =            170.756 ;
+postclmb.5c        =            199.591 ;
+postclmb.5c        =            199.591 ;
+postclmc.6c        =            222.567 ;
+postclmc.6q        =            223.174 ;
+postaxn            =            128.801 ;
+postctpv           =            131.949 ;
+postctxh           =             133.95 ;
+postclx            =            135.707 ;
+septaxn            =              0.153 ;
+septaxna           =              0.148 ;
+septaxnb           =              0.158 ;
+septctv            =              0.162 ;
+septctxh           =              0.168 ;
+septclx            =              0.174 ;
+postcl.5c          =            197.581 ;
+postcl.5q          =             201.19 ;
+postcl.6c          =            220.557 ;
+postcl.6q          =            221.164 ;
+posapwl1           =            168.118 ;
+posapwl2           =            167.518 ;
+postaxn            =            128.801 ;
+postaxna           =            127.135 ;
+postaxna           =            127.135 ;
+postaxnb           =            130.467 ;
+postaxnb           =            130.467 ;
+installing MBH in Q8  IR7 in the ARC68
+mbh_hsag           =                  0 ;
+g_mbh              =            0.01715 ;
+r_mbh              =      0.01938720906 ;
+pos_mbr            =         292.394742 ;
+pos_mbl            =        -292.394742 ;
+++++++ warning: ignored because of unknown element: mbh.a8r7.b1
+++++++ warning: ignored because of unknown element: mbh.a8l7.b1
+++++++ warning: ignored because of unknown element: s.tcld.8r7.b1
+++++++ warning: ignored because of unknown element: tcld.8r7.b1
+++++++ warning: ignored because of unknown element: e.tcld.8r7.b1
+++++++ warning: ignored because of unknown element: mbh.b8r7.b1
+++++++ warning: ignored because of unknown element: mbh.b8l7.b1
+++++++ warning: ignored because of unknown element: vtcld.8r7.b1
+++++++ warning: ignored, unknown command or element: (null)
+++++++ info: seqedit - number of elements installed:  7
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    2
+++++++ info: seqedit - number of elements replaced:   0
+++++++ info: pos_mbl redefined
+++++++ info: pos_mbr redefined
+++++++ warning: ignored because of unknown element: mbh.a8l7.b2
+++++++ warning: ignored because of unknown element: mbh.a8r7.b2
+++++++ warning: ignored because of unknown element: s.tcld.8l7.b2
+++++++ warning: ignored because of unknown element: s.tcld.8r7.b2
+++++++ warning: ignored because of unknown element: tcld.8l7.b2
+++++++ warning: ignored because of unknown element: tcld.8r7.b2
+++++++ warning: ignored because of unknown element: e.tcld.8l7.b2
+++++++ warning: ignored because of unknown element: e.tcld.8r7.b2
+++++++ warning: ignored because of unknown element: mbh.b8l7.b2
+++++++ warning: ignored because of unknown element: mbh.b8r7.b2
+++++++ warning: ignored because of unknown element: vtcld.8r7.b2
+++++++ info: seqedit - number of elements installed:  8
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    2
+++++++ info: seqedit - number of elements replaced:   0
+postcld.2          =          425.71735 ;
+makethin: style chosen : teapot
+makethin: slicing sequence : lhcb1
+makethin: style chosen : teapot
+makethin: slicing sequence : lhcb2
+mqxfa.a1r5..FL mqxfa.a1r5..FR mqxfa.a1r5
+mqxfa.b1r5..FL mqxfa.b1r5..FR mqxfa.b1r5
+mqxfb.a2r5..FL mqxfb.a2r5..FR mqxfb.a2r5
+mqxfb.b2r5..FL mqxfb.b2r5..FR mqxfb.b2r5
+mqxfa.a3r5..FL mqxfa.a3r5..FR mqxfa.a3r5
+mqxfa.b3r5..FL mqxfa.b3r5..FR mqxfa.b3r5
+mqxfa.a1l5..FL mqxfa.a1l5..FR mqxfa.a1l5
+mqxfa.b1l5..FL mqxfa.b1l5..FR mqxfa.b1l5
+mqxfb.a2l5..FL mqxfb.a2l5..FR mqxfb.a2l5
+mqxfb.b2l5..FL mqxfb.b2l5..FR mqxfb.b2l5
+mqxfa.a3l5..FL mqxfa.a3l5..FR mqxfa.a3l5
+mqxfa.b3l5..FL mqxfa.b3l5..FR mqxfa.b3l5
+mqxfa.a1r1..FL mqxfa.a1r1..FR mqxfa.a1r1
+mqxfa.b1r1..FL mqxfa.b1r1..FR mqxfa.b1r1
+mqxfb.a2r1..FL mqxfb.a2r1..FR mqxfb.a2r1
+mqxfb.b2r1..FL mqxfb.b2r1..FR mqxfb.b2r1
+mqxfa.a3r1..FL mqxfa.a3r1..FR mqxfa.a3r1
+mqxfa.b3r1..FL mqxfa.b3r1..FR mqxfa.b3r1
+mqxfa.a1l1..FL mqxfa.a1l1..FR mqxfa.a1l1
+mqxfa.b1l1..FL mqxfa.b1l1..FR mqxfa.b1l1
+mqxfb.a2l1..FL mqxfb.a2l1..FR mqxfb.a2l1
+mqxfb.b2l1..FL mqxfb.b2l1..FR mqxfb.b2l1
+mqxfa.a3l1..FL mqxfa.a3l1..FR mqxfa.a3l1
+mqxfa.b3l1..FL mqxfa.b3l1..FR mqxfa.b3l1
+mcbxfbh.a2l1..r mcbxfbh.a2l1
+mcbxfbh.a2r1..r mcbxfbh.a2r1
+mcbxfbh.a2l5..r mcbxfbh.a2l5
+mcbxfbh.a2r5..r mcbxfbh.a2r5
+mcbxfbh.b2l1..r mcbxfbh.b2l1
+mcbxfbh.b2r1..r mcbxfbh.b2r1
+mcbxfbh.b2l5..r mcbxfbh.b2l5
+mcbxfbh.b2r5..r mcbxfbh.b2r5
+mcbxfbv.a2l1..r mcbxfbv.a2l1
+mcbxfbv.a2r1..r mcbxfbv.a2r1
+mcbxfbv.a2l5..r mcbxfbv.a2l5
+mcbxfbv.a2r5..r mcbxfbv.a2r5
+mcbxfbv.b2l1..r mcbxfbv.b2l1
+mcbxfbv.b2r1..r mcbxfbv.b2r1
+mcbxfbv.b2l5..r mcbxfbv.b2l5
+mcbxfbv.b2r5..r mcbxfbv.b2r5
+mcbxfah.3l1..r mcbxfah.3l1
+mcbxfah.3r1..r mcbxfah.3r1
+mcbxfah.3l5..r mcbxfah.3l5
+mcbxfah.3r5..r mcbxfah.3r5
+mcbxfav.3l1..r mcbxfav.3l1
+mcbxfav.3r1..r mcbxfav.3r1
+mcbxfav.3l5..r mcbxfav.3l5
+mcbxfav.3r5..r mcbxfav.3r5
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000347499227633547 53.6442376944563 
+
+q1 dq1 betxmax dxmax 
+62.310000748038 1.99998305789641 600.739517506192 2.71699048469748 
+
+dxrms xcomax xcorms q2 
+1.43910862614902 0 0 60.319999999968 
+
+dq2 betymax dymax dyrms 
+2.00000467603447 693.675216408754 -0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+refbetxip1b1       = 6.00000696311818 ;
+refbetyip1b1       = 6.00000000025823 ;
+refbetxip5b1       = 6.00000857580693 ;
+refbetyip5b1       = 6.00000000016412 ;
+refbetxip2b1       = 9.99995354395105 ;
+refbetyip2b1       = 9.99999999978316 ;
+refbetxip8b1       = 9.99998528798899 ;
+refbetyip8b1       = 9.99999999985325 ;
+refqxb1            = 62.310000748038 ;
+refqyb1            = 60.319999999968 ;
+refdqxb1           = 1.99998305789641 ;
+refdqyb1           = 2.00000467603447 ;
+refxip1b1          = 0 ;
+refyip1b1          = 0 ;
+refxip5b1          = 0 ;
+refyip5b1          = 0 ;
+refxip2b1          = 0 ;
+refyip2b1          = 0 ;
+refxip8b1          = 0 ;
+refyip8b1          = 0 ;
+refpxip1b1         = 0 ;
+refpyip1b1         = 0 ;
+refpxip5b1         = 0 ;
+refpyip5b1         = 0 ;
+refpxip2b1         = 0 ;
+refpyip2b1         = 0 ;
+refpxip8b1         = 0 ;
+refpyip8b1         = 0 ;
+mux_ip15_ref       = 31.3144978158626 ;
+muy_ip15_ref       = 30.3510559530782 ;
+on_x1              = 295 ;
+on_sep1            = 2 ;
+on_x5              = 295 ;
+on_sep5            = 2 ;
+on_x2              = 170 ;
+on_sep2            = 3.5 ;
+on_x8              = -170 ;
+on_sep8            = -3.5 ;
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000347499227633547 53.6442376944563 
+
+q1 dq1 betxmax dxmax 
+62.310000748038 1.99998305789641 600.739517506192 2.71699048469748 
+
+dxrms xcomax xcorms q2 
+1.43910862614902 0 0 60.319999999968 
+
+dq2 betymax dymax dyrms 
+2.00000467603447 693.675216408754 -0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB1"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le  0.9382720813
+@ CHARGE           %le  1
+@ ENERGY           %le  450
+@ PC               %le  449.999021827272
+@ GAMMA            %le  479.605019661795
+@ KBUNCH           %le  1
+@ BCURRENT         %le  0.000414395555783364
+@ SIGE             %le  0.00045
+@ SIGT             %le  0.13
+@ NPART            %le  230000000000
+@ EX               %le  5.21262267388889e-09
+@ EY               %le  5.21262267388889e-09
+@ ET               %le  0.001
+@ BV_FLAG          %le  1
+@ LENGTH           %le  26658.8832
+@ ALFA             %le  0.000347499227633547
+@ ORBIT5           %le  -0
+@ GAMMATR          %le  53.6442376944563
+@ Q1               %le  62.310000748038
+@ Q2               %le  60.319999999968
+@ DQ1              %le  1.99998305789641
+@ DQ2              %le  2.00000467603447
+@ DXMAX            %le  2.71699048469748
+@ DYMAX            %le  -0
+@ XCOMAX           %le  0
+@ YCOMAX           %le  0
+@ BETXMAX          %le  600.739517506192
+@ BETYMAX          %le  693.675216408754
+@ XCORMS           %le  0
+@ YCORMS           %le  0
+@ DXRMS            %le  1.43910862614902
+@ DYRMS            %le  0
+@ DELTAP           %le  0
+@ SYNCH_1          %le  0
+@ SYNCH_2          %le  0
+@ SYNCH_3          %le  0
+@ SYNCH_4          %le  0
+@ SYNCH_5          %le  0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.57.10"
+* NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
+$ %s                 %le %le %le %le %le %le %le %le %le 
+ "IP5"               6664.5684327563 6.00000857580693 6.00000000016412 4.71839927843178e-06 1.18943709464912e-11 2.51017670501167e-07 5.87323275056339e-08 15.0983408225299 14.5331268901972
+ "IP8"               16650.6581836219 9.99998528798899 9.99999999985325 4.70547967577591e-06 3.61944412046242e-11 4.43552274205658e-07 3.39481957652944e-08 38.4558621736154 36.6582693662047
+ "IP1.L1"            19994.1624 6.00000696311818 6.00000000025823 4.79158407668894e-06 1.77823768774942e-12 2.60874830791179e-07 5.75269119926393e-08 46.4128386383925 44.8841828432754
+ "IP1"               19994.1624 6.00000696311818 6.00000000025823 4.79158407668894e-06 1.77823768774942e-12 2.60874830791179e-07 5.75269119926393e-08 46.4128386383925 44.8841828432754
+ "IP2"               23326.5989836219 9.99995354395105 9.99999999978316 1.65058270214377e-06 6.33341228612645e-12 5.48495882109889e-07 1.05530132484554e-08 54.5295814448426 52.5720130214905
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000347114996825513 53.6739195984511 
+
+q1 dq1 betxmax dxmax 
+62.3100008536652 1.99998542193515 606.23312360753 2.74265130135366 
+
+dxrms xcomax xcorms q2 
+1.43911609434406 0 0 60.3199999999931 
+
+dq2 betymax dymax dyrms 
+2.00000402360589 694.303830577098 0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB2"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le  0.9382720813
+@ CHARGE           %le  1
+@ ENERGY           %le  450
+@ PC               %le  449.999021827272
+@ GAMMA            %le  479.605019661795
+@ KBUNCH           %le  1
+@ BCURRENT         %le  0.000414395555783364
+@ SIGE             %le  0.00045
+@ SIGT             %le  0.13
+@ NPART            %le  230000000000
+@ EX               %le  5.21262267388889e-09
+@ EY               %le  5.21262267388889e-09
+@ ET               %le  0.001
+@ BV_FLAG          %le  -1
+@ LENGTH           %le  26658.8832
+@ ALFA             %le  0.000347114996825513
+@ ORBIT5           %le  -0
+@ GAMMATR          %le  53.6739195984511
+@ Q1               %le  62.3100008536652
+@ Q2               %le  60.3199999999931
+@ DQ1              %le  1.99998542193515
+@ DQ2              %le  2.00000402360589
+@ DXMAX            %le  2.74265130135366
+@ DYMAX            %le  0
+@ XCOMAX           %le  0
+@ YCOMAX           %le  0
+@ BETXMAX          %le  606.23312360753
+@ BETYMAX          %le  694.303830577098
+@ XCORMS           %le  0
+@ YCORMS           %le  0
+@ DXRMS            %le  1.43911609434406
+@ DYRMS            %le  0
+@ DELTAP           %le  0
+@ SYNCH_1          %le  0
+@ SYNCH_2          %le  0
+@ SYNCH_3          %le  0
+@ SYNCH_4          %le  0
+@ SYNCH_5          %le  0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.57.11"
+* NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
+$ %s                 %le %le %le %le %le %le %le %le %le 
+ "IP5"               6664.8731672437 5.99997370066488 5.99999999981848 -3.57164062478269e-06 -4.98715163136442e-12 1.84951004452163e-07 -1.16397076916794e-08 15.1373644428132 14.5337976415106
+ "IP8"               16650.5058163782 10.0000454971913 9.99999999967376 3.35699304403418e-06 8.85466451110579e-12 8.4398137192428e-08 2.40865346683432e-08 38.1935412756722 36.9904376650075
+ "IP1.L1"            19994.1624 5.99996655091118 6.00000000003308 -9.43475461695851e-07 3.51840561035632e-11 1.96648185209662e-07 -3.38860842323544e-09 46.4062970486305 44.8641645163671
+ "IP1"               19994.1624 5.99996655091118 6.00000000003308 -9.43475461695851e-07 3.51840561035632e-11 1.96648185209662e-07 -3.38860842323544e-09 46.4062970486305 44.8641645163671
+ "IP2"               23326.4466163782 9.9999625362559 9.99999999997351 4.2348476261486e-06 -2.63872920593517e-11 2.34671839411181e-07 1.00345414339241e-08 54.3255914519744 52.9327140585073
+enter Twiss module
+  
+iteration:   1 error:   4.660797E-08 deltap:   0.000000E+00
+orbit:   2.041931E-07 -1.801400E-09  8.431336E-08  1.724368E-09  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000347497638641516 53.6443603430145 
+
+q1 dq1 betxmax dxmax 
+62.309888190709 2.01033171230084 599.816015360827 2.65642317694755 
+
+dxrms xcomax xcorms q2 
+1.43931124240881 0.0164769474035593 0.00232168362693443 60.3199380714711 
+
+dq2 betymax dymax dyrms 
+2.05685305375317 694.537757331929 0.203712579206187 0.0652889613478347 
+
+ycomax ycorms deltap synch_1 
+0.016476689031018 0.00247862776927321 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB1"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le  0.9382720813
+@ CHARGE           %le  1
+@ ENERGY           %le  450
+@ PC               %le  449.999021827272
+@ GAMMA            %le  479.605019661795
+@ KBUNCH           %le  1
+@ BCURRENT         %le  0.000414395555783364
+@ SIGE             %le  0.00045
+@ SIGT             %le  0.13
+@ NPART            %le  230000000000
+@ EX               %le  5.21262267388889e-09
+@ EY               %le  5.21262267388889e-09
+@ ET               %le  0.001
+@ BV_FLAG          %le  1
+@ LENGTH           %le  26658.8832
+@ ALFA             %le  0.000347497638641516
+@ ORBIT5           %le  -0
+@ GAMMATR          %le  53.6443603430145
+@ Q1               %le  62.309888190709
+@ Q2               %le  60.3199380714711
+@ DQ1              %le  2.01033171230084
+@ DQ2              %le  2.05685305375317
+@ DXMAX            %le  2.65642317694755
+@ DYMAX            %le  0.203712579206187
+@ XCOMAX           %le  0.0164769474035593
+@ YCOMAX           %le  0.016476689031018
+@ BETXMAX          %le  599.816015360827
+@ BETYMAX          %le  694.537757331929
+@ XCORMS           %le  0.00232168362693443
+@ YCORMS           %le  0.00247862776927321
+@ DXRMS            %le  1.43931124240881
+@ DYRMS            %le  0.0652889613478347
+@ DELTAP           %le  0
+@ SYNCH_1          %le  0
+@ SYNCH_2          %le  0
+@ SYNCH_3          %le  0
+@ SYNCH_4          %le  0
+@ SYNCH_5          %le  0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.57.12"
+* NAME               S X Y PX PY 
+$ %s                 %le %le %le %le %le 
+ "IP5"               6664.5684327563 6.8940544701245e-08 0.0019999810501769 0.000295003163426264 -3.67961959238216e-09
+ "IP8"               16650.6581836219 -3.31690212039386e-08 -0.00350003676266623 -3.50202663777185e-05 1.80939165084112e-06
+ "IP1.L1"            19994.1624 -0.00199994422406671 -2.10577265156303e-08 -2.58420721487635e-09 0.000294997209856921
+ "IP1"               19994.1624 -0.00199994422406671 -2.10577265156303e-08 -2.58420721487635e-09 0.000294997209856921
+ "IP2"               23326.5989836219 -0.00349991853964728 3.27275757804014e-08 2.87537027656392e-07 0.000239997546357879
+enter Twiss module
+  
+iteration:   1 error:   2.528557E-05 deltap:   0.000000E+00
+orbit:   3.096055E-07  9.117675E-09  2.583992E-05 -2.542539E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.663434E-10 deltap:   0.000000E+00
+orbit:   3.096056E-07  9.117150E-09  2.583996E-05 -2.542550E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000347114787171997 53.6739358076774 
+
+q1 dq1 betxmax dxmax 
+62.3098130930853 2.04094399511118 604.381432026392 2.87097179167621 
+
+dxrms xcomax xcorms q2 
+1.44196922208421 0.0164766324357445 0.00274630514053431 60.3198324211349 
+
+dq2 betymax dymax dyrms 
+2.03883128054127 691.978256141805 0.239679511803972 0.0760092838875935 
+
+ycomax ycorms deltap synch_1 
+0.0164776687130328 0.00290670095973289 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB2"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le  0.9382720813
+@ CHARGE           %le  1
+@ ENERGY           %le  450
+@ PC               %le  449.999021827272
+@ GAMMA            %le  479.605019661795
+@ KBUNCH           %le  1
+@ BCURRENT         %le  0.000414395555783364
+@ SIGE             %le  0.00045
+@ SIGT             %le  0.13
+@ NPART            %le  230000000000
+@ EX               %le  5.21262267388889e-09
+@ EY               %le  5.21262267388889e-09
+@ ET               %le  0.001
+@ BV_FLAG          %le  -1
+@ LENGTH           %le  26658.8832
+@ ALFA             %le  0.000347114787171997
+@ ORBIT5           %le  -0
+@ GAMMATR          %le  53.6739358076774
+@ Q1               %le  62.3098130930853
+@ Q2               %le  60.3198324211349
+@ DQ1              %le  2.04094399511118
+@ DQ2              %le  2.03883128054127
+@ DXMAX            %le  2.87097179167621
+@ DYMAX            %le  0.239679511803972
+@ XCOMAX           %le  0.0164766324357445
+@ YCOMAX           %le  0.0164776687130328
+@ BETXMAX          %le  604.381432026392
+@ BETYMAX          %le  691.978256141805
+@ XCORMS           %le  0.00274630514053431
+@ YCORMS           %le  0.00290670095973289
+@ DXRMS            %le  1.44196922208421
+@ DYRMS            %le  0.0760092838875935
+@ DELTAP           %le  0
+@ SYNCH_1          %le  0
+@ SYNCH_2          %le  0
+@ SYNCH_3          %le  0
+@ SYNCH_4          %le  0
+@ SYNCH_5          %le  0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.57.14"
+* NAME               S X Y PX PY 
+$ %s                 %le %le %le %le %le 
+ "IP5"               6664.8731672437 1.20764185699033e-07 -0.00200462302084927 -0.000294999055610351 -1.95142007206673e-07
+ "IP8"               16650.5058163782 1.48739987839992e-07 0.00350533473471679 3.50074253456398e-05 -1.50267100604285e-06
+ "IP1.L1"            19994.1624 0.00200013142418405 -4.68773348134079e-06 2.45313820017466e-09 -0.00029513994072954
+ "IP1"               19994.1624 0.00200013142418405 -4.68773348134079e-06 2.45313820017466e-09 -0.00029513994072954
+ "IP2"               23326.4466163782 0.00350009965817513 -5.96707092659983e-06 -2.81462087362209e-07 -0.000239846466589453
+xnom1              = -0.00199994422406671 ;
+xnom2              = -0.00349991853964728 ;
+xnom5              = 6.8940544701245e-08 ;
+xnom8              = -3.31690212039386e-08 ;
+ynom1              = -2.10577265156303e-08 ;
+ynom2              = 3.27275757804014e-08 ;
+ynom5              = 0.0019999810501769 ;
+ynom8              = -0.00350003676266623 ;
+pxnom1             = -2.58420721487635e-09 ;
+pxnom2             = 2.87537027656392e-07 ;
+pxnom5             = 0.000295003163426264 ;
+pxnom8             = -3.50202663777185e-05 ;
+pynom1             = 0.000294997209856921 ;
+pynom2             = 0.000239997546357879 ;
+pynom5             = -3.67961959238216e-09 ;
+pynom8             = 1.80939165084112e-06 ;
+hocharge_ir1       = 0.0909091 ;
+long_ir1_1         = 0.01495 ;
+long_ir1_2         = 0.03081 ;
+long_ir1_3         = 0.048815 ;
+long_ir1_4         = 0.071825 ;
+long_ir1_5         = 0.117 ;
+hocharge_ir2       = 0.0909091 ;
+long_ir2_1         = 0.01495 ;
+long_ir2_2         = 0.03081 ;
+long_ir2_3         = 0.048815 ;
+long_ir2_4         = 0.071825 ;
+long_ir2_5         = 0.117 ;
+hocharge_ir5       = 0.0909091 ;
+long_ir5_1         = 0.01495 ;
+long_ir5_2         = 0.03081 ;
+long_ir5_3         = 0.048815 ;
+long_ir5_4         = 0.071825 ;
+long_ir5_5         = 0.117 ;
+hocharge_ir8       = 0.0909091 ;
+long_ir8_1         = 0.01495 ;
+long_ir8_2         = 0.03081 ;
+long_ir8_3         = 0.048815 ;
+long_ir8_4         = 0.071825 ;
+long_ir8_5         = 0.117 ;
+beamx              = 5.21262267388889e-09 ;
+beamy              = 5.21262267388889e-09 ;
+sigz               = 0.13 ;
+sige               = 0.00045 ;
+ho_charge          = 1 ;
+lr_charge          = 1 ;
+b_h_dist           = 3.7400228956229 ;
+enter Twiss module
+  
+iteration:   1 error:   1.505387E-13 deltap:   0.000000E+00
+orbit:  -1.096258E-13  2.075154E-15  2.673021E-14  2.640447E-16  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.8832 -0 0.000347501641872082 53.6440513497098 
+
+q1 dq1 betxmax dxmax 
+62.3100007480381 1.97664890236529 600.739517506441 2.73499462692957 
+
+dxrms xcomax xcorms q2 
+1.4405606964971 0.0164768725522404 0.00197398367802134 60.3199999999681 
+
+dq2 betymax dymax dyrms 
+1.99937088893662 693.675216408789 0.357278106926214 0.11868217982731 
+
+ycomax ycorms deltap synch_1 
+0.0164768811769005 0.00197320940926519 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+xnom1              = -0.00200000000002033 ;
+xnom2              = -0.00350000000000678 ;
+xnom5              = -1.93565866460355e-14 ;
+xnom8              = -3.82702767046106e-14 ;
+ynom1              = 8.00683304380545e-16 ;
+ynom2              = -3.7773603689395e-15 ;
+ynom5              = 0.00199999999999613 ;
+ynom8              = -0.0035000000000074 ;
+pxnom1             = 2.28144809156215e-15 ;
+pxnom2             = 2.91925892872731e-07 ;
+pxnom5             = 0.000295000000002342 ;
+pxnom8             = -3.50121307101742e-05 ;
+pynom1             = 0.00029500000000097 ;
+pynom2             = 0.000239999391277195 ;
+pynom5             = 5.04965044252756e-16 ;
+pynom8             = 1.80973622175831e-06 ;
+Want to make named table: suir1b1
+Want to make named table: suir1b2
+Want to make named table: suir2b1
+Want to make named table: suir2b2
+Want to make named table: suir5b1
+Want to make named table: suir5b2
+Want to make named table: suir8b1
+Want to make named table: suir8b2
+enter Twiss module
+  
+iteration:   1 error:   1.706884E-12 deltap:   0.000000E+00
+orbit:   2.399083E-13  1.852610E-15  7.186467E-13  5.239562E-15  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347501641872132 53.6440513497058 
+
+q1 dq1 betxmax dxmax 
+62.3100007479953 1.97664890241235 600.739517446628 2.73499462689535 
+
+dxrms xcomax xcorms q2 
+1.41674568743931 0.0164768725528994 0.00209792561347676 60.3199999999255 
+
+dq2 betymax dymax dyrms 
+1.99937088911836 693.675216405456 0.35727810695633 0.118825044442873 
+
+ycomax ycorms deltap synch_1 
+0.0164768811765693 0.00209768855285404 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+Want to make named table: twissb1
+enter Twiss module
+  
+iteration:   1 error:   2.205181E-12 deltap:   0.000000E+00
+orbit:  -1.089358E-13 -8.053846E-15 -1.411154E-12  1.803903E-14  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347123284338849 53.6732788664697 
+
+q1 dq1 betxmax dxmax 
+62.3100008536221 1.8983482025489 606.233123628607 2.64560163744918 
+
+dxrms xcomax xcorms q2 
+1.41670304264205 0.0164768725526626 0.00209879501734912 60.319999999951 
+
+dq2 betymax dymax dyrms 
+2.07144538207693 694.303830733804 0.455596179345516 0.129951149682922 
+
+ycomax ycorms deltap synch_1 
+0.0164768811780179 0.00209792042190435 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+Want to make named table: twissb2
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347499227633597 53.6442376944524 
+
+q1 dq1 betxmax dxmax 
+62.3100007479955 1.99998305797821 600.73951744596 2.71699048469743 
+
+dxrms xcomax xcorms q2 
+1.41527614353162 0 0 60.3199999999255 
+
+dq2 betymax dymax dyrms 
+2.00000467620766 693.675216405764 -0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347114996825564 53.6739195984471 
+
+q1 dq1 betxmax dxmax 
+62.3100008536228 1.99998542188127 606.233123630023 2.74265130135365 
+
+dxrms xcomax xcorms q2 
+1.41528724084932 0 0 60.3199999999508 
+
+dq2 betymax dymax dyrms 
+2.00000402414212 694.303830733616 0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347499227633597 53.6442376944524 
+
+q1 dq1 betxmax dxmax 
+62.3100007479955 1.99998305797821 600.73951744596 2.71699048469743 
+
+dxrms xcomax xcorms q2 
+1.41527614353162 0 0 60.3199999999255 
+
+dq2 betymax dymax dyrms 
+2.00000467620766 693.675216405764 -0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+Want to make named table: twissb1_crab
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347114996825564 53.6739195984471 
+
+q1 dq1 betxmax dxmax 
+62.3100008536228 1.99998542188127 606.233123630023 2.74265130135365 
+
+dxrms xcomax xcorms q2 
+1.41528724084932 0 0 60.3199999999508 
+
+dq2 betymax dymax dyrms 
+2.00000402414212 694.303830733616 0 0 
+
+ycomax ycorms deltap synch_1 
+0 0 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+Want to make named table: twissb2_crab
+Number of parasitic encounter before D1
+npara0_1           = 20 ;
+npara0_2           = 15 ;
+npara0_5           = 20 ;
+npara0_8           = 15 ;
+enter Twiss module
+  
+iteration:   1 error:   1.706884E-12 deltap:   0.000000E+00
+orbit:   2.399083E-13  1.852610E-15  7.186467E-13  5.239562E-15  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347501641872132 53.6440513497058 
+
+q1 dq1 betxmax dxmax 
+62.3100007479953 1.97664890241235 600.739517446633 2.73499462689535 
+
+dxrms xcomax xcorms q2 
+1.41030721458707 0.0164768725528994 0.00215219991099065 60.3199999999256 
+
+dq2 betymax dymax dyrms 
+1.99937088911836 693.675216405478 0.35727810695633 0.118897165036066 
+
+ycomax ycorms deltap synch_1 
+0.0164768811765693 0.00215221180807268 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB1"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le  0.9382720813
+@ CHARGE           %le  1
+@ ENERGY           %le  450
+@ PC               %le  449.999021827272
+@ GAMMA            %le  479.605019661795
+@ KBUNCH           %le  1
+@ BCURRENT         %le  0.000414395555783364
+@ SIGE             %le  0.00045
+@ SIGT             %le  0.13
+@ NPART            %le  230000000000
+@ EX               %le  5.21262267388889e-09
+@ EY               %le  5.21262267388889e-09
+@ ET               %le  0.001
+@ BV_FLAG          %le  1
+@ LENGTH           %le  26658.883199996
+@ ALFA             %le  0.000347501641872132
+@ ORBIT5           %le  -0
+@ GAMMATR          %le  53.6440513497058
+@ Q1               %le  62.3100007479953
+@ Q2               %le  60.3199999999256
+@ DQ1              %le  1.97664890241235
+@ DQ2              %le  1.99937088911836
+@ DXMAX            %le  2.73499462689535
+@ DYMAX            %le  0.35727810695633
+@ XCOMAX           %le  0.0164768725528994
+@ YCOMAX           %le  0.0164768811765693
+@ BETXMAX          %le  600.739517446633
+@ BETYMAX          %le  693.675216405478
+@ XCORMS           %le  0.00215219991099065
+@ YCORMS           %le  0.00215221180807268
+@ DXRMS            %le  1.41030721458707
+@ DYRMS            %le  0.118897165036066
+@ DELTAP           %le  0
+@ SYNCH_1          %le  0
+@ SYNCH_2          %le  0
+@ SYNCH_3          %le  0
+@ SYNCH_4          %le  0
+@ SYNCH_5          %le  0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.57.25"
+* S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
+$ %le %s                 %le %le %le %le %le %le %le %le %le %le 
+ 6589.76797484384 "BBMK_PAR.L5B1_20"  232.152821909535 444.40605255872 0.119855803302649 -3.37079020790944 14.8578859657367 14.2797662852504 -0.00847570838825121 -2.11125877351268e-05 -0.000102596725854685 -2.6179531131159e-07
+ 6593.50799773947 "BBMK_PAR.L5B1_19"  231.31741299185 470.008821274195 0.103514197630435 -3.47482796877012 14.8604547172868 14.2810687208335 -0.00885942249196369 -2.20917081933989e-05 -0.000102596725854685 -2.6179531131159e-07
+ 6597.24802063509 "BBMK_PAR.L5B1_18"  230.604240032895 496.389797204927 0.0871725919582218 -3.5788657296308 14.8630320801547 14.2823010715006 -0.00923505696877719 1.54503497471185e-05 -9.53994034430883e-05 3.40528264004459e-05
+ 6600.98804353071 "BBMK_PAR.L5B1_17"  231.369139819488 520.489880204936 -1.29619538114205 -0.595550126109555 14.8656153764926 14.2834693112722 -0.00961988710756597 0.000142456106555296 -0.000151958231780188 3.33082135894041e-05
+ 6604.72806642633 "BBMK_PAR.L5B1_16"  259.654616326602 486.371426474396 -5.82244849601522 8.28664004123635 14.8680741231134 14.2846378050213 -0.0105610617694471 0.000260141409850562 -0.000328771575272878 2.98528537696315e-05
+ 6608.46808932196 "BBMK_PAR.L5B1_15"  327.871307189126 393.076144486528 -12.9368615487273 16.0977233492264 14.8701411195028 14.2859813870116 -0.0122149875235637 0.000360407069078467 -0.000563320650722305 2.33711549031817e-05
+ 6612.20811221758 "BBMK_PAR.L5B1_14"  439.698709494831 275.166486941804 -16.1275505288241 14.421347518989 14.8717099340011 14.2877900931223 -0.014421209023797 0.000445534424135711 -0.000559176388971952 2.44561954390175e-05
+ 6615.9481351132 "BBMK_PAR.L5B1_13"  536.917425312069 190.692749655948 -8.96946451539467 8.42896262988795 14.8729199819263 14.2904208766669 -0.0160471428716938 0.000551851482718478 -0.00029520183899124 3.29943126369973e-05
+ 6619.68815800883 "BBMK_PAR.L5B1_12"  557.823126709983 146.277586069417 3.11143472587646 3.91694994222641 14.8739938982615 14.2940305817515 -0.0164563687739395 0.000700568638851206 6.53756455772613e-05 4.66715793686125e-05
+ 6623.42818090445 "BBMK_PAR.L5B1_11"  527.66726945199 120.179748103542 8.23470807370453 2.32593226494354 14.8750857956653 14.2985421678377 -0.0161033162661949 0.000880639536595998 0.000224355771110951 5.49642436627076e-05
+ 6627.16820380007 "BBMK_PAR.L5B1_10"  435.694558980902 111.059311335196 16.4780864620952 -0.00023657561326871 14.876311541884 14.303761042782 -0.0147318491177013 0.00111885163512452 0.000527763081036759 7.46185457336324e-05
+ 6630.90822669569 "BBMK_PAR.L5B1_9"   301.831725725595 117.334381082599 17.1228577169298 -1.15638193982179 14.8779425816295 14.3090095609511 -0.0123374325960862 0.00143198996769811 0.000707591670134356 8.84958276810915e-05
+ 6634.64824959132 "BBMK_PAR.L5B1_8"   192.128140535281 123.430937370348 11.2176074234752 0.251734074546924 14.8804326921035 14.3139202373153 -0.0098130521725739 0.00174417538071235 0.000583386288345383 6.85638945733004e-05
+ 6638.38827248694 "BBMK_PAR.L5B1_7"   127.044522831205 113.673771631148 6.57917131203365 2.29768159777697 14.8842828424255 14.3188940481747 -0.00793790914763294 0.00193993423582998 0.00042543033615082 3.54440573611261e-05
+ 6642.12829538256 "BBMK_PAR.L5B1_6"   89.9267279308162 89.9266275484161 3.74002226788667 3.7400228952314 14.8899234225749 14.3247087326199 -0.00661984052551821 0.00199999999936012 0.000295000000018246 2.44750267517919e-14
+ 6645.86831827819 "BBMK_PAR.L5B1_5"   64.2824819842555 64.2823802415517 3.11668600964078 3.11668574601139 14.8977555362099 14.3325408568329 -0.00551653377124117 0.00199999999945165 0.000295000000018246 2.44750267517919e-14
+ 6649.60834117381 "BBMK_PAR.L5B1_4"   43.300819792718 43.3007233542377 2.49334975139489 2.49334859679139 14.9090473687364 14.3438327109061 -0.00441322701696413 0.00199999999954319 0.000295000000018246 2.44750267517919e-14
+ 6653.34836406943 "BBMK_PAR.L5B1_3"   26.9817413562072 26.9816568864776 1.87001349314915 1.87001144757154 14.9264968197883 14.3612822088917 -0.00330992026268736 0.00199999999963473 0.000295000000018246 2.44750267517919e-14
+ 6657.08838696505 "BBMK_PAR.L5B1_2"   15.3252466747152 15.3251808382633 1.24667723490326 1.24667429835153 14.9559366391029 14.3907221387894 -0.00220661350841032 0.00199999999972627 0.000295000000018246 2.44750267517919e-14
+ 6660.82840986068 "BBMK_PAR.L5B1_1"   8.33133574824639 8.3312952095995 0.623340976657367 0.623337149131526 15.009627745551 14.4444135009664 -0.00110330675413328 0.0019999999998178 0.000295000000018246 2.44750267517919e-14
+ 6664.5684327563 "IP5"               6.00000857680086 6.00000000048611 4.71841147500566e-06 -8.84784942190017e-11 15.0983408225169 14.5331268901962 1.43753527487235e-13 0.00199999999990934 0.000295000000018246 2.44750267517919e-14
+ 6668.30845565092 "BBMK_PAR.R5B1_1"   8.33126515913138 8.33129520967592 -0.623331539667676 -0.623337149141742 15.1870543197351 14.6218402793991 0.00110330675412566 0.00200000000000088 0.000295000000018246 2.44750267517919e-14
+ 6672.04847854655 "BBMK_PAR.R5B1_2"   15.3251054964852 15.3251808384162 -1.24666779791357 -1.24667429836175 15.2407459198171 14.6755316415756 0.0022066135084027 0.00200000000009241 0.000295000000018246 2.44750267517919e-14
+ 6675.78850144217 "BBMK_PAR.R5B1_3"   26.9815295888622 26.9816568867068 -1.87000405615946 -1.87001144758175 15.2701859931696 14.704971571473 0.00330992026267974 0.00200000000018395 0.000295000000018246 2.44750267517919e-14
+ 6679.52852433779 "BBMK_PAR.R5B1_4"   43.300537436258 43.3007233545434 -2.4933403144052 -2.49334859680161 15.2876355700959 14.7224210694584 0.00441322701695651 0.00200000000027549 0.000295000000018246 2.44750267517919e-14
+ 6683.26854723341 "BBMK_PAR.R5B1_5"   64.2821290386804 64.2823802419338 -3.11667657265109 -3.11668574602161 15.2989274705519 14.7337129235316 0.00551653377123354 0.00200000000036703 0.000295000000018246 2.44750267517919e-14
+ 6687.00857012904 "BBMK_PAR.R5B1_6"   89.9263043961261 89.9266275488746 -3.74001283089698 -3.74002289524161 15.3067596241643 14.7415450477445 0.00661984052551058 0.00200000000045856 0.000295000000018246 2.44750267517919e-14
+ 6690.74859302466 "BBMK_PAR.R5B1_7"   113.673392245304 127.044424580376 -2.29767755808588 -6.57917109318694 15.3125743287694 14.7471856332255 0.00751047362718428 0.00206066649839661 0.000166912019994366 3.61140491489911e-05
+ 6694.48861592028 "BBMK_PAR.R5B1_8"   123.430554201646 192.128037370063 -0.251737123280345 -11.2176063009728 15.3175481556543 14.7510357860704 0.00787824712611973 0.00226656127217664 2.85732129825834e-05 7.46231401805213e-05
+ 6698.22863881591 "BBMK_PAR.R5B1_9"   117.334045248286 301.83161001385 1.15637461567706 -17.1228560679341 15.322458846673 14.7535258976903 0.00772399311330476 0.00262310784050709 -6.53224992250246e-05 0.000102621777094759
+ 6701.96866171153 "BBMK_PAR.R5B1_10"  111.0590235359 435.694435877065 0.000232380738706121 -16.4780867284097 15.327707379159 14.7551569379789 0.00743100162304163 0.00298607560025975 -3.26737930931891e-05 7.63079576641119e-05
+ 6705.70868460715 "BBMK_PAR.R5B1_11"  120.179470373117 527.667160383625 -2.32593124488433 -8.23471129750073 15.3329262669003 14.7563826844975 0.00760225399702538 0.00315082019243062 0.000113646120109653 1.58427959479473e-05
+ 6709.44870750277 "BBMK_PAR.R5B1_12"  146.277284668817 557.823049120941 -3.91694635049335 -3.11143922137479 15.3374378628502 14.7574745820901 0.00825796300447803 0.0031154751987741 0.000189162381088511 -1.50766515519052e-05
+ 6713.1887303984 "BBMK_PAR.R5B1_13"  190.692395873658 536.917386345971 -8.42895155992534 8.96945893474318 15.3410475750032 14.758548498539 0.00930518650695626 0.00293662335080038 0.000382195538974586 -8.21753607068036e-05
+ 6716.92875329402 "BBMK_PAR.R5B1_14"  275.166018264197 439.698710546758 -14.4213275824912 16.1275456371699 15.3436783632292 14.7597585465066 0.0110660385933454 0.0025350757908277 0.000555064191802395 -0.000129624198887541
+ 6720.66877618964 "BBMK_PAR.R5B1_15"  393.075516484097 327.87133983915 -16.0977022947139 12.9368579077711 15.3454870723251 14.7613273609249 0.0130080390247182 0.00205847951088876 0.000476193501029221 -0.000121268986000901
+ 6724.40879908527 "BBMK_PAR.R5B1_16"  486.370687828394 259.654675415928 -8.28663214692506 5.82244489603954 15.346830656409 14.7633943569762 0.014260467028792 0.0016799574583432 0.000191898560805717 -8.27603713031289e-05
+ 6728.14882198089 "BBMK_PAR.R5B1_17"  520.489125675847 231.369227648584 0.595544550473633 1.29619095758184 15.3479991518924 14.7658531028504 0.0145631325446908 0.00141490103049545 -6.6234649423256e-05 -5.57928576666696e-05
+ 6731.88884487651 "BBMK_PAR.R5B1_18"  496.389112028633 230.604364317389 3.57885605658534 -0.0871775396333491 15.3491673933171 14.7684363980018 0.0140366465692878 0.00123292144067622 -0.000152170653310775 -4.75725385172886e-05
+ 6735.62886777213 "BBMK_PAR.R5B1_19"  470.008207038781 231.317574304565 3.47481867378219 -0.103519150488637 15.35039974564 14.7710137592764 0.0134486863181563 0.00114481534987646 -0.000159367975722236 -1.32579168055363e-05
+ 6739.36889066776 "BBMK_PAR.R5B1_20"  444.405506436297 232.153020289241 3.37078129097904 -0.119860761343925 15.3517021828745 14.7735825088331 0.0128526464401261 0.00109523043747549 -0.000159367975722236 -1.32579168055363e-05
+ 19919.3619420855 "BBMK_PAR.L1B1_20"  232.152885911557 444.406052568873 0.119855796028398 -3.37079020791181 46.17238379061 44.6308222383004 -0.00109524194462495 -0.0128526618580252 -1.32576809282281e-05 -0.000159372536814665
+ 19923.1019649812 "BBMK_PAR.L1B1_19"  231.317477031329 470.008821284345 0.103514194889487 -3.47482796877019 46.1749525414504 44.6321246738835 -0.00114482597483937 -0.0134487187946453 -1.32576809282281e-05 -0.000159372536814665
+ 19926.8419878768 "BBMK_PAR.L1B1_18"  230.604304075922 496.389797215081 0.0871725937505601 -3.57886572962868 46.1775299036036 44.6333570245506 -0.00123293080253614 -0.0140366901321734 -4.75719633199942e-05 -0.000152169894379934
+ 19930.5820107724 "BBMK_PAR.L1B1_17"  231.369204209432 520.489880214991 -1.2961957552641 -0.595550126045485 46.1801131992233 44.6345252643221 -0.00141490826345708 -0.014563173147943 -5.57923268925025e-05 -6.62336474070693e-05
+ 19934.322033668 "BBMK_PAR.L1B1_16"  259.654688661351 486.371426483181 -5.82245012282368 8.28664004146252 46.1825719451594 44.6356937580712 -0.00167996295661449 -0.0142605024046192 -8.27599549226072e-05 0.000191900248717282
+ 19938.0620565637 "BBMK_PAR.L1B1_15"  327.871398537684 393.076144493104 -12.9368651506291 16.0977233495733 46.184638940973 44.6370373400615 -0.00205848364384897 -0.013008066820466 -0.000121268668610976 0.000476195847116266
+ 19941.8020794593 "BBMK_PAR.L1B1_14"  439.698831954758 275.166486945861 -16.1275550125441 14.4213475192812 46.1862077550342 44.6388460461721 -0.0025350789340664 -0.0110660579274212 -0.000129624118961843 0.000555065758016393
+ 19945.5421023549 "BBMK_PAR.L1B1_13"  536.917574766025 190.692749658315 -8.9694669999195 8.42896263007063 46.1874178026224 44.6414768297167 -0.00293662610294252 -0.00930520050631159 -8.2175229978711e-05 0.000382196823271416
+ 19949.2821252505 "BBMK_PAR.L1B1_12"  557.823281877331 146.277586070741 3.11143560730197 3.91694994233976 46.1884917186588 44.6450865348012 -0.00311547735139776 -0.00825797274175244 -1.50764661538419e-05 0.0001891634033813
+ 19953.0221481461 "BBMK_PAR.L1B1_11"  527.667416101839 120.179748104086 8.23471038204919 2.3259322650325 46.1895836157591 44.6495981208874 -0.00315082164063434 -0.0076022599575771 1.58429968483424e-05 0.000113647077394644
+ 19956.7621710418 "BBMK_PAR.L1B1_10"  435.694679922764 111.05931133513 16.4780910601728 -0.000236575534736514 46.1908093616373 44.6548169958317 -0.0029860762577616 -0.00743100416094156 7.63081787670345e-05 -3.26729160637429e-05
+ 19960.5021939374 "BBMK_PAR.L1B1_9"   301.831809342973 117.334381081928 17.122862490238 -1.15638193973684 46.1924404009305 44.6600655140008 -0.00262310784014071 -0.00772399311277963 0.000102621777075068 -6.53224992199678e-05
+ 19964.242216833 "BBMK_PAR.L1B1_8"   192.128193556536 123.430937369045 11.2176105575394 0.251734074622101 46.1949305107159 44.6649761903651 -0.0022665612718804 -0.00787824712558179 7.4623140164562e-05 2.85732129812357e-05
+ 19967.9822397286 "BBMK_PAR.L1B1_7"   127.044557614696 113.67377162939 6.57917316500734 2.2976815978185 46.1987806599793 44.6699500012246 -0.00206066649815068 -0.00751047362666889 3.61140491378553e-05 0.000166912019983552
+ 19971.7222626243 "BBMK_PAR.L1B1_6"   89.9267521609906 89.9266275465319 3.74002334653554 3.74002289522867 46.2044212385961 44.6757646856699 -0.00200000000024581 -0.00661984052505418 1.7441051281973e-14 0.00029499999999863
+ 19975.4622855199 "BBMK_PAR.L1B1_5"   64.282498772925 64.2823802397222 3.1166869206836 3.11668574599615 46.2122533501514 44.6835968098831 -0.00200000000018058 -0.00551653377084997 1.7441051281973e-14 0.00029499999999863
+ 19979.2023084155 "BBMK_PAR.L1B1_4"   43.3008303936039 43.300723352577 2.49335049483227 2.49334859676423 46.2235451798163 44.6948886639566 -0.00200000000011535 -0.00441322701664683 1.7441051281973e-14 0.00029499999999863
+ 19982.9423313111 "BBMK_PAR.L1B1_3"   26.9817470229866 26.9816568850555 1.87001406898033 1.87001144753172 46.2409946268839 44.712338161943 -0.00200000000005012 -0.00330992026244262 1.7441051281973e-14 0.00029499999999863
+ 19986.6823542068 "BBMK_PAR.L1B1_2"   15.3252486611048 15.3251808371893 1.24667764312899 1.2466742982998 46.2704344411413 44.7417780918425 -0.00199999999998489 -0.00220661350823948 1.7441051281973e-14 0.00029499999999863
+ 19990.4223771024 "BBMK_PAR.L1B1_1"   8.33133530793589 8.33129520895579 0.623341217277055 0.623337149067286 46.3241255454466 44.7954694540237 -0.00199999999991966 -0.00110330675403527 1.7441051281973e-14 0.00029499999999863
+ 19994.162399998 "IP1.L1"            6.0000069634934 6.00000000036858 4.79142572227291e-06 -1.64625939872773e-10 46.4128386383716 44.8841828432583 -0.00199999999985443 1.67864959840704e-13 1.7441051281973e-14 0.00029499999999863
+ 19994.162399998 "IP1"               6.0000069634934 6.00000000036858 4.79142572227291e-06 -1.64625939872773e-10 46.4128386383716 44.8841828432583 -0.00199999999985443 1.67864959840704e-13 1.7441051281973e-14 0.00029499999999863
+ 19997.9024228926 "BBMK_PAR.R1B1_1"   8.33126362652106 8.33129521017138 -0.62333163425887 -0.623337149229797 46.5015521580524 44.9728962324591 -0.0019999999997892 0.00110330675407587 1.7441051281973e-14 0.00029499999999863
+ 20001.6424457882 "BBMK_PAR.R1B1_2"   15.3251052982752 15.3251808396205 -1.24666806011081 -1.24667429846232 46.5552437636303 45.0265875946318 -0.00199999999972397 0.00220661350828008 1.7441051281973e-14 0.00029499999999863
+ 20005.3824686839 "BBMK_PAR.R1B1_3"   26.9815319787421 26.9816568887023 -1.87000448596214 -1.87001144769423 46.5846838358565 45.0560275245269 -0.00199999999965874 0.00330992026248322 1.7441051281973e-14 0.00029499999999863
+ 20009.1224915795 "BBMK_PAR.R1B1_4"   43.3005436679445 43.3007233574394 -2.49334091181408 -2.49334859692675 46.6021334107462 45.0734770225111 -0.00199999999959351 0.00441322701668743 1.7441051281973e-14 0.00029499999999863
+ 20012.8625144751 "BBMK_PAR.R1B1_5"   64.2821403658508 64.2823802458002 -3.11667733766541 -3.11668574615866 46.6134253093917 45.0847688765835 -0.00199999999952828 0.00551653377089057 1.7441051281973e-14 0.00029499999999863
+ 20016.6025373707 "BBMK_PAR.R1B1_6"   89.9263220725015 89.9266275538254 -3.74001376351735 -3.74002289539117 46.6212574615432 45.092601000796 -0.00199999999946305 0.00661984052509478 1.7441051281973e-14 0.00029499999999863
+ 20020.3425602664 "BBMK_PAR.R1B1_7"   113.673416168594 127.044424586821 -2.29767822423395 -6.57917109346123 46.6270721649643 45.0982415862767 -0.00193993423595584 0.00793790914712168 3.54440573561734e-05 0.00042543033612283
+ 20024.082583162 "BBMK_PAR.R1B1_8"   123.430581535369 192.128037379289 -0.251737348112675 -11.2176063014483 46.6320459907748 45.1020917391214 -0.00174417538085221 0.00981305217194081 6.85638945707384e-05 0.000583386288307194
+ 20027.8226060576 "BBMK_PAR.R1B1_9"   117.334072405976 301.831610027702 1.15637472822083 -17.1228560686556 46.6369566806811 45.1045818507412 -0.00143198996784292 0.0123374325952874 8.84958276802237e-05 0.000707591670088115
+ 20031.5626289532 "BBMK_PAR.R1B1_10"  111.059050320625 435.69443589656 0.000232241280302276 -16.4780867290805 46.6422052119263 45.1062128910297 -0.00111885230049341 0.0147318516273634 7.46183158957462e-05 0.000527763924765515
+ 20035.3026518489 "BBMK_PAR.R1B1_11"  120.179500393992 527.667160406579 -2.32593194931164 -8.23471129779429 46.6474240983861 45.1074386375482 -0.000880641098930072 0.016103321793149 5.49639927872349e-05 0.000224356537734592
+ 20039.0426747445 "BBMK_PAR.R1B1_12"  146.277322173143 557.823049144688 -3.91694746382257 -3.11143922144233 46.6519356931938 45.1085305351408 -0.000700571190957677 0.016456376988896 4.66713114540652e-05 6.53763530381394e-05
+ 20042.7826976401 "BBMK_PAR.R1B1_13"  190.692445658367 536.917386368323 -8.4289538578173 8.96945893518221 46.6555454044127 45.1096044515896 -0.000551855151807831 0.0160471533743227 3.29939760531519e-05 -0.000295201340162037
+ 20046.5227205357 "BBMK_PAR.R1B1_14"  275.166090948539 439.698710564666 -14.4213314804804 16.1275456378924 46.6581761919477 45.1108144995572 -0.000445539491336042 0.0144212210187264 2.44557849680735e-05 -0.000559176084011553
+ 20050.2627434313 "BBMK_PAR.R1B1_15"  393.075621078969 327.871339852024 -16.097706660817 12.9368579083467 46.6599849005641 45.1123833139754 -0.000360414353855559 0.0122150032950664 2.33705400593121e-05 -0.000563319439620696
+ 20054.002766327 "BBMK_PAR.R1B1_16"  486.370817908362 259.654675425689 -8.28663444129122 5.82244489632648 46.6613284842896 45.1144503100266 -0.000260150681143385 0.0105610827507617 2.98524114210561e-05 -0.000328769986422704
+ 20057.7427892226 "BBMK_PAR.R1B1_17"  520.489265462707 231.369227656782 0.595544636249378 1.29619095769707 46.6624969794598 45.1169090559008 -0.00014246674778021 0.00961991470823767 3.330795099949e-05 -0.000151956206407633
+ 20061.4828121182 "BBMK_PAR.R1B1_18"  496.389245869089 230.604364325045 3.57885695132753 -0.0871775395658408 46.6636652205701 45.1194923510521 -1.54617665652293e-05 0.00923509269308766 3.40526275178396e-05 -9.53972085538941e-05
+ 20065.2228350138 "BBMK_PAR.R1B1_19"  470.008334262066 231.317574311714 3.47481954832275 -0.103519150420403 46.6648975725601 45.1220697123266 2.20804356978472e-05 0.00885945250039484 -2.61654873925693e-07 -0.000102599850988675
+ 20068.9628579095 "BBMK_PAR.R1B1_20"  444.405627193546 232.153020295876 3.37078214531806 -0.11986076127495 46.6662000094413 45.1246384618833 2.11018404786142e-05 0.00847572670860988 -2.61654873925693e-07 -0.000102599850988675
+enter Twiss module
+  
+iteration:   1 error:   2.205181E-12 deltap:   0.000000E+00
+orbit:  -1.089358E-13 -8.053846E-15 -1.411154E-12  1.803903E-14  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347123284338849 53.6732788664697 
+
+q1 dq1 betxmax dxmax 
+62.3100008536221 1.8983482025489 606.233123628607 2.64560163744918 
+
+dxrms xcomax xcorms q2 
+1.41670304264205 0.0164768725526626 0.00209879501734912 60.319999999951 
+
+dq2 betymax dymax dyrms 
+2.07144538207693 694.303830733804 0.455596179345516 0.129951149682922 
+
+ycomax ycorms deltap synch_1 
+0.0164768811780179 0.00209792042190435 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB2"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le  0.9382720813
+@ CHARGE           %le  1
+@ ENERGY           %le  450
+@ PC               %le  449.999021827272
+@ GAMMA            %le  479.605019661795
+@ KBUNCH           %le  1
+@ BCURRENT         %le  0.000414395555783364
+@ SIGE             %le  0.00045
+@ SIGT             %le  0.13
+@ NPART            %le  230000000000
+@ EX               %le  5.21262267388889e-09
+@ EY               %le  5.21262267388889e-09
+@ ET               %le  0.001
+@ BV_FLAG          %le  -1
+@ LENGTH           %le  26658.883199996
+@ ALFA             %le  0.000347123284338849
+@ ORBIT5           %le  -0
+@ GAMMATR          %le  53.6732788664697
+@ Q1               %le  62.3100008536221
+@ Q2               %le  60.319999999951
+@ DQ1              %le  1.8983482025489
+@ DQ2              %le  2.07144538207693
+@ DXMAX            %le  2.64560163744918
+@ DYMAX            %le  0.455596179345516
+@ XCOMAX           %le  0.0164768725526626
+@ YCOMAX           %le  0.0164768811780179
+@ BETXMAX          %le  606.233123628607
+@ BETYMAX          %le  694.303830733804
+@ XCORMS           %le  0.00209879501734912
+@ YCORMS           %le  0.00209792042190435
+@ DXRMS            %le  1.41670304264205
+@ DYRMS            %le  0.129951149682922
+@ DELTAP           %le  0
+@ SYNCH_1          %le  0
+@ SYNCH_2          %le  0
+@ SYNCH_3          %le  0
+@ SYNCH_4          %le  0
+@ SYNCH_5          %le  0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.57.26"
+* S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
+$ %le %s                 %le %le %le %le %le %le %le %le %le %le 
+ 6590.07270933124 "BBMK_PAR.L5B2_20"  444.408065834104 232.153020272438 -3.37080209513399 0.119860761280512 14.8840032844189 14.2933420228492 0.0128526464399329 -0.00109523043599441 0.000159367975721061 -1.32579168031851e-05
+ 6593.81273222686 "BBMK_PAR.L5B2_19"  470.010924226204 231.31757428824 -3.47484005910611 0.103519150424286 14.8853057141379 14.2959107724062 0.0134486863179588 -0.00114481534838658 0.000159367975721061 -1.32579168031851e-05
+ 6597.55275512249 "BBMK_PAR.L5B2_18"  496.391991352843 230.604364301549 -3.57887802307824 0.0871775395680603 14.8865380593244 14.2984881336809 0.0140366465690857 -0.00123292143917755 0.000152170653309464 -4.75725385149425e-05
+ 6601.29277801811 "BBMK_PAR.L5B2_17"  520.492153691755 231.369227633145 -0.595549137052886 -1.29619095755685 14.8877062939626 14.3010714288325 0.0145631325444844 -0.00141490102898358 6.62346494231653e-05 -5.57928576553975e-05
+ 6605.03280091373 "BBMK_PAR.L5B2_16"  486.373525062804 259.654675399103 8.28667945046445 -5.82244489572579 14.8888747826387 14.3035301747069 0.014260467028593 -0.00167995745673115 -0.000191898560802174 -8.27603712644312e-05
+ 6608.77282380936 "BBMK_PAR.L5B2_15"  393.077816033794 327.871339818453 16.0977955309037 -12.9368579070197 14.8902183588735 14.3055971707583 0.0130080390245399 -0.00205847950906779 -0.000476193501021744 -0.000121268985926854
+ 6612.51284670498 "BBMK_PAR.L5B2_14"  275.167633474505 439.698710519572 14.4214114303958 -16.1275456362392 14.89202705737 14.3071659851767 0.0110660385931969 -0.00253507578871081 -0.000555064191794318 -0.000129624198808043
+ 6616.2528696006 "BBMK_PAR.L5B2_13"  190.693519687604 536.91738631332 8.42900062446867 -8.96945893426509 14.8946578301212 14.3083760331444 0.0093051865068338 -0.00293662334845435 -0.000382195538968807 -8.21753606659683e-05
+ 6619.99289249623 "BBMK_PAR.L5B2_12"  146.278149889623 557.823049087529 3.91696917676157 3.11143922112026 14.8982675209585 14.3094499495934 0.00825796300437218 -0.00311547519637682 -0.000189162381085243 -1.50766515636929e-05
+ 6623.73291539185 "BBMK_PAR.L5B2_11"  120.180182415357 527.667160352516 2.32594501911156 8.23471129694627 14.9027790901933 14.310541847186 0.00760225399693111 -0.00315082019009321 -0.000113646120107327 1.5842795913068e-05
+ 6627.47293828747 "BBMK_PAR.L5B2_10"  111.059680173904 435.694435851844 -0.000232000320257195 16.478086727386 14.9079979470349 14.3117675937046 0.00743100162295296 -0.00298607559812995 3.26737930937365e-05 7.63079575852833e-05
+ 6631.21296118309 "BBMK_PAR.L5B2_9"   117.334734526628 301.831609996815 -1.1563806381564 17.1228560668966 14.9132464485776 14.3133986339933 0.00772399311321579 -0.0026231078387281 6.53224992247827e-05 0.000102621776995848
+ 6634.95298407872 "BBMK_PAR.L5B2_8"   123.431272047636 192.128037359652 0.251739718783129 11.2176063002921 14.9181571108837 14.3158887456134 0.00787824712603087 -0.0022665612707499 -2.85732129817605e-05 7.46231400996244e-05
+ 6638.69300697434 "BBMK_PAR.L5B2_7"   113.674044021142 127.044424573947 2.2976922249251 6.57917109277865 14.9231309090366 14.3197388984586 0.00751047362710142 -0.00206066649722768 -0.000166912019992 3.61140490911919e-05
+ 6642.43302986996 "BBMK_PAR.L5B2_6"   89.926808837623 89.9266275448152 3.74003571761189 3.74002289499404 14.9289455806484 14.3253794839398 0.00661984052543949 -0.00199999999946536 -0.000295000000014482 -1.39699352515968e-14
+ 6646.17305276559 "BBMK_PAR.L5B2_5"   64.2824758377276 64.2823802395435 3.11669583606577 3.11668574582291 14.9367776911319 14.333211608153 0.00551653377117653 -0.00199999999951761 -0.000295000000014482 -1.39699352515968e-14
+ 6649.91307566121 "BBMK_PAR.L5B2_4"   43.300753695307 43.3007233534566 2.49335595451965 2.49334859665179 14.948069532832 14.3445034622265 0.00441322701691357 -0.00199999999956985 -0.000295000000014482 -1.39699352515968e-14
+ 6653.65309855683 "BBMK_PAR.L5B2_3"   26.9816424103648 26.9816568865578 1.87001607297369 1.87001144748082 14.9655190293793 14.3619529602122 0.00330992026265088 -0.0019999999996221 -0.000295000000014482 -1.39699352515968e-14
+ 6657.39312145245 "BBMK_PAR.L5B2_2"   15.3251419828928 15.3251808388393 1.24667619142757 1.2466742983097 14.9949590050184 14.3913928901093 0.00220661350838792 -0.00199999999967435 -0.000295000000014482 -1.39699352515968e-14
+ 6661.13314434808 "BBMK_PAR.L5B2_1"   8.33125241289581 8.33129521030557 0.623336309881448 0.623337149138574 15.0486505813497 14.445084252283 0.00110330675412495 -0.0019999999997266 -0.000295000000014482 -1.39699352515968e-14
+ 6664.8731672437 "IP5"               5.99997370037366 6.00000000095664 -3.57166467184545e-06 -3.25483682418962e-11 15.1373644428189 14.5337976415047 -1.3800641317528e-13 -0.00199999999977885 -0.000295000000014482 -1.39699352515968e-14
+ 6668.61319013832 "BBMK_PAR.R5B2_1"   8.33130584407916 8.33129520954527 -0.62334345304405 -0.62333714903693 15.2260779861364 14.6225110307044 -0.00110330675410584 -0.00199999999983109 -0.000295000000014482 -1.39699352515968e-14
+ 6672.35321303395 "BBMK_PAR.R5B2_2"   15.3252488452596 15.3251808373187 -1.24668333459017 -1.24667429820805 15.2797691888196 14.6762023928833 -0.0022066135083688 -0.00199999999988334 -0.000295000000014482 -1.39699352515968e-14
+ 6676.09323592957 "BBMK_PAR.R5B2_3"   26.9818027039148 26.9816568842769 -1.87002321613629 -1.87001144737917 15.3092089721701 14.7056423227832 -0.00330992026263176 -0.00199999999993559 -0.000295000000014482 -1.39699352515968e-14
+ 6679.83325882519 "BBMK_PAR.R5B2_4"   43.3009674200405 43.3007233504153 -2.49336309768226 -2.49334859655015 15.3266583734397 14.7230918207702 -0.00441322701689445 -0.00199999999998784 -0.000295000000014482 -1.39699352515968e-14
+ 6683.57328172081 "BBMK_PAR.R5B2_5"   64.2827429936444 64.282380235742 -3.11670297922838 -3.11668574572127 15.3379501637222 14.7343836748444 -0.00551653377115741 -0.00200000000004008 -0.000295000000014482 -1.39699352515968e-14
+ 6687.31330461644 "BBMK_PAR.R5B2_6"   89.9271294247232 89.9266275402534 -3.7400428607745 -3.74002289489239 15.3457822439458 14.7422157990581 -0.00661984052542037 -0.00200000000009233 -0.000295000000014482 -1.39699352515968e-14
+ 6691.05332751206 "BBMK_PAR.R5B2_7"   127.045123664441 113.673771620861 -6.57920599590403 -2.29768159757614 15.3514227981548 14.7480304835039 -0.00793790914751789 -0.00193993423668218 -0.00042543033614515 3.54440573370611e-05
+ 6694.79335040768 "BBMK_PAR.R5B2_8"   192.129081268335 123.430937359254 -11.2176656851952 -0.251734074537043 15.3552729299431 14.7530042943637 -0.00981305217243354 -0.00174417538162526 -0.000583386288337441 6.85638945651031e-05
+ 6698.53337330331 "BBMK_PAR.R5B2_9"   301.833234388856 117.334381072166 -17.1229464843049 1.1563819397007 15.3577630280966 14.7579149707284 -0.0123374325959113 -0.00143198996861128 -0.000707591670124642 8.84958276838303e-05
+ 6702.27339619893 "BBMK_PAR.R5B2_10"  435.696764687575 111.059311325476 -16.4781729606007 0.000236575589165197 15.3593940596371 14.763163488898 -0.0147318491174917 -0.00111885163603603 -0.000527763081028944 7.46185457274626e-05
+ 6706.01341909455 "BBMK_PAR.R5B2_11"  527.669965471141 120.179748093237 -8.23475314717531 -2.32593226477385 15.3606197996216 14.7683823638427 -0.0161033162659646 -0.000880639537567064 -0.000224355771107464 5.49642436382427e-05
+ 6709.75344199017 "BBMK_PAR.R5B2_12"  557.825999495942 146.27758605714 -3.11145367910188 -3.91694994193225 15.3617116914243 14.7728939499293 -0.0164563687737031 -0.000700568639943414 -6.5375645576049e-05 4.66715793344352e-05
+ 6713.4934648858 "BBMK_PAR.R5B2_13"  536.920211406936 190.692749640259 8.96950819886366 -8.42896262923281 15.3627856022079 14.7765036550141 -0.0160471428714623 -0.000551851483983883 0.000295201838987261 3.29943125768952e-05
+ 6717.23348778142 "BBMK_PAR.R5B2_14"  439.701009971047 275.166486919526 16.1276321268045 -14.4213475178624 15.363995643828 14.779134438559 -0.0144212090235879 -0.000445534425671345 0.000559176388964158 2.44561953551568e-05
+ 6720.97351067704 "BBMK_PAR.R5B2_15"  327.873040228399 393.076144455078 12.9369272528068 -16.0977233479814 15.3655644500759 14.7809431446698 -0.0122149875233835 -0.000360407070926378 0.000563320650715127 2.33711548247271e-05
+ 6724.71353357267 "BBMK_PAR.R5B2_16"  259.656006378561 486.37142643584 5.82247712779225 -8.28664004062367 15.3676314354692 14.7822867266602 -0.0105610617692869 -0.000260141411916282 0.000328771575269206 2.98528537319759e-05
+ 6728.45355646829 "BBMK_PAR.R5B2_17"  231.370395999111 520.489880164017 1.29620004671073 0.595550126017348 15.3700901688329 14.7834552204094 -0.00961988710741508 -0.000142456108701274 0.000151958231779247 3.33082135895112e-05
+ 6732.19357936391 "BBMK_PAR.R5B2_18"  230.605509153001 496.389797166238 -0.0871752661449707 3.57886572930532 15.3726734510483 14.7846234601811 -0.00923505696862693 -1.54503518515301e-05 9.53994034430391e-05 3.40528264132446e-05
+ 6735.93360225953 "BBMK_PAR.R5B2_19"  231.318701806917 470.008821237906 -0.103516789443971 3.47482796845409 15.3752507996428 14.7858558108483 -0.00885942249181397 2.20917061368683e-05 0.0001025967258545 -2.61795298507697e-07
+ 6739.67362515516 "BBMK_PAR.R5B2_20"  232.154129803409 444.40605252476 -0.119858312742971 3.37079020760286 15.3778195367999 14.7871582464315 -0.00847570838810218 2.11125857264831e-05 0.0001025967258545 -2.61795298507697e-07
+ 19919.3619420855 "BBMK_PAR.L1B2_20"  444.408545584788 232.153020276498 -3.37080840994853 0.119860761453329 46.1529363123016 44.6237088976742 -2.11018385956824e-05 0.00847572670958292 -2.61654858887015e-07 0.000102599850986615
+ 19923.1019649812 "BBMK_PAR.L1B2_19"  470.011452131885 231.317574291009 -3.47484661988357 0.103519150596729 46.1542387405862 44.6262776472311 -2.20804337586704e-05 0.00885945250136019 -2.61654858887015e-07 0.000102599850986615
+ 19926.8419878768 "BBMK_PAR.L1B2_18"  496.392569253361 230.604364303029 -3.57888482981871 0.0871775397401137 46.1554710843632 44.6288550085059 1.5461768560652e-05 0.00923509269404536 3.40526275328791e-05 9.53972085518846e-05
+ 19930.5820107724 "BBMK_PAR.L1B2_17"  520.492779757671 231.369227633343 -0.595552476228879 -1.29619095738633 46.1566393176187 44.6314383036574 0.000142466749825877 0.00961991470919086 3.33079510024403e-05 0.000151956206411258
+ 19934.322033668 "BBMK_PAR.L1B2_16"  486.37412875742 259.65467539799 8.2866871311396 -5.8224448955287 46.1578078048669 44.6338970495318 0.000260150683123058 0.0105610827517655 2.98524113879297e-05 0.00032876998644351
+ 19938.0620565637 "BBMK_PAR.L1B2_15"  393.078321145667 327.8713398156 16.0978136332965 -12.9368579067342 46.1591513794046 44.6359640455833 0.000360414355637405 0.0122150032961887 2.33705399869734e-05 0.00056331943966336
+ 19941.8020794593 "BBMK_PAR.L1B2_14"  275.168003135085 439.698710514316 14.4214282504571 -16.1275456358723 46.1609600755239 44.6375328600017 0.000445539492829146 0.01442122102002 2.44557848905161e-05 0.000559176084057531
+ 19945.5421023549 "BBMK_PAR.L1B2_13"  190.693791821595 536.917386305372 8.42901014540009 -8.96945893396067 46.1635908446306 44.6387429079694 0.000551855153053289 0.0160471533757458 3.29939759988277e-05 0.000295201340184511
+ 19949.2821252505 "BBMK_PAR.L1B2_12"  146.278375059676 557.823049077926 3.91697276566524 3.11143922123777 46.1672005301131 44.6398168244184 0.00070057119205101 0.0164563769903404 4.6671311425448e-05 -6.53763530474722e-05
+ 19953.0221481461 "BBMK_PAR.L1B2_11"  120.18038373494 527.667160342178 2.32594656596198 8.23471129695585 46.1717120920948 44.6409087220111 0.000880641099923195 0.0161033217945485 5.49639927685068e-05 -0.000224356537757774
+ 19956.7621710418 "BBMK_PAR.L1B2_10"  111.059882915389 435.694435842206 -0.000234235363961083 16.4780867271913 46.1769309397984 44.6421344685297 0.00111885230144952 0.0147318516286289 7.46183158959745e-05 -0.000527763924814936
+ 19960.5021939374 "BBMK_PAR.L1B2_9"   117.334965538307 301.831609988998 -1.1563850243165 17.122856066625 46.1821794313801 44.6437655088185 0.00143198996882603 0.0123374325963343 8.84958276898533e-05 -0.0007075916701495
+ 19964.242216833 "BBMK_PAR.L1B2_8"   123.431530656921 192.128037353691 0.25173826220487 11.2176063001136 46.1870900837046 44.6462556204386 0.00174417538185976 0.00981305217276895 6.85638945683774e-05 -0.000583386288358052
+ 19967.9822397286 "BBMK_PAR.L1B2_7"   113.674295809427 127.044424568946 2.29769546504575 6.57917109268801 46.1920638711352 44.6501057732839 0.00193993423692108 0.0079379091477859 3.54440573360805e-05 -0.000425430336160385
+ 19971.7222626243 "BBMK_PAR.L1B2_6"   89.9270196347843 89.9266275402339 3.74004280198409 3.74002289496801 46.1978785294862 44.6557463587654 0.00200000000031884 0.0066198405256413 -1.91543185663629e-14 -0.000295000000025331
+ 19975.4622855199 "BBMK_PAR.L1B2_5"   64.2826364212867 64.2823802352339 3.11670217770489 3.11668574577292 46.2057106209922 44.6635784829791 0.0020000000002472 0.00551653377133723 -1.91543185663629e-14 -0.000295000000025331
+ 19979.2023084155 "BBMK_PAR.L1B2_4"   43.3008696209619 43.3007233496185 2.49336155342629 2.49334859657844 46.2170024334238 44.6748703370534 0.00200000000017556 0.00441322701703423 -1.91543185663629e-14 -0.000295000000025331
+ 19982.9423313111 "BBMK_PAR.L1B2_3"   26.981719233769 26.9816568833466 1.87002092914709 1.87001144738336 46.2344518815776 44.692319835041 0.00200000000010392 0.00330992026273016 -1.91543185663629e-14 -0.000295000000025331
+ 19986.6823542068 "BBMK_PAR.L1B2_2"   15.3251852597398 15.3251808364502 1.2466803048685 1.24667429818888 46.2638917727722 44.7217597649421 0.00200000000003229 0.00220661350842716 -1.91543185663629e-14 -0.000295000000025331
+ 19990.4223771024 "BBMK_PAR.L1B2_1"   8.33126769885156 8.33129520890638 0.623339680589295 0.623337148993794 46.3175832190668 44.7754511271249 0.00199999999996065 0.00110330675412309 -1.91543185663629e-14 -0.000295000000025331
+ 19994.162399998 "IP1.L1"            5.99996655111796 6.0000000007289 -9.4368929864209e-07 -2.00684993081495e-10 46.4062970486297 44.8641645163567 0.00199999999988901 -1.79908791721672e-13 -1.91543185663629e-14 -0.000295000000025331
+ 19994.162399998 "IP1"               5.99996655111796 6.0000000007289 -9.4368929864209e-07 -2.00684993081495e-10 46.4062970486297 44.8641645163567 0.00199999999988901 -1.79908791721672e-13 -1.91543185663629e-14 -0.000295000000025331
+ 19997.9024228926 "BBMK_PAR.R1B2_1"   8.33128181528266 8.33129521066142 -0.623341567801151 -0.623337149228423 46.4950107941177 44.9528779055516 0.00199999999981738 -0.00110330675418778 -1.91543185663629e-14 -0.000295000000025331
+ 20001.6424457882 "BBMK_PAR.R1B2_2"   15.325213492602 15.3251808399602 -1.24668219208035 -1.24667429842351 46.5487021416951 45.0065692677221 0.00199999999974574 -0.00220661350849185 -1.91543185663629e-14 -0.000295000000025331
+ 20005.3824686839 "BBMK_PAR.R1B2_3"   26.9817615830623 26.9816568886117 -1.87002281635895 -1.87001144761799 46.5781419820874 45.0360091976169 0.0019999999996741 -0.00330992026279485 -1.91543185663629e-14 -0.000295000000025331
+ 20009.1224915795 "BBMK_PAR.R1B2_4"   43.3009260866863 43.3007233566386 -2.49336344063815 -2.49334859681307 46.5955914050691 45.0534586956013 0.00199999999960246 -0.00441322701709892 -1.91543185663629e-14 -0.000295000000025331
+ 20012.8625144751 "BBMK_PAR.R1B2_5"   64.2827070034422 64.2823802440091 -3.11670406491674 -3.11668574600755 46.6068832039163 45.064750549674 0.00199999999953082 -0.00551653377140192 -1.91543185663629e-14 -0.000295000000025331
+ 20016.6025373707 "BBMK_PAR.R1B2_6"   89.9271043333709 89.9266275507641 -3.74004468919594 -3.74002289520264 46.6147152874277 45.0725826738867 0.00199999999945919 -0.00661984052570599 -1.91543185663629e-14 -0.000295000000025331
+ 20020.3425602664 "BBMK_PAR.R1B2_7"   127.045114146196 113.673771633049 -6.57920838750195 -2.29768159768752 46.6203558426353 45.0783973583318 0.0020606664972016 -0.00751047362739972 3.61140490857042e-05 -0.000166912019997726
+ 20024.082583162 "BBMK_PAR.R1B2_8"   192.129093693771 123.430937371419 -11.2176692954278 -0.251734074420486 46.6242059744433 45.0833711691912 0.00226656127070236 -0.00787824712634042 7.46231400934799e-05 -2.85732129820225e-05
+ 20027.8226060576 "BBMK_PAR.R1B2_9"   301.833281141095 117.334381082676 -17.1229520178761 1.15638193995151 46.6266960723235 45.0882818455554 0.00262310783865576 -0.00772399311351577 0.00010262177698906 6.53224992281991e-05
+ 20031.5626289532 "BBMK_PAR.R1B2_10"  435.696857889144 111.059311334328 -16.478179363054 0.000236575741954197 46.6283271035631 45.0935303637245 0.00298607625597093 -0.00743100416165405 7.63081786978896e-05 3.26729160649213e-05
+ 20035.3026518489 "BBMK_PAR.R1B2_11"  527.670101720597 120.179748101604 -8.23475814737817 -2.325932264778 46.6295528432584 45.0987492386689 0.00315082163865831 -0.00760225995831396 1.58429968162508e-05 -0.000113647077407564
+ 20039.0426747445 "BBMK_PAR.R1B2_12"  557.826165514604 146.277586066023 -3.11145747522179 -3.91694994200824 46.6306447347576 45.1032608247551 0.00311547734936132 -0.00825797274256027 -1.50764661663941e-05 -0.000189163403401548
+ 20042.7826976401 "BBMK_PAR.R1B2_13"  536.920391984661 190.692749650424 8.969508349681 -8.42896262951735 46.6317186452007 45.1068705298397 0.00293662610093999 -0.00930520050722915 -8.21752299464544e-05 -0.000382196823310607
+ 20046.5227205357 "BBMK_PAR.R1B2_14"  439.701176995001 275.166486932649 16.1276353926401 -14.4213475183844 46.6329286863875 45.1095013133845 0.00253507893224967 -0.0110660579285187 -0.00012962411889651 -0.000555065758072652
+ 20050.2627434313 "BBMK_PAR.R1B2_15"  327.873183236915 393.076144472402 12.9369300431816 -16.0977233485226 46.6344974919953 45.1113100194952 0.0020584836422754 -0.0130080668217729 -0.000121268668550346 -0.000476195847168736
+ 20054.002766327 "BBMK_PAR.R1B2_16"  259.656138829852 486.371426455837 5.82247725781428 -8.28664004079657 46.6365644764105 45.1126536014856 0.0016799629552089 -0.014260502406068 -8.27599548926448e-05 -0.000191900248741049
+ 20057.7427892226 "BBMK_PAR.R1B2_17"  231.370534264952 520.489880184138 1.29619799838684 0.595550126208903 46.6390232084124 45.1138220952347 0.00141490826212464 -0.0145631731494374 -5.57923268865916e-05 6.62336474096754e-05
+ 20061.4828121182 "BBMK_PAR.R1B2_18"  230.605668017949 496.389797184191 -0.0871781282440034 3.57886572960388 46.641606488966 45.1149903350063 0.00123293080120028 -0.0140366901336292 -4.75719633219606e-05 0.000152169894391372
+ 20065.2228350138 "BBMK_PAR.R1B2_19"  231.318882068662 470.008821253659 -0.103519648378469 3.47482796874026 46.6441838356683 45.1162226856735 0.00114482597349615 -0.0134487187960581 -1.32576809301953e-05 0.000159372536826153
+ 20068.9628579095 "BBMK_PAR.R1B2_20"  232.154331438278 444.406052538431 -0.119861168512919 3.37079020787674 46.6467525707088 45.1175251212567 0.00109524194327438 -0.012852661859395 -1.32576809301953e-05 0.000159372536826153
+enter Twiss module
+  
+iteration:   1 error:   1.706884E-12 deltap:   0.000000E+00
+orbit:   2.399083E-13  1.852610E-15  7.186467E-13  5.239562E-15  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347501641872132 53.6440513497058 
+
+q1 dq1 betxmax dxmax 
+62.3100007479953 1.97664890241235 600.739517446633 2.73499462689535 
+
+dxrms xcomax xcorms q2 
+1.41030721458707 0.0164768725528994 0.00215219991099065 60.3199999999256 
+
+dq2 betymax dymax dyrms 
+1.99937088911836 693.675216405478 0.35727810695633 0.118897165036066 
+
+ycomax ycorms deltap synch_1 
+0.0164768811765693 0.00215221180807268 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB1"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le  0.9382720813
+@ CHARGE           %le  1
+@ ENERGY           %le  450
+@ PC               %le  449.999021827272
+@ GAMMA            %le  479.605019661795
+@ KBUNCH           %le  1
+@ BCURRENT         %le  0.000414395555783364
+@ SIGE             %le  0.00045
+@ SIGT             %le  0.13
+@ NPART            %le  230000000000
+@ EX               %le  5.21262267388889e-09
+@ EY               %le  5.21262267388889e-09
+@ ET               %le  0.001
+@ BV_FLAG          %le  1
+@ LENGTH           %le  26658.883199996
+@ ALFA             %le  0.000347501641872132
+@ ORBIT5           %le  -0
+@ GAMMATR          %le  53.6440513497058
+@ Q1               %le  62.3100007479953
+@ Q2               %le  60.3199999999256
+@ DQ1              %le  1.97664890241235
+@ DQ2              %le  1.99937088911836
+@ DXMAX            %le  2.73499462689535
+@ DYMAX            %le  0.35727810695633
+@ XCOMAX           %le  0.0164768725528994
+@ YCOMAX           %le  0.0164768811765693
+@ BETXMAX          %le  600.739517446633
+@ BETYMAX          %le  693.675216405478
+@ XCORMS           %le  0.00215219991099065
+@ YCORMS           %le  0.00215221180807268
+@ DXRMS            %le  1.41030721458707
+@ DYRMS            %le  0.118897165036066
+@ DELTAP           %le  0
+@ SYNCH_1          %le  0
+@ SYNCH_2          %le  0
+@ SYNCH_3          %le  0
+@ SYNCH_4          %le  0
+@ SYNCH_5          %le  0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.57.27"
+* S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
+$ %le %s                 %le %le %le %le %le %le %le %le %le %le 
+ 6664.4514327563 "BB_HO.L5B1_5"      6.00229117764788 6.00228150046523 0.0195046905373777 0.0194999999099732 15.0952376991283 14.5300237620878 -3.45149998584371e-05 0.00199999999990648 0.000295000000018246 2.44750267517919e-14
+ 6664.4966077563 "BB_HO.L5B1_4"      6.0008690584758 6.0008598055775 0.0119755346331887 0.0119708332438833 15.0964356990482 14.531221763897 -2.1188374857554e-05 0.00199999999990758 0.000295000000018246 2.44750267517919e-14
+ 6664.5196177563 "BB_HO.L5B1_3"      6.00040618759584 6.00039715118161 0.00814054011511973 0.00813583324421305 15.0970459948948 14.5318320606737 -1.44004248571679e-05 0.00199999999990815 0.000295000000018246 2.44750267517919e-14
+ 6664.5376227563 "BB_HO.L5B1_2"      6.00016707667323 6.00015820983065 0.00513971107132132 0.00513499991113904 15.0975235702552 14.5323096367466 -9.08894985686805e-06 0.00199999999990859 0.000295000000018246 2.44750267517919e-14
+ 6664.5534827563 "BB_HO.L5B1_1"      6.00004596824478 6.00003725090013 0.00249638151640936 0.00249166657794822 15.0979442628426 14.5327303299504 -4.41024985645185e-06 0.00199999999990897 0.000295000000018246 2.44750267517919e-14
+ 6664.5684327563 "BB_HO5B1_0"        6.00000857680086 6.00000000048611 4.71841147500566e-06 -8.84784942190017e-11 15.0983408225169 14.5331268901962 1.43753527487235e-13 0.00199999999990934 0.000295000000018246 2.44750267517919e-14
+ 6664.5833827553 "BB_HO.R5B1_1"      6.0000456860788 6.00003725090043 -0.00248694452671889 -0.00249166658816452 15.098737382174 14.5335234504155 4.41024984882788e-06 0.00199999999990971 0.000295000000018246 2.44750267517919e-14
+ 6664.5992427553 "BB_HO.R5B1_2"      6.00016649516593 6.00015820983128 -0.00513027408163085 -0.00513499992135533 15.0991580747916 14.5339441436193 9.08894984924407e-06 0.00199999999991009 0.000295000000018246 2.44750267517919e-14
+ 6664.6172477553 "BB_HO.R5B1_3"      6.00040526626255 6.00039715118261 -0.00813110312542926 -0.00813583325442934 15.0996356502119 14.5344217196922 1.44004248495439e-05 0.00199999999991054 0.000295000000018246 2.44750267517919e-14
+ 6664.6402577553 "BB_HO.R5B1_4"      6.00086770285224 6.00085980557897 -0.0119660976434982 -0.0119708332540996 15.1002459461742 14.5350320164689 2.118837484993e-05 0.0019999999999111 0.000295000000018246 2.44750267517919e-14
+ 6664.6854327553 "BB_HO.R5B1_5"      6.0022889693923 6.00228150046762 -0.0194952535476872 -0.0194999999201895 15.1014439464498 14.5362300182781 3.45149998508131e-05 0.0019999999999122 0.000295000000018246 2.44750267517919e-14
+ 16650.5411836209 "BB_HO.L8B1_5"      10.0013552923872 10.0013688991986 0.0117047224875311 0.011700000089697 38.4540001430968 36.656407338305 4.09641945683692e-06 -0.00350021173909556 -3.50121307045776e-05 1.80973624280548e-06
+ 16650.5863586209 "BB_HO.L8B1_4"      10.0005018490732 10.000515882253 0.0071872158419512 0.00718250008939652 38.4547190612413 36.657126255456 2.5147464522825e-06 -0.00350012998426079 -3.50121307045776e-05 1.80973624280548e-06
+ 16650.6093686209 "BB_HO.L8B1_3"      10.000224039488 10.0002382896089 0.00488621245689265 0.00488150008912779 38.4550852637974 36.6574924574943 1.70911732474233e-06 -0.00350008834222984 -3.50121307045776e-05 1.80973624280548e-06
+ 16650.6273736208 "BB_HO.L8B1_2"      10.0000805050277 10.0000949247932 0.00308570980838598 0.00308100008917136 38.4553718180638 36.6577790113499 1.0787239114735e-06 -0.00350005575792879 -3.50121307045776e-05 1.80973624280548e-06
+ 16650.6432336208 "BB_HO.L8B1_1"      10.0000077803096 10.0000223494304 0.00149970747528455 0.0014950000890889 38.4556242367951 36.6580314297154 5.23431518515691e-07 -0.00350002705551198 -3.50121307045776e-05 1.80973624280548e-06
+ 16650.6581836208 "BB_HO8B1_0"        9.99998528933892 9.9999999991777 4.70527593628538e-06 8.88978657489654e-11 38.4558621736061 36.6582693661781 1.64458411861348e-13 -0.00349999999995515 -3.50121307045776e-05 1.80973624280548e-06
+ 16650.6731336198 "BB_HO.R8B1_1"      10.0000074989311 10.0000223494221 -0.00149029682336742 -0.00149499981124875 38.4561001104046 36.6585073026248 -5.23431154571185e-07 -0.00349997294440013 -3.50121307045776e-05 1.80973624280548e-06
+ 16650.6889936198 "BB_HO.R8B1_2"      10.0000799251433 10.0000949247761 -0.00307629915646885 -0.00308099981133121 38.4563525291468 36.6587597209903 -1.07872354752899e-06 -0.00349994424198332 -3.50121307045776e-05 1.80973624280548e-06
+ 16650.7069986198 "BB_HO.R8B1_3"      10.0002231207261 10.0002382895818 -0.00487680180497551 -0.00488149981128764 38.4566390834346 36.6590462748459 -1.70911696079782e-06 -0.00349991165768227 -3.50121307045776e-05 1.80973624280548e-06
+ 16650.7300086198 "BB_HO.R8B1_4"      10.0005004972331 10.0005158822131 -0.00717780519003406 -0.00718249981155637 38.4570052860323 36.6594124768842 -2.51474608833799e-06 -0.00349987001565133 -3.50121307045776e-05 1.80973624280548e-06
+ 16650.7751836198 "BB_HO.R8B1_5"      10.0013530902947 10.0013688991336 -0.011695311835614 -0.0116999998118568 38.4577242043046 36.6601313940352 -4.09641909289242e-06 -0.00349978826081656 -3.50121307045776e-05 1.80973624280548e-06
+ 19994.045399998 "BB_HO.L1B1_5"      6.00228958203914 6.00228150032985 0.019504768794571 0.0194999998339045 46.4097355141533 44.8810797151498 -0.00199999999985647 -3.4514999831494e-05 1.7441051281973e-14 0.00029499999999863
+ 19994.090574998 "BB_HO.L1B1_4"      6.000867455888 6.00085980544902 0.0119756108660568 0.0119708331678187 46.4109335143924 44.8822777169591 -0.00199999999985568 -2.11883748317654e-05 1.7441051281973e-14 0.00029499999999863
+ 19994.113584998 "BB_HO.L1B1_3"      6.00040458152352 6.00039715105662 0.00814061531666392 0.00813583316792181 46.4115438104022 44.8828880137358 -0.00199999999985528 -1.44004248315623e-05 1.7441051281973e-14 0.00029499999999863
+ 19994.131589998 "BB_HO.L1B1_2"      6.00016546790744 6.00015820970843 0.00513978546629087 0.00513499983509218 46.4120213858905 44.8833655898087 -0.00199999999985497 -9.08894983215225e-06 1.7441051281973e-14 0.00029499999999863
+ 19994.147449998 "BB_HO.L1B1_1"      6.00004435713047 6.00003725078033 0.00249645520077894 0.00249166650200117 46.4124420785907 44.8837862830124 -0.00199999999985469 -4.41024983231547e-06 1.7441051281973e-14 0.00029499999999863
+ 19994.162399998 "BB_HO1B1_0"        6.0000069634934 6.00000000036858 4.79142572227291e-06 -1.64625939872773e-10 46.4128386383716 44.8841828432583 -0.00199999999985443 1.67864959840704e-13 1.7441051281973e-14 0.00029499999999863
+ 19994.177349997 "BB_HO.R1B1_1"      6.00004407059823 6.00003725078519 -0.00248687218259389 -0.00249166666451235 46.4132351981355 44.8845794034776 -0.00199999999985417 4.41024987291436e-06 1.7441051281973e-14 0.00029499999999863
+ 19994.193209997 "BB_HO.R1B1_2"      6.00016487740187 6.00015820971845 -0.00513020244810583 -0.00513499999760337 46.4136558908664 44.8850000966814 -0.00199999999985389 9.08894987275114e-06 1.7441051281973e-14 0.00029499999999863
+ 19994.211214997 "BB_HO.R1B1_3"      6.00040364593346 6.00039715107249 -0.00813103229847888 -0.00813583333043299 46.4141334664155 44.8854776727543 -0.00199999999985358 1.44004248721612e-05 1.7441051281973e-14 0.00029499999999863
+ 19994.234224997 "BB_HO.R1B1_4"      6.00086607928744 6.00085980547237 -0.0119660278478717 -0.0119708333303299 46.4147437625428 44.8860879695309 -0.00199999999985318 2.11883748723642e-05 1.7441051281973e-14 0.00029499999999863
+ 19994.279399997 "BB_HO.R1B1_5"      6.0022873396129 6.00228150036789 -0.019495185776386 -0.0194999999964157 46.4159417631431 44.8872859713402 -0.00199999999985239 3.45149998720929e-05 1.7441051281973e-14 0.00029499999999863
+ 23326.4819836189 "BB_HO.L2B1_5"      10.001322836549 10.0013688996542 0.0117017050002212 0.0117000000197585 54.5277194083043 52.5701509935728 -0.00350003415509787 -2.80799287013785e-05 2.91925887256419e-07 0.000239999391262596
+ 23326.5271586189 "BB_HO.L2B1_4"      10.0004696665128 10.000515882715 0.00718418401365659 0.00718250001967125 54.528438328772 52.5708699107238 -0.00350002096734592 -1.72379562012611e-05 2.91925887256419e-07 0.000239999391262596
+ 23326.5501686189 "BB_HO.L2B1_3"      10.0001919966205 10.0002382900741 0.00488317332398136 0.00488150001951113 54.5288045325041 52.571236112762 -0.00350001425013125 -1.1715570208118e-05 2.91925887256419e-07 0.000239999391262596
+ 23326.5681736188 "BB_HO.L2B1_2"      10.0000485717022 10.0000949252609 0.00308266495971532 0.00308100001963967 54.5290910876871 52.5715226666177 -0.00350000899400565 -7.39438116889484e-06 2.91925887256419e-07 0.000239999391262596
+ 23326.5840336188 "BB_HO.L2B1_1"      9.99997594364652 10.0000223499003 0.00149665759179336 0.00149500001963207 54.5293435072233 52.5717750849831 -0.00350000436406108 -3.58799082358519e-06 2.91925887256419e-07 0.000239999391262596
+ 23326.5989836188 "BB_HO2B1_0"        9.99995354393836 9.99999999964967 1.65064650770032e-06 1.95115933159912e-11 54.5295814447907 52.5720130214458 -0.00349999999976907 7.59540622908281e-14 2.91925887256419e-07 0.000239999391262596
+ 23326.6139336178 "BB_HO.R2B1_1"      9.99997584493487 10.0000223498961 -0.00149335619873307 -0.00149499988056447 54.5298193823434 52.5722509578925 -0.00349999563547734 3.58799073538732e-06 2.91925887256419e-07 0.000239999391262596
+ 23326.6297936178 "BB_HO.R2B1_2"      10.0000483682704 10.0000949252523 -0.00307936356665504 -0.00308099988057207 54.5300718018834 52.572503376258 -0.00349999100553277 7.39438108069698e-06 2.91925887256419e-07 0.000239999391262596
+ 23326.6477986178 "BB_HO.R2B1_3"      10.0001916743055 10.0002382900605 -0.00487987193092108 -0.00488149988044352 54.530358357074 52.5727899301136 -0.00349998574940717 1.17155701199201e-05 2.91925887256419e-07 0.000239999391262596
+ 23326.6708086178 "BB_HO.R2B1_4"      10.0004691922677 10.000515882695 -0.0071808826205963 -0.00718249988060365 54.5307245608206 52.5731561321519 -0.00349997903219251 1.72379561130633e-05 2.91925887256419e-07 0.000239999391262596
+ 23326.7159836178 "BB_HO.R2B1_5"      10.001322064023 10.0013688996217 -0.0116984036071609 -0.0116999998806909 54.5314434813332 52.5738750493029 -0.00349996584444055 2.80799286131806e-05 2.91925887256419e-07 0.000239999391262596
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    404
+++++++ info: seqedit - number of elements replaced:   0
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    404
+++++++ info: seqedit - number of elements replaced:   0
+enter Twiss module
+  
+iteration:   1 error:   1.706994E-12 deltap:   0.000000E+00
+orbit:   2.399035E-13  1.852729E-15  7.186745E-13  5.239546E-15  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347501641872134 53.6440513497057 
+
+q1 dq1 betxmax dxmax 
+62.3100007479953 1.97664890241239 600.739517446631 2.73499462689529 
+
+dxrms xcomax xcorms q2 
+1.42723752992861 0.0164768725528994 0.00209248831067092 60.3199999999256 
+
+dq2 betymax dymax dyrms 
+1.9993708891184 693.675216405479 0.357278106956344 0.118842341148202 
+
+ycomax ycorms deltap synch_1 
+0.0164768811765692 0.00209227898861843 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+beta.ip1           = 6.0000069634934 ;
+enter Twiss module
+  
+iteration:   1 error:   1.706994E-12 deltap:   0.000000E+00
+orbit:   2.399035E-13  1.852729E-15  7.186745E-13  5.239546E-15  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347501641872134 53.6440513497057 
+
+q1 dq1 betxmax dxmax 
+62.3100007479953 1.97664890241239 600.739517446631 2.73499462689529 
+
+dxrms xcomax xcorms q2 
+1.42723752992861 0.0164768725528994 0.00209248831067092 60.3199999999256 
+
+dq2 betymax dymax dyrms 
+1.9993708891184 693.675216405479 0.357278106956344 0.118842341148202 
+
+ycomax ycorms deltap synch_1 
+0.0164768811765692 0.00209227898861843 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+enter Twiss module
+  
+iteration:   1 error:   1.706994E-12 deltap:   0.000000E+00
+orbit:   2.399035E-13  1.852729E-15  7.186745E-13  5.239546E-15  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347501641872134 53.6440513497057 
+
+q1 dq1 betxmax dxmax 
+62.3100007479953 1.97664890241239 600.739517446631 2.73499462689529 
+
+dxrms xcomax xcorms q2 
+1.42723752992861 0.0164768725528994 0.00209248831067092 60.3199999999256 
+
+dq2 betymax dymax dyrms 
+1.9993708891184 693.675216405479 0.357278106956344 0.118842341148202 
+
+ycomax ycorms deltap synch_1 
+0.0164768811765692 0.00209227898861843 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+Running survey for aligment calculations...
+mbrc_mech_sep      = 188 ;
+mbrd_mech_sep      = 186 ;
+mbrs_mech_sep      = 6 ;
+mbrb_mech_sep      = 226 ;
+stest              = 0 ;
+stest              = 0 ;
+stest              = 0 ;
+stest              = 0 ;
+stest              = 0 ;
+stest              = 0 ;
+stest              = 0 ;
+stest              = 0 ;
+stest              = 19913.872399998 ;
+dx_mbxf.4l1..1     = 0.00375825777048428 ;
+sx_mbxf.4l1..1     = -80.2899983574025 ;
+dx_mbxf.4l1..1     = 0.00375825777048428 ;
+stest              = 19915.544399998 ;
+dx_mbxf.4l1..2     = 0.00187912901658871 ;
+sx_mbxf.4l1..2     = -78.617999413359 ;
+dx_mbxf.4l1..2     = 0.00187912901658871 ;
+stest              = 19917.216399998 ;
+dx_mbxf.4l1..3     = 0.000626376367867282 ;
+sx_mbxf.4l1..3     = -76.9459998826751 ;
+dx_mbxf.4l1..3     = 0.000626376367867282 ;
+stest              = 19918.888399998 ;
+dx_mbxf.4l1..4     = -1.4754109420287e-13 ;
+sx_mbxf.4l1..4     = -75.2740000000013 ;
+dx_mbxf.4l1..4     = -1.4754109420287e-13 ;
+stest              = 0 ;
+stest              = 20069.436399997 ;
+dx_mbxf.4r1..1     = 1.47541094200902e-13 ;
+sx_mbxf.4r1..1     = 75.2739999989972 ;
+dx_mbxf.4r1..1     = 1.47541094200902e-13 ;
+stest              = 20071.108399997 ;
+dx_mbxf.4r1..2     = -0.000626376367867282 ;
+sx_mbxf.4r1..2     = 76.945999881671 ;
+dx_mbxf.4r1..2     = -0.000626376367867282 ;
+stest              = 20072.780399997 ;
+dx_mbxf.4r1..3     = -0.00187912901658871 ;
+sx_mbxf.4r1..3     = 78.6179994123549 ;
+dx_mbxf.4r1..3     = -0.00187912901658871 ;
+stest              = 20074.452399997 ;
+dx_mbxf.4r1..4     = -0.00375825777048428 ;
+sx_mbxf.4r1..4     = 80.2899983563984 ;
+dx_mbxf.4r1..4     = -0.00375825777048428 ;
+stest              = 0 ;
+stest              = 6584.2784327563 ;
+dx_mbxf.4l5..1     = 0.00375825777054759 ;
+sx_mbxf.4l5..1     = -80.289998357398 ;
+dx_mbxf.4l5..1     = 0.00375825777054759 ;
+stest              = 6585.9504327563 ;
+dx_mbxf.4l5..2     = 0.00187912901665071 ;
+sx_mbxf.4l5..2     = -78.6179994133572 ;
+dx_mbxf.4l5..2     = 0.00187912901665071 ;
+stest              = 6587.6224327563 ;
+dx_mbxf.4l5..3     = 0.000626376367927961 ;
+sx_mbxf.4l5..3     = -76.9459998826715 ;
+dx_mbxf.4l5..3     = 0.000626376367927961 ;
+stest              = 6589.2944327563 ;
+dx_mbxf.4l5..4     = -8.81801311135853e-14 ;
+sx_mbxf.4l5..4     = -75.2740000000003 ;
+dx_mbxf.4l5..4     = -8.81801311135853e-14 ;
+stest              = 0 ;
+stest              = 6739.8424327553 ;
+dx_mbxf.4r5..1     = 8.81801311124123e-14 ;
+sx_mbxf.4r5..1     = 75.273999998999 ;
+dx_mbxf.4r5..1     = 8.81801311124123e-14 ;
+stest              = 6741.5144327553 ;
+dx_mbxf.4r5..2     = -0.000626376367927961 ;
+sx_mbxf.4r5..2     = 76.9459998816701 ;
+dx_mbxf.4r5..2     = -0.000626376367927961 ;
+stest              = 6743.1864327553 ;
+dx_mbxf.4r5..3     = -0.00187912901665071 ;
+sx_mbxf.4r5..3     = 78.6179994123559 ;
+dx_mbxf.4r5..3     = -0.00187912901665071 ;
+stest              = 6744.8584327553 ;
+dx_mbxf.4r5..4     = -0.00375825777054759 ;
+sx_mbxf.4r5..4     = 80.2899983563966 ;
+dx_mbxf.4r5..4     = -0.00375825777054759 ;
+stest              = 0 ;
+stest              = 19848.537399998 ;
+dx_mbrd.4l1.b1..1  = 0.0969998930610801 ;
+sx_mbrd.4l1.b1..1  = -145.624929951571 ;
+dx_mbrd.4l1.b1..1  = 0.00399989306108015 ;
+stest              = 19850.6120666647 ;
+dx_mbrd.4l1.b1..2  = 0.096222666881377 ;
+sx_mbrd.4l1.b1..2  = -143.550263430488 ;
+dx_mbrd.4l1.b1..2  = 0.003222666881377 ;
+stest              = 19852.6867333313 ;
+dx_mbrd.4l1.b1..3  = 0.094668214631106 ;
+sx_mbrd.4l1.b1..3  = -141.475597346162 ;
+dx_mbrd.4l1.b1..3  = 0.001668214631106 ;
+stest              = 19854.761399998 ;
+dx_mbrd.4l1.b1..4  = 0.0923365365285459 ;
+sx_mbrd.4l1.b1..4  = -139.400931989759 ;
+dx_mbrd.4l1.b1..4  = -0.000663463471454115 ;
+stest              = 0 ;
+stest              = 20133.563399997 ;
+dx_mbrd.4r1.b1..1  = -0.0923365365285459 ;
+sx_mbrd.4r1.b1..1  = 139.400931988755 ;
+dx_mbrd.4r1.b1..1  = 0.000663463471454115 ;
+stest              = 20135.6380666637 ;
+dx_mbrd.4r1.b1..2  = -0.094668214631106 ;
+sx_mbrd.4r1.b1..2  = 141.475597345158 ;
+dx_mbrd.4r1.b1..2  = -0.001668214631106 ;
+stest              = 20137.7127333303 ;
+dx_mbrd.4r1.b1..3  = -0.096222666881377 ;
+sx_mbrd.4r1.b1..3  = 143.550263429486 ;
+dx_mbrd.4r1.b1..3  = -0.003222666881377 ;
+stest              = 20139.787399997 ;
+dx_mbrd.4r1.b1..4  = -0.0969998930610801 ;
+sx_mbrd.4r1.b1..4  = 145.624929950568 ;
+dx_mbrd.4r1.b1..4  = -0.00399989306108015 ;
+stest              = 0 ;
+stest              = 6518.9434327563 ;
+dx_mbrd.4l5.b1..1  = 0.096999893061195 ;
+sx_mbrd.4l5.b1..1  = -145.624929951564 ;
+dx_mbrd.4l5.b1..1  = 0.00399989306119498 ;
+stest              = 6521.01809942297 ;
+dx_mbrd.4l5.b1..2  = 0.0962226668814902 ;
+sx_mbrd.4l5.b1..2  = -143.550263430483 ;
+dx_mbrd.4l5.b1..2  = 0.00322266688149021 ;
+stest              = 6523.09276608963 ;
+dx_mbrd.4l5.b1..3  = 0.0946682146312176 ;
+sx_mbrd.4l5.b1..3  = -141.475597346155 ;
+dx_mbrd.4l5.b1..3  = 0.00166821463121758 ;
+stest              = 6525.1674327563 ;
+dx_mbrd.4l5.b1..4  = 0.0923365365286558 ;
+sx_mbrd.4l5.b1..4  = -139.400931989753 ;
+dx_mbrd.4l5.b1..4  = -0.000663463471344175 ;
+stest              = 0 ;
+stest              = 6803.9694327553 ;
+dx_mbrd.4r5.b1..1  = -0.0923365365286558 ;
+sx_mbrd.4r5.b1..1  = 139.400931988753 ;
+dx_mbrd.4r5.b1..1  = 0.000663463471344175 ;
+stest              = 6806.04409942197 ;
+dx_mbrd.4r5.b1..2  = -0.0946682146312176 ;
+sx_mbrd.4r5.b1..2  = 141.475597345155 ;
+dx_mbrd.4r5.b1..2  = -0.00166821463121758 ;
+stest              = 6808.11876608863 ;
+dx_mbrd.4r5.b1..3  = -0.0962226668814902 ;
+sx_mbrd.4r5.b1..3  = 143.550263429482 ;
+dx_mbrd.4r5.b1..3  = -0.00322266688149021 ;
+stest              = 6810.1934327553 ;
+dx_mbrd.4r5.b1..4  = -0.096999893061195 ;
+sx_mbrd.4r5.b1..4  = 145.624929950563 ;
+dx_mbrd.4r5.b1..4  = -0.00399989306119498 ;
+stest              = 0 ;
+stest              = 23259.7109836189 ;
+dx_mbx.4l2..1      = -0.00579286925047029 ;
+sx_mbx.4l2..1      = -66.8879974106549 ;
+dx_mbx.4l2..1      = -0.00579286925047029 ;
+stest              = 23262.2309836189 ;
+dx_mbx.4l2..2      = -0.00289643483832691 ;
+sx_mbx.4l2..2      = -64.3679990752047 ;
+dx_mbx.4l2..2      = -0.00289643483832691 ;
+stest              = 23264.7509836189 ;
+dx_mbx.4l2..3      = -0.000965478327216829 ;
+sx_mbx.4l2..3      = -61.8479998150078 ;
+dx_mbx.4l2..3      = -0.000965478327216829 ;
+stest              = 23267.2709836189 ;
+dx_mbx.4l2..4      = -9.2015284280933e-13 ;
+sx_mbx.4l2..4      = -59.3279999999571 ;
+dx_mbx.4l2..4      = -9.2015284280933e-13 ;
+stest              = 0 ;
+stest              = 23385.9269836179 ;
+dx_mbx.4r2..1      = -5.25801624462474e-13 ;
+sx_mbx.4r2..1      = 59.3279999990569 ;
+dx_mbx.4r2..1      = -5.25801624462474e-13 ;
+stest              = 23388.4469836179 ;
+dx_mbx.4r2..2      = 0.000965478325934299 ;
+sx_mbx.4r2..2      = 61.8479998141074 ;
+dx_mbx.4r2..2      = 0.000965478325934299 ;
+stest              = 23390.9669836179 ;
+dx_mbx.4r2..3      = 0.00289643483704083 ;
+sx_mbx.4r2..3      = 64.3679990743043 ;
+dx_mbx.4r2..3      = 0.00289643483704083 ;
+stest              = 23393.4869836179 ;
+dx_mbx.4r2..4      = 0.00579286924918421 ;
+sx_mbx.4r2..4      = 66.8879974097545 ;
+dx_mbx.4r2..4      = 0.00579286924918421 ;
+stest              = 0 ;
+stest              = 16583.7701836209 ;
+dx_mbx.4l8..1      = -0.00579286925272271 ;
+sx_mbx.4l8..1      = -66.8879974106546 ;
+dx_mbx.4l8..1      = -0.00579286925272271 ;
+stest              = 16586.2901836209 ;
+dx_mbx.4l8..2      = -0.00289643484089908 ;
+sx_mbx.4l8..2      = -64.3679990752047 ;
+dx_mbx.4l8..2      = -0.00289643484089908 ;
+stest              = 16588.8101836209 ;
+dx_mbx.4l8..3      = -0.000965478329788994 ;
+sx_mbx.4l8..3      = -61.8479998150078 ;
+dx_mbx.4l8..3      = -0.000965478329788994 ;
+stest              = 16591.3301836209 ;
+dx_mbx.4l8..4      = -3.00914848594402e-12 ;
+sx_mbx.4l8..4      = -59.3279999999569 ;
+dx_mbx.4l8..4      = -3.00914848594402e-12 ;
+stest              = 0 ;
+stest              = 16709.9861836199 ;
+dx_mbx.4r8..1      = 2.04636307898909e-12 ;
+sx_mbx.4r8..1      = 59.3279999990575 ;
+dx_mbx.4r8..1      = 2.04636307898909e-12 ;
+stest              = 16712.5061836199 ;
+dx_mbx.4r8..2      = 0.000965478327863423 ;
+sx_mbx.4r8..2      = 61.8479998141081 ;
+dx_mbx.4r8..2      = 0.000965478327863423 ;
+stest              = 16715.0261836199 ;
+dx_mbx.4r8..3      = 0.00289643483897351 ;
+sx_mbx.4r8..3      = 64.367999074305 ;
+dx_mbx.4r8..3      = 0.00289643483897351 ;
+stest              = 16717.5461836199 ;
+dx_mbx.4r8..4      = 0.00579286925079003 ;
+sx_mbx.4r8..4      = 66.8879974097549 ;
+dx_mbx.4r8..4      = 0.00579286925079003 ;
+stest              = 0 ;
+stest              = 23196.4159836188 ;
+dx_mbrc.4l2.b1..1  = -0.0969998889309664 ;
+sx_mbrc.4l2.b1..1  = -130.182929372628 ;
+dx_mbrc.4l2.b1..1  = -0.00299988893096645 ;
+stest              = 23198.9359836188 ;
+dx_mbrc.4l2.b1..2  = -0.0960344106046591 ;
+sx_mbrc.4l2.b1..2  = -127.662929557578 ;
+dx_mbrc.4l2.b1..2  = -0.00203441060465911 ;
+stest              = 23201.4559836188 ;
+dx_mbrc.4l2.b1..3  = -0.0941034540935632 ;
+sx_mbrc.4l2.b1..3  = -125.142930297381 ;
+dx_mbrc.4l2.b1..3  = -0.000103454093563243 ;
+stest              = 23203.9759836188 ;
+dx_mbrc.4l2.b1..4  = -0.0912070196814128 ;
+sx_mbrc.4l2.b1..4  = -122.622931961931 ;
+dx_mbrc.4l2.b1..4  = 0.00279298031858724 ;
+stest              = 0 ;
+stest              = 23449.2219836178 ;
+dx_mbrc.4r2.b1..1  = 0.0912070196793238 ;
+sx_mbrc.4r2.b1..1  = 122.62293196083 ;
+dx_mbrc.4r2.b1..1  = -0.00279298032067624 ;
+stest              = 23451.7419836178 ;
+dx_mbrc.4r2.b1..2  = 0.0941034540914671 ;
+sx_mbrc.4r2.b1..2  = 125.142930296281 ;
+dx_mbrc.4r2.b1..2  = 0.000103454091467142 ;
+stest              = 23454.2619836178 ;
+dx_mbrc.4r2.b1..3  = 0.0960344106025701 ;
+sx_mbrc.4r2.b1..3  = 127.662929556477 ;
+dx_mbrc.4r2.b1..3  = 0.00203441060257012 ;
+stest              = 23456.7819836178 ;
+dx_mbrc.4r2.b1..4  = 0.0969998889288632 ;
+sx_mbrc.4r2.b1..4  = 130.182929371528 ;
+dx_mbrc.4r2.b1..4  = 0.00299988892886324 ;
+stest              = 0 ;
+stest              = 16520.4751836209 ;
+dx_mbrc.4l8.b1..1  = -0.0969998889327286 ;
+sx_mbrc.4l8.b1..1  = -130.182929372528 ;
+dx_mbrc.4l8.b1..1  = -0.00299988893272859 ;
+stest              = 16522.9951836209 ;
+dx_mbrc.4l8.b1..2  = -0.0960344106065918 ;
+sx_mbrc.4l8.b1..2  = -127.662929557477 ;
+dx_mbrc.4l8.b1..2  = -0.00203441060659179 ;
+stest              = 16525.5151836209 ;
+dx_mbrc.4l8.b1..3  = -0.0941034540951691 ;
+sx_mbrc.4l8.b1..3  = -125.142930297281 ;
+dx_mbrc.4l8.b1..3  = -0.00010345409516907 ;
+stest              = 16528.0351836209 ;
+dx_mbrc.4l8.b1..4  = -0.0912070196833454 ;
+sx_mbrc.4l8.b1..4  = -122.622931961831 ;
+dx_mbrc.4l8.b1..4  = 0.00279298031665456 ;
+stest              = 0 ;
+stest              = 16773.2811836198 ;
+dx_mbrc.4r8.b1..1  = 0.0912070196807733 ;
+sx_mbrc.4r8.b1..1  = 122.622931960829 ;
+dx_mbrc.4r8.b1..1  = -0.00279298031922673 ;
+stest              = 16775.8011836198 ;
+dx_mbrc.4r8.b1..2  = 0.0941034540925969 ;
+sx_mbrc.4r8.b1..2  = 125.142930296279 ;
+dx_mbrc.4r8.b1..2  = 0.000103454092596905 ;
+stest              = 16778.3211836198 ;
+dx_mbrc.4r8.b1..3  = 0.0960344106040196 ;
+sx_mbrc.4r8.b1..3  = 127.662929556475 ;
+dx_mbrc.4r8.b1..3  = 0.00203441060401963 ;
+stest              = 16780.8411836198 ;
+dx_mbrc.4r8.b1..4  = 0.0969998889301564 ;
+sx_mbrc.4r8.b1..4  = 130.182929371526 ;
+dx_mbrc.4r8.b1..4  = 0.00299988893015643 ;
+stest              = 0 ;
+stest              = 3276.72121637815 ;
+dx_mbrs.5l4.b1..1  = -0.00594066261087534 ;
+sx_mbrs.5l4.b1..1  = -55.5629972768939 ;
+dx_mbrs.5l4.b1..1  = -0.00294066261087534 ;
+stest              = 3279.24121637815 ;
+dx_mbrs.5l4.b1..2  = -0.00297033153471915 ;
+sx_mbrs.5l4.b1..2  = -53.0429990274627 ;
+dx_mbrs.5l4.b1..2  = 2.96684652808495e-05 ;
+stest              = 3281.76121637815 ;
+dx_mbrs.5l4.b1..3  = -0.000990110562717916 ;
+sx_mbrs.5l4.b1..3  = -50.5229998054939 ;
+dx_mbrs.5l4.b1..3  = 0.00200988943728208 ;
+stest              = 3284.28121637815 ;
+dx_mbrs.5l4.b1..4  = -1.81188397618826e-13 ;
+sx_mbrs.5l4.b1..4  = -48.0030000000012 ;
+dx_mbrs.5l4.b1..4  = 0.00299999999981881 ;
+stest              = 0 ;
+stest              = 3380.28721637815 ;
+dx_mbrs.5r4.b1..1  = 8.24229573481716e-13 ;
+sx_mbrs.5r4.b1..1  = 48.0029999999993 ;
+dx_mbrs.5r4.b1..1  = -0.00299999999917577 ;
+stest              = 3382.80721637815 ;
+dx_mbrs.5r4.b1..2  = -0.000990110561705393 ;
+sx_mbrs.5r4.b1..2  = 50.5229998054919 ;
+dx_mbrs.5r4.b1..2  = 0.00200988943829461 ;
+stest              = 3385.32721637815 ;
+dx_mbrs.5r4.b1..3  = -0.00297033153402282 ;
+sx_mbrs.5r4.b1..3  = 53.0429990274604 ;
+dx_mbrs.5r4.b1..3  = 2.96684659771814e-05 ;
+stest              = 3387.84721637815 ;
+dx_mbrs.5r4.b1..4  = -0.005940662610179 ;
+sx_mbrs.5r4.b1..4  = 55.5629972768914 ;
+dx_mbrs.5r4.b1..4  = -0.002940662610179 ;
+stest              = 0 ;
+stest              = 3204.82021637815 ;
+dx_mbrb.5l4.b1..1  = -0.11299986350474 ;
+sx_mbrb.5l4.b1..1  = -127.463915094615 ;
+dx_mbrb.5l4.b1..1  = 1.36495259997482e-07 ;
+stest              = 3207.34021637815 ;
+dx_mbrb.5l4.b1..2  = -0.112009752942207 ;
+sx_mbrb.5l4.b1..2  = -124.943915289123 ;
+dx_mbrb.5l4.b1..2  = 0.000990247057793173 ;
+stest              = 3209.86021637815 ;
+dx_mbrb.5l4.b1..3  = -0.110029531970206 ;
+sx_mbrb.5l4.b1..3  = -122.423916067154 ;
+dx_mbrb.5l4.b1..3  = 0.00297046802979441 ;
+stest              = 3212.38021637815 ;
+dx_mbrb.5l4.b1..4  = -0.107059200894049 ;
+sx_mbrb.5l4.b1..4  = -119.903917817723 ;
+dx_mbrb.5l4.b1..4  = 0.00594079910595059 ;
+stest              = 0 ;
+stest              = 3452.18821637815 ;
+dx_mbrb.5r4.b1..1  = -0.107059200893936 ;
+sx_mbrb.5r4.b1..1  = 119.903917817721 ;
+dx_mbrb.5r4.b1..1  = 0.00594079910606428 ;
+stest              = 3454.70821637815 ;
+dx_mbrb.5r4.b1..2  = -0.110029531970092 ;
+sx_mbrb.5r4.b1..2  = 122.423916067151 ;
+dx_mbrb.5r4.b1..2  = 0.00297046802990809 ;
+stest              = 3457.22821637815 ;
+dx_mbrb.5r4.b1..3  = -0.112009752942406 ;
+sx_mbrb.5r4.b1..3  = 124.94391528912 ;
+dx_mbrb.5r4.b1..3  = 0.000990247057594221 ;
+stest              = 3459.74821637815 ;
+dx_mbrb.5r4.b1..4  = -0.112999863504939 ;
+sx_mbrb.5r4.b1..4  = 127.463915094613 ;
+dx_mbrb.5r4.b1..4  = 1.36495061045516e-07 ;
+stest              = 0 ;
+ Energy is   450.00000000000000      GeV
+ ******Sector******            1           2
+ 308         MB   slices in sector  1
+  16         MQTF slices in sector  1
+  16         MQTD slices in sector  1
+   4         MQS  slices in sector  1
+ 154         MCS  slices in sector  1
+  77         MCO  slices in sector  1
+  77         MCD  slices in sector  1
+ ******Sector******            2           3
+ 308         MB   slices in sector  2
+  16         MQTF slices in sector  2
+  16         MQTD slices in sector  2
+   4         MQS  slices in sector  2
+ 154         MCS  slices in sector  2
+  77         MCO  slices in sector  2
+  77         MCD  slices in sector  2
+ ******Sector******            3           4
+ 308         MB   slices in sector  3
+  16         MQTF slices in sector  3
+  16         MQTD slices in sector  3
+   4         MQS  slices in sector  3
+ 154         MCS  slices in sector  3
+  77         MCO  slices in sector  3
+  77         MCD  slices in sector  3
+ ******Sector******            4           5
+ 308         MB   slices in sector  4
+  16         MQTF slices in sector  4
+  16         MQTD slices in sector  4
+   4         MQS  slices in sector  4
+ 154         MCS  slices in sector  4
+  77         MCO  slices in sector  4
+  77         MCD  slices in sector  4
+ ******Sector******            5           6
+ 308         MB   slices in sector  5
+  16         MQTF slices in sector  5
+  16         MQTD slices in sector  5
+   4         MQS  slices in sector  5
+ 154         MCS  slices in sector  5
+  77         MCO  slices in sector  5
+  77         MCD  slices in sector  5
+ ******Sector******            6           7
+ 314         MB   slices in sector  6
+  16         MQTF slices in sector  6
+  16         MQTD slices in sector  6
+   4         MQS  slices in sector  6
+ 154         MCS  slices in sector  6
+  77         MCO  slices in sector  6
+  77         MCD  slices in sector  6
+ ******Sector******            7           8
+ 314         MB   slices in sector  7
+  16         MQTF slices in sector  7
+  16         MQTD slices in sector  7
+   4         MQS  slices in sector  7
+ 154         MCS  slices in sector  7
+  77         MCO  slices in sector  7
+  77         MCD  slices in sector  7
+ ******Sector******            8           1
+ 308         MB   slices in sector  8
+  16         MQTF slices in sector  8
+  16         MQTD slices in sector  8
+   4         MQS  slices in sector  8
+ 154         MCS  slices in sector  8
+  77         MCO  slices in sector  8
+  77         MCD  slices in sector  8
+ Injection Energy
+ a2res           1   0.0000000000000000     
+ a3res           1   0.0000000000000000     
+ a2res           2   0.0000000000000000     
+ a3res           2   0.0000000000000000     
+START MATCHING
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.13283296E+00
+
+
+call:       4   Penalty function =   0.69357889E-05
+call:      11   Penalty function =   0.67974722E-05
+call:      25   Penalty function =   0.67974721E-05
+ ++++++++++ LMDIF ended: converged without success
+call:      25   Penalty function =   0.67974721E-05
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         q1           4     6.22825000E+01     6.22823378E+01     2.63146684E-06
+Global constraint:         q2           4     6.02825000E+01     6.02827041E+01     4.16600521E-06
+
+
+Final Penalty Function =   6.79747205e-06
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kqtf                     -1.94393e-04  0.00000e+00 -1.00000e+20  1.00000e+20
+kqtd                      2.40106e-04  0.00000e+00 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   6.79747205e-06
+enter Twiss module
+  
+iteration:   1 error:   3.411070E-04 deltap:   0.000000E+00
+orbit:   1.160715E-04 -1.111317E-06  2.442148E-04  2.723564E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.996155E-07 deltap:   0.000000E+00
+orbit:   1.161005E-04 -1.111942E-06  2.444932E-04  2.727050E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347807223491654 53.6204804788534 
+
+q1 dq1 betxmax dxmax 
+62.2823377820343 2.96281730750285 627.48412260198 2.68645554503426 
+
+dxrms xcomax xcorms q2 
+1.427605449164 0.0168577541485369 0.00246525206557214 60.2827041079424 
+
+dq2 betymax dymax dyrms 
+2.02965241694832 689.199008904224 0.222892127176284 0.0702722994227358 
+
+ycomax ycorms deltap synch_1 
+0.0166857332478521 0.00259931888970387 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+enter Twiss module
+  
+iteration:   1 error:   3.412357E-04 deltap:   0.000000E+00
+orbit:   1.160489E-04 -1.110493E-06  2.441758E-04  2.722784E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.993110E-07 deltap:   0.000000E+00
+orbit:   1.160781E-04 -1.111119E-06  2.444540E-04  2.726270E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.0003478072231252 53.6204805071009 
+
+q1 dq1 betxmax dxmax 
+62.282349253787 2.9627243928625 627.443485316578 2.68643581417684 
+
+dxrms xcomax xcorms q2 
+1.42760507475315 0.0168578464605388 0.00246525848154941 60.2826925122124 
+
+dq2 betymax dymax dyrms 
+2.02966770062065 688.804676565174 0.222827616041382 0.0702627732952454 
+
+ycomax ycorms deltap synch_1 
+0.0166857888053938 0.0025993293429208 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+enter Twiss module
+  
+iteration:   1 error:   3.409784E-04 deltap:   0.000000E+00
+orbit:   1.160940E-04 -1.112140E-06  2.442538E-04  2.724343E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.999200E-07 deltap:   0.000000E+00
+orbit:   1.161230E-04 -1.112764E-06  2.445323E-04  2.727830E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347807223860337 53.6204804504339 
+
+q1 dq1 betxmax dxmax 
+62.2822876039154 2.96276135014646 627.348859808449 2.68647528375387 
+
+dxrms xcomax xcorms q2 
+1.42760582406198 0.0168576619141687 0.00246524566354517 60.2827544123476 
+
+dq2 betymax dymax dyrms 
+2.02973949438991 689.593527099117 0.222956683369177 0.0702818461411902 
+
+ycomax ycorms deltap synch_1 
+0.0166856777544055 0.00259930844751785 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+enter Twiss module
+  
+iteration:   1 error:   3.412030E-04 deltap:   0.000000E+00
+orbit:   1.160547E-04 -1.110702E-06  2.441857E-04  2.722982E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.993884E-07 deltap:   0.000000E+00
+orbit:   1.160838E-04 -1.111328E-06  2.444640E-04  2.726468E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347807223218136 53.6204804999371 
+
+q1 dq1 betxmax dxmax 
+62.2823508962415 2.96276555326106 627.480284924763 2.6864408288134 
+
+dxrms xcomax xcorms q2 
+1.42760516987842 0.0168578229884161 0.00246525684935143 60.2826909010524 
+
+dq2 betymax dymax dyrms 
+2.02965176240241 688.885423477053 0.222844009839357 0.0702651927874971 
+
+ycomax ycorms deltap synch_1 
+0.0166857746771608 0.00259932668477458 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+enter Twiss module
+  
+iteration:   1 error:   3.413586E-04 deltap:   0.000000E+00
+orbit:   1.160231E-04 -1.110864E-06  2.442107E-04  2.723070E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.990189E-07 deltap:   0.000000E+00
+orbit:   1.160523E-04 -1.111492E-06  2.444887E-04  2.726551E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347807222560032 53.6204805506661 
+
+q1 dq1 betxmax dxmax 
+62.2824364769901 2.96315673147184 627.464915244841 2.68641770227409 
+
+dxrms xcomax xcorms q2 
+1.42760480482813 0.0168577603147856 0.00246524890699059 60.2826054359335 
+
+dq2 betymax dymax dyrms 
+2.02943724813588 688.924897382693 0.222846015280311 0.0702691309653046 
+
+ycomax ycorms deltap synch_1 
+0.01668573575649 0.00259932028219612 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+enter Twiss module
+  
+iteration:   1 error:   3.410473E-04 deltap:   0.000000E+00
+orbit:   1.160863E-04 -1.110541E-06  2.441607E-04  2.722895E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.997583E-07 deltap:   0.000000E+00
+orbit:   1.161153E-04 -1.111165E-06  2.444393E-04  2.726385E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347807223873208 53.6204804494418 
+
+q1 dq1 betxmax dxmax 
+62.2822652611637 2.96237459456104 627.493285229745 2.68646397060981 
+
+dxrms xcomax xcorms q2 
+1.42760553579496 0.0168578856966709 0.00246526479822292 60.2827764261795 
+
+dq2 betymax dymax dyrms 
+2.0298666557054 688.864689408129 0.222842071714775 0.0702613096155151 
+
+ycomax ycorms deltap synch_1 
+0.0166858136587003 0.00259933309629016 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+enter Twiss module
+  
+iteration:   1 error:   3.415163E-04 deltap:   0.000000E+00
+orbit:   1.159911E-04 -1.111029E-06  2.442361E-04  2.723158E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.986450E-07 deltap:   0.000000E+00
+orbit:   1.160203E-04 -1.111658E-06  2.445137E-04  2.726636E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347807221890084 53.6204806023081 
+
+q1 dq1 betxmax dxmax 
+62.2825151385792 2.96352245881768 626.300153077322 2.68639428400185 
+
+dxrms xcomax xcorms q2 
+1.42760443581048 0.0168576968437125 0.00246524086573662 60.2825268973021 
+
+dq2 betymax dymax dyrms 
+2.02924140951293 690.555782614403 0.222848115933048 0.0702731775451825 
+
+ycomax ycorms deltap synch_1 
+0.0166856963807266 0.00259931380365525 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+START MATCHING
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.95264144E-07
+
+
+ ++++++++++ LMDIF ended: converged successfully
+call:       1   Penalty function =   0.95264144E-07
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         q1           4     6.22825000E+01     6.22825151E+01     2.29176579E-08
+Global constraint:         q2           4     6.02825000E+01     6.02825269E+01     7.23464863E-08
+
+
+Final Penalty Function =   9.52641441e-08
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kqtf                     -1.94393e-04 -1.94393e-04 -1.00000e+20  1.00000e+20
+kqtd                      2.40106e-04  2.40106e-04 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   9.52641441e-08
+START MATCHING
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.95264144E-07
+
+
+ ++++++++++ LMDIF ended: converged successfully
+call:       1   Penalty function =   0.95264144E-07
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         q1           4     6.22825000E+01     6.22825151E+01     2.29176579E-08
+Global constraint:         q2           4     6.02825000E+01     6.02825269E+01     7.23464863E-08
+
+
+Final Penalty Function =   9.52641441e-08
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+cmrskew                   1.36605e-04  1.36605e-04 -1.00000e+20  1.00000e+20
+cmiskew                   3.42264e-04  3.42264e-04 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   9.52641441e-08
+START MATCHING
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.95264144E-07
+
+
+ ++++++++++ LMDIF ended: converged successfully
+call:       1   Penalty function =   0.95264144E-07
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         q1           4     6.22825000E+01     6.22825151E+01     2.29176579E-08
+Global constraint:         q2           4     6.02825000E+01     6.02825269E+01     7.23464863E-08
+
+
+Final Penalty Function =   9.52641441e-08
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kqtf                     -1.94393e-04 -1.94393e-04 -1.00000e+20  1.00000e+20
+kqtd                      2.40106e-04  2.40106e-04 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   9.52641441e-08
+START MATCHING
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.95264144E-07
+
+
+ ++++++++++ LMDIF ended: converged successfully
+call:       1   Penalty function =   0.95264144E-07
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         q1           4     6.22825000E+01     6.22825151E+01     2.29176579E-08
+Global constraint:         q2           4     6.02825000E+01     6.02825269E+01     7.23464863E-08
+
+
+Final Penalty Function =   9.52641441e-08
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+cmrskew                   1.36605e-04  1.36605e-04 -1.00000e+20  1.00000e+20
+cmiskew                   3.42264e-04  3.42264e-04 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   9.52641441e-08
+START MATCHING
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.95264144E-07
+
+
+ ++++++++++ LMDIF ended: converged successfully
+call:       1   Penalty function =   0.95264144E-07
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         q1           4     6.22825000E+01     6.22825151E+01     2.29176579E-08
+Global constraint:         q2           4     6.02825000E+01     6.02825269E+01     7.23464863E-08
+
+
+Final Penalty Function =   9.52641441e-08
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kqtf                     -1.94393e-04 -1.94393e-04 -1.00000e+20  1.00000e+20
+kqtd                      2.40106e-04  2.40106e-04 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   9.52641441e-08
+enter Twiss module
+  
+iteration:   1 error:   3.415163E-04 deltap:   0.000000E+00
+orbit:   1.159911E-04 -1.111029E-06  2.442361E-04  2.723158E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.986450E-07 deltap:   0.000000E+00
+orbit:   1.160203E-04 -1.111658E-06  2.445137E-04  2.726636E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347807221890084 53.6204806023081 
+
+q1 dq1 betxmax dxmax 
+62.2825151385792 2.96352245881768 626.300153077322 2.68639428400185 
+
+dxrms xcomax xcorms q2 
+1.42760443581048 0.0168576968437125 0.00246524086573662 60.2825268973021 
+
+dq2 betymax dymax dyrms 
+2.02924140951293 690.555782614403 0.222848115933048 0.0702731775451825 
+
+ycomax ycorms deltap synch_1 
+0.0166856963807266 0.00259931380365525 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+closest0           = 0.00036632590803265 ;
+closest1           = 1.17587229837568e-05 ;
+closest2           = 1.17587229837568e-05 ;
+cmrskew            = 0.000136604814927816 ;
+cmiskew            = 0.000342263611237755 ;
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START SIMPLEX:
+
+call:      91   Penalty function =   0.55897709E-14
+call:     102   Penalty function =   0.35955605E-14
+ call limit
+call:     103   Penalty function =   0.35955605E-14
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START LMDIF:
+
+Initial Penalty Function =   0.35955605E-14
+
+
+call:      10   Penalty function =   0.31900403E-25
+call:      19   Penalty function =   0.14316038E-31
+ ++++++++++ LMDIF ended: converged successfully
+call:      19   Penalty function =   0.14316038E-31
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+ip1:1                      x            4    -2.00000000E-03    -2.00000000E-03     1.88079096E-35
+ip1:1                      px           4     2.28144809E-15     2.28136720E-15     6.54345847E-37
+ip1:1                      y            4     8.00683304E-16     8.43343272E-16     1.81987281E-33
+ip1:1                      py           4     2.95000000E-04     2.95000000E-04     1.05794492E-35
+s.ds.r1.b1:1               x            4     0.00000000E+00     2.06563836E-17     4.26686185E-34
+s.ds.r1.b1:1               px           4     0.00000000E+00    -5.52565700E-19     3.05328853E-35
+s.ds.r1.b1:1               y            4     0.00000000E+00    -1.06940271E-16     1.14362215E-32
+s.ds.r1.b1:1               py           4     0.00000000E+00    -2.39307875E-18     5.72682589E-34
+
+
+Final Penalty Function =   1.43160377e-32
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbch6.l1b1               1.22385e-09  0.00000e+00 -1.79740e-04  1.79740e-04
+acbyv5.l1b1               3.89331e-12  0.00000e+00 -1.79740e-04  1.79740e-04
+acbyh5.r1b1               2.39324e-09  0.00000e+00 -1.79740e-04  1.79740e-04
+acbcv6.r1b1               1.37747e-12  0.00000e+00 -1.79740e-04  1.79740e-04
+acbyhs4.l1b1             -1.89588e-06 -1.89402e-06 -1.92600e-04  1.92600e-04
+acbyhs4.r1b1              4.16543e-08  3.73804e-08 -1.92600e-04  1.92600e-04
+acbyvs4.l1b1             -2.27675e-05 -2.27675e-05 -1.92600e-04  1.92600e-04
+acbyvs4.r1b1              1.46571e-05  1.46571e-05 -1.92600e-04  1.92600e-04
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.43160377e-32
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START SIMPLEX:
+
+ call limit
+call:     102   Penalty function =   0.82815158E-15
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START LMDIF:
+
+Initial Penalty Function =   0.82815158E-15
+
+
+call:      10   Penalty function =   0.88700981E-33
+ ++++++++++ LMDIF ended: converged successfully
+call:      10   Penalty function =   0.88700981E-33
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+ip2:1                      x            4    -3.50000000E-03    -3.50000000E-03     1.88079096E-37
+ip2:1                      px           4     2.91925893E-07     2.91925893E-07     1.36633999E-36
+ip2:1                      y            4    -3.77736037E-15    -3.78740745E-15     1.00943843E-34
+ip2:1                      py           4     2.39999391E-04     2.39999391E-04     8.88967603E-36
+s.ds.r2.b1:1               x            4     0.00000000E+00     4.14676333E-19     1.71956461E-37
+s.ds.r2.b1:1               px           4     0.00000000E+00     1.76077578E-19     3.10033135E-36
+s.ds.r2.b1:1               y            4     0.00000000E+00     2.68613235E-17     7.21530701E-34
+s.ds.r2.b1:1               py           4     0.00000000E+00    -7.12873665E-19     5.08188862E-35
+
+
+Final Penalty Function =   8.87009813e-34
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbyhs5.l2b1              1.52528e-05  1.52538e-05 -1.92600e-04  1.92600e-04
+acbchs5.r2b1             -2.52361e-05 -2.52376e-05 -1.79740e-04  1.79740e-04
+acbyvs5.l2b1             -6.31841e-06 -6.31842e-06 -1.92600e-04  1.92600e-04
+acbcvs5.r2b1              4.48720e-05  4.48720e-05 -1.79740e-04  1.79740e-04
+acbyhs4.l2b1             -6.18422e-05 -6.18450e-05 -1.92600e-04  1.92600e-04
+acbyhs4.r2b1             -2.32154e-05 -2.32142e-05 -1.92600e-04  1.92600e-04
+acbyvs4.l2b1             -6.10778e-05 -6.10778e-05 -1.92600e-04  1.92600e-04
+acbyvs4.r2b1             -4.58325e-06 -4.58326e-06 -1.92600e-04  1.92600e-04
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   8.87009813e-34
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START SIMPLEX:
+
+ call limit
+call:     102   Penalty function =   0.10344553E-13
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START LMDIF:
+
+Initial Penalty Function =   0.10344553E-13
+
+
+call:      10   Penalty function =   0.36375133E-23
+call:      19   Penalty function =   0.68952876E-30
+ ++++++++++ LMDIF ended: converged successfully
+call:      19   Penalty function =   0.68952876E-30
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+ip5:1                      x            4    -1.93565866E-14    -1.93330586E-14     5.53568392E-34
+ip5:1                      px           4     2.95000000E-04     2.95000000E-04     2.38037606E-35
+ip5:1                      y            4     2.00000000E-03     2.00000000E-03     9.29503820E-32
+ip5:1                      py           4     5.04965044E-16     4.99007438E-16     3.54930720E-33
+s.ds.r5.b1:1               x            4     0.00000000E+00    -1.18978382E-16     1.41558554E-32
+s.ds.r5.b1:1               px           4     0.00000000E+00     3.18854964E-18     1.01668488E-33
+s.ds.r5.b1:1               y            4     0.00000000E+00     7.42209386E-16     5.50874773E-31
+s.ds.r5.b1:1               py           4     0.00000000E+00     1.62494272E-17     2.64043885E-32
+
+
+Final Penalty Function =   6.89528763e-31
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbch6.l5b1               1.34295e-09  0.00000e+00 -1.79740e-04  1.79740e-04
+acbyv5.l5b1               6.30923e-15  0.00000e+00 -1.79740e-04  1.79740e-04
+acbyh5.r5b1               2.38932e-09  0.00000e+00 -1.79740e-04  1.79740e-04
+acbcv6.r5b1               1.61733e-13  0.00000e+00 -1.79740e-04  1.79740e-04
+acbyhs4.l5b1             -1.46591e-05 -1.46572e-05 -1.92600e-04  1.92600e-04
+acbyhs4.r5b1              2.27718e-05  2.27676e-05 -1.92600e-04  1.92600e-04
+acbyvs4.l5b1             -3.73993e-08 -3.73993e-08 -1.92600e-04  1.92600e-04
+acbyvs4.r5b1              1.89399e-06  1.89399e-06 -1.92600e-04  1.92600e-04
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   6.89528763e-31
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START SIMPLEX:
+
+ call limit
+call:     102   Penalty function =   0.78450380E-15
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START LMDIF:
+
+Initial Penalty Function =   0.78450380E-15
+
+
+call:      10   Penalty function =   0.10816642E-23
+call:      19   Penalty function =   0.60516739E-33
+ ++++++++++ LMDIF ended: converged successfully
+call:      19   Penalty function =   0.60516739E-33
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+ip8:1                      x            4    -3.82702767E-14    -3.82789375E-14     7.50095607E-35
+ip8:1                      px           4    -3.50121307E-05    -3.50121307E-05     7.34683969E-36
+ip8:1                      y            4    -3.50000000E-03    -3.50000000E-03     3.00926554E-36
+ip8:1                      py           4     1.80973622E-06     1.80973622E-06     8.99987862E-37
+s.ds.r8.b1:1               x            4     0.00000000E+00    -2.13211941E-17     4.54593317E-34
+s.ds.r8.b1:1               px           4     0.00000000E+00    -7.99377590E-19     6.39004531E-35
+s.ds.r8.b1:1               y            4     0.00000000E+00     3.09227420E-19     9.56215971E-38
+s.ds.r8.b1:1               py           4     0.00000000E+00     5.58874352E-20     3.12340541E-37
+
+
+Final Penalty Function =   6.05167386e-34
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbch5.l8b1              -1.05847e-09  0.00000e+00 -1.79740e-04  1.79740e-04
+acbyhs4.l8b1              1.14183e-05  1.14157e-05 -1.92600e-04  1.92600e-04
+acbyhs4.r8b1             -6.00851e-05 -6.00845e-05 -1.92600e-04  1.92600e-04
+acbyhs5.r8b1             -6.23486e-06 -6.23586e-06 -1.92600e-04  1.92600e-04
+acbcvs5.l8b1             -1.61686e-05 -1.61686e-05 -1.79740e-04  1.79740e-04
+acbyvs4.l8b1             -2.87808e-05 -2.87808e-05 -1.92600e-04  1.92600e-04
+acbyvs4.r8b1             -6.02713e-05 -6.02713e-05 -1.92600e-04  1.92600e-04
+acbyvs5.r8b1              1.52218e-05  1.52218e-05 -1.92600e-04  1.92600e-04
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   6.05167386e-34
+tarmatchcoip       = 7.05336978319186e-31 ;
+tarxir1b1          = 1.43160377250805e-32 ;
+tarxir2b1          = 8.87009812940711e-34 ;
+tarxir5b1          = 6.8952876339555e-31 ;
+tarxir8b1          = 6.05167385614139e-34 ;
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    4
+user given constraints: 4
+total constraints:      4
+
+START SIMPLEX:
+
+call:      31   Penalty function =   0.44099101E-09
+call:      35   Penalty function =   0.43663100E-09
+call:      38   Penalty function =   0.11830829E-09
+call:      41   Penalty function =   0.11515810E-09
+call:      45   Penalty function =   0.10316357E-09
+call:      47   Penalty function =   0.69216551E-10
+call:      49   Penalty function =   0.65513386E-10
+call:      52   Penalty function =   0.58725829E-10
+call:      54   Penalty function =   0.45031984E-10
+call:      61   Penalty function =   0.34554788E-10
+call:      65   Penalty function =   0.29680928E-10
+call:      67   Penalty function =   0.25642938E-10
+call:      71   Penalty function =   0.16847762E-10
+call:      73   Penalty function =   0.95173351E-11
+call:      83   Penalty function =   0.86975042E-11
+call:      87   Penalty function =   0.41916303E-11
+call:      90   Penalty function =   0.21207144E-11
+call:      94   Penalty function =   0.17891925E-11
+call:      97   Penalty function =   0.14191575E-11
+call:      99   Penalty function =   0.13408811E-11
+call:     101   Penalty function =   0.53156739E-12
+ call limit
+call:     102   Penalty function =   0.25111021E-12
+number of variables:    4
+user given constraints: 4
+total constraints:      4
+
+START LMDIF:
+
+Initial Penalty Function =   0.25111021E-12
+
+
+call:       6   Penalty function =   0.28644243E-22
+call:      11   Penalty function =   0.80866371E-35
+ ++++++++++ LMDIF ended: converged successfully
+call:      11   Penalty function =   0.80866371E-35
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+e.ds.l1.b1:1               x            4     0.00000000E+00     2.69183506E-18     7.24597600E-36
+e.ds.l1.b1:1               px           4     0.00000000E+00    -8.49412153E-20     7.21501006E-37
+e.ds.l1.b1:1               y            4     0.00000000E+00    -3.42290937E-19     1.17163085E-37
+e.ds.l1.b1:1               py           4     0.00000000E+00     4.46881623E-21     1.99703185E-39
+
+
+Final Penalty Function =   8.08663712e-36
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbh14.l1b1               1.05257e-07 -4.28296e-08 -8.00000e-05  8.00000e-05
+acbh12.l1b1               6.56950e-06  6.62606e-06 -8.00000e-05  8.00000e-05
+acbv15.l1b1              -1.56133e-06 -9.71260e-08 -8.00000e-05  8.00000e-05
+acbv13.l1b1               5.18351e-05  5.18033e-05 -8.00000e-05  8.00000e-05
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   8.08663712e-36
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    4
+user given constraints: 4
+total constraints:      4
+
+START SIMPLEX:
+
+call:      33   Penalty function =   0.11054120E-09
+call:      44   Penalty function =   0.98659299E-10
+call:      51   Penalty function =   0.98449057E-10
+call:      53   Penalty function =   0.96605386E-10
+call:      56   Penalty function =   0.74719328E-10
+call:      61   Penalty function =   0.64371353E-10
+call:      67   Penalty function =   0.63849685E-10
+call:      69   Penalty function =   0.55663150E-10
+call:      72   Penalty function =   0.47178815E-10
+call:      76   Penalty function =   0.28865807E-10
+call:      79   Penalty function =   0.18899147E-10
+call:      81   Penalty function =   0.11262605E-10
+call:      83   Penalty function =   0.79746165E-11
+call:      85   Penalty function =   0.15882334E-11
+call:      96   Penalty function =   0.13432468E-11
+call:      99   Penalty function =   0.48982781E-12
+ call limit
+call:     102   Penalty function =   0.24629198E-12
+number of variables:    4
+user given constraints: 4
+total constraints:      4
+
+START LMDIF:
+
+Initial Penalty Function =   0.24629198E-12
+
+
+call:       6   Penalty function =   0.19331199E-22
+call:      11   Penalty function =   0.37064554E-32
+ ++++++++++ LMDIF ended: converged successfully
+call:      11   Penalty function =   0.37064554E-32
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+s.ds.r2.b1:1               x            4     0.00000000E+00    -1.52445840E-17     2.32397341E-34
+s.ds.r2.b1:1               px           4     0.00000000E+00    -1.91769346E-19     3.67754819E-36
+s.ds.r2.b1:1               y            4     0.00000000E+00     5.88645919E-17     3.46504018E-33
+s.ds.r2.b1:1               py           4     0.00000000E+00    -2.31091292E-19     5.34031854E-36
+
+
+Final Penalty Function =   3.70645539e-33
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbh13.r1b1               2.56197e-06  2.54899e-06 -8.00000e-05  8.00000e-05
+acbh15.r1b1               1.64285e-08 -6.97873e-10 -8.00000e-05  8.00000e-05
+acbv12.r1b1               2.92606e-05  2.92722e-05 -8.00000e-05  8.00000e-05
+acbv14.r1b1              -6.91323e-07 -2.20306e-07 -8.00000e-05  8.00000e-05
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   3.70645539e-33
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    4
+user given constraints: 4
+total constraints:      4
+
+START SIMPLEX:
+
+call:      27   Penalty function =   0.48927577E-09
+call:      35   Penalty function =   0.46401259E-09
+call:      39   Penalty function =   0.36012379E-09
+call:      46   Penalty function =   0.35739780E-09
+call:      48   Penalty function =   0.35449837E-09
+call:      50   Penalty function =   0.35026187E-09
+call:      52   Penalty function =   0.32402910E-09
+call:      54   Penalty function =   0.31992859E-09
+call:      57   Penalty function =   0.26518285E-09
+call:      61   Penalty function =   0.24854530E-09
+call:      64   Penalty function =   0.22909403E-09
+call:      66   Penalty function =   0.20524777E-09
+call:      69   Penalty function =   0.61891407E-10
+call:      81   Penalty function =   0.58523097E-10
+call:      83   Penalty function =   0.48519946E-10
+call:      89   Penalty function =   0.46669620E-10
+call:      91   Penalty function =   0.43819110E-10
+call:      93   Penalty function =   0.40261852E-10
+call:      98   Penalty function =   0.37513189E-10
+ call limit
+call:     103   Penalty function =   0.37513189E-10
+number of variables:    4
+user given constraints: 4
+total constraints:      4
+
+START LMDIF:
+
+Initial Penalty Function =   0.37513189E-10
+
+
+call:       6   Penalty function =   0.10635439E-17
+call:      11   Penalty function =   0.19470744E-28
+call:      16   Penalty function =   0.22162433E-35
+ ++++++++++ LMDIF ended: converged successfully
+call:      16   Penalty function =   0.22162433E-35
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+e.ds.l5.b1:1               x            4     0.00000000E+00    -1.38456807E-18     1.91702873E-36
+e.ds.l5.b1:1               px           4     0.00000000E+00     5.41383523E-20     2.93096119E-37
+e.ds.l5.b1:1               y            4     0.00000000E+00    -7.56044671E-20     5.71603545E-39
+e.ds.l5.b1:1               py           4     0.00000000E+00    -2.00614777E-21     4.02462889E-40
+
+
+Final Penalty Function =   2.21624335e-36
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbh14.l5b1               2.03236e-06  2.58029e-07 -8.00000e-05  8.00000e-05
+acbh12.l5b1              -4.57919e-05 -4.57534e-05 -8.00000e-05  8.00000e-05
+acbv15.l5b1               1.41425e-08 -2.70207e-09 -8.00000e-05  8.00000e-05
+acbv13.l5b1               9.69187e-07  9.59212e-07 -8.00000e-05  8.00000e-05
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   2.21624335e-36
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    4
+user given constraints: 4
+total constraints:      4
+
+START SIMPLEX:
+
+call:      41   Penalty function =   0.19542527E-11
+call:      43   Penalty function =   0.18647012E-11
+call:      45   Penalty function =   0.11469424E-11
+call:      53   Penalty function =   0.10738349E-11
+call:      55   Penalty function =   0.62753844E-12
+call:      60   Penalty function =   0.54168066E-12
+call:      63   Penalty function =   0.30825147E-12
+call:      65   Penalty function =   0.23024104E-12
+call:      72   Penalty function =   0.20621987E-12
+call:      74   Penalty function =   0.18953921E-12
+call:      76   Penalty function =   0.18016512E-12
+call:      82   Penalty function =   0.15233964E-12
+call:      85   Penalty function =   0.14898363E-12
+call:      89   Penalty function =   0.13523928E-12
+call:      93   Penalty function =   0.13483277E-12
+call:      95   Penalty function =   0.13084309E-12
+call:      97   Penalty function =   0.12088594E-12
+call:      99   Penalty function =   0.10051709E-12
+ call limit
+call:     102   Penalty function =   0.10051709E-12
+number of variables:    4
+user given constraints: 4
+total constraints:      4
+
+START LMDIF:
+
+Initial Penalty Function =   0.10051709E-12
+
+
+call:       6   Penalty function =   0.12763424E-21
+call:      11   Penalty function =   0.47707531E-34
+ ++++++++++ LMDIF ended: converged successfully
+call:      11   Penalty function =   0.47707531E-34
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+s.ds.r6.b1:1               x            4     0.00000000E+00     5.74375773E-18     3.29907529E-35
+s.ds.r6.b1:1               px           4     0.00000000E+00     7.57995645E-21     5.74557398E-39
+s.ds.r6.b1:1               y            4     0.00000000E+00    -3.69154125E-18     1.36274768E-35
+s.ds.r6.b1:1               py           4     0.00000000E+00     1.04093984E-19     1.08355575E-36
+
+
+Final Penalty Function =   4.77075310e-35
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbh13.r5b1              -1.62874e-05 -1.62864e-05 -8.00000e-05  8.00000e-05
+acbh15.r5b1               4.32256e-08  1.29626e-10 -8.00000e-05  8.00000e-05
+acbv12.r5b1               4.97144e-06  4.97534e-06 -8.00000e-05  8.00000e-05
+acbv14.r5b1              -3.08026e-08 -3.87693e-08 -8.00000e-05  8.00000e-05
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   4.77075310e-35
+START MATCHING
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.18655379E+00
+
+
+call:       4   Penalty function =   0.51066602E-06
+call:       7   Penalty function =   0.56512473E-18
+call:      10   Penalty function =   0.38067272E-23
+ ++++++++++ LMDIF ended: converged successfully
+call:      10   Penalty function =   0.38067272E-23
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         q1           4     6.22950000E+01     6.22950000E+01     3.68050944E-24
+Global constraint:         q2           4     6.02700000E+01     6.02700000E+01     1.26217745E-25
+
+
+Final Penalty Function =   3.80672718e-24
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kqtf                     -1.24648e-04  0.00000e+00 -1.00000e+20  1.00000e+20
+kqtd                      3.16620e-04  0.00000e+00 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   3.80672718e-24
+START MATCHING
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.61958744E+03
+
+
+call:       4   Penalty function =   0.58030481E+03
+call:       7   Penalty function =   0.50987659E+03
+call:      10   Penalty function =   0.38279635E+03
+call:      13   Penalty function =   0.18322350E+03
+call:      16   Penalty function =   0.21845867E+01
+call:      19   Penalty function =   0.13355184E-06
+call:      22   Penalty function =   0.64837959E-12
+call:      25   Penalty function =   0.81397948E-13
+call:      28   Penalty function =   0.34074138E-13
+call:      31   Penalty function =   0.12219024E-13
+ ++++++++++ LMDIF ended: converged without success
+call:      34   Penalty function =   0.12219024E-13
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         dq1          4     2.00000000E+01     2.00000001E+01     5.99115422E-15
+Global constraint:         dq2          4     2.00000000E+01     1.99999999E+01     6.22787005E-15
+
+
+Final Penalty Function =   1.22190243e-14
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+ksf                       2.46821e-02  0.00000e+00 -1.00000e+20  1.00000e+20
+ksd                      -4.22266e-02  0.00000e+00 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.22190243e-14
+START MATCHING
+
+number of variables:    4
+user given constraints: 2
+total constraints:      4
+
+START LMDIF:
+
+Initial Penalty Function =   0.20304252E-12
+
+
+call:       6   Penalty function =   0.85645488E-13
+call:      11   Penalty function =   0.52021416E-14
+ ++++++++++ LMDIF ended: converged without success
+call:      16   Penalty function =   0.52021416E-14
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         dq1          4     2.00000000E+01     2.00000000E+01     1.20895168E-15
+Global constraint:         dq2          4     2.00000000E+01     2.00000001E+01     3.99318992E-15
+Global constraint:         q1           4     6.22950000E+01     6.22950000E+01     2.90805684E-24
+Global constraint:         q2           4     6.02700000E+01     6.02700000E+01     4.08945493E-25
+
+
+Final Penalty Function =   5.20214161e-15
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+ksf                       2.46821e-02  2.46821e-02 -1.00000e+20  1.00000e+20
+ksd                      -4.22266e-02 -4.22266e-02 -1.00000e+20  1.00000e+20
+kqtf                     -1.24647e-04 -1.24648e-04 -1.00000e+20  1.00000e+20
+kqtd                      3.16620e-04  3.16620e-04 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   5.20214161e-15
+nrj                = 450 ;
+************************************
+********Triplet correctors**********
+************************************
+kqsx3.l1/kmqsxmax1*100 = 0 ;
+kqsx3.r1/kmqsxmax1*100 = 0 ;
+kqsx3.l5/kmqsxmax1*100 = 0 ;
+kqsx3.r5/kmqsxmax1*100 = 0 ;
+kqsx3.l2/kmqsxmax2*100 = 0 ;
+kqsx3.r2/kmqsxmax2*100 = 0 ;
+kqsx3.l8/kmqsxmax2*100 = 0 ;
+kqsx3.r8/kmqsxmax2*100 = 0 ;
+kcsx3.l1/kmcsxmax1*100 = 0 ;
+kcsx3.r1/kmcsxmax1*100 = 0 ;
+kcsx3.l5/kmcsxmax1*100 = 0 ;
+kcsx3.r5/kmcsxmax1*100 = 0 ;
+kcsx3.l2/kmcsxmax2*100 = 0 ;
+kcsx3.r2/kmcsxmax2*100 = 0 ;
+kcsx3.l8/kmcsxmax2*100 = 0 ;
+kcsx3.r8/kmcsxmax2*100 = 0 ;
+kcssx3.l1/kmcssxmax1*100 = 0 ;
+kcssx3.r1/kmcssxmax1*100 = 0 ;
+kcssx3.l5/kmcssxmax1*100 = 0 ;
+kcssx3.r5/kmcssxmax1*100 = 0 ;
+kcssx3.l2/kmcssxmax2*100 = 0 ;
+kcssx3.r2/kmcssxmax2*100 = 0 ;
+kcssx3.l8/kmcssxmax2*100 = 0 ;
+kcssx3.r8/kmcssxmax2*100 = 0 ;
+kcox3.l1/kmcoxmax1*100 = 0 ;
+kcox3.r1/kmcoxmax1*100 = 0 ;
+kcox3.l5/kmcoxmax1*100 = 0 ;
+kcox3.r5/kmcoxmax1*100 = 0 ;
+kcox3.l2/kmcoxmax2*100 = 0 ;
+kcox3.r2/kmcoxmax2*100 = 0 ;
+kcox3.l8/kmcoxmax2*100 = 0 ;
+kcox3.r8/kmcoxmax2*100 = 0 ;
+kcosx3.l1/kmcosxmax1*100 = 0 ;
+kcosx3.r1/kmcosxmax1*100 = 0 ;
+kcosx3.l5/kmcosxmax1*100 = 0 ;
+kcosx3.r5/kmcosxmax1*100 = 0 ;
+kcosx3.l2/kmcosxmax2*100 = 0 ;
+kcosx3.r2/kmcosxmax2*100 = 0 ;
+kcosx3.l8/kmcosxmax2*100 = 0 ;
+kcosx3.r8/kmcosxmax2*100 = 0 ;
+kcdx3.l1/kmcdxmax1*100 = 0 ;
+kcdx3.r1/kmcdxmax1*100 = 0 ;
+kcdx3.l5/kmcdxmax1*100 = 0 ;
+kcdx3.r5/kmcdxmax1*100 = 0 ;
+kcdsx3.l1/kmcdsxmax1*100 = 0 ;
+kcdsx3.r1/kmcdsxmax1*100 = 0 ;
+kcdsx3.l5/kmcdsxmax1*100 = 0 ;
+kcdsx3.r5/kmcdsxmax1*100 = 0 ;
+kctx3.l1/kmctxmax1*100 = 0 ;
+kctx3.r1/kmctxmax1*100 = 0 ;
+kctx3.l5/kmctxmax1*100 = 0 ;
+kctx3.r5/kmctxmax1*100 = 0 ;
+kctx3.l2/kmctxmax2*100 = 0 ;
+kctx3.r2/kmctxmax2*100 = 0 ;
+kctx3.l8/kmctxmax2*100 = 0 ;
+kctx3.r8/kmctxmax2*100 = 0 ;
+kctsx3.l1/kmctsxmax1*100 = 0 ;
+kctsx3.r1/kmctsxmax1*100 = 0 ;
+kctsx3.l5/kmctsxmax1*100 = 0 ;
+kctsx3.r5/kmctsxmax1*100 = 0 ;
+************************************
+*************Arc correctors*********
+************************************
+kqtf.a12b1/kmqtmax*100 = 0 ;
+kqtd.a12b1/kmqtmax*100 = 0 ;
+kqtf.a23b1/kmqtmax*100 = -0.349174602742762 ;
+kqtd.a23b1/kmqtmax*100 = 0.433005878630223 ;
+kqtf.a34b1/kmqtmax*100 = -0.534013484992762 ;
+kqtd.a34b1/kmqtmax*100 = 0.468020921430224 ;
+kqtf.a45b1/kmqtmax*100 = 0 ;
+kqtd.a45b1/kmqtmax*100 = 0 ;
+kqtf.a56b1/kmqtmax*100 = 0 ;
+kqtd.a56b1/kmqtmax*100 = 0 ;
+kqtf.a67b1/kmqtmax*100 = 0.173175169257238 ;
+kqtd.a67b1/kmqtmax*100 = -0.0112936261697765 ;
+kqtf.a78b1/kmqtmax*100 = 0.512540815132237 ;
+kqtd.a78b1/kmqtmax*100 = 0.619015422455223 ;
+kqtf.a81b1/kmqtmax*100 = 0 ;
+kqtd.a81b1/kmqtmax*100 = 0 ;
+kqs.r1b1/kmqsmax*100 = 0 ;
+kqs.l2b1/kmqsmax*100 = 0 ;
+kqs.a23b1/kmqsmax*100 = -0.0198949409892074 ;
+kqs.r3b1/kmqsmax*100 = -0.0226002177105133 ;
+kqs.l4b1/kmqsmax*100 = -0.0226002177105133 ;
+kqs.a45b1/kmqsmax*100 = 0 ;
+kqs.r5b1/kmqsmax*100 = 0 ;
+kqs.l6b1/kmqsmax*100 = 0 ;
+kqs.a67b1/kmqsmax*100 = 0.000716427166616689 ;
+kqs.r7b1/kmqsmax*100 = 0.0174635844206725 ;
+kqs.l8b1/kmqsmax*100 = 0.0174635844206725 ;
+kqs.a81b1/kmqsmax*100 = 0 ;
+ksf1.a12b1/kmsmax*100 = 0.956037362816597 ;
+ksf2.a12b1/kmsmax*100 = 1.016015625 ;
+ksf1.a23b1/kmsmax*100 = 1.37910472383438 ;
+ksf2.a23b1/kmsmax*100 = 1.37910472383438 ;
+ksf1.a34b1/kmsmax*100 = 1.37910472383438 ;
+ksf2.a34b1/kmsmax*100 = 1.37910472383438 ;
+ksf1.a45b1/kmsmax*100 = 1.18908498810831 ;
+ksf2.a45b1/kmsmax*100 = 1.016015625 ;
+ksf1.a56b1/kmsmax*100 = 1.58857867161877 ;
+ksf2.a56b1/kmsmax*100 = 1.016015625 ;
+ksf1.a67b1/kmsmax*100 = 1.37910472383438 ;
+ksf2.a67b1/kmsmax*100 = 1.37910472383438 ;
+ksf1.a78b1/kmsmax*100 = 1.37910472383438 ;
+ksf2.a78b1/kmsmax*100 = 1.37910472383438 ;
+ksf1.a81b1/kmsmax*100 = 1.17114660543381 ;
+ksf2.a81b1/kmsmax*100 = 1.016015625 ;
+ksd1.a12b1/kmsmax*100 = -1.67642578125 ;
+ksd2.a12b1/kmsmax*100 = -2.12524071978853 ;
+ksd1.a23b1/kmsmax*100 = -2.3603332311525 ;
+ksd2.a23b1/kmsmax*100 = -2.3603332311525 ;
+ksd1.a34b1/kmsmax*100 = -2.3603332311525 ;
+ksd2.a34b1/kmsmax*100 = -2.3603332311525 ;
+ksd1.a45b1/kmsmax*100 = -1.67642578125 ;
+ksd2.a45b1/kmsmax*100 = -2.00254099127159 ;
+ksd1.a56b1/kmsmax*100 = -1.67642578125 ;
+ksd2.a56b1/kmsmax*100 = -2.01136113924176 ;
+ksd1.a67b1/kmsmax*100 = -2.3603332311525 ;
+ksd2.a67b1/kmsmax*100 = -2.3603332311525 ;
+ksd1.a78b1/kmsmax*100 = -2.3603332311525 ;
+ksd2.a78b1/kmsmax*100 = -2.3603332311525 ;
+ksd1.a81b1/kmsmax*100 = -1.67642578125 ;
+ksd2.a81b1/kmsmax*100 = -1.64793140049919 ;
+kss.a12b1/kmssmax*100 = 0 ;
+kss.a23b1/kmssmax*100 = 0 ;
+kss.a34b1/kmssmax*100 = 0 ;
+kss.a45b1/kmssmax*100 = 0 ;
+kss.a56b1/kmssmax*100 = 0 ;
+kss.a67b1/kmssmax*100 = 0 ;
+kss.a78b1/kmssmax*100 = 0 ;
+kss.a81b1/kmssmax*100 = 0 ;
+kcs.a12b1/kmcsmax*100 = 0 ;
+kcs.a23b1/kmcsmax*100 = 0 ;
+kcs.a34b1/kmcsmax*100 = 0 ;
+kcs.a45b1/kmcsmax*100 = 0 ;
+kcs.a56b1/kmcsmax*100 = 0 ;
+kcs.a67b1/kmcsmax*100 = 0 ;
+kcs.a78b1/kmcsmax*100 = 0 ;
+kcs.a81b1/kmcsmax*100 = 0 ;
+kco.a12b1/kmcomax*100 = 0 ;
+kco.a23b1/kmcomax*100 = 0 ;
+kco.a34b1/kmcomax*100 = 0 ;
+kco.a45b1/kmcomax*100 = 0 ;
+kco.a56b1/kmcomax*100 = 0 ;
+kco.a67b1/kmcomax*100 = 0 ;
+kco.a78b1/kmcomax*100 = 0 ;
+kco.a81b1/kmcomax*100 = 0 ;
+kcd.a12b1/kmcdmax*100 = 0 ;
+kcd.a23b1/kmcdmax*100 = 0 ;
+kcd.a34b1/kmcdmax*100 = 0 ;
+kcd.a45b1/kmcdmax*100 = 0 ;
+kcd.a56b1/kmcdmax*100 = 0 ;
+kcd.a67b1/kmcdmax*100 = 0 ;
+kcd.a78b1/kmcdmax*100 = 0 ;
+kcd.a81b1/kmcdmax*100 = 0 ;
+kof.a12b1/kmomax*100. = -3.88458724523793 ;
+kof.a23b1/kmomax*100. = -3.88458724523793 ;
+kof.a34b1/kmomax*100. = -3.88458724523793 ;
+kof.a45b1/kmomax*100. = -3.88458724523793 ;
+kof.a56b1/kmomax*100. = -3.88458724523793 ;
+kof.a67b1/kmomax*100. = -3.88458724523793 ;
+kof.a78b1/kmomax*100. = -3.88458724523793 ;
+kof.a81b1/kmomax*100. = -3.88458724523793 ;
+kod.a12b1/kmomax*100. = -3.88458724523793 ;
+kod.a23b1/kmomax*100. = -3.88458724523793 ;
+kod.a34b1/kmomax*100. = -3.88458724523793 ;
+kod.a45b1/kmomax*100. = -3.88458724523793 ;
+kod.a56b1/kmomax*100. = -3.88458724523793 ;
+kod.a67b1/kmomax*100. = -3.88458724523793 ;
+kod.a78b1/kmomax*100. = -3.88458724523793 ;
+kod.a81b1/kmomax*100. = -3.88458724523793 ;
+return;
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+!                 final twiss before sending to sixtrack
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+ON_BB_CHARGE:=1;
+
+
+
+/*
+
+twiss;
+
+ value, table(summ,q1);
+
+ value, table(summ,q2);
+
+ value, table(summ,dq1);
+
+ value, table(summ,dq2);
+
+ sixtrack, radius=0.017;
+
+*/
+
+
+
+
+
+VRF400:=0. ;LAGRF400.B1=0.5;LAGRF400.B2=0.;
+
+!if (NRJ<4999.9999) {VRF400:=8. ;LAGRF400.B1=0.5;LAGRF400.B2=0.;};
+
+!if (NRJ>5000.0000) {VRF400:=16.;LAGRF400.B1=0.5;LAGRF400.B2=0.;};
+
+twiss;
+
+enter Twiss module
+  
+iteration:   1 error:   1.858556E-07 deltap:   0.000000E+00
+orbit:  -9.205359E-08  2.248447E-09  8.119708E-10  8.584208E-12  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347646528599278 53.6328717169955 
+
+q1 dq1 betxmax dxmax 
+62.2949999999998 20.1033649595077 620.964642813926 2.67491755498258 
+
+dxrms xcomax xcorms q2 
+1.4267757915836 0.0164767495227694 0.00241775115521684 60.2699999999999 
+
+dq2 betymax dymax dyrms 
+19.9208406132664 678.478463036152 0.233873308038859 0.0727765116259127 
+
+ycomax ycorms deltap synch_1 
+0.0164768818811137 0.00256673786457338 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
+
+xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
+
+xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
+
+xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
+
+
+
+
+
+value,xnom1,xnom2,xnom5,xnom8;
+
+xnom1              = -0.00200000766102691 ;
+xnom2              = -0.00349998659974414 ;
+xnom5              = -1.95147794151113e-08 ;
+xnom8              = -1.63933058217449e-09 ;
+value,ynom1,ynom2,ynom5,ynom8;
+
+ynom1              = 5.69769966147346e-11 ;
+ynom2              = -9.50323682420537e-11 ;
+ynom5              = 0.00199999986402777 ;
+ynom8              = -0.00350000012265858 ;
+value,pxnom1,pxnom2,pxnom5,pxnom8;
+
+pxnom1             = 3.98795810202726e-09 ;
+pxnom2             = 2.94880307522509e-07 ;
+pxnom5             = 0.000294997325277891 ;
+pxnom8             = -3.50088871240621e-05 ;
+value,pynom1,pynom2,pynom5,pynom8;
+
+pynom1             = 0.000295000010778508 ;
+pynom2             = 0.00023999939386026 ;
+pynom5             = 1.30348629385906e-11 ;
+pynom8             = 1.80975466038905e-06 ;
+value, table(summ,q1);
+
+table( summ q1 )   = 62.2949999999998 ;
+value, table(summ,q2);
+
+table( summ q2 )   = 60.2699999999999 ;
+value, table(summ,dq1);
+
+table( summ dq1 )  = 20.1033649595077 ;
+value, table(summ,dq2);
+
+table( summ dq2 )  = 19.9208406132664 ;
+!sixtrack,cavall, mult_auto_off,radius=0.017;
+
+sixtrack,cavall, radius=0.017;
+
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+Reference radius set to : 0.017000
+
+total block length: 26658.883200
+
+c6t terminated - total number of elements: 24077
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 0
+                 alignment errors   MAD-X: 88
+                alignment errors SixTrack: 88
+                          sequence length: 26658.883200 [m]
+if( ON_BB_SWITCH == 1){
+
+  !Fix bb lenses in sixtrack input
+
+  exec, SIXTRACK_INPUT_BB_LENSES;
+
+};
+
+
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern=MQTL;
+
+twiss,file="last_twiss.1";
+
+enter Twiss module
+  
+iteration:   1 error:   1.858556E-07 deltap:   0.000000E+00
+orbit:  -9.205359E-08  2.248447E-09  8.119708E-10  8.584208E-12  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+length orbit5 alfa gammatr 
+26658.883199996 -0 0.000347646528599278 53.6328717169955 
+
+q1 dq1 betxmax dxmax 
+62.2949999999998 20.1033649595077 620.964642813926 2.67491755498258 
+
+dxrms xcomax xcorms q2 
+1.4267757915836 0.0164767495227694 0.00241775115521684 60.2699999999999 
+
+dq2 betymax dymax dyrms 
+19.9208406132664 678.478463036152 0.233873308038859 0.0727765116259127 
+
+ycomax ycorms deltap synch_1 
+0.0164768818811137 0.00256673786457338 0 0 
+
+synch_2 synch_3 synch_4 synch_5 
+0 0 0 0 
+
+nflips 
+0 
+stop;
+
+
+  Number of warnings: 116
+116 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

@@ -106,7 +106,7 @@ $(call onlx64,$(user-cases),)
 
 # user-cases are run only with tests-all on Lxplus + AFS + Gnu 64 bit
 user-cases = \
-test-lhc test-hllhc
+test-lhc test-hllhc test-hllhc-wire test-hllhc-fma test-lhc-wire
 
 # tests to remove (e.g. that relies on external resources)
 tests-to-rm =
@@ -166,7 +166,6 @@ onlxp  = $(if $(and $(call eq,$(OSTYPE),Linux),\
                       $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
 onlx64 = $(if $(and $(call eq,$(ARCH),64),\
                     $(call eq,$(OSTYPE),Linux),\
-                    $(findstring lxplus,$(HOSTNAME)),\
                     $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
 
 # info on macros above

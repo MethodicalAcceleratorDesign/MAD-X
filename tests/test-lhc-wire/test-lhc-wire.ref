@@ -1,0 +1,3672 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.05.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2019.06.07               +
+  + Execution date: 2019.06.25 10:59:11      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+! lhc2016_ats_v4.mask  ---  from Yannis
+
+! S. Fartoukh March 2009
+
+! Ref sample job for tracking with multipole field imperfection in nominal
+
+! LHC magnets using V6.503 in collision
+
+! M. Giovannozzi November 2010
+
+
+
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
+
+Option,  warn,info;
+
+System,"mkdir -p temp";
+
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/2018 db5";
+
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/2017 db6"; ! just because there is no errors dir in 2018 yet
+
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705 wise";
+
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/WISE/After_sector_3-4_repair fidel";
+
+System,"ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.0 slhc";
+
+system,"ln -fns /afs/cern.ch/user/n/nkarast/public/MADXTests/macro macro";
+
+option,-echo,-info;
+
+makethin: style chosen : teapot
+makethin: slicing sequence : lhcb1
+makethin: style chosen : teapot
+makethin: slicing sequence : lhcb2
+enter Twiss module
+  
+iteration:   1 error:   8.264110E-08 deltap:   0.000000E+00
+orbit:   1.702757E-15 -2.415443E-17  6.694399E-08  8.730785E-10  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.180844E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484076848        53.57425459 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999302        1.937876598        8065.101673        2.861666141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.394014314    4.776579287e-14    1.303027385e-14        60.31954179 
+
+               dq2            betymax              dymax              dyrms 
+       1.961889149        8068.998653       0.1183208306      0.01998332359 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.005680539229    0.0005000682538                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB1"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le        0.9382720813
+@ CHARGE           %le                   1
+@ ENERGY           %le                6500
+@ PC               %le         6499.999932
+@ GAMMA            %le         6927.628062
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     0.0002071986744
+@ SIGE             %le             0.00011
+@ SIGT             %le               0.075
+@ NPART            %le            1.15e+11
+@ EX               %le     3.175690121e-10
+@ EY               %le     3.175690121e-10
+@ ET               %le               0.001
+@ BV_FLAG          %le                   1
+@ LENGTH           %le          26658.8832
+@ ALFA             %le     0.0003484076848
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le         53.57425459
+@ Q1               %le         62.30999302
+@ Q2               %le         60.31954179
+@ DQ1              %le         1.937876598
+@ DQ2              %le         1.961889149
+@ DXMAX            %le         2.861666141
+@ DYMAX            %le        0.1183208306
+@ XCOMAX           %le     4.776579287e-14
+@ YCOMAX           %le      0.005680539229
+@ BETXMAX          %le         8065.101673
+@ BETYMAX          %le         8068.998653
+@ XCORMS           %le     1.303027385e-14
+@ YCORMS           %le     0.0005000682538
+@ DXRMS            %le         1.394014314
+@ DYRMS            %le       0.01998332359
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.59.21"
+* NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
+$ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
+ "IP5"                      6664.568433       0.2999133449       0.2999237948    0.0001765888208   -0.0001016414575   -1.020977065e-06    5.756130313e-06        15.01707165        14.32703074
+ "IP8"                      16650.65818        2.999164724        2.998459924    -2.54369349e-05    0.0007032687902     9.65589163e-06   -2.197967926e-07        38.44654908        36.85879259
+ "IP1.L1"                    19994.1624       0.2999198121       0.2997675819    0.0001114768172   -9.842279953e-06    2.172086555e-06    4.352491204e-06         46.3705132        44.99828653
+ "IP1"                       19994.1624       0.2999198121       0.2997675819    0.0001114768172   -9.842279953e-06    2.172086555e-06    4.352491204e-06         46.3705132        44.99828653
+ "IP2"                      23326.59898        10.00300524        10.00473431    0.0001912328214   -0.0009380228137    1.016269504e-05   -7.985826058e-07        54.62583185        52.72288328
+enter Twiss module
+  
+iteration:   1 error:   1.005057E-07 deltap:   0.000000E+00
+orbit:   2.654863E-15  6.845785E-17 -8.755796E-08  9.374343E-10  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.121660E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003482774185        53.58427285 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999367        1.938174195        8063.189263        2.886883927 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.397285813     2.51920812e-13    4.015706984e-14        60.31953678 
+
+               dq2            betymax              dymax              dyrms 
+       1.962093132        8063.935918       0.1781379675      0.03612467492 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.006085092777    0.0005072288284                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB2"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le        0.9382720813
+@ CHARGE           %le                   1
+@ ENERGY           %le                6500
+@ PC               %le         6499.999932
+@ GAMMA            %le         6927.628062
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     0.0002071986744
+@ SIGE             %le             0.00011
+@ SIGT             %le               0.075
+@ NPART            %le            1.15e+11
+@ EX               %le     3.175690121e-10
+@ EY               %le     3.175690121e-10
+@ ET               %le               0.001
+@ BV_FLAG          %le                  -1
+@ LENGTH           %le          26658.8832
+@ ALFA             %le     0.0003482774185
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le         53.58427285
+@ Q1               %le         62.30999367
+@ Q2               %le         60.31953678
+@ DQ1              %le         1.938174195
+@ DQ2              %le         1.962093132
+@ DXMAX            %le         2.886883927
+@ DYMAX            %le        0.1781379675
+@ XCOMAX           %le      2.51920812e-13
+@ YCOMAX           %le      0.006085092777
+@ BETXMAX          %le         8063.189263
+@ BETYMAX          %le         8063.935918
+@ XCORMS           %le     4.015706984e-14
+@ YCORMS           %le     0.0005072288284
+@ DXRMS            %le         1.397285813
+@ DYRMS            %le       0.03612467492
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.59.23"
+* NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
+$ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
+ "IP5"                      6664.873167       0.2999845742       0.2999533945   -0.0001922507394   -0.0004568962481    2.371804561e-06   -4.713061352e-06        15.20148798        14.32526466
+ "IP8"                      16650.50582        2.999967724        2.999963005   -0.0003790002858   -4.974475313e-05    6.976709302e-06   -4.575258115e-07        38.21506015        37.02120078
+ "IP1.L1"                    19994.1624       0.3000558964       0.3000390449    0.0002227211028    0.0007787734735    9.007352827e-07   -4.952816149e-06        46.44947163        44.88304382
+ "IP1"                       19994.1624       0.3000558964       0.3000390449    0.0002227211028    0.0007787734735    9.007352827e-07   -4.952816149e-06        46.44947163        44.88304382
+ "IP2"                      23326.44662          10.001694        10.00399694   -0.0002069187885    -0.001293162379    1.164032156e-05    1.861003967e-07        54.31445997        53.16275373
+enter Twiss module
+  
+iteration:   1 error:   1.182115E-06 deltap:   0.000000E+00
+orbit:  -6.686919E-07  1.079829E-08  8.311388E-07  1.005228E-08  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   9.293601E-12 deltap:   0.000000E+00
+orbit:  -6.686946E-07  1.079835E-08  8.311351E-07  1.005226E-08  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.205774E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484731401         53.5692228 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999314        1.203023105         8065.10389        3.186521738 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.432796688      0.01215545833     0.001789190279        60.31954318 
+
+               dq2            betymax              dymax              dyrms 
+       1.309047033        8068.977618        2.930347728       0.4860537043 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266031918     0.001780220816                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB1"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le        0.9382720813
+@ CHARGE           %le                   1
+@ ENERGY           %le                6500
+@ PC               %le         6499.999932
+@ GAMMA            %le         6927.628062
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     0.0002071986744
+@ SIGE             %le             0.00011
+@ SIGT             %le               0.075
+@ NPART            %le            1.15e+11
+@ EX               %le     3.175690121e-10
+@ EY               %le     3.175690121e-10
+@ ET               %le               0.001
+@ BV_FLAG          %le                   1
+@ LENGTH           %le          26658.8832
+@ ALFA             %le     0.0003484731401
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le          53.5692228
+@ Q1               %le         62.30999314
+@ Q2               %le         60.31954318
+@ DQ1              %le         1.203023105
+@ DQ2              %le         1.309047033
+@ DXMAX            %le         3.186521738
+@ DYMAX            %le         2.930347728
+@ XCOMAX           %le       0.01215545833
+@ YCOMAX           %le       0.01266031918
+@ BETXMAX          %le          8065.10389
+@ BETYMAX          %le         8068.977618
+@ XCORMS           %le      0.001789190279
+@ YCORMS           %le      0.001780220816
+@ DXRMS            %le         1.432796688
+@ DYRMS            %le        0.4860537043
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.59.25"
+* NAME                                S                  X                  Y                 PX                 PY 
+$ %s                                %le                %le                %le                %le                %le 
+ "IP5"                      6664.568433   -3.694761537e-08    -0.001250005829    0.0001499744915    -9.20320366e-08
+ "IP8"                      16650.65818   -5.744692887e-08   -0.0009999329225   -0.0001046099145    1.973578485e-06
+ "IP1.L1"                    19994.1624   -0.0005500345362    1.187616587e-08     3.36427689e-09    0.0001499908262
+ "IP1"                       19994.1624   -0.0005500345362    1.187616587e-08     3.36427689e-09    0.0001499908262
+ "IP2"                      23326.59898     0.001000007976    -0.002000026624     3.34278046e-07    0.0002753753042
+enter Twiss module
+  
+iteration:   1 error:   7.433043E-07 deltap:   0.000000E+00
+orbit:   1.930829E-07  1.921855E-10 -7.565033E-07  7.468622E-09  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.196922E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0     0.000348350631        53.57864168 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999213        1.222726954        8063.180855        2.751473386 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.411404351      0.01215566059     0.001788550956        60.31953706 
+
+               dq2            betymax              dymax              dyrms 
+       2.195962892        8063.931682        2.755463191       0.5378437506 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266159235     0.001816422433                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB2"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le        0.9382720813
+@ CHARGE           %le                   1
+@ ENERGY           %le                6500
+@ PC               %le         6499.999932
+@ GAMMA            %le         6927.628062
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     0.0002071986744
+@ SIGE             %le             0.00011
+@ SIGT             %le               0.075
+@ NPART            %le            1.15e+11
+@ EX               %le     3.175690121e-10
+@ EY               %le     3.175690121e-10
+@ ET               %le               0.001
+@ BV_FLAG          %le                  -1
+@ LENGTH           %le          26658.8832
+@ ALFA             %le      0.000348350631
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le         53.57864168
+@ Q1               %le         62.30999213
+@ Q2               %le         60.31953706
+@ DQ1              %le         1.222726954
+@ DQ2              %le         2.195962892
+@ DXMAX            %le         2.751473386
+@ DYMAX            %le         2.755463191
+@ XCOMAX           %le       0.01215566059
+@ YCOMAX           %le       0.01266159235
+@ BETXMAX          %le         8063.180855
+@ BETYMAX          %le         8063.931682
+@ XCORMS           %le      0.001788550956
+@ YCORMS           %le      0.001816422433
+@ DXRMS            %le         1.411404351
+@ DYRMS            %le        0.5378437506
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.59.27"
+* NAME                                S                  X                  Y                 PX                 PY 
+$ %s                                %le                %le                %le                %le                %le 
+ "IP5"                      6664.873167   -3.079506887e-08    -0.002349989178   -0.0001500509265    1.029632478e-07
+ "IP8"                      16650.50582   -5.315200118e-08    0.0009999100651    0.0001046141394   -1.956356582e-06
+ "IP1.L1"                    19994.1624    0.0005499892925    8.657796786e-09   -6.651475241e-08   -0.0001500986111
+ "IP1"                       19994.1624    0.0005499892925    8.657796786e-09   -6.651475241e-08   -0.0001500986111
+ "IP2"                      23326.44662   -0.0009999432598    -0.002000075392   -3.266224372e-07   -0.0002753996771
+hocharge_ir1       =          0.0909091 ;
+long_ir1_1         =           0.008625 ;
+long_ir1_2         =           0.017775 ;
+long_ir1_3         =          0.0281625 ;
+long_ir1_4         =          0.0414375 ;
+long_ir1_5         =             0.0675 ;
+hocharge_ir2       =          0.0909091 ;
+long_ir2_1         =           0.008625 ;
+long_ir2_2         =           0.017775 ;
+long_ir2_3         =          0.0281625 ;
+long_ir2_4         =          0.0414375 ;
+long_ir2_5         =             0.0675 ;
+hocharge_ir5       =          0.0909091 ;
+long_ir5_1         =           0.008625 ;
+long_ir5_2         =           0.017775 ;
+long_ir5_3         =          0.0281625 ;
+long_ir5_4         =          0.0414375 ;
+long_ir5_5         =             0.0675 ;
+hocharge_ir8       =          0.0909091 ;
+long_ir8_1         =           0.008625 ;
+long_ir8_2         =           0.017775 ;
+long_ir8_3         =          0.0281625 ;
+long_ir8_4         =          0.0414375 ;
+long_ir8_5         =             0.0675 ;
+beamx              =    3.175690121e-10 ;
+beamy              =    3.175690121e-10 ;
+sigz               =              0.075 ;
+sige               =            0.00011 ;
+ho_charge          =                  1 ;
+lr_charge          =                  1 ;
+b_h_dist           =        3.740022896 ;
+enter Twiss module
+  
+iteration:   1 error:   1.182115E-06 deltap:   0.000000E+00
+orbit:  -6.686919E-07  1.079829E-08  8.311388E-07  1.005228E-08  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   9.293601E-12 deltap:   0.000000E+00
+orbit:  -6.686946E-07  1.079835E-08  8.311351E-07  1.005226E-08  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.205774E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484731401         53.5692228 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999314        1.203023105         8065.10389        3.186521738 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.432796688      0.01215545833     0.001789190279        60.31954318 
+
+               dq2            betymax              dymax              dyrms 
+       1.309047033        8068.977618        2.930347728       0.4860537043 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266031918     0.001780220816                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Set8 halo to 3.250945 sigma, the lumi is reduced from    2.808705393e+33 Hz/cm2 to              2e+32 Hz/cm2
+halo8/2.*sqrt(3.*epsx)*1e3 =      0.05017176421 ;
+enter Twiss module
+  
+iteration:   1 error:   1.182115E-06 deltap:   0.000000E+00
+orbit:  -6.686919E-07  1.079829E-08  8.311388E-07  1.005228E-08  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   9.293601E-12 deltap:   0.000000E+00
+orbit:  -6.686946E-07  1.079835E-08  8.311351E-07  1.005226E-08  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.205774E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484731401         53.5692228 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999314        1.203023105         8065.10389        3.186521738 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.432796688      0.01215545833     0.001789190279        60.31954318 
+
+               dq2            betymax              dymax              dyrms 
+       1.309047033        8068.977618        2.930347728       0.4860537043 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266031918     0.001780220816                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Want to make named table: twissb1
+enter Twiss module
+  
+iteration:   1 error:   7.433043E-07 deltap:   0.000000E+00
+orbit:   1.930829E-07  1.921855E-10 -7.565033E-07  7.468622E-09  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.196922E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0     0.000348350631        53.57864168 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999213        1.222726954        8063.180855        2.751473386 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.411404351      0.01215566059     0.001788550956        60.31953706 
+
+               dq2            betymax              dymax              dyrms 
+       2.195962892        8063.931682        2.755463191       0.5378437506 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266159235     0.001816422433                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Want to make named table: twissb2
+sepr1              =         112.689123 ;
+sepr2              =        35.48649091 ;
+sepr5              =        112.7041881 ;
+sepr8              =        64.79159921 ;
+on_x1              =                150 ;
+on_x2              =                200 ;
+on_x5              =                150 ;
+on_x8              =               -250 ;
+on_sep1            =                 -0 ;
+on_sep2            =       0.1408986877 ;
+on_sep5            =                  0 ;
+on_sep8            =     -0.05017541606 ;
+on_alice           =        1.076923077 ;
+on_lhcb            =        1.076923077 ;
+enter Twiss module
+  
+iteration:   1 error:   1.168078E-06 deltap:   0.000000E+00
+orbit:  -6.734704E-07  1.080678E-08  8.208895E-07  9.925594E-09  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   9.338349E-12 deltap:   0.000000E+00
+orbit:  -6.734732E-07  1.080684E-08  8.208859E-07  9.925571E-09  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484756178        53.56903237 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999313        1.238924038        8065.103467        3.203684038 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.432614452      0.01215542972     0.001777552814         60.3195432 
+
+               dq2            betymax              dymax              dyrms 
+       1.288805593        8068.977147        2.932870148       0.4883221381 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266032334     0.001783538389                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+xnom1              =   -3.529655825e-08 ;
+xnom2              =    0.0001409138098 ;
+xnom5              =    -3.72364802e-08 ;
+xnom8              =   -5.725257481e-08 ;
+ynom1              =    1.206064479e-08 ;
+ynom2              =    -0.002000024898 ;
+ynom5              =    -0.001800006358 ;
+ynom8              =   -5.010135609e-05 ;
+pxnom1             =    5.187364759e-09 ;
+pxnom2             =    3.347144589e-07 ;
+pxnom5             =    0.0001499729402 ;
+pxnom8             =   -0.0001046093407 ;
+pynom1             =    0.0001499897179 ;
+pynom2             =      0.00027537544 ;
+pynom5             =   -9.091291313e-08 ;
+pynom8             =    1.973485192e-06 ;
+Want to make named table: suir1b1
+Want to make named table: suir1b2
+Want to make named table: suir2b1
+Want to make named table: suir2b2
+Want to make named table: suir5b1
+Want to make named table: suir5b2
+Want to make named table: suir8b1
+Want to make named table: suir8b2
+enter Twiss module
+  
+iteration:   1 error:   1.168081E-06 deltap:   0.000000E+00
+orbit:  -6.734686E-07  1.080675E-08  8.208919E-07  9.925625E-09  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   9.338006E-12 deltap:   0.000000E+00
+orbit:  -6.734714E-07  1.080682E-08  8.208882E-07  9.925602E-09  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484756178        53.56903237 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999313        1.238924054        8065.103448        3.203684038 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.419425594      0.01215542972     0.001818232706         60.3195432 
+
+               dq2            betymax              dymax              dyrms 
+       1.288805598        8068.977157        2.932870154       0.5015966407 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266032334     0.001831489693                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Want to make named table: twissb1
+enter Twiss module
+  
+iteration:   1 error:   7.147956E-07 deltap:   0.000000E+00
+orbit:   1.810459E-07  5.443644E-12 -7.602513E-07  7.343247E-09  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.128923E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003483494374        53.57873347 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999216        1.167593969        8063.181294        2.770532979 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.399589755      0.01215569323     0.001817537832        60.31953705 
+
+               dq2            betymax              dymax              dyrms 
+       2.189932426        8063.931858        2.764273456       0.5468125618 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266160823     0.001838013259                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Want to make named table: twissb2
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.108802E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484076717         53.5742556 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999302        1.937876729        8065.101656        2.861666142 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.379232235                  0                  0        60.31954179 
+
+               dq2            betymax              dymax              dyrms 
+       1.961889137        8068.998663                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003482773952        53.58427464 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999366        1.938174743        8063.189263        2.886883915 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.382510246                  0                  0        60.31953678 
+
+               dq2            betymax              dymax              dyrms 
+       1.962092817        8063.935916                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.108802E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484076717         53.5742556 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999302        1.937876729        8065.101656        2.861666142 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.379232235                  0                  0        60.31954179 
+
+               dq2            betymax              dymax              dyrms 
+       1.961889137        8068.998663                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Want to make named table: twissb1_crab
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003482773952        53.58427464 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999366        1.938174743        8063.189263        2.886883915 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.382510246                  0                  0        60.31953678 
+
+               dq2            betymax              dymax              dyrms 
+       1.962092817        8063.935916                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Want to make named table: twissb2_crab
+Number of parasitic encounter before D1
+npara0_1           =                 16 ;
+npara0_2           =                 15 ;
+npara0_5           =                 16 ;
+npara0_8           =                 15 ;
+enter Twiss module
+  
+iteration:   1 error:   1.168081E-06 deltap:   0.000000E+00
+orbit:  -6.734686E-07  1.080675E-08  8.208919E-07  9.925625E-09  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   9.338006E-12 deltap:   0.000000E+00
+orbit:  -6.734714E-07  1.080682E-08  8.208882E-07  9.925602E-09  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484756178        53.56903237 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999313        1.238924054        8065.103448        3.203684038 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.417964174      0.01215542972     0.001822192264         60.3195432 
+
+               dq2            betymax              dymax              dyrms 
+       1.288805598        8068.977157        2.932870154       0.5055733876 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266032334     0.001836260714                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB1"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le        0.9382720813
+@ CHARGE           %le                   1
+@ ENERGY           %le                6500
+@ PC               %le         6499.999932
+@ GAMMA            %le         6927.628062
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     0.0002071986744
+@ SIGE             %le             0.00011
+@ SIGT             %le               0.075
+@ NPART            %le            1.15e+11
+@ EX               %le     3.175690121e-10
+@ EY               %le     3.175690121e-10
+@ ET               %le               0.001
+@ BV_FLAG          %le                   1
+@ LENGTH           %le          26658.8832
+@ ALFA             %le     0.0003484756178
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le         53.56903237
+@ Q1               %le         62.30999313
+@ Q2               %le          60.3195432
+@ DQ1              %le         1.238924054
+@ DQ2              %le         1.288805598
+@ DXMAX            %le         3.203684038
+@ DYMAX            %le         2.932870154
+@ XCOMAX           %le       0.01215542972
+@ YCOMAX           %le       0.01266032334
+@ BETXMAX          %le         8065.103448
+@ BETYMAX          %le         8068.977157
+@ XCORMS           %le      0.001822192264
+@ YCORMS           %le      0.001836260714
+@ DXRMS            %le         1.417964174
+@ DYRMS            %le        0.5055733876
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.59.53"
+*                  S NAME                             BETX               BETY               ALFX               ALFY                MUX                MUY                  X                  Y                 PX                 PY 
+$                %le %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
+        6582.287929 "BBMK_PAR.L5B1_22"         2863.267487        4901.411129       -9.063096018       -37.66589772        14.76659206        14.07652235    -0.003643817074    0.0007151834889    -3.38446043e-05    -4.14507673e-05
+        6586.027952 "BBMK_PAR.L5B1_21"         2931.466018        5187.205401       -9.171693772       -38.74921528        14.76679752         14.0766404    -0.003770396669    0.0005601566701    -3.38446043e-05    -4.14507673e-05
+        6589.767975 "BBMK_PAR.L5B1_20"         3000.476644        5481.102939        -9.28026028       -39.83253284        14.76699823        14.07675204    -0.003896976123    0.0004051298514   -3.384456498e-05    -4.14507673e-05
+        6593.507998 "BBMK_PAR.L5B1_19"         3070.299378        5783.103741       -9.388825346        -40.9158504        14.76719434        14.07685776    -0.004023555446    0.0002501030326   -3.384452416e-05    -4.14507673e-05
+        6597.248021 "BBMK_PAR.L5B1_18"         3140.934209        6093.207808        -9.49738895       -41.99916796        14.76738602        14.07695804    -0.004150134634    9.507621386e-05   -3.384448183e-05    -4.14507673e-05
+        6600.988044 "BBMK_PAR.L5B1_17"          3212.38113         6411.41514       -9.605951076       -43.08248552        14.76757341        14.07705327    -0.004276713683   -5.995060489e-05   -3.384443799e-05    -4.14507673e-05
+        6604.728066 "BBMK_PAR.L5B1_16"          3284.64013        6737.725737       -9.714511704       -44.16580309        14.76775666        14.07714384    -0.004403292589   -0.0002149774236   -3.384439266e-05    -4.14507673e-05
+        6608.468089 "BBMK_PAR.L5B1_15"         3357.711267        7072.139599       -9.823105787       -45.24912065         14.7679359        14.07723007    -0.004529871392   -0.0003700042424   -3.384439266e-05    -4.14507673e-05
+        6612.208112 "BBMK_PAR.L5B1_14"         3460.207602          7353.3074       -40.02237765        17.96329946        14.76811113        14.07731233    -0.004667558929   -0.0005229575578   -6.868354027e-05   -3.705134304e-05
+        6615.948135 "BBMK_PAR.L5B1_13"         4227.740402         6374.40302        -172.783458        232.2746171        14.76826995         14.0773975    -0.005215416448   -0.0006273472061   -0.0002264431248   -1.830711765e-05
+        6619.688158 "BBMK_PAR.L5B1_12"         6065.026045        4302.765696       -284.8174673        265.8589277         14.7683885         14.0775102    -0.006296848496   -0.0006680849827   -0.0003068027646    -8.82670329e-06
+        6623.428181 "BBMK_PAR.L5B1_11"          7818.82791        2769.530968       -129.3796864        135.9823522         14.7684734        14.07768575    -0.007190300802   -0.0007267754943   -0.0001287539145   -2.676987888e-05
+        6627.168204 "BBMK_PAR.L5B1_10"         7909.872465        2092.962646        62.61035157         63.3142012        14.76854788        14.07793696     -0.00726453021   -0.0008691321582    5.344119498e-05   -4.555017058e-05
+        6630.908227 "BBMK_PAR.L5B1_9"          6560.360356        1873.233281         283.481086       -2.197335095        14.76862882        14.07824379    -0.006630742323    -0.001096487745    0.0002820637537   -7.722422133e-05
+         6634.64825 "BBMK_PAR.L5B1_8"          4172.027241         2053.26869        298.4675085       -30.65763216        14.76874168        14.07854978    -0.005304300031     -0.00143429666    0.0003738803699   -9.394691399e-05
+        6638.388272 "BBMK_PAR.L5B1_7"          2479.725831        2102.029593        153.6808228        27.55221917        14.76893026         14.0788309    -0.004089659342    -0.001717381397    0.0002534742167   -4.917324638e-05
+        6642.128295 "BBMK_PAR.L5B1_6"          1679.325785        1679.250811        74.82226592        74.81920231        14.76922759        14.07914167    -0.003365450621    -0.001797966254    0.0001499729404   -9.091320165e-08
+        6645.868318 "BBMK_PAR.L5B1_5"          1166.291198        1166.237404        62.35191757        62.34931824        14.76965291        14.07956702     -0.00280454839    -0.001798306271    0.0001499729404   -9.091320165e-08
+        6649.608341 "BBMK_PAR.L5B1_4"          746.5353881        746.4993004        49.88156923        49.87943417        14.77029083        14.08020497    -0.002243646159    -0.001798646289    0.0001499729404   -9.091320165e-08
+        6653.348364 "BBMK_PAR.L5B1_3"          420.0583544        420.0365007        37.41122089        37.40955011         14.7713538        14.08126799    -0.001682743929    -0.001798986306    0.0001499729404   -9.091320165e-08
+        6657.088387 "BBMK_PAR.L5B1_2"          186.8600974        186.8490048        24.94087254        24.93966604        14.77347848        14.08339279    -0.001121841698    -0.001799326323    0.0001499729404   -9.091320165e-08
+         6660.82841 "BBMK_PAR.L5B1_1"          46.94061701        46.93681268         12.4705242        12.46978197        14.77983585         14.0897506   -0.0005609394671    -0.001799666341    0.0001499729404   -9.091320165e-08
+        6664.568433 "IP5"                     0.2999132749       0.2999244351    0.0001758563023   -0.0001020947197        15.01707262        14.32703085   -3.723638546e-08    -0.001800006358    0.0001499729404   -9.091320165e-08
+        6668.308456 "BBMK_PAR.R5B1_1"          46.93798616           46.93834       -12.47017248       -12.46998616        15.25436501        14.56427882    0.0005608649942    -0.001800346376    0.0001499729404   -9.091320165e-08
+        6672.048479 "BBMK_PAR.R5B1_2"          186.8548357        186.8520594       -24.94052083       -24.93987023        15.26072264        14.57063648     0.001121767225    -0.001800686393    0.0001499729404   -9.091320165e-08
+        6675.788501 "BBMK_PAR.R5B1_3"          420.0504618        420.0410826       -37.41086917       -37.40975429        15.26284738        14.57276125     0.001682669456    -0.001801026411    0.0001499729404   -9.091320165e-08
+        6679.528524 "BBMK_PAR.R5B1_4"          746.5248646        746.5054097       -49.88121751       -49.87963836        15.26391035        14.57382425     0.002243571686    -0.001801366428    0.0001499729404   -9.091320165e-08
+        6683.268547 "BBMK_PAR.R5B1_5"          1166.278044        1166.245041       -62.35156586       -62.34952243        15.26454828         14.5744622     0.002804473917    -0.001801706446    0.0001499729404   -9.091320165e-08
+         6687.00857 "BBMK_PAR.R5B1_6"              1679.31        1679.259975        -74.8219142       -74.81940649        15.26497362        14.57488754     0.003365376148    -0.001802046463    0.0001499729404   -9.091320165e-08
+        6690.748593 "BBMK_PAR.R5B1_7"          2102.104297         2479.62933       -27.55327293        -153.674915        15.26528438        14.57518488     0.003765358778    -0.001884039657    4.937594417e-05   -5.076296489e-05
+        6694.488616 "BBMK_PAR.R5B1_8"          2053.342201        4171.865602         30.6586553       -298.4560178        15.26556549        14.57537347      0.00372106341    -0.002192231864    -6.11813906e-05   -0.0001059488317
+        6698.228639 "BBMK_PAR.R5B1_9"          1873.300882        6560.106864        2.197340065       -283.4702053        15.26587147        14.57548633     0.003532982223    -0.002560253596   -1.003352866e-05   -7.005349449e-05
+        6701.968662 "BBMK_PAR.R5B1_10"         2093.038776        7909.567415        -63.3165784       -62.60801003        15.26617829        14.57556728     0.003711958459    -0.002662612992     0.000106715438    1.587918911e-05
+        6705.708685 "BBMK_PAR.R5B1_11"         2769.632356        7818.526907       -135.9874043        129.3746326        15.26642949        14.57564176     0.004230967275    -0.002511235942    0.0001978957191    7.872362501e-05
+        6709.448708 "BBMK_PAR.R5B1_12"         4302.923916        6064.793031       -265.8687778        284.8064517        15.26660503        14.57572666     0.005236161117    -0.002075203203    0.0003156337972    0.0001396560782
+         6713.18873 "BBMK_PAR.R5B1_13"         6374.638085        4227.578436       -232.2832565        172.7767654        15.26671772        14.57584521       0.0063439304    -0.001573420848    0.0002246748833    0.0001148528455
+        6716.928753 "BBMK_PAR.R5B1_14"         7353.579145        3460.075547       -17.96403721        40.02077696         15.2668029        14.57600404     0.006789874239    -0.001230510571    1.054441388e-05    7.010750448e-05
+        6720.668776 "BBMK_PAR.R5B1_15"         7072.401494        3357.583665        45.25072245         9.82265912        15.26688515        14.57617928     0.006623393885    -0.001002454987   -5.425618682e-05    5.965432323e-05
+        6724.408799 "BBMK_PAR.R5B1_16"         6737.975787        3284.515849        44.16736834        9.714070685        15.26697138        14.57635853     0.006420474504   -0.0007793464521   -5.425618682e-05    5.965432323e-05
+        6728.148822 "BBMK_PAR.R5B1_17"         6411.653312        3212.260278          43.084081         9.60548225        15.26706194        14.57654178     0.006217554974   -0.0005562379173   -5.425625285e-05    5.965432323e-05
+        6731.888845 "BBMK_PAR.R5B1_18"         6093.433973        3140.816954        42.00078694        9.496893815        15.26715717        14.57672918     0.006014635236   -0.0003331293826   -5.425631647e-05    5.965432323e-05
+        6735.628868 "BBMK_PAR.R5B1_19"         5783.317811        3070.185877        40.91748634        9.388305379        15.26725744        14.57692087     0.005811715296   -0.0001100208479   -5.425637768e-05    5.965432323e-05
+        6739.368891 "BBMK_PAR.R5B1_20"         5481.304868        3000.367046        39.83417939        9.279716944        15.26736316        14.57711699     0.005608795161    0.0001130876868   -5.425643648e-05    5.965432323e-05
+        6743.108914 "BBMK_PAR.R5B1_21"         5187.395183        2931.360462        38.75086626        9.171128509        15.26747479         14.5773177     0.005405874838    0.0003361962215   -5.425649287e-05    5.965432323e-05
+        6746.848936 "BBMK_PAR.R5B1_22"         4901.588758        2863.166124        37.66749608        9.062540074        15.26759284        14.57752317     0.005202954312    0.0005593047562   -5.425649287e-05    5.965432323e-05
+         19911.8819 "BBMK_PAR.L1B1_22"         2863.214766        4903.960216       -9.062867249       -37.68558913        46.12002332        44.74779429     -1.4099341e-07    -0.005203591535   -1.650927763e-09   -5.426171072e-05
+        19915.62192 "BBMK_PAR.L1B1_21"         2931.411573        5189.903907       -9.171461586       -38.76947519        46.12022878        44.74791228   -1.471679176e-07    -0.005406531576   -1.650927763e-09   -5.426171072e-05
+        19919.36194 "BBMK_PAR.L1B1_20"         3000.420449        5483.955115       -9.280024678       -39.85336125        46.12042949        44.74802385   -1.533424197e-07    -0.005609471616   -1.650926227e-09   -5.426171072e-05
+        19923.10196 "BBMK_PAR.L1B1_19"         3070.241408        5786.113841       -9.388586328       -40.93724731        46.12062561        44.74812952   -1.595169167e-07    -0.005812411657   -1.650924619e-09   -5.426171072e-05
+        19926.84199 "BBMK_PAR.L1B1_18"         3140.874439        6096.380084       -9.497146516       -42.02113336        46.12081729        44.74822974   -1.656914083e-07    -0.006015351697   -1.650922936e-09   -5.426171072e-05
+        19930.58201 "BBMK_PAR.L1B1_17"         3212.319533        6414.753844       -9.605705225       -43.10501942        46.12100468        44.74832493   -1.718658944e-07    -0.006218291738   -1.650921181e-09   -5.426171072e-05
+        19934.32203 "BBMK_PAR.L1B1_16"         3284.576682        6741.235122       -9.714262438       -44.18890548        46.12118793        44.74841545   -1.780403747e-07    -0.006421231778   -1.650919352e-09   -5.426171072e-05
+        19938.06206 "BBMK_PAR.L1B1_15"         3357.645941        7075.823917       -9.822853104       -45.27279154        46.12136718        44.74850163   -1.842148508e-07    -0.006624171819   -1.650919352e-09   -5.426171072e-05
+        19941.80208 "BBMK_PAR.L1B1_14"         3460.139813        7357.138937       -40.02153204        17.97256221        46.12154241        44.74858385   -1.911784448e-07    -0.006790669522   -3.306597973e-09    1.054582078e-05
+         19945.5421 "BBMK_PAR.L1B1_13"         4227.657057        6377.725148       -172.7799903        232.3955743        46.12170124        44.74866898   -2.155013308e-07    -0.006344672822   -9.798205712e-09    0.0002247013607
+        19949.28213 "BBMK_PAR.L1B1_12"         6064.905925        4305.008743       -284.8117649        265.9974249        46.12181979        44.74878162   -2.618516226e-07    -0.005236773216   -1.312398262e-08    0.0003156709172
+        19953.02215 "BBMK_PAR.L1B1_11"         7818.672543        2770.975317       -129.3770541         136.053174        46.12190469        44.74895707   -3.003488192e-07     -0.00423146102   -5.698511899e-09    0.0001979190889
+        19956.76217 "BBMK_PAR.L1B1_10"         7909.714833        2094.054776        62.60916526        63.34714604        46.12197917        44.74920815   -3.047738554e-07    -0.003712390995     1.68807042e-09     0.000106727519
+        19960.50219 "BBMK_PAR.L1B1_9"          6560.229209         1874.21142        283.4754803        -2.19857363        46.12206012        44.74951483   -2.802137354e-07    -0.003533395256    1.131301654e-08   -1.003507364e-05
+        19964.24222 "BBMK_PAR.L1B1_8"          4171.943475        2054.341549        298.4615773       -30.67374032        46.12217297        44.74982066   -2.264100636e-07    -0.003721499834       1.520009e-08   -6.118891942e-05
+        19967.98224 "BBMK_PAR.L1B1_7"          2479.675683        2103.128586        153.6777762        27.56653683        46.12236156        44.75010163   -1.783526041e-07    -0.003765804068    9.759851301e-09    4.938078044e-05
+        19971.72226 "BBMK_PAR.L1B1_6"          1679.291439         1680.12933        74.82079688        74.85825955        46.12265889        44.75041224   -1.517036159e-07    -0.003365777815    5.187453249e-09     0.000149989718
+        19975.46229 "BBMK_PAR.L1B1_5"          1166.266964        1166.848057        62.35068308        62.38188247        46.12308423        44.75083737    -1.32302422e-07    -0.002804812836    5.187453249e-09     0.000149989718
+        19979.20231 "BBMK_PAR.L1B1_4"          746.5195102        746.8906556        49.88056928        49.90550539        46.12372216        44.75147498   -1.129012281e-07    -0.002243847857    5.187453249e-09     0.000149989718
+        19982.94233 "BBMK_PAR.L1B1_3"           420.049079         420.257126        37.41045548        37.42912831        46.12478515        44.75253744   -9.350003417e-08    -0.001682882877    5.187453249e-09     0.000149989718
+        19986.68235 "BBMK_PAR.L1B1_2"          186.8556701        186.9474682        24.94034168        24.95275123        46.12690988        44.75466112   -7.409884025e-08    -0.001121917898    5.187453249e-09     0.000149989718
+        19990.42238 "BBMK_PAR.L1B1_1"          46.93928337        46.96168234        12.47022788        12.47637415        46.13326741        44.76101558   -5.469764633e-08   -0.0005609529186    5.187453249e-09     0.000149989718
+         19994.1624 "IP1.L1"                  0.2999189105       0.2997683439    0.0001140823167   -2.933875976e-06        46.37051371        44.99828675    -3.52964524e-08    1.206073095e-08    5.187453249e-09     0.000149989718
+         19994.1624 "IP1"                     0.2999189105       0.2997683439    0.0001140823167   -2.933875976e-06        46.37051371        44.99828675    -3.52964524e-08    1.206073095e-08    5.187453249e-09     0.000149989718
+        19997.90242 "BBMK_PAR.R1B1_1"          46.93757666         46.9617262       -12.46999971       -12.47638001         46.6077961          45.235557   -1.589525849e-08    0.0005609770399    5.187453249e-09     0.000149989718
+        20001.64245 "BBMK_PAR.R1B1_2"          186.8522567        186.9475559       -24.94011351       -24.95275709         46.6141538        45.24191144    3.505935431e-09     0.001121942019    5.187453249e-09     0.000149989718
+        20005.38247 "BBMK_PAR.R1B1_3"          420.0439589        420.2572576       -37.41022731       -37.42913417        46.61627857        45.24403513    2.290712935e-08     0.001682906999    5.187453249e-09     0.000149989718
+        20009.12249 "BBMK_PAR.R1B1_4"          746.5126834         746.890831       -49.88034111       -49.90551126        46.61734156        45.24509758    4.230832327e-08     0.002243871978    5.187453249e-09     0.000149989718
+        20012.86251 "BBMK_PAR.R1B1_5"           1166.25843        1166.848276       -62.35045491       -62.38188834         46.6179795         45.2457352    6.170951719e-08     0.002804836957    5.187453249e-09     0.000149989718
+        20016.60254 "BBMK_PAR.R1B1_6"          1679.281199        1680.129594       -74.82056871       -74.85826542        46.61840484        45.24616033    8.111071111e-08     0.003365801937    5.187453249e-09     0.000149989718
+        20020.34256 "BBMK_PAR.R1B1_7"          2102.067734        2480.914464        -27.5527315       -153.7546723        46.61871561        45.24645751      9.6521197e-08     0.004090090535    2.671497039e-09    0.0002535018652
+        20024.08258 "BBMK_PAR.R1B1_8"          2053.306035        4174.028877        30.65817743       -298.6108888        46.61899672          45.246646    1.005556362e-07     0.005304862855   -7.854148535e-11    0.0003739213476
+        20027.82261 "BBMK_PAR.R1B1_9"          1873.267441        6563.509555        2.197362892       -283.6173489        46.61930271         45.2467588      1.0141086e-07     0.006631450738    1.370617437e-09    0.0002820949338
+        20031.56263 "BBMK_PAR.R1B1_10"         2093.000911         7913.67094       -63.31537096       -62.64060006        46.61960954        45.24683971    1.128796786e-07     0.007265310167    4.823836354e-09    5.344788653e-05
+        20035.30265 "BBMK_PAR.R1B1_11"         2769.581709        7822.583992       -135.9848557        129.4416577        46.61986074        45.24691415      1.3520355e-07     0.007191078162    7.863304838e-09   -0.0001287662569
+        20039.04267 "BBMK_PAR.R1B1_12"         4302.844643        6067.940791       -265.8638178        284.9541648        46.62003628        45.24699901    1.731865493e-07     0.006297535058     1.16835041e-08   -0.0003068344147
+         20042.7827 "BBMK_PAR.R1B1_13"         6374.520086        4229.773317        -232.278895        172.8663611        46.62014898         45.2471175    2.144389877e-07     0.005215991892    8.621191088e-09   -0.0002264659346
+        20046.52272 "BBMK_PAR.R1B1_14"         7353.442538        3461.872689       -17.96364165        40.04145768        46.62023415        45.24727625    2.332747598e-07     0.004668082227     1.32151598e-09   -6.868881046e-05
+        20050.26274 "BBMK_PAR.R1B1_15"         7072.269658        3359.328352        45.24994076        9.827658552        46.62031641         45.2474514    2.315729319e-07     0.004530389818   -7.152236824e-10   -3.384511513e-05
+        20054.00277 "BBMK_PAR.R1B1_16"         6737.849734        3286.223337        44.16660387         9.71901714        46.62040264        45.24763055     2.28897979e-07     0.004403808312   -7.152236824e-10   -3.384511513e-05
+        20057.74279 "BBMK_PAR.R1B1_17"         6411.532913        3213.930965        43.08333374        9.610375727         46.6204932        45.24781371    2.262230207e-07     0.004277226807   -7.152260552e-10   -3.384511513e-05
+        20061.48281 "BBMK_PAR.R1B1_18"         6093.319099        3142.451236         42.0000569        9.501734314        46.62058844        45.24800101    2.235480548e-07     0.004150645301   -7.152283963e-10   -3.384511513e-05
+        20065.22284 "BBMK_PAR.R1B1_19"         5783.208334         3071.78415        40.91677351        9.393092901        46.62068871        45.24819259    2.208730814e-07     0.004024063796   -7.152307056e-10   -3.384511513e-05
+        20068.96286 "BBMK_PAR.R1B1_20"         5481.200658        3001.929706        39.83348378        9.284451489        46.62079443        45.24838861    2.181981007e-07      0.00389748229   -7.152329831e-10   -3.384511513e-05
+        20072.70288 "BBMK_PAR.R1B1_21"         5187.296112        2932.887905        38.75018786        9.175810076        46.62090606        45.24858922    2.155231126e-07     0.003770900785   -7.152352289e-10   -3.384511513e-05
+         20076.4429 "BBMK_PAR.R1B1_22"         4901.494697        2864.658747         37.6668349        9.067168663        46.62102411        45.24879458    2.128481165e-07     0.003644319279   -7.152352289e-10   -3.384511513e-05
+enter Twiss module
+  
+iteration:   1 error:   7.147956E-07 deltap:   0.000000E+00
+orbit:   1.810459E-07  5.443644E-12 -7.602513E-07  7.343247E-09  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.128923E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003483494374        53.57873347 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999216        1.167593969        8063.181294        2.770532979 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.399589755      0.01215569323     0.001817537832        60.31953705 
+
+               dq2            betymax              dymax              dyrms 
+       2.189932426        8063.931858        2.764273456       0.5468125618 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266160823     0.001838013259                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB2"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le        0.9382720813
+@ CHARGE           %le                   1
+@ ENERGY           %le                6500
+@ PC               %le         6499.999932
+@ GAMMA            %le         6927.628062
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     0.0002071986744
+@ SIGE             %le             0.00011
+@ SIGT             %le               0.075
+@ NPART            %le            1.15e+11
+@ EX               %le     3.175690121e-10
+@ EY               %le     3.175690121e-10
+@ ET               %le               0.001
+@ BV_FLAG          %le                  -1
+@ LENGTH           %le          26658.8832
+@ ALFA             %le     0.0003483494374
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le         53.57873347
+@ Q1               %le         62.30999216
+@ Q2               %le         60.31953705
+@ DQ1              %le         1.167593969
+@ DQ2              %le         2.189932426
+@ DXMAX            %le         2.770532979
+@ DYMAX            %le         2.764273456
+@ XCOMAX           %le       0.01215569323
+@ YCOMAX           %le       0.01266160823
+@ BETXMAX          %le         8063.181294
+@ BETYMAX          %le         8063.931858
+@ XCORMS           %le      0.001817537832
+@ YCORMS           %le      0.001838013259
+@ DXRMS            %le         1.399589755
+@ DYRMS            %le        0.5468125618
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.59.55"
+*                  S NAME                             BETX               BETY               ALFX               ALFY                MUX                MUY                  X                  Y                 PX                 PY 
+$                %le %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
+        6582.592664 "BBMK_PAR.L5B2_22"         4900.419542        2862.899212       -37.65849424       -9.061133394        14.95096488        14.07468329     0.005205859514    0.0005588737181    5.427898998e-05   -5.965506041e-05
+        6586.332686 "BBMK_PAR.L5B2_21"         5186.157664        2931.082941       -38.74160539       -9.169698648        14.95108295        14.07488878     0.005408864179    0.0003357624263    5.427898998e-05   -5.965506041e-05
+        6590.072709 "BBMK_PAR.L5B2_20"         5479.997108        3000.078743       -39.82465952       -9.278263902        14.95119461        14.07508951     0.005611868642    0.0001126511346    5.427893357e-05   -5.965506041e-05
+        6593.812732 "BBMK_PAR.L5B2_19"         5781.937873        3069.886619       -40.90770746       -9.386829156        14.95130036        14.07528565     0.005814872917   -0.0001104601572    5.427887473e-05   -5.965506041e-05
+        6597.552755 "BBMK_PAR.L5B2_18"          6091.97992        3140.506567       -41.99074905        -9.49539441        14.95140065        14.07547735     0.006017876996    -0.000333571449    5.427881349e-05   -5.965506041e-05
+        6601.292778 "BBMK_PAR.L5B2_17"         6410.123207        3211.938589       -43.07378411       -9.603959664         14.9514959        14.07566477     0.006220880873   -0.0005566827408    5.427874984e-05   -5.965506041e-05
+        6605.032801 "BBMK_PAR.L5B2_16"         6736.367692        3284.182683       -44.15681245       -9.712524918        14.95158649        14.07584804     0.006423884542   -0.0007797940326    5.427868377e-05   -5.965506041e-05
+        6608.772824 "BBMK_PAR.L5B2_15"         7070.713471        3357.238851       -45.23990754       -9.821090172        14.95167274        14.07602731     0.006626888062    -0.001002905324    5.427868377e-05   -5.965506041e-05
+        6612.512847 "BBMK_PAR.L5B2_14"         7351.823902         3459.71594        17.95976366       -40.01605762        14.95175501        14.07620256     0.006793437721    -0.001230965552    -1.05529816e-05   -7.011219522e-05
+         6616.25287 "BBMK_PAR.L5B2_13"         6373.116411        4227.134338        232.2278229       -172.7580558        14.95184021        14.07636141     0.006347248725    -0.001573921582   -0.0002247956513   -0.0001148727926
+        6619.992892 "BBMK_PAR.L5B2_12"         4301.896691         6064.15088        265.8053214       -284.7757363        14.95195293        14.07647998     0.005238887959       -0.002075801   -0.0003158021042   -0.0001396837191
+        6623.732915 "BBMK_PAR.L5B2_11"         2768.971087          7817.6944        135.9549496       -129.3602974        14.95212851        14.07656488     0.004233155662    -0.002511913103   -0.0001980029455   -7.873444956e-05
+        6627.472938 "BBMK_PAR.L5B2_10"         2092.538963        7908.721073        63.30147102        62.60187021        14.95237977        14.07663938       0.0037138617    -0.002663292684   -0.0001067727589   -1.587343061e-05
+        6631.212961 "BBMK_PAR.L5B2_9"          1872.853456        6559.401185       -2.196803704        283.4402713        14.95268666        14.07672033     0.003534783756     -0.00256087121    1.003590862e-05     7.00805979e-05
+        6634.952984 "BBMK_PAR.L5B2_8"          2052.851686        4171.413521       -30.65132074        298.4242349        14.95299271         14.0768332     0.003722950532    -0.002192722846    6.120982047e-05    0.0001059844778
+        6638.693007 "BBMK_PAR.L5B2_7"          2101.602057        2479.357341        27.54669961        153.6586174        14.95327389        14.07702182     0.003767269101    -0.001884416195   -4.940073516e-05    5.078697699e-05
+         6642.43303 "BBMK_PAR.L5B2_6"          1678.908714        1679.072274        74.80404369        74.81160189        14.95358473        14.07731918     0.003367084495    -0.001802353751     -0.00015004878    1.054264395e-07
+        6646.173053 "BBMK_PAR.L5B2_5"          1165.999301        1166.111203        62.33667123        62.34292505        14.95401016        14.07774458     0.002805898622    -0.001801959453     -0.00015004878    1.054264395e-07
+        6649.913076 "BBMK_PAR.L5B2_4"          746.3464037        746.4164053        49.86929878        49.87424821        14.95464824         14.0783826      0.00224471275    -0.001801565156     -0.00015004878    1.054264395e-07
+        6653.653099 "BBMK_PAR.L5B2_3"          419.9500237        419.9878818        37.40192632        37.40557137        14.95571148        14.07944573     0.001683526877    -0.001801170859     -0.00015004878    1.054264395e-07
+        6657.393121 "BBMK_PAR.L5B2_2"          186.8101605         186.825632        24.93455387        24.93689453        14.95783672        14.08157079     0.001122341005    -0.001800776561     -0.00015004878    1.054264395e-07
+        6661.133144 "BBMK_PAR.L5B2_1"          46.92681426        46.92965589        12.46718141        12.46821768        14.96419587        14.08792949     0.000561155132    -0.001800382264     -0.00015004878    1.054264395e-07
+        6664.873167 "IP5"                     0.2999848641       0.2999535341   -0.0001910462328   -0.0004591563058        15.20148764        14.32526498    -3.07406286e-08    -0.001799987967     -0.00015004878    1.054264395e-07
+         6668.61319 "BBMK_PAR.R5B2_1"          46.92967231        46.93652488        -12.4675635       -12.46913599        15.43871898        14.56245525   -0.0005612166131    -0.001799593669     -0.00015004878    1.054264395e-07
+        6672.353213 "BBMK_PAR.R5B2_2"          186.8158766          186.83937       -24.93493595       -24.93781284        15.44507784        14.56881324    -0.001122402486    -0.001799199372     -0.00015004878    1.054264395e-07
+        6676.093236 "BBMK_PAR.R5B2_3"          419.9585978        420.0084888       -37.40230841       -37.40648968        15.44720303        14.57093817    -0.001683588358    -0.001798805075     -0.00015004878    1.054264395e-07
+        6679.833259 "BBMK_PAR.R5B2_4"          746.3578358        746.4438813       -49.86968087       -49.87516652        15.44826624        14.57200126    -0.002244774231    -0.001798410778     -0.00015004878    1.054264395e-07
+        6683.573282 "BBMK_PAR.R5B2_5"          1166.013591        1166.145548       -62.33705332       -62.34384336        15.44890431        14.57263926    -0.002805960103     -0.00179801648     -0.00015004878    1.054264395e-07
+        6687.313305 "BBMK_PAR.R5B2_6"          1678.925863        1679.113488       -74.80442578        -74.8125202        15.44932974        14.57306464    -0.003367145976    -0.001797622183     -0.00015004878    1.054264395e-07
+        6691.053328 "BBMK_PAR.R5B2_7"          2479.135101        2101.853071       -153.6441916        -27.5493421        15.44962714        14.57337544    -0.004091720626     -0.00171699944   -0.0002536022126    4.917752239e-05
+         6694.79335 "BBMK_PAR.R5B2_8"          4171.033163        2053.092177       -298.3963718        30.65555963        15.44981577        14.57365659    -0.005306974655     -0.00143392184   -0.0003740719034     9.39405781e-05
+        6698.533373 "BBMK_PAR.R5B2_9"          6558.797018        1873.068191       -283.4135124         2.19770411        15.44992865         14.5739626    -0.006634096951    -0.001096132523   -0.0002822088627    7.722303015e-05
+        6702.273396 "BBMK_PAR.R5B2_10"         7907.987379        2092.773651       -62.59541066       -63.30792161        15.45000961        14.57426946    -0.007268214304   -0.0008687596378     -5.3470494e-05    4.556070664e-05
+        6706.013419 "BBMK_PAR.R5B2_11"         7816.964379        2769.275965        129.3488696       -135.9692696        15.45008411         14.5745207    -0.007193964138   -0.0007263497592    0.0001288143942    2.679014472e-05
+        6709.753442 "BBMK_PAR.R5B2_12"         6063.580389        4302.364187        284.7495975       -265.8335575        15.45016903        14.57469626    -0.006300075434   -0.0006675567579    0.0003069541469    8.858829605e-06
+        6713.493465 "BBMK_PAR.R5B2_13"         4226.732561        6373.803126        172.7422873       -232.2521961         15.4502876        14.57480897    -0.005218111229   -0.0006267061719    0.0002265530706    1.833005567e-05
+        6717.233488 "BBMK_PAR.R5B2_14"         3459.382604        7352.610961        40.01285359       -17.96103655        15.45044647        14.57489415    -0.004669997568   -0.0005222706001    6.871154045e-05    3.705262974e-05
+        6720.973511 "BBMK_PAR.R5B2_15"         3356.910573        7071.465685        9.820781062        45.24537029        15.45062174        14.57497642    -0.004532274414   -0.0003693320054     3.38512142e-05    4.144606696e-05
+        6724.713534 "BBMK_PAR.R5B2_16"         3283.856732        6737.079591        9.712211956        44.16212899        15.45080102        14.57506266    -0.004405670098   -0.0002143227661     3.38512142e-05    4.144606696e-05
+        6728.453556 "BBMK_PAR.R5B2_17"         3211.614841        6410.796191        9.603676296        43.07888769        15.45098431        14.57515323     -0.00427906568   -5.931352669e-05    3.385125956e-05    4.144606696e-05
+        6732.193579 "BBMK_PAR.R5B2_18"         3140.184842        6092.615485        9.495139139        41.99564638        15.45117175        14.57524847    -0.004152461118    9.569571269e-05    3.385130342e-05    4.144606696e-05
+        6735.933602 "BBMK_PAR.R5B2_19"         3069.566746        5782.537475        9.386600504        40.91240508        15.45136347        14.57534876    -0.004025856417    0.0002507049521    3.385134577e-05    4.144606696e-05
+        6739.673625 "BBMK_PAR.R5B2_20"         2999.760561        5480.562159        9.278060408        39.82916378        15.45155963        14.57545449    -0.003899251581    0.0004057141915    3.385138662e-05    4.144606696e-05
+        6743.413648 "BBMK_PAR.R5B2_21"         2930.766297        5186.689537        9.169518869        38.74592247        15.45176039        14.57556614    -0.003772646614    0.0005607234308    3.385142596e-05    4.144606696e-05
+        6747.153671 "BBMK_PAR.R5B2_22"         2862.583941         4900.91961        9.060946093        37.66268117        15.45196589         14.5756842    -0.003646041506    0.0007157326702    3.385142596e-05    4.144606696e-05
+         19911.8819 "BBMK_PAR.L1B2_22"         4899.247685        2862.064821       -37.64989255       -9.059730461        46.19901321        44.63265929    2.558647351e-06     0.003647391987    1.940031057e-08    3.385475081e-05
+        19915.62192 "BBMK_PAR.L1B2_21"         5184.920586         2930.23805       -38.73276828       -9.168294145        46.19913132        44.63286483    2.631204957e-06      0.00377400953    1.940031057e-08    3.385475081e-05
+        19919.36194 "BBMK_PAR.L1B2_20"         5478.693048        2999.223341       -39.81558698       -9.276857829          46.199243        44.63306562    2.703762464e-06     0.003900627073    1.940028314e-08    3.385475081e-05
+        19923.10196 "BBMK_PAR.L1B2_19"          5780.56507        3069.020693        -40.8983995       -9.385421513        46.19934877        44.63326182    2.776319881e-06     0.004027244617    1.940025484e-08    3.385475081e-05
+        19926.84199 "BBMK_PAR.L1B2_18"         6090.536612        3139.630106       -41.98120567       -9.493985196        46.19944909        44.63345358    2.848877204e-06      0.00415386216    1.940022568e-08    3.385475081e-05
+        19930.58201 "BBMK_PAR.L1B2_17"         6408.607633        3211.051581       -43.06400531        -9.60254888        46.19954437        44.63364105    2.921434432e-06     0.004280479703    1.940019566e-08    3.385475081e-05
+        19934.32203 "BBMK_PAR.L1B2_16"         6734.778092        3283.285117       -44.14679824       -9.711112564        46.19963497        44.63382437    2.993991562e-06     0.004407097246    1.940016478e-08    3.385475081e-05
+        19938.06206 "BBMK_PAR.L1B2_15"         7069.048084        3356.330714       -45.22965789       -9.819676248        46.19972124        44.63400368    3.066548623e-06     0.004533714789    1.940016478e-08    3.385475081e-05
+        19941.80208 "BBMK_PAR.L1B2_14"          7350.09539        3458.789554        17.95513499       -40.00658606        46.19980353        44.63417899     3.12609155e-06      0.00467145722   -7.852950312e-09    6.872775585e-05
+         19945.5421 "BBMK_PAR.L1B2_13"         6371.620778        4226.012958        232.1729176       -172.7134702        46.19988875        44.63433788     2.90979086e-06     0.005219722118   -1.062613587e-07    0.0002266183016
+        19949.28213 "BBMK_PAR.L1B2_12"         4300.889605        6062.553415         265.742689       -284.7019627         46.2000015        44.63445647    2.389786387e-06     0.006302002578   -1.479433265e-07     0.000307044142
+        19953.02215 "BBMK_PAR.L1B2_11"          2768.32535        7815.645382        135.9228371       -129.3276366        46.20017712         44.6345414    1.916212149e-06     0.007196150391   -9.443890653e-08    0.0001288501258
+        19956.76217 "BBMK_PAR.L1B2_10"         2092.053666        7906.657412        63.28638234        62.58429045        46.20042844        44.63461591    1.664446332e-06     0.007270411612   -5.075964032e-08   -5.348832905e-05
+        19960.50219 "BBMK_PAR.L1B2_9"          1872.422057        6557.697915       -2.196706505        283.3654258         46.2007354        44.63469689    1.573091217e-06     0.006636096436    1.411866421e-09   -0.0002822957487
+        19964.24222 "BBMK_PAR.L1B2_8"          2052.382057        4170.337703       -30.64471838        298.3460252        46.20104152        44.63480979    1.645314523e-06     0.005308567364    2.415091166e-08   -0.0003741864556
+        19967.98224 "BBMK_PAR.L1B2_7"          2101.124321        2478.725229        27.54002719        153.6181961        46.20132276        44.63499845    1.663209013e-06     0.004092946207   -2.221245881e-08   -0.0002536789591
+        19971.72226 "BBMK_PAR.L1B2_6"           1678.52976        1678.652015        74.78674792        74.79163021        46.20163367         44.6352959    1.485054938e-06     0.003368151532   -6.662952587e-08    -0.000150094545
+        19975.46229 "BBMK_PAR.L1B2_5"          1165.738686        1165.827111        62.32232563        62.32648863         46.2020592        44.63572139    1.235858986e-06     0.002806794497   -6.662952587e-08    -0.000150094545
+        19979.20231 "BBMK_PAR.L1B2_4"          746.1820607        746.2420372        49.85790335        49.86134706        46.20269743        44.63635957    9.866630338e-07     0.002245437462   -6.662952587e-08    -0.000150094545
+        19982.94233 "BBMK_PAR.L1B2_3"          419.8598853        419.8967929        37.39348106        37.39620548        46.20376089        44.63742294    7.374670816e-07     0.001684080427   -6.662952587e-08    -0.000150094545
+        19986.68235 "BBMK_PAR.L1B2_2"          186.7721594        186.7913784        24.92905878         24.9310639        46.20588658        44.63954843    4.882711293e-07     0.001122723393   -6.662952587e-08    -0.000150094545
+        19990.42238 "BBMK_PAR.L1B2_1"          46.91888289        46.92579365        12.46463649        12.46592232        46.21224691        44.64590797     2.39075177e-07    0.0005613663578   -6.662952587e-08    -0.000150094545
+         19994.1624 "IP1.L1"                  0.3000558696       0.3000387242    0.0002142097446    0.0007807478533        46.44947159        44.88304379   -1.012077527e-08    9.322913605e-09   -6.662952587e-08    -0.000150094545
+         19994.1624 "IP1"                     0.3000558696       0.3000387242    0.0002142097446    0.0007807478533        46.44947159        44.88304379   -1.012077527e-08    9.322913605e-09   -6.662952587e-08    -0.000150094545
+        19997.90242 "BBMK_PAR.R1B2_1"          46.91567827        46.91411356       -12.46420807       -12.46436083        46.68676402        45.12042653   -2.593167275e-07   -0.0005613477118   -6.662952587e-08    -0.000150094545
+        20001.64245 "BBMK_PAR.R1B2_2"          186.7657501        186.7680182       -24.92863036        -24.9295024        46.69312468        45.12678727   -5.085126798e-07    -0.001122704747   -6.662952587e-08    -0.000150094545
+        20005.38247 "BBMK_PAR.R1B2_3"          419.8502714        419.8617526       -37.39305264       -37.39464398        46.69525043        45.12891297    -7.57708632e-07    -0.001684061781   -6.662952587e-08    -0.000150094545
+        20009.12249 "BBMK_PAR.R1B2_4"          746.1692422        746.1953168       -49.85747493       -49.85978556        46.69631391        45.12997642   -1.006904584e-06    -0.002245418816   -6.662952587e-08    -0.000150094545
+        20012.86251 "BBMK_PAR.R1B2_5"          1165.722662        1165.768711       -62.32189721       -62.32492713        46.69695215        45.13061463   -1.256100537e-06    -0.002806775851   -6.662952587e-08    -0.000150094545
+        20016.60254 "BBMK_PAR.R1B2_6"          1678.510532        1678.581935        -74.7863195       -74.79006871        46.69737768        45.13104015   -1.505296489e-06    -0.003368132886   -6.662952587e-08    -0.000150094545
+        20020.34256 "BBMK_PAR.R1B2_7"          2478.525515        2101.197808       -153.6068122       -27.54198643        46.69767515        45.13135105   -1.827503556e-06    -0.003768438592   -1.128968534e-07   -4.941521744e-05
+        20024.08258 "BBMK_PAR.R1B2_8"          4170.011515        2052.461064       -298.3236832        30.64490216        46.69786383        45.13163228   -2.369062038e-06     -0.00372410327   -1.692029075e-07    6.122788991e-05
+        20027.82261 "BBMK_PAR.R1B2_9"           6557.19424        1872.501309        -283.344655        2.195803744        46.69797673        45.13193839   -2.969714068e-06    -0.003535881562   -1.281011766e-07    1.003809551e-05
+        20031.56263 "BBMK_PAR.R1B2_10"         7906.058122        2092.150249       -62.58054053       -63.29029963        46.69805772        45.13224534   -3.260065173e-06    -0.003715018673   -2.560096376e-08   -0.0001068069067
+        20035.30265 "BBMK_PAR.R1B2_11"         7815.060263        2768.461858        129.3169607       -135.9305349        46.69813224        45.13249665   -3.240497713e-06    -0.004234483324    5.382651406e-08   -0.0001980673917
+        20039.04267 "BBMK_PAR.R1B2_12"         6062.105971        4301.111133        284.6799566        -265.757372        46.69821717        45.13267226   -2.853266683e-06    -0.005240539984    1.342246314e-07   -0.0003159035843
+         20042.7827 "BBMK_PAR.R1B2_13"         4225.707319        6371.957947         172.699985       -232.1861989        46.69833577          45.132785   -2.381329727e-06    -0.006349257289    9.760252348e-08   -0.0002248683515
+        20046.52272 "BBMK_PAR.R1B2_14"         3458.546268        7350.492171        40.00277796       -17.95709944        46.69849468        45.13287021   -2.153281189e-06    -0.006795593212    2.521597233e-08   -1.055779168e-05
+        20050.26274 "BBMK_PAR.R1B2_15"         3356.101986        7069.436968        9.818012803        45.23115095        46.69866999         45.1329525   -2.119984687e-06    -0.006629000244    6.517601059e-09    5.429266264e-05
+        20054.00277 "BBMK_PAR.R1B2_16"         3283.068723        6735.155852        9.709478123        44.14827941        46.69884932        45.13303876    -2.09560871e-06    -0.006425944442    6.517601059e-09    5.429266264e-05
+        20057.74279 "BBMK_PAR.R1B2_17"         3210.847152        6408.974665        9.600976882        43.06540787        46.69903265        45.13312936   -2.071232684e-06    -0.006222888641    6.517622783e-09    5.429266264e-05
+        20061.48281 "BBMK_PAR.R1B2_18"         3139.437216        6090.893407        9.492474144        41.98253633        46.69922013        45.13322464   -2.046856588e-06     -0.00601983284    6.517644218e-09    5.429266264e-05
+        20065.22284 "BBMK_PAR.R1B2_19"         3068.838925        5780.912077        9.383969928        40.89966479         46.6994119        45.13332495   -2.022480424e-06    -0.005816777038    6.517665363e-09    5.429266264e-05
+        20068.96286 "BBMK_PAR.R1B2_20"         2999.052289        5479.030676        9.275464252        39.81679325        46.69960811        45.13343071   -1.998104192e-06    -0.005613721237    6.517686219e-09    5.429266264e-05
+        20072.70288 "BBMK_PAR.R1B2_21"         2930.077315        5185.249203        9.166957134        38.73392171        46.69980891        45.13354239   -1.973727894e-06    -0.005410665436    6.517706785e-09    5.429266264e-05
+         20076.4429 "BBMK_PAR.R1B2_22"         2861.913992         4899.56766        9.058418786        37.65105016        46.70001446        45.13366048   -1.949351521e-06    -0.005207609634    6.517706785e-09    5.429266264e-05
+enter Twiss module
+  
+iteration:   1 error:   1.168081E-06 deltap:   0.000000E+00
+orbit:  -6.734686E-07  1.080675E-08  8.208919E-07  9.925625E-09  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   9.338006E-12 deltap:   0.000000E+00
+orbit:  -6.734714E-07  1.080682E-08  8.208882E-07  9.925602E-09  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484756178        53.56903237 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999313        1.238924054        8065.103448        3.203684038 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.417964174      0.01215542972     0.001822192264         60.3195432 
+
+               dq2            betymax              dymax              dyrms 
+       1.288805598        8068.977157        2.932870154       0.5055733876 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266032334     0.001836260714                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "LHCB1"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le        0.9382720813
+@ CHARGE           %le                   1
+@ ENERGY           %le                6500
+@ PC               %le         6499.999932
+@ GAMMA            %le         6927.628062
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     0.0002071986744
+@ SIGE             %le             0.00011
+@ SIGT             %le               0.075
+@ NPART            %le            1.15e+11
+@ EX               %le     3.175690121e-10
+@ EY               %le     3.175690121e-10
+@ ET               %le               0.001
+@ BV_FLAG          %le                   1
+@ LENGTH           %le          26658.8832
+@ ALFA             %le     0.0003484756178
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le         53.56903237
+@ Q1               %le         62.30999313
+@ Q2               %le          60.3195432
+@ DQ1              %le         1.238924054
+@ DQ2              %le         1.288805598
+@ DXMAX            %le         3.203684038
+@ DYMAX            %le         2.932870154
+@ XCOMAX           %le       0.01215542972
+@ YCOMAX           %le       0.01266032334
+@ BETXMAX          %le         8065.103448
+@ BETYMAX          %le         8068.977157
+@ XCORMS           %le      0.001822192264
+@ YCORMS           %le      0.001836260714
+@ DXRMS            %le         1.417964174
+@ DYRMS            %le        0.5055733876
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "25/06/19"
+@ TIME             %08s "10.59.58"
+*                  S NAME                             BETX               BETY               ALFX               ALFY                MUX                MUY                  X                  Y                 PX                 PY 
+$                %le %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
+        6664.500933 "BB_HO.L5B1_5"            0.3151289077       0.3151019789       0.2252409259       0.2249545956        14.98184082         14.2917982   -1.016040986e-05    -0.001800000222    0.0001499729404   -9.091320165e-08
+        6664.526995 "BB_HO.L5B1_4"             0.305653059       0.3056409708       0.1383408018       0.1380577068        14.99522185        14.30518006   -6.251740102e-06    -0.001800002591    0.0001499729404   -9.091320165e-08
+         6664.54027 "BB_HO.L5B1_3"            0.3025676993       0.3025631054      0.09407800477      0.09379655773        15.00217157        14.31212997   -4.260849319e-06    -0.001800003798    0.0001499729404   -9.091320165e-08
+        6664.550658 "BB_HO.L5B1_2"                0.300973       0.3009742397      0.05944299129      0.05916283373        15.00765108        14.31760951   -2.703005401e-06    -0.001800004742    0.0001499729404   -9.091320165e-08
+        6664.559808 "BB_HO.L5B1_1"            0.3001643489       0.3001707052      0.02893417075      0.02865514904        15.01249687        14.32245524   -1.330752996e-06    -0.001800005574    0.0001499729404   -9.091320165e-08
+        6664.568433 "BB_HO5B1_0"              0.2999132749       0.2999244351    0.0001758563023   -0.0001020947197        15.01707262        14.32703085   -3.723638546e-08    -0.001800006358    0.0001499729404   -9.091320165e-08
+        6664.577058 "BB_HO.R5B1_1"            0.3001582818       0.3001742274     -0.02858245481     -0.02885933515        15.02164841        14.33160644    1.256280075e-06    -0.001800007142    0.0001499729404   -9.091320165e-08
+        6664.586208 "BB_HO.R5B1_2"            0.3009604965       0.3009814986     -0.05909127535     -0.05936701983        15.02649435        14.33645208     2.62853248e-06    -0.001800007974    0.0001499729404   -9.091320165e-08
+        6664.596595 "BB_HO.R5B1_3"            0.3025478889       0.3025746062     -0.09372628883     -0.09400074384        15.03197416        14.34193146    4.186376398e-06    -0.001800008919    0.0001499729404   -9.091320165e-08
+         6664.60987 "BB_HO.R5B1_4"            0.3056239105       0.3056578927      -0.1379890858      -0.1382618929        15.03892443        14.34888104    6.177267181e-06    -0.001800010126    0.0001499729404   -9.091320165e-08
+        6664.635933 "BB_HO.R5B1_5"            0.3150814261        0.315129544      -0.2248892099      -0.2251587817        15.05230711        14.36226195    1.008593694e-05    -0.001800012495    0.0001499729404   -9.091320165e-08
+         19994.0949 "BB_HO.L1B1_5"            0.3151259181       0.3149671845       0.2251749188       0.2251709425        46.33528209         44.9630371    -3.56466055e-08   -1.011224523e-05    5.187453249e-09     0.000149989718
+        19994.12096 "BB_HO.L1B1_4"            0.3056534673       0.3054960785       0.1382764292       0.1382288069        46.34866317        44.97642502    -3.55114075e-08   -6.203138208e-06    5.187453249e-09     0.000149989718
+        19994.13424 "BB_HO.L1B1_3"            0.3025698057       0.3024139764      0.09401446465      0.09394461119        46.35561285        44.98337829   -3.544254406e-08   -4.212024701e-06    5.187453249e-09     0.000149989718
+        19994.14462 "BB_HO.L1B1_2"            0.3009764196       0.3008222222       0.0593801026      0.05929285356        46.36109232        44.98886057   -3.538865939e-08   -2.654006506e-06    5.187453249e-09     0.000149989718
+        19994.15377 "BB_HO.L1B1_1"            0.3001689142       0.3000164537      0.02887185587      0.02876928365        46.36593805        44.99370877   -3.534119419e-08   -1.281600586e-06    5.187453249e-09     0.000149989718
+         19994.1624 "BB_HO1B1_0"              0.2999189105       0.2997683439    0.0001140823167   -2.933875976e-06        46.37051371        44.99828675    -3.52964524e-08    1.206073095e-08    5.187453249e-09     0.000149989718
+        19994.17102 "BB_HO.R1B1_1"            0.3001649783       0.3000165548      -0.0286436879     -0.02877514807        46.37508941        45.00286473   -3.525171063e-08    1.305721898e-06    5.187453249e-09     0.000149989718
+        19994.18017 "BB_HO.R1B1_2"            0.3009683083       0.3008224307     -0.05915193463     -0.05929871797        46.37993523        45.00771293   -3.520424543e-08    2.678127818e-06    5.187453249e-09     0.000149989718
+        19994.19056 "BB_HO.R1B1_3"            0.3025569541       0.3024143067     -0.09378629668     -0.09395047561        46.38541489         45.0131952   -3.515036076e-08    4.236146013e-06    5.187453249e-09     0.000149989718
+        19994.20384 "BB_HO.R1B1_4"            0.3056345579       0.3054965645      -0.1380482612      -0.1382346713        46.39236494        45.02014846   -3.508149732e-08    6.227259519e-06    5.187453249e-09     0.000149989718
+         19994.2299 "BB_HO.R1B1_5"            0.3150951154       0.3149679762      -0.2249467509      -0.2251768069        46.40574709        45.03353635   -3.494629932e-08    1.013636654e-05    5.187453249e-09     0.000149989718
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    404
+++++++ info: seqedit - number of elements replaced:   0
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    404
+++++++ info: seqedit - number of elements replaced:   0
+enter Twiss module
+  
+iteration:   1 error:   8.264110E-08 deltap:   0.000000E+00
+orbit:   1.702757E-15 -2.415443E-17  6.694399E-08  8.730785E-10  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484076848        53.57425459 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999302        1.937876615        8065.101657        2.861666141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.390054504    4.776579304e-14    1.300903362e-14        60.31954179 
+
+               dq2            betymax              dymax              dyrms 
+       1.961889154        8068.998662       0.1183208307      0.02027721199 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.005680539229    0.0004986447833                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+beta.ip1           =       0.2999189105 ;
+enter Twiss module
+  
+iteration:   1 error:   8.264110E-08 deltap:   0.000000E+00
+orbit:   1.702757E-15 -2.415443E-17  6.694399E-08  8.730785E-10  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484076848        53.57425459 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999302        1.937876615        8065.101657        2.861666141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.390054504    4.776579304e-14    1.300903362e-14        60.31954179 
+
+               dq2            betymax              dymax              dyrms 
+       1.961889154        8068.998662       0.1183208307      0.02027721199 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.005680539229    0.0004986447833                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+enter Twiss module
+  
+iteration:   1 error:   8.264110E-08 deltap:   0.000000E+00
+orbit:   1.702757E-15 -2.415443E-17  6.694399E-08  8.730785E-10  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484076848        53.57425459 
+
+                q1                dq1            betxmax              dxmax 
+       62.30999302        1.937876615        8065.101657        2.861666141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.390054504    4.776579304e-14    1.300903362e-14        60.31954179 
+
+               dq2            betymax              dymax              dyrms 
+       1.961889154        8068.998662       0.1183208307      0.02027721199 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.005680539229    0.0004986447833                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+!    correct orbit distortion resulting from other magnets
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0)
+
+{
+
+ exec, initial_micado(4);
+
+ exec, initial_micado(4);
+
+ exec, initial_micado(4);
+
+ exec, initial_micado(4);
+
+ };
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+!    final orbit correction before applying crossing scheme
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0)
+
+{ exec, final_micado(0.004); };
+
+
+
+! end of orbit correction, now switch ON crossing scheme
+
+! restoring crossing angle
+
+on_x1=on_x1aux;on_sep1=on_sep1aux;
+
+on_x2=on_x2aux;on_sep2=on_sep2aux; on_oe2=on_oe2aux; on_a2=on_a2aux;
+
+on_x5=on_x5aux;on_sep5=on_sep5aux; on_ov5=on_ov5aux;
+
+on_x8=on_x8aux;on_sep8=on_sep8aux; on_a8=on_a8aux;
+
+on_alice=on_aliceaux; on_lhcb=on_lhcbaux;
+
+on_disp=on_dispaux;
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+!                 matching of orbit, tune and chromaticity
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+if(ON_COLLISION==0) {ON_BB_CHARGE:=1;};    ! W/o head-on Q and Q' are matched with bb
+
+
+
+!on_disp=1; ! for ATS, in order to correct dispersion in the IR
+
+
+
+!Rematch the CO in the arc for dispersion correction
+
+if(ON_DISP<>0) {call,file="slhc/toolkit/rematchCOarc.madx";};
+
+
+
+!Rematch the Xscheme towards specified separation and Xange in IP1/2/5/8
+
+call,file="/afs/cern.ch/eng/lhc/optics/runII/2017/toolkit/rematchCOIP.madx";
+
+!S. Fartoukh Novembre 2009
+
+!Rematch the orbit at all IP after the error abd bb implementation
+
+!S. Fartoukh March 2012
+
+! Use acbh5.l8b1 for IR8 H crossing
+
+! Add a SIMPLEX matching command to ease the rematching
+
+
+
+limitMCBY   :=  96.3 *1.e-6*1;  ! (2.5T * 0.9m) Existing MCBY in IR2/8
+
+if (l.MCBYY>0){
+
+limitMCBYY  :=  96.3 *1.e-6*2;  ! 4.5Tm for MCBYY in IR1/5
+
+} else {
+
+limitMCBYY  :=  limitMCBY;
+
+};
+
+
+
+
+
+
+
+
+
+limitMCBC :=  89.87*1.e-6*1;
+
+limitMCBW :=  80.14*1.e-6*1;
+
+
+
+on_dispaux=on_disp;
+
+on_disp=0;
+
+
+
+if(mylhcbeam==1)
+
+{
+
+
+
+!!IR1
+
+match,sequence=lhcb1,range=s.ds.l1.b1/e.ds.r1.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb1,range=IP1,x=xnom1,y=ynom1,px=pxnom1,py=pynom1;
+
+constraint,sequence=lhcb1,range=e.ds.r1.b1,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary, name=ACBCH6.L1B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV5.L1B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCH5.R1B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV6.R1B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBYHS4.L1B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYHS4.R1B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYVS4.L1B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYVS4.R1B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+simplex, calls = 100, tolerance=1.E-30;
+
+lmdif, calls = 100, tolerance=1.E-30;
+
+Endmatch;
+
+tarip1=tar;
+
+
+
+!!IR2
+
+match,sequence=lhcb1,range=s.ds.l2.b1/e.ds.r2.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb1,range=IP2,x=xnom2,y=ynom2,px=pxnom2,py=pynom2;
+
+constraint,sequence=lhcb1,range=e.ds.r2.b1,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary,   name=acbyhs5.l2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbchs5.r2b1, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyvs5.l2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbcvs5.r2b1, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyhs4.l2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyhs4.r2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.l2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.r2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+!simplex, calls = 100, tolerance=1.E-30;
+
+!lmdif, calls = 100, tolerance=1.E-30;
+
+Endmatch;
+
+tarip2=tar;
+
+
+
+!!IR5
+
+match,sequence=lhcb1,range=s.ds.l5.b1/e.ds.r5.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb1,range=IP5,x=xnom5,y=ynom5,px=pxnom5,py=pynom5;
+
+constraint,sequence=lhcb1,range=e.ds.r5.b1,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary, name=ACBCH6.L5B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV5.L5B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCH5.R5B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV6.R5B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBYHS4.L5B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYHS4.R5B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYVS4.L5B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYVS4.R5B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+!simplex, calls = 100, tolerance=1.E-30;
+
+!lmdif, calls = 100, tolerance=1.E-30;
+
+Endmatch;
+
+tarip5=tar;
+
+
+
+!!IR8
+
+match,sequence=lhcb1,range=s.ds.l8.b1/e.ds.r8.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb1,range=IP8,x=xnom8,y=ynom8,px=pxnom8,py=pynom8;
+
+constraint,sequence=lhcb1,range=e.ds.r8.b1,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary,   name=acbchs5.l8b1, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;  ! was temporarily unavailable
+
+!vary,   name=acbwh5.l8b1,   step = 0.00001,lower=-limitMCBW,upper=limitMCBW; ! temporary   replacement
+
+!vary,   name=acbch5.l8b1, step = 0.00001,lower=-limitMCBC,upper=limitMCBC; ! temporary   replacement
+
+vary,   name=acbyhs4.l8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyhs4.r8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyhs5.r8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbcvs5.l8b1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyvs4.l8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.r8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs5.r8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+!simplex, calls = 100, tolerance=1.E-30;
+
+!lmdif, calls = 100, tolerance=1.E-30;
+
+Endmatch;
+
+tarip8=tar;
+
+
+
+
+
+};
+
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START JACOBIAN:
+
+ JACOBIAN Strategy =           3
+Initial Penalty Function =   0.7564254527349431E-13
+
+
+ Solve system with            6 con,           8 var
+ Rank             6   Condition number    182.42456008546375     
+ Step length    8.4645462201374613E-005
+call:     2 Dx =   0.84645462E-04  Penalty function =  0.3936673965696209E-14
+ Solve system with            8 con,           8 var
+ Rank             8   Condition number    677.89991730450390     
+ Step length    1.7549604650426599E-004
+call:     3 Dx =   0.17549605E-03  Penalty function =  0.2657840888291086E-25
+ Solve system with            8 con,           8 var
+ Rank             8   Condition number    677.89993286162030     
+ Step length    2.6944727694756361E-010
+call:     4 Dx =   0.26944728E-09  Penalty function =  0.3009725164863387E-32
+ ++++++++++ JACOBIAN ended: converged successfully
+ Final difference norm:   9.4365969883245773E-005
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START SIMPLEX:
+
+ converged
+call:      98   Penalty function =   0.30097252E-32
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START LMDIF:
+
+Initial Penalty Function =   0.30097252E-32
+
+
+ ++++++++++ LMDIF ended: converged successfully
+call:       1   Penalty function =   0.30097252E-32
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+ip1:1                      x            4    -3.52965582E-08    -3.52965582E-08     1.15692953E-41
+ip1:1                      px           4     5.18736476E-09     5.18736476E-09     6.84227766E-43
+ip1:1                      y            4     1.20606448E-08     1.20606448E-08     2.02163777E-35
+ip1:1                      py           4     1.49989718E-04     1.49989718E-04     2.93873588E-37
+e.ds.r1.b1:1               x            4     0.00000000E+00     7.18693794E-20     5.16520770E-39
+e.ds.r1.b1:1               px           4     0.00000000E+00    -9.54689971E-22     9.11432940E-41
+e.ds.r1.b1:1               y            4     0.00000000E+00    -5.24987894E-17     2.75612288E-33
+e.ds.r1.b1:1               py           4     0.00000000E+00     1.52671792E-18     2.33086761E-34
+
+
+Final Penalty Function =   3.00972516e-33
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbch6.l1b1              -7.44915e-11 -7.36060e-22 -8.98700e-05  8.98700e-05
+acbcv5.l1b1              -1.98242e-05 -1.98262e-05 -8.98700e-05  8.98700e-05
+acbch5.r1b1               5.38218e-09  1.45313e-21 -8.98700e-05  8.98700e-05
+acbcv6.r1b1               1.35244e-05  1.35273e-05 -8.98700e-05  8.98700e-05
+acbyhs4.l1b1             -1.59970e-09 -1.56634e-21 -9.63000e-05  9.63000e-05
+acbyhs4.r1b1             -5.72710e-09  1.58341e-21 -9.63000e-05  9.63000e-05
+acbyvs4.l1b1             -3.00621e-05 -3.00635e-05 -9.63000e-05  9.63000e-05
+acbyvs4.r1b1              2.46808e-05  2.46802e-05 -9.63000e-05  9.63000e-05
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   3.00972516e-33
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START JACOBIAN:
+
+ JACOBIAN Strategy =           3
+Initial Penalty Function =   0.2697974342507547E-12
+
+
+ Solve system with            8 con,           8 var
+ Rank             8   Condition number    31.537051502895629     
+ Step length    2.8034824465952884E-004
+call:     2 Dx =   0.28034824E-03  Penalty function =  0.9964510365203372E-25
+ Solve system with            8 con,           8 var
+ Rank             8   Condition number    31.537051513426544     
+ Step length    1.7172071624507731E-010
+call:     3 Dx =   0.17172072E-09  Penalty function =  0.1347639740946674E-31
+ ++++++++++ JACOBIAN ended: converged successfully
+ Final difference norm:   1.6869639675570677E-004
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+ip2:1                      x            4     1.40913810E-04     1.40913810E-04     4.70197740E-38
+ip2:1                      px           4     3.34714459E-07     3.34714459E-07     5.81146499E-39
+ip2:1                      y            4    -2.00002490E-03    -2.00002490E-03     1.52344068E-33
+ip2:1                      py           4     2.75375440E-04     2.75375440E-04     5.75992232E-35
+e.ds.r2.b1:1               x            4     0.00000000E+00    -1.11660526E-19     1.24680731E-38
+e.ds.r2.b1:1               px           4     0.00000000E+00    -1.04030346E-20     1.08223129E-38
+e.ds.r2.b1:1               y            4     0.00000000E+00    -1.08895468E-16     1.18582229E-32
+e.ds.r2.b1:1               py           4     0.00000000E+00     6.08757128E-19     3.70585241E-35
+
+
+Final Penalty Function =   1.34763974e-32
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbyhs5.l2b1             -4.32661e-07 -4.21025e-07 -9.63000e-05  9.63000e-05
+acbchs5.r2b1              3.28797e-06  3.26797e-06 -8.98700e-05  8.98700e-05
+acbyvs5.l2b1             -3.81036e-05 -3.81070e-05 -9.63000e-05  9.63000e-05
+acbcvs5.r2b1              4.43695e-05  4.43688e-05 -8.98700e-05  8.98700e-05
+acbyhs4.l2b1              1.95858e-06  1.94596e-06 -9.63000e-05  9.63000e-05
+acbyhs4.r2b1             -9.00701e-07 -8.93806e-07 -9.63000e-05  9.63000e-05
+acbyvs4.l2b1             -8.10420e-05 -8.10425e-05 -9.63000e-05  9.63000e-05
+acbyvs4.r2b1             -1.73359e-05 -1.73284e-05 -9.63000e-05  9.63000e-05
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.34763974e-32
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START JACOBIAN:
+
+ JACOBIAN Strategy =           3
+Initial Penalty Function =   0.9304965905217923E-12
+
+
+ Solve system with            8 con,           8 var
+ Rank             8   Condition number    542.62592174464805     
+ Step length    4.9863884408618336E-004
+call:     2 Dx =   0.49863884E-03  Penalty function =  0.4066676981441328E-25
+ Solve system with            8 con,           8 var
+ Rank             8   Condition number    542.62595095411018     
+ Step length    5.0606188105623024E-010
+call:     3 Dx =   0.50606188E-09  Penalty function =  0.2389735227518889E-30
+ ++++++++++ JACOBIAN ended: converged successfully
+ Final difference norm:   2.4798081240297564E-004
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+ip5:1                      x            4    -3.72364802E-08    -3.72364802E-08     6.89806224E-34
+ip5:1                      px           4     1.49972940E-04     1.49972940E-04     8.99987862E-35
+ip5:1                      y            4    -1.80000636E-03    -1.80000636E-03     2.30396893E-36
+ip5:1                      py           4    -9.09129131E-08    -9.09129131E-08     7.10308102E-37
+e.ds.r5.b1:1               x            4     0.00000000E+00    -4.83379426E-16     2.33655670E-31
+e.ds.r5.b1:1               px           4     0.00000000E+00     6.37524162E-18     4.06437057E-33
+e.ds.r5.b1:1               y            4     0.00000000E+00     2.09913423E-17     4.40636451E-34
+e.ds.r5.b1:1               py           4     0.00000000E+00    -5.47967156E-19     3.00268004E-35
+
+
+Final Penalty Function =   2.38973523e-31
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbch6.l5b1              -1.32801e-05 -1.32905e-05 -8.98700e-05  8.98700e-05
+acbcv5.l5b1              -5.53424e-05 -5.53869e-05 -8.98700e-05  8.98700e-05
+acbch5.r5b1               1.97494e-05  1.97585e-05 -8.98700e-05  8.98700e-05
+acbcv6.r5b1              -5.52471e-05 -5.52197e-05 -8.98700e-05  8.98700e-05
+acbyhs4.l5b1             -2.44632e-05 -2.44571e-05 -9.63000e-05  9.63000e-05
+acbyhs4.r5b1              3.00563e-05  3.00535e-05 -9.63000e-05  9.63000e-05
+acbyvs4.l5b1             -5.93768e-05 -5.93497e-05 -9.63000e-05  9.63000e-05
+acbyvs4.r5b1             -5.91618e-05 -5.91706e-05 -9.63000e-05  9.63000e-05
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   2.38973523e-31
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+entry name: betx
+number of entries: 1
+entry value: 100.000000
+entry name: bety
+number of entries: 1
+entry value: 100.000000
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+number of variables:    8
+user given constraints: 4
+total constraints:      8
+
+START JACOBIAN:
+
+ JACOBIAN Strategy =           3
+Initial Penalty Function =   0.3253184860176313E-12
+
+
+ Solve system with            8 con,           8 var
+ Rank             8   Condition number    116.42595245686843     
+ Step length    3.5273379787002204E-004
+call:     2 Dx =   0.35273380E-03  Penalty function =  0.2943472908979068E-24
+ Solve system with            8 con,           8 var
+ Rank             8   Condition number    116.42586301997000     
+ Step length    2.4718303795007580E-010
+call:     3 Dx =   0.24718304E-09  Penalty function =  0.1392494773927963E-33
+ ++++++++++ JACOBIAN ended: converged successfully
+ Final difference norm:   1.9031493002589592E-004
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+ip8:1                      x            4    -5.72525748E-08    -5.72525748E-08     7.52316385E-35
+ip8:1                      px           4    -1.04609341E-04    -1.04609341E-04     2.64486229E-36
+ip8:1                      y            4    -5.01013561E-05    -5.01013561E-05     1.03314933E-38
+ip8:1                      py           4     1.97348519E-06     1.97348519E-06     7.17464814E-41
+e.ds.r8.b1:1               x            4     0.00000000E+00     7.54674456E-18     5.69533534E-35
+e.ds.r8.b1:1               px           4     0.00000000E+00     1.86825031E-19     3.49035923E-36
+e.ds.r8.b1:1               y            4     0.00000000E+00     9.53284581E-19     9.08751492E-37
+e.ds.r8.b1:1               py           4     0.00000000E+00    -1.00544764E-20     1.01092496E-38
+
+
+Final Penalty Function =   1.39249477e-34
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+acbchs5.l8b1              3.99880e-05  4.00001e-05 -8.98700e-05  8.98700e-05
+acbyhs4.l8b1              5.10904e-05  5.10762e-05 -9.63000e-05  9.63000e-05
+acbyhs4.r8b1             -7.67641e-05 -7.67563e-05 -9.63000e-05  9.63000e-05
+acbyhs5.r8b1             -2.09927e-05 -2.10102e-05 -9.63000e-05  9.63000e-05
+acbcvs5.l8b1             -7.86832e-07 -7.66657e-07 -8.98700e-05  8.98700e-05
+acbyvs4.l8b1              7.78447e-08  7.02684e-08 -9.63000e-05  9.63000e-05
+acbyvs4.r8b1             -6.88333e-07 -6.82148e-07 -9.63000e-05  9.63000e-05
+acbyvs5.r8b1              1.53990e-07  1.44192e-07 -9.63000e-05  9.63000e-05
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.39249477e-34
+
+
+if(mylhcbeam==2)
+
+{
+
+
+
+!!IR1
+
+match,sequence=lhcb2,range=s.ds.l1.b2/e.ds.r1.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb2,range=IP1,x=xnom1,y=ynom1,px=pxnom1,py=pynom1;
+
+constraint,sequence=lhcb2,range=e.ds.r1.b2,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary, name=ACBCH6.R1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV5.R1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCH5.L1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV6.L1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBYHS4.L1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYHS4.R1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYVS4.L1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYVS4.R1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+!simplex, calls = 100, tolerance=1.E-30;
+
+!lmdif, calls = 2000, tolerance=1.E-30;
+
+Endmatch;
+
+tarip1=tar;
+
+
+
+!!IR2
+
+match,sequence=lhcb2,range=s.ds.l2.b2/e.ds.r2.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb2,range=IP2,x=xnom2,y=ynom2,px=pxnom2,py=pynom2;
+
+constraint,sequence=lhcb2,range=e.ds.r2.b2,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary,   name=acbyhs5.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbchs5.r2b2, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyvs5.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbcvs5.r2b2, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyhs4.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyhs4.r2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.r2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+!simplex, calls = 100, tolerance=1.E-30;
+
+!lmdif, calls = 2000, tolerance=1.E-30;
+
+Endmatch;
+
+tarip2=tar;
+
+
+
+!!IR5
+
+match,sequence=lhcb2,range=s.ds.l5.b2/e.ds.r5.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb2,range=IP5,x=xnom5,y=ynom5,px=pxnom5,py=pynom5;
+
+constraint,sequence=lhcb2,range=e.ds.r5.b2,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary, name=ACBCH6.R5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV5.R5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCH5.L5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV6.L5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBYHS4.L5b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary, name=ACBYHS4.R5b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary, name=ACBYVS4.L5b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary, name=ACBYVS4.R5b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+!simplex, calls = 100, tolerance=1.E-30;
+
+!lmdif, calls = 2000, tolerance=1.E-30;
+
+Endmatch;
+
+tarip5=tar;
+
+
+
+!!IR8
+
+match,sequence=lhcb2,range=s.ds.l8.b2/e.ds.r8.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb2,range=IP8,x=xnom8,y=ynom8,px=pxnom8,py=pynom8;
+
+constraint,sequence=lhcb2,range=e.ds.r8.b2,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary,   name=acbchs5.l8b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyhs5.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbcvs5.l8b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyvs5.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyhs4.l8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyhs4.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.l8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+!simplex, calls = 100, tolerance=1.E-30;
+
+!lmdif, calls = 2000, tolerance=1.E-30;
+
+Endmatch;
+
+tarip8=tar;
+
+
+
+};
+
+
+
+if(mylhcbeam==4)
+
+{
+
+
+
+!!IR1
+
+match,sequence=lhcb2,range=e.ds.r1.b2/s.ds.l1.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb2,range=IP1,x=xnom1,y=ynom1,px=pxnom1,py=pynom1;
+
+constraint,sequence=lhcb2,range=s.ds.l1.b2,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary, name=ACBCH6.R1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV5.R1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCH5.L1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV6.L1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBYHS4.L1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYHS4.R1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYVS4.L1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYVS4.R1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+simplex, calls = 100, tolerance=1.E-30;
+
+lmdif, calls = 2000, tolerance=1.E-30;
+
+Endmatch;
+
+tarip1=tar;
+
+
+
+!!IR2
+
+match,sequence=lhcb2,range=e.ds.r2.b2/s.ds.l2.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb2,range=IP2,x=xnom2,y=ynom2,px=pxnom2,py=pynom2;
+
+constraint,sequence=lhcb2,range=s.ds.l2.b2,x=0.,y=0.,px=0.,py=0.;
+
+ 
+
+vary,   name=acbyhs5.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbchs5.r2b2, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyvs5.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbcvs5.r2b2, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyhs4.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyhs4.r2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.r2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+simplex, calls = 100, tolerance=1.E-30;
+
+lmdif, calls = 2000, tolerance=1.E-30;
+
+Endmatch;
+
+tarip2=tar;
+
+
+
+
+
+!!IR5
+
+match,sequence=lhcb2,range=e.ds.r5.b2/s.ds.l5.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb2,range=IP5,x=xnom5,y=ynom5,px=pxnom5,py=pynom5;
+
+constraint,sequence=lhcb2,range=s.ds.l5.b2,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary, name=ACBCH6.R5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV5.R5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCH5.L5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBCV6.L5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary, name=ACBYHS4.L5b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYHS4.R5b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYVS4.L5b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+vary, name=ACBYVS4.R5b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+simplex, calls = 100, tolerance=1.E-30;
+
+lmdif, calls = 2000, tolerance=1.E-30;
+
+Endmatch;
+
+tarip5=tar;
+
+
+
+
+
+!!IR8
+
+match,sequence=lhcb2,range=e.ds.r8.b2/s.ds.l8.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+
+constraint,sequence=lhcb2,range=IP8,x=xnom8,y=ynom8,px=pxnom8,py=pynom8;
+
+constraint,sequence=lhcb2,range=s.ds.l8.b2,x=0.,y=0.,px=0.,py=0.;
+
+
+
+vary,   name=acbchs5.l8b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyhs5.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbcvs5.l8b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+
+vary,   name=acbyvs5.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyhs4.l8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyhs4.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.l8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+vary,   name=acbyvs4.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+
+
+jacobian, calls=15, tolerance=1e-30;
+
+simplex, calls = 100, tolerance=1.E-30;
+
+lmdif, calls = 2000, tolerance=1.E-30;
+
+Endmatch;
+
+tarip8=tar;
+
+
+
+};
+
+
+
+
+
+tarip=tarip1+tarip2+tarip5+tarip8;
+
+value,tarip1,tarip2,tarip5,tarip8,tarip;
+
+tarip1             =    3.009725165e-33 ;
+tarip2             =    1.347639741e-32 ;
+tarip5             =    2.389735228e-31 ;
+tarip8             =    1.392494774e-34 ;
+tarip              =    2.555988948e-31 ;
+
+
+on_disp=on_dispaux;
+
+return;
+
+
+
+if(mylhcbeam==1)
+
+{kqtf=kqtf.b1;kqtd=kqtd.b1;kqtf.b1:=kqtf;kqtd.b1:=kqtd;
+
+ ksf=ksf.b1;ksd=ksd.b1;ksf.b1:=ksf;ksd.b1:=ksd;};
+
+
+
+if(mylhcbeam>1)
+
+{kqtf=kqtf.b2;kqtd=kqtd.b2;kqtf.b2:=kqtf;kqtd.b2:=kqtd;
+
+ ksf=ksf.b2;ksd=ksd.b2;ksf.b2:=ksf;ksd.b2:=ksd;};
+
+
+
+ match;
+
+START MATCHING
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.124722E-11 (symplectifying R)                                                                                                               
+ global, q1=qx0, q2=qy0;
+
+vary,   name=dQx.b1_sq, step=1.0E-7 ;
+
+vary,   name=dQy.b1_sq, step=1.0E-7 ;
+
+ lmdif,  calls=100, tolerance=1.0E-21;
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.124722E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.21000201E-04
+
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.133804E-11 (symplectifying R)                                                                                                               
+call:       4   Penalty function =   0.51268525E-15
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105227E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.16559768E-22
+ ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105227E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.16559768E-22
+ endmatch;
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105227E-11 (symplectifying R)                                                                                                               
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105227E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     2.90805684E-24
+Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     1.36517113E-23
+
+
+Final Penalty Function =   1.65597681e-23
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+dqx.b1_sq                 6.98113e-06  0.00000e+00 -1.00000e+20  1.00000e+20
+dqy.b1_sq                 4.58166e-04  0.00000e+00 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.65597681e-23
+
+
+ match,chrom;
+
+START MATCHING
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.205694E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105227E-11 (symplectifying R)                                                                                                               
+ global, dq1=qprime, dq2=qprime;
+
+vary,   name=dQpx.b1_sq;
+
+vary,   name=dQpy.b1_sq;
+
+ lmdif,  calls=100, tolerance=1.0E-21;
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.205694E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105227E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.37770687E+03
+
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105227E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.358100E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105227E-11 (symplectifying R)                                                                                                               
+call:       4   Penalty function =   0.33995079E+03
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.167376E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.129717E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.202460E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.27689573E+03
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.202460E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.202460E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.148237E-11 (symplectifying R)                                                                                                               
+call:      10   Penalty function =   0.17017265E+03
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.114124E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.148237E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.179448E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.148237E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.187979E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.268319E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.34277667E+02
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.305566E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.268319E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.197156E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.268319E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.174731E-11 (symplectifying R)                                                                                                               
+call:      16   Penalty function =   0.74580351E-06
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.192686E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105909E-11 (symplectifying R)                                                                                                               
+call:      19   Penalty function =   0.22300843E-13
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.197284E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105675E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105675E-11 (symplectifying R)                                                                                                               
+ ++++++++++ LMDIF ended: converged without success
+call:      23   Penalty function =   0.22300843E-13
+ endmatch;
+
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+Global constraint:         dq1          4     1.50000000E+01     1.50000000E+01     1.43423986E-15
+Global constraint:         dq2          4     1.50000000E+01     1.49999999E+01     2.08666027E-14
+
+
+Final Penalty Function =   2.23008425e-14
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+dqpx.b1_sq                1.37512e+01  0.00000e+00 -1.00000e+20  1.00000e+20
+dqpy.b1_sq                1.37650e+01  0.00000e+00 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   2.23008425e-14
+
+
+ match,chrom;
+
+START MATCHING
+
+ global, dq1=qprime, dq2=qprime;
+
+ global, q1=qx0, q2=qy0;
+
+vary,   name=dQx.b1_sq;
+
+vary,   name=dQy.b1_sq;
+
+vary,   name=dQpx.b1_sq, step=1.0E-7 ;
+
+vary,   name=dQpy.b1_sq, step=1.0E-7 ;
+
+ lmdif,  calls=500, tolerance=1.0E-21;
+
+number of variables:    4
+user given constraints: 2
+total constraints:      4
+
+START LMDIF:
+
+Initial Penalty Function =   0.22300843E-13
+
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.112458E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.113531E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.230160E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.197284E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.244071E-11 (symplectifying R)                                                                                                               
+ ++++++++++ LMDIF ended: converged without success
+call:       6   Penalty function =   0.22300843E-13
+ endmatch;
+
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+Global constraint:         dq1          4     1.50000000E+01     1.50000000E+01     1.43423986E-15
+Global constraint:         dq2          4     1.50000000E+01     1.49999999E+01     2.08666027E-14
+Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     4.24596494E-24
+Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     3.15544362E-24
+
+
+Final Penalty Function =   2.23008426e-14
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+dqx.b1_sq                 6.98113e-06  6.98113e-06 -1.00000e+20  1.00000e+20
+dqy.b1_sq                 4.58166e-04  4.58166e-04 -1.00000e+20  1.00000e+20
+dqpx.b1_sq                1.37512e+01  1.37512e+01 -1.00000e+20  1.00000e+20
+dqpy.b1_sq                1.37650e+01  1.37650e+01 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   2.23008426e-14
+
+
+
+
+
+
+!======== WIRES INSTALLATION =========!
+
+
+
+sIP1 = 19994.1624;
+
+sIP5 = 6664.56843;
+
+
+
+if(ON_WIRE == 1){
+
+!s_opt = 158.3;
+
+
+
+! IP1
+
+
+
+x_wire_r1b1 = 0;
+
+y_wire_r1b1 = -0.00739;
+
+s_wire_r1b1 = sIP1+176.17;
+
+I_wire_r1b1 = 420.0;
+
+
+
+x_wire_l1b1 = 0;
+
+y_wire_l1b1 = 0.00742;
+
+s_wire_l1b1 = sIP1-145.945;
+
+I_wire_l1b1 = 384.0;
+
+
+
+
+
+if(I_wire_r1b1<>0){
+
+on_wire_r1b1 = 1;
+
+exec, INSTALL_WIRE_C_B1(bbwire_c_r1b1, s_wire_r1b1, x_wire_r1b1, y_wire_r1b1, I_wire_r1b1);
+
+exec, MATCH_WIRE_C_B1(r1b1);
+
+I_wire_r1b1 = 0;
+
+kq5.r1b1=kq5.r1b1_BM;
+
+kq4.r1b1=kq4.r1b1_BM;
+
+kq6.r1b1=kq6.r1b1_BM;
+
+};
+
+
+
+if(I_wire_l1b1<>0){
+
+on_wire_l1b1 = 1;
+
+exec, INSTALL_WIRE_C_B1(bbwire_c_l1b1, s_wire_l1b1, x_wire_l1b1, y_wire_l1b1, I_wire_l1b1);
+
+exec, MATCH_WIRE_C_B1(l1b1);
+
+I_wire_l1b1 = 0;
+
+kq5.l1b1=kq5.l1b1_BM;
+
+kq4.l1b1=kq4.l1b1_BM;
+
+kq6.l1b1=kq6.l1b1_BM;
+
+};
+
+
+
+! IP5
+
+
+
+x_wire_r5b1 = -0.00715;
+
+y_wire_r5b1 = 0;
+
+s_wire_r5b1 = sIP5+150.03;
+
+I_wire_r5b1 = 228.0;
+
+
+
+x_wire_l5b1 = 0.00824;
+
+y_wire_l5b1 = 0;
+
+s_wire_l5b1 = sIP5-147.95;
+
+I_wire_l5b1 = 408.0;
+
+
+
+if(I_wire_r5b1<>0){
+
+on_wire_r5b1 = 1;
+
+exec, INSTALL_WIRE_C_B1(bbwire_c_r5b1, s_wire_r5b1, x_wire_r5b1, y_wire_r5b1, I_wire_r5b1);
+
+exec, MATCH_WIRE_C_B1(r5b1);
+
+I_wire_r5b1 = 0;
+
+kq5.r5b1=kq5.r5b1_BM;
+
+kq4.r5b1=kq4.r5b1_BM;
+
+kq6.r5b1=kq6.r5b1_BM;
+
+};
+
+
+
+if(I_wire_l5b1<>0){
+
+on_wire_l5b1 = 1;
+
+exec, INSTALL_WIRE_C_B1(bbwire_c_l5b1, s_wire_l5b1, x_wire_l5b1, y_wire_l5b1, I_wire_l5b1);
+
+exec, MATCH_WIRE_C_B1(l5b1);
+
+I_wire_l5b1 = 0;
+
+kq5.l5b1=kq5.l5b1_BM;
+
+kq4.l5b1=kq4.l5b1_BM;
+
+kq6.l5b1=kq6.l5b1_BM;
+
+};
+
+
+
+use, sequence = lhcb1;
+
+twiss;
+
+
+
+! Switch ON the wires back
+
+
+
+if(on_wire_r1b1 <>0){
+
+I_wire_r1b1 = 420.0;
+
+kq6.r1b1=kq6.r1b1_AM;
+
+kq5.r1b1=kq5.r1b1_AM;
+
+kq4.r1b1=kq4.r1b1_AM;
+
+};
+
+
+
+if(on_wire_l1b1 <>0){
+
+I_wire_l1b1 = 384.0;
+
+kq6.l1b1=kq6.l1b1_AM;
+
+kq5.l1b1=kq5.l1b1_AM;
+
+kq4.l1b1=kq4.l1b1_AM;
+
+};
+
+
+
+if(on_wire_r5b1 <>0){
+
+I_wire_r5b1 = 228.0;
+
+kq6.r5b1=kq6.r5b1_AM;
+
+kq5.r5b1=kq5.r5b1_AM;
+
+kq4.r5b1=kq4.r5b1_AM;
+
+};
+
+
+
+if(on_wire_l5b1 <>0){
+
+I_wire_l5b1 = 408.0;
+
+kq6.l5b1=kq6.l5b1_AM;
+
+kq5.l5b1=kq5.l5b1_AM;
+
+kq4.l5b1=kq4.l5b1_AM;
+
+};
+
+
+
+match;
+
+global, q1=qx0, q2=qy0;
+
+vary,   name=dQx.b1_sq, step=1.0E-7 ;
+
+vary,   name=dQy.b1_sq, step=1.0E-7 ;
+
+lmdif,  calls=500, tolerance=1.0E-21;
+
+endmatch;
+
+
+
+};
+
+enter Twiss module
+  
+iteration:   1 error:   2.963202E-16 deltap:   0.000000E+00
+orbit:  -1.837944E-16  1.920393E-18 -3.213407E-16 -4.702522E-18  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484758384        53.56901541 
+
+                q1                dq1            betxmax              dxmax 
+             62.31        15.01263333        8065.083705        3.203603287 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.429519947      0.01215542972      0.00178595453              60.32 
+
+               dq2            betymax              dymax              dyrms 
+       15.00023496        8068.341042        2.930735837       0.4962193858 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266032334     0.001793688138                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Close orbit of the weak beam at the wire location
+s_at_bbcw.b1       =         20170.3324 ;
+x_at_bbcw.b1       =    9.299330088e-08 ;
+y_at_bbcw.b1       =    0.0007119041286 ;
+Distance in [sig] and [m] between the wire and the weak beam
+x_wire_r1b1        =                  0 ;
+x_dist_sig_bbcw.b1 =                  0 ;
+y_wire_r1b1        =           -0.00739 ;
+y_dist_sig_bbcw.b1 =       -11.66231558 ;
+Distance in [m] of the wire from the reference orbit
+bbwire_c_r1b1->xma =    9.299330088e-08 ;
+bbwire_c_r1b1->yma =    -0.006678095871 ;
+Current in the wire [Am] and equivalent number of encounters
+i_wire_r1b1        =                420 ;
+i_wire_r1b1_n      =         76.0361917 ;
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+number of variables:    2
+user given constraints: 1
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.55942846E-02
+
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.117515E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.153148E-11 (symplectifying R)                                                                                                               
+call:       4   Penalty function =   0.46849743E-06
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.117034E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.139136E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.107581E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.59188625E-12
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.239414E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.159882E-11 (symplectifying R)                                                                                                               
+call:      10   Penalty function =   0.20856507E-18
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.115057E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.176352E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171458E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.59983721E-22
+ ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171458E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.59983721E-22
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171458E-11 (symplectifying R)                                                                                                               
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171458E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     4.18083658E-23
+Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     1.81753553E-23
+
+
+Final Penalty Function =   5.99837211e-23
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kq5.r1b1                  1.22143e-03  1.22828e-03 -1.00000e+20  1.00000e+20
+kq4.r1b1                 -2.42713e-03 -2.41366e-03 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   5.99837211e-23
+enter Twiss module
+  
+iteration:   1 error:   1.014470E-05 deltap:   0.000000E+00
+orbit:  -7.169246E-10  1.551980E-11 -1.272590E-05 -1.942618E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.887731E-07 deltap:   0.000000E+00
+orbit:  -2.838030E-10  7.700417E-12 -1.236375E-05 -1.887343E-07  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171458E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484760401        53.56899991 
+
+                q1                dq1            betxmax              dxmax 
+             62.31        14.66765466        8065.845155        3.203627515 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.429523094      0.01215543073      0.00178595489              60.32 
+
+               dq2            betymax              dymax              dyrms 
+       16.00287406        8066.955373         2.93237365       0.4965738363 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01267357429     0.001790665921                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+enter Twiss module
+  
+iteration:   1 error:   2.963202E-16 deltap:   0.000000E+00
+orbit:  -1.837944E-16  1.920393E-18 -3.213407E-16 -4.702522E-18  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484758384        53.56901541 
+
+                q1                dq1            betxmax              dxmax 
+             62.31        15.01263333        8065.083705        3.203603287 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.429501621      0.01215542972     0.001785930698              60.32 
+
+               dq2            betymax              dymax              dyrms 
+       15.00023496        8068.341042        2.930735837       0.4962196056 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266032334     0.001793686961                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Close orbit of the weak beam at the wire location
+s_at_bbcw.b1       =         19848.2174 ;
+x_at_bbcw.b1       =   -3.588550765e-08 ;
+y_at_bbcw.b1       =    -0.001749047053 ;
+Distance in [sig] and [m] between the wire and the weak beam
+x_wire_l1b1        =                  0 ;
+x_dist_sig_bbcw.b1 =                  0 ;
+y_wire_l1b1        =            0.00742 ;
+y_dist_sig_bbcw.b1 =        11.63792148 ;
+Distance in [m] of the wire from the reference orbit
+bbwire_c_l1b1->xma =   -3.588550765e-08 ;
+bbwire_c_l1b1->yma =     0.005670952947 ;
+Current in the wire [Am] and equivalent number of encounters
+i_wire_l1b1        =                384 ;
+i_wire_l1b1_n      =        69.51880384 ;
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+number of variables:    2
+user given constraints: 1
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.13185054E-01
+
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.131517E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.251546E-11 (symplectifying R)                                                                                                               
+call:       4   Penalty function =   0.85350575E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.369605E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.258134E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.335105E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.18162368E-07
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.106250E-11 (symplectifying R)                                                                                                               
+call:      10   Penalty function =   0.60812672E-15
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.301494E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.193477E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.15802462E-22
+ ++++++++++ LMDIF ended: converged successfully
+call:      13   Penalty function =   0.15802462E-22
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     1.31316942E-23
+Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     2.67076748E-24
+
+
+Final Penalty Function =   1.58024617e-23
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kq5.l1b1                 -1.34718e-03 -1.49222e-03 -1.00000e+20  1.00000e+20
+kq4.l1b1                  2.29696e-03  2.41366e-03 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.58024617e-23
+enter Twiss module
+  
+iteration:   1 error:   3.391432E-05 deltap:   0.000000E+00
+orbit:   5.235740E-10  2.691295E-12 -3.706486E-05 -5.420795E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   8.385696E-07 deltap:   0.000000E+00
+orbit:   4.586583E-09 -7.469449E-11 -3.612516E-05 -5.282314E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484765387        53.56896159 
+
+                q1                dq1            betxmax              dxmax 
+             62.31        14.24501195        7998.125239        3.205879209 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.429218803      0.01215544348     0.001785933187              60.32 
+
+               dq2            betymax              dymax              dyrms 
+       15.54474481        8143.859252        2.948721022       0.4999171608 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01269372161     0.001785517986                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+enter Twiss module
+  
+iteration:   1 error:   2.963202E-16 deltap:   0.000000E+00
+orbit:  -1.696810E-16  1.674650E-18 -3.213407E-16 -4.702522E-18  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.146527E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484758384        53.56901541 
+
+                q1                dq1            betxmax              dxmax 
+             62.31        15.01263333        8065.083705        3.203603287 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.429468816      0.01215542972     0.001785917884              60.32 
+
+               dq2            betymax              dymax              dyrms 
+       15.00023496        8068.341042        2.930735837       0.4963080626 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266032334     0.001793954011                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Close orbit of the weak beam at the wire location
+s_at_bbcw.b1       =         6814.59843 ;
+x_at_bbcw.b1       =     0.001527100759 ;
+y_at_bbcw.b1       =     0.004600854949 ;
+Distance in [sig] and [m] between the wire and the weak beam
+x_wire_r5b1        =           -0.00715 ;
+x_dist_sig_bbcw.b1 =       -11.95021187 ;
+y_wire_r5b1        =                  0 ;
+y_dist_sig_bbcw.b1 =                  0 ;
+Distance in [m] of the wire from the reference orbit
+bbwire_c_r5b1->xma =    -0.005622899241 ;
+bbwire_c_r5b1->yma =     0.004600854949 ;
+Current in the wire [Am] and equivalent number of encounters
+i_wire_r5b1        =                228 ;
+i_wire_r5b1_n      =        41.27678978 ;
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+number of variables:    2
+user given constraints: 1
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.47626207E-02
+
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.108247E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.183944E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.158356E-11 (symplectifying R)                                                                                                               
+call:       4   Penalty function =   0.59695462E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.112090E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.147933E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.15519411E-09
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.148615E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.112160E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.311269E-11 (symplectifying R)                                                                                                               
+call:      10   Penalty function =   0.55499720E-16
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.112254E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.336239E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.180787E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.10728508E-22
+ ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.180787E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.10728508E-22
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.180787E-11 (symplectifying R)                                                                                                               
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.180787E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     4.54383881E-24
+Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     6.18466950E-24
+
+
+Final Penalty Function =   1.07285083e-23
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kq5.r5b1                  1.15350e-03  1.22828e-03 -1.00000e+20  1.00000e+20
+kq4.r5b1                 -2.35150e-03 -2.41366e-03 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.07285083e-23
+enter Twiss module
+  
+iteration:   1 error:   6.433333E-05 deltap:   0.000000E+00
+orbit:  -1.254843E-05  1.400738E-07 -2.900975E-05 -2.334847E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   8.912691E-07 deltap:   0.000000E+00
+orbit:  -1.234276E-05  1.377585E-07 -2.947907E-05 -2.380219E-07  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.180787E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484767409        53.56894604 
+
+                q1                dq1            betxmax              dxmax 
+             62.31         15.3475942        8104.775166         3.20202512 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.429464059       0.0121547784     0.001779811038              60.32 
+
+               dq2            betymax              dymax              dyrms 
+       14.41305063        8069.633868        2.946343508       0.4997793975 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01264345726     0.001776023219                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+enter Twiss module
+  
+iteration:   1 error:   2.963202E-16 deltap:   0.000000E+00
+orbit:  -1.696810E-16  1.674650E-18 -3.213407E-16 -4.702522E-18  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.103340E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484758384        53.56901541 
+
+                q1                dq1            betxmax              dxmax 
+             62.31        15.01263333        8065.083705        3.203603287 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.429441185      0.01215542972     0.001785900409              60.32 
+
+               dq2            betymax              dymax              dyrms 
+       15.00023496        8068.341042        2.930735837       0.4963640079 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266032334     0.001794081877                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+Close orbit of the weak beam at the wire location
+s_at_bbcw.b1       =         6516.61843 ;
+x_at_bbcw.b1       =     -0.00142125639 ;
+y_at_bbcw.b1       =     0.003437234607 ;
+Distance in [sig] and [m] between the wire and the weak beam
+x_wire_l5b1        =            0.00824 ;
+x_dist_sig_bbcw.b1 =        10.90426384 ;
+y_wire_l5b1        =                  0 ;
+y_dist_sig_bbcw.b1 =                  0 ;
+Distance in [m] of the wire from the reference orbit
+bbwire_c_l5b1->xma =      0.00681874361 ;
+bbwire_c_l5b1->yma =     0.003437234607 ;
+Current in the wire [Am] and equivalent number of encounters
+i_wire_l5b1        =                408 ;
+i_wire_l5b1_n      =        73.86372908 ;
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.190958E-11 (symplectifying R)                                                                                                               
+number of variables:    2
+user given constraints: 1
+total constraints:      2
+
+START LMDIF:
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.190958E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.90399378E-02
+
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.165620E-11 (symplectifying R)                                                                                                               
+call:       4   Penalty function =   0.22094717E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.206281E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.142303E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.59593868E-08
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.119045E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.166399E-11 (symplectifying R)                                                                                                               
+call:      10   Penalty function =   0.11726838E-14
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.239609E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.112859E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.12519286E-21
+ ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.112859E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.12519286E-21
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.112859E-11 (symplectifying R)                                                                                                               
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.112859E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     1.07618298E-22
+Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     1.75745588E-23
+
+
+Final Penalty Function =   1.25192857e-22
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kq5.l5b1                 -1.63134e-03 -1.49222e-03 -1.00000e+20  1.00000e+20
+kq4.l5b1                  2.52071e-03  2.41366e-03 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.25192857e-22
+enter Twiss module
+  
+iteration:   1 error:   8.093711E-05 deltap:   0.000000E+00
+orbit:  -2.489904E-05  3.002706E-07 -2.413700E-05 -5.953356E-08  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   5.354302E-07 deltap:   0.000000E+00
+orbit:  -2.401020E-05  2.894226E-07 -2.413359E-05 -5.948403E-08  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.112859E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0     0.000348473824        53.56917024 
+
+                q1                dq1            betxmax              dxmax 
+             62.31        15.88460486        8156.816051        3.205976835 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.430409071       0.0121493536      0.00177465853              60.32 
+
+               dq2            betymax              dymax              dyrms 
+       14.49486325        8098.260022        2.902706989       0.4897611617 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01261558871     0.001769830743                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+enter Twiss module
+  
+iteration:   1 error:   2.963202E-16 deltap:   0.000000E+00
+orbit:  -1.696810E-16  1.674650E-18 -3.213407E-16 -4.702522E-18  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.103340E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484758384        53.56901541 
+
+                q1                dq1            betxmax              dxmax 
+             62.31        15.01263333        8065.083705        3.203603287 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.429441185      0.01215542972     0.001785900409              60.32 
+
+               dq2            betymax              dymax              dyrms 
+       15.00023496        8068.341042        2.930735837       0.4963640079 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01266032334     0.001794081877                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+START MATCHING
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.234782E-11 (symplectifying R)                                                                                                               
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.234782E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.76641403E-04
+
+
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.157432E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.399318E-11 (symplectifying R)                                                                                                               
+call:       4   Penalty function =   0.18534622E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.120186E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.247530E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.345130E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.82273555E-10
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.119797E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.237784E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.278434E-11 (symplectifying R)                                                                                                               
+call:      10   Penalty function =   0.53071331E-20
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.324013E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.301390E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.132311E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.85323196E-24
+ ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.132311E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.85323196E-24
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.132311E-11 (symplectifying R)                                                                                                               
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.132311E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     0.00000000E+00
+Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     8.53231955E-25
+
+
+Final Penalty Function =   8.53231955e-25
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+dqx.b1_sq                -5.28394e-04  6.98113e-06 -1.00000e+20  1.00000e+20
+dqy.b1_sq                 1.18148e-03  4.58166e-04 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   8.53231955e-25
+
+
+
+
+use, sequence=lhcb1;
+
+twiss;
+
+enter Twiss module
+  
+iteration:   1 error:   1.819068E-04 deltap:   0.000000E+00
+orbit:  -3.124644E-05  3.129392E-07 -9.059187E-05 -8.311903E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.137474E-05 deltap:   0.000000E+00
+orbit:  -3.414089E-05  3.907895E-07 -9.917938E-05 -9.390461E-07  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   9.442609E-07 deltap:   0.000000E+00
+orbit:  -3.437045E-05  3.934322E-07 -9.956675E-05 -9.417896E-07  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.132311E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484823201        53.56851722 
+
+                q1                dq1            betxmax              dxmax 
+             62.31        14.73285687        8159.360777        3.206067939 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.429893828      0.01214978463     0.001768956725              60.32 
+
+               dq2            betymax              dymax              dyrms 
+       15.93181573        8143.097899        2.936964976       0.4964796824 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01263504787     0.001743197879                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+
+
+ON_BB_CHARGE:=1;
+
+
+
+VRF400:=12.;
+
+LAGRF400.B1=0.5;
+
+LAGRF400.B2=0.;
+
+
+
+! We want to save as an output the final Twiss
+
+if(mylhcbeam==1) {use,  sequence=lhcb1;};
+
+if(mylhcbeam>1) {use,  sequence=lhcb2;};
+
+select,flag=twiss, clear;
+
+select, flag=twiss, pattern="^mq.*", column=NAME, S, L, X, Y, PX, PY, BETX, BETY, MUX, MUY, DX, DY, DPX, DPY;
+
+select, flag=twiss, pattern="^bbmk.*", column=NAME, S, L, X, Y, PX, PY, BETX, BETY, MUX, MUY, DX, DY, DPX, DPY;
+
+select, flag=twiss, pattern="^ip.*", column=NAME, S, L, X, Y, PX, PY, BETX, BETY, MUX, MUY, DX, DY, DPX, DPY;
+
+select, flag=twiss, pattern="^bbwire.*", column=NAME, S, L, X, Y, PX, PY, BETX, BETY, MUX, MUY, DX, DY, DPX, DPY;
+
+twiss, file="final_twiss.twiss";
+
+enter Twiss module
+  
+iteration:   1 error:   1.819068E-04 deltap:   0.000000E+00
+orbit:  -3.293273E-05  3.603907E-07 -9.461754E-05 -8.587055E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.588539E-06 deltap:   0.000000E+00
+orbit:  -3.434930E-05  3.941982E-07 -9.983827E-05 -9.465350E-07  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   7.463058E-08 deltap:   0.000000E+00
+orbit:  -3.438971E-05  3.938657E-07 -9.960400E-05 -9.422206E-07  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.302791E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484888155          53.568018 
+
+                q1                dq1            betxmax              dxmax 
+       62.30136653        10.72720329        8361.552404        3.200475651 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.432020116      0.01214978621     0.001768962957        60.31218266 
+
+               dq2            betymax              dymax              dyrms 
+       15.68142639        8415.670618        2.975453721       0.5038431038 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01263501016     0.001743194409                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+
+
+! Table for the quadrupoles values (the one used in the matching...)
+
+DELETE, TABLE=myktable;
+
+CREATE, TABLE=myktable, COLUMN={kq5.l5b1,kq4.l5b1,kq5.r5b1,kq4.r5b1,kq5.l1b1,kq4.l1b1,kq5.r1b1,kq4.r1b1};
+
+FILL, TABLE=myktable, ROW=1;
+
+WRITE, TABLE=myktable, FILE="k_table.tfs";
+
+
+
+! Tune Footprint
+
+
+
+footkey = 0;
+
+
+
+if(footkey<>0){
+
+MAKEFOOTPRINT_V1("dynap", "dynaptune")
+
+};
+
+
+
+
+
+twiss;
+
+enter Twiss module
+  
+iteration:   1 error:   1.819068E-04 deltap:   0.000000E+00
+orbit:  -3.293273E-05  3.603907E-07 -9.461754E-05 -8.587055E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.588539E-06 deltap:   0.000000E+00
+orbit:  -3.434930E-05  3.941982E-07 -9.983827E-05 -9.465350E-07  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   7.463058E-08 deltap:   0.000000E+00
+orbit:  -3.438971E-05  3.938657E-07 -9.960400E-05 -9.422206E-07  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.302791E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484888155          53.568018 
+
+                q1                dq1            betxmax              dxmax 
+       62.30136653        10.72720329        8361.552404        3.200475651 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.432020116      0.01214978621     0.001768962957        60.31218266 
+
+               dq2            betymax              dymax              dyrms 
+       15.68142639        8415.670618        2.975453721       0.5038431038 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01263501016     0.001743194409                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
+
+xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
+
+xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
+
+xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
+
+betxnom1 =table(twiss,IP1,betx) ;betynom1 = table(twiss,IP1,bety) ;
+
+betxnom5 =table(twiss,IP5,betx) ;betynom5 = table(twiss,IP5,bety) ;
+
+
+
+dtct1b1=table(twiss,TCTPH.4L1.B1,mux)-table(twiss,MKD.O5L6.B1,mux);
+
+dtct5b1=table(twiss,TCTPH.4L5.B1,mux)-table(twiss,MKD.O5L6.B1,mux)+table(summ,q1);
+
+ddtct1b1=(dtct1b1-floor(dtct1b1))*360;
+
+ddtct5b1=(dtct5b1-floor(dtct5b1))*360;
+
+value,dtct1b1,dtct5b1,ddtct1b1,ddtct5b1;
+
+dtct1b1            =        23.50008317 ;
+dtct5b1            =         54.4473573 ;
+ddtct1b1           =        180.0299426 ;
+ddtct5b1           =        161.0486286 ;
+
+
+value,xnom1,xnom2,xnom5,xnom8;
+
+xnom1              =   -2.212307116e-06 ;
+xnom2              =    0.0001367332416 ;
+xnom5              =    6.209950069e-07 ;
+xnom8              =   -7.570717293e-06 ;
+value,ynom1,ynom2,ynom5,ynom8;
+
+ynom1              =   -8.802031565e-07 ;
+ynom2              =    -0.001975551525 ;
+ynom5              =    -0.001799450653 ;
+ynom8              =   -4.656384079e-05 ;
+value,pxnom1,pxnom2,pxnom5,pxnom8;
+
+pxnom1             =   -2.660823484e-06 ;
+pxnom2             =    1.596482879e-06 ;
+pxnom5             =    0.0001453518222 ;
+pxnom8             =   -0.0001042720431 ;
+value,pynom1,pynom2,pynom5,pynom8;
+
+pynom1             =    0.0001357448906 ;
+pynom2             =    0.0002755916883 ;
+pynom5             =    1.410406272e-05 ;
+pynom8             =   -3.392920978e-06 ;
+value, betxnom1,betynom1,betxnom5,betynom5;
+
+betxnom1           =         0.29257264 ;
+betynom1           =       0.2881081066 ;
+betxnom5           =       0.2929029284 ;
+betynom5           =       0.3266548306 ;
+value, table(summ,q1);
+
+table( summ q1 )   =        62.30136653 ;
+value, table(summ,q2);
+
+table( summ q2 )   =        60.31218266 ;
+value, table(summ,dq1);
+
+table( summ dq1 )  =        10.72720329 ;
+value, table(summ,dq2);
+
+table( summ dq2 )  =        15.68142639 ;
+
+
+
+
+use, sequence = lhcb1;
+
+
+
+sixtrack,cavall, radius=0.017;
+
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+Reference radius set to : 0.017000
+
+total block length: 26658.883200
+
+c6t terminated - total number of elements: 37471
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 0
+                 alignment errors   MAD-X: 8
+                alignment errors SixTrack: 8
+                          sequence length: 26658.883200 [m]
+
+
+!Fix bb lenses in sixtrack input
+
+exec, SIXTRACK_INPUT_BB_LENSES;
+
+
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern=MQTL;
+
+twiss,file="last_twiss.1";
+
+enter Twiss module
+  
+iteration:   1 error:   1.819068E-04 deltap:   0.000000E+00
+orbit:  -3.293273E-05  3.603907E-07 -9.461754E-05 -8.587055E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.588539E-06 deltap:   0.000000E+00
+orbit:  -3.434930E-05  3.941982E-07 -9.983827E-05 -9.465350E-07  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   7.463058E-08 deltap:   0.000000E+00
+orbit:  -3.438971E-05  3.938657E-07 -9.960400E-05 -9.422206E-07  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.302791E-11 (symplectifying R)                                                                                                               
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003484888155          53.568018 
+
+                q1                dq1            betxmax              dxmax 
+       62.30136653        10.72720329        8361.552404        3.200475651 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.432020116      0.01214978621     0.001768962957        60.31218266 
+
+               dq2            betymax              dymax              dyrms 
+       15.68142639        8415.670618        2.975453721       0.5038431038 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01263501016     0.001743194409                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+
+
+
+
+
+
+stop;
+
+
+  Number of warnings: 127
+0 in C and 127 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
