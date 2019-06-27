@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.05.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.31 12:23:26      +
+  + Release   date: 2019.06.07               +
+  + Execution date: 2019.06.27 10:19:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !example of 6D calculation on ALS (synchrotron light source)
 
@@ -50,17 +50,17 @@ Determined SECTOR NMUL MAX :  2
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.150000E+01
  Setting MADx with 
-     energy           1.5000000870399719     
+     energy           1.50000008703997     
      method                   2
      Num. of steps           20
-     charge          -1.0000000000000000     
-  Length of machine:    196.87813579154621     
+     charge          -1.00000000000000     
+  Length of machine:    196.878135791546     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    5.6919674902566881E-014   0.0000000000000000       -7.7160500211448380E-015
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   5.691967490256688E-014  0.000000000000000E+000 -7.716050021144838E-015
 
 
 !  ptc_printframes, file="ALS.C", format=rootmacro;!this prints my visualisation with ROOT
@@ -114,6 +114,7 @@ obs_points pro_ptc_setswitch Done
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
+ Closed orbit:   1.849313249509225E-015 -9.806347110831090E-020  0.000000000000000E+000  0.000000000000000E+000 -0.149896228999759       1.540436433373398E-012
 
 ++++++ table: ptc_twiss_summary
 
@@ -130,28 +131,28 @@ obs_points pro_ptc_setswitch Done
       0.8243387316        12.21021568        1.344962596        22.46553125 
 
          beta11min          beta11max          beta12min          beta12max 
-      0.8243387316        12.21021568    4.720496314e-37    4.244782869e-34 
+      0.8243387316        12.21021568    3.209661831e-71    1.948821143e-40 
 
          beta13min          beta13max          beta21min          beta21max 
-    5.33500918e-09     0.003445478433    4.742867677e-37    9.260174994e-36 
+    5.33500918e-09     0.003445478433     7.67582947e-36      1.4289069e-34 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.344962596        22.46553125    2.625382144e-33    9.730328758e-31 
+       1.344962596        22.46553125    2.644095966e-35     2.43001136e-31 
 
          beta31min          beta31max          beta32min          beta32max 
-   1.297134175e-07      0.01267018466    5.068911176e-34    2.270415387e-33 
+   1.297134175e-07      0.01267018466    1.015602187e-32    1.015971364e-32 
 
          beta33min          beta33max           disp1min           disp1max 
        16.49298388        16.49448224                  0       0.2383825039 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1918836552       0.1918826607   -8.044166648e-16    8.034882229e-16 
+     -0.1918836552       0.1918826607   -3.499773087e-16    3.555563493e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -4.384115746e-16     4.34170616e-16                  0     1.84931325e-15 
+  -1.887918286e-16    1.957412697e-16                  0     1.84931325e-15 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -9.806347113e-20                  0                  0    1.540436433e-12 
+  -9.806347111e-20                  0                  0    1.540436433e-12 
 
            orbit_t             xcorms             ycorms            pxcorms 
       -0.149896229    1.796834153e-13                  0    1.699545599e-13 

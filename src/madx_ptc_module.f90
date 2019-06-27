@@ -334,10 +334,10 @@ CONTAINS
        particle=.false.
        CALL MAKE_STATES(PARTICLE)
     else
+       muonfactor=pma/pmae
        if (getdebug() > 1) then
            print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. PROTON beam'
        endif
-       muonfactor=pma/pmae
        CALL MAKE_STATES(muonfactor)
     endif
 
@@ -717,7 +717,6 @@ CONTAINS
     case(4)
        call aafail('ptc_input:','PTC does not accept matrix elements. Program stops.')
     case(22)
-       call fort_warn('ptc_input: ','Element Beam-Beam, must use slice tracking to get effect')
        key%magnet="marker"
     !case(1,11)
     case(1,11,20,21,44)
@@ -3168,7 +3167,11 @@ CONTAINS
        name(:len_trim(name2)-1)=name2(:len_trim(name2)-1)
        call context(name)
        call move_to(my_ring,p,name,pos)
-       tilt=-p%mag%p%tiltd
+       
+       !madxtilt =  get_orginal_madx_tilt(name)
+       
+       tilt=-(p%mag%p%tiltd)! - madxtilt)   ! here we should read tilt from MADX lattice and deduce back the automatic tilt from skew (+ normal)
+       
        if(pos/=0) then
           if(p%mag%l/=zero) then
              do k=1,maxmul
@@ -3320,8 +3323,8 @@ CONTAINS
     totch=node_value('charge ') * get_value('probe ', 'npart ')
 
     if (getdebug()>1) then
-      print*, 'charge npart ',node_value('charge '), get_value('probe ', 'npart ')
-      print*, 'gamma0, arad, totch ',gamma0, arad, totch
+      print*, 'getfk for beam-beam: charge npart ',node_value('charge '), get_value('probe ', 'npart ')
+      print*, 'getfk for beam-beam: gamma0, arad, totch ',gamma0, arad, totch
     endif
 
 
@@ -3344,8 +3347,78 @@ CONTAINS
          (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
 
   end subroutine getfk
-  !________________________________________________________________________________________________
+ 
+  !____________________________________________________________________________________________
+  ! Configures beam-beam for every beambeam element defined in MADX lattice
+  subroutine getBeamBeam()
+   implicit none
+   integer                 :: i,e,elcode
+   integer, external       :: restart_sequ, & !  restart beamline and return number of beamline node
+                              advance_node    !  advance to the next node in expanded sequence
+                                              !  =0 (end of range), =1 (else)
+   double precision, external :: node_value  !/*returns value for parameter par of current element */
+   type(fibre), pointer    :: p
+   real (dp)               :: fk
 
+   TYPE(INTEGRATION_NODE),POINTER :: CURR_SLICE
+
+   e=restart_sequ()
+   p=>my_ring%start
+   do e=1, my_ring%n !in slices e goes to nelem + 1 because the last slice is the fist one.
+
+     elcode=node_value('mad8_type ')
+
+     if (elcode .eq. 22) then
+
+        if (getdebug() > 1 ) then
+          write(6,*) " Beam-Beam position at element named >>",p%mag%name,"<<"
+        endif
+
+        CURR_SLICE => p%t1
+
+        do while (.not. (CURR_SLICE%cas==case0.or.CURR_SLICE%cas==caset) )
+          if (associated(CURR_SLICE,p%t2)) exit
+          CURR_SLICE => CURR_SLICE%next
+          !print*, CURR_SLICE%cas
+        enddo
+
+        !print *,  'BB Node Case NO: ',CURR_SLICE%cas
+
+        if(((CURR_SLICE%cas==case0).or.(CURR_SLICE%cas==caset))) then !must be 0 or 3
+
+          if(.not.associated(CURR_SLICE%BB)) call alloc(CURR_SLICE%BB)
+
+          call getfk(fk)
+          CURR_SLICE%bb%fk = fk
+          CURR_SLICE%bb%sx = node_value('sigx ')
+          CURR_SLICE%bb%sy = node_value('sigy ')
+          CURR_SLICE%bb%xm = node_value('xma ')
+          CURR_SLICE%bb%ym = node_value('yma ')
+          CURR_SLICE%bb%PATCH=.true.
+          if (getdebug() > -2 ) then
+            print*, "BB fk=",CURR_SLICE%bb%fk
+            print*, "BB sx=",CURR_SLICE%bb%sx
+            print*, "BB sy=",CURR_SLICE%bb%sy
+            print*, "BB xm=",CURR_SLICE%bb%xm
+            print*, "BB ym=",CURR_SLICE%bb%ym
+          endif
+
+          do_beam_beam = .true.
+
+        else
+          call fort_warn('getBeamBeam: ','Bad node case for BeamBeam')
+        endif
+
+      endif
+
+      i=advance_node() ! c-code go to the next node -> the passed value is never used, just to shut up a compiler
+      p=>p%next
+    enddo
+
+  end subroutine getBeamBeam
+  !________________________________________________________________________________________________
+  ! this routine serves ptc_putbeambeam command
+  ! that enables user to inject beambeam inside any element without splitting it
   subroutine putbeambeam()
     implicit none
     real (dp) :: fk, xma, yma, sigx, sigy,s
@@ -3639,5 +3712,6 @@ CONTAINS
 
 
   end  function getmaxnmul
+
 
 END MODULE madx_ptc_module
