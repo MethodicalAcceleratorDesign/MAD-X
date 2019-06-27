@@ -1,0 +1,216 @@
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!     Wire compensator installation in lhcb1
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+INSTALL_WIRE_COMP_LHCB1: MACRO = {
+
+use, sequence=lhcb1;
+
+
+!!!!!!!!!!!!!!!!SET THE SIG* OF THE BEAM BEAM WIRE COMPENSATOR ELEMENT!!!!!!!!!!!!!!!!
+!## IP1 ##!
+sigx_c_l1.b1 = (2*1e-3)/6; ! in [m]
+sigy_c_l1.b1 = (2*1e-3)/6; ! in [m]
+sigx_c_r1.b1 = (2*1e-3)/6; ! in [m]
+sigy_c_r1.b1 = (2*1e-3)/6; ! in [m]
+        
+!## IP5 ##!
+sigx_c_l5.b1 = (2*1e-3)/6; ! in [m]
+sigy_c_l5.b1 = (2*1e-3)/6; ! in [m]
+sigx_c_r5.b1 = (2*1e-3)/6; ! in [m]
+sigy_c_r5.b1 = (2*1e-3)/6; ! in [m]
+
+
+!!!!!!!!!!!!!!!!DIFINE WIRE MARKERS!!!!!!!!!!!!!!!!
+!## IP1 ##!
+mar_wire_c_l1.b1: marker;
+mar_wire_c_r1.b1: marker;
+
+!## IP5 ##!
+mar_wire_c_l5.b1: marker;
+mar_wire_c_r5.b1: marker;
+
+
+!!!!!!!!!!!!!!!!INSTALL WIRE MARKERS!!!!!!!!!!!!!!!!
+seqedit, sequence=lhcb1;
+flatten;
+
+!## IP1 ##!
+if (wire_c_s_l1.b1<>0){
+install, element=mar_wire_c_l1.b1, at=wire_c_s_l1.b1, from=ip1;
+};
+
+if (wire_c_s_r1.b1<>0){
+install, element=mar_wire_c_r1.b1, at=wire_c_s_r1.b1, from=ip1;
+};
+
+
+!## IP5 ##!
+if (wire_c_s_l5.b1<>0){
+install, element=mar_wire_c_l5.b1, at=wire_c_s_l5.b1, from=ip5;
+};
+
+if (wire_c_s_r5.b1<>0){
+install, element=mar_wire_c_r5.b1, at=wire_c_s_r5.b1, from=ip5;
+};
+
+flatten;
+endedit;
+
+
+!!!!!!!!!!!!!!!!TRANSVERS POSITION OF THE WIRES!!!!!!!!!!!!!!!!
+use, sequence=lhcb1;
+select,flag=twiss,sequence=lhcb1,clear;
+
+!## IP1 & IP5 ##!      
+select, flag=twiss, sequence=lhcb1, pattern=mar_wire_c_[lr][15].b1, column=name,s,x,y,px,py,betx,bety,sig11,sig12,sig22,sig33,sig34,sig44,sig13,sig14,sig23,sig24;
+select, flag=twiss, sequence=lhcb1, pattern=ip[15], class=marker, column=name,s,x,y,px,py,betx,bety,sig11,sig12,sig22,sig33,sig34,sig44,sig13,sig14,sig23,sig24;
+twiss, sequence=lhcb1;
+
+
+!!!!!!!!!!!!!!!!PRINTED VALUES!!!!!!!!!!!!!!!!
+
+s_at_wire_c_l1.b1 = table(twiss,mar_wire_c_l1.b1,s)-table(twiss,ip1,s);
+x_at_wire_c_l1.b1 = table(twiss,mar_wire_c_l1.b1,x);
+y_at_wire_c_l1.b1 = table(twiss,mar_wire_c_l1.b1,y);
+s_at_wire_c_r1.b1 = table(twiss,mar_wire_c_r1.b1,s)-table(twiss,ip1,s);
+x_at_wire_c_r1.b1 = table(twiss,mar_wire_c_r1.b1,x);
+y_at_wire_c_r1.b1 = table(twiss,mar_wire_c_r1.b1,y);
+
+s_at_wire_c_l5.b1 = table(twiss,mar_wire_c_l5.b1,s)-table(twiss,ip5,s);
+x_at_wire_c_l5.b1 = table(twiss,mar_wire_c_l5.b1,x);
+y_at_wire_c_l5.b1 = table(twiss,mar_wire_c_l5.b1,y);
+s_at_wire_c_r5.b1 = table(twiss,mar_wire_c_r5.b1,s)-table(twiss,ip5,s);
+x_at_wire_c_r5.b1 = table(twiss,mar_wire_c_r5.b1,x);
+y_at_wire_c_r5.b1 = table(twiss,mar_wire_c_r5.b1,y);
+
+
+x_dist_w_c_sig_l1.b1= wire_c_x_l1.b1/sqrt(table(twiss,mar_wire_c_l1.b1,sig11));
+x_dist_w_c_sig_r1.b1= wire_c_x_r1.b1/sqrt(table(twiss,mar_wire_c_r1.b1,sig11));
+y_dist_w_c_sig_l1.b1= wire_c_y_l1.b1/sqrt(table(twiss,mar_wire_c_l1.b1,sig33));
+y_dist_w_c_sig_r1.b1= wire_c_y_r1.b1/sqrt(table(twiss,mar_wire_c_r1.b1,sig33));
+
+x_dist_w_c_sig_l5.b1= wire_c_x_l5.b1/sqrt(table(twiss,mar_wire_c_l5.b1,sig11));
+x_dist_w_c_sig_r5.b1= wire_c_x_r5.b1/sqrt(table(twiss,mar_wire_c_r5.b1,sig11));
+y_dist_w_c_sig_l5.b1= wire_c_y_l5.b1/sqrt(table(twiss,mar_wire_c_l5.b1,sig33));
+y_dist_w_c_sig_r5.b1= wire_c_y_r5.b1/sqrt(table(twiss,mar_wire_c_r5.b1,sig33));
+
+
+! The total number of particles (abs(total charge)) in the wire compensator
+! It should be used the BEAM%lhcb2->npart but since the beambeam element is associated with the beam of the secuance that is part of, the BEAM%lhcb1->npart is used for consistency (generally BEAM%lhcb2->npart = BEAM%lhcb1->npart)
+
+!## IP1 ##!
+num_p_w_l1.b1 = qelect*clight*i_wire_c_l1.b1*beam%lhcb1->npart; 
+num_p_w_r1.b1 = qelect*clight*i_wire_c_r1.b1*beam%lhcb1->npart;
+
+!## IP5 ##!
+num_p_w_l5.b1 = qelect*clight*i_wire_c_l5.b1*beam%lhcb1->npart;
+num_p_w_r5.b1 = qelect*clight*i_wire_c_r5.b1*beam%lhcb1->npart;
+
+
+!!!!!!!!!!!!!!!!INSTALL THE BEAM BEAM WIRE COMPENSATOR!!!!!!!!!!!!!!!!
+seqedit, sequence=lhcb1;
+flatten;
+
+!## IP1 ##!
+if (wire_c_s_l1.b1<>0){
+x_bbwire_c_l1.b1 = table(twiss,mar_wire_c_l1.b1,x);
+y_bbwire_c_l1.b1 = table(twiss,mar_wire_c_l1.b1,y);
+xma_l1.b1 = x_bbwire_c_l1.b1 + wire_c_x_l1.b1;
+yma_l1.b1 = y_bbwire_c_l1.b1 + wire_c_y_l1.b1;
+bbwire_c_l1.b1: beambeam, charge:=-i_wire_c_l1.b1*on_off_w_c_l1.b1, sigx=sigx_c_l1.b1, sigy=sigy_c_l1.b1, xma=xma_l1.b1, yma=yma_l1.b1, bbshape=1, bbdir=-1;
+replace, element=mar_wire_c_l1.b1, by=bbwire_c_l1.b1;
+};
+
+if (wire_c_s_r1.b1<>0){
+x_bbwire_c_r1.b1 = table(twiss,mar_wire_c_r1.b1,x);
+y_bbwire_c_r1.b1 = table(twiss,mar_wire_c_r1.b1,y);
+xma_r1.b1 = x_bbwire_c_r1.b1 + wire_c_x_r1.b1;
+yma_r1.b1 = y_bbwire_c_r1.b1 - wire_c_y_r1.b1;
+bbwire_c_r1.b1: beambeam, charge:=-i_wire_c_r1.b1*on_off_w_c_r1.b1, sigx=sigx_c_r1.b1, sigy=sigy_c_r1.b1, xma=xma_r1.b1, yma=yma_r1.b1, bbshape=1, bbdir=-1;
+replace, element=mar_wire_c_r1.b1, by=bbwire_c_r1.b1;
+};
+
+
+!## IP5 ##!
+if (wire_c_s_l5.b1<>0){
+x_bbwire_c_l5.b1 = table(twiss,mar_wire_c_l5.b1,x);
+y_bbwire_c_l5.b1 = table(twiss,mar_wire_c_l5.b1,y);
+xma_l5.b1 = x_bbwire_c_l5.b1 + wire_c_x_l5.b1;
+yma_l5.b1 = y_bbwire_c_l5.b1 + wire_c_y_l5.b1;
+bbwire_c_l5.b1: beambeam, charge:=-i_wire_c_l5.b1*on_off_w_c_l5.b1, sigx=sigx_c_l5.b1, sigy=sigy_c_l5.b1, xma=xma_l5.b1, yma=yma_l5.b1, bbshape=1, bbdir=-1;
+replace, element=mar_wire_c_l5.b1, by=bbwire_c_l5.b1;
+};
+
+if (wire_c_s_r5.b1<>0){
+x_bbwire_c_r5.b1 = table(twiss,mar_wire_c_r5.b1,x);
+y_bbwire_c_r5.b1 = table(twiss,mar_wire_c_r5.b1,y);
+xma_r5.b1 = x_bbwire_c_r5.b1 - wire_c_x_r5.b1;
+yma_r5.b1 = y_bbwire_c_r5.b1 + wire_c_y_r5.b1;
+bbwire_c_r5.b1: beambeam, charge:=-i_wire_c_r5.b1*on_off_w_c_r5.b1, sigx=sigx_c_r5.b1, sigy=sigy_c_r5.b1, xma=xma_r5.b1, yma=yma_r5.b1, bbshape=1, bbdir=-1;
+replace, element=mar_wire_c_r5.b1, by=bbwire_c_r5.b1;
+};
+
+flatten;
+endedit;
+
+use, sequence=lhcb1;
+
+
+print, text= 'Close orbite position of the weak beam at the wire compensator s position';
+value, s_at_wire_c_l1.b1,x_at_wire_c_l1.b1,y_at_wire_c_l1.b1,s_at_wire_c_r1.b1,x_at_wire_c_r1.b1,y_at_wire_c_r1.b1;
+
+value, s_at_wire_c_l5.b1,x_at_wire_c_l5.b1,y_at_wire_c_l5.b1,s_at_wire_c_r5.b1,x_at_wire_c_r5.b1,y_at_wire_c_r5.b1;
+
+
+print, text=  'Distance in [m] and [sigma] of the wire compensator from the weak beam';
+value, x_dist_w_c_sig_l1.b1,wire_c_x_l1.b1, x_dist_w_c_sig_r1.b1,wire_c_x_r1.b1, y_dist_w_c_sig_l1.b1,wire_c_y_l1.b1, y_dist_w_c_sig_r1.b1,wire_c_y_r1.b1;
+
+value, x_dist_w_c_sig_l5.b1,wire_c_x_l5.b1, x_dist_w_c_sig_r5.b1,wire_c_x_r5.b1, y_dist_w_c_sig_l5.b1,wire_c_y_l5.b1, y_dist_w_c_sig_r5.b1,wire_c_y_r5.b1;
+
+
+print, text=  'Distance in [m] of the wire compensator from the ideal orbit';
+value, bbwire_c_l1.b1->xma,bbwire_c_l1.b1->yma,bbwire_c_r1.b1->xma,bbwire_c_r1.b1->yma;
+
+value, bbwire_c_l5.b1->xma,bbwire_c_l5.b1->yma,bbwire_c_r5.b1->xma,bbwire_c_r5.b1->yma;
+
+
+print, text=  'Wire compensator integrated current in [Am]';
+value, num_p_w_l1.b1,num_p_w_r1.b1,num_p_w_l5.b1,num_p_w_r5.b1;
+
+};!end macro
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!     Wire compensator installation in bb_lenses.dat
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+PRINT_WIRE_LENSES : macro = {
+ 	system, "sed -i '$d' bb_lenses.dat"; ! removes last line: NEXT
+ 	!! Print out the beam beam wire compensator lenses
+ 	option,-echo, -info;
+ 	assign, echo=bb_lenses.dat;
+
+ 	!## IP1 ##!
+	if (wire_c_s_l1.b1<>0){
+ 	printf, text="bbwire_c_l1.b1 0 %f %f %f %f %f", value= (bbwire_c_l1.b1->sigx)^2*1e6, (bbwire_c_l1.b1->sigy)^2*1e6, (bbwire_c_l1.b1->xma-x_bbwire_c_l1.b1)*1e3, (bbwire_c_l1.b1->yma-y_bbwire_c_l1.b1)*1e3, bbwire_c_l1.b1->charge;
+};
+ 	if (wire_c_s_r1.b1<>0){
+	printf, text="bbwire_c_r1.b1 0 %f %f %f %f %f", value= (bbwire_c_r1.b1->sigx)^2*1e6, (bbwire_c_r1.b1->sigy)^2*1e6, (bbwire_c_r1.b1->xma-x_bbwire_c_r1.b1)*1e3, (bbwire_c_r1.b1->yma-y_bbwire_c_r1.b1)*1e3, bbwire_c_r1.b1->charge;
+};
+ 	!## IP5 ##!
+	if (wire_c_s_l5.b1<>0){
+ 	printf, text="bbwire_c_l5.b1 0 %f %f %f %f %f", value= (bbwire_c_l5.b1->sigx)^2*1e6, (bbwire_c_l5.b1->sigy)^2*1e6, (bbwire_c_l5.b1->xma-x_bbwire_c_l5.b1)*1e3, (bbwire_c_l5.b1->yma-y_bbwire_c_l5.b1)*1e3, bbwire_c_l5.b1->charge;
+};
+	if (wire_c_s_r5.b1<>0){
+ 	printf, text="bbwire_c_r5.b1 0 %f %f %f %f %f", value= (bbwire_c_r5.b1->sigx)^2*1e6, (bbwire_c_r5.b1->sigy)^2*1e6, (bbwire_c_r5.b1->xma-x_bbwire_c_r5.b1)*1e3, (bbwire_c_r5.b1->yma-y_bbwire_c_r5.b1)*1e3, bbwire_c_r5.b1->charge;
+};
+ 	print, text="NEXT";
+ 	assign,echo=terminal;
+};!end macro
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;

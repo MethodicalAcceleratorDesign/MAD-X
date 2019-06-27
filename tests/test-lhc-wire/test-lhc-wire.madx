@@ -1,0 +1,767 @@
+! lhc2016_ats_v4.mask  ---  from Yannis
+! S. Fartoukh March 2009
+! Ref sample job for tracking with multipole field imperfection in nominal
+! LHC magnets using V6.503 in collision
+! M. Giovannozzi November 2010
+
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
+Option,  warn,info;
+System,"mkdir -p temp";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/2018 db5";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/2017 db6"; ! just because there is no errors dir in 2018 yet
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/errors/0705 wise";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/WISE/After_sector_3-4_repair fidel";
+System,"ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.0 slhc";
+system,"ln -fns /afs/cern.ch/user/n/nkarast/public/MADXTests/macro macro";
+option,-echo,-info;
+
+call, file="macro/wires_installation.madx";
+call, file="macro/footprint.madx";
+
+!---------------------------------------------------------------;
+!           CALL IN SELECTION, MACRO's, SEQUENCE, BEAM, NRJ and OPTICS FILES;
+!---------------------------------------------------------------;
+
+mylhcbeam=1 ;! LHC beam 1 (clockwise)
+
+
+!Think Nominal sequence
+Option, -echo,-warn,-info;
+if (mylhcbeam==4){
+   call,file="db5/lhcb4_as-built.seq"; bvaux=1;}
+else {
+   call,file="db5/lhc_as-built.seq"; bvaux=-1;};
+Option, -echo,warn,-info;
+
+
+! Slice nominal sequencei manually
+
+makethinfactor = 4;
+select, flag=makethin, clear;
+select, flag=makethin, class=mb, slice=2;
+select, flag=makethin, class=mq, slice=2*makethinfactor;
+select, flag=makethin, class=mqxa,  slice=16*makethinfactor;
+select, flag=makethin, class=mqxb,  slice=16*makethinfactor;
+select, flag=makethin, pattern=mbx\.,    slice=4;
+select, flag=makethin, pattern=mbrb\.,   slice=4;
+select, flag=makethin, pattern=mbrc\.,   slice=4;
+select, flag=makethin, pattern=mbrs\.,   slice=4;
+select, flag=makethin, pattern=mbh\.,    slice=4;
+select, flag=makethin, pattern=mqwa\.,   slice=4*makethinfactor;
+select, flag=makethin, pattern=mqwb\.,   slice=4*makethinfactor;
+select, flag=makethin, pattern=mqy\.,    slice=4*makethinfactor;
+select, flag=makethin, pattern=mqm\.,    slice=4*makethinfactor;
+select, flag=makethin, pattern=mqmc\.,   slice=4*makethinfactor;
+select, flag=makethin, pattern=mqml\.,   slice=4*makethinfactor;
+select, flag=makethin, pattern=mqtlh\.,  slice=2*makethinfactor;
+select, flag=makethin, pattern=mqtli\.,  slice=2*makethinfactor;
+select, flag=makethin, pattern=mqt\.  ,  slice=2*makethinfactor;
+
+option rbarc=false; beam;
+use,sequence=lhcb1; makethin,sequence=lhcb1, makedipedge=false, style=teapot;
+use,sequence=lhcb2; makethin,sequence=lhcb2, makedipedge=false, style=teapot;
+option rbarc=true;
+
+is_thin=1;
+
+!Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
+seqedit,sequence=lhcb1;flatten;cycle,start=IP3;flatten;endedit;
+seqedit,sequence=lhcb2;flatten;cycle,start=IP3;flatten;endedit;
+
+!********************************************
+
+NRJ= 6500;
+
+! A Laundau octupole current 20A inj, 550A col
+I_MO=100;
+
+
+!General switch to select collision (0/1)
+ON_COLLISION:=1;
+
+!General switch to install bb lens (0/1)
+ON_BB_SWITCH:=1;
+
+!General switch to install the wires
+ON_WIRE:=1;
+
+!Some parameters for BB calculations
+b_t_dist :=25.;!bunch separation [ns]
+sigt_col=0.075; ! bunch length [m] in collision
+gamma_rel      := NRJ/pmass;
+emittance_norm := (2.2)*1.0e-6;
+epsx:=emittance_norm /gamma_rel;
+epsy:=emittance_norm /gamma_rel;
+
+
+!********************************************
+
+tsplit= 2.0;   !new tune split
+qx00  = 62.0;  !integer h tune
+qy00  = 60.0;  !integer v tune
+
+if (NRJ<6000) {
+stop;
+!Inj. optics in thin lens for IR1&5 (11 m in IR1/5)
+call,file="/afs/cern.ch/user/s/sfar/public/ATS2017/draft/opticsfile.1_INJ_thin";
+qx0 = 62.31;   qy0 = 60.32;  qprime = 15;
+Beam,particle=proton,sequence=lhcb1,energy=450.0,NPART=1.15e+11,
+     sige=4.5e-4,sigt=0.130,ex=epsx,ey=epsy;
+Beam,particle=proton,sequence=lhcb2,energy=450.0,bv = bvaux,NPART=1.15e+11,
+     sige=4.5e-4,sigt=0.130,ex=epsx,ey=epsy;
+};
+
+if (NRJ>5999)
+{
+call, file="db5/PROTON/opticsfile.22_ctpps2";
+
+! Crossing angles in IP1/5
+on_x1  = 150;
+on_x5  = 150;
+
+on_alice:=7000/nrj; on_lhcb:=+7000/nrj;
+qx0 = 62.31;
+qy0 = 60.32;
+qprime = 15;
+
+Beam,particle=proton,sequence=lhcb1,energy=NRJ,NPART=1.15e+11,
+     sige=1.1e-4,sigt=0.075,ex=epsx,ey=epsy;
+Beam,particle=proton,sequence=lhcb2,energy=NRJ,bv = bvaux,NPART=1.15e+11,
+     sige=1.1e-4,sigt=0.075,ex=epsx,ey=epsy;
+};
+
+qprimex0=15;
+qprimey0=15;
+
+! CMS Bump?
+on_ov5:=-1.8;
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!                        TEST the optics
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+! Saving crossing scheme knobs
+on_x1aux=on_x1;on_sep1aux=on_sep1;
+on_x2aux=on_x2;on_sep2aux=on_sep2; on_a2aux=on_a2;
+on_x5aux=on_x5;on_sep5aux=on_sep5; on_ov5aux=on_ov5;
+on_x8aux=on_x8;on_sep8aux=on_sep8; on_a8aux=on_a8;
+on_aliceaux=on_alice; on_lhcbaux=on_lhcb; on_oe2aux=on_oe2;
+on_dispaux=on_disp;
+
+on_x1=0;on_x5=0;on_sep1=0;on_sep5=0; on_ov5=0;
+on_x2=0;on_x8=0;on_a2=0;on_sep2=0;on_sep8=0; on_a8=0;
+on_lhcb=0;on_alice=0; on_oe2=0;
+on_disp=0;
+system,"rm -f twiss.b1";system,"rm -f twiss.b2";
+
+Use, sequence=lhcb1;
+select,flag=twiss,clear;
+select, flag=twiss, pattern="IP1",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP2",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP5",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP8",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+twiss,sequence=lhcb1,file=twiss.b1;system,"cat twiss.b1";
+
+Use, sequence=lhcb2;
+select,flag=twiss,clear;
+select, flag=twiss, pattern="IP1",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP2",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP5",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP8",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+twiss, sequence=lhcb2,file=twiss.b2;system,"cat twiss.b2";
+
+system,"rm -f twiss.b1";system,"rm -f twiss.b2";
+
+!Switch on Xscheme
+on_x1=on_x1aux;on_sep1=on_sep1aux;
+on_x2=on_x2aux;on_sep2=on_sep2aux; on_oe2=on_oe2aux; on_a2=on_a2aux;
+on_x5=on_x5aux;on_sep5=on_sep5aux; on_ov5=on_ov5aux;
+on_x8=on_x8aux;on_sep8=on_sep8aux; on_a8=on_a8aux;
+on_alice=on_aliceaux; on_lhcb=on_lhcbaux;
+on_disp=on_dispaux;
+
+Use, sequence=lhcb1;
+select,flag=twiss,clear;
+select, flag=twiss, pattern="IP1",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP2",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP5",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP8",   column=name,s,x,y,px,py;
+twiss, sequence=lhcb1, file=twiss.b1;system,"cat twiss.b1";
+
+Use, sequence=lhcb2;
+select,flag=twiss,clear;
+select, flag=twiss, pattern="IP1",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP2",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP5",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP8",   column=name,s,x,y,px,py;
+twiss, sequence=lhcb2, file=twiss.b2;system,"cat twiss.b2";
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!     Xscheme definition   & Beam-beam encounters installation
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+! call of the macro
+call,file="slhc/beambeam/macro_bb.madx";
+
+n_insideD1 = 5;    !5;    !default value for the number of additionnal parasitic encounters inside D1
+
+nho_IR1= 11;        ! number of slices for head-on in IR1 (between 0 and 201)
+nho_IR2= 11;        ! number of slices for head-on in IR2 (between 0 and 201)
+nho_IR5= 11;        ! number of slices for head-on in IR5 (between 0 and 201)
+nho_IR8= 11;        ! number of slices for head-on in IR8 (between 0 and 201)
+
+exec DEFINE_BB_PARAM;  !Define main beam-beam parameters
+
+if (ON_COLLISION==1)
+{
+ !Switch on Xscheme in precollision
+ on_x1aux=on_x1;on_sep1aux=1;
+ on_x2aux=on_x2;on_sep2aux=1; on_oe2aux=on_oe2; on_a2aux=on_a2;
+ on_x5aux=on_x5;on_sep5aux=1; on_ov5aux=on_ov5;
+ on_x8aux=on_x8;on_sep8aux=1; on_a8aux=on_a8;
+ on_aliceaux=on_alice; on_lhcbaux=on_lhcb;
+ on_disp:=0;
+ halo1=0;halo2=5;halo5=0;halo8=0;  !halo collision at 5 sigma's in Alice
+ ! number of collision/turn at IP1/2/5/8
+ nco_IP1= 2544;
+ nco_IP5= nco_IP1;
+ nco_IP2= 2215;
+ nco_IP8= 2332;
+ exec LEVEL_PARALLEL_OFFSET_FOR(2e32, 8); value,halo8/2.*sqrt(3.*epsx)*1e3;
+!Redefine the on_sep's accordingly
+ exec CALCULATE_XSCHEME(halo1,halo2,halo5,halo8);
+ on_sep1aux=on_sep1; on_sep2aux=on_sep2; on_sep5aux=on_sep5; on_sep8aux=on_sep8;
+};
+
+! Saving crossing scheme knobs
+on_x1aux=on_x1;on_sep1aux=on_sep1;
+on_x2aux=on_x2;on_sep2aux=on_sep2; on_oe2aux=on_oe2; on_a2aux=on_a2;
+on_x5aux=on_x5;on_sep5aux=on_sep5; on_ov5aux=on_ov5;
+on_x8aux=on_x8;on_sep8aux=on_sep8; on_a8aux=on_a8;
+on_aliceaux=on_alice; on_lhcbaux=on_lhcb;
+!on_dispaux=on_disp;
+on_disp=0; !see old mask don't know why
+
+!Record the nominal IP position and crossing angle
+if(mylhcbeam==1) {use,  sequence=lhcb1;};
+if(mylhcbeam>1) {use,  sequence=lhcb2;};
+twiss;
+xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);
+ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
+xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);
+ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
+xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);
+ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
+xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);
+ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
+value,xnom1,xnom2,xnom5,xnom8;
+value,ynom1,ynom2,ynom5,ynom8;
+value,pxnom1,pxnom2,pxnom5,pxnom8;
+value,pynom1,pynom2,pynom5,pynom8;
+
+if( ON_BB_SWITCH == 1)
+{
+
+!Install b-b marker
+exec INSTALL_BB_MARK(b1);
+exec INSTALL_BB_MARK(b2);
+
+!Define bb lenses for both beams in all IR's and calculate # of encounters before D1
+exec CALCULATE_BB_LENS;
+
+!Install bb lenses
+on_ho1 = 1; on_lr1l = 1; on_lr1r = 1; npara_1 = npara0_1 + n_insideD1;
+on_ho5 = 1; on_lr5l = 1; on_lr5r = 1; npara_5 = npara0_5 + n_insideD1;
+on_ho2 = 0; on_lr2l = 0; on_lr2r = 0; npara_2 = npara0_2 + n_insideD1;
+on_ho8 = 0; on_lr8l = 0; on_lr8r = 0; npara_8 = npara0_8 + n_insideD1;
+if(mylhcbeam==1) {exec INSTALL_BB_LENS(b1);};
+if(mylhcbeam==2) {exec INSTALL_BB_LENS(b2);};
+
+
+!Print the lenses in bb_lenses.dat
+exec, PRINT_BB_LENSES;
+
+ON_BB_CHARGE := 0; !Switch off the charge the bb lenses
+
+use,sequence=lhcb1;
+select,flag=twiss,clear;
+select,flag=twiss,class=marker,pattern=PAR.*L1,range=mbxw.f4l1/IP1.L1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+select,flag=twiss,class=marker,pattern=PAR.*L5,range=mbxw.f4l5/IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+select,flag=twiss,class=marker,pattern=PAR.*R1,range=IP1/mbxw.f4r1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+select,flag=twiss,class=marker,pattern=PAR.*R5,range=IP5/mbxw.f4r5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+select,flag=twiss,class=marker,pattern=IP1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+select,flag=twiss,class=marker,pattern=IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+twiss,file=twiss_bb.b1;system,"cat twiss_bb.b1";
+
+use,sequence=lhcb2;
+select,flag=twiss,clear;
+select,flag=twiss,class=marker,pattern=PAR.*L1,range=mbxw.f4l1/IP1.L1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+select,flag=twiss,class=marker,pattern=PAR.*L5,range=mbxw.f4l5/IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+select,flag=twiss,class=marker,pattern=PAR.*R1,range=IP1/mbxw.f4r1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+select,flag=twiss,class=marker,pattern=PAR.*R5,range=IP5/mbxw.f4r5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+select,flag=twiss,class=marker,pattern=IP1,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+select,flag=twiss,class=marker,pattern=IP5,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+twiss,file=twiss_bb.b2;system,"cat twiss_bb.b2";
+
+if(mylhcbeam==1) {use,sequence=lhcb1;};
+if(mylhcbeam>1) {use,sequence=lhcb2;};
+
+select,flag=twiss,clear;
+select,flag=twiss,pattern=HO,class=beambeam,column=s,name,betx,bety,alfx,alfy,mux,muy,x,y,px,py;
+twiss,file=twiss_bb;system,"cat twiss_bb";
+
+
+!Remove bb markers
+exec REMOVE_BB_MARKER;
+
+};
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!                   Installation markers for dump
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+!## IP3 ##!
+ip3_dump_sta.b1: marker;
+ip3_dump_mid.b1: marker;
+ip3_dump_end.b1: marker;
+
+use, sequence=lhcb1;
+seqedit, sequence=lhcb1;
+flatten;
+
+install, element=ip3_dump_sta.b1, at=0, from=ip3;
+install, element=ip3_dump_mid.b1, at=0, from=ip3;
+install, element=ip3_dump_end.b1, at=0, from=ip3;
+
+flatten;
+endedit;
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!               Prepare nominal twiss tables
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+if (mylhcbeam==1) { use,sequence=lhcb1;}
+else {use,sequence=lhcb2;};
+
+! disable crossing bumps
+on_x1=0;on_sep1=0;
+on_x2=0;on_sep2=0; on_oe2=0;on_a2=0;
+on_x5=0;on_sep5=0; on_ov5=0;
+on_x8=0;on_sep8=0; on_a8=0;
+on_alice=0;on_lhcb=0;
+on_disp=0;
+
+twiss, table=nominal;   // used by orbit correction
+beta.ip1=table(twiss,IP1,betx);value,beta.ip1;
+
+! print nominal optics parameter at the MB, MQS and MSS for
+! b2, b3, b4, b5, a2 and a3 correction
+ select, flag=twiss, clear;
+ select, flag=twiss,pattern=MB\.   ,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MBH\.   ,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.14,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.15,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.16,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.17,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.18,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.19,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.20,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.21,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MQS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MSS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MCO                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MCD                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MCS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ twiss,  file='temp/optics0_MB.mad';
+
+! print nominal optics parameter at the D1, MQX and triplet corrector
+! for triplet correction
+ select, flag=twiss, clear;
+ select, flag=twiss, pattern=MQX  , class=multipole, column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MBX  , class=multipole, column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MBRC , class=multipole, column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MQSX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCSX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCTX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCOSX                 , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCOX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCSSX                 , column=name,betx,bety,x,y;
+ twiss,  file='temp/optics0_inser.mad';
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                Switch ON/OFF some multipole
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+!exec ON_ALL_MULT;
+ON_LSF=0;
+
+ ON_A1s =  0 ; ON_A1r =  0 ; ON_B1s =  0 ; ON_B1r =  0;
+ ON_A2s =  1 ; ON_A2r =  1 ; ON_B2s =  0 ; ON_B2r =  0;
+ ON_A3s =  1 ; ON_A3r =  1 ; ON_B3s =  1 ; ON_B3r =  1;
+ ON_A4s =  1 ; ON_A4r =  1 ; ON_B4s =  1 ; ON_B4r =  1;
+ cON_A5s =  1 ; ON_A5r =  1 ; ON_B5s =  1 ; ON_B5r =  1;
+ ON_A6s =  1 ; ON_A6r =  1 ; ON_B6s =  1 ; ON_B6r =  1;
+ ON_A7s =  1 ; ON_A7r =  1 ; ON_B7s =  1 ; ON_B7r =  1;
+ ON_A8s =  1 ; ON_A8r =  1 ; ON_B8s =  1 ; ON_B8r =  1;
+ ON_A9s =  1 ; ON_A9r =  1 ; ON_B9s =  1 ; ON_B9r =  1;
+ ON_A10s =  1; ON_A10r =  1; ON_B10s =  1; ON_B10r =  1;
+ ON_A11s =  1; ON_A11r =  1; ON_B11s =  1; ON_B11r =  1;
+ ON_A12s =  ON_LSF; ON_A12r = ON_LSF; ON_B12s = ON_LSF; ON_B12r =  ON_LSF;
+ ON_A13s =  ON_LSF; ON_A13r = ON_LSF; ON_B13s = ON_LSF; ON_B13r =  ON_LSF;
+ ON_A14s =  ON_LSF; ON_A14r = ON_LSF; ON_B14s = ON_LSF; ON_B14r =  ON_LSF;
+ ON_A15s =  ON_LSF; ON_A15r = ON_LSF; ON_B15s = ON_LSF; ON_B15r =  ON_LSF;
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+! Define the seed number (for statistical error assignment in the new IT/D1)
+! and call the corresponding measured error table for nominal LHC magnets
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+!For the mask file
+eoption,seed=1;
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!             apply field errors to MB magnets
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ON_B2s =  1 ; ON_B2r =  1;
+!call,   file="db5/measured_errors/Efcomp_MB.madx"  ;
+ON_B2s =  0 ; ON_B2r =  0;
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!     correct orbit distortion resulting from MB magnets
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0)
+{
+  exec,   initial_micado(4);
+  exec,   initial_micado(4);
+};
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+! MO settings
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+brho:=NRJ*1e9/clight;
+if (mylhcbeam==1){
+KOF.A12B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOF.A23B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOF.A34B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOF.A45B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOF.A56B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOF.A67B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOF.A78B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOF.A81B1:=Kmax_MO*I_MO/Imax_MO/brho;
+
+KOD.A12B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A23B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A34B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A45B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A56B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A67B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A78B1:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A81B1:=Kmax_MO*I_MO/Imax_MO/brho;
+};
+
+if (mylhcbeam>1){
+KOF.A12B2:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A23B2:=Kmax_MO*I_MO/Imax_MO/brho;
+KOF.A34B2:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A45B2:=Kmax_MO*I_MO/Imax_MO/brho;
+KOF.A56B2:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A67B2:=Kmax_MO*I_MO/Imax_MO/brho;
+KOF.A78B2:=Kmax_MO*I_MO/Imax_MO/brho; KOF.A81B2:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A12B2:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A23B2:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A34B2:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A45B2:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A56B2:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A67B2:=Kmax_MO*I_MO/Imax_MO/brho;
+KOD.A78B2:=Kmax_MO*I_MO/Imax_MO/brho; KOD.A81B2:=Kmax_MO*I_MO/Imax_MO/brho;
+};
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!               correction of field errors in MB (compatible with V6.503 & SLHC)
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ select, flag=error, clear;
+ select, flag=error, pattern=MB\.,class=multipole;
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+! correction of triplet and D1 (only in collision, not compatible with SLHC)
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+if (NRJ>5999)
+{
+ option, echo, warn, -info;
+ select, flag=error, clear;
+ select, flag=error, pattern=MQX,  class=multipole;
+ select, flag=error, pattern=MBX,  class=multipole;
+ select, flag=error, pattern=MBRC, class=multipole;
+ kcsx3.l2 :=0;kcsx3.r2 :=0;kcsx3.l8 :=0;kcsx3.r8 :=0; !switch off b3  correction in IR2 and IR8
+ kcox3.l2 :=0;kcox3.r2 :=0;kcox3.l8 :=0;kcox3.r8 :=0; !switch off b4  correction in IR2 and IR8
+ kctx3.l2 :=0;kctx3.r2 :=0;kctx3.l8 :=0;kctx3.r8 :=0; !switch off b6  correction in IR2 and IR8
+ kqsx3.l2 :=0;kqsx3.r2 :=0;kqsx3.l8 :=0;kqsx3.r8 :=0; !switch off a2  correction in IR2 and IR8
+ kcssx3.l2:=0;kcssx3.r2:=0;kcssx3.l8:=0;kcssx3.r8:=0; !switch off a3  correction in IR2 and IR8
+ kcosx3.l2:=0;kcosx3.r2:=0;kcosx3.l8:=0;kcosx3.r8:=0; !switch off a4  correction in IR2 and IR8
+};
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!    correct orbit distortion resulting from other magnets
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0)
+{
+ exec, initial_micado(4);
+ exec, initial_micado(4);
+ exec, initial_micado(4);
+ exec, initial_micado(4);
+ };
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!    final orbit correction before applying crossing scheme
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+if((ON_A1S)^2+(ON_A1r)^2+(ON_B1S)^2+(ON_B1r)^2 >0)
+{ exec, final_micado(0.004); };
+
+! end of orbit correction, now switch ON crossing scheme
+! restoring crossing angle
+on_x1=on_x1aux;on_sep1=on_sep1aux;
+on_x2=on_x2aux;on_sep2=on_sep2aux; on_oe2=on_oe2aux; on_a2=on_a2aux;
+on_x5=on_x5aux;on_sep5=on_sep5aux; on_ov5=on_ov5aux;
+on_x8=on_x8aux;on_sep8=on_sep8aux; on_a8=on_a8aux;
+on_alice=on_aliceaux; on_lhcb=on_lhcbaux;
+on_disp=on_dispaux;
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                 matching of orbit, tune and chromaticity
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+if(ON_COLLISION==0) {ON_BB_CHARGE:=1;};    ! W/o head-on Q and Q' are matched with bb
+
+!on_disp=1; ! for ATS, in order to correct dispersion in the IR
+
+!Rematch the CO in the arc for dispersion correction
+if(ON_DISP<>0) {call,file="slhc/toolkit/rematchCOarc.madx";};
+
+!Rematch the Xscheme towards specified separation and Xange in IP1/2/5/8
+call,file="/afs/cern.ch/eng/lhc/optics/runII/2017/toolkit/rematchCOIP.madx";
+
+if(mylhcbeam==1)
+{kqtf=kqtf.b1;kqtd=kqtd.b1;kqtf.b1:=kqtf;kqtd.b1:=kqtd;
+ ksf=ksf.b1;ksd=ksd.b1;ksf.b1:=ksf;ksd.b1:=ksd;};
+
+if(mylhcbeam>1)
+{kqtf=kqtf.b2;kqtd=kqtd.b2;kqtf.b2:=kqtf;kqtd.b2:=kqtd;
+ ksf=ksf.b2;ksd=ksd.b2;ksf.b2:=ksf;ksd.b2:=ksd;};
+
+ match;
+ global, q1=qx0, q2=qy0;
+vary,   name=dQx.b1_sq, step=1.0E-7 ;
+vary,   name=dQy.b1_sq, step=1.0E-7 ;
+ lmdif,  calls=100, tolerance=1.0E-21;
+ endmatch;
+
+ match,chrom;
+ global, dq1=qprime, dq2=qprime;
+vary,   name=dQpx.b1_sq;
+vary,   name=dQpy.b1_sq;
+ lmdif,  calls=100, tolerance=1.0E-21;
+ endmatch;
+
+ match,chrom;
+ global, dq1=qprime, dq2=qprime;
+ global, q1=qx0, q2=qy0;
+vary,   name=dQx.b1_sq;
+vary,   name=dQy.b1_sq;
+vary,   name=dQpx.b1_sq, step=1.0E-7 ;
+vary,   name=dQpy.b1_sq, step=1.0E-7 ;
+ lmdif,  calls=500, tolerance=1.0E-21;
+ endmatch;
+
+
+
+!======== WIRES INSTALLATION =========!
+
+sIP1 = 19994.1624;
+sIP5 = 6664.56843;
+
+if(ON_WIRE == 1){
+!s_opt = 158.3;
+
+! IP1
+
+x_wire_r1b1 = 0;
+y_wire_r1b1 = -0.00739;
+s_wire_r1b1 = sIP1+176.17;
+I_wire_r1b1 = 420.0;
+
+x_wire_l1b1 = 0;
+y_wire_l1b1 = 0.00742;
+s_wire_l1b1 = sIP1-145.945;
+I_wire_l1b1 = 384.0;
+
+
+if(I_wire_r1b1<>0){
+on_wire_r1b1 = 1;
+exec, INSTALL_WIRE_C_B1(bbwire_c_r1b1, s_wire_r1b1, x_wire_r1b1, y_wire_r1b1, I_wire_r1b1);
+exec, MATCH_WIRE_C_B1(r1b1);
+I_wire_r1b1 = 0;
+kq5.r1b1=kq5.r1b1_BM;
+kq4.r1b1=kq4.r1b1_BM;
+kq6.r1b1=kq6.r1b1_BM;
+};
+
+if(I_wire_l1b1<>0){
+on_wire_l1b1 = 1;
+exec, INSTALL_WIRE_C_B1(bbwire_c_l1b1, s_wire_l1b1, x_wire_l1b1, y_wire_l1b1, I_wire_l1b1);
+exec, MATCH_WIRE_C_B1(l1b1);
+I_wire_l1b1 = 0;
+kq5.l1b1=kq5.l1b1_BM;
+kq4.l1b1=kq4.l1b1_BM;
+kq6.l1b1=kq6.l1b1_BM;
+};
+
+! IP5
+
+x_wire_r5b1 = -0.00715;
+y_wire_r5b1 = 0;
+s_wire_r5b1 = sIP5+150.03;
+I_wire_r5b1 = 228.0;
+
+x_wire_l5b1 = 0.00824;
+y_wire_l5b1 = 0;
+s_wire_l5b1 = sIP5-147.95;
+I_wire_l5b1 = 408.0;
+
+if(I_wire_r5b1<>0){
+on_wire_r5b1 = 1;
+exec, INSTALL_WIRE_C_B1(bbwire_c_r5b1, s_wire_r5b1, x_wire_r5b1, y_wire_r5b1, I_wire_r5b1);
+exec, MATCH_WIRE_C_B1(r5b1);
+I_wire_r5b1 = 0;
+kq5.r5b1=kq5.r5b1_BM;
+kq4.r5b1=kq4.r5b1_BM;
+kq6.r5b1=kq6.r5b1_BM;
+};
+
+if(I_wire_l5b1<>0){
+on_wire_l5b1 = 1;
+exec, INSTALL_WIRE_C_B1(bbwire_c_l5b1, s_wire_l5b1, x_wire_l5b1, y_wire_l5b1, I_wire_l5b1);
+exec, MATCH_WIRE_C_B1(l5b1);
+I_wire_l5b1 = 0;
+kq5.l5b1=kq5.l5b1_BM;
+kq4.l5b1=kq4.l5b1_BM;
+kq6.l5b1=kq6.l5b1_BM;
+};
+
+use, sequence = lhcb1;
+twiss;
+
+! Switch ON the wires back
+
+if(on_wire_r1b1 <>0){
+I_wire_r1b1 = 420.0;
+kq6.r1b1=kq6.r1b1_AM;
+kq5.r1b1=kq5.r1b1_AM;
+kq4.r1b1=kq4.r1b1_AM;
+};
+
+if(on_wire_l1b1 <>0){
+I_wire_l1b1 = 384.0;
+kq6.l1b1=kq6.l1b1_AM;
+kq5.l1b1=kq5.l1b1_AM;
+kq4.l1b1=kq4.l1b1_AM;
+};
+
+if(on_wire_r5b1 <>0){
+I_wire_r5b1 = 228.0;
+kq6.r5b1=kq6.r5b1_AM;
+kq5.r5b1=kq5.r5b1_AM;
+kq4.r5b1=kq4.r5b1_AM;
+};
+
+if(on_wire_l5b1 <>0){
+I_wire_l5b1 = 408.0;
+kq6.l5b1=kq6.l5b1_AM;
+kq5.l5b1=kq5.l5b1_AM;
+kq4.l5b1=kq4.l5b1_AM;
+};
+
+match;
+global, q1=qx0, q2=qy0;
+vary,   name=dQx.b1_sq, step=1.0E-7 ;
+vary,   name=dQy.b1_sq, step=1.0E-7 ;
+lmdif,  calls=500, tolerance=1.0E-21;
+endmatch;
+
+};
+
+
+use, sequence=lhcb1;
+twiss;
+
+ON_BB_CHARGE:=1;
+
+VRF400:=12.;
+LAGRF400.B1=0.5;
+LAGRF400.B2=0.;
+
+! We want to save as an output the final Twiss
+if(mylhcbeam==1) {use,  sequence=lhcb1;};
+if(mylhcbeam>1) {use,  sequence=lhcb2;};
+select,flag=twiss, clear;
+select, flag=twiss, pattern="^mq.*", column=NAME, S, L, X, Y, PX, PY, BETX, BETY, MUX, MUY, DX, DY, DPX, DPY;
+select, flag=twiss, pattern="^bbmk.*", column=NAME, S, L, X, Y, PX, PY, BETX, BETY, MUX, MUY, DX, DY, DPX, DPY;
+select, flag=twiss, pattern="^ip.*", column=NAME, S, L, X, Y, PX, PY, BETX, BETY, MUX, MUY, DX, DY, DPX, DPY;
+select, flag=twiss, pattern="^bbwire.*", column=NAME, S, L, X, Y, PX, PY, BETX, BETY, MUX, MUY, DX, DY, DPX, DPY;
+twiss, file="final_twiss.twiss";
+
+! Table for the quadrupoles values (the one used in the matching...)
+DELETE, TABLE=myktable;
+CREATE, TABLE=myktable, COLUMN={kq5.l5b1,kq4.l5b1,kq5.r5b1,kq4.r5b1,kq5.l1b1,kq4.l1b1,kq5.r1b1,kq4.r1b1};
+FILL, TABLE=myktable, ROW=1;
+WRITE, TABLE=myktable, FILE="k_table.tfs";
+
+! Tune Footprint
+
+footkey = 0;
+
+if(footkey<>0){
+MAKEFOOTPRINT_V1("dynap", "dynaptune")
+};
+
+
+twiss;
+xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
+xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
+xnom5=table(twiss,IP5,x);pxnom5=table(twiss,IP5,px);ynom5=table(twiss,IP5,y);pynom5=table(twiss,IP5,py);
+xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pynom8=table(twiss,IP8,py);
+betxnom1 =table(twiss,IP1,betx) ;betynom1 = table(twiss,IP1,bety) ;
+betxnom5 =table(twiss,IP5,betx) ;betynom5 = table(twiss,IP5,bety) ;
+
+dtct1b1=table(twiss,TCTPH.4L1.B1,mux)-table(twiss,MKD.O5L6.B1,mux);
+dtct5b1=table(twiss,TCTPH.4L5.B1,mux)-table(twiss,MKD.O5L6.B1,mux)+table(summ,q1);
+ddtct1b1=(dtct1b1-floor(dtct1b1))*360;
+ddtct5b1=(dtct5b1-floor(dtct5b1))*360;
+value,dtct1b1,dtct5b1,ddtct1b1,ddtct5b1;
+
+value,xnom1,xnom2,xnom5,xnom8;
+value,ynom1,ynom2,ynom5,ynom8;
+value,pxnom1,pxnom2,pxnom5,pxnom8;
+value,pynom1,pynom2,pynom5,pynom8;
+value, betxnom1,betynom1,betxnom5,betynom5;
+value, table(summ,q1);
+value, table(summ,q2);
+value, table(summ,dq1);
+value, table(summ,dq2);
+
+
+use, sequence = lhcb1;
+
+sixtrack,cavall, radius=0.017;
+
+!Fix bb lenses in sixtrack input
+exec, SIXTRACK_INPUT_BB_LENSES;
+
+select, flag=twiss, clear;
+select, flag=twiss, pattern=MQTL;
+twiss,file="last_twiss.1";
+
+
+
+stop;
