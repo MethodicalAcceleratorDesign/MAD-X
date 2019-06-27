@@ -334,10 +334,10 @@ CONTAINS
        particle=.false.
        CALL MAKE_STATES(PARTICLE)
     else
+       muonfactor=pma/pmae
        if (getdebug() > 1) then
            print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. PROTON beam'
        endif
-       muonfactor=pma/pmae
        CALL MAKE_STATES(muonfactor)
     endif
 

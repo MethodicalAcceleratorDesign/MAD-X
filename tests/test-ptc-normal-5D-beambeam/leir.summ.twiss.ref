@@ -1,9 +1,9 @@
 @ NAME             %04s "SUMM"
 @ TYPE             %04s "SUMM"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.22.39"
+@ ORIGIN           %16s "5.05.01 Linux 64"
+@ DATE             %08s "27/06/19"
+@ TIME             %08s "12.00.27"
 *             LENGTH             ORBIT5               ALFA            GAMMATR                 Q1                DQ1            BETXMAX              DXMAX              DXRMS             XCOMAX             XCORMS                 Q2                DQ2            BETYMAX              DYMAX              DYRMS             YCOMAX             YCORMS             DELTAP            SYNCH_1            SYNCH_2            SYNCH_3            SYNCH_4            SYNCH_5             NFLIPS 
 $                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
-        78.54370266                 -0       0.1241075638        2.838578276        1.820059621       -5.030192641        15.12421277        20.60419792        9.639963193                  0                  0         2.71982919       -10.39500524        20.07025727                  0                  0                  0                  0                  0        9.747887059        1.526297364       0.3728165258       0.5042000294        4.147872957                  0
+        78.54370266                 -0       0.1182846613        2.907607528        1.822284779         160.466757        15.17476941        20.95013299        9.843308374                  0                  0         2.71778368       -203.8329924        20.33402761        5.142031503        2.210404629                  0                  0                  0        9.290535008        1.526297364       0.3728165258        0.480816359        4.297209119                  0
