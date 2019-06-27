@@ -263,6 +263,29 @@ ptc_oneturnmap(struct in_cmd* cmd)
 }
 
 void
+pro_ptc_normal(void)
+  /* controls ptc_normal module */
+{
+  // need to set probe_beam to read beam parameters for beam-beam, for example
+  struct command* keep_beam = current_beam;
+  double ptc_deltap;  
+  ptc_deltap = get_value(current_command->name,"deltap");
+  
+  adjust_beam();
+  
+  probe_beam = clone_command(current_beam);
+  
+  adjust_probe_fp(ptc_deltap); /* sets correct gamma, beta, etc. */
+  
+  w_ptc_normal_();
+
+  /* cleanup */
+  current_beam = keep_beam;
+  probe_beam = delete_command(probe_beam);
+  
+  
+}
+void
 pro_ptc_twiss(void)
   /* controls ptc_twiss module */
 {
