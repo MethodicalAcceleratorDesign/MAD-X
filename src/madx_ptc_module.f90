@@ -3168,7 +3168,11 @@ CONTAINS
        name(:len_trim(name2)-1)=name2(:len_trim(name2)-1)
        call context(name)
        call move_to(my_ring,p,name,pos)
-       tilt=-p%mag%p%tiltd
+       
+       !madxtilt =  get_orginal_madx_tilt(name)
+       
+       tilt=-(p%mag%p%tiltd)! - madxtilt)   ! here we should read tilt from MADX lattice and deduce back the automatic tilt from skew (+ normal)
+       
        if(pos/=0) then
           if(p%mag%l/=zero) then
              do k=1,maxmul
