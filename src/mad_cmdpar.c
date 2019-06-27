@@ -1104,7 +1104,7 @@ get_value(const char* name, const char* par)
     /*printf("Getting probe beam => %p\n", probe_beam);*/
     if (probe_beam == 0x0)
      {
-       printf("\n\n PROBE IS NULL!!!!!!\n\n\n");
+       printf("\n\n get_value: PROBE IS NULL (name=%s, par=%s)!!!!!!\n\n\n",name,par);
        return 0.0;
      }
     return command_par_value(aux_buff->c, probe_beam);
