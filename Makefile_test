@@ -106,7 +106,7 @@ $(call onlx64,$(user-cases),)
 
 # user-cases are run only with tests-all on Lxplus + AFS + Gnu 64 bit
 user-cases = \
-test-lhc test-hllhc test-hllhc-wire test-hllhc-fma test-lhc-wire
+test-lhc test-hllhc test-hllhc-wire test-hllhc-fma test-lhc-wire test-lhc-virtualcorr
 
 # tests to remove (e.g. that relies on external resources)
 tests-to-rm =
