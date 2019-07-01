@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.05.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.08 16:39:53      +
+  + Release   date: 2019.06.07               +
+  + Execution date: 2019.06.27 10:42:38      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test case for coupling calculations
 
@@ -238,17 +238,17 @@ ptc_create_layout,model=2,method=6,nst=1,exact;
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.600000E+01
  Setting MADx with 
-     energy           6.0000000000000000     
+     energy           6.00000000000000     
      method                   6
      Num. of steps            1
-     charge          -1.0000000000000000     
-  Length of machine:    86.338846012799522     
+     charge          -1.00000000000000     
+  Length of machine:    86.3388460127995     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -8.4547052805185974        4.9767276369542052E-015   85.842063290121274     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   -8.45470528051860       4.976727636954205E-015   85.8420632901213     
 select flag=ptc_twiss,column=name,s,betx,beta11,bety,beta22,beta12,beta21,mu1,mu2,beta11p,beta21p,beta22p,beta12p,disp1,disp1p;
 
 ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
@@ -275,6 +275,7 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
+ Closed orbit:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
 
 ++++++ table: ptc_twiss_summary
 
@@ -288,7 +289,7 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
        0.811467693      -0.8460403281      -0.8505154254                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-    0.006027089961        15.30834683     0.006336267376        27.21066157 
+     0.00602708996        15.30834683     0.006336267376        27.21066157 
 
          beta11min          beta11max          beta12min          beta12max 
       0.5553009471        7.632436352      0.01974230369        10.33565773 
