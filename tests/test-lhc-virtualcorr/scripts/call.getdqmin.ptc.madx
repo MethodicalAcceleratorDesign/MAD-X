@@ -1,0 +1,72 @@
+!!!################################################################################################################################
+!!!################ output files ##################################################################################################
+!!!################################################################################################################################
+assign, echo="output/dqmin.ptc.final.trim.dat";
+	print, text="### TRIM VALUES"
+assign, echo=terminal;
+assign, echo="output/dqmin.ptc.final.deltaq.dat";
+	print, text="### DQvalues"
+assign, echo=terminal;
+assign, echo="output/dqmin.ptc.final.deltaq.mad.dat";
+	print, text="### madx DQvalues"
+assign, echo=terminal;
+
+!!!################################################################################################################################
+!!!################ scan through settings of knob #################################################################################
+!!!################################################################################################################################
+kqtfINIT=kqtf.b1;
+kqtdINIT=kqtd.b1;
+trim=0.0;
+trimstep=0.1;
+trimfactor=5;
+deltaqinit=abs(ptcqyinit-ptcqxinit);
+dqstop=deltaqinit*2;
+lastdq=dqstop;
+while(deltaq<dqstop && abs(trimstep)>0.00001){
+	!!!################ define knob to make tunes approach 
+	kqtf.b1=kqtf.b1+(4.207e-5*(trimstep));
+	kqtd.b1=kqtd.b1+(4.276e-5*(trimstep));
+
+	  ptc_create_universe;          
+ 	  ptc_create_layout,model=3,method=6,nst=3,resplit,thin=0.0005,xbend=0.0005;
+	  ptc_align;                                                                    
+	  select_ptc_normal,  q1=0, q2=0;                                                                                             
+	  ptc_normal,closed_orbit,normal,icase=5,no=5;                                  
+	  write, table=normal_results;                    
+	  tunex   = table(normal_results,Q1,VALUE) ;                                    
+	  tuney   = table(normal_results,Q2,VALUE) ; 
+	  deltaq = abs(tuney-tunex);  
+                               
+	assign, echo="output/dqmin.ptc.final.trim.dat";
+	value, trim;
+	assign, echo=terminal;
+	assign, echo="output/dqmin.ptc.final.deltaq.dat";
+	value, deltaq;
+	assign, echo=terminal;
+
+	  select,flag=twiss,clear;
+	  select, flag=twiss, pattern="IP",   column=name,s;
+	  twiss, chrom, sequence=lhcb1, table;
+	  maddq = abs(table(summ,q1)-table(summ,q2)-5.0);
+
+	assign, echo="output/dqmin.ptc.final.deltaq.mad.dat";
+	value, maddq;
+	assign, echo=terminal;
+
+	value,trim;
+	value, deltaq;
+	value, maddq;
+	value, trimstep;
+	value, trimfactor;
+
+	if(deltaq>lastdq){
+			if(trimfactor==2){trimfactor=5.0;}
+			elseif(trimfactor==5){trimfactor=2.0;}
+			trimstep=(trimstep/trimfactor)*(-1);
+			}
+
+	lastdq=deltaq;
+	trim=trim+trimstep;
+}
+kqtf.b1=kqtfINIT;
+kqtd.b1=kqtdINIT;
