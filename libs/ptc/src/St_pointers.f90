@@ -53,6 +53,7 @@ module pointer_lattice
   logical :: onefunc = .true.,skipzero=.false.,skipcomplex=.true.
  type(probe), pointer :: xs0g(:) => null()
 
+
    
   INTERFACE SCRIPT
      MODULE PROCEDURE read_ptc_command
@@ -148,6 +149,15 @@ endif
 
   end  subroutine set_lattice_pointers
 
+  subroutine piotr()
+    implicit none
+    TYPE(REAL_8) :: a
+    TYPE(REAL_8) :: b
+    
+    a = b
+    
+  end subroutine piotr
+  
 
   subroutine read_ptc_command(ptc_fichier)
     use madx_ptc_module !etienne , piotr_state=>my_state,piotr_my_ring=>my_ring
@@ -220,13 +230,13 @@ endif
     REAL(DP) RA(2)
     REAL(DP) XA,YA,DXA,DYA, DC_ac,A_ac,theta_ac,D_ac
     real(dp), allocatable :: an(:),bn(:) !,n_co(:)
+    real(dp) d_volt,d_phas
     integer icnmin,icnmax,n_ac,inode,icavv !,n_coeff
     logical :: longprintt,onemap
 !    logical :: log_estate=.true. 
     integer :: mftune=6,nc
     real(dp), allocatable :: tc(:)
     type(integration_node), pointer  :: t
-
      longprintt=longprint 
      longprint=.true.
 !    if(log_estate) then
@@ -1362,6 +1372,171 @@ endif
       !    if(n_coeff>0) then
       !       deallocate(n_co)
       !    endif
+        case('MODULATERF','ACMAGNETRF')
+          READ(MF,*) NAME , posr
+
+          CALL CONTEXT(NAME)
+          N_NAME=0
+          IF(NAME(1:2)=='NO') THEN
+             READ(MF,*) NAME
+             call context(name)
+             N_NAME=len_trim(name)
+          ENDIF
+          READ(MF,*)  DC_ac,A_ac,theta_ac
+          READ(MF,*)  D_ac,n_ac !,n_coeff
+          i2=0
+          if(n_ac>0) then        !n_ac>0
+             allocate(an(n_ac))
+             allocate(bn(n_ac))
+             an=0.0_dp
+             bn=0.0_dp
+             do while(.true.)
+                read(mf,*) i1,dtu(1:2)
+                if(i1<=0) exit
+                if(i1>i2) i2=i1
+                an(i1)=dtu(2)
+                bn(i1)=dtu(1)
+             enddo
+          else
+              n_ac=1
+              allocate(an(n_ac))
+             allocate(bn(n_ac))
+             an=0.0_dp
+             bn=0.0_dp
+             i2=1             
+          endif                  !n_ac>0
+
+          p=>my_ering%start
+          do ii=1,my_ering%N
+             found_it=MY_FALSE
+             IF(N_NAME==0) THEN
+                found_it=P%MAG%NAME==NAME
+             ELSE
+                found_it=P%MAG%NAME(1:N_NAME)==NAME(1:N_NAME)
+             ENDIF
+
+             IF(FOUND_IT) THEN
+                write(6,*) " slow ac magnet found ",P%MAG%name
+                 if(associated(p%mag%volt)) then
+                    write(6,*) " It is an electric element "
+                else
+                  write(6,*) " Not electric element "
+                  stop
+                endif
+                READ(MF,*) d_volt , d_phas
+                if(.not.associated(P%MAG%DC_ac)) then
+                   allocate(P%MAG%DC_ac)
+                   allocate(P%MAG%A_ac)
+                   allocate(P%MAG%theta_ac)
+                   allocate(P%MAG%D_ac)
+
+                   allocate(P%MAGP%DC_ac)
+                   allocate(P%MAGP%A_ac)
+                   allocate(P%MAGP%theta_ac)
+                   CALL alloc(P%MAGP%DC_ac)
+                   CALL alloc(P%MAGP%A_ac)
+                   CALL alloc(P%MAGP%theta_ac)
+                   allocate(P%MAGp%D_ac)
+                   CALL alloc(P%MAGP%D_ac)
+
+
+
+                   P%MAG%D_ac=D_ac
+                   P%MAG%DC_ac=DC_ac
+                   P%MAG%A_ac=A_ac
+                   P%MAG%theta_ac=theta_ac*twopi
+                   P%MAGP%D_ac=D_ac
+                   P%MAGP%DC_ac=DC_ac
+                   P%MAGP%A_ac=A_ac
+                   P%MAGP%theta_ac=theta_ac*twopi
+                 if(P%MAG%slow_ac/=0) then
+                  write(6,*) P%MAG%name, " already modulated "
+                  stop 180
+                 endif
+                   P%MAG%slow_ac=posr
+                   P%MAGP%slow_ac=posr
+
+                   if(i2>p%mag%p%nmul) then
+                      CALL ADD(P,i2,0,0.0_dp)
+                   endif
+                              
+                   allocate(P%MAG%d_an(p%mag%p%nmul))
+                   allocate(P%MAG%d_bn(p%mag%p%nmul))
+                   allocate(P%MAGp%d_an(p%mag%p%nmul))
+                   allocate(P%MAGp%d_bn(p%mag%p%nmul))
+                   allocate(P%MAG%d0_an(p%mag%p%nmul))
+                   allocate(P%MAG%d0_bn(p%mag%p%nmul))
+                   allocate(P%MAGp%d0_an(p%mag%p%nmul))
+                   allocate(P%MAGp%d0_bn(p%mag%p%nmul))
+
+
+                   P%MAG%d_an=0.0_dp
+                   P%MAG%d_bn=0.0_dp
+
+                   call alloc(P%MAGp%d_an,p%mag%p%nmul)
+                   call alloc(P%MAGp%d_bn,p%mag%p%nmul)
+                   call alloc(P%MAGp%d0_an,p%mag%p%nmul)
+                   call alloc(P%MAGp%d0_bn,p%mag%p%nmul)
+                   do i1=1,p%mag%p%nmul
+                      P%MAG%d0_bn(i1)=P%MAG%bn(i1)
+                      P%MAG%d0_an(i1)=P%MAG%an(i1)
+                      P%MAGp%d0_bn(i1)=P%MAG%bn(i1)
+                      P%MAGp%d0_an(i1)=P%MAG%an(i1)
+                   enddo
+
+                   do i1=1,n_ac
+                      P%MAG%d_an(i1) =an(i1)
+                      P%MAGp%d_an(i1)=an(i1)
+                      P%MAG%d_bn(i1) =bn(i1)
+                      P%MAGp%d_bn(i1)=bn(i1)
+                   enddo
+                                
+                            allocate(P%MAG%D0_Volt)         
+                            allocate(P%MAGp%D0_Volt)
+                            allocate(P%MAG%D_Volt)         
+                            allocate(P%MAGp%D_Volt) 
+                            allocate(P%MAG%D0_phas)         
+                            allocate(P%MAGp%D0_phas)         
+                            allocate(P%MAG%D_phas)         
+                            allocate(P%MAGp%D_phas) 
+         
+                       call alloc(P%MAGp%D0_Volt)             
+                       call alloc(P%MAGp%D_Volt) 
+                       call alloc(P%MAGp%D0_phas)             
+                       call alloc(P%MAGp%D_phas) 
+                       
+                         P%MAG%D0_Volt = P%MAG%VOLT
+                         P%MAGp%D0_Volt = P%MAGp%VOLT
+	     
+
+                         P%MAG%D_Volt = d_volt
+                         P%MAGp%D_Volt = d_volt
+
+                         P%MAG%D0_phas = P%MAG%phas
+                         P%MAGp%D0_phas = P%MAGp%phas
+	     
+                         P%MAG%D_phas = d_phas
+                         P%MAGp%D_phas = d_phas
+             
+                else
+                   write(6,*) " already associated --> change code "
+                   stop 166
+                ENDIF
+             ENDIF
+
+
+             p=>p%next
+          enddo
+
+
+          if(n_ac>0) then
+             deallocate(an,bn)
+          endif
+
+      !    if(n_coeff>0) then
+      !       deallocate(n_co)
+      !    endif
+
        case('MAPSFORZHE')
           READ(MF,*) i11,I22,number_zhe_maps ,hgap ! position  i1=i2 one turn map,  fact is precision of stochastic kick
           READ(MF,*) MY_A_NO,do_state0   ! ORDER OF THE MAP  
@@ -2638,7 +2813,6 @@ fmd1='(1X,a3,I1,a3,i1,a4,2(D18.11,1x),(f10.3,1x),a2)'
         write(mf1,*) x
     endif
      if(present(fix)) fix=x
-
 
     call GET_loss(r,energy,deltap)
        if(present(FILE1)) then

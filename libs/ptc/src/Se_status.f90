@@ -67,7 +67,7 @@ module S_status
   ! TYPE(B_CYL) SECTOR_B
   !TYPE(B_CYL),ALLOCATABLE ::  S_B(:)
   !  INTEGER, TARGET :: NDPT_OTHER = 0
-  real(dp) CRAD,CFLUC
+  real(dp) CRAD,CFLUC,CFLUC0
   !  real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
   !  real(dp),PARAMETER::AAA=-0.25992104989487316476721060727823e0_dp  ! fourth order integrator
   !  real(dp),PARAMETER::FD1=half/(one+AAA),FD2=AAA*FD1,FK1=one/(one+AAA),FK2=(AAA-one)*FK1
@@ -81,6 +81,7 @@ module S_status
   PRIVATE CHECK_APERTURE_R,CHECK_APERTURE_P !,CHECK_APERTURE_S
   LOGICAL(lp), target:: electron
   real(dp), target :: muon=1.0_dp
+ ! logical :: junk_e=.true.
   LOGICAL(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
   ! include "a_def_all_kind.inc"    ! sept 2007
   ! include "a_def_sagan.inc"
@@ -250,13 +251,22 @@ CONTAINS
   real(dp) function cradf(p)
     implicit none
     type (MAGNET_CHART), pointer:: P
-    cradf=radfac*crad*p%p0c**3
+    ! if(junk_e) then
+    !   cradf=radfac*crad*p%p0c**3
+    ! else
+       cradf=radfac*CGAM0*twopii/p%GAMMA0I**3/p%MASS
+    ! endif  
+
   end function cradf
 
   real(dp) function cflucf(p)
     implicit none
     type (MAGNET_CHART), pointer:: P
-    cflucf=cfluc*p%p0c**5
+    ! if(junk_e) then    
+    !  cflucf=cfluc*p%p0c**5
+    ! else
+      cflucf=cfluc0*twopii/p%GAMMA0I**5/p%MASS**2
+    ! endif
   end function cflucf
 
 

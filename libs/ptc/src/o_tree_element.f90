@@ -30,7 +30,8 @@ module tree_element_MODULE
 
 
   private scdaddo,daddsco
-  private real_8REAL6,REAL6real_8,real_8REAL_8
+  private real_8REAL6,REAL6real_8
+  public real_8REAL_8
   private probe_quaternion_to_matrixr,probe_quaternion_to_matrixp
 
 

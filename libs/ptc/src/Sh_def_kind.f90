@@ -3638,7 +3638,9 @@ CALL FRINGECAV(EL,X,k,2)
     endif
 
     VL=dir*YL*EL%volt*volt_c/EL%P%P0C
-
+     
+    print*,"skowron: ph:",EL%PHAS," ph0=",EL%phase0, EL%t," volt omega",VL,O
+    
     do ko=1,el%nf    ! over modes
 
        DF=0.0_dp

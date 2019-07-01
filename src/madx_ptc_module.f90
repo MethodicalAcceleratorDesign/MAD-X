@@ -62,7 +62,7 @@ MODULE madx_ptc_module
      type(fibreptr)          :: elements(maxelperclock)
   end type clockdef
 
-  integer, private, parameter:: nmaxclocks = 2
+  integer, private, parameter:: nmaxclocks = 3
   type(clockdef),  dimension(nmaxclocks) :: clocks ! 3 pointers
   integer                                :: nclocks = 0
 
@@ -262,6 +262,7 @@ CONTAINS
     real(dp) patch_ang(3),patch_trans(3)
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2),myfield(2*maxmul+2)
     real(dp) gamma,gamma2,gammatr2,freq,offset_deltap
+    real(dp) modulationq
     real(dp) fint,fintx,div,muonfactor,edge,rhoi,hgap,corr,tanedg,secedg,psip
     real(dp) sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
     REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
@@ -1161,6 +1162,27 @@ CONTAINS
           key%list%lag = key%list%lag + twopi*freq*(l/2d0)/(clight*beta0)
        endif
 
+       modulationq = node_value('modulationq ')
+       if (abs(modulationq) .gt. 1e-12) then
+         
+         key%list%clockno_ac = getclockidx(modulationq)
+
+         if (key%list%clockno_ac .lt. 0) then
+           call aafail('ptc_input:', &
+           'Too many AC Dipole clocks, PTC can accept max 3 clocks with given tune and ramp. Program stops.')
+         endif
+
+       
+         key%list%n_ac = 1 
+         
+         key%list%d_volt = node_value('volterr ')
+         key%list%d_phas = node_value('lagerr ')
+
+         print*,"RF Cavity modulation ON volt", key%list%d_volt, " lag ", key%list%d_phas
+       else
+         print*,"RF Cavity modulation OFF"
+       endif
+
        ! LD: 09.04.2019
 !       write (*,'(3(a,E25.16))') "@@ RF freq= ", freq," lag= ", key%list%lag, " lag= ", node_value('lag ')
 
@@ -1358,8 +1380,8 @@ CONTAINS
         key%list%A_ac = zero
         key%list%theta_ac = -node_value('lag ') ! it is ignored with fast modulationtype = 1
 
-
-        key%list%clockno_ac = getclockidx()
+        modulationq = node_value('freq ')
+        key%list%clockno_ac = getclockidx(modulationq)
 
         if (key%list%clockno_ac .lt. 0) then
           call aafail('ptc_input:', &
@@ -1391,7 +1413,8 @@ CONTAINS
         key%list%A_ac = zero
         key%list%theta_ac = -node_value('lag ')
 
-        key%list%clockno_ac = getclockidx()
+        modulationq = node_value('freq ')
+        key%list%clockno_ac = getclockidx(modulationq)
 
         if (key%list%clockno_ac .lt. 0) then
           call aafail('ptc_input:', &
@@ -1524,8 +1547,9 @@ CONTAINS
 
     call create_fibre(my_ring%end,key,EXCEPTION) !in ../libs/ptc/src/Sp_keywords.f90
 
-    if(code.eq.40 .or. code.eq.41 ) then
+    if(key%list%n_ac > 0 ) then
       !save pointer to the AC dipole element for ramping in tracking
+      print*,"Adding Element: ",name, "of type ",code," to clock ",key%list%clockno_ac
       call addelementtoclock(my_ring%end,key%list%clockno_ac)
     endif
 
@@ -3497,7 +3521,7 @@ CONTAINS
   ! if clock with such freqency exists it returns its index
   ! if not, returns index of the next free slot
   ! if there is no free slots, returns -1
-  integer function getclockidx()
+  integer function getclockidx(f)
     implicit none
     real(dp) f ! frequency to search
     integer i, r1, r2, r3, r4
@@ -3508,7 +3532,7 @@ CONTAINS
     ! frequency is in fact tune
     ! kept like this on Rogelio request not to break the codes before LS2
     ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
-    f= node_value('freq ')
+    
 
     r1 = node_value('ramp1 ')
     r2 = node_value('ramp2 ')
@@ -3546,6 +3570,8 @@ CONTAINS
     getclockidx = nclocks
 
     clocks(nclocks)%nelements = 0
+    
+    print*,"getclockidx: Created new clock"
 
 
   end function getclockidx
@@ -3579,12 +3605,16 @@ CONTAINS
     integer  n,i
     real(dp) r
     type(fibre), pointer :: p
-
+    
+    print*,"acdipoleramping t=",t
+    
     do n=1,nclocks
 
       do i=1,clocks(n)%nelements
 
         p => clocks(n)%elements(i)%p
+
+        print*,"Setting ramp to clock ",n," element ", p%mag%name
 
         if (clocks(n)%rampupstop < 1) then
           ! no ramping, always full amplitude
@@ -3617,10 +3647,11 @@ CONTAINS
         p%mag%d_ac = zero
 
       enddo
-    ! print*,"Setting ramp to clock ",n," element ", clocks(1)%element%mag%name, " to ", clocks(n)%element%mag%d_ac
+     
 
     enddo
-
+    
+    print*,"acdipoleramping d_ac=",p%mag%d_ac
   end subroutine acdipoleramping
 
   !_________________________________________
