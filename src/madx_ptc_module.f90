@@ -61,12 +61,15 @@ MODULE madx_ptc_module
      integer                 :: nelements = 0
      type(fibreptr)          :: elements(maxelperclock)
   end type clockdef
-
+  
+  
   integer, private, parameter:: nmaxclocks = 3
   type(clockdef),  dimension(nmaxclocks) :: clocks ! 3 pointers
   integer                                :: nclocks = 0
 
-
+  real(dp) :: beta0start
+  real(dp) :: my_ring_length
+  
   character(1000), private  :: whymsg
 
 CONTAINS
@@ -1367,7 +1370,7 @@ CONTAINS
         ! need to convert voltage (E field) to corresponding B field
         if (L .gt. 0) then
           key%list%d_bn(1) =  0.3 * node_value('volt ')  / ( L * beta0 * get_value('beam ','pc '))
-          !print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
+          print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
         else
           key%list%d_bn(1) =  0.3 * node_value('volt ')  / (beta0 * get_value('beam ','pc '))
         endif
@@ -1391,7 +1394,7 @@ CONTAINS
 
     case(41)
 
-       key%magnet="hkicker"
+       key%magnet="vkicker"
        do i=1,NMAX
           key%list%k(i)=zero
           key%list%ks(i)=zero
@@ -1400,7 +1403,7 @@ CONTAINS
         key%list%n_ac = 1 ! only dipole
         if (L .gt. 0) then
           key%list%d_an(1) =  0.3 * node_value('volt ') / ( L * beta0 * get_value('beam ','pc '))
-          !print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
+          print*,"VACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
         else
           key%list%d_an(1) =  0.3 * node_value('volt ')  / (beta0 * get_value('beam ','pc '))
         endif
@@ -1567,9 +1570,12 @@ CONTAINS
     if (getdebug() > 0) then
        print*,' Length of machine: ',l_machine
     endif
-
+    
+    print*,"skowron check beta0, before: ",beta0
     CALL GET_ENERGY(ENERGY,kin,BRHO,beta0,P0C)
-
+    print*,"skowron check beta0, after: ",beta0
+    beta0start = beta0
+    
     isclosedlayout=get_value('ptc_create_layout ','closed_layout ') .ne. 0
 
     if (getdebug() > 0) then
@@ -1608,10 +1614,12 @@ CONTAINS
     endif
 
     call setintstate(default)
-
+    
+    call get_length(my_ring,l)
+    my_ring_length = l
     if(my_ring%HARMONIC_NUMBER>0) then
        print*,"HARMONIC NUMBER defined in the ring: ", my_ring%HARMONIC_NUMBER
-       call get_length(my_ring,l)
+       
 
        j=restart_sequ()
        p=>my_ring%start
@@ -3592,10 +3600,15 @@ CONTAINS
      elidx = clocks(c)%nelements
 
      clocks(c)%elements(elidx)%p=>p
+     
+     ! sets amplitude of modulation to maximum for ptc_twiss
+     ! (in track this parameter is ramped up and down)
+     p%magp%d_ac = 1
 
   end subroutine addelementtoclock
 
   !________________________________________________________________________________________________
+  !
   subroutine acdipoleramping(t)
     implicit none
     !---------------------------------------    *

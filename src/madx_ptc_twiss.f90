@@ -10,7 +10,7 @@ module madx_ptc_twiss_module
   USE madx_ptc_knobs_module
   USE madx_ptc_distrib_module
 
-  implicit none
+  implicit none 
 
   save
 
@@ -571,6 +571,7 @@ contains
     character(48)           :: summary_table_name
     character(12)           :: tmfile='transfer.map'
     character(48)           :: charconv !routine
+    real(dp)                :: BETA0
 
 
     if(universe.le.0.or.EXCEPTION.ne.0) then
@@ -794,6 +795,7 @@ contains
        call readinitialdistrib()
     endif
 
+    n_rf = nclocks
 
     ! old PTC
     !call init(default,no,nda,BERZ,mynd2,npara)
@@ -873,6 +875,21 @@ contains
     !############################################################################
     !############################################################################
     !############################################################################
+
+    ! n_rf is a variable of PTC that must be set accordingly
+    
+    
+    print*," Set relativistic beta correctly for AC dipole BETA0start=",BETA0start
+    do i=1,nclocks
+      A_script_probe%ac(i)%om = twopi*clocks(i)%tune * BETA0start / my_ring_length
+      !omega of the the modulation
+      !savedProbe%ac%om = twopi*clocks(1)%tune
+      A_script_probe%ac(i)%x(1)  = zero
+      A_script_probe%ac(i)%x(2)  = one  ! initial clock vector (sin like)
+    enddo
+
+    
+
 
        doRDTtracking = get_value('ptc_twiss ','trackrdts ') .ne. 0
        if (doRDTtracking) then
@@ -4897,5 +4914,7 @@ contains
 !  character(*) :: base
 !
 !end function buildVariableName
+
+
 
 end module madx_ptc_twiss_module
