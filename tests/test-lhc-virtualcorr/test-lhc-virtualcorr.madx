@@ -3,10 +3,10 @@ option, warn,info;
 !###################################################################################################################################
 !############################## CREATE SOFT LINKS AND DIRECTORIES ##################################################################
 !###################################################################################################################################
-System,"rm -r temp";
-System,"rm -r output";
-System,"mkdir temp";
-System,"mkdir output";
+!System,"rm -r temp";
+!System,"rm -r output";
+System,"mkdir -p temp";
+System,"mkdir -p output";
 !######################################################################
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/SLHCV1.0 slhc";
