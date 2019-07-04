@@ -1192,6 +1192,10 @@ CONTAINS
       key%magnet="elseparator"
       ex = node_value('ex ')
       ey = node_value('ey ')
+      if (l .ne. 0) then
+        ex = ex + node_value('ex_l ')/l
+        ey = ey + node_value('ey_l ')/l
+      endif
       key%list%volt=sqrt(ex**2 + ey**2)
       key%list%lag=atan2(ey,ex)
       print *, "elseparator: volt=", key%list%volt, "lag=", key%list%lag, "ex=", ex, "ey=", ey ;
@@ -3194,11 +3198,11 @@ CONTAINS
        name(:len_trim(name2)-1)=name2(:len_trim(name2)-1)
        call context(name)
        call move_to(my_ring,p,name,pos)
-       
+
        !madxtilt =  get_orginal_madx_tilt(name)
-       
+
        tilt=-(p%mag%p%tiltd)! - madxtilt)   ! here we should read tilt from MADX lattice and deduce back the automatic tilt from skew (+ normal)
-       
+
        if(pos/=0) then
           if(p%mag%l/=zero) then
              do k=1,maxmul
@@ -3378,7 +3382,7 @@ CONTAINS
          (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
 
   end subroutine getfk
- 
+
   !____________________________________________________________________________________________
   ! Configures beam-beam for every beambeam element defined in MADX lattice
   subroutine getBeamBeam()
