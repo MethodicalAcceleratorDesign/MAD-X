@@ -1198,7 +1198,6 @@ CONTAINS
       endif
       key%list%volt=sqrt(ex**2 + ey**2)
       key%list%lag=atan2(ey,ex)
-      print *, "elseparator: volt=", key%list%volt, "lag=", key%list%lag, "ex=", ex, "ey=", ey ;
 
     case(12)
        ! actually our SROT element
