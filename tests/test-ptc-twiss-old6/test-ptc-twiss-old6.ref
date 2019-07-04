@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.13 23:45:42      +
+  + Release   date: 2019.06.07               +
+  + Execution date: 2019.06.27 10:34:31      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -498,9 +498,9 @@ START LMDIF:
 Initial Penalty Function =   0.80418008E+02
 
 
-call:       4   Penalty function =   0.68565992E-13
+call:       4   Penalty function =   0.68596135E-13
  ++++++++++ LMDIF ended: converged successfully
-call:       4   Penalty function =   0.68565992E-13
+call:       4   Penalty function =   0.68596135E-13
 endmatch;
 
 
@@ -508,11 +508,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         dq1          4     2.00000000E+00     2.00000026E+00     6.66322790E-14
-Global constraint:         dq2          4     2.00000000E+00     1.99999996E+00     1.93371287E-15
+Global constraint:         dq1          4     2.00000000E+00     2.00000026E+00     6.66630980E-14
+Global constraint:         dq2          4     2.00000000E+00     1.99999996E+00     1.93303688E-15
 
 
-Final Penalty Function =   6.85659919e-14
+Final Penalty Function =   6.85961348e-14
 
 
 
@@ -525,7 +525,7 @@ ksd.b1                   -1.09468e-01 -1.07933e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   6.85659919e-14
+VARIABLE "TAR" SET TO   6.85961348e-14
 value, KSF.B1;
 
 ksf.b1             =      0.06179867366 ;
@@ -562,13 +562,13 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.93797465E-11
+Initial Penalty Function =   0.93797449E-11
 
 
-call:       4   Penalty function =   0.25874711E-18
-call:       7   Penalty function =   0.44049993E-22
+call:       4   Penalty function =   0.25798029E-18
+call:       7   Penalty function =   0.19164902E-22
  ++++++++++ LMDIF ended: converged successfully
-call:       7   Penalty function =   0.44049993E-22
+call:       7   Penalty function =   0.19164902E-22
 endmatch;
 
 
@@ -576,11 +576,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-lhcb1$end:1                mux          4     6.42800000E+01     6.42800000E+01     5.83630852E-24
-lhcb1$end:1                muy          4     5.93100000E+01     5.93100000E+01     3.82136844E-23
+lhcb1$end:1                mux          4     6.42800000E+01     6.42800000E+01     9.89547120E-25
+lhcb1$end:1                muy          4     5.93100000E+01     5.93100000E+01     1.81753553E-23
 
 
-Final Penalty Function =   4.40499929e-23
+Final Penalty Function =   1.91649024e-23
 
 
 
@@ -593,13 +593,13 @@ kqtd.b1                   1.12701e-09  0.00000e+00 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   4.40499929e-23
+VARIABLE "TAR" SET TO   1.91649024e-23
 value, KQTF.B1;
 
-kqtf.b1            =     -4.9135591e-10 ;
+kqtf.b1            =    -4.91356067e-10 ;
 value, KQTD.B1;
 
-kqtd.b1            =    1.127012958e-09 ;
+kqtd.b1            =     1.12701241e-09 ;
 
 
 VRF400=16;
@@ -708,17 +708,17 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=1;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.449999E+03
  Setting MADx with 
-     energy           450.00000000000000     
+     energy           450.000000000000     
      method                   6
      Num. of steps            1
-     charge           1.0000000000000000     
-  Length of machine:    26658.883200000000     
+     charge           1.00000000000000     
+  Length of machine:    26658.8832000000     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        26658.883200002034     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   0.000000000000000E+000  0.000000000000000E+000   26658.8832000020     
 
 
 SELECT, flag=ptc_twiss, clear;
@@ -749,6 +749,7 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCom
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
+ Closed orbit:  -2.500015169528096E-003 -3.567728399876380E-009 -7.649117161965302E-008  1.600066422916072E-004  1.141438679805326E-005  8.804811569816177E-007
 
 ++++++ table: ptc_twiss_summary
 
@@ -765,16 +766,16 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCom
        9.999904677        623.4144437        9.819046443        639.6111433 
 
          beta11min          beta11max          beta12min          beta12max 
-       9.999904673        623.4144433    3.584973171e-09    3.803554514e-07 
+       9.999904673        623.4144434    3.584971066e-09    3.803551622e-07 
 
          beta13min          beta13max          beta21min          beta21max 
-   3.924847111e-09      0.04761849525    2.791541912e-09    3.686516124e-07 
+   3.924847103e-09      0.04761849525    2.791540124e-09     3.68651315e-07 
 
          beta22min          beta22max          beta23min          beta23max 
-       9.819046443         639.611143    6.372983134e-10    0.0001425093864 
+       9.819046443         639.611143    6.372983122e-10    0.0001425093864 
 
          beta31min          beta31max          beta32min          beta32max 
-   9.522644138e-09       0.0496327398    3.544342774e-07    6.257024793e-05 
+   9.522644768e-09       0.0496327398    3.544342774e-07    6.257024793e-05 
 
          beta33min          beta33max           disp1min           disp1max 
        166.9905597        167.0946714       -2.819829434        2.814765452 
@@ -786,22 +787,22 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCom
     -0.00387564436      0.00299433985                  0     -0.00250001517 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -3.567728269e-09   -7.649116866e-08    0.0001600066423    8.804816453e-07 
+    -3.5677284e-09   -7.649117162e-08    0.0001600066423     8.80481157e-07 
 
            orbit_t             xcorms             ycorms            pxcorms 
-   1.141438798e-05    0.0009316851209    0.0009604958264    3.079876774e-05 
+    1.14143868e-05    0.0009316851209    0.0009604958264    3.079876774e-05 
 
            pycorms             tcorms            ptcorms             xcomax 
-   3.139702411e-05     5.31596873e-06    8.804816455e-07     0.007226400175 
+   3.139702411e-05    5.315969761e-06    8.804811573e-07     0.007226400175 
 
             ycomax            pxcomax            pycomax             tcomax 
-    0.007641671572    0.0003940871055    0.0004529212793    1.285828049e-05 
+    0.007641671572    0.0003940871055    0.0004529212793    1.285828311e-05 
 
            ptcomax             xcomin             ycomin            pxcomin 
-   8.804816457e-07    -0.008235647056    -0.008512310964   -0.0004423489589 
+   8.804811576e-07    -0.008235647056    -0.008512310964   -0.0004423489589 
 
            pycomin             tcomin            ptcomin 
-  -0.0003835866478   -2.529663824e-06    8.804816386e-07 
+  -0.0003835866478   -2.529662993e-06    8.804811504e-07 
 
 
 select_ptc_normal, dq1,dq2;
@@ -832,7 +833,7 @@ ptc_normal,closed_orbit,normal,icase=5,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   -2.4999927550697627E-003  -3.8031142804977888E-009  -8.1822968962374675E-008   1.6000806167795650E-004   0.0000000000000000     
+ Closed orbit:  -2.499992755069758E-003 -3.803114280479791E-009 -8.182296896130220E-008  1.600080616779566E-004  0.000000000000000E+000
 write, table=normal_results,file="normal_results";
 
 

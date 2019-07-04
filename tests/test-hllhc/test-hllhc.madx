@@ -676,8 +676,8 @@ twiss;
 !*/
 
 select, flag=twiss, clear;
-twiss,file="last_twiss.20";
-!system,"gzip -f last_twiss.20";
+select, flag=twiss, pattern=MQTL;
+twiss,file="last_twiss.1";
 
 ! cleaning files
 removefile file="db5" ;

@@ -1,0 +1,307 @@
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!             Wire compensator installation
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+! With the important input of K.Skoufaris
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!             Wire compensator installation
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+! With the important input of K.Skoufaris
+
+INSTALL_WIRE_C_B1(name_bbcw.b1, s_bbcw.b1, x_bbcw.b1, y_bbcw.b1, I_bbcw.b1): MACRO = {
+
+!This macro installs ONE wire on B1, given its s and transverse positions and
+!its current. Please be careful that the distances have to be given with respect
+!to B1 reference frame. As input, the user should also choose a name to give to
+!the wire
+
+use, sequence = lhcb1;
+
+!======= SIGMA OF THE BBCW =========!
+
+sigx_bbcw.b1 = (2*1e-3)/6; ! in [m]
+sigy_bbcw.b1 = (2*1e-3)/6; ! in [m]
+
+!======== DEFINE THE WIRE MARKER ========!
+
+mar_bbcw.b1: marker;
+
+!======== INSTALL THE WIRE MARKER =======!
+
+seqedit, sequence=lhcb1;
+flatten;
+install, element=mar_bbcw.b1, at=s_bbcw.b1;
+flatten;
+endedit;
+
+!========== TRANSVERSE POSITION =========!
+
+use, sequence = lhcb1;
+select, flag=twiss, sequence=lhcb1, clear;
+select, flag=twiss, sequence=lhcb1, pattern=mar_bbcw.b1, column=name,s,x,y,px,py,betx,bety,sig11,sig12,sig22,sig33,sig34,sig44,sig13,sig14,sig23,sig24;
+select, flag=twiss, sequence=lhcb1, pattern=ip[15], class=marker, column=name,s,x,y,px,py,betx,bety,sig11,sig12,sig22,sig33,sig34,sig44,sig13,sig14,sig23,sig24;
+twiss, sequence=lhcb1;
+
+
+!======== PRINT VALUES ===========!
+
+s_at_bbcw.b1 = table(twiss, mar_bbcw.b1,s);
+x_at_bbcw.b1 = table(twiss, mar_bbcw.b1,x);
+y_at_bbcw.b1 = table(twiss, mar_bbcw.b1,y);
+
+! in sigmas
+
+x_dist_sig_bbcw.b1 = x_bbcw.b1/sqrt(table(twiss, mar_bbcw.b1, sig11));
+y_dist_sig_bbcw.b1 = y_bbcw.b1/sqrt(table(twiss, mar_bbcw.b1, sig33));
+
+! current
+
+I_bbcw.b1_N := I_bbcw.b1/(qelect*clight*beam%lhcb1->npart);
+
+
+!======= INSTALL THE WIRE ========!
+
+seqedit, sequence=lhcb1;
+flatten;
+
+xma_bbcw.b1 = x_bbcw.b1 + x_at_bbcw.b1;
+yma_bbcw.b1 = y_bbcw.b1 + y_at_bbcw.b1;
+
+name_bbcw.b1: beambeam, charge:=-I_bbcw.b1_N, sigx=sigx_bbcw.b1, sigy=sigy_bbcw.b1, xma=xma_bbcw.b1, yma=yma_bbcw.b1, bbshape=1, bbdir=-1;
+replace, element=mar_bbcw.b1, by=name_bbcw.b1;
+
+flatten;
+endedit;
+
+use, sequence = lhcb1;
+
+print, text='Close orbit of the weak beam at the wire location';
+value, s_at_bbcw.b1, x_at_bbcw.b1, y_at_bbcw.b1;
+
+print, text='Distance in [sig] and [m] between the wire and the weak beam';
+value, x_bbcw.b1, x_dist_sig_bbcw.b1, y_bbcw.b1, y_dist_sig_bbcw.b1;
+
+print, text='Distance in [m] of the wire from the reference orbit';
+value, name_bbcw.b1->xma, name_bbcw.b1->yma;
+
+print, text='Current in the wire [Am] and equivalent number of encounters';
+value, I_bbcw.b1,I_bbcw.b1_N;
+
+!======= PRINT IN THE BB LENSES FILE ========!
+
+system, "sed -i '$d' bb_lenses.dat"; ! removes last line: NEXT
+!! Print out the beam beam wire compensator lenses
+!option,-echo, -info;
+assign, echo=bb_lenses.dat;
+
+printf, text="name_bbcw.b1 0 %f %f %f %f %f", value= (name_bbcw.b1->sigx)^2*1e6, (name_bbcw.b1->sigy)^2*1e6, 1.0*(name_bbcw.b1->xma-x_at_bbcw.b1)*1e3, 1.0*(name_bbcw.b1->yma-y_at_bbcw.b1)*1e3, name_bbcw.b1->charge;
+print, text="NEXT";
+assign, echo=terminal;
+
+};
+
+
+
+
+INSTALL_WIRE_C_B2(name_bbcw.b2, s_bbcw.b2, x_bbcw.b2, y_bbcw.b2, I_bbcw.b2v): MACRO = {
+
+!This macro installs ONE wire on B2, given its s and transverse positions and
+!its current. Please be careful that the distances have to be given with respect
+!to B1 reference frame. As input, the user should also choose a name to give to
+!the wire
+!In the case of B2, we do not print the lense in the bb_lenses file (only B1 is being tracked)
+
+use, sequence = lhcb2;
+
+!======= SIGMA OF THE BBCW =========!
+
+sigx_bbcw.b2 = (2*1e-3)/6; ! in [m]
+sigy_bbcw.b2 = (2*1e-3)/6; ! in [m]
+
+!======== DEFINE THE WIRE MARKER ========!
+
+mar_bbcw.b2: marker;
+
+!======== INSTALL THE WIRE MARKER =======!
+
+seqedit, sequence=lhcb2;
+flatten;
+install, element=mar_bbcw.b2, at=s_bbcw.b2;
+flatten;
+endedit;
+
+!========== TRANSVERSE POSITION =========!
+
+use, sequence = lhcb2;
+select, flag=twiss, sequence=lhcb2, clear;
+select, flag=twiss, sequence=lhcb2, pattern=mar_bbcw.b2, column=name,s,x,y,px,py,betx,bety,sig11,sig12,sig22,sig33,sig34,sig44,sig13,sig14,sig23,sig24;
+select, flag=twiss, sequence=lhcb2, pattern=ip[15], class=marker, column=name,s,x,y,px,py,betx,bety,sig11,sig12,sig22,sig33,sig34,sig44,sig13,sig14,sig23,sig24;
+twiss, sequence=lhcb2;
+
+
+!======== PRINT VALUES ===========!
+
+s_at_bbcw.b2 = table(twiss, mar_bbcw.b2,s);
+x_at_bbcw.b2 = table(twiss, mar_bbcw.b2,x);
+y_at_bbcw.b2 = table(twiss, mar_bbcw.b2,y);
+
+! in sigmas
+
+x_dist_sig_bbcw.b2 = x_bbcw.b2/sqrt(table(twiss, mar_bbcw.b2, sig11));
+y_dist_sig_bbcw.b2 = y_bbcw.b2/sqrt(table(twiss, mar_bbcw.b2, sig33));
+
+! current
+
+I_bbcw.b2_N := I_bbcw.b2/(qelect*clight*beam%lhcb2->npart);
+
+
+!======= INSTALL THE WIRE ========!
+
+seqedit, sequence=lhcb2;
+flatten;
+
+xma_bbcw.b2 = x_bbcw.b2 + x_at_bbcw.b2;
+yma_bbcw.b2 = y_bbcw.b2 + y_at_bbcw.b2;
+
+name_bbcw.b2: beambeam, charge:=-I_bbcw.b2_N, sigx=sigx_bbcw.b2, sigy=sigy_bbcw.b2, xma=xma_bbcw.b2, yma=yma_bbcw.b2, bbshape=1, bbdir=-1;
+replace, element=mar_bbcw.b2, by=name_bbcw.b2;
+
+flatten;
+endedit;
+
+use, sequence = lhcb2;
+
+print, text='Close orbit of the weak beam at the wire location';
+value, s_at_bbcw.b2, x_at_bbcw.b2, y_at_bbcw.b2;
+
+print, text='Distance in [sig] and [m] between the wire and the weak beam';
+value, x_bbcw.b2, x_dist_sig_bbcw.b2, y_bbcw.b2, y_dist_sig_bbcw.b2;
+
+print, text='Distance in [m] of the wire from the reference orbit';
+value, name_bbcw.b2->xma, name_bbcw.b2->yma;
+
+print, text='Current in the wire [Am] and equivalent number of encounters';
+value, I_bbcw.b2,I_bbcw.b2_N;
+
+};
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!                    Wire matching macro
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+MATCH_WIRE_C_B1(WWBB): MACRO = {
+
+! This macro aims to match a given WWBB wire already installed ON B1
+use, sequence=lhcb1;
+match,sequence=lhcb1;
+kq5.WWBB_BM=kq5.WWBB;
+kq4.WWBB_BM=kq4.WWBB;
+kq6.WWBB_BM=kq6.WWBB;
+
+global, q1=qx0;
+global, q2=qy0;
+vary,   name=kq5.WWBB, step=1.0E-7 ;
+vary,   name=kq4.WWBB, step=1.0E-7 ;
+lmdif,  calls=100, tolerance=1.0E-21;
+endmatch;
+twiss;
+
+q1_AF = table(summ,q1);
+q2_AF = table(summ,q2);
+
+deltaQ1 = ABS(q1_AF-qx0);
+deltaQ2 = ABS(q2_AF-qy0);
+
+if(deltaQ1>1E-5 || deltaQ2>1E-5){
+matchQ6_WWBB = 1;
+use, sequence=lhcb1;
+match,sequence=lhcb1;
+
+global, q1=qx0;
+global, q2=qy0;
+vary,   name=kq5.WWBB, step=1.0E-8 ;
+vary,   name=kq4.WWBB, step=1.0E-8 ;
+vary,   name=kq6.WWBB, step=1.0E-8 ;
+jacobian,  calls=100, tolerance=1.0E-21;
+endmatch;
+twiss;
+};
+kq5.WWBB_AM=kq5.WWBB;
+kq4.WWBB_AM=kq4.WWBB;
+kq6.WWBB_AM=kq6.WWBB;
+};
+
+MATCH_WIRE_C_B2(WWBB): MACRO = {
+
+! This macro aims to match a given WWBB wire already installed ON B2
+use, sequence=lhcb2;
+match,sequence=lhcb2;
+kq5.WWBB_BM=kq5.WWBB;
+kq4.WWBB_BM=kq4.WWBB;
+kq6.WWBB_BM=kq6.WWBB;
+
+global, q1=qx0;
+global, q2=qy0;
+vary,   name=kq5.WWBB, step=1.0E-7 ;
+vary,   name=kq4.WWBB, step=1.0E-7 ;
+lmdif,  calls=100, tolerance=1.0E-21;
+endmatch;
+twiss;
+
+q1_AF = table(summ,q1);
+q2_AF = table(summ,q2);
+
+deltaQ1 = ABS(q1_AF-qx0);
+deltaQ2 = ABS(q2_AF-qy0);
+
+if(deltaQ1>1E-5 || deltaQ2>1E-5){
+matchQ6_WWBB = 1;
+use, sequence=lhcb2;
+match,sequence=lhcb2;
+
+global, q1=qx0;
+global, q2=qy0;
+vary,   name=kq5.WWBB, step=1.0E-8 ;
+vary,   name=kq4.WWBB, step=1.0E-8 ;
+vary,   name=kq6.WWBB, step=1.0E-8 ;
+jacobian,  calls=100, tolerance=1.0E-21;
+endmatch;
+twiss;
+};
+kq5.WWBB_AM=kq5.WWBB;
+kq4.WWBB_AM=kq4.WWBB;
+kq6.WWBB_AM=kq6.WWBB;
+};
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;^M
+!     Wire compensator installation in bb_lenses.dat^M
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;^M
+
+PRINT_WIRE_LENSES : macro = {
+        system, "sed -i '$d' bb_lenses.dat"; ! removes last line: NEXT
+        !! Print out the beam beam wire compensator lenses
+        option,-echo, -info;
+        assign, echo=bb_lenses.dat;
+
+        !## IP1 ##!
+        if (I_wire_l1.b1<>0){
+        printf, text="bbwire_c_l1.b1 0 %f %f %f %f %f", value= (bbwire_c_l1.b1->sigx)^2*1e6, (bbwire_c_l1.b1->sigy)^2*1e6, -1.0*(bbwire_c_l1.b1->xma-x_bbwire_c_l1.b1)*1e3, -1.0*(bbwire_c_l1.b1->yma-y_bbwire_c_l1.b1)*1e3, bbwire_c_l1.b1->charge;
+};
+        if (I_wire_r1.b1<>0){
+        printf, text="bbwire_c_r1.b1 0 %f %f %f %f %f", value= (bbwire_c_r1.b1->sigx)^2*1e6, (bbwire_c_r1.b1->sigy)^2*1e6, -1.0*(bbwire_c_r1.b1->xma-x_bbwire_c_r1.b1)*1e3, -1.0*(bbwire_c_r1.b1->yma-y_bbwire_c_r1.b1)*1e3, bbwire_c_r1.b1->charge;
+};
+        !## IP5 ##!
+        if (I_wire_l5.b1<>0){
+        printf, text="bbwire_c_l5.b1 0 %f %f %f %f %f", value= (bbwire_c_l5.b1->sigx)^2*1e6, (bbwire_c_l5.b1->sigy)^2*1e6, -1.0*(bbwire_c_l5.b1->xma-x_bbwire_c_l5.b1)*1e3, -1.0*(bbwire_c_l5.b1->yma-y_bbwire_c_l5.b1)*1e3, bbwire_c_l5.b1->charge;
+};
+        if (I_wire_r5.b1<>0){
+        printf, text="bbwire_c_r5.b1 0 %f %f %f %f %f", value= (bbwire_c_r5.b1->sigx)^2*1e6, (bbwire_c_r5.b1->sigy)^2*1e6, -1.0*(bbwire_c_r5.b1->xma-x_bbwire_c_r5.b1)*1e3, -1.0*(bbwire_c_r5.b1->yma-y_bbwire_c_r5.b1)*1e3, bbwire_c_r5.b1->charge;
+};
+        print, text="NEXT";
+        assign,echo=terminal;
+};!end macro

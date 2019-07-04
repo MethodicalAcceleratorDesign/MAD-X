@@ -22,7 +22,7 @@ use,  sequence= smachd;
 ! ********** Track 20 particles
 ! Note the usage of the options
 ! 'onepass': 
-track, onepass, onetable, file= "out_test-track_ap_collimator", aperture, dump;
+track, onepass,  file= "out_test-track_ap_collimator", aperture, dump;
   n=0;  
   while(n<20) {
      n= n+1; 

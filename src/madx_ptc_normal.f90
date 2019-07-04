@@ -85,6 +85,9 @@ contains
     call my_state(icase,deltap,deltap0)
     CALL UPDATE_STATES
 
+    call make_node_layout(my_ring)    
+    call getBeamBeam()
+
     x(:)=zero
 
     ! pass starting point for closed orbit search
@@ -116,7 +119,11 @@ contains
        isstochastic = default%stochastic
        default%stochastic = .false.
 
-       call find_orbit(my_ring,x,1,default,c_1d_7)
+       current=>my_ring%start
+       !global_verbose = .true.
+       call FIND_ORBIT_x(x,default,c_1d_8,fibre1=current)
+ 
+  !     call find_orbit(my_ring,x,1,default,c_1d_7)
 
        default%stochastic = isstochastic
 
@@ -221,7 +228,8 @@ contains
 
     call daprint(theTransferMap%x,18)
 
-
+    !!!!!!!
+    !!!!!!!
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
     if(maptable) then
        call makemaptable(theTransferMap%x,no)
@@ -545,9 +553,7 @@ contains
 
 
     CALL kill(theTransferMap)
-
     close(18)
-
     if (getdebug() > 1) then
       close(19)
     endif

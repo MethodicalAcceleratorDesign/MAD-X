@@ -1,0 +1,135 @@
+
+! fine tuning of coupling   (S.Fartoukh)
+
+
+! store initial skew quad strengths
+ kqs.r1b1_0  = kqs.r1b1 ;
+ kqs.l2b1_0  = kqs.l2b1 ;
+ kqs.a23b1_0 = kqs.a23b1;
+ kqs.r3b1_0  = kqs.r3b1 ;
+ kqs.l4b1_0  = kqs.l4b1 ;
+ kqs.a45b1_0 = kqs.a45b1;
+ kqs.r5b1_0  = kqs.r5b1 ;
+ kqs.l6b1_0  = kqs.l6b1 ;
+ kqs.a67b1_0 = kqs.a67b1;
+ kqs.r7b1_0  = kqs.r7b1 ;
+ kqs.l8b1_0  = kqs.l8b1 ;
+ kqs.a81b1_0 = kqs.a81b1;
+
+! knob definitions by S.Fartoukh's program
+! V6.503.as-built with missing sector 34
+ B11 = 0.10783010E-01 ; B12 = -.14106326E-01 ;  // 25/11/2009 11:28:02
+ B21 = -.32954856E-01 ; B22 = 0.82313824E-02 ;
+ B31 = 0.00000000E+00 ; B32 = 0.00000000E+00 ;  // disabled
+ B41 = -.18201103E-01 ; B42 = -.14496686E-01 ;
+ B51 = 0.39189304E-01 ; B52 = 0.11634490E-01 ;
+ B61 = -.16869284E-03 ; B62 = -.14486997E-01 ;
+ B71 = -.96896935E-02 ; B72 = -.15472699E-01 ;
+ B81 = -.24822709E-01 ; B82 = 0.10720227E-01 ;
+
+! apply increments to skew quads
+ kqs.r1b1  := kqs.r1b1_0  + b11*cmrskew + b12*cmiskew;
+ kqs.l2b1  := kqs.l2b1_0  + b11*cmrskew + b12*cmiskew;
+ kqs.a23b1 := kqs.a23b1_0 + b21*cmrskew + b22*cmiskew;
+ kqs.r3b1  := kqs.r3b1_0  + b31*cmrskew + b32*cmiskew;
+ kqs.l4b1  := kqs.l4b1_0  + b31*cmrskew + b32*cmiskew;
+ kqs.a45b1 := kqs.a45b1_0 + b41*cmrskew + b42*cmiskew;
+ kqs.r5b1  := kqs.r5b1_0  + b51*cmrskew + b52*cmiskew;
+ kqs.l6b1  := kqs.l6b1_0  + b51*cmrskew + b52*cmiskew;
+ kqs.a67b1 := kqs.a67b1_0 + b61*cmrskew + b62*cmiskew;
+ kqs.r7b1  := kqs.r7b1_0  + b71*cmrskew + b72*cmiskew;
+ kqs.l8b1  := kqs.l8b1_0  + b71*cmrskew + b72*cmiskew;
+ kqs.a81b1 := kqs.a81b1_0 + b81*cmrskew + b82*cmiskew;
+
+
+
+
+! saved on 13/10/08 15:49:08 by T.Risselada
+
+! closest tune
+ kqtf.b10=kqtf.b1;
+ kqtd.b10=kqtd.b1;
+ qmid=(qx0-qx00+qy0-qy00)*0.5;
+
+ match;
+ global, q1=qx00+qmid,q2=qy00+qmid;
+ vary,   name=kqtf.b1, step=1.E-9;
+ vary,   name=kqtd.b1, step=1.E-9;
+ lmdif,  calls=50, tolerance=1.E-5;
+ endmatch;
+
+
+! Quick minimization based on linear machine
+ cmrskew0 = cmrskew;
+ cmiskew0 = cmiskew;
+ twiss; qx=table(summ,q1); qy=table(summ,q2);
+
+ cta0     = abs(qx-qy-tsplit);
+ closest0 = cta0;
+ cmrskew  = cmrskew0+cta0/2.;
+ twiss; qx=table(summ,q1); qy=table(summ,q2);
+
+ ctap     = abs(qx-qy-tsplit);
+ cmrskew  = cmrskew0-cta0/2.;
+ twiss; qx=table(summ,q1); qy=table(summ,q2);
+
+ ctam     = abs(qx-qy-tsplit);
+ cmrskew  = cmrskew0+(ctam^2-ctap^2)/2./cta0;
+ twiss; qx=table(summ,q1); qy=table(summ,q2);
+
+ cta0     = abs(qx-qy-tsplit);
+ cmiskew  = cmiskew0+cta0/2.;
+ twiss; qx=table(summ,q1); qy=table(summ,q2);
+
+ ctap     = abs(qx-qy-tsplit);
+ cmiskew  = cmiskew0-cta0/2.;
+ twiss; qx=table(summ,q1); qy=table(summ,q2);
+
+ ctam     = abs(qx-qy-tsplit);
+ cmiskew  = cmiskew0+(ctam^2-ctap^2)/2./cta0;
+ twiss; qx=table(summ,q1); qy=table(summ,q2);
+
+ closest1 =abs(qx-qy-tsplit);
+
+
+!Empirical minimisation
+ match;
+ global, q1=qx00+qmid, q2=qy00+qmid;
+ vary,   name=kqtf.b1, step=1.E-9;
+ vary,   name=kqtd.b1, step=1.E-9;
+ lmdif,  calls=100,tolerance=1.E-6;
+ endmatch;
+
+ match;
+ global, q1=qx00+qmid, q2=qy00+qmid;
+ vary,   name=cmrskew, step=1.E-9;
+ vary,   name=cmiskew, step=1.E-9;
+ lmdif,  calls=150, tolerance=2.E-6;
+ endmatch;
+
+ match;
+ global, q1=qx00+qmid, q2=qy00+qmid;
+ vary,   name=kqtf.b1, step=1.E-9;
+ vary,   name=kqtd.b1, step=1.E-9;
+ lmdif,  calls=100, tolerance=1.E-7;
+ endmatch;
+
+ match;
+ global, q1=qx00+qmid, q2=qy00+qmid;
+ vary,   name=cmrskew, step=1.E-9;
+ vary,   name=cmiskew, step=1.E-9;
+ lmdif,  calls=150, tolerance=2.E-7;
+ endmatch;
+
+ match;
+ global, q1=qx00+qmid, q2=qy00+qmid;
+ vary,   name=kqtf.b1, step=1.E-9;
+ vary,   name=kqtd.b1, step=1.E-9;
+ lmdif,  calls=100, tolerance=1.E-7;
+ endmatch;
+
+ twiss;  qx=table(summ,q1); qy=table(summ,q2);
+ closest2=abs(qx-qy-tsplit);
+ value, closest0, closest1, closest2, cmrskew, cmiskew;
+
+return;

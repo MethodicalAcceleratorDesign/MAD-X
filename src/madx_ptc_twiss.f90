@@ -698,10 +698,8 @@ contains
 
     slice = slice_magnets .or. center_magnets
 
-    if ( slice) then
-     call make_node_layout(my_ring)
-     call getBeamBeam()
-    endif
+    call make_node_layout(my_ring)
+    call getBeamBeam()
 
 
     !############################################################################
@@ -770,7 +768,7 @@ contains
           return
        endif
 
-      if (getdebug() > 1) then
+      if (getdebug() > 0) then
          CALL write_closed_orbit(icase,orbit)
       endif
 
@@ -3897,75 +3895,6 @@ contains
 
   end subroutine trackOrbitExtremaAndRms
 
-  !____________________________________________________________________________________________
-
-
-  subroutine getBeamBeam()
-   implicit none
-   integer                 :: i,e,elcode
-   integer, external       :: restart_sequ, & !  restart beamline and return number of beamline node
-                              advance_node    !  advance to the next node in expanded sequence
-                                              !  =0 (end of range), =1 (else)
-   double precision, external :: node_value  !/*returns value for parameter par of current element */
-   type(fibre), pointer    :: p
-   real (dp)               :: fk
-
-   TYPE(INTEGRATION_NODE),POINTER :: CURR_SLICE
-
-   e=restart_sequ()
-   p=>my_ring%start
-   do e=1, my_ring%n !in slices e goes to nelem + 1 because the last slice is the fist one.
-
-     elcode=node_value('mad8_type ')
-
-     if (elcode .eq. 22) then
-
-        if (getdebug() > 1 ) then
-          write(6,*) " Beam-Beam position at element named >>",p%mag%name,"<<"
-        endif
-
-        CURR_SLICE => p%t1
-
-        do while (.not. (CURR_SLICE%cas==case0.or.CURR_SLICE%cas==caset) )
-          if (associated(CURR_SLICE,p%t2)) exit
-          CURR_SLICE => CURR_SLICE%next
-          !print*, CURR_SLICE%cas
-        enddo
-
-        !print *,  'BB Node Case NO: ',CURR_SLICE%cas
-
-        if(((CURR_SLICE%cas==case0).or.(CURR_SLICE%cas==caset))) then !must be 0 or 3
-
-          if(.not.associated(CURR_SLICE%BB)) call alloc(CURR_SLICE%BB)
-
-          call getfk(fk)
-          CURR_SLICE%bb%fk = fk
-          CURR_SLICE%bb%sx = node_value('sigx ')
-          CURR_SLICE%bb%sy = node_value('sigy ')
-          CURR_SLICE%bb%xm = node_value('xma ')
-          CURR_SLICE%bb%ym = node_value('yma ')
-          CURR_SLICE%bb%PATCH=.true.
-          if (getdebug() > 2 ) then
-            print*, "BB fk=",CURR_SLICE%bb%fk
-            print*, "BB sx=",CURR_SLICE%bb%sx
-            print*, "BB sy=",CURR_SLICE%bb%sy
-            print*, "BB xm=",CURR_SLICE%bb%xm
-            print*, "BB ym=",CURR_SLICE%bb%ym
-          endif
-
-          do_beam_beam = .true.
-
-        else
-          call fort_warn('getBeamBeam: ','Bad node case for BeamBeam')
-        endif
-
-      endif
-
-      i=advance_node() ! c-code go to the next node -> the passed value is never used, just to shut up a compiler
-      p=>p%next
-    enddo
-
-  end subroutine getBeamBeam
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
