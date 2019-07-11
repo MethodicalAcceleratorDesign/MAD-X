@@ -20,8 +20,8 @@ Option, -echo,warn,-info;
 !###################################################################################################################################
 !############################## TUNE AND CHROMA ####################################################################################
 !###################################################################################################################################
-qxinit=64.31;
-qyinit=59.32;
+qxinit=64.27;
+qyinit=59.355;
    ptcqxinit=qxinit-64.0;
    ptcqyinit=qyinit-59.0;
 	qxinitint=qxinit-ptcqxinit;
@@ -608,6 +608,15 @@ correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, c
 !                   fine tuning of coupling                     
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  call,   file="scripts/FineTuneCoupling.madx";
+qxinit=64.31;
+qyinit=59.32;
+   ptcqxinit=qxinit-64.0;
+   ptcqyinit=qyinit-59.0;
+	qxinitint=qxinit-ptcqxinit;
+	qyinitint=qyinit-ptcqyinit; ! WATCH OUT - ALL THESE VALUES ARE USED BY MATCHING ROUTINES AND THE DQMIN CALCULATION LATER ON IN THE SCIPT...
+dqxinit=3.0;
+dqyinit=3.0;
+
 if(mylhcbeam==1){
    match;
      global, q1=qxinit, q2=qyinit;
