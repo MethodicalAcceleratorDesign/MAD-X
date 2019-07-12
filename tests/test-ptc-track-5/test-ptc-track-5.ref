@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.05.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.26 14:54:13      +
+  + Release   date: 2019.06.07               +
+  + Execution date: 2019.06.27 10:42:34      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !MADX test for rf lag handling in PTC
 
@@ -48,17 +48,17 @@ Determined SECTOR NMUL MAX :  0
       Particle Rest Mass : 0.105658E+00
                 Momentum : 0.162997E+02
  Setting MADx with 
-     energy           16.300000000000001     
+     energy           16.3000000000000     
      method                   2
      Num. of steps            5
-     charge           1.0000000000000000     
-  Length of machine:    2040.9999999999332     
+     charge           1.00000000000000     
+  Length of machine:    2040.99999999993     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        2040.9999999999445     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   0.000000000000000E+000  0.000000000000000E+000   2040.99999999994     
  Setting debug level to           1
 maxaccel is found and its value is 0.000000
 exact_mis is found and its value is 1.000000
@@ -94,6 +94,7 @@ obs_points pro_ptc_setswitch Done
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
+ Closed orbit:  -5.771726222072360E-014 -1.390249327966604E-019  0.000000000000000E+000  0.000000000000000E+000 -0.406250000000005      -2.006478505054242E-013
 
 ++++++ table: ptc_twiss_summary
 
@@ -110,25 +111,25 @@ obs_points pro_ptc_setswitch Done
        6.836712715        13.61411602        6.885900951        13.77102758 
 
          beta11min          beta11max          beta12min          beta12max 
-       6.836712715        13.61411602    3.395162299e-34     6.70607447e-32 
+       6.836712715        13.61411602    3.389995993e-34    6.708096024e-32 
 
          beta13min          beta13max          beta21min          beta21max 
-    0.004250828635     0.009538941926     1.43713695e-32    9.540496885e-32 
+    0.004250828635     0.009538941926    1.434442183e-32    9.539593107e-32 
 
          beta22min          beta22max          beta23min          beta23max 
-       6.885900951        13.77102758    1.926252268e-32    4.039368119e-29 
+       6.885900951        13.77102758    3.803195551e-32    4.037735173e-29 
 
          beta31min          beta31max          beta32min          beta32max 
-    0.006077299655     0.006077299675    1.830675568e-32     9.83195337e-32 
+    0.006077299655     0.006077299675    1.661910274e-32    9.290568544e-32 
 
          beta33min          beta33max           disp1min           disp1max 
        8.673544247        8.673544278                  0       0.2876332587 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.02976572802      0.02976572802   -3.931084846e-15     3.75481145e-15 
+    -0.02976572802      0.02976572802   -4.012840546e-15    3.902163712e-15 
 
           disp4min           disp4max             deltap            orbit_x 
-   -4.90182381e-16    5.002399941e-16                  0   -5.771726222e-14 
+  -5.007753145e-16    5.125588867e-16                  0   -5.771726222e-14 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
   -1.390249328e-19                  0                  0   -2.006478505e-13 

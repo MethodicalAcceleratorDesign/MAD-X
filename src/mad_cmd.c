@@ -233,7 +233,7 @@ exec_command(void)
       }
       else if (strcmp(p->cmd_def->module, "ptc_normal") == 0) {
         if (match_is_on == kMatch_PTCknobs) madx_mpk_setcalc(p);
-        else w_ptc_normal_();
+        else pro_ptc_normal();
       }
       else if (strcmp(p->cmd_def->module, "select_ptc_normal") == 0)  select_ptc_normal(p);
       else if (strcmp(p->cmd_def->module, "ptc_trackline") == 0)      pro_ptc_trackline(p);

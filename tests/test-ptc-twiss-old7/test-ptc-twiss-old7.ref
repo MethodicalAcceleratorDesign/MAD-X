@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:03:46      +
+  + Release   date: 2019.06.07               +
+  + Execution date: 2019.06.27 10:18:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -271,17 +271,17 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.00000000000000     
+     energy           100.000000000000     
      method                   6
      Num. of steps           10
-     charge           1.0000000000000000     
-  Length of machine:    534.59999999999957     
+     charge           1.00000000000000     
+  Length of machine:    534.600000000000     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   -40.5807584670257       0.000000000000000E+000   532.533460530796     
 !ptc_create_layout,model=2,method=6,nst=1,exact; ! steps pb more apparent
 
 !ptc_create_layout,model=2,method=6,nst=4,exact; ! looks like 2 is minimum to split the element at the middle...
@@ -320,6 +320,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,summary_file=twiss_ptc_summar
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
+ Closed orbit:   3.260716132748987E-004  2.596346677780604E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
 
 ++++++ table: ptc_twiss_summary
 
@@ -354,22 +355,22 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,summary_file=twiss_ptc_summar
     -0.02966479784      0.02965774672                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    0.0003260716069 
+                 0                  0                  0    0.0003260716133 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596346497e-06                  0                  0                  0 
+   2.596346678e-06                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    0.0002136648539                  0    3.396649362e-06 
+                 0    0.0002136648615                  0    3.396649496e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003315824915 
+                 0                  0                  0    0.0003315825074 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.310271591e-06                  0                 -0 
+                 0    5.310271876e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0    -0.000152545601                  0   -6.256318909e-06 
+                 0    -0.000152545614                  0   -6.256319151e-06 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
@@ -397,6 +398,7 @@ ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
+ Closed orbit:   3.260716132748987E-004  2.596346677780604E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
 
 ++++++ table: ptc_twiss_summary
 
@@ -410,10 +412,10 @@ ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
        0.254674956        1.051019373        1.046713362                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       31.29632882        181.4719986         31.2954739        181.4881854 
+       31.29632881        181.4719986         31.2954739        181.4881854 
 
          beta11min          beta11max          beta12min          beta12max 
-       31.29632882        181.4719986                  0                  0 
+       31.29632881        181.4719986                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
                  0                  0                  0                  0 
@@ -431,22 +433,22 @@ ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
     -0.02966479784      0.02965774672                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    0.0003260716069 
+                 0                  0                  0    0.0003260716133 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596346497e-06                  0                  0                  0 
+   2.596346678e-06                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    0.0002072674695                  0    3.347072467e-06 
+                 0    0.0002072674777                  0    3.347072601e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003328421449 
+                 0                  0                  0    0.0003328421609 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.310271591e-06                  0                 -0 
+                 0    5.310271876e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -0.0001525583663                  0   -6.256318909e-06 
+                 0   -0.0001525583793                  0   -6.256319151e-06 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
@@ -476,7 +478,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=4;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607158926246932E-004   2.5963462593228163E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:   3.260716132748987E-004  2.596346677780604E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
 
 
 ptc_end;
@@ -511,17 +513,17 @@ Determined SECTOR NMUL MAX :  2
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.250000E+03
  Setting MADx with 
-     energy           250.00000000000000     
+     energy           250.000000000000     
      method                   6
      Num. of steps            5
-     charge          -1.0000000000000000     
-  Length of machine:    534.59999999999957     
+     charge          -1.00000000000000     
+  Length of machine:    534.600000000000     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   -40.5807584670257       0.000000000000000E+000   532.533460530796     
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -544,7 +546,7 @@ Determined SECTOR NMUL MAX :  2
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    8.8978067121092011E-005   7.2839183526605370E-007   5.2160503323142552E-005  -6.7480410626117705E-007   0.0000000000000000     
+ Closed orbit:   8.897806712109201E-005  7.283918352660537E-007  5.216050332314255E-005 -6.748041062611771E-007  0.000000000000000E+000
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
@@ -586,7 +588,7 @@ Determined SECTOR NMUL MAX :  2
    7.283918353e-07    5.216050332e-05   -6.748041063e-07                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    7.160177351e-05    6.445516048e-05     8.58579163e-07 
+                 0    7.160177351e-05    6.445516048e-05     8.58579163e-07 
 
            pycorms             tcorms            ptcorms             xcomax 
    1.291700295e-06                  0                  0    8.897806712e-05 
