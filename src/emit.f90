@@ -243,8 +243,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: el, tilt, bvk
   double precision :: edg1, edg2, sk1, sk2, hgap, fint, sks, sksol, h, ct
   double precision :: corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
-  double precision :: tedg1, fact1, fact1x, rfac, rfac1, drfac1_dx, drfac1_dy
-  double precision :: h2, hcb2, tedg2, fact2, fact2x, rfac2
+  double precision :: tedg1, fact1, dfact1_dx, rfac, rfac1, drfac1_dx, drfac1_dy
+  double precision :: h2, hcb2, tedg2, fact2, dfact2_dx, rfac2
   double precision :: drfac2_dx, drfac2_dy, bi2gi2, betas, gammas
   double precision :: e5sq1, e5sq2, e5sqs1, e5sqs2, x, y
   double precision :: f1, f2, f1s, f2s, twon, str, st
@@ -255,6 +255,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: drfac1_dpx, drfac1_dpy, drfac2_dpx, drfac2_dpy
   double precision :: denominator1, denominator2
   double precision :: bet1_sqr, bet2_sqr, dbet1_sqr_dpt, dbet2_sqr_dpt
+  double precision :: p1, p2
 
   integer, external :: node_fd_errors
   double precision, external  :: node_value, get_value
@@ -354,9 +355,9 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
         tedg1  = tan(edg1)
         fact1  = (one + h*x1) * (one - tedg1*x1)
-        fact1x = h - tedg1 - 2.0*h*tedg1*x1
+        dfact1_dx = h - tedg1 - two*h*tedg1*x1
         rfac1  = cg*el*h1**2*fact1
-        drfac1_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact1 + h1**2*fact1x)
+        drfac1_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact1 + h1**2*dfact1_dx)
         drfac1_dy = cg*el *  two*(hx*hxy+hy*hyy)*fact1
 
         hx = sk1*x2 + sks*y2 + h + half*sk2 * (x2**2 - y2**2)
@@ -371,18 +372,20 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
         tedg2  = tan(edg2)
         fact2  = (one + h*x2) * (one - tedg2*x2)
-        fact2x = h - tedg2 - 2.0*h*tedg2*x2
+        dfact2_dx = h - tedg2 - two*h*tedg2*x2
 
         rfac2  = cg*el*h2**2*fact2
-        drfac2_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact2 + h2**2*fact2x)
+        drfac2_dx = cg*el * (two*(hx*hxx+hy*hyx)*fact2 + h2**2*dfact2_dx)
         drfac2_dy = cg*el *  two*(hx*hxy+hy*hyy)*fact2
 
+        p1 = sqrt(pt1*pt1 + two*pt1/betas + one) ! delta + 1
+        p2 = sqrt(pt2*pt2 + two*pt2/betas + one) ! delta + 1
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
         bet2_sqr = (pt2*pt2 + two*pt2/betas + one) / (one/betas + pt2)**2;
         dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
         dbet2_sqr_dpt = (two/betas+two*pt2)/(pt2+one/betas)**2-(two*((pt2*two)/betas+pt2**2+one))/(pt2+one/betas)**3;
-        denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
-        denominator2 = 2*sqrt(((rfac2-two)*rfac2)/bet2_sqr+one);
+        denominator1 = two*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
+        denominator2 = two*sqrt(((rfac2-two)*rfac2)/bet2_sqr+one);
         
         !---- Cubic integration over h**3 * E(i,5) * conjg(E(i,5)).
         bi2gi2 = one / (betas * gammas)**2
@@ -426,12 +429,15 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
              ((two*drfac1_dpy*py1*rfac1)-(two*drfac1_dpy*py1))/(bet1_sqr*denominator1);
         rw(4,6) = -(dbet1_sqr_dpt*py1*rfac1**2-two*dbet1_sqr_dpt*py1*rfac1) / &
              (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
-        rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
-        rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
-        rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
-        rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
-        rw(6,6) = one-rfac1;
-
+        rw(6,1) =     - drfac1_dx * p1**2
+        rw(6,3) =     - drfac1_dy * p1**2
+        rw(6,6) = one - two * rfac1 * (one + pt1)
+        !! if the sixth variable was pt, the RW(6,*) equations would look like
+        !rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
+        !rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
+        !rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
+        !rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
+        !rw(6,6) = one-rfac1;
         RE = matmul(RE,RW)
 
         RW = EYE
@@ -449,13 +455,17 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
              ((two*drfac2_dpy*py2*rfac2)-(two*drfac2_dpy*py2))/(bet2_sqr*denominator2);
         rw(4,6) = -(dbet2_sqr_dpt*py2*rfac2**2-two*dbet2_sqr_dpt*py2*rfac2) / &
              (two*bet2_sqr**2*sqrt((rfac2**2-two*rfac2+bet2_sqr)/bet2_sqr));
-        rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
-        rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
-        rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
-        rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
-        rw(6,6) = one-rfac2;
+        rw(6,1) =     - drfac2_dx * p2**2
+        rw(6,3) =     - drfac2_dy * p2**2
+        rw(6,6) = one - two * rfac2 * (one + pt2)
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
+        !rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
+        !rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
+        !rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
+        !rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
+        !rw(6,6) = one-rfac2;
         RE = matmul(RW,RE)
-
+        
      case (code_quadrupole , code_sextupole, code_octupole, code_solenoid) !---- Common to all pure multipoles.
         sk1 = zero
         sk2 = zero
@@ -509,6 +519,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         drfac2_dpy = -cg*sksol/el
 
         !
+        p1 = sqrt(pt1*pt1 + two*pt1/betas + one) ! delta + 1
+        p2 = sqrt(pt2*pt2 + two*pt2/betas + one) ! delta + 1
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
         bet2_sqr = (pt2*pt2 + two*pt2/betas + one) / (one/betas + pt2)**2;
         denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
@@ -538,12 +550,15 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
              ((two*drfac1_dpy*py1*rfac1)-(two*drfac1_dpy*py1))/(bet1_sqr*denominator1);
         rw(4,6) = -(dbet1_sqr_dpt*py1*rfac1**2-two*dbet1_sqr_dpt*py1*rfac1) / &
              (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
-        rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
-        rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
-        rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
-        rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
-        rw(6,6) = one-rfac1;
-
+        rw(6,1) =     - drfac1_dx * p1**2
+        rw(6,3) =     - drfac1_dy * p1**2
+        rw(6,6) = one - two * rfac1 * (one + pt1)
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
+        !rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
+        !rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
+        !rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
+        !rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
+        !rw(6,6) = one-rfac1;
         RE = matmul(RE,RW)
 
         RW = EYE
@@ -561,11 +576,15 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
              ((two*drfac2_dpy*py2*rfac2)-(two*drfac2_dpy*py2))/(bet2_sqr*denominator2);
         rw(4,6) = -(dbet2_sqr_dpt*py2*rfac2**2-two*dbet2_sqr_dpt*py2*rfac2) / &
              (two*bet2_sqr**2*sqrt((rfac2**2-two*rfac2+bet2_sqr)/bet2_sqr));
-        rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
-        rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
-        rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
-        rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
-        rw(6,6) = one-rfac2;
+        rw(6,1) =     - drfac2_dx * p2**2
+        rw(6,3) =     - drfac2_dy * p2**2
+        rw(6,6) = one - two * rfac2 * (one + pt2)
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
+        !rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
+        !rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
+        !rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
+        !rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
+        !rw(6,6) = one-rfac2;
         RE = matmul(RW,RE)
 
      case (code_multipole) !---- Thin multipoles
@@ -611,6 +630,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
         !---- Support variables
         x1 = orb1(1); px1 = orb1(2); y1 = orb1(3); py1 = orb1(4); t1 = orb1(5); pt1 = orb1(6)
+        p1 = sqrt(pt1*pt1 + two*pt1/betas + one) ! delta + 1
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
         dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
         denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
@@ -630,11 +650,15 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
              ((two*drfac1_dpy*py1*rfac1)-(two*drfac1_dpy*py1))/(bet1_sqr*denominator1);
         rw(4,6) = -(dbet1_sqr_dpt*py1*rfac1**2-two*dbet1_sqr_dpt*py1*rfac1) / &
              (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
-        rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
-        rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
-        rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
-        rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
-        rw(6,6) = one-rfac1;
+        rw(6,1) =     - drfac1_dx * p1**2
+        rw(6,3) =     - drfac1_dy * p1**2
+        rw(6,6) = one - two * rfac1 * (one + pt1)
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
+        !rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
+        !rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
+        !rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
+        !rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
+        !rw(6,6) = one-rfac1;
 
         ! RE = RW * RE * RW
         RE = matmul(RW, matmul(RE,RW))
@@ -698,6 +722,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         x1 = orb1(1); px1 = orb1(2); y1 = orb1(3); py1 = orb1(4); t1 = orb1(5); pt1 = orb1(6)
         x2 = orb2(1); px2 = orb2(2); y2 = orb2(3); py2 = orb2(4); t2 = orb2(5); pt2 = orb2(6)
         
+        p1 = sqrt(pt1*pt1 + two*pt1/betas + one)
+        p2 = sqrt(pt2*pt2 + two*pt2/betas + one)
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
         bet2_sqr = (pt2*pt2 + two*pt2/betas + one) / (one/betas + pt2)**2;
         dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
@@ -721,12 +747,15 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
              ((two*drfac1_dpy*py1*rfac1)-(two*drfac1_dpy*py1))/(bet1_sqr*denominator1);
         rw(4,6) = -(dbet1_sqr_dpt*py1*rfac1**2-two*dbet1_sqr_dpt*py1*rfac1) / &
              (two*bet1_sqr**2*sqrt((rfac1**2-two*rfac1+bet1_sqr)/bet1_sqr));
-        rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
-        rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
-        rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
-        rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
-        rw(6,6) = one-rfac1;
-
+        rw(6,1) =     - drfac1_dx * p1**2
+        rw(6,3) =     - drfac1_dy * p1**2
+        rw(6,6) = one - two * rfac1 * (one + pt1)
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
+        !rw(6,1) = -drfac1_dx*pt1-drfac1_dx/betas;
+        !rw(6,2) = -drfac1_dpx*pt1-drfac1_dpx/betas;
+        !rw(6,3) = -drfac1_dy*pt1-drfac1_dy/betas;
+        !rw(6,4) = -drfac1_dpy*pt1-drfac1_dpy/betas;
+        !rw(6,6) = one-rfac1;
         RE = matmul(RE,RW)
 
         RW = EYE
@@ -744,11 +773,15 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
              ((two*drfac2_dpy*py2*rfac2)-(two*drfac2_dpy*py2))/(bet2_sqr*denominator2);
         rw(4,6) = -(dbet2_sqr_dpt*py2*rfac2**2-two*dbet2_sqr_dpt*py2*rfac2) / &
              (two*bet2_sqr**2*sqrt((rfac2**2-two*rfac2+bet2_sqr)/bet2_sqr));
-        rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
-        rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
-        rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
-        rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
-        rw(6,6) = one-rfac2;
+        rw(6,1) =     - drfac2_dx * p2**2
+        rw(6,3) =     - drfac2_dy * p2**2
+        rw(6,6) = one - two * rfac2 * (one + pt2)
+        !! if the sixth variable was pt, the RW(6,:) equations would look like
+        !rw(6,1) = -drfac2_dx*pt2-drfac2_dx/betas;
+        !rw(6,2) = -drfac2_dpx*pt2-drfac2_dpx/betas;
+        !rw(6,3) = -drfac2_dy*pt2-drfac2_dy/betas;
+        !rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
+        !rw(6,6) = one-rfac2;
         RE = matmul(RW,RE)
 
      case (code_rfmultipole)  !---- thin RF multipole
