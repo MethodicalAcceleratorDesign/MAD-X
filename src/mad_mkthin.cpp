@@ -163,6 +163,7 @@ private:
   void finish_make_sliced_elem(element*& sliced_elem, const element* thick_elem, command* cmd, const std::string parent_name, int slice_no); // final common steps
   void slice_node_translate();  // slice/translate and add slices to sliced sequence
   void slice_node_default();    // like collimator and add slices to sliced sequence
+  void slice_attributes_to_slice(command* cmd,const element* thick_elem); // deal with attributes like kick
   void place_thick_slice(const element* thick_elem, element* sliced_elem, const int i);
   void place_start_or_end_marker(const bool at_start);
   node* copy_thin(node* thick_node);
@@ -1020,14 +1021,6 @@ static void add_node_at_end_of_sequence(node* node,sequence* sequ) // position i
   }
   sequ->end = node;
   
-  if(MaTh::Verbose>1)
-  {
-    std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << std::left << std::setw(MaTh::el_name_maxlen) << node->name << " " << std::setw(MaTh::par_name_maxlen) << node->base_name << std::right
-    << " position=" << std::setw(10) << node->position  << " at_value=" << std::setw(10) << node->at_value;
-    if(node->at_expr)   std::cout << " " << my_dump_expression(node->at_expr);
-    if(node->from_name) std::cout << " from " << std::setw(5) << node->from_name; else std::cout << "           ";
-    std::cout << " length="   << std::setw(10) << node->length  << " in " << sequ->name << '\n';
-  }
   add_to_node_list(node, 0, sequ->nodes);
   return;
 }
@@ -1073,9 +1066,9 @@ static void place_node_at(const node* node, sequence* to_sequ, element* sliced_e
   this_node->from_name = node->from_name;
   this_node->at_value  = at;
   if(at_expr) this_node->at_expr   = at_expr;
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " place " << sliced_elem->name << " using at_expr where " << my_dump_expression(at_expr) << " at_value=" << at << '\n';
+  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " place " << sliced_elem->name << " using at_expr where " << my_dump_expression(at_expr) << " at_value=" << at << std::endl;
   add_node_at_end_of_sequence(this_node,to_sequ); // add the thick node to the sequences
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " dump_node(this_node)   :" << '\n';
+  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " dump_node(this_node)   :" << std::endl;
 }
 
 static void place_thin_slice(const node* node, sequence* to_sequ, element* sliced_elem,const double rel_shift) // used to place dipedge and markers
@@ -2064,7 +2057,6 @@ element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no
   command* cmd = new_cmdptr( thick_elem );
   copy_params_from_elem(cmd,thick_elem,str_v_join(MaTh::DoNotCopy,{"kill_ent_fringe","kill_exi_fringe"}));
   SetParameter_in_cmd(cmd,ksi_par,"ksi",1);
-  
   set_lrad(cmd,length_param,nslices); // keep l  as lrad
   if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << my_dump_command(cmd) << std::endl;
   finish_make_sliced_elem(sliced_elem, thick_elem, cmd, parent_or_base, slice_no);
@@ -2251,11 +2243,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   double length = work_node->length; // direct curved thick_elem->length
   
   expression* l_expr = nullptr;
-  if (length_param)
-  {
-    l_expr  = length_param->expr;
-    // if(l_expr) l_expr_val = my_get_expression_value(l_expr);
-  }
+  if (length_param) l_expr  = length_param->expr;
   
   int middle=-1;
   if (nslices>1) middle = nslices/2+1; // used to determine after which slide to place the central marker in case of thin slicing
@@ -2311,6 +2299,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " work_node " << work_node->name << " nslices=" << nslices << " i=" << i << " middle=" << middle << " place middle marker at=" << work_node->at_value << " at_expr=" << at_expr
         << " thin_at_value=" << my_get_expression_value(thin_at_expr) << '\n';
     }
+
     if(slice_i && !ThickSLice) place_node_at(work_node, sliced_seq, slice_i,thin_at_expr);
   }
   
@@ -2377,6 +2366,37 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
   }
 } // SeqElList::slice_node_default()
 
+void SeqElList::slice_attributes_to_slice(command* cmd,const element* thick_elem)
+{ // looks for attributes like kick that need slicing, moodify them in cmd used to construct the sliced element
+  const std::vector<std::string> attributes_to_slice = { "kick", "hkick", "vkick", "chkick", "cvkick"};
+  ElmAttr theElmAttr(thick_elem);
+  std::vector<std::string> active_par_to_be_used=theElmAttr.get_list_of_active_attributes();
+  for(unsigned i=0;i<active_par_to_be_used.size();++i)
+  {
+    bool found=false;
+    std::string attribute_name=active_par_to_be_used[i];
+    for(unsigned int j=0;j<attributes_to_slice.size();++j) // all active attributes
+    {
+      if(attribute_name==attributes_to_slice[j]) // found in attributes_to_slice
+      {
+        found=true;
+        break;
+      }
+    }
+    if(found)
+    {
+      name_list* nl=cmd->par_names;
+      const int ei=name_list_pos(attribute_name.c_str(),nl);
+      if(ei>-1)
+      {
+        command_parameter* the_param=cmd->par->parameters[ei];
+        if(the_param->expr) the_param->expr = compound_expr(the_param->expr,0.,"/",nullptr,nslices);
+        else the_param->double_value /= nslices;
+      }
+    }
+  }
+}
+
 element* SeqElList::create_sliced_element(const element* thick_elem, int slice_no)
 {
   element *sliced_elem_parent;
@@ -2395,10 +2415,11 @@ element* SeqElList::create_sliced_element(const element* thick_elem, int slice_n
   if(slice_no > nslices && thick_elem!=thick_elem->parent ) slice_no=1; // check, but not for base classes
   if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << std::left << std::setw(MaTh::el_name_maxlen) << thick_elem->name << " " << std::setw(MaTh::el_type_maxlen) << work_node->base_name << " slice_no=" << slice_no << " nslices=" << nslices << " is parent=" << (thick_elem==thick_elem->parent) << '\n';
   const command_parameter* length_param  = return_param_recurse("l",thick_elem);
-  
+
   command* cmd = new_cmdptr( thick_elem );
   copy_params_from_elem(cmd,thick_elem,str_v_join(MaTh::DoNotCopy,{"kill_ent_fringe","kill_exi_fringe"}));
   set_lrad(cmd,length_param,nslices); // keep l  as lrad
+  if(nslices>1) slice_attributes_to_slice(cmd,thick_elem); // like kick
   finish_make_sliced_elem(sliced_elem, thick_elem, cmd, parent_or_base, slice_no);
   ParameterRemove("l", sliced_elem);
   return sliced_elem;
@@ -2494,13 +2515,11 @@ void SeqElList::place_thick_slice(const element* thick_elem, element* sliced_ele
   if(sliced_elem==nullptr) return; // nothing to place
   const int n=nslices-1; // in case of thick slices,
   SliceDistPos SP(n, slice_style==std::string("teapot") );
-  if(verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " sliced_elem->name=" << sliced_elem->name << " nslices=" << nslices << " n=" << n << " start from thick_elem " << thick_elem->name << " MaTh::iMoreExpressions=" << MaTh::iMoreExpressions;
   
   expression* l_par_expr=my_get_param_expression(thick_elem, "l"); // with this l_par_expr should not be NULL
   expression* at_expr = clone_expression(work_node->at_expr);
   double at = work_node->at_value;
   
-  if(verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " at_expr" << my_dump_expression(at_expr) << '\n';
   
   double rel_shift;
   
@@ -2542,6 +2561,21 @@ void SeqElList::place_thick_slice(const element* thick_elem, element* sliced_ele
     if(verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " rel_shift_expr " << my_dump_expression(rel_shift_expr) << '\n';
     at_expr = compound_expr(at_expr,at, "+", rel_shift_expr,  0 ); // this also updates the value
   }
+
+  // H E R E new  work on solenoid
+  if(std::string(thick_elem->base_type->name)==std::string("solenoid"))
+  {
+    expression* xtilt_expr     =my_get_param_expression(thick_elem, "xtilt");
+    expression* rot_start_expr =my_get_param_expression(thick_elem, "rot_start");
+    if(rot_start_expr && xtilt_expr)
+    {
+      rot_start_expr = compound_expr(rot_start_expr,0, "+", at_expr,0 );
+      SetParameterValue("rot_start",work_node->p_elem, my_get_expression_value(rot_start_expr));
+      ParameterTurnOn("rot_start",work_node->p_elem);
+      // SetParameterValue("kill_ent_fringe",thick_elem,true,k_logical);
+    }
+  }
+  
   place_node_at(work_node,sliced_seq,sliced_elem,at_expr);
 }
 
