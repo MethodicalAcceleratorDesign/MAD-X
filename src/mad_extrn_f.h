@@ -80,6 +80,7 @@
 #define store_node_value store_node_value_
 #define store_node_vector store_node_vector_
 #define store_no_fd_err store_no_fd_err_
+#define node_apertype node_apertype_
 
 // from mad_option.c
 #define get_option get_option_ // *

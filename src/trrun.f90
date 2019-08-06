@@ -722,14 +722,14 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
 
   logical :: fmap, debug
   logical :: run=.false., dynap=.false.
-  integer :: i, nn, jtrk
+  integer :: i, nn, jtrk, apint
   double precision :: ct, tmp, st, theta
   double precision :: ap1, ap2, ap3, ap4, aperture(maxnaper)
   double precision :: offset(2), offx, offy
   double precision :: ek(6), re(6,6), te(6,6,6), craporb(6)
   character(len=name_len) :: aptype
 
-  integer, external :: get_option
+  integer, external :: get_option, node_apertype
   double precision, external :: get_value, node_value
 
   double precision, parameter :: min_double = 1.e-36
@@ -772,7 +772,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
      call node_string('apertype ',aptype,nn)
-
+     apint=node_apertype()
      APERTURE(:maxnaper) = zero
      call get_node_vector('aperture ',nn,aperture)
 
@@ -788,7 +788,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
         print *, " "
      endif
 
-     call trcoll(aptype, aperture, offset, al_errors,  maxaper, &
+     call trcoll(apint, aptype, aperture, offset, al_errors,  maxaper, &
           turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack)
   endif ! Test aperture
 
@@ -2602,12 +2602,13 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   call augment_count(table)
 end subroutine tt_puttab
 
-subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
+subroutine trcoll(apint, apertype, aperture, offset, al_errors, maxaper, &
                  turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk)
   use twiss0fi
   use name_lenfi
   use Inf_NaN_Detection
   use math_constfi, only : zero, one, pi
+  use aperture_enums
   implicit none
   ! 2015-Feb-20  18:46:05  ghislain: rewrite of trcoll
   ! 2015-Mar-09  14:50:37  ghislain: adapted to new racetrack parameter definition
@@ -2638,7 +2639,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   character(len=name_len) :: apertype
   double precision :: aperture(*), offset(2), al_errors(align_max), maxaper(6)
   double precision :: sum, last_pos(*), last_orbit(6,*), z(6,*)
-  integer :: turn, part_id(*), last_turn(*), ntrk
+  integer :: turn, part_id(*), last_turn(*), ntrk, apint
 
   integer :: i, n, nn
   double precision :: ap1, ap2, ap3, ap4, x, y!, pi
@@ -2652,16 +2653,17 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   !--- First check aperture parameters
   ap1 = zero ; ap2 = zero ; ap3 = zero ; ap4 = zero
 
-  select case (apertype)
 
-     case ("circle")
+  select case (apint)
+
+     case (ap_circle)
         ap1 = aperture(1)
         if (ap1.lt.min_double) then
            if (debug) print *, " zero or negative circle radius ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
         endif
 
-     case ("ellipse")
+     case (ap_ellipse)
         ap1 = aperture(1)
         ap2 = aperture(2)
         if (ap1.lt.min_double) then
@@ -2673,7 +2675,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("rectangle")
+     case (ap_rectangle)
         ap1 = aperture(1)
         ap2 = aperture(2)
         if (ap1.lt.min_double) then
@@ -2685,7 +2687,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("lhcscreen", "rectcircle")
+     case (ap_lhcscreen, ap_rectcircle)
         !*****         test circle
         ap3 = aperture(3)
         if (ap3.lt.min_double) then
@@ -2704,7 +2706,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("rectellipse")
+     case (ap_rectellipse)
         !*****         test ellipse
         ap3 = aperture(3)
         ap4 = aperture(4)
@@ -2728,7 +2730,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("racetrack")
+     case (ap_racetrack)
         ap1 = aperture(1)
         ap2 = aperture(2)
         ap3 = aperture(3)
@@ -2762,7 +2764,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap4 = ap2
         endif
 
-     case ("octagon")
+     case (ap_octagon)
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape
         ap1 = aperture(1)
         ap2 = aperture(2)
@@ -2815,24 +2817,24 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
      x = abs(z(1,i) - al_errors(11) - offset(1))
      y = abs(z(3,i) - al_errors(12) - offset(2))
 
-     select case (apertype)
+     select case (apint)
 
-     case ("circle")
+     case (ap_circle)
         lost = (x/ap1)**2 + (y/ap1)**2 .gt. one
 
-     case ("ellipse")
+     case (ap_ellipse)
         lost = (x/ap1)**2 + (y/ap2)**2 .gt. one
 
-     case ("rectangle")
+     case (ap_rectangle)
         lost =  x .gt. ap1 .or. y .gt. ap2
 
-     case ("lhcscreen", "rectcircle")
+     case (ap_lhcscreen, ap_rectcircle)
         lost = x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap3)**2 .gt. one
 
-     case ("rectellipse")
+     case (ap_rectellipse)
        lost =  x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap4)**2 .gt. one
 
-     case ("racetrack")
+     case (ap_racetrack)
         ! 2015-Mar-09  15:05:39  ghislain: adapted to new racetrack parameter definition
         !*** case of racetrack: test outer rectangle (ap1,ap2) first
         !    then test ellipse for corner part.
@@ -2840,7 +2842,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
              ( x .gt. ap1-ap3 .and. y .gt. ap2-ap4 .and. &
                ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap4)) / ap4)**2 .gt. one )
 
-     case ("octagon")
+     case (ap_octagon)
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape
         !*** case of octagon: test outer rectangle (ap1,ap2) then test cut corner.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. &

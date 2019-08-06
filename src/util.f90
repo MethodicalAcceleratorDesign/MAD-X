@@ -113,6 +113,19 @@ module code_constfi
   integer, parameter :: code_collimator = 44
 end module code_constfi
 
+module aperture_enums
+  implicit none
+  public
+  integer, parameter :: ap_circle = 0
+  integer, parameter :: ap_ellipse = 1
+  integer, parameter :: ap_rectangle = 2
+  integer, parameter :: ap_lhcscreen = 3
+  integer, parameter :: ap_rectcircle = 4
+  integer, parameter :: ap_rectellipse = 5
+  integer, parameter :: ap_racetrack = 6
+  integer, parameter :: ap_octagon = 7
+
+end module aperture_enums
 
 module Inf_NaN_Detection
 

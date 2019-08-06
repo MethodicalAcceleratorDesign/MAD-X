@@ -2,7 +2,7 @@
 #define MAD_ELEM_H
 
 // types
-
+enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon};
 struct node;
 struct name_list;
 struct command;
@@ -22,6 +22,19 @@ struct element  /* each element is unique */
   int stamp;
   struct element* base_type;    /* pointer to base_type of element */
                                 /* *this for base_type elements (rbend etc.) */
+
+  struct aperture* aper;
+};
+
+struct aperture
+{
+  enum en_apertype apertype;
+  double aper_offset;
+  double *xlistu;
+  double *ylistu;
+  double *xlistd;
+  double *ylistd;
+  int length;
 };
 
 struct el_list /* contains list of element pointers sorted by name */
@@ -69,6 +82,8 @@ double  el_par_value_recurse(const char* par, const struct element*);
 void    fill_elem_var_list(struct element*, struct el_list*, struct var_list*);
 void    add_to_el_list(struct element**, int inf, struct el_list*, int flag);
 void    grow_el_list(struct el_list*);
+
+void set_aperture_element(struct element *el, struct command* def);
 // used by mad_mkthin.c
 struct command_parameter* return_param(const char* par, const struct element*);
 struct command_parameter* return_param_recurse(const char* par, const struct element*);

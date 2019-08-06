@@ -5,6 +5,7 @@ new_element(const char* name)
 {
   const char *rout_name = "new_element";
   struct element* el = mycalloc(rout_name, 1, sizeof *el);
+  el->aper =           mycalloc(rout_name, 1, sizeof *el->aper);
   strcpy(el->name, name);
   el->stamp = 123456;
   el->def = 0x0;
@@ -262,10 +263,38 @@ make_element(const char* name, const char* parent, struct command* def, int flag
     if(command_par_value("l",def) !=0 && belongs_to_class(el,"multipole"))
       warning("Multipole defined with non-zero length:", el->name);
     el->length = el_par_value("l", el);
+    set_aperture_element(el, def);
   }
+  
   add_to_el_list(&el, def->mad8_type, element_list, flag);
   return el;
 }
+void set_aperture_element(struct element *el, struct command* def){
+  char *type;
+//enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon};
+  type = command_par_string("apertype", def);
+  if(type!=NULL){
+    if(strcmp(type,"circle")==0){
+      el->aper->apertype = circle;
+    }
+    else if(strcmp(type,"ellipse")==0)
+      el->aper->apertype = ellipse;
+    else if(strcmp(type,"rectangle")==0)
+      el->aper->apertype = rectangle;
+    else if(strcmp(type,"lhcscreen")==0)
+      el->aper->apertype = lhcscreen;
+    else if(strcmp(type,"rectcircle")==0)
+      el->aper->apertype = rectcircle;
+    else if(strcmp(type,"rectellipse")==0)
+      el->aper->apertype = rectellipse;
+    else if(strcmp(type,"racetrack")==0)
+      el->aper->apertype = racetrack;
+    else if(strcmp(type,"octagon")==0)
+      el->aper->apertype = octagon;
+    }
+}
+
+
 
 void
 make_elem_node(struct element* el, int occ_cnt)

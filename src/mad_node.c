@@ -689,6 +689,10 @@ node_string(const char* key, char* string, int* l)
     memset(string, ' ', *l);
 }
 
+int node_apertype(void){
+  return current_node->p_elem->aper->apertype;
+}
+
 int
 remove_one(struct node* node)
 {
