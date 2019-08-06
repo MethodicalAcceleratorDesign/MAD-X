@@ -771,7 +771,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
-     call node_string('apertype ',aptype,nn)
+    
      apint=node_apertype()
      APERTURE(:maxnaper) = zero
      call get_node_vector('aperture ',nn,aperture)
@@ -780,7 +780,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
      call get_node_vector('aper_offset ',nn,offset)
 
      if (debug) then
-        print *, " aperture type       ", aptype
+        print *, " aperture type       ", apint
         print *, "          parameters ", (aperture(i),i=1,4)
         print *, "          offsets    ", (offset(i),i=1,2)
         print *, " alignment errors    ", (al_errors(i),i=11,12)
@@ -788,7 +788,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
         print *, " "
      endif
 
-     call trcoll(apint, aptype, aperture, offset, al_errors,  maxaper, &
+     call trcoll(apint,  aperture, offset, al_errors,  maxaper, &
           turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack)
   endif ! Test aperture
 
@@ -2602,7 +2602,7 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   call augment_count(table)
 end subroutine tt_puttab
 
-subroutine trcoll(apint, apertype, aperture, offset, al_errors, maxaper, &
+subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
                  turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk)
   use twiss0fi
   use name_lenfi
@@ -2616,7 +2616,7 @@ subroutine trcoll(apint, apertype, aperture, offset, al_errors, maxaper, &
   ! Purpose:                                                             *
   !   test for aperture limit.                                           *
   ! input:                                                               *
-  !   apertype  (string)   aperture type among                           *
+  !   apint  (integer)   aperture type among                           *
   !                       circle,rectangle,ellipse,rectcircle,lhcscreen, *
   !                       rectellipse,racetrack,octagon                  *
   !   aperture  (array double) aperture parameters,                      *
@@ -2641,7 +2641,7 @@ subroutine trcoll(apint, apertype, aperture, offset, al_errors, maxaper, &
   double precision :: sum, last_pos(*), last_orbit(6,*), z(6,*)
   integer :: turn, part_id(*), last_turn(*), ntrk, apint
 
-  integer :: i, n, nn
+  integer :: i, n, nn, nna
   double precision :: ap1, ap2, ap3, ap4, x, y!, pi
   logical :: lost, debug
 
@@ -2864,6 +2864,8 @@ subroutine trcoll(apint, apertype, aperture, offset, al_errors, maxaper, &
      ! lose particle if it is outside aperture
 99   if (lost) then
         n = i
+        nna=name_len
+        call node_string('apertype ',apertype,nna)
         call trkill(n, turn, sum, ntrk, part_id, last_turn, last_pos, last_orbit, z, apertype)
         if (ntrk .eq. 0) then
            call fort_warn('trcoll: ','Particle Number equals zero: exit from trcoll')
