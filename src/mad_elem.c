@@ -291,7 +291,32 @@ void set_aperture_element(struct element *el, struct command* def){
       el->aper->apertype = racetrack;
     else if(strcmp(type,"octagon")==0)
       el->aper->apertype = octagon;
+    else{
+      el->aper->apertype = custom;
+      int lines=0, ch;
+      FILE *fp = fopen(type,"r");
+      while(!feof(fp))
+      {
+        ch = fgetc(fp);
+        if(ch == '\n'){
+          lines++;
+        }
+      }
+      
+      el->aper->xlist = mycalloc("aperlist", lines+1, sizeof *el->aper->xlist);
+      el->aper->ylist = mycalloc("aperlist", lines+1, sizeof *el->aper->ylist);
+      rewind(fp);
+      int i=0;
+      while (2==fscanf(fp, "%lf %lf", &el->aper->xlist[i], &el->aper->ylist[i])) i++;
+      /* closing the shape: a last point is inserted in table
+     with coordinates equal to those of the first point */
+    el->aper->length = i-1; // this minus 1 has to be there because of how the algorithm is done.  
+    el->aper->xlist[i]=el->aper->xlist[0];
+    el->aper->ylist[i]=el->aper->ylist[0];   
+    
     }
+
+  }
 }
 
 

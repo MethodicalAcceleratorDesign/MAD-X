@@ -693,6 +693,12 @@ int node_apertype(void){
   return current_node->p_elem->aper->apertype;
 }
 
+int inside_userdefined_geometry(double* x, double *y){
+  return aper_chk_inside(*x, *y, current_node->p_elem->aper->xlist, 
+    current_node->p_elem->aper->ylist, current_node->p_elem->aper->length );
+}
+
+
 int
 remove_one(struct node* node)
 {

@@ -124,6 +124,7 @@ module aperture_enums
   integer, parameter :: ap_rectellipse = 5
   integer, parameter :: ap_racetrack = 6
   integer, parameter :: ap_octagon = 7
+  integer, parameter :: ap_custom = 8
 
 end module aperture_enums
 

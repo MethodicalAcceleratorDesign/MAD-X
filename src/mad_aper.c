@@ -220,7 +220,7 @@ aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat,
   }
 }
 
-static int
+int
 aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipelength )
 {
 // winding number test for a point in a polygon
@@ -229,14 +229,16 @@ aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipeleng
 // Return:  wn = the winding number (=0 only when point is outside polygon)
 // source : wn_PnInPoly() at http://geomalgorithms.com/a03-_inclusion.html
  int    wn = 0;    // the  winding number counter
-
+printf("poooihnttts %f %f \n", p, q);
  // loop through all edges of the polygon
  for (int i=0; i<=pipelength; i++) { // edge from V[i] to  V[i+1]
+  printf("xxxxyyyyy %f %f \n", pipex[i], pipey[i]);
    if (pipey[i] <= q  &&  pipey[i+1]  > q) {
      // first vertex is below point; second vertex is above; upward crossing
      if ( (pipex[i+1] - pipex[i]) * (q - pipey[i]) - (p - pipex[i]) * (pipey[i+1] - pipey[i])  > 0 ) {
        // Point left of  edge
        ++wn;
+       printf("wwwwwwL %d", wn);
        continue;
      }
    }
@@ -245,11 +247,12 @@ aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipeleng
      if ( (pipex[i+1] - pipex[i]) * (q - pipey[i]) - (p - pipex[i]) * (pipey[i+1] - pipey[i])  < 0) {
        // Point right of  edge
        --wn;
+       printf("wwwwwwR %d", wn);
        continue;
      }
    }
  }
-
+ printf("wwwwwwwwwwwwwindin %d", wn);
  return wn;
 }
 

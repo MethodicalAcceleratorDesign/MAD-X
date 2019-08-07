@@ -2,7 +2,7 @@
 #define MAD_ELEM_H
 
 // types
-enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon};
+enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon, custom};
 struct node;
 struct name_list;
 struct command;
@@ -30,8 +30,8 @@ struct aperture
 {
   enum en_apertype apertype;
   double aper_offset;
-  double *xlistu;
-  double *ylistu;
+  double *xlist;
+  double *ylist;
   double *xlistd;
   double *ylistd;
   int length;

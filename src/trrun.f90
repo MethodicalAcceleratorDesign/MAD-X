@@ -2645,7 +2645,7 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
   double precision :: ap1, ap2, ap3, ap4, x, y!, pi
   logical :: lost, debug
 
-  integer, external :: get_option
+  integer, external :: get_option, inside_userdefined_geometry
   double precision, parameter :: min_double=1.d-36
 
   debug = get_option('debug ') .ne. 0
@@ -2791,6 +2791,8 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
            return
         endif
 
+
+
      case default
         ! add error case for un-identified aperture type;
         ! this INCLUDES the case of aperture data given in file with input APERTYPE=filename!
@@ -2818,7 +2820,6 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
      y = abs(z(3,i) - al_errors(12) - offset(2))
 
      select case (apint)
-
      case (ap_circle)
         lost = (x/ap1)**2 + (y/ap1)**2 .gt. one
 
@@ -2847,7 +2848,10 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
         !*** case of octagon: test outer rectangle (ap1,ap2) then test cut corner.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. &
              (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. zero
-
+     case (ap_custom)
+          x = z(1,i) - al_errors(11) - offset(1)
+     	  y = z(3,i) - al_errors(12) - offset(2)
+     	lost = inside_userdefined_geometry(x,y) .eq. 0
      case default
 
      end select
