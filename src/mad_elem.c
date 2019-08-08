@@ -275,7 +275,13 @@ void set_aperture_element(struct element *el, struct command* def){
   type = command_par_string("apertype", def);
   if(type!=NULL){
     if(strcmp(type,"circle")==0){
-      el->aper->apertype = circle;
+      
+      double vector [4]; 
+      element_vector(el,"aperture", vector);
+      if(vector[0] > ten_m_12)
+        el->aper->apertype = circle;
+      else
+        el->aper->apertype = -1;
     }
     else if(strcmp(type,"ellipse")==0)
       el->aper->apertype = ellipse;

@@ -290,7 +290,9 @@ get_refpos(struct sequence* sequ)
   // else return zero;
   else return sequ->length/2.;
 }
-
+double get_length_(void){
+  return current_node->length;
+}
 
 double
 node_value(const char* par)

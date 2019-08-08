@@ -116,6 +116,7 @@ end module code_constfi
 module aperture_enums
   implicit none
   public
+  integer, parameter :: ap_notset = -1
   integer, parameter :: ap_circle = 0
   integer, parameter :: ap_ellipse = 1
   integer, parameter :: ap_rectangle = 2

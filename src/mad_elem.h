@@ -32,8 +32,6 @@ struct aperture
   double aper_offset;
   double *xlist;
   double *ylist;
-  double *xlistd;
-  double *ylistd;
   int length;
 };
 
@@ -83,7 +81,7 @@ void    fill_elem_var_list(struct element*, struct el_list*, struct var_list*);
 void    add_to_el_list(struct element**, int inf, struct el_list*, int flag);
 void    grow_el_list(struct el_list*);
 
-void set_aperture_element(struct element *el, struct command* def);
+void    set_aperture_element(struct element *el, struct command* def);
 // used by mad_mkthin.c
 struct command_parameter* return_param(const char* par, const struct element*);
 struct command_parameter* return_param_recurse(const char* par, const struct element*);
