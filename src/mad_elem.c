@@ -6,6 +6,8 @@ new_element(const char* name)
   const char *rout_name = "new_element";
   struct element* el = mycalloc(rout_name, 1, sizeof *el);
   el->aper =           mycalloc(rout_name, 1, sizeof *el->aper);
+  el->aper->aperture = mycalloc(rout_name, 4, sizeof *el->aper->aperture);
+  el->aper->aper_offset = mycalloc(rout_name, 2, sizeof *el->aper->aper_offset);
   strcpy(el->name, name);
   el->stamp = 123456;
   el->def = 0x0;
@@ -323,6 +325,11 @@ void set_aperture_element(struct element *el, struct command* def){
     }
 
   }
+
+  element_vector(el, "aperture", el->aper->aperture);
+  element_vector(el, "aper_offset",el->aper->aper_offset);
+
+  
 }
 
 
@@ -832,7 +839,7 @@ void
 update_element(struct element* el, struct command* update)
   /* updates the parameters of el from those read into update */
 {
-
+  dump_command(update);
   struct command_parameter_list* e_pl = el->def->par;
   struct command_parameter_list* pl = update->par;
   struct command_parameter *e_par, *par;
@@ -866,6 +873,7 @@ update_element(struct element* el, struct command* update)
       }
     }
   }
+  set_aperture_element(el, update); //updates contains all the info of the element
 }
 
 void

@@ -737,7 +737,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   double precision, external :: get_value, node_value
 
   double precision, parameter :: min_double = 1.e-36
-
+  external :: node_aperture_vector, node_aperture_offset
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
   dynap = switch .eq. 2
@@ -799,11 +799,14 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
         enddo 
 
      else
-     APERTURE(:maxnaper) = zero
-     call get_node_vector('aperture ',nn,aperture)
+     !APERTURE(:maxnaper) = zero
+     !call get_node_vector('aperture ',nn,aperture)
+     call node_aperture_vector(aperture)
+     call node_aperture_offset(offset)
+     !print*, aperture
 
-     OFFSET = zero
-     call get_node_vector('aper_offset ',nn,offset)
+     !OFFSET = zero
+     !call get_node_vector('aper_offset ',nn,offset)
 
      if (debug) then
         print *, " aperture type       ", apint

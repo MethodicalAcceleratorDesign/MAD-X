@@ -105,7 +105,9 @@ void    set_new_position(struct sequence*);
 int     advance_to_pos(char* table, int* t_pos);
 int     node_apertype(void);
 int     inside_userdefined_geometry(double *x, double *y);
-double get_length_(void);
+double  get_length_(void);
+void    node_aperture_vector(double * vec);
+void    node_aperture_offset(double * vec);
 
 #endif // MAD_NODE_H
 

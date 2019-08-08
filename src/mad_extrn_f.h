@@ -82,6 +82,8 @@
 #define store_no_fd_err store_no_fd_err_
 #define node_apertype node_apertype_
 #define inside_userdefined_geometry inside_userdefined_geometry_
+#define node_aperture_vector node_aperture_vector_
+#define node_aperture_offset node_aperture_offset_
 
 // from mad_option.c
 #define get_option get_option_ // *

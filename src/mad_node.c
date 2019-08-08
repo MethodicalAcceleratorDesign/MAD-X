@@ -694,6 +694,16 @@ node_string(const char* key, char* string, int* l)
 int node_apertype(void){
   return current_node->p_elem->aper->apertype;
 }
+void node_aperture_vector(double *vec){
+  for(int i=0;i<4; i++){
+  vec[i] = current_node->p_elem->aper->aperture[i];
+  }
+}
+void node_aperture_offset(double *vec){
+  for(int i=0;i<2; i++){
+  vec[i] = current_node->p_elem->aper->aper_offset[i];
+  }
+}
 
 int inside_userdefined_geometry(double* x, double *y){
   return aper_chk_inside(*x, *y, current_node->p_elem->aper->xlist, 

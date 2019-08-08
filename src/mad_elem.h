@@ -29,7 +29,8 @@ struct element  /* each element is unique */
 struct aperture
 {
   enum en_apertype apertype;
-  double aper_offset;
+  double *aper_offset;
+  double *aperture;
   double *xlist;
   double *ylist;
   int length;
