@@ -303,6 +303,10 @@ void set_aperture_element(struct element *el, struct command* def){
       el->aper->apertype = custom;
       int lines=0, ch;
       FILE *fp = fopen(type,"r");
+      if(fp==NULL){
+          fatal_error("Aperture File is not existing ",type);
+        }
+      
       while(!feof(fp))
       {
         ch = fgetc(fp);
