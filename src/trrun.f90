@@ -45,7 +45,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   double precision :: last_pos(*), z(6,*), dxt(*), dyt(*)
   double precision :: last_orbit(6,*),  l_buf(*)
 
-  logical :: onepass, onetable, last_out, info, aperflag, doupdate
+  logical :: onepass, onetable, last_out, info, aperflag, doupdate, debug
   logical :: run=.false.,dynap=.false.
   logical, save :: first=.true.
   logical :: bb_sxy_update, virgin_state, emittance_update
@@ -84,7 +84,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 !-------------------------------------------------------------------
 
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
-  double precision, external :: node_value, get_variable, get_value
+  double precision, external :: node_value, get_variable, get_value	
 
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
@@ -107,6 +107,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
   damp = get_option('damp ') .ne. 0
   quantum = get_option('quantum ') .ne. 0
+
+  debug = get_option('debug ') .ne. 0
 
   !-------added by Yipeng SUN 01-12-2008--------------
   if (deltap .eq. zero) then
@@ -465,6 +467,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            if (code .eq. code_placeholder) code = code_instrument
 
            el = node_value('l ')
+		   
            code_buf(nlm+1) = code
            l_buf(nlm+1) = el
            call element_name(el_name,len(el_name))
@@ -506,10 +509,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               enddo
            endif
         endif
-
+        
         !-------- Track through element  // suppress dxt 13.12.04
         call ttmap(switch, code, el, z, jmax, dxt, dyt, sum, tot_turn+turn, part_id, &
-             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass)
+             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass,debug)
 
         !-------- Space Charge update
 !frs on 04.06.2016 - fixing
@@ -694,12 +697,13 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 end subroutine trrun
 
 subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
-     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass)
+     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug)
   use twtrrfi
   use twiss0fi
   use name_lenfi
   use math_constfi, only : zero, one
   use code_constfi
+  use aperture_enums
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -718,27 +722,27 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   double precision :: el, sum
   double precision :: track(6,*), dxt(*), dyt(*), last_pos(*)
   double precision :: last_orbit(6,*), maxaper(6), al_errors(align_max)
-  logical :: aperflag, onepass
+  logical :: aperflag, onepass, lost_global
 
   logical :: fmap, debug
   logical :: run=.false., dynap=.false.
-  integer :: i, nn, jtrk
+  integer :: i, nn, jtrk, apint
   double precision :: ct, tmp, st, theta
   double precision :: ap1, ap2, ap3, ap4, aperture(maxnaper)
   double precision :: offset(2), offx, offy
   double precision :: ek(6), re(6,6), te(6,6,6), craporb(6)
   character(len=name_len) :: aptype
 
-  integer, external :: get_option
+  integer, external :: get_option, node_apertype
   double precision, external :: get_value, node_value
 
   double precision, parameter :: min_double = 1.e-36
-
+  external :: node_aperture_vector, node_aperture_offset
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
   dynap = switch .eq. 2
 
-  debug = get_option('debug ') .ne. 0
+  !debug = get_option('debug ') .ne. 0
 
   fmap=.false.
   EK(:6) = zero
@@ -771,16 +775,41 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
-     call node_string('apertype ',aptype,nn)
+    
+     apint=node_apertype()
+     if(apint .eq. ap_notset) then
+		! make global check even if aperture is not defined
+		lost_global =.false.
+     	do jtrk = 1,ktrack
+	     	lost_global =  ISNAN(track(2,jtrk)) .or. ISNAN(track(4,jtrk)) .or. &
+	        ISNAN(track(5,jtrk)) .or. ISNAN(track(6,jtrk))                                .or. &
+	        abs(track(1, jtrk)) .gt. maxaper(1) .or.  abs(track(2, jtrk)) .gt. maxaper(2) .or. &
+	        abs(track(3, jtrk)) .gt. maxaper(3) .or.  abs(track(4, jtrk)) .gt. maxaper(4) .or. &
+	        abs(track(5, jtrk)) .gt. maxaper(5) .or.  abs(track(6, jtrk)) .gt. maxaper(6)
+	        if(lost_global) then
+			    APERTURE(:maxnaper) = zero
+			    call get_node_vector('aperture ',nn,aperture)
 
-     APERTURE(:maxnaper) = zero
-     call get_node_vector('aperture ',nn,aperture)
+			    OFFSET = zero
+			    call get_node_vector('aper_offset ',nn,offset)
+			    call trcoll(apint,  aperture, offset, al_errors,  maxaper, &
+          			turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack, debug)
+			    EXIT ! They are anway checked against all the particles so no need to continue to loop
+	        endif 
+        enddo 
 
-     OFFSET = zero
-     call get_node_vector('aper_offset ',nn,offset)
+     else
+     !APERTURE(:maxnaper) = zero
+     !call get_node_vector('aperture ',nn,aperture)
+     call node_aperture_vector(aperture)
+     call node_aperture_offset(offset)
+     !print*, aperture
+
+     !OFFSET = zero
+     !call get_node_vector('aper_offset ',nn,offset)
 
      if (debug) then
-        print *, " aperture type       ", aptype
+        print *, " aperture type       ", apint
         print *, "          parameters ", (aperture(i),i=1,4)
         print *, "          offsets    ", (offset(i),i=1,2)
         print *, " alignment errors    ", (al_errors(i),i=11,12)
@@ -788,8 +817,9 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
         print *, " "
      endif
 
-     call trcoll(aptype, aperture, offset, al_errors,  maxaper, &
-          turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack)
+     call trcoll(apint,  aperture, offset, al_errors,  maxaper, &
+          turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack, debug)
+     endif
   endif ! Test aperture
 
   ! Switch based on element code for element specific tracking
@@ -2602,12 +2632,13 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   call augment_count(table)
 end subroutine tt_puttab
 
-subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
-                 turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk)
+subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
+                 turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk, debug)
   use twiss0fi
   use name_lenfi
   use Inf_NaN_Detection
   use math_constfi, only : zero, one, pi
+  use aperture_enums
   implicit none
   ! 2015-Feb-20  18:46:05  ghislain: rewrite of trcoll
   ! 2015-Mar-09  14:50:37  ghislain: adapted to new racetrack parameter definition
@@ -2615,7 +2646,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   ! Purpose:                                                             *
   !   test for aperture limit.                                           *
   ! input:                                                               *
-  !   apertype  (string)   aperture type among                           *
+  !   apint  (integer)   aperture type among                           *
   !                       circle,rectangle,ellipse,rectcircle,lhcscreen, *
   !                       rectellipse,racetrack,octagon                  *
   !   aperture  (array double) aperture parameters,                      *
@@ -2638,30 +2669,30 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   character(len=name_len) :: apertype
   double precision :: aperture(*), offset(2), al_errors(align_max), maxaper(6)
   double precision :: sum, last_pos(*), last_orbit(6,*), z(6,*)
-  integer :: turn, part_id(*), last_turn(*), ntrk
+  integer :: turn, part_id(*), last_turn(*), ntrk, apint
 
-  integer :: i, n, nn
+  integer :: i, n, nn, nna
   double precision :: ap1, ap2, ap3, ap4, x, y!, pi
   logical :: lost, debug
 
-  integer, external :: get_option
+  integer, external :: get_option, inside_userdefined_geometry
   double precision, parameter :: min_double=1.d-36
 
-  debug = get_option('debug ') .ne. 0
+ ! debug = get_option('debug ') .ne. 0
 
   !--- First check aperture parameters
   ap1 = zero ; ap2 = zero ; ap3 = zero ; ap4 = zero
 
-  select case (apertype)
+  select case (apint)
 
-     case ("circle")
+     case (ap_circle)
         ap1 = aperture(1)
         if (ap1.lt.min_double) then
            if (debug) print *, " zero or negative circle radius ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
         endif
 
-     case ("ellipse")
+     case (ap_ellipse)
         ap1 = aperture(1)
         ap2 = aperture(2)
         if (ap1.lt.min_double) then
@@ -2673,7 +2704,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("rectangle")
+     case (ap_rectangle)
         ap1 = aperture(1)
         ap2 = aperture(2)
         if (ap1.lt.min_double) then
@@ -2685,7 +2716,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("lhcscreen", "rectcircle")
+     case (ap_lhcscreen, ap_rectcircle)
         !*****         test circle
         ap3 = aperture(3)
         if (ap3.lt.min_double) then
@@ -2704,7 +2735,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("rectellipse")
+     case (ap_rectellipse)
         !*****         test ellipse
         ap3 = aperture(3)
         ap4 = aperture(4)
@@ -2728,7 +2759,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("racetrack")
+     case (ap_racetrack)
         ap1 = aperture(1)
         ap2 = aperture(2)
         ap3 = aperture(3)
@@ -2762,7 +2793,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap4 = ap2
         endif
 
-     case ("octagon")
+     case (ap_octagon)
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape
         ap1 = aperture(1)
         ap2 = aperture(2)
@@ -2788,10 +2819,17 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            call fort_warn('trcoll:','octagon aperture: first and second angles inverted. exit from trcoll')
            return
         endif
+     case(ap_custom)
+        ap1 = aperture(1)
+        ap2 = aperture(2)
+     case(ap_notset)
+     ! Intenitionaly left blank. 
+
 
      case default
         ! add error case for un-identified aperture type;
         ! this INCLUDES the case of aperture data given in file with input APERTYPE=filename!
+        print *, "nummmmer", apint
         call fort_warn('trcoll:','called with unknown aperture type. Ignored')
 
   end select
@@ -2815,24 +2853,23 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
      x = abs(z(1,i) - al_errors(11) - offset(1))
      y = abs(z(3,i) - al_errors(12) - offset(2))
 
-     select case (apertype)
-
-     case ("circle")
+     select case (apint)
+     case (ap_circle)
         lost = (x/ap1)**2 + (y/ap1)**2 .gt. one
 
-     case ("ellipse")
+     case (ap_ellipse)
         lost = (x/ap1)**2 + (y/ap2)**2 .gt. one
 
-     case ("rectangle")
+     case (ap_rectangle)
         lost =  x .gt. ap1 .or. y .gt. ap2
 
-     case ("lhcscreen", "rectcircle")
+     case (ap_lhcscreen, ap_rectcircle)
         lost = x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap3)**2 .gt. one
 
-     case ("rectellipse")
+     case (ap_rectellipse)
        lost =  x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap4)**2 .gt. one
 
-     case ("racetrack")
+     case (ap_racetrack)
         ! 2015-Mar-09  15:05:39  ghislain: adapted to new racetrack parameter definition
         !*** case of racetrack: test outer rectangle (ap1,ap2) first
         !    then test ellipse for corner part.
@@ -2840,12 +2877,18 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
              ( x .gt. ap1-ap3 .and. y .gt. ap2-ap4 .and. &
                ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap4)) / ap4)**2 .gt. one )
 
-     case ("octagon")
+     case (ap_octagon)
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape
         !*** case of octagon: test outer rectangle (ap1,ap2) then test cut corner.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. &
              (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. zero
-
+     case (ap_custom)
+        lost =  x .gt. ap1 .or. y .gt. ap2 ! First checks the user defined rectangle
+        if(lost) then
+          x = z(1,i) - al_errors(11) - offset(1)
+     	  y = z(3,i) - al_errors(12) - offset(2)
+     	  lost = inside_userdefined_geometry(x,y) .eq. 0
+     	endif
      case default
 
      end select
@@ -2858,10 +2901,11 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
                 abs(z(5, i)) .gt. maxaper(5) .or.  abs(z(6, i)) .gt. maxaper(6)
      endif
 
-
      ! lose particle if it is outside aperture
 99   if (lost) then
         n = i
+        nna=name_len
+        call node_string('apertype ',apertype,nna)
         call trkill(n, turn, sum, ntrk, part_id, last_turn, last_pos, last_orbit, z, apertype)
         if (ntrk .eq. 0) then
            call fort_warn('trcoll: ','Particle Number equals zero: exit from trcoll')
@@ -2873,6 +2917,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
 
   enddo
 end subroutine trcoll
+
 
 subroutine ttrfloss(turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk)
   use twiss0fi
@@ -3447,7 +3492,7 @@ subroutine trclor(switch,orbit0)
   integer :: switch
   double precision :: orbit0(6)
 
-  logical :: aperflag, onepass
+  logical :: aperflag, onepass, debug
   integer :: itra
 
   integer :: i, j, k, bbd_pos, j_tot, code, irank, n_align
@@ -3464,7 +3509,7 @@ subroutine trclor(switch,orbit0)
   integer, parameter :: itmax=10
 
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
-  double precision, external :: node_value, get_value, get_variable
+  double precision, external :: node_value, get_value, get_variable, get_length
 
   write (*,'(/a)')          'Full 6D closed orbit search.'
   write (*,'(a)')           'Initial value of 6-D closed orbit from Twiss: '
@@ -3522,6 +3567,8 @@ subroutine trclor(switch,orbit0)
 !        if (code .eq. code_tkicker)     code = code_kicker
         if (code .eq. code_placeholder) code = code_instrument
         el      = node_value('l ')
+        
+        
       !  if (itra .eq. 1 .and. &
       !      code.ne.code_drift .and. &
       !      code.ne.code_quadrupole .and. &
@@ -3554,10 +3601,10 @@ subroutine trclor(switch,orbit0)
               enddo
            endif
         endif
-
+		debug = get_option('debug ') .ne. 0
         !-------- Track through element
         call ttmap(switch,code,el,z,pmax,dxt,dyt,sum,turn,part_id, &
-             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass)
+             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug)
 
         !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. code_drift .and. n_align .ne. 0)  then

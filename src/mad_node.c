@@ -290,7 +290,9 @@ get_refpos(struct sequence* sequ)
   // else return zero;
   else return sequ->length/2.;
 }
-
+double get_length_(void){
+  return current_node->length;
+}
 
 double
 node_value(const char* par)
@@ -688,6 +690,26 @@ node_string(const char* key, char* string, int* l)
   else
     memset(string, ' ', *l);
 }
+
+int node_apertype(void){
+  return current_node->p_elem->aper->apertype;
+}
+void node_aperture_vector(double *vec){
+  for(int i=0;i<4; i++){
+  vec[i] = current_node->p_elem->aper->aperture[i];
+  }
+}
+void node_aperture_offset(double *vec){
+  for(int i=0;i<2; i++){
+  vec[i] = current_node->p_elem->aper->aper_offset[i];
+  }
+}
+
+int inside_userdefined_geometry(double* x, double *y){
+  return aper_chk_inside(*x, *y, current_node->p_elem->aper->xlist, 
+    current_node->p_elem->aper->ylist, current_node->p_elem->aper->length );
+}
+
 
 int
 remove_one(struct node* node)
