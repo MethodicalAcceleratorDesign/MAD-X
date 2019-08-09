@@ -355,6 +355,7 @@ delete_element(struct element* el)
   if (stamp_flag && el->stamp != 123456)
     fprintf(stamp_file, "d_e double delete --> %s\n", el->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", el->name);
+  myfree(rout_name, el->aper);
   myfree(rout_name, el);
   return NULL;
 }
