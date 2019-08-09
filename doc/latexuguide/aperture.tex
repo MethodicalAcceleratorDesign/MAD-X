@@ -77,7 +77,7 @@ The minimum aperture definition uses the following two attributes:
 \end{madlist}
 
 \begin{table}[ht]
-  \caption{Predefined aperture types}
+  \caption{Defintion of aperture types}
   \label{table:apertype}
   \vspace{1ex}
   \begin{tabular}{|l | c | p{7.5cm}|}
@@ -102,7 +102,12 @@ The minimum aperture definition uses the following two attributes:
     \hline
     \texttt{OCTAGON} & 4 & half width and half height along main axes, 
     two angles sustaining the cut corner in the first quadrant, 
-    given in radians and in order of increasing values. \\   
+    given in radians and in order of increasing values. \\
+    \hline
+    \texttt{"FileName"} & 2 & In addition to the points in the file which
+    are defining geometry it is also possible add two parameters
+    to APERTURE attribute. These values are used for a check identical to 
+    the RECTANGLE check. \\    
     \hline
   \end{tabular}
 \end{table}
