@@ -44,9 +44,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   integer :: part_id(*), last_turn(*), code_buf(*)
   double precision :: last_pos(*), z(6,*), dxt(*), dyt(*)
   double precision :: last_orbit(6,*),  l_buf(*)
+  double precision :: theta_buf(10000), theta
 
   logical :: onepass, onetable, last_out, info, aperflag, doupdate, debug
-  logical :: run=.false.,dynap=.false.
+  logical :: run=.false.,dynap=.false., thin_foc
   logical, save :: first=.true.
   logical :: bb_sxy_update, virgin_state, emittance_update
   logical :: checkpnt_restart, fast_error_func, exit_loss_turn
@@ -109,6 +110,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   quantum = get_option('quantum ') .ne. 0
 
   debug = get_option('debug ') .ne. 0
+  thin_foc = get_option('thin_foc ').eq.1
 
   !-------added by Yipeng SUN 01-12-2008--------------
   if (deltap .eq. zero) then
@@ -457,6 +459,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         !-----------------------------------------------------------------
      endif
 
+
+
      do !--- loop over nodes
 
         bbd_pos = j
@@ -467,10 +471,14 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            if (code .eq. code_placeholder) code = code_instrument
 
            el = node_value('l ')
-		   
+           theta = node_value('tilt ')
+		   theta_buf(nlm+1) = theta
            code_buf(nlm+1) = code
            l_buf(nlm+1) = el
-           call element_name(el_name,len(el_name))
+           !param(nlm+1, enum_bvk) = 
+           !param(nlm+1, enum_lrad) -= 
+           !param(nlm+1, enum_bvk)
+           !param(nlm+1, enum_bvk)
 
            if ((code.eq.code_sextupole .or. &
               code.eq.code_octupole .or. &
@@ -478,6 +486,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               code.eq.code_rfcavity .or. &
               code.eq.code_crabcavity) .and. el.ne.zero) then
               !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
+              call element_name(el_name,len(el_name))
               print *," "
               print *,el_name, "code: ",code," el: ",el,"   THICK ELEMENT FOUND"
               print *," "
@@ -494,6 +503,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         else
            el = l_buf(nlm+1)
            code = code_buf(nlm+1)
+           theta = theta_buf(nlm+1)
         endif
 
         if (run) nobs = node_value('obs_point ')
@@ -512,7 +522,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         
         !-------- Track through element  // suppress dxt 13.12.04
         call ttmap(switch, code, el, z, jmax, dxt, dyt, sum, tot_turn+turn, part_id, &
-             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass,debug)
+             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass,debug, theta, thin_foc)
 
         !-------- Space Charge update
 !frs on 04.06.2016 - fixing
@@ -697,7 +707,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 end subroutine trrun
 
 subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
-     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug)
+     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc)
   use twtrrfi
   use twiss0fi
   use name_lenfi
@@ -725,7 +735,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   logical :: aperflag, onepass, lost_global
 
   logical :: fmap, debug
-  logical :: run=.false., dynap=.false.
+  logical :: run=.false., dynap=.false., thin_foc
   integer :: i, nn, jtrk, apint
   double precision :: ct, tmp, st, theta
   double precision :: ap1, ap2, ap3, ap4, aperture(maxnaper)
@@ -742,14 +752,8 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   run   = switch .eq. 1
   dynap = switch .eq. 2
 
-  !debug = get_option('debug ') .ne. 0
-
   fmap=.false.
-  EK(:6) = zero
-  CRAPORB(:6) = zero
-  RE(:6,:6) = zero
-  TE(:6,:6,:6) = zero
-
+ 
   !---- Drift space; no rotation or aperture check, go straight to tracking and return
   if (code .eq. code_drift) then
      call ttdrf(el,track,ktrack)
@@ -758,7 +762,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   endif
 
   !---- Rotate trajectory before entry
-  theta = node_value('tilt ')
+
   if (theta .ne. zero)  then
      st = sin(theta)
      ct = cos(theta)
@@ -803,8 +807,6 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
      !call get_node_vector('aperture ',nn,aperture)
      call node_aperture_vector(aperture)
      call node_aperture_offset(offset)
-     !print*, aperture
-
      !OFFSET = zero
      !call get_node_vector('aper_offset ',nn,offset)
 
@@ -829,6 +831,10 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call tttdipole(track,ktrack)
 
     case (code_matrix)
+       EK(:6) = zero
+  	   RE(:6,:6) = zero
+  	   TE(:6,:6,:6) = zero
+  	   CRAPORB(:6) = zero
        call tmarb(.false.,.false.,craporb,fmap,ek,re,te)
        call tttrak(ek,re,track,ktrack)
 
@@ -836,7 +842,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call tttquad(track,ktrack)
 
     case (code_multipole)
-       call ttmult(track,ktrack,dxt,dyt,turn)
+       call ttmult(track,ktrack,dxt,dyt,turn,thin_foc)
 
     case (code_solenoid)
        call trsol(track, ktrack,dxt,dyt)
@@ -922,7 +928,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   return
 end subroutine ttmap
 
-subroutine ttmult(track,ktrack,dxt,dyt,turn)
+subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   use twtrrfi
   use name_lenfi
   use trackfi
@@ -937,12 +943,14 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   !   KTRACK    (integer) Number of surviving tracks.                    *
   !   dxt       (double)  local buffer                                   *
   !   dyt       (double)  local buffer                                   *
+  !   el_num    (integer) elemenent number in sequence                   *
+  !   para(*,20)(double)  matrix containing the values                   *
   !----------------------------------------------------------------------*
   double precision :: track(6,*), dxt(*), dyt(*)
   integer :: ktrack, turn
 
   logical, save :: first=.true.
-  logical ::  time_var
+  logical ::  time_var,thin_foc
   integer :: iord, jtrk, nd, nord, i, j, n_ferr, nn, ns, noisemax, nn1, in, mylen
   double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad
   double precision :: pt, px, py, rfac
@@ -983,7 +991,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !---- Angle (no bvk in track)
-  an = node_value('angle ')
+  !an = node_value('angle ')
   if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
 
   !----
@@ -1005,8 +1013,8 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
 
   !--- Time variation for fields in matrix, multipole or RF-cavity
   ! 2015-Jun-24  18:55:43  ghislain: DOC FIXME not documented!!!
-  time_var = node_value('time_var ') .ne. zero
-
+ ! time_var = node_value('time_var ') .ne. zero
+ time_var = .false.
   if (time_var .and. time_var_m) then
      time_var_m_cnt = time_var_m_cnt + 1
      time_var_m_lnt = time_var_m_lnt + 1
@@ -1066,7 +1074,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      dxt(:ktrack) = zero
      dyt(:ktrack) = zero
      !----------- introduction of dipole focusing
-     if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
+     if (elrad.gt.zero .and. thin_foc) then
 
         DXT(:ktrack) = dipr*dipr*TRACK(1,:ktrack)/elrad
         DYT(:ktrack) = dipi*dipi*TRACK(3,:ktrack)/elrad
@@ -1084,7 +1092,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
            dyt(jtrk) = dx*track(3,jtrk) + dy*track(1,jtrk)
         enddo
      enddo
-     if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
+     if (elrad.gt.zero .and. thin_foc) then
         DXT(:ktrack) = DXT(:ktrack) + dipr*dipr*TRACK(1,:ktrack)/elrad
         DYT(:ktrack) = DYT(:ktrack) + dipi*dipi*TRACK(3,:ktrack)/elrad
      endif
@@ -3492,7 +3500,7 @@ subroutine trclor(switch,orbit0)
   integer :: switch
   double precision :: orbit0(6)
 
-  logical :: aperflag, onepass, debug
+  logical :: aperflag, onepass, debug, thin_foc
   integer :: itra
 
   integer :: i, j, k, bbd_pos, j_tot, code, irank, n_align
@@ -3502,7 +3510,7 @@ subroutine trclor(switch,orbit0)
   double precision :: z(6,7), zz(6), z0(6,7), z00(6,7), a(6,7), ddd(6)
   double precision :: cotol, err, deltap, el, dxt(200), dyt(200)
   double precision :: al_errors(align_max)
-  double precision :: sum, orbit(6)
+  double precision :: sum, orbit(6), theta
   double precision :: last_pos(6), last_orbit(6,1), maxaper(6)
   character(len=12) :: char_a
 
@@ -3557,6 +3565,8 @@ subroutine trclor(switch,orbit0)
   ORBIT = ORBIT0
 
   !---- Iteration for closed orbit.
+  debug = get_option('debug ') .ne. 0
+  thin_foc = get_option('thin_foc ') .eq. 1
   do itra = 1, itmax
      j = restart_sequ()
 
@@ -3601,10 +3611,11 @@ subroutine trclor(switch,orbit0)
               enddo
            endif
         endif
-		debug = get_option('debug ') .ne. 0
+		
+		theta = node_value('tilt ')
         !-------- Track through element
         call ttmap(switch,code,el,z,pmax,dxt,dyt,sum,turn,part_id, &
-             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug)
+             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc)
 
         !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. code_drift .and. n_align .ne. 0)  then
