@@ -327,6 +327,56 @@ node_value(const char* par)
   else value =  element_value(current_node, lpar);
   return value;
 }
+double node_obs_point(void){
+  return current_node->obs_point;
+}
+
+void set_tt_multipoles(int *maxmul){
+  int tmp_n, tmp_s;
+  double tmp_nv[*maxmul] ;
+  double tmp_sv[*maxmul] ;
+  current_node->p_elem->multip = mycalloc("alloc mult struct", 1, sizeof (*current_node->p_elem->multip));
+  current_node->p_elem->multip->knl = mycalloc("alloc multip normal", *maxmul, sizeof (*current_node->p_elem->multip->knl));
+  current_node->p_elem->multip->ksl = mycalloc("alloc multip skew"  , *maxmul, sizeof (*current_node->p_elem->multip->ksl));
+
+  get_node_vector("knl", &tmp_n, tmp_nv);
+  get_node_vector("ksl", &tmp_s, tmp_sv);
+  current_node->p_elem->multip->nn = tmp_n;
+  current_node->p_elem->multip->ns = tmp_s;
+  
+  for(int i=0;i<tmp_n;i++){
+    current_node->p_elem->multip->knl[i] = tmp_nv[i];
+  }
+  for(int i=0;i<tmp_s;i++){
+    current_node->p_elem->multip->ksl[i] = tmp_sv[i];
+  }
+
+
+}
+
+void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl){
+    nn[0]=current_node->p_elem->multip->nn;
+    ns[0]=current_node->p_elem->multip->ns;
+    for(int i=0;i<*nn;i++){
+      knl[i] = current_node->p_elem->multip->knl[i];
+    }
+    for(int i=0;i<*ns;i++){
+      ksl[i] = current_node->p_elem->multip->ksl[i];
+    }
+
+
+}
+void alloc_tt_attrib(int *length){
+  current_node->p_elem->tt_attrib = mycalloc("tmp_array_tt", (*length+1), sizeof (*current_node->p_elem->tt_attrib));
+}
+
+void set_tt_attrib(int *index, double *value){
+  current_node->p_elem->tt_attrib[*index] = *value;
+}
+
+double get_tt_attrib(int *index){
+  return current_node->p_elem->tt_attrib[*index];
+}
 
 void
 link_in_front(struct node* new, struct node* el)

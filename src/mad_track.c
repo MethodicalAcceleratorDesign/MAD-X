@@ -96,7 +96,8 @@ track_run(struct in_cmd* cmd)
 
   // run track rountine
   trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2,
-         buf_dxt, buf_dyt, buf3, buf4, &buf5, &e_flag, ibuf3, buf6);
+         buf_dxt, buf_dyt, buf3, buf4, &buf5, &e_flag, ibuf3, 
+         buf6);
 
   // summary
   t = find_table("tracksumm");
