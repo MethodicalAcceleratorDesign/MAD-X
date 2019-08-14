@@ -1,5 +1,6 @@
 subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
-                 z, dxt, dyt, last_orbit, eigen, coords, e_flag, code_buf, l_buf)
+                 z, dxt, dyt, last_orbit, eigen, coords, e_flag, code_buf, & 
+                 l_buf)
   use twtrrfi
   use bbfi
   use time_varfi
@@ -114,43 +115,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   debug = get_option('debug ') .ne. 0
   thin_foc = get_option('thin_foc ').eq.1
 
-
-
-  j = restart_sequ()
-
-  do !---- loop over nodes
-
-    code    = node_value('mad8_type ')
-  !        if (code .eq. code_tkicker)     code = code_kicker
-    if(code .eq. code_multipole) then
-     call alloc_tt_attrib(total_enums)
-     call set_tt_attrib(enum_other_bv, node_value('other_bv '))
-     call set_tt_attrib(enum_lrad, node_value('lrad '))
-     call set_tt_attrib(enum_noise, node_value('noise '))
-     call set_tt_attrib(enum_angle, node_value('angle '))
-     call set_tt_attrib(enum_time_var, node_value('time_var '))
-     call set_tt_multipoles(maxmul)
-    endif
-
-    if(code.eq.code_hkicker .or. code.eq.code_vkicker .or. &
-      code.eq.code_kicker .or.  code.eq.code_tkicker) then
-      call alloc_tt_attrib(total_enums)
-      call set_tt_attrib(enum_other_bv, node_value('other_bv '))
-      call set_tt_attrib(enum_sinkick, node_value('sinkick '))
-      call set_tt_attrib(enum_kick, node_value('kick '))
-      call set_tt_attrib(enum_chkick, node_value('chkick '))
-      call set_tt_attrib(enum_cvkick, node_value('chkick '))
-      call set_tt_attrib(enum_hkick, node_value('hkick '))
-      call set_tt_attrib(enum_vkick, node_value('vkick '))
-    endif 
-    
-
-
-    if (advance_node() .eq. 0)  exit
-
-    j=j+1
-  end do !--- end of loop over nodes to set upt things
-
+  call init_elements()
   !-------added by Yipeng SUN 01-12-2008--------------
   if (deltap .eq. zero) then
      onepass = get_option('onepass ') .ne. 0
@@ -744,6 +709,49 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
 100 call fort_fail('TRACK: Fatal ', 'checkpoint_restart file corrupted')
 end subroutine trrun
+
+subroutine init_elements
+  use track_enums
+  use trackfi
+  use twtrrfi
+  use code_constfi
+  implicit none
+  integer:: j, code
+  integer, external :: restart_sequ, advance_node
+  double precision, external :: node_value
+ 
+  
+  j = restart_sequ()
+  do !---- loop over nodes
+    code    = node_value('mad8_type ')
+  !        if (code .eq. code_tkicker)     code = code_kicker
+    if(code .eq. code_multipole) then
+     call alloc_tt_attrib(total_enums)
+     call set_tt_attrib(enum_other_bv, node_value('other_bv '))
+     call set_tt_attrib(enum_lrad, node_value('lrad '))
+     call set_tt_attrib(enum_noise, node_value('noise '))
+     call set_tt_attrib(enum_angle, node_value('angle '))
+     call set_tt_attrib(enum_time_var, node_value('time_var '))
+     call set_tt_multipoles(maxmul)
+    endif
+
+    if(code.eq.code_hkicker .or. code.eq.code_vkicker .or. &
+      code.eq.code_kicker .or.  code.eq.code_tkicker) then
+      call alloc_tt_attrib(total_enums)
+      call set_tt_attrib(enum_other_bv, node_value('other_bv '))
+      call set_tt_attrib(enum_sinkick, node_value('sinkick '))
+      call set_tt_attrib(enum_kick, node_value('kick '))
+      call set_tt_attrib(enum_chkick, node_value('chkick '))
+      call set_tt_attrib(enum_cvkick, node_value('chkick '))
+      call set_tt_attrib(enum_hkick, node_value('hkick '))
+      call set_tt_attrib(enum_vkick, node_value('vkick '))
+    endif 
+    
+    if (advance_node() .eq. 0)  exit
+
+  end do !--- end of loop over nodes to set upt things
+
+end subroutine init_elements
 
 subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
      last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc)
@@ -3533,6 +3541,7 @@ subroutine trupdate(turn)
   call pro_input(cmd)
   write(cmd, '(''exec, tr$macro($tr$turni) ; '')')
   call pro_input(cmd)
+  call init_elements() ! added since now temporary variables are used and need to update
 end subroutine trupdate
 
 subroutine trclor(switch,orbit0)
