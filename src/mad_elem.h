@@ -3,6 +3,7 @@
 
 // types
 enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon, custom};
+enum track_enums{non_existing, enum_other_bv, enum_lrad, enum_noise, enum_angle, enum_time_var};
 struct node;
 struct name_list;
 struct command;
@@ -24,6 +25,8 @@ struct element  /* each element is unique */
                                 /* *this for base_type elements (rbend etc.) */
 
   struct aperture* aper;
+  double *tt_attrib;
+  struct multipole* multip;
 };
 
 struct aperture
@@ -34,6 +37,13 @@ struct aperture
   double *xlist;
   double *ylist;
   int length;
+};
+struct multipole
+{
+  int nn;
+  int ns;
+  double *knl;
+  double *ksl;
 };
 
 struct el_list /* contains list of element pointers sorted by name */

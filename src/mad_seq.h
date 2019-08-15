@@ -92,6 +92,7 @@ int     set_enable(const char* type, struct in_cmd*);
 void    set_sequence(char* name);
 int     set_cont_sequence(void);
 int     sequ_check_valid_twiss(struct sequence*);
+int     get_nnodes(void);
 
 #endif // MAD_SEQ_H
 
