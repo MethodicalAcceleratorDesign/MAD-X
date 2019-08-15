@@ -46,8 +46,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   integer :: part_id(*), last_turn(*), code_buf(*)
   double precision :: last_pos(*), z(6,*), dxt(*), dyt(*)
   double precision :: last_orbit(6,*),  l_buf(*)
-  double precision :: theta_buf(100000), theta
-
+  double precision :: theta
+  double precision, dimension (:), allocatable :: theta_buf   
   logical :: onepass, onetable, last_out, info, aperflag, doupdate, debug
   logical :: run=.false.,dynap=.false., thin_foc
   logical, save :: first=.true.
@@ -86,14 +86,14 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   double precision  :: Summ_t_square    ! local for rms value
 !-------------------------------------------------------------------
 
-  integer, external :: restart_sequ, advance_node, get_option, node_al_errors
+  integer, external :: restart_sequ, advance_node, get_option, node_al_errors, get_nnodes
   double precision, external :: node_value, get_variable, get_value, node_obs_point
   external :: set_tt_attrib, alloc_tt_attrib, set_tt_multipoles, get_tt_multipoles
 
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
   dynap = switch .eq. 2
-
+  allocate ( theta_buf(get_nnodes()) )
   !--- Initialize
   deltap = get_value('probe ','deltap ')
   betas  = get_value('probe ','beta ')

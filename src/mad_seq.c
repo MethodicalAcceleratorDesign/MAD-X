@@ -2083,6 +2083,10 @@ expand_curr_sequ(int flag)
   }
 }
 
+int get_nnodes(void){
+  return current_sequ->n_nodes;
+} 
+
 void
 reset_errors(struct sequence* sequ)
   /* zeros the sel_err node flag for all nodes of an expanded sequence */
