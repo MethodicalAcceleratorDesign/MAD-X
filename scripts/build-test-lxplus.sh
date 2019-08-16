@@ -106,27 +106,28 @@ check_error "make all-linux64-gnu failed" "no-exit"
 
 echo -e "\n===== Intel build ====="
 
-#if [ -f "/cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh" ] ; then
-#  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh intel64
-#fi
+if [ -f "/cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh" ] ; then
+  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh intel64
+fi
 
-#if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
+if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
 #  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh ia32
 #  icc      --version
 #  ifort    --version
-#
+
 #  make all-linux32-intel
 #  check_error "make all-linux32-intel failed" "no-exit"
 
-#  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh intel64
-#  icc      --version
-#  ifort    --version
-#
-#  make all-linux64-intel
-#  check_error "make all-linux64-intel failed" "no-exit"
-#else
-#  echo "Intel compilers not found, skipped."
-#fi
+  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/18-all-setup.sh intel64
+  icc      --version
+  ifort    --version
+
+  make all-linux64-intel
+  check_error "make all-linux64-intel failed" "no-exit"
+else
+  echo "Intel compilers not found, skipped."
+fi
+
 
 echo -e "\n===== NagFor build ====="
 echo -e "\nNo more supported on AFS, skipped..."
