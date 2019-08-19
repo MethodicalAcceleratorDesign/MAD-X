@@ -84,11 +84,12 @@ if [ "$1" = "nobuild" ] ; then
 fi
 ################################################################################
 
+
 echo -e "\n===== Release number ====="
 cat VERSION
 
 echo -e "\n===== Gnu build ====="
-#source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/i686-slc6/setup.sh
+source /cvmfs/sft.cern.ch/lcg/contrib/gcc/9.2.0/x86_64-centos7/setup.sh
 #gcc      --version
 #g++      --version
 #gfortran --version
@@ -96,7 +97,7 @@ echo -e "\n===== Gnu build ====="
 #make all-linux32-gnu
 #check_error "make all-linux32-gnu failed" "no-exit"
 
-source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/x86_64-slc6/setup.sh
+#source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/x86_64-slc6/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
@@ -167,17 +168,17 @@ if [ "$1" = "notest" ] ; then
 else
   echo ""
 
-#if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
+if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
 #  echo -e "\n===== Testing madx-linux32-intel ====="
 #  make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
 #  check_error "make tests-all for madx-linux32-intel failed"  "no-exit"
 
-#  echo -e "\n===== Testing madx-linux64-intel ====="
-#  make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
-#  check_error "make tests-all for madx-linux64-intel failed" "no-exit"
-#else
-#  echo "Intel compilers not found, skipped."
-#fi
+  echo -e "\n===== Testing madx-linux64-intel ====="
+  make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
+  check_error "make tests-all for madx-linux64-intel failed" "no-exit"
+else
+  echo "Intel compilers not found, skipped."
+fi
 
 #  echo -e "\n===== Testing madx-linux32-gnu ====="
 #  make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR

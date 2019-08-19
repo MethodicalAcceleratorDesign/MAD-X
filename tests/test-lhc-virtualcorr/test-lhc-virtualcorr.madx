@@ -5,7 +5,7 @@ option, warn,info;
 !###################################################################################################################################
 !System,"rm -r temp";
 !System,"rm -r output";
-System,"mkdir -p temp";
+!System,"mkdir -p temp";
 System,"mkdir -p output";
 !######################################################################
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
@@ -423,7 +423,7 @@ if(is_thin==1) {
 	select, flag=error, clear;
 	select, flag=error, pattern=MB\.,class=multipole;
 	esave,  file="temp/MB.errors";
-	system, "optics2016/errors/corr_MB_v3";
+	!system, "optics2016/errors/corr_MB_v3";
 	call, file="temp/MB_corr_setting.mad";
 	value, kcs.a12b1;
 	value, kcs.a78b1;
