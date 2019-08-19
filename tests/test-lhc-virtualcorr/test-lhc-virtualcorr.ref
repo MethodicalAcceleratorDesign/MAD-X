@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.01  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.06.07               +
-  + Execution date: 2019.07.11 10:11:17      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.08.19 13:40:18      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Links definitions
 
@@ -19,7 +19,7 @@ option, warn,info;
 
 !System,"rm -r output";
 
-System,"mkdir -p temp";
+!System,"mkdir -p temp";
 
 System,"mkdir -p output";
 
@@ -351,9 +351,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "11/07/19"
-@ TIME             %08s "10.11.22"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "19/08/19"
+@ TIME             %08s "13.40.23"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP5"                      6664.568433        11.00260699        11.00650363     0.002850892684    0.0007548514235    0.0004950767763   -2.680921442e-05        15.59181943        14.29786066
@@ -431,9 +431,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "11/07/19"
-@ TIME             %08s "10.11.23"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "19/08/19"
+@ TIME             %08s "13.40.24"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP1"                                0        11.00474119        11.00406663    -0.003641817309   -0.0006151400488    0.0005597189687   -2.942489079e-05                  0                  0
@@ -1327,76 +1327,6 @@ kcs.a12b1          =                  0 ;
 kcs.a78b1          =                  0 ;
 kcs.a12b2          =                  0 ;
 kcs.a78b2          =                  0 ;
- Energy is   450.00000000000000      GeV
- ******Sector******            1           2
- 308         MB   slices in sector  1
-  16         MQTF slices in sector  1
-  16         MQTD slices in sector  1
-   4         MQS  slices in sector  1
- 154         MCS  slices in sector  1
-  77         MCO  slices in sector  1
-  76         MCD  slices in sector  1
- ******Sector******            2           3
- 308         MB   slices in sector  2
-  16         MQTF slices in sector  2
-  16         MQTD slices in sector  2
-   4         MQS  slices in sector  2
- 154         MCS  slices in sector  2
-  77         MCO  slices in sector  2
-  77         MCD  slices in sector  2
- ******Sector******            3           4
- 308         MB   slices in sector  3
-  16         MQTF slices in sector  3
-  16         MQTD slices in sector  3
-   4         MQS  slices in sector  3
- 154         MCS  slices in sector  3
-  77         MCO  slices in sector  3
-  77         MCD  slices in sector  3
- ******Sector******            4           5
- 308         MB   slices in sector  4
-  16         MQTF slices in sector  4
-  16         MQTD slices in sector  4
-   4         MQS  slices in sector  4
- 154         MCS  slices in sector  4
-  77         MCO  slices in sector  4
-  77         MCD  slices in sector  4
- ******Sector******            5           6
- 308         MB   slices in sector  5
-  16         MQTF slices in sector  5
-  16         MQTD slices in sector  5
-   4         MQS  slices in sector  5
- 154         MCS  slices in sector  5
-  77         MCO  slices in sector  5
-  77         MCD  slices in sector  5
- ******Sector******            6           7
- 308         MB   slices in sector  6
-  16         MQTF slices in sector  6
-  16         MQTD slices in sector  6
-   4         MQS  slices in sector  6
- 154         MCS  slices in sector  6
-  77         MCO  slices in sector  6
-  77         MCD  slices in sector  6
- ******Sector******            7           8
- 308         MB   slices in sector  7
-  16         MQTF slices in sector  7
-  16         MQTD slices in sector  7
-   4         MQS  slices in sector  7
- 154         MCS  slices in sector  7
-  77         MCO  slices in sector  7
-  77         MCD  slices in sector  7
- ******Sector******            8           1
- 308         MB   slices in sector  8
-   8         MQTF slices in sector  8
-  16         MQTD slices in sector  8
-   4         MQS  slices in sector  8
- 154         MCS  slices in sector  8
-  77         MCO  slices in sector  8
-  77         MCD  slices in sector  8
- Injection Energy
-   0.0000000000000000     
-                       NaN
-   0.0000000000000000     
-                       NaN
 kcs.a12b1          =       0.1464698273 ;
 kcs.a78b1          =      0.08039643636 ;
 kcs.a12b2          =                  0 ;
