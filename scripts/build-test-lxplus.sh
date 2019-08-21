@@ -107,10 +107,10 @@ check_error "make all-linux64-gnu failed" "no-exit"
 
 echo -e "\n===== Intel build ====="
 
-if [ -f "/cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh" ] ; then
-  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh intel64
-fi
-
+#if [ -f "/cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh" ] ; then
+#  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh intel64
+#fi
+source /cvmfs/projects.cern.ch/intelsw/psxe/linux/19-all-setup.sh intel64
 if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
 #  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh ia32
 #  icc      --version
@@ -119,7 +119,7 @@ if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
 #  make all-linux32-intel
 #  check_error "make all-linux32-intel failed" "no-exit"
 
-  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/18-all-setup.sh intel64
+
   icc      --version
   ifort    --version
 
