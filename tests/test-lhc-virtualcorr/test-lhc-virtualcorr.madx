@@ -424,7 +424,7 @@ if(is_thin==1) {
 	select, flag=error, pattern=MB\.,class=multipole;
 	esave,  file="temp/MB.errors";
 	!system, "optics2016/errors/corr_MB_v3";
-	call, file="temp/MB_corr_setting2.mad";
+	call, file="savedcorr/MB_corr_setting_saved.mad";
 	value, kcs.a12b1;
 	value, kcs.a78b1;
 	value, kcs.a12b2;
