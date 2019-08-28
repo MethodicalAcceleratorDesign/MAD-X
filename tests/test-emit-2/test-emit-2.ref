@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Darwin)      +
+  +     MAD-X 5.05.01  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2019.04.30 13:19:03      +
+  + Release   date: 2019.06.07               +
+  + Execution date: 2019.06.07 17:54:25      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
@@ -120,10 +120,10 @@ enter EMIT module
                              py                0.15165232E-29      0.41245501E+01      0.29927911E-30
                              pt                0.26021594E-01      0.53905911E-29      0.13022468E+01
  
- Damping partition numbers                         1.49534453          1.00000032          0.50465608
- Damping constants [1/s]                           0.28263157E+03      0.18900772E+03      0.95383866E+02
- Damping times [s]                                 0.35381751E-02      0.52907891E-02      0.10483953E-01
- Emittances [pi micro m]                       0.11259233E-02      0.27519820E-30      0.28530881E+01
+ Damping partition numbers                         1.49533276          1.00000032          1.50467344
+ Damping constants [1/s]                           0.28262935E+03      0.18900772E+03      0.28439481E+03
+ Damping times [s]                                 0.35382030E-02      0.52907891E-02      0.35162386E-02
+ Emittances [pi micro m]                       0.11259322E-02      0.27519820E-30      0.95690415E+00
 
  EMIT: beam parameters have been updated.
 
@@ -144,13 +144,13 @@ parameter: pc   double value:        2.999999956
 parameter: gamma   double value:        5870.853595
 parameter: beta   double value:       0.9999999855
 parameter: brho   double value:        10.00692271
-parameter: ex   double value:    1.125923312e-09
-parameter: exn   double value:    6.610130826e-06
+parameter: ex   double value:    1.125932175e-09
+parameter: exn   double value:    6.610182862e-06
 parameter: ey   double value:    2.751981994e-37
 parameter: eyn   double value:    1.615648315e-33
-parameter: et   double value:    2.853088103e-06
-parameter: sigt   double value:     0.001481252466
-parameter: sige   double value:     0.001926106961
+parameter: et   double value:    9.569041543e-07
+parameter: sigt   double value:    0.0008578396932
+parameter: sige   double value:     0.001115467778
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -163,7 +163,7 @@ parameter: u0   double value:    0.0002542024392
 parameter: qs   double value:      0.01229083024
 parameter: arad   double value:    2.817940323e-15
 parameter: bv   double value:                  1
-parameter: pdamp   double array: 1.495345e+00 1.000000e+00 5.046561e-01 
+parameter: pdamp   double array: 1.495333e+00 1.000000e+00 1.504673e+00 
 parameter: n1min   double value:                 -1
 
 
@@ -268,7 +268,7 @@ enter EMIT module
  
                                                   M o d e   1         M o d e   2         M o d e   3
  Fractional tunes            undamped              0.54473120          0.09300237          0.01229083
-                             damped                0.54473120          0.09300237          0.01229083
+                             damped                0.54473120          0.09300237          0.01229082
  
  beta* [m]                   x                 0.11192592E+02      0.50132093E-29      0.19146961E-02
                              y                 0.24489317E-29      0.59288110E+01      0.15434933E-31
@@ -286,10 +286,10 @@ enter EMIT module
                              py                0.35953802E-29      0.41248810E+01      0.29358016E-30
                              pt                0.26021781E-01      0.35925532E-29      0.13022468E+01
  
- Damping partition numbers                         1.29625405          1.00000041          0.70374674
- Damping constants [1/s]                           0.24500130E+03      0.18900724E+03      0.13301317E+03
- Damping times [s]                                 0.40816110E-02      0.52908026E-02      0.75180523E-02
- Emittances [pi micro m]                       0.44844860E-02      0.59353367E-31      0.20459708E+01
+ Damping partition numbers                         1.29624117          1.00000041          1.70376019
+ Damping constants [1/s]                           0.24499886E+03      0.18900724E+03      0.32202288E+03
+ Damping times [s]                                 0.40816516E-02      0.52908026E-02      0.31053694E-02
+ Emittances [pi micro m]                       0.44845305E-02      0.59353367E-31      0.84509855E+00
 
  EMIT: beam parameters have been updated.
 
@@ -316,13 +316,13 @@ parameter: pc   double value:        2.999999956
 parameter: gamma   double value:        5870.853595
 parameter: beta   double value:       0.9999999855
 parameter: brho   double value:        10.00692271
-parameter: ex   double value:    4.484485954e-09
-parameter: exn   double value:     2.63277601e-05
+parameter: ex   double value:    4.484530517e-09
+parameter: exn   double value:    2.632802173e-05
 parameter: ey   double value:    5.935336675e-38
 parameter: eyn   double value:    3.484549215e-34
-parameter: et   double value:    2.045970782e-06
-parameter: sigt   double value:     0.001254359952
-parameter: sige   double value:     0.001631069713
+parameter: et   double value:    8.450985528e-07
+parameter: sigt   double value:    0.0008061722208
+parameter: sige   double value:     0.001048278042
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -335,7 +335,7 @@ parameter: u0   double value:    0.0002542017677
 parameter: qs   double value:      0.01229083026
 parameter: arad   double value:    2.817940323e-15
 parameter: bv   double value:                  1
-parameter: pdamp   double array: 1.296254e+00 1.000000e+00 7.037467e-01 
+parameter: pdamp   double array: 1.296241e+00 1.000000e+00 1.703760e+00 
 parameter: n1min   double value:                 -1
 
 

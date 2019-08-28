@@ -5,7 +5,7 @@ option, warn,info;
 !###################################################################################################################################
 !System,"rm -r temp";
 !System,"rm -r output";
-System,"mkdir -p temp";
+!System,"mkdir -p temp";
 System,"mkdir -p output";
 !######################################################################
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
@@ -20,8 +20,8 @@ Option, -echo,warn,-info;
 !###################################################################################################################################
 !############################## TUNE AND CHROMA ####################################################################################
 !###################################################################################################################################
-qxinit=64.31;
-qyinit=59.32;
+qxinit=64.27;
+qyinit=59.355;
    ptcqxinit=qxinit-64.0;
    ptcqyinit=qyinit-59.0;
 	qxinitint=qxinit-ptcqxinit;
@@ -423,8 +423,8 @@ if(is_thin==1) {
 	select, flag=error, clear;
 	select, flag=error, pattern=MB\.,class=multipole;
 	esave,  file="temp/MB.errors";
-	system, "optics2016/errors/corr_MB_v3";
-	call, file="temp/MB_corr_setting.mad";
+	!system, "optics2016/errors/corr_MB_v3";
+	call, file="savedcorr/MB_corr_setting_saved.mad";
 	value, kcs.a12b1;
 	value, kcs.a78b1;
 	value, kcs.a12b2;
@@ -608,6 +608,15 @@ correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, c
 !                   fine tuning of coupling                     
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  call,   file="scripts/FineTuneCoupling.madx";
+qxinit=64.31;
+qyinit=59.32;
+   ptcqxinit=qxinit-64.0;
+   ptcqyinit=qyinit-59.0;
+	qxinitint=qxinit-ptcqxinit;
+	qyinitint=qyinit-ptcqyinit; ! WATCH OUT - ALL THESE VALUES ARE USED BY MATCHING ROUTINES AND THE DQMIN CALCULATION LATER ON IN THE SCIPT...
+dqxinit=3.0;
+dqyinit=3.0;
+
 if(mylhcbeam==1){
    match;
      global, q1=qxinit, q2=qyinit;

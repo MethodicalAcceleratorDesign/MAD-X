@@ -220,7 +220,7 @@ aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat,
   }
 }
 
-static int
+int
 aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipelength )
 {
 // winding number test for a point in a polygon
@@ -229,7 +229,6 @@ aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipeleng
 // Return:  wn = the winding number (=0 only when point is outside polygon)
 // source : wn_PnInPoly() at http://geomalgorithms.com/a03-_inclusion.html
  int    wn = 0;    // the  winding number counter
-
  // loop through all edges of the polygon
  for (int i=0; i<=pipelength; i++) { // edge from V[i] to  V[i+1]
    if (pipey[i] <= q  &&  pipey[i+1]  > q) {
@@ -249,7 +248,6 @@ aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipeleng
      }
    }
  }
-
  return wn;
 }
 

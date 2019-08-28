@@ -2405,10 +2405,12 @@ SUBROUTINE tmsigma_emit(rt, s0mat)
   !   SIGMA(6,6)(real)    Beam matrix in internal form.                  *
   !----------------------------------------------------------------------*
   double precision, intent(IN)  :: rt(6,6)
-  double precision :: ex, ey, et, em(6,6), s0mat(6,6)
+  double precision :: ex, ey, et, em(6,6), s0mat(6,6), tmp_e(36)
   double precision :: reval(6), aival(6) ! re and im parts
   double precision, external :: get_value
   logical, external :: m66sta
+  external :: print_eigenvectors
+  logical:: saveig
 
   integer :: j, k
 
@@ -2422,7 +2424,13 @@ SUBROUTINE tmsigma_emit(rt, s0mat)
   ex = get_value('probe ','ex ')!BEAM->Ex
   ey = get_value('probe ','ey ')!BEAM->Ey
   et = get_value('probe ','et ')!BEAM->Ez
-
+  
+  saveig = get_value('twiss ','eigenvector ').ne.zero
+  if(saveig) then
+    tmp_e = RESHAPE(em, shape(tmp_e))
+    call print_eigenvectors(tmp_e)
+  end if
+  
   do j = 1, 6
     do k = 1, 6
       s0mat(j,k) = ex * (em(j,1)*em(k,1) + em(j,2)*em(k,2)) + &
