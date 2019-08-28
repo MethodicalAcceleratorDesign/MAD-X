@@ -11230,8 +11230,6 @@ integer :: kkk=0
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
-
-
     CALL ALLOC( XN,6)
     CALL ALLOC( PZ,PT,A,PZS,DPX)
     A=YL*EL%P%B0
@@ -11244,9 +11242,11 @@ integer :: kkk=0
        PT=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(4)**2)
        PZS=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
 
-!       write (*,('(4(A,E25.16))')) "@@ . beta0= ", B, " Rho= ", R, " A= ", A%r, " B1= ", EL%BN(1)%r
+!       write (*,('(4(A,E25.16))')) "@@ . beta0= ", B, " Rho= ", R
 !       call PRTP1("PZS", PZS)
 !       call PRTP1("DPX", DPX)
+!       call PRTP1("B1" , EL%BN(1))
+!       call PRTP1("A"  , A)
 
        XN(1)=PZS/DIR/EL%BN(1)-DPX-R
 
