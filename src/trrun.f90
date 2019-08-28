@@ -2891,9 +2891,8 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
            call fort_warn('trcoll:','octagon aperture: first and second angles inverted. exit from trcoll')
            return
         endif
-     case(ap_custom)
-        ap1 = aperture(1)
-        ap2 = aperture(2)
+     case(ap_custom_file)
+
      case(ap_notset)
      ! Intenitionaly left blank. 
 
@@ -2901,7 +2900,6 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
      case default
         ! add error case for un-identified aperture type;
         ! this INCLUDES the case of aperture data given in file with input APERTYPE=filename!
-        print *, "nummmmer", apint
         call fort_warn('trcoll:','called with unknown aperture type. Ignored')
 
   end select
@@ -2921,7 +2919,6 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
 
 
      lost = .false.
-
      x = abs(z(1,i) - al_errors(11) - offset(1))
      y = abs(z(3,i) - al_errors(12) - offset(2))
 
@@ -2954,16 +2951,24 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
         !*** case of octagon: test outer rectangle (ap1,ap2) then test cut corner.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. &
              (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. zero
-     case (ap_custom)
+     
+
+
+     case (ap_custom_file)
         lost =  x .gt. ap1 .or. y .gt. ap2 ! First checks the user defined rectangle
         if(lost) then
           x = z(1,i) - al_errors(11) - offset(1)
         y = z(3,i) - al_errors(12) - offset(2)
         lost = inside_userdefined_geometry(x,y) .eq. 0
-      endif
+     endif
+
      case default
 
      end select
+
+     if(lost .and. apint.eq.ap_custom_internal) then
+       lost = inside_userdefined_geometry(x,y) .eq. 0
+     endif
 
      if (.not. lost) then
         lost =  ISNAN(z(2,i)) .or. ISNAN(z(4,i))                                .or. &
