@@ -365,8 +365,10 @@ void set_aperture_element(struct element *el, struct command* def){
       el->aper->length = tmp_l; // minus 1 or not ?? has to be there because of how the algorithm is done.  
       el->aper->xlist[tmp_l]=el->aper->xlist[0];
       el->aper->ylist[tmp_l]=el->aper->ylist[0];
-      if(el->aper->apertype==-1){
-        el->aper->apertype=rectangle;
+      if(el->aper->apertype==-1){ //If no other aperture is defined then a 10 meter rectangle is set! 
+        el->aper->apertype=rectangle; 
+        el->aper->aperture[0] = 10;
+        el->aper->aperture[1] = 10;
       }
       //el->aper->apertype = custom;
 
