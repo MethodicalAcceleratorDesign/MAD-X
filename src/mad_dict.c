@@ -927,7 +927,7 @@ const char *const_command_def =
 " "
 "eoption: error none 0 0 "
 "seed     = [i, 123456789], "
-"add      = [l, true]; "
+"add      = [l, false, true]; "
 " "
 "eprint: error none 0 0 "
 "full     = [l, false]; "
