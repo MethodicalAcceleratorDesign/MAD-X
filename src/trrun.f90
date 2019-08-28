@@ -863,7 +863,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
 
     case (code_rfmultipole)
        call ttrfmult(track,ktrack,turn)
-    
+
     case (code_hmonitor:code_rcollimator, code_instrument, &
         code_slmonitor:code_imonitor, code_placeholder, code_collimator)
         if(el .gt. 0) call ttdrf(el,track,ktrack)
@@ -925,7 +925,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   double precision :: npeak(100), nlag(100), ntune(100), temp, noise
   character(len=name_len) name
   double precision :: beta_sqr, f_damp_t
-  
+
   integer :: node_fd_errors, store_no_fd_err, get_option
 
   !---- Precompute reciprocals of orders and radiation constant
@@ -1140,7 +1140,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
         TRACK(2,:ktrack) = TRACK(2,:ktrack) * f_damp_t;
         TRACK(4,:ktrack) = TRACK(4,:ktrack) * f_damp_t;
         TRACK(6,:ktrack) = TRACK(6,:ktrack) * (one - rfac) - rfac / bet0;
-        
+
      endif
   endif
 
@@ -1404,7 +1404,7 @@ subroutine ttrf(track,ktrack)
   phirf = rfl * twopi
   ! dl    = el / two
   ! bi2gi2 = one / (betas * gammas) ** 2
-  
+
   TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
 
   !*---- If there were wakefields, track the wakes and then the 2nd half
@@ -1886,7 +1886,7 @@ subroutine ttcorr(el,track,ktrack,turn)
         track(6,:ktrack) = track(6,:ktrack) * (one - rfac) - rfac / bet0;
      endif
   endif
-  
+
 end subroutine ttcorr
 
 subroutine ttbb(track,ktrack)
@@ -3194,35 +3194,35 @@ subroutine trsol(track,ktrack,dxt,dyt)
            xf    = track(1,i)
            yf    = track(3,i)
            psigf = track(6,i) / bet0
-           
+
            !     We do not use a constant deltap!!!!! WE use full 6D formulae!
            onedp   = sqrt( one + two*psigf + (bet0**2)*(psigf**2) )
            fpsig   = onedp - one
            fppsig  = ( one + (bet0**2)*psigf ) / onedp
-           
+
            ! Set up C,S, Q,R,Z
            cosTh = cos(skl/onedp)
            sinTh = sin(skl/onedp)
            Q = -skl * sk / onedp
            R = fppsig / (onedp**2) * skl * sk
            Z = fppsig / (onedp**2) * skl
-           
+
            pxf  = track(2,i) + xf*Q
            pyf  = track(4,i) + yf*Q
            sigf = track(5,i)*bet0 - half*(xf**2 + yf**2)*R
-           
+
            ! For radiation calculations (initial angles)
            dxt(i) = track(2,i);
            dyt(i) = track(4,i);
-           
+
            ! final angles after solenoid
            pxf_ =  pxf * cosTh  +  pyf * sinTh;
            pyf_ = -pxf * sinTh  +  pyf * cosTh;
-           
+
            ! kick received by particle
            dxt(i) = pxf_ - track(2,i);
            dyt(i) = pyf_ - track(4,i);
-           
+
            !---- Radiation loss at entrance (step.eq.1) and exit (step.eq.3)
            if ((step.eq.1).or.(step.eq.3)) then
               if (radiate) then
@@ -3279,21 +3279,21 @@ subroutine trsol(track,ktrack,dxt,dyt)
               py_ = track(4,i)
               z_  = track(5,i)
               pt_ = track(6,i)
-              
+
               ! set up constants
               onedp = sqrt(one + two*pt_/bet0 + pt_**2);
-              
+
               ! set up constants
               cosTh = cos(two*skl/onedp)
               sinTh = sin(two*skl/onedp)
               omega = sk/onedp;
-              
+
               ! Store the kick for radiation calculations
               pxf_ = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
               pyf_ = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
               dxt(i) = pxf_ - track(2,i);
               dyt(i) = pyf_ - track(4,i);
-              
+
               if ((step.eq.1).or.(step.eq.3)) then
                  if (radiate) then
                     !---- Full damping.
@@ -3326,7 +3326,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
                  bet = onedp / (one/bet0 + pt_);
                  length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
                       two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
-                 
+
                  ! Thick transport
                  track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
                  track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
@@ -3335,7 +3335,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
                  track(5,i) = z_ + length/bet0 - length_/bet;
               endif
            enddo ! step
-           
+
         enddo ! i
      else
         call ttdrf(length,track,ktrack);
@@ -3447,7 +3447,7 @@ subroutine trclor(switch,orbit0)
   integer :: switch
   double precision :: orbit0(6)
 
-  logical :: aperflag, onepass
+  logical :: aperflag, onepass, debug
   integer :: itra
 
   integer :: i, j, k, bbd_pos, j_tot, code, irank, n_align
@@ -3484,6 +3484,11 @@ subroutine trclor(switch,orbit0)
 
   DDD(1:6) = 1d-15
 
+! How does it work without the code right after? i.e. A will always be singular!
+!  do k = 1, 6
+!     z(k,k+1) = z(k,k+1) + ddd(k)
+!  enddo
+
   Z0  = Z
   Z00 = Z
 
@@ -3496,18 +3501,19 @@ subroutine trclor(switch,orbit0)
   cotol = get_variable('twiss_tol ')
 
   !---- Initialize kinematics and orbit
-  bet0   = get_value('beam ','beta ')
-  betas  = get_value('probe ','beta ')
-  gammas = get_value('probe ','gamma ')
-  bet0i  = one / bet0
-  beti   = one / betas
-  dtbyds = get_value('probe ','dtbyds ')
-  deltas = get_variable('track_deltap ')
-  deltap = get_value('probe ','deltap ')
-  arad   = get_value('probe ','arad ')
-  radiate  = get_value('probe ','radiate ') .ne. zero
-  damp = get_option('damp ') .ne. 0
+  bet0    = get_value('beam ','beta ')
+  betas   = get_value('probe ','beta ')
+  gammas  = get_value('probe ','gamma ')
+  bet0i   = one / bet0
+  beti    = one / betas
+  dtbyds  = get_value('probe ','dtbyds ')
+  deltas  = get_variable('track_deltap ')
+  deltap  = get_value('probe ','deltap ')
+  arad    = get_value('probe ','arad ')
+  radiate = get_value('probe ','radiate ') .ne. zero
+  damp    = get_option('damp ') .ne. 0
   quantum = get_option('quantum ') .ne. 0
+  debug   = get_option('debug ') .ne. 0 .and. get_option('trace ') .ne. 0
 
   ORBIT = ORBIT0
 
@@ -3570,7 +3576,7 @@ subroutine trclor(switch,orbit0)
         if (advance_node() .eq. 0) exit
 
         j=j+1
-     end do !---- end of loop over nodes
+     enddo !---- end of loop over nodes
 
      !---- construct one-turn map
      do k=1,6
@@ -3583,7 +3589,7 @@ subroutine trclor(switch,orbit0)
      err = maxval(abs(A(:,7)))
 
      call solver(a,6,1,irank)
-     if (irank .lt. 6) go to 100
+     if (irank .lt. 6) goto 100
 
      Z0(:,1)  = Z0(:,1)  - A(:,7)
      Z00(:,1) = Z00(:,1) - A(:,7)
@@ -3596,8 +3602,13 @@ subroutine trclor(switch,orbit0)
         z0(k,k+1) = z0(k,k+1) + ddd(k)
      enddo
 
-     Z = Z0
+    if (debug) then
+      write (*,'(a,42e14.6)') 'Z= ', Z
+      write (*,'(a,42e14.6)') 'A= ', A
+      write (*,'(a,42e14.6)') 'Z0= ', Z0
+    endif
 
+     Z = Z0
      !---- end of Iteration
   enddo
 
@@ -4466,7 +4477,7 @@ subroutine tttquad(track, ktrack)
      k1  = k1  + f_errors(2)/length
      k1s = k1s + f_errors(3)/length
   endif
-  
+
   if (k1s.ne.zero) then
      tilt = -atan2(k1s, k1)/two ! + tilt
      k1 = sqrt(k1**2 + k1s**2)
@@ -4534,7 +4545,7 @@ subroutine tttquad(track, ktrack)
            pt = pt * (one - rfac) - rfac / beta;
         endif
      endif
-     
+
      call ttcfd(x, px, y, py, z, pt, 0d0, 0d0, k1, length);
 
      !---- Radiation effects at exit
@@ -4564,7 +4575,7 @@ subroutine tttquad(track, ktrack)
            pt = pt * (one - rfac) - rfac / beta;
         endif
      endif
-     
+
      !---  rotate orbit at exit
      if (tilt .ne. zero)  then
         tmp = x
