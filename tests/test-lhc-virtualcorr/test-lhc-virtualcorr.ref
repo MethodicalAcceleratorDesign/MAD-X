@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.01  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.06.07               +
-  + Execution date: 2019.07.02 16:23:21      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.08.19 13:40:18      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Links definitions
 
@@ -19,7 +19,7 @@ option, warn,info;
 
 !System,"rm -r output";
 
-System,"mkdir -p temp";
+!System,"mkdir -p temp";
 
 System,"mkdir -p output";
 
@@ -351,9 +351,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "02/07/19"
-@ TIME             %08s "16.23.27"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "19/08/19"
+@ TIME             %08s "13.40.23"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP5"                      6664.568433        11.00260699        11.00650363     0.002850892684    0.0007548514235    0.0004950767763   -2.680921442e-05        15.59181943        14.29786066
@@ -431,9 +431,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "02/07/19"
-@ TIME             %08s "16.23.29"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "19/08/19"
+@ TIME             %08s "13.40.24"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP1"                                0        11.00474119        11.00406663    -0.003641817309   -0.0006151400488    0.0005597189687   -2.942489079e-05                  0                  0
@@ -814,27 +814,26 @@ total constraints:      4
 
 START LMDIF:
 
-Initial Penalty Function =   0.13176618E+00
+Initial Penalty Function =   0.34756208E+00
 
 
-call:       6   Penalty function =   0.40502993E-04
-call:      11   Penalty function =   0.13118808E-07
-call:      16   Penalty function =   0.94150714E-14
-call:      21   Penalty function =   0.76979083E-22
+call:       6   Penalty function =   0.45014680E-02
+call:      11   Penalty function =   0.19096392E-08
+call:      16   Penalty function =   0.13042246E-21
  ++++++++++ LMDIF ended: converged successfully
-call:      21   Penalty function =   0.76979083E-22
+call:      16   Penalty function =   0.13042246E-21
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.43100000E+01     6.43100000E+01     7.27014210E-23
-Global constraint:         q2           4     5.93200000E+01     5.93200000E+01     9.89547120E-25
-Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     1.34860209E-24
-Global constraint:         dq2          4     3.00000000E+00     3.00000000E+00     1.93951235E-24
+Global constraint:         q1           4     6.42700000E+01     6.42700000E+01     3.90972086E-23
+Global constraint:         q2           4     5.93550000E+01     5.93550000E+01     3.99908303E-23
+Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     3.24633815E-23
+Global constraint:         dq2          4     3.00000000E+00     3.00000000E+00     1.88710367E-23
 
 
-Final Penalty Function =   7.69790826e-23
+Final Penalty Function =   1.30422457e-22
 
 
 
@@ -842,14 +841,14 @@ Final Penalty Function =   7.69790826e-23
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   3.17917e-06 -1.22883e-04 -1.00000e+20  1.00000e+20
-kqtd.b1                  -4.09867e-05  5.63378e-05 -1.00000e+20  1.00000e+20
-ksf.b1                    6.64874e-02  6.64264e-02 -1.00000e+20  1.00000e+20
-ksd.b1                   -1.08518e-01 -1.08425e-01 -1.00000e+20  1.00000e+20
+kqtf.b1                  -1.34082e-04 -1.22883e-04 -1.00000e+20  1.00000e+20
+kqtd.b1                  -1.42999e-04  5.63378e-05 -1.00000e+20  1.00000e+20
+ksf.b1                    6.63351e-02  6.64264e-02 -1.00000e+20  1.00000e+20
+ksd.b1                   -1.08380e-01 -1.08425e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   7.69790826e-23
+VARIABLE "TAR" SET TO   1.30422457e-22
 START MATCHING
 
 number of variables:    2
@@ -858,25 +857,24 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.85000000E-01
+Initial Penalty Function =   0.42250000E+00
 
 
-call:       4   Penalty function =   0.38280593E-01
-call:       7   Penalty function =   0.24024202E-01
-call:      10   Penalty function =   0.33294330E-02
-call:      15   Penalty function =   0.29230535E-02
+call:       4   Penalty function =   0.29461594E-02
+call:      10   Penalty function =   0.29209357E-02
+call:      15   Penalty function =   0.29209263E-02
  ++++++++++ LMDIF ended: converged: info =            1
-call:      20   Penalty function =   0.29230535E-02
+call:      15   Penalty function =   0.29209263E-02
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42988175E+01     1.45735080E-03
-Global constraint:         q2           4     5.92950000E+01     5.92911716E+01     1.46570268E-03
+Global constraint:         q1           4     6.42950000E+01     6.42988131E+01     1.45393717E-03
+Global constraint:         q2           4     5.92950000E+01     5.92911699E+01     1.46698916E-03
 
 
-Final Penalty Function =   2.92305348e-03
+Final Penalty Function =   2.92092633e-03
 
 
 
@@ -884,36 +882,36 @@ Final Penalty Function =   2.92305348e-03
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                  -7.71897e-05  3.17917e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                   5.33367e-05 -4.09867e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                  -7.71999e-05 -1.34082e-04 -1.00000e+20  1.00000e+20
+kqtd.b1                   5.34047e-05 -1.42999e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   2.92305348e-03
+VARIABLE "TAR" SET TO   2.92092633e-03
 enter Twiss module
   
-iteration:   1 error:   2.659366E-05 deltap:   0.000000E+00
-orbit:  -1.075413E-05  3.113620E-07 -1.552305E-06 -2.023241E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.664215E-05 deltap:   0.000000E+00
+orbit:  -1.083641E-05  3.124281E-07 -1.581876E-06 -2.061797E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   5.684230E-10 deltap:   0.000000E+00
-orbit:  -1.075402E-05  3.113659E-07 -1.552317E-06 -2.023284E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   5.625966E-10 deltap:   0.000000E+00
+orbit:  -1.083629E-05  3.124319E-07 -1.581888E-06 -2.061840E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217086588        55.75304926 
+        26658.8832                 -0    0.0003217086842        55.75304706 
 
                 q1                dq1            betxmax              dxmax 
-       64.29881753        3.090965501         589.458344        2.829699698 
+       64.29881305        2.866529013        589.4728596        2.829976508 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354908425     0.001399005542    0.0003480709256        59.29117155 
+         1.3549123     0.001399003346    0.0003480828224        59.29116987 
 
                dq2            betymax              dymax              dyrms 
-       3.042647041        620.0247625      0.04374447535      0.01185697924 
+       2.956704377        620.0023983      0.04359568347      0.01183657092 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003788173769    0.0002680286486                  0                  0 
+     0.00378818469    0.0002680285628                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -922,28 +920,28 @@ orbit:  -1.075402E-05  3.113659E-07 -1.552317E-06 -2.023284E-08  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   1.693155E-05 deltap:   0.000000E+00
-orbit:  -6.804762E-06  1.978140E-07 -1.801798E-06 -9.485271E-09  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.698364E-05 deltap:   0.000000E+00
+orbit:  -6.888484E-06  1.989182E-07 -1.831155E-06 -9.872378E-09  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   2.161175E-10 deltap:   0.000000E+00
-orbit:  -6.804713E-06  1.978154E-07 -1.801830E-06 -9.485929E-09  0.000000E+00  0.000000E+00
+iteration:   2 error:   2.127189E-10 deltap:   0.000000E+00
+orbit:  -6.888433E-06  1.989196E-07 -1.831188E-06 -9.873046E-09  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217087359        55.75304258 
+        26658.8832                 -0    0.0003217087612        55.75304039 
 
                 q1                dq1            betxmax              dxmax 
-       64.28990431        3.042173012        608.5296608        2.829796653 
+       64.28990181        2.821340142        608.5382497        2.830081271 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354910274     0.001404957565    0.0003510000086        59.30009402 
+       1.354914249     0.001404953113    0.0003510112856        59.30009036 
 
                dq2            betymax              dymax              dyrms 
-       3.094103644        631.7476004      0.04251284626      0.01149069596 
+       3.006740455        631.7398377       0.0423630569      0.01147011684 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787223955    0.0002683860619                  0                  0 
+    0.003787234884    0.0002683859126                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -952,28 +950,28 @@ orbit:  -6.804713E-06  1.978154E-07 -1.801830E-06 -9.485929E-09  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   3.609804E-05 deltap:   0.000000E+00
-orbit:  -1.465842E-05  4.234963E-07 -1.353301E-06 -3.123656E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   3.614304E-05 deltap:   0.000000E+00
+orbit:  -1.473929E-05  4.245253E-07 -1.383049E-06 -3.162038E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.040607E-09 deltap:   0.000000E+00
-orbit:  -1.465820E-05  4.235035E-07 -1.353266E-06 -3.123630E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.031991E-09 deltap:   0.000000E+00
+orbit:  -1.473907E-05  4.245323E-07 -1.383013E-06 -3.162012E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217085952        55.75305478 
+        26658.8832                 -0    0.0003217086207        55.75305257 
 
                 q1                dq1            betxmax              dxmax 
-       64.29174921        3.050484766        606.9495499        2.829598771 
+       64.29174936        2.828977866        606.9632217        2.829867879 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354906542     0.001393082397     0.000345225457        59.29823772 
+       1.354910317      0.00139308244    0.0003452379145        59.29823142 
 
                dq2            betymax              dymax              dyrms 
-        3.08088702        626.2029887      0.04497323404      0.01230822483 
+       2.993800139        626.2011069      0.04482534706      0.01228784304 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003789074598    0.0002677102013                  0                  0 
+    0.003789085543    0.0002677101519                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -982,28 +980,28 @@ orbit:  -1.465820E-05  4.235035E-07 -1.353266E-06 -3.123630E-08  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   3.662476E-05 deltap:   0.000000E+00
-orbit:  -1.487540E-05  4.297247E-07 -1.343666E-06 -3.185939E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   3.668655E-05 deltap:   0.000000E+00
+orbit:  -1.496319E-05  4.309524E-07 -1.373115E-06 -3.226321E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.070487E-09 deltap:   0.000000E+00
-orbit:  -1.487517E-05  4.297321E-07 -1.343627E-06 -3.185908E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.062669E-09 deltap:   0.000000E+00
+orbit:  -1.496296E-05  4.309597E-07 -1.373076E-06 -3.226289E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0     0.000321708592        55.75305505 
+        26658.8832                 -0    0.0003217086174        55.75305285 
 
                 q1                dq1            betxmax              dxmax 
-       64.29175151        3.050457385        606.8161424        2.829593012 
+        64.2917518        2.828950231        606.8256248        2.829861493 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354906436     0.001392752066    0.0003450688362        59.29823551 
+       1.354910202     0.001392741583    0.0003450762758        59.29822907 
 
                dq2            betymax              dymax              dyrms 
-       3.080810327        626.0033449      0.04504184691      0.01233577773 
+       2.993721148        625.9950175      0.04489622275      0.01231628605 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003789123529    0.0002676935045                  0                  0 
+    0.003789136052    0.0002676929197                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1012,28 +1010,28 @@ orbit:  -1.487517E-05  4.297321E-07 -1.343627E-06 -3.185908E-08  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   4.451715E-05 deltap:   0.000000E+00
-orbit:  -1.788664E-05  5.201632E-07  7.069549E-07  1.559057E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.457100E-05 deltap:   0.000000E+00
+orbit:  -1.797137E-05  5.213011E-07  6.763349E-07  1.514829E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.610943E-09 deltap:   0.000000E+00
-orbit:  -1.788633E-05  5.201746E-07  7.069060E-07  1.558897E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.599753E-09 deltap:   0.000000E+00
+orbit:  -1.797106E-05  5.213123E-07  6.762859E-07  1.514669E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0     0.000321708494        55.75306354 
+        26658.8832                 -0    0.0003217085196        55.75306133 
 
                 q1                dq1            betxmax              dxmax 
-       64.29012845         3.04290119        606.7933556        2.829412239 
+       64.29013042        2.822035525        606.8030864        2.829676024 
 
              dxrms             xcomax             xcorms                 q2 
-        1.35490379     0.001387522283    0.0003434782449        59.29986116 
+       1.354907487     0.001387517046     0.000343486933        59.29985304 
 
                dq2            betymax              dymax              dyrms 
-       3.090036871        626.0724646      0.04483447123      0.01229366844 
+       3.002691697        626.0641257      0.04468590079      0.01227378138 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787598283    0.0002677103831                  0                  0 
+     0.00378761235    0.0002677096461                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1042,28 +1040,28 @@ orbit:  -1.788633E-05  5.201746E-07  7.069060E-07  1.558897E-08  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   2.876004E-05 deltap:   0.000000E+00
-orbit:  -1.185929E-05  3.391784E-07 -3.484906E-06 -8.046980E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.882970E-05 deltap:   0.000000E+00
+orbit:  -1.195014E-05  3.404961E-07 -3.513000E-06 -8.083280E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   6.163695E-10 deltap:   0.000000E+00
-orbit:  -1.185913E-05  3.391824E-07 -3.484808E-06 -8.046818E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   6.115229E-10 deltap:   0.000000E+00
+orbit:  -1.194997E-05  3.405000E-07 -3.512901E-06 -8.083118E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217086927        55.75304633 
+        26658.8832                 -0     0.000321708718        55.75304413 
 
                 q1                dq1            betxmax              dxmax 
-        64.2966108        3.076141465        592.0441028        2.829774698 
+       64.29660605         2.85265453        592.0600715        2.830047889 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354909109     0.001397994434     0.000346699725        59.29337506 
+       1.354912944     0.001397978679    0.0003467058335        59.29337367 
 
                dq2            betymax              dymax              dyrms 
-        3.05363458        624.4644648      0.04524754585      0.01239225981 
+       2.967330644        624.4495607      0.04510491952      0.01237318669 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003790664805    0.0002676977477                  0                  0 
+    0.003790675754    0.0002676972745                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1072,28 +1070,28 @@ orbit:  -1.185913E-05  3.391824E-07 -3.484808E-06 -8.046818E-08  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   2.089105E-05 deltap:   0.000000E+00
-orbit:  -8.826016E-06  2.481516E-07 -5.726228E-06 -1.304506E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.096854E-05 deltap:   0.000000E+00
+orbit:  -8.919941E-06  2.495596E-07 -5.752783E-06 -1.307704E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   2.434712E-10 deltap:   0.000000E+00
-orbit:  -8.825898E-06  2.481528E-07 -5.726099E-06 -1.304483E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   2.412233E-10 deltap:   0.000000E+00
+orbit:  -8.919822E-06  2.495607E-07 -5.752654E-06 -1.307681E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217087965        55.75303733 
+        26658.8832                 -0    0.0003217088217        55.75303515 
 
                 q1                dq1            betxmax              dxmax 
-       64.29504075         3.06584121        599.7243005        2.829958054 
+       64.29503724        2.843020702        599.7454445        2.830235992 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354911821     0.001403270864    0.0003483776202        59.29494538 
+       1.354915725     0.001403249807    0.0003483823155        59.29494274 
 
                dq2            betymax              dymax              dyrms 
-       3.062537185        624.4636767      0.04545239278      0.01246321615 
+       2.975964321        624.4494893      0.04531283008      0.01244458477 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003792228689    0.0002677236789                  0                  0 
+     0.00379223803    0.0002677232759                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1108,21 +1106,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.46442859E-06
+Initial Penalty Function =   0.46652865E-06
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.46442859E-06
+call:       1   Penalty function =   0.46652865E-06
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950408E+01     1.66085774E-07
-Global constraint:         q2           4     5.92950000E+01     5.92949454E+01     2.98342813E-07
+Global constraint:         q1           4     6.42950000E+01     6.42950372E+01     1.38673775E-07
+Global constraint:         q2           4     5.92950000E+01     5.92949427E+01     3.27854872E-07
 
 
-Final Penalty Function =   4.64428587e-07
+Final Penalty Function =   4.66528647e-07
 
 
 
@@ -1130,12 +1128,12 @@ Final Penalty Function =   4.64428587e-07
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                  -7.71897e-05 -7.71897e-05 -1.00000e+20  1.00000e+20
-kqtd.b1                   5.33367e-05  5.33367e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                  -7.71999e-05 -7.71999e-05 -1.00000e+20  1.00000e+20
+kqtd.b1                   5.34047e-05  5.34047e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   4.64428587e-07
+VARIABLE "TAR" SET TO   4.66528647e-07
 START MATCHING
 
 number of variables:    2
@@ -1144,21 +1142,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.46442859E-06
+Initial Penalty Function =   0.46652865E-06
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.46442859E-06
+call:       1   Penalty function =   0.46652865E-06
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950408E+01     1.66085774E-07
-Global constraint:         q2           4     5.92950000E+01     5.92949454E+01     2.98342813E-07
+Global constraint:         q1           4     6.42950000E+01     6.42950372E+01     1.38673775E-07
+Global constraint:         q2           4     5.92950000E+01     5.92949427E+01     3.27854872E-07
 
 
-Final Penalty Function =   4.64428587e-07
+Final Penalty Function =   4.66528647e-07
 
 
 
@@ -1166,12 +1164,12 @@ Final Penalty Function =   4.64428587e-07
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-cmrskew                  -4.03671e-03 -4.03671e-03 -1.00000e+20  1.00000e+20
-cmiskew                  -6.49720e-03 -6.49720e-03 -1.00000e+20  1.00000e+20
+cmrskew                  -4.04213e-03 -4.04213e-03 -1.00000e+20  1.00000e+20
+cmiskew                  -6.49047e-03 -6.49047e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   4.64428587e-07
+VARIABLE "TAR" SET TO   4.66528647e-07
 START MATCHING
 
 number of variables:    2
@@ -1180,22 +1178,22 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.46442859E-06
+Initial Penalty Function =   0.46652865E-06
 
 
-call:       4   Penalty function =   0.40671132E-07
+call:       4   Penalty function =   0.40601670E-07
  ++++++++++ LMDIF ended: converged successfully
-call:       4   Penalty function =   0.40671132E-07
+call:       4   Penalty function =   0.40601670E-07
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42949857E+01     2.03356812E-08
-Global constraint:         q2           4     5.92950000E+01     5.92950143E+01     2.03354504E-08
+Global constraint:         q1           4     6.42950000E+01     6.42949858E+01     2.03009137E-08
+Global constraint:         q2           4     5.92950000E+01     5.92950142E+01     2.03007564E-08
 
 
-Final Penalty Function =   4.06711316e-08
+Final Penalty Function =   4.06016701e-08
 
 
 
@@ -1203,12 +1201,12 @@ Final Penalty Function =   4.06711316e-08
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                  -7.73185e-05 -7.71897e-05 -1.00000e+20  1.00000e+20
-kqtd.b1                   5.31641e-05  5.33367e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                  -7.73134e-05 -7.71999e-05 -1.00000e+20  1.00000e+20
+kqtd.b1                   5.32202e-05  5.34047e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   4.06711316e-08
+VARIABLE "TAR" SET TO   4.06016701e-08
 START MATCHING
 
 number of variables:    2
@@ -1217,21 +1215,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.40671132E-07
+Initial Penalty Function =   0.40601670E-07
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.40671132E-07
+call:       1   Penalty function =   0.40601670E-07
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42949857E+01     2.03356812E-08
-Global constraint:         q2           4     5.92950000E+01     5.92950143E+01     2.03354504E-08
+Global constraint:         q1           4     6.42950000E+01     6.42949858E+01     2.03009137E-08
+Global constraint:         q2           4     5.92950000E+01     5.92950142E+01     2.03007564E-08
 
 
-Final Penalty Function =   4.06711316e-08
+Final Penalty Function =   4.06016701e-08
 
 
 
@@ -1239,12 +1237,12 @@ Final Penalty Function =   4.06711316e-08
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-cmrskew                  -4.03671e-03 -4.03671e-03 -1.00000e+20  1.00000e+20
-cmiskew                  -6.49720e-03 -6.49720e-03 -1.00000e+20  1.00000e+20
+cmrskew                  -4.04213e-03 -4.04213e-03 -1.00000e+20  1.00000e+20
+cmiskew                  -6.49047e-03 -6.49047e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   4.06711316e-08
+VARIABLE "TAR" SET TO   4.06016701e-08
 START MATCHING
 
 number of variables:    2
@@ -1253,21 +1251,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.40671132E-07
+Initial Penalty Function =   0.40601670E-07
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.40671132E-07
+call:       1   Penalty function =   0.40601670E-07
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42949857E+01     2.03356812E-08
-Global constraint:         q2           4     5.92950000E+01     5.92950143E+01     2.03354504E-08
+Global constraint:         q1           4     6.42950000E+01     6.42949858E+01     2.03009137E-08
+Global constraint:         q2           4     5.92950000E+01     5.92950142E+01     2.03007564E-08
 
 
-Final Penalty Function =   4.06711316e-08
+Final Penalty Function =   4.06016701e-08
 
 
 
@@ -1275,47 +1273,47 @@ Final Penalty Function =   4.06711316e-08
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                  -7.73185e-05 -7.73185e-05 -1.00000e+20  1.00000e+20
-kqtd.b1                   5.31641e-05  5.31641e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                  -7.73134e-05 -7.73134e-05 -1.00000e+20  1.00000e+20
+kqtd.b1                   5.32202e-05  5.32202e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   4.06711316e-08
+VARIABLE "TAR" SET TO   4.06016701e-08
 enter Twiss module
   
-iteration:   1 error:   2.078287E-05 deltap:   0.000000E+00
-orbit:  -8.776177E-06  2.468451E-07 -5.695964E-06 -1.300844E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.086682E-05 deltap:   0.000000E+00
+orbit:  -8.872242E-06  2.483239E-07 -5.721498E-06 -1.303919E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   2.400250E-10 deltap:   0.000000E+00
-orbit:  -8.776060E-06  2.468462E-07 -5.695836E-06 -1.300821E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   2.380237E-10 deltap:   0.000000E+00
+orbit:  -8.872123E-06  2.483250E-07 -5.721369E-06 -1.303896E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217092954         55.7529941 
+        26658.8832                 -0    0.0003217092852        55.75299498 
 
                 q1                dq1            betxmax              dxmax 
-       64.29498574        3.066004166        593.0484947        2.829946622 
+       64.29498575        2.843175184        593.0966024        2.830225786 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354913736     0.001403330469    0.0003484061465        59.29501426 
+       1.354917513     0.001403307147    0.0003484090146        59.29501425 
 
                dq2            betymax              dymax              dyrms 
-       3.062686998         623.719583      0.04545115417      0.01246257519 
+       2.976097595        623.7384459      0.04531146564      0.01244389825 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003792227847    0.0002677224893                  0                  0 
+     0.00379223734    0.0002677220196                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
             nflips 
                  0 
-closest0           =     0.007645976083 ;
-closest1           =    9.537438888e-05 ;
-closest2           =    2.852056506e-05 ;
-cmrskew            =     -0.00403671267 ;
-cmiskew            =    -0.006497200745 ;
+closest0           =      0.00764318225 ;
+closest1           =    9.449754057e-05 ;
+closest2           =    2.849619978e-05 ;
+cmrskew            =     -0.00404213016 ;
+cmiskew            =    -0.006490472474 ;
 nip                =                  1 ;
 nip                =                  2 ;
 nip                =                  3 ;
@@ -1329,112 +1327,42 @@ kcs.a12b1          =                  0 ;
 kcs.a78b1          =                  0 ;
 kcs.a12b2          =                  0 ;
 kcs.a78b2          =                  0 ;
- Energy is   450.00000000000000      GeV
- ******Sector******            1           2
- 308         MB   slices in sector  1
-  16         MQTF slices in sector  1
-  16         MQTD slices in sector  1
-   4         MQS  slices in sector  1
- 154         MCS  slices in sector  1
-  77         MCO  slices in sector  1
-  76         MCD  slices in sector  1
- ******Sector******            2           3
- 308         MB   slices in sector  2
-  16         MQTF slices in sector  2
-  16         MQTD slices in sector  2
-   4         MQS  slices in sector  2
- 154         MCS  slices in sector  2
-  77         MCO  slices in sector  2
-  77         MCD  slices in sector  2
- ******Sector******            3           4
- 308         MB   slices in sector  3
-  16         MQTF slices in sector  3
-  16         MQTD slices in sector  3
-   4         MQS  slices in sector  3
- 154         MCS  slices in sector  3
-  77         MCO  slices in sector  3
-  77         MCD  slices in sector  3
- ******Sector******            4           5
- 308         MB   slices in sector  4
-  16         MQTF slices in sector  4
-  16         MQTD slices in sector  4
-   4         MQS  slices in sector  4
- 154         MCS  slices in sector  4
-  77         MCO  slices in sector  4
-  77         MCD  slices in sector  4
- ******Sector******            5           6
- 308         MB   slices in sector  5
-  16         MQTF slices in sector  5
-  16         MQTD slices in sector  5
-   4         MQS  slices in sector  5
- 154         MCS  slices in sector  5
-  77         MCO  slices in sector  5
-  77         MCD  slices in sector  5
- ******Sector******            6           7
- 308         MB   slices in sector  6
-  16         MQTF slices in sector  6
-  16         MQTD slices in sector  6
-   4         MQS  slices in sector  6
- 154         MCS  slices in sector  6
-  77         MCO  slices in sector  6
-  77         MCD  slices in sector  6
- ******Sector******            7           8
- 308         MB   slices in sector  7
-  16         MQTF slices in sector  7
-  16         MQTD slices in sector  7
-   4         MQS  slices in sector  7
- 154         MCS  slices in sector  7
-  77         MCO  slices in sector  7
-  77         MCD  slices in sector  7
- ******Sector******            8           1
- 308         MB   slices in sector  8
-   8         MQTF slices in sector  8
-  16         MQTD slices in sector  8
-   4         MQS  slices in sector  8
- 154         MCS  slices in sector  8
-  77         MCO  slices in sector  8
-  77         MCD  slices in sector  8
- Injection Energy
-   0.0000000000000000     
-                       NaN
-   0.0000000000000000     
-                       NaN
 kcs.a12b1          =       0.1464698273 ;
 kcs.a78b1          =      0.08039643636 ;
 kcs.a12b2          =                  0 ;
 kcs.a78b2          =                  0 ;
 enter Twiss module
   
-iteration:   1 error:   5.438839E-05 deltap:   1.000000E-06
-orbit:  -3.663693E-05  7.495725E-07  1.771280E-05  4.030494E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   5.442770E-05 deltap:   1.000000E-06
+orbit:  -3.671502E-05  7.505493E-07  1.769235E-05  4.027535E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   5.725826E-09 deltap:   1.000000E-06
-orbit:  -3.663879E-05  7.496356E-07  1.770963E-05  4.030038E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   5.744361E-09 deltap:   1.000000E-06
+orbit:  -3.671689E-05  7.506127E-07  1.768920E-05  4.027081E-07  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   5.562735E-05 deltap:   0.000000E+00
-orbit:  -3.608681E-05  7.556954E-07  1.773283E-05  4.033907E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   5.566718E-05 deltap:   0.000000E+00
+orbit:  -3.616508E-05  7.566777E-07  1.771240E-05  4.030945E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   5.658726E-09 deltap:   0.000000E+00
-orbit:  -3.608840E-05  7.557558E-07  1.772937E-05  4.033413E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   5.676422E-09 deltap:   0.000000E+00
+orbit:  -3.616668E-05  7.567384E-07  1.770894E-05  4.030453E-07  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217040034        55.75345266 
+        26658.8832                 -0    0.0003217040372        55.75344973 
 
                 q1                dq1            betxmax              dxmax 
-        64.2963605        8.415187438        603.1011837        2.783139704 
+       64.29635707        8.206766054        603.1140638        2.783417143 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354486195     0.001375892299    0.0003488974045        59.28221053 
+       1.354487859      0.00137589591    0.0003489119963        59.28222641 
 
                dq2            betymax              dymax              dyrms 
-       4.184389532        620.8557701      0.08860880344      0.02372624406 
+       4.083469882        620.8342877      0.08842759134       0.0236867952 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003778746752    0.0002705380275                  0                  0 
+    0.003778759174    0.0002705366407                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1452,11 +1380,11 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: 0.000402        0.017535          0.017540        0.126328 
+before correction: 0.000401        0.017524          0.017529        0.126335 
 after correction:  -0.000001        0.003052          0.003052        0.069968 
 
 
-Max strength: 2.143093e-03 is below corrector strength limit: 1.000000e+00
+Max strength: 2.143187e-03 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -1468,40 +1396,40 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: -0.000098        0.015553          0.015553        0.098302 
-after correction:  -0.000001        0.000730          0.000730        0.015915 
+before correction: -0.000100        0.015566          0.015566        0.098477 
+after correction:  -0.000001        0.000730          0.000730        0.015914 
 
 
-Max strength: 5.874860e-04 is below corrector strength limit: 1.000000e+00
+Max strength: 5.875000e-04 is below corrector strength limit: 1.000000e+00
 enter Twiss module
   
-iteration:   1 error:   9.782609E-07 deltap:   1.000000E-06
-orbit:  -1.433675E-06  1.420994E-08  1.468667E-07  6.752348E-09  0.000000E+00  0.000000E+00
+iteration:   1 error:   9.769733E-07 deltap:   1.000000E-06
+orbit:  -1.433338E-06  1.420740E-08  1.456396E-07  6.724882E-09  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   1.577887E-06 deltap:   0.000000E+00
-orbit:  -8.824308E-07  2.030793E-08  1.659391E-07  7.081845E-09  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.578320E-06 deltap:   0.000000E+00
+orbit:  -8.822843E-07  2.031108E-08  1.647209E-07  7.054068E-09  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   3.632067E-12 deltap:   0.000000E+00
-orbit:  -8.824310E-07  2.030796E-08  1.659364E-07  7.081803E-09  0.000000E+00  0.000000E+00
+iteration:   2 error:   3.631741E-12 deltap:   0.000000E+00
+orbit:  -8.822845E-07  2.031111E-08  1.647182E-07  7.054026E-09  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217037725        55.75347267 
+        26658.8832                 -0    0.0003217038054        55.75346982 
 
                 q1                dq1            betxmax              dxmax 
-       64.29640326        8.417464443        603.0295555        2.782704278 
+       64.29639981        8.208962129        603.0427052         2.78298545 
 
              dxrms             xcomax             xcorms                 q2 
-        1.35448335     0.001410469212    0.0003551499608        59.28220934 
+       1.354484894     0.001410469551    0.0003551500597        59.28222539 
 
                dq2            betymax              dymax              dyrms 
-       4.179342106        620.8941379      0.08860914679      0.02363468972 
+       4.078515467         620.872459      0.08844157327      0.02359748385 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787190442    0.0002681021074                  0                  0 
+    0.003787190686    0.0002681021551                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1519,11 +1447,11 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: -0.000004        0.003170          0.003170        0.074787 
+before correction: -0.000004        0.003170          0.003170        0.074786 
 after correction:  -0.000001        0.003052          0.003052        0.069945 
 
 
-Max strength: 1.218499e-05 is below corrector strength limit: 1.000000e+00
+Max strength: 1.208417e-05 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -1535,40 +1463,40 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: 0.000002        0.001020          0.001020        0.016333 
+before correction: 0.000002        0.001020          0.001020        0.016332 
 after correction:  -0.000001        0.000730          0.000730        0.015896 
 
 
-Max strength: 4.444994e-06 is below corrector strength limit: 1.000000e+00
+Max strength: 4.425204e-06 is below corrector strength limit: 1.000000e+00
 enter Twiss module
   
-iteration:   1 error:   1.311365E-06 deltap:   1.000000E-06
-orbit:  -5.203954E-07 -6.947872E-09 -3.251540E-08 -5.688627E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.311819E-06 deltap:   1.000000E-06
+orbit:  -5.202031E-07 -6.953076E-09 -3.247110E-08 -5.677748E-10  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.367967E-11 deltap:   1.000000E-06
-orbit:  -5.204027E-07 -6.947698E-09 -3.251135E-08 -5.687936E-10  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.364424E-11 deltap:   1.000000E-06
+orbit:  -5.202104E-07 -6.952903E-09 -3.246704E-08 -5.677057E-10  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   7.170473E-08 deltap:   0.000000E+00
-orbit:   3.089024E-08 -8.508488E-10 -1.345881E-08 -2.396559E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   7.164215E-08 deltap:   0.000000E+00
+orbit:   3.089117E-08 -8.503450E-10 -1.340546E-08 -2.388760E-10  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0     0.000321703763        55.75347349 
+        26658.8832                 -0    0.0003217037959        55.75347064 
 
                 q1                dq1            betxmax              dxmax 
-       64.29640379        8.417699064          603.02767        2.782680395 
+       64.29640034        8.209192572        603.0408209        2.782961912 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354483205     0.001411409517    0.0003555280402        59.28220884 
+       1.354484744      0.00141140954    0.0003555280378         59.2822249 
 
                dq2            betymax              dymax              dyrms 
-       4.179019953        620.8959743      0.08860552765      0.02363257877 
+       4.078197129        620.8742893      0.08843852016      0.02359551272 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787670513    0.0002680297849                  0                  0 
+    0.003787670488    0.0002680297801                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1590,7 +1518,7 @@ before correction: -0.000003        0.003052          0.003052        0.070005
 after correction:  -0.000001        0.003052          0.003052        0.069944 
 
 
-Max strength: 4.722123e-07 is below corrector strength limit: 1.000000e+00
+Max strength: 4.696328e-07 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -1606,36 +1534,36 @@ before correction: 0.000000        0.000730          0.000730        0.015895
 after correction:  -0.000001        0.000730          0.000730        0.015894 
 
 
-Max strength: 4.561225e-07 is below corrector strength limit: 1.000000e+00
+Max strength: 4.500155e-07 is below corrector strength limit: 1.000000e+00
 enter Twiss module
   
-iteration:   1 error:   1.245093E-06 deltap:   1.000000E-06
-orbit:  -5.488475E-07 -6.162202E-09 -1.842564E-08 -3.307787E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.245606E-06 deltap:   1.000000E-06
+orbit:  -5.486587E-07 -6.167866E-09 -1.843418E-08 -3.304259E-10  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.335780E-11 deltap:   1.000000E-06
-orbit:  -5.488549E-07 -6.162031E-09 -1.842150E-08 -3.307091E-10  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.332406E-11 deltap:   1.000000E-06
+orbit:  -5.486660E-07 -6.167695E-09 -1.843004E-08 -3.303564E-10  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   5.428887E-09 deltap:   0.000000E+00
-orbit:   2.435761E-09 -6.512942E-11  6.317035E-10 -1.569737E-12  0.000000E+00  0.000000E+00
+iteration:   1 error:   5.425793E-09 deltap:   0.000000E+00
+orbit:   2.433291E-09 -6.508525E-11  6.322174E-10 -1.524892E-12  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217037632        55.75347348 
+        26658.8832                 -0     0.000321703796        55.75347064 
 
                 q1                dq1            betxmax              dxmax 
-       64.29640373        8.417712792        603.0276241        2.782680946 
+       64.29640028        8.209206285         603.040775        2.782962469 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354483202      0.00141136116    0.0003555168489        59.28220885 
+       1.354484741     0.001411361197    0.0003555168627        59.28222491 
 
                dq2            betymax              dymax              dyrms 
-        4.17901493        620.8960994      0.08860378048      0.02363234677 
+        4.07819234        620.8744146      0.08843676981      0.02359528415 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787660474    0.0002680321326                  0                  0 
+    0.003787660472    0.0002680321273                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1657,7 +1585,7 @@ before correction: -0.000001        0.003052          0.003052        0.069930
 after correction:  -0.000001        0.003052          0.003052        0.069944 
 
 
-Max strength: 9.374728e-08 is below corrector strength limit: 1.000000e+00
+Max strength: 9.361417e-08 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -1673,7 +1601,7 @@ before correction: -0.000001        0.000730          0.000730        0.015894
 after correction:  -0.000001        0.000730          0.000730        0.015894 
 
 
-Max strength: 7.227444e-08 is below corrector strength limit: 1.000000e+00
+Max strength: 7.226882e-08 is below corrector strength limit: 1.000000e+00
 START MATCHING
 
 number of variables:    4
@@ -1682,29 +1610,27 @@ total constraints:      4
 
 START LMDIF:
 
-Initial Penalty Function =   0.53177027E+02
+Initial Penalty Function =   0.50538176E+02
 
 
-call:       6   Penalty function =   0.57877430E-02
-call:      11   Penalty function =   0.11638738E-03
-call:      16   Penalty function =   0.22628871E-05
-call:      21   Penalty function =   0.53171993E-08
-call:      26   Penalty function =   0.34459548E-13
-call:      31   Penalty function =   0.81539017E-20
- ++++++++++ LMDIF ended: converged without success
-call:      31   Penalty function =   0.81539017E-20
+call:       6   Penalty function =   0.20526617E-01
+call:      11   Penalty function =   0.22447613E-06
+call:      16   Penalty function =   0.12406854E-18
+call:      21   Penalty function =   0.20411376E-23
+ ++++++++++ LMDIF ended: converged successfully
+call:      21   Penalty function =   0.20411376E-23
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.43100000E+01     6.43100000E+01     2.48802438E-21
-Global constraint:         q2           4     5.93200000E+01     5.93200000E+01     2.71261624E-21
-Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     1.44895234E-21
-Global constraint:         dq2          4     3.00000000E+00     3.00000000E+00     1.50430875E-21
+Global constraint:         q1           4     6.42700000E+01     6.42700000E+01     2.01948392E-24
+Global constraint:         q2           4     5.93550000E+01     5.93550000E+01     2.01948392E-26
+Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     1.23082023E-27
+Global constraint:         dq2          4     3.00000000E+00     3.00000000E+00     2.27980802E-28
 
 
-Final Penalty Function =   8.15390171e-21
+Final Penalty Function =   2.04113756e-24
 
 
 
@@ -1712,14 +1638,14 @@ Final Penalty Function =   8.15390171e-21
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   8.25298e-05  0.00000e+00 -1.00000e+20  1.00000e+20
-kqtd.b1                  -1.29090e-04  0.00000e+00 -1.00000e+20  1.00000e+20
-ksf.b1                    6.19983e-02  6.64874e-02 -1.00000e+20  1.00000e+20
-ksd.b1                   -1.07777e-01 -1.08518e-01 -1.00000e+20  1.00000e+20
+kqtf.b1                  -4.21647e-05  0.00000e+00 -1.00000e+20  1.00000e+20
+kqtd.b1                  -2.35806e-04  0.00000e+00 -1.00000e+20  1.00000e+20
+ksf.b1                    6.18225e-02  6.63351e-02 -1.00000e+20  1.00000e+20
+ksd.b1                   -1.07615e-01 -1.08380e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   8.15390171e-21
+VARIABLE "TAR" SET TO   2.04113756e-24
 START MATCHING
 
 number of variables:    2
@@ -1728,27 +1654,26 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.85000000E-01
+Initial Penalty Function =   0.42250000E+00
 
 
-call:       4   Penalty function =   0.39076918E-01
-call:       7   Penalty function =   0.50495220E-02
-call:      11   Penalty function =   0.50387305E-02
-call:      14   Penalty function =   0.44751988E-02
-call:      19   Penalty function =   0.44751958E-02
-call:      22   Penalty function =   0.44751800E-02
+call:       4   Penalty function =   0.45304831E-02
+call:       9   Penalty function =   0.45083102E-02
+call:      12   Penalty function =   0.44694268E-02
+call:      16   Penalty function =   0.44688893E-02
+call:      20   Penalty function =   0.44688503E-02
  ++++++++++ LMDIF ended: converged: info =            1
-call:      22   Penalty function =   0.44751800E-02
+call:      20   Penalty function =   0.44688503E-02
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42997349E+01     2.24190811E-03
-Global constraint:         q2           4     5.92950000E+01     5.92902742E+01     2.23327187E-03
+Global constraint:         q1           4     6.42950000E+01     6.42997205E+01     2.22830761E-03
+Global constraint:         q2           4     5.92950000E+01     5.92902666E+01     2.24054269E-03
 
 
-Final Penalty Function =   4.47517998e-03
+Final Penalty Function =   4.46885030e-03
 
 
 
@@ -1756,36 +1681,36 @@ Final Penalty Function =   4.47517998e-03
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   7.67532e-06  8.25298e-05 -1.00000e+20  1.00000e+20
-kqtd.b1                  -3.94065e-05 -1.29090e-04 -1.00000e+20  1.00000e+20
+kqtf.b1                   7.63462e-06 -4.21647e-05 -1.00000e+20  1.00000e+20
+kqtd.b1                  -3.92942e-05 -2.35806e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   4.47517998e-03
+VARIABLE "TAR" SET TO   4.46885030e-03
 enter Twiss module
   
-iteration:   1 error:   8.765495E-06 deltap:   0.000000E+00
-orbit:   7.084008E-06 -1.303854E-07 -5.399663E-06 -6.537029E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   8.729110E-06 deltap:   0.000000E+00
+orbit:   7.042477E-06 -1.297550E-07 -5.389327E-06 -6.522418E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.261905E-10 deltap:   0.000000E+00
-orbit:   7.083969E-06 -1.303840E-07 -5.399637E-06 -6.536970E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.246546E-10 deltap:   0.000000E+00
+orbit:   7.042439E-06 -1.297537E-07 -5.389301E-06 -6.522360E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217078556        55.75311886 
+        26658.8832                 -0      0.00032170795        55.75311068 
 
                 q1                dq1            betxmax              dxmax 
-       64.29973488        3.146449853        606.1489917        2.792711462 
+        64.2997205        2.887658775        606.1545971        2.793036668 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354587677     0.001416889155    0.0003576058033        59.29027425 
+       1.354591138     0.001416873967    0.0003576048003        59.29026656 
 
                dq2            betymax              dymax              dyrms 
-       3.020552664        610.3933895       0.0862366092      0.02200831895 
+        2.91791162        610.3670573      0.08604515258      0.02196776769 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003786361798    0.0002684548567                  0                  0 
+    0.003786366402    0.0002684537189                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1794,28 +1719,28 @@ orbit:   7.083969E-06 -1.303840E-07 -5.399637E-06 -6.536970E-08  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   2.080334E-05 deltap:   0.000000E+00
-orbit:   1.199100E-05 -2.714102E-07 -5.825761E-06 -5.364798E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.075883E-05 deltap:   0.000000E+00
+orbit:   1.194596E-05 -2.706850E-07 -5.815223E-06 -5.351132E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.453967E-10 deltap:   0.000000E+00
-orbit:   1.199106E-05 -2.714069E-07 -5.825660E-06 -5.364561E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   4.431242E-10 deltap:   0.000000E+00
+orbit:   1.194602E-05 -2.706817E-07 -5.815123E-06 -5.350896E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217078121        55.75312263 
+        26658.8832                 -0    0.0003217079062        55.75311448 
 
                 q1                dq1            betxmax              dxmax 
-       64.30070239         3.15686853        598.8493385        2.792351109 
+       64.30068887        2.897574241         598.857333        2.792687624 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354583675     0.001424271112    0.0003613930579        59.28933466 
+       1.354587232     0.001424250721    0.0003613895986        59.28932609 
 
                dq2            betymax              dymax              dyrms 
-       3.017637644        610.1308755      0.08493713249       0.0216661224 
+       2.915166118        610.1507399      0.08474003308      0.02162461189 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003785126892    0.0002689258901                  0                  0 
+    0.003785132241    0.0002689244238                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1824,28 +1749,28 @@ orbit:   1.199106E-05 -2.714069E-07 -5.825660E-06 -5.364561E-08  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   3.032658E-06 deltap:   0.000000E+00
-orbit:   2.251586E-06  8.383011E-09 -5.049698E-06 -7.747241E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   3.061247E-06 deltap:   0.000000E+00
+orbit:   2.213464E-06  8.921459E-09 -5.039458E-06 -7.731632E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.585823E-10 deltap:   0.000000E+00
-orbit:   2.251468E-06  8.385274E-09 -5.049582E-06 -7.747087E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.568071E-10 deltap:   0.000000E+00
+orbit:   2.213347E-06  8.923695E-09 -5.039343E-06 -7.731479E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217079203        55.75311326 
+        26658.8832                 -0     0.000321708015        55.75310505 
 
                 q1                dq1            betxmax              dxmax 
-       64.29016046        3.087703927        596.0343321        2.793059744 
+       64.29015471        2.833489488        596.0541804        2.793373832 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354591598     0.001409556471    0.0003539429614         59.2998316 
+       1.354594962     0.001409546422    0.0003539442508        59.29981529 
 
                dq2            betymax              dymax              dyrms 
-       3.071798993        639.4395816      0.08755487897      0.02244427362 
+       2.967302596        639.4354728      0.08736854635      0.02240437606 
 
             ycomax             ycorms             deltap            synch_1 
-     0.00378752096    0.0002680465035                  0                  0 
+    0.003787524918    0.0002680456082                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1854,28 +1779,28 @@ orbit:   2.251468E-06  8.385274E-09 -5.049582E-06 -7.747087E-08  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   5.338319E-06 deltap:   0.000000E+00
-orbit:   5.148093E-06 -7.477989E-08 -5.250965E-06 -7.015078E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   5.323347E-06 deltap:   0.000000E+00
+orbit:   5.100239E-06 -7.396556E-08 -5.240111E-06 -7.001993E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   9.727520E-11 deltap:   0.000000E+00
-orbit:   5.148021E-06 -7.477850E-08 -5.250922E-06 -7.015014E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   9.575536E-11 deltap:   0.000000E+00
+orbit:   5.100168E-06 -7.396419E-08 -5.240068E-06 -7.001930E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217078789        55.75311685 
+        26658.8832                 -0    0.0003217079735        55.75310865 
 
                 q1                dq1            betxmax              dxmax 
-       64.29036725        3.091338421        599.7247233        2.792851783 
+       64.29036027        2.836995924        599.7355222         2.79317307 
 
              dxrms             xcomax             xcorms                 q2 
-        1.35458925     0.001413959201    0.0003561301985        59.29963377 
+       1.354592679     0.001413934404    0.0003561242854        59.29961866 
 
                dq2            betymax              dymax              dyrms 
-       3.071805638        643.0344993       0.0867602459      0.02217123155 
+        2.96734244        643.0196979      0.08657298357      0.02213165734 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003786833074    0.0002682847293                  0                  0 
+    0.003786839265    0.0002682830392                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1884,28 +1809,28 @@ orbit:   5.148021E-06 -7.477850E-08 -5.250922E-06 -7.015014E-08  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   8.080206E-06 deltap:   0.000000E+00
-orbit:   1.050517E-06  5.028690E-08 -2.228965E-06  6.507639E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   8.062653E-06 deltap:   0.000000E+00
+orbit:   1.006341E-06  5.099493E-08 -2.220012E-06  7.282948E-10  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.285012E-10 deltap:   0.000000E+00
-orbit:   1.050490E-06  5.028821E-08 -2.229008E-06  6.500773E-10  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.279155E-10 deltap:   0.000000E+00
+orbit:   1.006315E-06  5.099622E-08 -2.220056E-06  7.275972E-10  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217077881        55.75312471 
+        26658.8832                 -0    0.0003217078827        55.75311651 
 
                 q1                dq1            betxmax              dxmax 
-       64.28804693         3.08732047        599.7818215        2.792585128 
+       64.28804199        2.834014876        599.7922554        2.792898616 
 
              dxrms             xcomax             xcorms                 q2 
-        1.35458604      0.00140667262    0.0003538101044        59.30196086 
+       1.354589354     0.001406654113    0.0003538059986         59.3019437 
 
                dq2            betymax              dymax              dyrms 
-        3.08908151         643.259489      0.08556206341      0.02207539323 
+       2.984174571        643.2449481      0.08536932309      0.02203361332 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003784550844    0.0002683477005                  0                  0 
+    0.003784558984    0.0002683458565                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1914,28 +1839,28 @@ orbit:   1.050490E-06  5.028821E-08 -2.229008E-06  6.500773E-10  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   1.502586E-05 deltap:   0.000000E+00
-orbit:   9.256222E-06 -2.000801E-07 -8.459208E-06 -1.433177E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.496414E-05 deltap:   0.000000E+00
+orbit:   9.204676E-06 -1.991592E-07 -8.446140E-06 -1.431296E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   3.976827E-10 deltap:   0.000000E+00
-orbit:   9.256116E-06 -2.000759E-07 -8.459447E-06 -1.433206E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   3.942590E-10 deltap:   0.000000E+00
+orbit:   9.204571E-06 -1.991551E-07 -8.446379E-06 -1.431324E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217079747        55.75310854 
+        26658.8832                 -0    0.0003217080692        55.75310035 
 
                 q1                dq1            betxmax              dxmax 
-       64.29730901        3.121466842        608.8263117        2.793120919 
+       64.29729592        2.863888844        608.8441077        2.793450041 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354592522     0.001421273216    0.0003585301967        59.29268815 
+       1.354596066     0.001421242087    0.0003585223465        59.29267915 
 
                dq2            betymax              dymax              dyrms 
-       3.029231305        613.2442463      0.08795798047      0.02228374168 
+       2.926109485        613.2250703      0.08777621589      0.02224642331 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003789146873    0.0002682689826                  0                  0 
+    0.003789151058    0.0002682673667                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1944,28 +1869,28 @@ orbit:   9.256116E-06 -2.000759E-07 -8.459447E-06 -1.433206E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   2.602520E-05 deltap:   0.000000E+00
-orbit:   1.339913E-05 -3.263648E-07 -1.187489E-05 -2.193190E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.595390E-05 deltap:   0.000000E+00
+orbit:   1.334388E-05 -3.253373E-07 -1.185930E-05 -2.190696E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.084517E-09 deltap:   0.000000E+00
-orbit:   1.339900E-05 -3.263549E-07 -1.187579E-05 -2.193302E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.082965E-09 deltap:   0.000000E+00
+orbit:   1.334374E-05 -3.253274E-07 -1.186020E-05 -2.190808E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217080761        55.75309976 
+        26658.8832                 -0    0.0003217081705        55.75309157 
 
                 q1                dq1            betxmax              dxmax 
-       64.29510992        3.099557289         606.925665        2.793394207 
+       64.29509829        2.843067545        606.9471407        2.793731253 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354595878     0.001428658237    0.0003610245239        59.29488628 
+       1.354599539     0.001428620736    0.0003610146096        59.29487582 
 
                dq2            betymax              dymax              dyrms 
-       3.037752115        632.2878465      0.08916236521      0.02241349536 
+       2.934185878         632.296891        0.088986162      0.02237849313 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003791506834    0.0002683020215                  0                  0 
+    0.003791508958    0.0002683003971                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1980,24 +1905,24 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.25015054E-05
+Initial Penalty Function =   0.25082191E-05
 
 
-call:       4   Penalty function =   0.19369462E-05
-call:       7   Penalty function =   0.11108476E-05
-call:      11   Penalty function =   0.10928790E-05
+call:       4   Penalty function =   0.19339711E-05
+call:       7   Penalty function =   0.11061776E-05
+call:      11   Penalty function =   0.10874219E-05
  ++++++++++ LMDIF ended: converged: info =            1
-call:      17   Penalty function =   0.10928790E-05
+call:      17   Penalty function =   0.10874219E-05
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42949260E+01     5.47274331E-07
-Global constraint:         q2           4     5.92950000E+01     5.92950739E+01     5.45604664E-07
+Global constraint:         q1           4     6.42950000E+01     6.42949262E+01     5.44529575E-07
+Global constraint:         q2           4     5.92950000E+01     5.92950737E+01     5.42892323E-07
 
 
-Final Penalty Function =   1.09287900e-06
+Final Penalty Function =   1.08742190e-06
 
 
 
@@ -2005,12 +1930,12 @@ Final Penalty Function =   1.09287900e-06
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   7.44380e-06  7.67532e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -3.96565e-05 -3.94065e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                   7.44893e-06  7.63462e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -3.95894e-05 -3.92942e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.09287900e-06
+VARIABLE "TAR" SET TO   1.08742190e-06
 START MATCHING
 
 number of variables:    2
@@ -2019,21 +1944,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.10928790E-05
+Initial Penalty Function =   0.10874219E-05
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.10928790E-05
+call:       1   Penalty function =   0.10874219E-05
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42949260E+01     5.47274331E-07
-Global constraint:         q2           4     5.92950000E+01     5.92950739E+01     5.45604664E-07
+Global constraint:         q1           4     6.42950000E+01     6.42949262E+01     5.44529575E-07
+Global constraint:         q2           4     5.92950000E+01     5.92950737E+01     5.42892323E-07
 
 
-Final Penalty Function =   1.09287900e-06
+Final Penalty Function =   1.08742190e-06
 
 
 
@@ -2041,12 +1966,12 @@ Final Penalty Function =   1.09287900e-06
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-cmrskew                  -1.88647e-03 -1.88647e-03 -1.00000e+20  1.00000e+20
-cmiskew                  -9.29393e-03 -9.29393e-03 -1.00000e+20  1.00000e+20
+cmrskew                  -1.89265e-03 -1.89265e-03 -1.00000e+20  1.00000e+20
+cmiskew                  -9.28580e-03 -9.28580e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.09287900e-06
+VARIABLE "TAR" SET TO   1.08742190e-06
 START MATCHING
 
 number of variables:    2
@@ -2055,21 +1980,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.10928790E-05
+Initial Penalty Function =   0.10874219E-05
 
 
  ++++++++++ LMDIF ended: converged: info =            1
-call:      11   Penalty function =   0.10928790E-05
+call:      11   Penalty function =   0.10874219E-05
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42949260E+01     5.47274331E-07
-Global constraint:         q2           4     5.92950000E+01     5.92950739E+01     5.45604664E-07
+Global constraint:         q1           4     6.42950000E+01     6.42949262E+01     5.44529575E-07
+Global constraint:         q2           4     5.92950000E+01     5.92950737E+01     5.42892323E-07
 
 
-Final Penalty Function =   1.09287900e-06
+Final Penalty Function =   1.08742190e-06
 
 
 
@@ -2077,12 +2002,12 @@ Final Penalty Function =   1.09287900e-06
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   7.44380e-06  7.44380e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -3.96565e-05 -3.96565e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                   7.44893e-06  7.44893e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -3.95894e-05 -3.95894e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.09287900e-06
+VARIABLE "TAR" SET TO   1.08742190e-06
 START MATCHING
 
 number of variables:    2
@@ -2091,23 +2016,23 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.10928790E-05
+Initial Penalty Function =   0.10874219E-05
 
 
-call:       5   Penalty function =   0.64516169E-06
-call:       8   Penalty function =   0.14059745E-06
+call:       5   Penalty function =   0.64165372E-06
+call:       8   Penalty function =   0.14021707E-06
  ++++++++++ LMDIF ended: converged successfully
-call:       8   Penalty function =   0.14059745E-06
+call:       8   Penalty function =   0.14021707E-06
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42949736E+01     6.98627032E-08
-Global constraint:         q2           4     5.92950000E+01     5.92950266E+01     7.07347453E-08
+Global constraint:         q1           4     6.42950000E+01     6.42949736E+01     6.96718094E-08
+Global constraint:         q2           4     5.92950000E+01     5.92950266E+01     7.05452653E-08
 
 
-Final Penalty Function =   1.40597449e-07
+Final Penalty Function =   1.40217075e-07
 
 
 
@@ -2115,12 +2040,12 @@ Final Penalty Function =   1.40597449e-07
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-cmrskew                  -1.80185e-03 -1.88647e-03 -1.00000e+20  1.00000e+20
-cmiskew                  -9.24054e-03 -9.29393e-03 -1.00000e+20  1.00000e+20
+cmrskew                  -1.80838e-03 -1.89265e-03 -1.00000e+20  1.00000e+20
+cmiskew                  -9.23141e-03 -9.28580e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.40597449e-07
+VARIABLE "TAR" SET TO   1.40217075e-07
 START MATCHING
 
 number of variables:    2
@@ -2129,22 +2054,22 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.14059745E-06
+Initial Penalty Function =   0.14021707E-06
 
 
-call:       7   Penalty function =   0.14039609E-06
+call:       7   Penalty function =   0.14001227E-06
  ++++++++++ LMDIF ended: converged without success
-call:      13   Penalty function =   0.14039609E-06
+call:      13   Penalty function =   0.14001227E-06
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42949736E+01     6.96407523E-08
-Global constraint:         q2           4     5.92950000E+01     5.92950266E+01     7.07553403E-08
+Global constraint:         q1           4     6.42950000E+01     6.42949736E+01     6.94480967E-08
+Global constraint:         q2           4     5.92950000E+01     5.92950266E+01     7.05641776E-08
 
 
-Final Penalty Function =   1.40396093e-07
+Final Penalty Function =   1.40012274e-07
 
 
 
@@ -2152,79 +2077,79 @@ Final Penalty Function =   1.40396093e-07
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   7.44634e-06  7.44380e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -3.96541e-05 -3.96565e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                   7.45150e-06  7.44893e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -3.95870e-05 -3.95894e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.40396093e-07
+VARIABLE "TAR" SET TO   1.40012274e-07
 enter Twiss module
   
-iteration:   1 error:   2.612704E-05 deltap:   0.000000E+00
-orbit:   1.342463E-05 -3.274828E-07 -1.185885E-05 -2.181733E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.606819E-05 deltap:   0.000000E+00
+orbit:   1.338655E-05 -3.266898E-07 -1.184919E-05 -2.180303E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.082061E-09 deltap:   0.000000E+00
-orbit:   1.342450E-05 -3.274730E-07 -1.185974E-05 -2.181843E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.080288E-09 deltap:   0.000000E+00
+orbit:   1.338642E-05 -3.266800E-07 -1.185009E-05 -2.180413E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217090063        55.75301915 
+        26658.8832                 -0    0.0003217089841        55.75302108 
 
                 q1                dq1            betxmax              dxmax 
-       64.29497361        3.099876315        590.6951364        2.793378205 
+       64.29497365        2.843353889        590.6236299        2.793717532 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354599817     0.001428704552    0.0003610974816         59.2950266 
+       1.354603003     0.001428674064    0.0003610853254        59.29502656 
 
                dq2            betymax              dymax              dyrms 
-       3.038335942        612.8692621      0.08911558153      0.02239883881 
+       2.934710557        613.1540182      0.08893743529      0.02236302248 
 
             ycomax             ycorms             deltap            synch_1 
-     0.00379144522    0.0002683118541                  0                  0 
+    0.003791446601    0.0002683104915                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
             nflips 
                  0 
-closest0           =     0.009460629801 ;
-closest1           =    0.0002236418624 ;
-closest2           =    5.298941035e-05 ;
-cmrskew            =    -0.001801849847 ;
-cmiskew            =    -0.009240538325 ;
+closest0           =     0.009453932437 ;
+closest1           =    0.0002224719864 ;
+closest2           =    5.291692548e-05 ;
+cmrskew            =    -0.001808379605 ;
+cmiskew            =    -0.009231412701 ;
 enter Twiss module
   
-iteration:   1 error:   3.635208E-05 deltap:   1.000000E-06
-orbit:   1.821525E-05 -4.518149E-07 -3.919463E-06 -1.330058E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   3.629377E-05 deltap:   1.000000E-06
+orbit:   1.817722E-05 -4.510294E-07 -3.909804E-06 -1.328547E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.610569E-09 deltap:   1.000000E-06
-orbit:   1.821555E-05 -4.518043E-07 -3.920497E-06 -1.330171E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.606403E-09 deltap:   1.000000E-06
+orbit:   1.817752E-05 -4.510188E-07 -3.910836E-06 -1.328660E-07  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   3.520835E-05 deltap:   0.000000E+00
-orbit:   1.880661E-05 -4.468892E-07 -3.884132E-06 -1.325102E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   3.514947E-05 deltap:   0.000000E+00
+orbit:   1.876835E-05 -4.460967E-07 -3.874456E-06 -1.323592E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.524939E-09 deltap:   0.000000E+00
-orbit:   1.880675E-05 -4.468772E-07 -3.885121E-06 -1.325211E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.518326E-09 deltap:   0.000000E+00
+orbit:   1.876849E-05 -4.460847E-07 -3.875442E-06 -1.323702E-07  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0     0.000321713985        55.75258775 
+        26658.8832                 -0    0.0003217139268        55.75259279 
 
                 q1                dq1            betxmax              dxmax 
-       64.29098286        9.353020189        594.5580839        2.727428029 
+       64.29098294        9.166072942         594.576618        2.727763613 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354950701     0.001430320114    0.0003619830182        59.30025291 
+       1.354943299     0.001430289508    0.0003619708955        59.30025246 
 
                dq2            betymax              dymax              dyrms 
-       2.505503346        612.1537225      0.08615521225      0.02764887629 
+       2.332331555        612.1415723      0.08599910921      0.02762451404 
 
             ycomax             ycorms             deltap            synch_1 
-     0.00379746429    0.0002681583243                  0                  0 
+    0.003797465087     0.000268157077                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2242,11 +2167,11 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: -0.000156        0.014013          0.014014        0.093577 
+before correction: -0.000155        0.014014          0.014014        0.093589 
 after correction:  -0.000001        0.003051          0.003051        0.069919 
 
 
-Max strength: 8.935227e-05 is below corrector strength limit: 1.000000e+00
+Max strength: 8.929479e-05 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -2258,43 +2183,43 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: 0.000963        0.012061          0.012099        0.070815 
+before correction: 0.000963        0.012040          0.012079        0.070698 
 after correction:  -0.000001        0.000729          0.000729        0.015876 
 
 
-Max strength: 8.648393e-05 is below corrector strength limit: 1.000000e+00
+Max strength: 8.643961e-05 is below corrector strength limit: 1.000000e+00
 enter Twiss module
   
-iteration:   1 error:   1.546551E-06 deltap:   1.000000E-06
-orbit:  -4.377247E-07 -6.249586E-09 -5.370954E-07 -2.459634E-09  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.544647E-06 deltap:   1.000000E-06
+orbit:  -4.385356E-07 -6.225308E-09 -5.366575E-07 -2.460311E-09  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.093935E-11 deltap:   1.000000E-06
-orbit:  -4.377297E-07 -6.249453E-09 -5.370942E-07 -2.459591E-09  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.089728E-11 deltap:   1.000000E-06
+orbit:  -4.385406E-07 -6.225176E-09 -5.366562E-07 -2.460268E-09  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   1.534847E-06 deltap:   0.000000E+00
-orbit:   1.517248E-07 -1.269135E-09 -5.029778E-07 -1.992077E-09  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.532803E-06 deltap:   0.000000E+00
+orbit:   1.506903E-07 -1.238255E-09 -5.025257E-07 -1.992976E-09  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   8.960220E-13 deltap:   0.000000E+00
-orbit:   1.517247E-07 -1.269137E-09 -5.029781E-07 -1.992087E-09  0.000000E+00  0.000000E+00
+iteration:   2 error:   8.982599E-13 deltap:   0.000000E+00
+orbit:   1.506903E-07 -1.238258E-09 -5.025260E-07 -1.992986E-09  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217142079        55.75256843 
+        26658.8832                 -0    0.0003217141506         55.7525734 
 
                 q1                dq1            betxmax              dxmax 
-       64.29089384        9.917624467        594.8066914        2.730009816 
+       64.29089411        9.728625471         594.824783        2.730328291 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354907035     0.001411315963    0.0003555071168        59.30018529 
+         1.3549003      0.00141131477    0.0003555066046        59.30018499 
 
                dq2            betymax              dymax              dyrms 
-       1.942531924         612.311152      0.08195972367      0.02647828097 
+         1.7713989        612.2986215      0.08181566732      0.02645205176 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787354359    0.0002681125697                  0                  0 
+    0.003787354946    0.0002681123935                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2312,11 +2237,11 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: -0.000002        0.003098          0.003098        0.071177 
+before correction: -0.000002        0.003098          0.003098        0.071176 
 after correction:  -0.000001        0.003052          0.003052        0.069954 
 
 
-Max strength: 3.244562e-05 is below corrector strength limit: 1.000000e+00
+Max strength: 3.243136e-05 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -2332,36 +2257,36 @@ before correction: -0.000008        0.000749          0.000749        0.015759
 after correction:  -0.000001        0.000730          0.000730        0.015895 
 
 
-Max strength: 5.251767e-06 is below corrector strength limit: 1.000000e+00
+Max strength: 5.208995e-06 is below corrector strength limit: 1.000000e+00
 enter Twiss module
   
-iteration:   1 error:   1.154870E-06 deltap:   1.000000E-06
-orbit:  -5.821258E-07 -5.130730E-09 -2.528133E-08 -2.666175E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.155466E-06 deltap:   1.000000E-06
+orbit:  -5.818930E-07 -5.137691E-09 -2.526153E-08 -2.662350E-10  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.080469E-11 deltap:   1.000000E-06
-orbit:  -5.821290E-07 -5.130614E-09 -2.527741E-08 -2.665497E-10  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.076599E-11 deltap:   1.000000E-06
+orbit:  -5.818962E-07 -5.137575E-09 -2.525762E-08 -2.661672E-10  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   1.077570E-08 deltap:   0.000000E+00
-orbit:   7.281950E-09 -1.494738E-10  8.717259E-09  1.998769E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.080826E-08 deltap:   0.000000E+00
+orbit:   7.291562E-09 -1.498412E-10  8.751204E-09  2.000371E-10  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217142068        55.75256853 
+        26658.8832                 -0    0.0003217141496        55.75257348 
 
                 q1                dq1            betxmax              dxmax 
-       64.29089369        9.916989029        594.8053085        2.729996909 
+       64.29089396        9.727980867        594.8234017        2.730315252 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354906803     0.001411374823    0.0003555136974        59.30018521 
+       1.354900075     0.001411374908    0.0003555137298        59.30018491 
 
                dq2            betymax              dymax              dyrms 
-       1.943094105        612.3111395      0.08202043085      0.02646012083 
+       1.771971732        612.2986099      0.08187646067      0.02643383869 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787648678    0.0002680362733                  0                  0 
+    0.003787648684    0.0002680362593                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2383,7 +2308,7 @@ before correction: -0.000001        0.003052          0.003052        0.070010
 after correction:  -0.000001        0.003052          0.003052        0.069953 
 
 
-Max strength: 7.549810e-07 is below corrector strength limit: 1.000000e+00
+Max strength: 7.560688e-07 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -2399,36 +2324,36 @@ before correction: -0.000001        0.000730          0.000730        0.015896
 after correction:  -0.000001        0.000730          0.000730        0.015894 
 
 
-Max strength: 2.195695e-07 is below corrector strength limit: 1.000000e+00
+Max strength: 2.170937e-07 is below corrector strength limit: 1.000000e+00
 enter Twiss module
   
-iteration:   1 error:   1.144707E-06 deltap:   1.000000E-06
-orbit:  -5.892178E-07 -4.988233E-09 -3.343286E-08 -4.651463E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.145272E-06 deltap:   1.000000E-06
+orbit:  -5.889937E-07 -4.994842E-09 -3.345070E-08 -4.649406E-10  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.074493E-11 deltap:   1.000000E-06
-orbit:  -5.892210E-07 -4.988118E-09 -3.342900E-08 -4.650790E-10  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.070631E-11 deltap:   1.000000E-06
+orbit:  -5.889968E-07 -4.994727E-09 -3.344684E-08 -4.648733E-10  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   1.889861E-09 deltap:   0.000000E+00
-orbit:   1.905698E-10 -6.995122E-12  5.655373E-10  1.360694E-12  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.879029E-09 deltap:   0.000000E+00
+orbit:   1.915715E-10 -7.010197E-12  5.618646E-10  1.344240E-12  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217142069        55.75256852 
+        26658.8832                 -0    0.0003217141497        55.75257348 
 
                 q1                dq1            betxmax              dxmax 
-        64.2908937        9.916985277        594.8052287        2.729996266 
+       64.29089396        9.727978465        594.8233223         2.73031462 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354906806     0.001411370691    0.0003555146414        59.30018521 
+       1.354900078      0.00141137074    0.0003555146572        59.30018492 
 
                dq2            betymax              dymax              dyrms 
-       1.943098816        612.3111341      0.08202318175      0.02646073193 
+       1.771974937        612.2986045      0.08187921216      0.02643445067 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787655617     0.000268034994                  0                  0 
+    0.003787655601    0.0002680349859                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2450,7 +2375,7 @@ before correction: -0.000001        0.003052          0.003052        0.069950
 after correction:  -0.000001        0.003052          0.003052        0.069953 
 
 
-Max strength: 7.547043e-09 is below corrector strength limit: 1.000000e+00
+Max strength: 7.488339e-09 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -2466,7 +2391,7 @@ before correction: -0.000001        0.000730          0.000730        0.015894
 after correction:  -0.000001        0.000730          0.000730        0.015894 
 
 
-Max strength: 2.743449e-08 is below corrector strength limit: 1.000000e+00
+Max strength: 2.742076e-08 is below corrector strength limit: 1.000000e+00
 START MATCHING
 
 number of variables:    4
@@ -2475,27 +2400,28 @@ total constraints:      4
 
 START LMDIF:
 
-Initial Penalty Function =   0.42372765E+04
+Initial Penalty Function =   0.42219515E+04
 
 
-call:       6   Penalty function =   0.16260246E+02
-call:      11   Penalty function =   0.13244617E-03
-call:      16   Penalty function =   0.79179450E-13
-call:      21   Penalty function =   0.14557392E-22
+call:       6   Penalty function =   0.16287049E+04
+call:      11   Penalty function =   0.91451892E+02
+call:      16   Penalty function =   0.93314840E-05
+call:      21   Penalty function =   0.44239445E-19
+call:      26   Penalty function =   0.17356411E-22
  ++++++++++ LMDIF ended: converged successfully
-call:      21   Penalty function =   0.14557392E-22
+call:      26   Penalty function =   0.17356411E-22
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.43100000E+01     6.43100000E+01     1.26217745E-23
-Global constraint:         q2           4     5.93200000E+01     5.93200000E+01     1.45907713E-24
-Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     4.50266225E-25
-Global constraint:         dq2          4     3.00000000E+00     3.00000000E+00     2.62739985E-26
+Global constraint:         q1           4     6.42700000E+01     6.42700000E+01     5.16987883E-24
+Global constraint:         q2           4     5.93550000E+01     5.93550000E+01     1.21219522E-23
+Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     9.80731599E-27
+Global constraint:         dq2          4     3.00000000E+00     3.00000000E+00     5.47723876E-26
 
 
-Final Penalty Function =   1.45573918e-23
+Final Penalty Function =   1.73564107e-23
 
 
 
@@ -2503,14 +2429,14 @@ Final Penalty Function =   1.45573918e-23
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   7.25071e-05  7.44634e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -1.50878e-04 -3.96541e-05 -1.00000e+20  1.00000e+20
-ksf.b1                    3.53773e-02  6.19983e-02 -1.00000e+20  1.00000e+20
-ksd.b1                   -1.43860e-01 -1.07777e-01 -1.00000e+20  1.00000e+20
+kqtf.b1                  -4.37284e-05  7.45150e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -2.49053e-04 -3.95870e-05 -1.00000e+20  1.00000e+20
+ksf.b1                    3.52301e-02  6.18225e-02 -1.00000e+20  1.00000e+20
+ksd.b1                   -1.43678e-01 -1.07615e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.45573918e-23
+VARIABLE "TAR" SET TO   1.73564107e-23
 START MATCHING
 
 number of variables:    2
@@ -2519,25 +2445,27 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.90326875E-01
+Initial Penalty Function =   0.42614620E+00
 
 
-call:       4   Penalty function =   0.12551880E-01
-call:       7   Penalty function =   0.10182358E-01
-call:      12   Penalty function =   0.58465977E-02
-call:      16   Penalty function =   0.56236459E-02
+call:       4   Penalty function =   0.57146933E-02
+call:       9   Penalty function =   0.56390792E-02
+call:      13   Penalty function =   0.56197452E-02
+call:      17   Penalty function =   0.56196783E-02
+call:      20   Penalty function =   0.56196638E-02
+call:      23   Penalty function =   0.56196179E-02
  ++++++++++ LMDIF ended: converged: info =            1
-call:      21   Penalty function =   0.56236459E-02
+call:      26   Penalty function =   0.56196179E-02
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.43002951E+01     2.80381404E-03
-Global constraint:         q2           4     5.92950000E+01     5.92896898E+01     2.81983183E-03
+Global constraint:         q1           4     6.42950000E+01     6.43002903E+01     2.79875540E-03
+Global constraint:         q2           4     5.92950000E+01     5.92896888E+01     2.82086253E-03
 
 
-Final Penalty Function =   5.62364587e-03
+Final Penalty Function =   5.61961793e-03
 
 
 
@@ -2545,36 +2473,36 @@ Final Penalty Function =   5.62364587e-03
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   6.46127e-06  7.25071e-05 -1.00000e+20  1.00000e+20
-kqtd.b1                  -5.21492e-05 -1.50878e-04 -1.00000e+20  1.00000e+20
+kqtf.b1                   6.45426e-06 -4.37284e-05 -1.00000e+20  1.00000e+20
+kqtd.b1                  -5.20609e-05 -2.49053e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   5.62364587e-03
+VARIABLE "TAR" SET TO   5.61961793e-03
 enter Twiss module
   
-iteration:   1 error:   2.921716E-05 deltap:   0.000000E+00
-orbit:   1.302104E-05 -3.487150E-07 -1.274659E-05 -1.957416E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.916950E-05 deltap:   0.000000E+00
+orbit:   1.300107E-05 -3.481592E-07 -1.273196E-05 -1.955328E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.963863E-09 deltap:   0.000000E+00
-orbit:   1.302108E-05 -3.487093E-07 -1.274754E-05 -1.957498E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.958568E-09 deltap:   0.000000E+00
+orbit:   1.300111E-05 -3.481535E-07 -1.273290E-05 -1.955409E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217108644        55.75285814 
+        26658.8832                 -0    0.0003217108701        55.75285765 
 
                 q1                dq1            betxmax              dxmax 
-       64.30029511        3.086837055        604.8028236        2.797345785 
+       64.30029033        2.877361859        604.8249163        2.797621194 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354669182     0.001438698693    0.0003634989217        59.28968979 
+       1.354672257     0.001438661045    0.0003634850819        59.28968882 
 
                dq2            betymax              dymax              dyrms 
-       3.033928545        647.8177892       0.1300260248      0.02918207451 
+       2.904352357        647.8075029       0.1298297889      0.02913353908 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003785669288    0.0002686354473                  0                  0 
+    0.003785670804    0.0002686342305                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2583,28 +2511,28 @@ orbit:   1.302108E-05 -3.487093E-07 -1.274754E-05 -1.957498E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   4.259295E-05 deltap:   0.000000E+00
-orbit:   1.840494E-05 -5.050884E-07 -1.359909E-05 -1.890932E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.253994E-05 deltap:   0.000000E+00
+orbit:   1.838259E-05 -5.044701E-07 -1.358327E-05 -1.888771E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   2.745144E-09 deltap:   0.000000E+00
-orbit:   1.840526E-05 -5.050797E-07 -1.360015E-05 -1.890997E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   2.738654E-09 deltap:   0.000000E+00
+orbit:   1.838291E-05 -5.044614E-07 -1.358432E-05 -1.888837E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217108239        55.75286165 
+        26658.8832                 -0    0.0003217108292        55.75286119 
 
                 q1                dq1            betxmax              dxmax 
-       64.30005255        3.089364245        598.4355576        2.796517483 
+       64.30004454        2.879949088        598.4595218        2.796803831 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354658177     0.001446848588    0.0003678939236        59.28994716 
+       1.354661335     0.001446807569    0.0003678781318        59.28994939 
 
                dq2            betymax              dymax              dyrms 
-        3.03830277        642.7720574       0.1283273379      0.02929765829 
+       2.908651898        642.7790297       0.1281247704      0.02924635822 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003784408619    0.0002691044989                  0                  0 
+    0.003784410716    0.0002691029967                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2613,28 +2541,28 @@ orbit:   1.840526E-05 -5.050797E-07 -1.360015E-05 -1.890997E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   1.613468E-05 deltap:   0.000000E+00
-orbit:   7.730683E-06 -1.951365E-07 -1.199542E-05 -2.029607E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.609214E-05 deltap:   0.000000E+00
+orbit:   7.712992E-06 -1.946408E-07 -1.198189E-05 -2.027584E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.179973E-09 deltap:   0.000000E+00
-orbit:   7.730540E-06 -1.951330E-07 -1.199613E-05 -2.029680E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.175853E-09 deltap:   0.000000E+00
+orbit:   7.712848E-06 -1.946373E-07 -1.198259E-05 -2.027657E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217109321        55.75285228 
+        26658.8832                 -0    0.0003217109383        55.75285175 
 
                 q1                dq1            betxmax              dxmax 
-        64.2883184        3.017217054        601.8921752        2.798161521 
+       64.28831549         2.81228715        601.9001735        2.798426188 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354680208     0.001430610347    0.0003592552597        59.30166534 
+       1.354683198     0.001430576006    0.0003592432674        59.30166253 
 
                dq2            betymax              dymax              dyrms 
-       3.098447792        610.6923894       0.1317532195      0.02916475356 
+       2.966031858        610.6800749       0.1315628323      0.02911872492 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003786835878    0.0002682444543                  0                  0 
+    0.003786836875    0.0002682434562                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2643,28 +2571,28 @@ orbit:   7.730540E-06 -1.951330E-07 -1.199613E-05 -2.029680E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   3.822566E-05 deltap:   0.000000E+00
-orbit:   1.664953E-05 -4.540943E-07 -1.331171E-05 -1.911857E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   3.820598E-05 deltap:   0.000000E+00
+orbit:   1.664066E-05 -4.538653E-07 -1.329833E-05 -1.909567E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   2.491249E-09 deltap:   0.000000E+00
-orbit:   1.664974E-05 -4.540866E-07 -1.331275E-05 -1.911930E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   2.486982E-09 deltap:   0.000000E+00
+orbit:   1.664087E-05 -4.538577E-07 -1.329936E-05 -1.909640E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217108341        55.75286077 
+        26658.8832                 -0    0.0003217108394        55.75286031 
 
                 q1                dq1            betxmax              dxmax 
-       64.29998198        3.087595193        600.6680013        2.796787347 
+       64.29997503         2.87822904        600.6765004        2.797068199 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354661742     0.001444200198    0.0003664528993        59.29001143 
+       1.354664847     0.001444179465    0.0003664481468        59.29001266 
 
                dq2            betymax              dymax              dyrms 
-       3.037655617        645.2159437       0.1288747568      0.02924946259 
+       2.908000257        645.2034485       0.1286702963      0.02919939228 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003784827606    0.0002689435618                  0                  0 
+    0.003784826505    0.0002689432956                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2673,28 +2601,28 @@ orbit:   1.664974E-05 -4.540866E-07 -1.331275E-05 -1.911930E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   2.669674E-05 deltap:   0.000000E+00
-orbit:   1.235056E-05 -3.218818E-07 -9.375073E-06 -1.058073E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.668619E-05 deltap:   0.000000E+00
+orbit:   1.234521E-05 -3.217565E-07 -9.364888E-06 -1.056469E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   8.704214E-10 deltap:   0.000000E+00
-orbit:   1.235062E-05 -3.218778E-07 -9.375327E-06 -1.058078E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   8.687789E-10 deltap:   0.000000E+00
+orbit:   1.234527E-05 -3.217526E-07 -9.365141E-06 -1.056474E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217107108        55.75287146 
+        26658.8832                 -0    0.0003217107161        55.75287099 
 
                 q1                dq1            betxmax              dxmax 
-       64.29250536        3.054564275        609.5579959         2.79666847 
+       64.29250455        2.848043359        609.5720689        2.796942097 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354661319     0.001436494921    0.0003637339983        59.29748602 
+       1.354664304     0.001436480409    0.0003637314508        59.29748111 
 
                dq2            betymax              dymax              dyrms 
-       3.082854264        615.8466855       0.1277110962       0.0291073032 
+       2.951403581        615.8279225       0.1274999096      0.02905497167 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003782234976    0.0002689682351                  0                  0 
+    0.003782235963    0.0002689679832                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2703,28 +2631,28 @@ orbit:   1.235062E-05 -3.218778E-07 -9.375327E-06 -1.058078E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   4.968557E-05 deltap:   0.000000E+00
-orbit:   2.095979E-05 -5.866184E-07 -1.746671E-05 -2.793515E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.965687E-05 deltap:   0.000000E+00
+orbit:   2.094740E-05 -5.862854E-07 -1.744978E-05 -2.790494E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.987772E-09 deltap:   0.000000E+00
-orbit:   2.096025E-05 -5.866065E-07 -1.746904E-05 -2.793710E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   4.979344E-09 deltap:   0.000000E+00
+orbit:   2.094786E-05 -5.862736E-07 -1.745210E-05 -2.790688E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217109634        55.75284957 
+        26658.8832                 -0    0.0003217109687         55.7528491 
 
                 q1                dq1            betxmax              dxmax 
-       64.30248085        3.092520045        600.7126016        2.796909043 
+       64.30247184        2.882211133        600.7210736        2.797197182 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354662259     0.001451938126    0.0003692631594        59.28751792 
+       1.354665485     0.001451911125    0.0003692560633        59.28752117 
 
                dq2            betymax              dymax              dyrms 
-       3.020807824        644.8218303       0.1300433028      0.02940670334 
+       2.891725917        644.8091738       0.1298455935      0.02935889612 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787457935    0.0002689784253                  0                  0 
+     0.00378745468    0.0002689780504                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2733,28 +2661,28 @@ orbit:   2.096025E-05 -5.866065E-07 -1.746904E-05 -2.793710E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   1.729936E-05 deltap:   0.000000E+00
-orbit:   8.051999E-06 -1.896291E-07 -5.646256E-06 -2.298083E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.729104E-05 deltap:   0.000000E+00
+orbit:   8.050124E-06 -1.896067E-07 -5.638906E-06 -2.288417E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   7.283307E-11 deltap:   0.000000E+00
-orbit:   8.052000E-06 -1.896285E-07 -5.646215E-06 -2.297981E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   7.293779E-11 deltap:   0.000000E+00
+orbit:   8.050125E-06 -1.896060E-07 -5.638865E-06 -2.288316E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217105932        55.75288165 
+        26658.8832                 -0    0.0003217105985        55.75288118 
 
                 q1                dq1            betxmax              dxmax 
-       64.29486276        3.076412783        608.7186393        2.796552118 
+       64.29486003        2.868961905        608.7091564        2.796818555 
 
              dxrms             xcomax             xcorms                 q2 
-        1.35466099      0.00142880233    0.0003611001394         59.2951299 
+       1.354663855     0.001428793961    0.0003610996461        59.29512691 
 
                dq2            betymax              dymax              dyrms 
-       3.073454419        634.3708622       0.1265493823      0.02898013844 
+       2.942594367        634.3356075       0.1263314642      0.02892554247 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003779672617    0.0002690509437                  0                  0 
+    0.003779675619    0.0002690506163                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2769,23 +2697,23 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.35709657E-05
+Initial Penalty Function =   0.35699075E-05
 
 
-call:       4   Penalty function =   0.24474631E-05
-call:       9   Penalty function =   0.14499387E-05
+call:       4   Penalty function =   0.24161175E-05
+call:       9   Penalty function =   0.14376817E-05
  ++++++++++ LMDIF ended: converged: info =            1
-call:      19   Penalty function =   0.14499387E-05
+call:      19   Penalty function =   0.14376817E-05
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950854E+01     7.28904566E-07
-Global constraint:         q2           4     5.92950000E+01     5.92949151E+01     7.21034158E-07
+Global constraint:         q1           4     6.42950000E+01     6.42950850E+01     7.22765518E-07
+Global constraint:         q2           4     5.92950000E+01     5.92949154E+01     7.14916228E-07
 
 
-Final Penalty Function =   1.44993872e-06
+Final Penalty Function =   1.43768175e-06
 
 
 
@@ -2793,12 +2721,12 @@ Final Penalty Function =   1.44993872e-06
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   6.76909e-06  6.46127e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -5.18694e-05 -5.21492e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                   6.77385e-06  6.45426e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -5.17929e-05 -5.20609e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.44993872e-06
+VARIABLE "TAR" SET TO   1.43768175e-06
 START MATCHING
 
 number of variables:    2
@@ -2807,21 +2735,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.14499387E-05
+Initial Penalty Function =   0.14376817E-05
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.14499387E-05
+call:       1   Penalty function =   0.14376817E-05
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950854E+01     7.28904566E-07
-Global constraint:         q2           4     5.92950000E+01     5.92949151E+01     7.21034158E-07
+Global constraint:         q1           4     6.42950000E+01     6.42950850E+01     7.22765518E-07
+Global constraint:         q2           4     5.92950000E+01     5.92949154E+01     7.14916228E-07
 
 
-Final Penalty Function =   1.44993872e-06
+Final Penalty Function =   1.43768175e-06
 
 
 
@@ -2829,12 +2757,12 @@ Final Penalty Function =   1.44993872e-06
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-cmrskew                   1.78230e-03  1.78230e-03 -1.00000e+20  1.00000e+20
-cmiskew                   7.42973e-04  7.42973e-04 -1.00000e+20  1.00000e+20
+cmrskew                   1.78695e-03  1.78695e-03 -1.00000e+20  1.00000e+20
+cmiskew                   7.43941e-04  7.43941e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.44993872e-06
+VARIABLE "TAR" SET TO   1.43768175e-06
 START MATCHING
 
 number of variables:    2
@@ -2843,21 +2771,22 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.14499387E-05
+Initial Penalty Function =   0.14376817E-05
 
 
+call:      14   Penalty function =   0.14376817E-05
  ++++++++++ LMDIF ended: converged: info =            1
-call:      16   Penalty function =   0.14499387E-05
+call:      18   Penalty function =   0.14376817E-05
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950854E+01     7.28904566E-07
-Global constraint:         q2           4     5.92950000E+01     5.92949151E+01     7.21034158E-07
+Global constraint:         q1           4     6.42950000E+01     6.42950850E+01     7.22790835E-07
+Global constraint:         q2           4     5.92950000E+01     5.92949154E+01     7.14890907E-07
 
 
-Final Penalty Function =   1.44993872e-06
+Final Penalty Function =   1.43768174e-06
 
 
 
@@ -2865,12 +2794,12 @@ Final Penalty Function =   1.44993872e-06
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   6.76909e-06  6.76909e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -5.18694e-05 -5.18694e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                   6.77385e-06  6.77385e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -5.17929e-05 -5.17929e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.44993872e-06
+VARIABLE "TAR" SET TO   1.43768174e-06
 START MATCHING
 
 number of variables:    2
@@ -2879,29 +2808,29 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.14499387E-05
+Initial Penalty Function =   0.14376817E-05
 
 
-call:       6   Penalty function =   0.12808378E-05
-call:       9   Penalty function =   0.11311538E-05
-call:      12   Penalty function =   0.10012148E-05
-call:      15   Penalty function =   0.83488541E-06
-call:      18   Penalty function =   0.67814994E-06
-call:      21   Penalty function =   0.51618881E-06
-call:      24   Penalty function =   0.26697361E-06
-call:      27   Penalty function =   0.23058854E-07
+call:       6   Penalty function =   0.12683309E-05
+call:       9   Penalty function =   0.11186319E-05
+call:      12   Penalty function =   0.98887780E-06
+call:      15   Penalty function =   0.82254533E-06
+call:      18   Penalty function =   0.66595669E-06
+call:      21   Penalty function =   0.50348546E-06
+call:      24   Penalty function =   0.25797339E-06
+call:      27   Penalty function =   0.20118724E-07
  ++++++++++ LMDIF ended: converged successfully
-call:      27   Penalty function =   0.23058854E-07
+call:      27   Penalty function =   0.20118724E-07
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950107E+01     1.14030295E-08
-Global constraint:         q2           4     5.92950000E+01     5.92949892E+01     1.16558249E-08
+Global constraint:         q1           4     6.42950000E+01     6.42950100E+01     9.94323623E-09
+Global constraint:         q2           4     5.92950000E+01     5.92949899E+01     1.01754880E-08
 
 
-Final Penalty Function =   2.30588544e-08
+Final Penalty Function =   2.01187242e-08
 
 
 
@@ -2909,12 +2838,12 @@ Final Penalty Function =   2.30588544e-08
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-cmrskew                   1.63389e-03  1.78230e-03 -1.00000e+20  1.00000e+20
-cmiskew                   7.10493e-04  7.42973e-04 -1.00000e+20  1.00000e+20
+cmrskew                   1.63795e-03  1.78695e-03 -1.00000e+20  1.00000e+20
+cmiskew                   7.11986e-04  7.43941e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   2.30588544e-08
+VARIABLE "TAR" SET TO   2.01187242e-08
 START MATCHING
 
 number of variables:    2
@@ -2923,21 +2852,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.23058854E-07
+Initial Penalty Function =   0.20118724E-07
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.23058854E-07
+call:       1   Penalty function =   0.20118724E-07
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950107E+01     1.14030295E-08
-Global constraint:         q2           4     5.92950000E+01     5.92949892E+01     1.16558249E-08
+Global constraint:         q1           4     6.42950000E+01     6.42950100E+01     9.94323623E-09
+Global constraint:         q2           4     5.92950000E+01     5.92949899E+01     1.01754880E-08
 
 
-Final Penalty Function =   2.30588544e-08
+Final Penalty Function =   2.01187242e-08
 
 
 
@@ -2945,47 +2874,47 @@ Final Penalty Function =   2.30588544e-08
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   6.76909e-06  6.76909e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -5.18694e-05 -5.18694e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                   6.77385e-06  6.77385e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -5.17929e-05 -5.17929e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   2.30588544e-08
+VARIABLE "TAR" SET TO   2.01187242e-08
 enter Twiss module
   
-iteration:   1 error:   1.705371E-05 deltap:   0.000000E+00
-orbit:   7.958100E-06 -1.861672E-07 -5.634097E-06 -2.389451E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.704528E-05 deltap:   0.000000E+00
+orbit:   7.959913E-06 -1.861831E-07 -5.628128E-06 -2.382379E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   7.085262E-11 deltap:   0.000000E+00
-orbit:   7.958099E-06 -1.861666E-07 -5.634060E-06 -2.389355E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   7.104423E-11 deltap:   0.000000E+00
+orbit:   7.959912E-06 -1.861825E-07 -5.628090E-06 -2.382283E-08  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217093786        55.75298689 
+        26658.8832                 -0    0.0003217093542        55.75298901 
 
                 q1                dq1            betxmax              dxmax 
-       64.29501068        3.075926691        591.2277966        2.796582193 
+       64.29500997        2.868443026        591.2853632        2.796848734 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354655935     0.001428630686     0.000360953897         59.2949892 
+       1.354658678     0.001428622937    0.0003609523013        59.29498991 
 
                dq2            betymax              dymax              dyrms 
-       3.072801247        621.8512751       0.1266318043      0.02898586796 
+       2.941945035        621.7359663       0.1264133109      0.02893108516 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003779738122     0.000269031139                  0                  0 
+    0.003779741019    0.0002690308227                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
             nflips 
                  0 
-closest0           =       0.0106053142 ;
-closest1           =    0.0002671430301 ;
-closest2           =    2.147471142e-05 ;
-cmrskew            =     0.001633887798 ;
-cmiskew            =    0.0007104933521 ;
+closest0           =      0.01060150573 ;
+closest1           =    0.0002668850881 ;
+closest2           =    2.005894011e-05 ;
+cmrskew            =     0.001637949809 ;
+cmiskew            =    0.0007119862968 ;
 START MATCHING
 
 number of variables:    4
@@ -2994,28 +2923,27 @@ total constraints:      4
 
 START LMDIF:
 
-Initial Penalty Function =   0.96086853E-01
+Initial Penalty Function =   0.44334854E+00
 
 
-call:       7   Penalty function =   0.45806141E-01
-call:      12   Penalty function =   0.34520074E-02
-call:      17   Penalty function =   0.66847217E-07
-call:      22   Penalty function =   0.46158004E-19
-call:      27   Penalty function =   0.34478738E-23
+call:       7   Penalty function =   0.26081301E+00
+call:      12   Penalty function =   0.19690627E-04
+call:      17   Penalty function =   0.26798522E-16
+call:      22   Penalty function =   0.62449815E-23
  ++++++++++ LMDIF ended: converged successfully
-call:      27   Penalty function =   0.34478738E-23
+call:      22   Penalty function =   0.62449815E-23
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.43100000E+01     6.43100000E+01     3.41292782E-24
-Global constraint:         q2           4     5.93200000E+01     5.93200000E+01     2.01948392E-26
-Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     8.78021909E-27
-Global constraint:         dq2          4     3.00000000E+00     3.00000000E+00     5.97088819E-27
+Global constraint:         q1           4     6.42700000E+01     6.42700000E+01     7.27014210E-25
+Global constraint:         q2           4     5.93550000E+01     5.93550000E+01     5.49804497E-24
+Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     1.04326855E-28
+Global constraint:         dq2          4     3.00000000E+00     3.00000000E+00     1.98179609E-26
 
 
-Final Penalty Function =   3.44787377e-24
+Final Penalty Function =   6.24498146e-24
 
 
 
@@ -3023,46 +2951,46 @@ Final Penalty Function =   3.44787377e-24
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   7.22741e-05  6.76909e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -1.51089e-04 -5.18694e-05 -1.00000e+20  1.00000e+20
-ksf.b1                    3.53745e-02  3.53773e-02 -1.00000e+20  1.00000e+20
-ksd.b1                   -1.43857e-01 -1.43860e-01 -1.00000e+20  1.00000e+20
+kqtf.b1                  -4.37262e-05  6.77385e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -2.49023e-04 -5.17929e-05 -1.00000e+20  1.00000e+20
+ksf.b1                    3.52281e-02  3.52301e-02 -1.00000e+20  1.00000e+20
+ksd.b1                   -1.43676e-01 -1.43678e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   3.44787377e-24
+VARIABLE "TAR" SET TO   6.24498146e-24
 enter Twiss module
   
-iteration:   1 error:   4.682009E-05 deltap:   1.000000E-06
-orbit:   3.814952E-05 -6.662949E-07 -1.794450E-05 -2.400810E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   5.305921E-05 deltap:   1.000000E-06
+orbit:   3.110947E-05 -7.278354E-07 -1.921944E-05 -1.879053E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.901599E-09 deltap:   1.000000E-06
-orbit:   3.814745E-05 -6.662380E-07 -1.794372E-05 -2.400671E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   2.560941E-09 deltap:   1.000000E-06
+orbit:   3.110935E-05 -7.278131E-07 -1.921865E-05 -1.878856E-07  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   4.565802E-05 deltap:   0.000000E+00
-orbit:   3.868797E-05 -6.598283E-07 -1.794644E-05 -2.399173E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   5.167294E-05 deltap:   0.000000E+00
+orbit:   3.166612E-05 -7.217587E-07 -1.922246E-05 -1.877787E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   5.097334E-09 deltap:   0.000000E+00
-orbit:   3.868575E-05 -6.597688E-07 -1.794547E-05 -2.399013E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   2.525411E-09 deltap:   0.000000E+00
+orbit:   3.166588E-05 -7.217355E-07 -1.922162E-05 -1.877589E-07  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003215684878        55.76519925 
+        26658.8832                 -0    0.0003220249591        55.72566157 
 
                 q1                dq1            betxmax              dxmax 
-             64.31        2.988600116        607.4235081        2.799665219 
+             64.27        3.000601524        604.9154698        2.797147932 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354109619     0.001443033976    0.0003611504219              59.32 
+       1.356144568     0.001446169442     0.000379125244             59.355 
 
                dq2            betymax              dymax              dyrms 
-       3.002981188        629.6527438       0.1193009226      0.02695478035 
+       2.989960535        633.2507483       0.1116255872      0.02450854989 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003779540832     0.000269648665                  0                  0 
+    0.003779470312    0.0002710241262                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3080,11 +3008,11 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: -0.000215        0.017371          0.017372        0.144439 
-after correction:  -0.000001        0.003051          0.003051        0.069924 
+before correction: -0.001061        0.029548          0.029567        0.263851 
+after correction:  -0.000001        0.003051          0.003051        0.069928 
 
 
-Max strength: 1.619872e-04 is below corrector strength limit: 1.000000e+00
+Max strength: 2.961461e-04 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -3096,40 +3024,43 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: -0.000566        0.019777          0.019785        0.109575 
-after correction:  -0.000001        0.000730          0.000730        0.015907 
+before correction: -0.000848        0.041703          0.041712        0.256929 
+after correction:  -0.000001        0.000730          0.000730        0.015920 
 
 
-Max strength: 1.490352e-04 is below corrector strength limit: 1.000000e+00
+Max strength: 3.025423e-04 is below corrector strength limit: 1.000000e+00
 enter Twiss module
   
-iteration:   1 error:   2.057384E-06 deltap:   1.000000E-06
-orbit:  -2.426543E-07 -1.630026E-08  9.477392E-07  1.510060E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.961033E-06 deltap:   1.000000E-06
+orbit:   9.998728E-08 -2.535534E-08  1.335401E-06  1.654477E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.866066E-11 deltap:   1.000000E-06
-orbit:  -2.426531E-07 -1.630020E-08  9.477526E-07  1.510077E-08  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.914591E-11 deltap:   1.000000E-06
+orbit:   9.999544E-08 -2.535534E-08  1.335411E-06  1.654488E-08  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   8.965558E-07 deltap:   0.000000E+00
-orbit:   2.953296E-07 -9.817887E-09  9.461762E-07  1.526547E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.062383E-06 deltap:   0.000000E+00
+orbit:   6.551306E-07 -1.924119E-08  1.332846E-06  1.667018E-08  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   4.570978E-12 deltap:   0.000000E+00
+orbit:   6.551308E-07 -1.924117E-08  1.332847E-06  1.667019E-08  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003215684424         55.7652032 
+        26658.8832                 -0    0.0003220249727         55.7256604 
 
                 q1                dq1            betxmax              dxmax 
-       64.31006249         2.99310571        607.4114602        2.800422266 
+       64.27003604        3.007209955          605.02577        2.798157971 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354119312     0.001411732738    0.0003557690569         59.3200715 
+       1.356147096     0.001412029879    0.0003559552735        59.35507891 
 
                dq2            betymax              dymax              dyrms 
-       2.999535084        629.7165242       0.1180776855      0.02658035406 
+       2.989848696        633.3557229       0.1088376328      0.02378999781 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787345615    0.0002680187892                  0                  0 
+    0.003787052031    0.0002681013095                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3147,11 +3078,11 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: 0.000027        0.003092          0.003093        0.070100 
+before correction: 0.000072        0.003346          0.003347        0.065845 
 after correction:  -0.000001        0.003052          0.003052        0.069936 
 
 
-Max strength: 3.217471e-05 is below corrector strength limit: 1.000000e+00
+Max strength: 3.705790e-05 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -3163,40 +3094,40 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: 0.000003        0.000885          0.000885        0.017225 
-after correction:  -0.000001        0.000730          0.000730        0.015895 
+before correction: -0.000002        0.001095          0.001095        0.019016 
+after correction:  -0.000001        0.000729          0.000729        0.015894 
 
 
-Max strength: 1.635677e-05 is below corrector strength limit: 1.000000e+00
+Max strength: 2.953047e-05 is below corrector strength limit: 1.000000e+00
 enter Twiss module
   
-iteration:   1 error:   1.058060E-06 deltap:   1.000000E-06
-orbit:  -5.780614E-07 -5.313752E-09 -6.348756E-09 -2.871809E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.090614E-06 deltap:   1.000000E-06
+orbit:  -6.861889E-07 -2.433152E-09  4.505566E-09 -1.548892E-10  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.141777E-12 deltap:   1.000000E-06
-orbit:  -5.780603E-07 -5.313723E-09 -6.345121E-09 -2.871188E-10  0.000000E+00  0.000000E+00
+iteration:   2 error:   5.062480E-12 deltap:   1.000000E-06
+orbit:  -6.861878E-07 -2.433121E-09  4.508566E-09 -1.548378E-10  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   1.027983E-07 deltap:   0.000000E+00
-orbit:  -4.009469E-08  1.168925E-09 -7.930722E-09 -1.225185E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.972014E-07 deltap:   0.000000E+00
+orbit:  -1.310802E-07  3.681617E-09  1.956083E-09 -2.924209E-11  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003215684407        55.76520334 
+        26658.8832                 -0    0.0003220249755        55.72566016 
 
                 q1                dq1            betxmax              dxmax 
-         64.310062        2.993199331        607.4139116        2.800417026 
+       64.27003508        3.007327422        605.0305706        2.798150217 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354119272     0.001411347842     0.000355493537        59.32007119 
+       1.356146911     0.001411175168    0.0003554442284        59.35507935 
 
                dq2            betymax              dymax              dyrms 
-        2.99953463        629.7173225       0.1180405555      0.02657709211 
+       2.989698707        633.3508821        0.108831765      0.02380089113 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787656584    0.0002680326048                  0                  0 
+     0.00378765388    0.0002680358027                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3214,11 +3145,11 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: -0.000001        0.003052          0.003052        0.069868 
+before correction: -0.000000        0.003052          0.003052        0.069843 
 after correction:  -0.000001        0.003052          0.003052        0.069937 
 
 
-Max strength: 9.606473e-07 is below corrector strength limit: 1.000000e+00
+Max strength: 1.844105e-06 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -3230,40 +3161,40 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: -0.000002        0.000731          0.000731        0.015906 
+before correction: -0.000002        0.000742          0.000742        0.015912 
 after correction:  -0.000001        0.000730          0.000730        0.015895 
 
 
-Max strength: 6.283618e-07 is below corrector strength limit: 1.000000e+00
+Max strength: 2.139469e-06 is below corrector strength limit: 1.000000e+00
 enter Twiss module
   
-iteration:   1 error:   1.158421E-06 deltap:   1.000000E-06
-orbit:  -5.389884E-07 -6.454678E-09  2.075171E-09 -1.641263E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.383212E-06 deltap:   1.000000E-06
+orbit:  -5.572023E-07 -6.057216E-09  1.108712E-09 -1.535053E-10  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.138582E-12 deltap:   1.000000E-06
-orbit:  -5.389870E-07 -6.454651E-09  2.078948E-09 -1.640620E-10  0.000000E+00  0.000000E+00
+iteration:   2 error:   5.361607E-12 deltap:   1.000000E-06
+orbit:  -5.572003E-07 -6.057191E-09  1.111878E-09 -1.534506E-10  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   2.434070E-09 deltap:   0.000000E+00
-orbit:  -1.020140E-09  2.796243E-11  4.929466E-10  5.383470E-13  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.597493E-09 deltap:   0.000000E+00
+orbit:  -2.088812E-09  5.744067E-11 -1.441879E-09 -2.786157E-11  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003215684406        55.76520335 
+        26658.8832                 -0    0.0003220249753        55.72566018 
 
                 q1                dq1            betxmax              dxmax 
-       64.31006203        2.993198322        607.4137881        2.800416077 
+        64.2700352        3.007313452        605.0301905        2.798147042 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354119258     0.001411404502    0.0003555138938        59.32007116 
+       1.356146892     0.001411349508    0.0003555161595        59.35507926 
 
                dq2            betymax              dymax              dyrms 
-       2.999528874        629.7173126       0.1180419005      0.02657750638 
+       2.989697727        633.3511486       0.1088346602      0.02380163379 
 
             ycomax             ycorms             deltap            synch_1 
-      0.0037876562    0.0002680317588                  0                  0 
+    0.003787657374    0.0002680349224                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3281,11 +3212,11 @@ CORRECTION SUMMARY:
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-before correction: -0.000001        0.003052          0.003052        0.069943 
+before correction: -0.000001        0.003052          0.003052        0.069951 
 after correction:  -0.000001        0.003052          0.003052        0.069937 
 
 
-Max strength: 7.496758e-08 is below corrector strength limit: 1.000000e+00
+Max strength: 2.355767e-07 is below corrector strength limit: 1.000000e+00
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -3301,7 +3232,7 @@ before correction: -0.000001        0.000730          0.000730        0.015895
 after correction:  -0.000001        0.000730          0.000730        0.015895 
 
 
-Max strength: 2.251108e-08 is below corrector strength limit: 1.000000e+00
+Max strength: 5.524491e-08 is below corrector strength limit: 1.000000e+00
 START MATCHING
 
 number of variables:    2
@@ -3310,28 +3241,28 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.85733418E-01
+Initial Penalty Function =   0.42367903E+00
 
 
-call:       4   Penalty function =   0.16724350E-03
-call:      10   Penalty function =   0.16173958E-03
-call:      14   Penalty function =   0.16161760E-03
-call:      17   Penalty function =   0.16161195E-03
-call:      20   Penalty function =   0.16153225E-03
-call:      24   Penalty function =   0.16152927E-03
-call:      28   Penalty function =   0.16152926E-03
+call:       4   Penalty function =   0.17345380E-03
+call:      10   Penalty function =   0.17268309E-03
+call:      13   Penalty function =   0.17261120E-03
+call:      16   Penalty function =   0.17204260E-03
+call:      20   Penalty function =   0.17202785E-03
+call:      23   Penalty function =   0.17201538E-03
+call:      27   Penalty function =   0.17201278E-03
  ++++++++++ LMDIF ended: converged: info =            1
-call:      28   Penalty function =   0.16152926E-03
+call:      30   Penalty function =   0.17201278E-03
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42959015E+01     8.12629664E-05
-Global constraint:         q2           4     5.92950000E+01     5.92941041E+01     8.02662935E-05
+Global constraint:         q1           4     6.42950000E+01     6.42959287E+01     8.62534452E-05
+Global constraint:         q2           4     5.92950000E+01     5.92940739E+01     8.57593382E-05
 
 
-Final Penalty Function =   1.61529260e-04
+Final Penalty Function =   1.72012783e-04
 
 
 
@@ -3339,36 +3270,36 @@ Final Penalty Function =   1.61529260e-04
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   6.53421e-06  7.22741e-05 -1.00000e+20  1.00000e+20
-kqtd.b1                  -5.15427e-05 -1.51089e-04 -1.00000e+20  1.00000e+20
+kqtf.b1                   6.61211e-06 -4.37262e-05 -1.00000e+20  1.00000e+20
+kqtd.b1                  -5.14544e-05 -2.49023e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.61529260e-04
+VARIABLE "TAR" SET TO   1.72012783e-04
 enter Twiss module
   
-iteration:   1 error:   2.662138E-05 deltap:   0.000000E+00
-orbit:  -3.137871E-05  4.742628E-07  1.382531E-05  2.306478E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.023098E-05 deltap:   0.000000E+00
+orbit:  -1.856877E-05  3.996812E-07  1.928619E-05  1.643979E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.218542E-09 deltap:   0.000000E+00
-orbit:  -3.138106E-05  4.743171E-07  1.382630E-05  2.306619E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   9.560538E-10 deltap:   0.000000E+00
+orbit:  -1.856901E-05  3.996878E-07  1.928597E-05  1.643983E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0     0.000321709843        55.75294665 
+        26658.8832                 -0    0.0003217096059        55.75296719 
 
                 q1                dq1            betxmax              dxmax 
-       64.29590146        3.079256996        594.0385501        2.797102651 
+       64.29592873        2.877052876         595.021346        2.797303906 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354663877     0.001395901995    0.0003566331653        59.29410409 
+       1.354661031     0.001400517464    0.0003423149307        59.29407394 
 
                dq2            betymax              dymax              dyrms 
-       3.069305067        609.8232486       0.1245489166      0.02858970582 
+       2.938144641        609.3124142       0.1224382491      0.02804195812 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003788431244    0.0002675864086                  0                  0 
+    0.003794508012      0.00026681337                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3377,28 +3308,28 @@ orbit:  -3.138106E-05  4.743171E-07  1.382630E-05  2.306619E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   2.427989E-05 deltap:   0.000000E+00
-orbit:  -3.046395E-05  4.476907E-07  1.367222E-05  2.317745E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   3.944490E-05 deltap:   0.000000E+00
+orbit:  -1.761137E-05  3.723183E-07  1.924379E-05  1.667356E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.120164E-09 deltap:   0.000000E+00
-orbit:  -3.046629E-05  4.477441E-07  1.367329E-05  2.317893E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   8.635420E-10 deltap:   0.000000E+00
+orbit:  -1.761161E-05  3.723243E-07  1.924356E-05  1.667355E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217098388        55.75294701 
+        26658.8832                 -0    0.0003217096009        55.75296763 
 
                 q1                dq1            betxmax              dxmax 
-       64.29632104        3.082383672        592.3351582         2.79696933 
+       64.29634932        2.880056374        592.8966302        2.797170694 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354662136     0.001397298629    0.0003573507879        59.29368884 
+       1.354659255     0.001401980756    0.0003429957628        59.29365787 
 
                dq2            betymax              dymax              dyrms 
-       3.067546165        610.8409274       0.1242655504      0.02861941495 
+       2.936488749        610.2117008        0.122148006      0.02807212119 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003788203899     0.000267676166                  0                  0 
+    0.003794317721    0.0002668907404                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3407,28 +3338,28 @@ orbit:  -3.046629E-05  4.477441E-07  1.367329E-05  2.317893E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   2.895418E-05 deltap:   0.000000E+00
-orbit:  -3.229071E-05  5.007523E-07  1.397562E-05  2.295067E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.101597E-05 deltap:   0.000000E+00
+orbit:  -1.952355E-05  4.269645E-07  1.932567E-05  1.620451E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.323423E-09 deltap:   0.000000E+00
-orbit:  -3.229306E-05  5.008074E-07  1.397653E-05  2.295203E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.043342E-09 deltap:   0.000000E+00
+orbit:  -1.952378E-05  4.269718E-07  1.932544E-05  1.620460E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0     0.000321709848        55.75294622 
+        26658.8832                 -0    0.0003217096118        55.75296668 
 
                 q1                dq1            betxmax              dxmax 
-       64.29553066        3.076435811        598.9925395         2.79723558 
+       64.29557588        2.874437737        600.9480702        2.797436721 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354665617     0.001394507277     0.000355920036        59.29447094 
+       1.354662806     0.001399055774    0.0003416389784        59.29442267 
 
                dq2            betymax              dymax              dyrms 
-       3.070806423        609.1158432       0.1248330539      0.02856284755 
+       2.939453992        609.4170962       0.1227292753      0.02801485838 
 
             ycomax             ycorms             deltap            synch_1 
-     0.00378865582    0.0002674989438                  0                  0 
+    0.003794695428    0.0002667380675                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3437,28 +3368,28 @@ orbit:  -3.229306E-05  5.008074E-07  1.397653E-05  2.295203E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   3.080736E-05 deltap:   0.000000E+00
-orbit:  -3.301565E-05  5.218072E-07  1.409342E-05  2.285871E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.157975E-05 deltap:   0.000000E+00
+orbit:  -2.020850E-05  4.465344E-07  1.935224E-05  1.603440E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.411669E-09 deltap:   0.000000E+00
-orbit:  -3.301801E-05  5.218632E-07  1.409429E-05  2.286002E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.102853E-09 deltap:   0.000000E+00
+orbit:  -2.020871E-05  4.465422E-07  1.935202E-05  1.603453E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217098525        55.75294583 
+        26658.8832                 -0    0.0003217096165        55.75296627 
 
                 q1                dq1            betxmax              dxmax 
-       64.29538077        3.075026804        609.5135999        2.797341255 
+       64.29546125        2.873306533        609.7363239        2.797531979 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354667005     0.001393396951    0.0003553548417        59.29461796 
+       1.354664083      0.00139800569    0.0003411559352         59.2945346 
 
                dq2            betymax              dymax              dyrms 
-       3.071197612         615.047049       0.1250600819      0.02854348547 
+       2.939659364        615.1169488       0.1229390277      0.02799726885 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003788832846    0.0002674308507                  0                  0 
+    0.003794828422    0.0002666851817                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3467,28 +3398,28 @@ orbit:  -3.301801E-05  5.218632E-07  1.409429E-05  2.286002E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   3.170975E-05 deltap:   0.000000E+00
-orbit:  -3.335389E-05  5.321523E-07  1.437767E-05  2.347954E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.134519E-05 deltap:   0.000000E+00
+orbit:  -2.062670E-05  4.593228E-07  1.965943E-05  1.672283E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.505322E-09 deltap:   0.000000E+00
-orbit:  -3.335630E-05  5.322095E-07  1.437847E-05  2.348077E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.238007E-09 deltap:   0.000000E+00
+orbit:  -2.062693E-05  4.593314E-07  1.965917E-05  1.672295E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217098438        55.75294658 
+        26658.8832                 -0    0.0003217096059         55.7529672 
 
                 q1                dq1            betxmax              dxmax 
-       64.29442711        3.070330422        601.0936263        2.797332785 
+       64.29430277        2.868022511        601.1247125        2.797521409 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354666982     0.001392792875    0.0003551521905        59.29557191 
+       1.354664039     0.001397256193    0.0003409225547        59.29569344 
 
                dq2            betymax              dymax              dyrms 
-       3.076861981        646.1653105       0.1249706951      0.02853421108 
+       2.946269509        646.1998819       0.1228267615      0.02798490432 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003788647279    0.0002674329606                  0                  0 
+    0.003794611021    0.0002666769382                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3497,28 +3428,28 @@ orbit:  -3.335630E-05  5.322095E-07  1.437847E-05  2.348077E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   2.990540E-05 deltap:   0.000000E+00
-orbit:  -3.267736E-05  5.114607E-07  1.380790E-05  2.223625E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.181450E-05 deltap:   0.000000E+00
+orbit:  -1.979020E-05  4.337437E-07  1.904315E-05  1.534353E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.318691E-09 deltap:   0.000000E+00
-orbit:  -3.267966E-05  5.115155E-07  1.380883E-05  2.223763E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   9.728920E-10 deltap:   0.000000E+00
+orbit:  -1.979041E-05  4.337508E-07  1.904297E-05  1.534367E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217098612        55.75294507 
+        26658.8832                 -0    0.0003217096273        55.75296534 
 
                 q1                dq1            betxmax              dxmax 
-       64.29518972         3.07330039        609.2378065        2.797349742 
+       64.29522915        2.871300704        609.5341533        2.797542577 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354667029     0.001394001193    0.0003555580352        59.29480875 
+       1.354664127     0.001398755439    0.0003413901582        59.29476637 
 
                dq2            betymax              dymax              dyrms 
-       3.071958345         615.181341       0.1251494951      0.02855285091 
+       2.940521889        615.3242617       0.1230513295      0.02800976858 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003789018633    0.0002674290588                  0                  0 
+    0.003795046159    0.0002666938648                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3527,28 +3458,28 @@ orbit:  -3.267966E-05  5.115155E-07  1.380883E-05  2.223763E-07  0.000000E+00  0
                  0 
 enter Twiss module
   
-iteration:   1 error:   2.900130E-05 deltap:   0.000000E+00
-orbit:  -3.233805E-05  5.010834E-07  1.352028E-05  2.161038E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.205012E-05 deltap:   0.000000E+00
+orbit:  -1.937062E-05  4.209146E-07  1.873127E-05  1.464825E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.226125E-09 deltap:   0.000000E+00
-orbit:  -3.234031E-05  5.011370E-07  1.352127E-05  2.161184E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   8.478340E-10 deltap:   0.000000E+00
+orbit:  -1.937082E-05  4.209208E-07  1.873113E-05  1.464840E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0      0.00032170987        55.75294431 
+        26658.8832                 -0    0.0003217096381        55.75296441 
 
                 q1                dq1            betxmax              dxmax 
-       64.29500825        3.071625454        601.0335904        2.797358271 
+       64.29500755        2.869347085        602.8226282        2.797553232 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354667053     0.001394607322    0.0003557623515        59.29498998 
+       1.354664172     0.001399507564    0.0003416258899        59.29498766 
 
                dq2            betymax              dymax              dyrms 
-       3.072666918        627.0507464       0.1252391894      0.02856233438 
+       2.941330447        628.7596908       0.1231639849      0.02802243931 
 
             ycomax             ycorms             deltap            synch_1 
-     0.00378920517    0.0002674275819                  0                  0 
+     0.00379526485    0.0002667030154                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3563,21 +3494,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.16855566E-07
+Initial Penalty Function =   0.20935114E-07
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.16855566E-07
+call:       1   Penalty function =   0.20935114E-07
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950082E+01     6.80618654E-09
-Global constraint:         q2           4     5.92950000E+01     5.92949900E+01     1.00493798E-08
+Global constraint:         q1           4     6.42950000E+01     6.42950076E+01     5.70233188E-09
+Global constraint:         q2           4     5.92950000E+01     5.92949877E+01     1.52327819E-08
 
 
-Final Penalty Function =   1.68555663e-08
+Final Penalty Function =   2.09351138e-08
 
 
 
@@ -3585,12 +3516,12 @@ Final Penalty Function =   1.68555663e-08
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   6.53421e-06  6.53421e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -5.15427e-05 -5.15427e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                   6.61211e-06  6.61211e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -5.14544e-05 -5.14544e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.68555663e-08
+VARIABLE "TAR" SET TO   2.09351138e-08
 START MATCHING
 
 number of variables:    2
@@ -3599,21 +3530,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.16855566E-07
+Initial Penalty Function =   0.20935114E-07
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.16855566E-07
+call:       1   Penalty function =   0.20935114E-07
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950082E+01     6.80618654E-09
-Global constraint:         q2           4     5.92950000E+01     5.92949900E+01     1.00493798E-08
+Global constraint:         q1           4     6.42950000E+01     6.42950076E+01     5.70233188E-09
+Global constraint:         q2           4     5.92950000E+01     5.92949877E+01     1.52327819E-08
 
 
-Final Penalty Function =   1.68555663e-08
+Final Penalty Function =   2.09351138e-08
 
 
 
@@ -3621,12 +3552,12 @@ Final Penalty Function =   1.68555663e-08
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-cmrskew                   1.88920e-05  1.88920e-05 -1.00000e+20  1.00000e+20
-cmiskew                  -5.34028e-05 -5.34028e-05 -1.00000e+20  1.00000e+20
+cmrskew                   4.36950e-05  4.36950e-05 -1.00000e+20  1.00000e+20
+cmiskew                  -2.15981e-04 -2.15981e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.68555663e-08
+VARIABLE "TAR" SET TO   2.09351138e-08
 START MATCHING
 
 number of variables:    2
@@ -3635,21 +3566,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.16855566E-07
+Initial Penalty Function =   0.20935114E-07
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.16855566E-07
+call:       1   Penalty function =   0.20935114E-07
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950082E+01     6.80618654E-09
-Global constraint:         q2           4     5.92950000E+01     5.92949900E+01     1.00493798E-08
+Global constraint:         q1           4     6.42950000E+01     6.42950076E+01     5.70233188E-09
+Global constraint:         q2           4     5.92950000E+01     5.92949877E+01     1.52327819E-08
 
 
-Final Penalty Function =   1.68555663e-08
+Final Penalty Function =   2.09351138e-08
 
 
 
@@ -3657,12 +3588,12 @@ Final Penalty Function =   1.68555663e-08
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   6.53421e-06  6.53421e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -5.15427e-05 -5.15427e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                   6.61211e-06  6.61211e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -5.14544e-05 -5.14544e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.68555663e-08
+VARIABLE "TAR" SET TO   2.09351138e-08
 START MATCHING
 
 number of variables:    2
@@ -3671,21 +3602,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.16855566E-07
+Initial Penalty Function =   0.20935114E-07
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.16855566E-07
+call:       1   Penalty function =   0.20935114E-07
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950082E+01     6.80618654E-09
-Global constraint:         q2           4     5.92950000E+01     5.92949900E+01     1.00493798E-08
+Global constraint:         q1           4     6.42950000E+01     6.42950076E+01     5.70233188E-09
+Global constraint:         q2           4     5.92950000E+01     5.92949877E+01     1.52327819E-08
 
 
-Final Penalty Function =   1.68555663e-08
+Final Penalty Function =   2.09351138e-08
 
 
 
@@ -3693,12 +3624,12 @@ Final Penalty Function =   1.68555663e-08
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-cmrskew                   1.88920e-05  1.88920e-05 -1.00000e+20  1.00000e+20
-cmiskew                  -5.34028e-05 -5.34028e-05 -1.00000e+20  1.00000e+20
+cmrskew                   4.36950e-05  4.36950e-05 -1.00000e+20  1.00000e+20
+cmiskew                  -2.15981e-04 -2.15981e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.68555663e-08
+VARIABLE "TAR" SET TO   2.09351138e-08
 START MATCHING
 
 number of variables:    2
@@ -3707,21 +3638,21 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.16855566E-07
+Initial Penalty Function =   0.20935114E-07
 
 
  ++++++++++ LMDIF ended: converged successfully
-call:       1   Penalty function =   0.16855566E-07
+call:       1   Penalty function =   0.20935114E-07
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42950000E+01     6.42950082E+01     6.80618654E-09
-Global constraint:         q2           4     5.92950000E+01     5.92949900E+01     1.00493798E-08
+Global constraint:         q1           4     6.42950000E+01     6.42950076E+01     5.70233188E-09
+Global constraint:         q2           4     5.92950000E+01     5.92949877E+01     1.52327819E-08
 
 
-Final Penalty Function =   1.68555663e-08
+Final Penalty Function =   2.09351138e-08
 
 
 
@@ -3729,47 +3660,47 @@ Final Penalty Function =   1.68555663e-08
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   6.53421e-06  6.53421e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -5.15427e-05 -5.15427e-05 -1.00000e+20  1.00000e+20
+kqtf.b1                   6.61211e-06  6.61211e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -5.14544e-05 -5.14544e-05 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.68555663e-08
+VARIABLE "TAR" SET TO   2.09351138e-08
 enter Twiss module
   
-iteration:   1 error:   2.900130E-05 deltap:   0.000000E+00
-orbit:  -3.233805E-05  5.010834E-07  1.352028E-05  2.161038E-07  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.205012E-05 deltap:   0.000000E+00
+orbit:  -1.937062E-05  4.209146E-07  1.873127E-05  1.464825E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.226125E-09 deltap:   0.000000E+00
-orbit:  -3.234031E-05  5.011370E-07  1.352127E-05  2.161184E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   8.478340E-10 deltap:   0.000000E+00
+orbit:  -1.937082E-05  4.209208E-07  1.873113E-05  1.464840E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0      0.00032170987        55.75294431 
+        26658.8832                 -0    0.0003217096381        55.75296441 
 
                 q1                dq1            betxmax              dxmax 
-       64.29500825        3.071625454        601.0335904        2.797358271 
+       64.29500755        2.869347085        602.8226282        2.797553232 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354667053     0.001394607322    0.0003557623515        59.29498998 
+       1.354664172     0.001399507564    0.0003416258899        59.29498766 
 
                dq2            betymax              dymax              dyrms 
-       3.072666918        627.0507464       0.1252391894      0.02856233438 
+       2.941330447        628.7596908       0.1231639849      0.02802243931 
 
             ycomax             ycorms             deltap            synch_1 
-     0.00378920517    0.0002674275819                  0                  0 
+     0.00379526485    0.0002667030154                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
             nflips 
                  0 
-closest0           =     0.001797374321 ;
-closest1           =    1.827462102e-05 ;
-closest2           =    1.827462102e-05 ;
-cmrskew            =    1.889198346e-05 ;
-cmiskew            =   -5.340280527e-05 ;
+closest0           =     0.001854790708 ;
+closest1           =    1.989349428e-05 ;
+closest2           =    1.989349428e-05 ;
+cmrskew            =    4.369498913e-05 ;
+cmiskew            =   -0.0002159811756 ;
 START MATCHING
 
 number of variables:    4
@@ -3778,26 +3709,26 @@ total constraints:      4
 
 START LMDIF:
 
-Initial Penalty Function =   0.95436077E-01
+Initial Penalty Function =   0.10555138E+00
 
 
-call:       6   Penalty function =   0.10499011E-03
-call:      11   Penalty function =   0.42261808E-11
-call:      16   Penalty function =   0.60947837E-23
+call:       6   Penalty function =   0.34127265E-04
+call:      11   Penalty function =   0.13504678E-13
+call:      16   Penalty function =   0.31990029E-22
  ++++++++++ LMDIF ended: converged successfully
-call:      16   Penalty function =   0.60947837E-23
+call:      16   Penalty function =   0.31990029E-22
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.43100000E+01     6.43100000E+01     9.89547120E-25
-Global constraint:         q2           4     5.93200000E+01     5.93200000E+01     4.85181011E-24
-Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     6.03971631E-27
-Global constraint:         dq2          4     3.00000000E+00     3.00000000E+00     2.47386780E-25
+Global constraint:         q1           4     6.43100000E+01     6.43100000E+01     2.01948392E-24
+Global constraint:         q2           4     5.93200000E+01     5.93200000E+01     2.99338004E-23
+Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     6.18466950E-28
+Global constraint:         dq2          4     3.00000000E+00     3.00000000E+00     3.61266740E-26
 
 
-Final Penalty Function =   6.09478373e-24
+Final Penalty Function =   3.19900294e-23
 
 
 
@@ -3805,43 +3736,46 @@ Final Penalty Function =   6.09478373e-24
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                   7.20213e-05  6.53421e-06 -1.00000e+20  1.00000e+20
-kqtd.b1                  -1.50794e-04 -5.15427e-05 -1.00000e+20  1.00000e+20
-ksf.b1                    3.53743e-02  3.53745e-02 -1.00000e+20  1.00000e+20
-ksd.b1                   -1.43856e-01 -1.43857e-01 -1.00000e+20  1.00000e+20
+kqtf.b1                   7.20941e-05  6.61211e-06 -1.00000e+20  1.00000e+20
+kqtd.b1                  -1.50799e-04 -5.14544e-05 -1.00000e+20  1.00000e+20
+ksf.b1                    3.53718e-02  3.52281e-02 -1.00000e+20  1.00000e+20
+ksd.b1                   -1.43855e-01 -1.43676e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   6.09478373e-24
+VARIABLE "TAR" SET TO   3.19900294e-23
 enter Twiss module
   
-iteration:   1 error:   1.228574E-06 deltap:   1.000000E-06
-orbit:  -5.801630E-07 -6.785332E-09  3.233056E-09 -2.324108E-10  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.811866E-05 deltap:   1.000000E-06
+orbit:   1.342286E-05 -1.218625E-07  3.775202E-06 -6.603739E-08  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   4.675638E-12 deltap:   1.000000E-06
-orbit:  -5.801615E-07 -6.785302E-09  3.237320E-09 -2.323381E-10  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.558259E-09 deltap:   1.000000E-06
+orbit:   1.342176E-05 -1.218415E-07  3.775396E-06 -6.603575E-08  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
-iteration:   1 error:   6.731317E-08 deltap:   0.000000E+00
-orbit:  -4.216623E-08 -3.033509E-10  1.644608E-09 -6.777877E-11  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.812287E-05 deltap:   0.000000E+00
+orbit:   1.395999E-05 -1.153644E-07  3.773476E-06 -6.587881E-08  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.752583E-09 deltap:   0.000000E+00
+orbit:   1.395880E-05 -1.153410E-07  3.773804E-06 -6.587506E-08  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003215690495        55.76515055 
+        26658.8832                 -0    0.0003215688758        55.76516561 
 
                 q1                dq1            betxmax              dxmax 
-             64.31        2.988188342        607.4296507        2.800403445 
+             64.31        2.988689673        607.5231368        2.800310847 
 
              dxrms             xcomax             xcorms                 q2 
-       1.354121586     0.001411465534    0.0003555592015              59.32 
+       1.354118313     0.001417041625    0.0003426172314              59.32 
 
                dq2            betymax              dymax              dyrms 
-       3.003438522        629.6712107       0.1180678004       0.0265844274 
+       3.002953839        629.7251274       0.1163623522      0.02616089599 
 
             ycomax             ycorms             deltap            synch_1 
-    0.003787678372    0.0002680319949                  0                  0 
+    0.003791778925    0.0002673703062                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -3896,7 +3830,7 @@ Determined SECTOR NMUL MAX :  0
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   -2.6331326368346637E-005   1.3492706070194506E-006   1.7945994595728683E-006   1.0552565542801156E-008   0.0000000000000000     
+ Closed orbit:   -1.2343454322566903E-005   1.2345112115887018E-006   5.5793498812599410E-006  -5.4998384178734080E-008   0.0000000000000000     
 
   Number of warnings: 269
 234 in C and 35 in Fortran

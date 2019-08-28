@@ -5,6 +5,9 @@ new_element(const char* name)
 {
   const char *rout_name = "new_element";
   struct element* el = mycalloc(rout_name, 1, sizeof *el);
+  el->aper =           mycalloc(rout_name, 1, sizeof *el->aper);
+  el->aper->aperture = mycalloc(rout_name, 4, sizeof *el->aper->aperture);
+  el->aper->aper_offset = mycalloc(rout_name, 2, sizeof *el->aper->aper_offset);
   strcpy(el->name, name);
   el->stamp = 123456;
   el->def = 0x0;
@@ -262,10 +265,78 @@ make_element(const char* name, const char* parent, struct command* def, int flag
     if(command_par_value("l",def) !=0 && belongs_to_class(el,"multipole"))
       warning("Multipole defined with non-zero length:", el->name);
     el->length = el_par_value("l", el);
+    set_aperture_element(el, def);
   }
+  
   add_to_el_list(&el, def->mad8_type, element_list, flag);
   return el;
 }
+void set_aperture_element(struct element *el, struct command* def){
+  char *type;
+//enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon};
+  type = command_par_string("apertype", def);
+  if(type!=NULL){
+    if(strcmp(type,"circle")==0){
+      
+      double vector [4]; 
+      element_vector(el,"aperture", vector);
+      if(vector[0] > ten_m_12)
+        el->aper->apertype = circle;
+      else
+        el->aper->apertype = -1;
+    }
+    else if(strcmp(type,"ellipse")==0)
+      el->aper->apertype = ellipse;
+    else if(strcmp(type,"rectangle")==0)
+      el->aper->apertype = rectangle;
+    else if(strcmp(type,"lhcscreen")==0)
+      el->aper->apertype = lhcscreen;
+    else if(strcmp(type,"rectcircle")==0)
+      el->aper->apertype = rectcircle;
+    else if(strcmp(type,"rectellipse")==0)
+      el->aper->apertype = rectellipse;
+    else if(strcmp(type,"racetrack")==0)
+      el->aper->apertype = racetrack;
+    else if(strcmp(type,"octagon")==0)
+      el->aper->apertype = octagon;
+    else{
+      el->aper->apertype = custom;
+      int lines=0, ch;
+      FILE *fp = fopen(type,"r");
+      if(fp==NULL){
+          fatal_error("Aperture File is not existing ",type);
+        }
+      
+      while(!feof(fp))
+      {
+        ch = fgetc(fp);
+        if(ch == '\n'){
+          lines++;
+        }
+      }
+      
+      el->aper->xlist = mycalloc("aperlist", lines+1, sizeof *el->aper->xlist);
+      el->aper->ylist = mycalloc("aperlist", lines+1, sizeof *el->aper->ylist);
+      rewind(fp);
+      int i=0;
+      while (2==fscanf(fp, "%lf %lf", &el->aper->xlist[i], &el->aper->ylist[i])) i++;
+      /* closing the shape: a last point is inserted in table
+     with coordinates equal to those of the first point */
+    el->aper->length = i-1; // this minus 1 has to be there because of how the algorithm is done.  
+    el->aper->xlist[i]=el->aper->xlist[0];
+    el->aper->ylist[i]=el->aper->ylist[0];   
+    
+    }
+
+  }
+
+  element_vector(el, "aperture", el->aper->aperture);
+  element_vector(el, "aper_offset",el->aper->aper_offset);
+
+  
+}
+
+
 
 void
 make_elem_node(struct element* el, int occ_cnt)
@@ -288,6 +359,7 @@ delete_element(struct element* el)
   if (stamp_flag && el->stamp != 123456)
     fprintf(stamp_file, "d_e double delete --> %s\n", el->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", el->name);
+  myfree(rout_name, el->aper);
   myfree(rout_name, el);
   return NULL;
 }
@@ -772,7 +844,6 @@ void
 update_element(struct element* el, struct command* update)
   /* updates the parameters of el from those read into update */
 {
-
   struct command_parameter_list* e_pl = el->def->par;
   struct command_parameter_list* pl = update->par;
   struct command_parameter *e_par, *par;
@@ -806,6 +877,7 @@ update_element(struct element* el, struct command* update)
       }
     }
   }
+  set_aperture_element(el, update); //updates contains all the info of the element
 }
 
 void

@@ -981,6 +981,22 @@ pro_twiss(void)
   current_sequ->range_end = use_range[1];
 }
 
+void print_eigenvectors_(double *eigenvectors){
+  int i,p;
+  char *filename;
+  FILE *fptr;
+  
+  filename = command_par_string_user("eigenfile", current_twiss);
+  if ((fptr = fopen(filename, "w")) == NULL)
+      fatal_error("cannot open output file:", filename);
+  
+  for(i=0; i < 6; i ++){
+    p=i*6;
+    fprintf(fptr, "%.9e %.9e %.9e %.9e %.9e %.9e \n", eigenvectors[p],eigenvectors[p+1],
+    eigenvectors[p+2],eigenvectors[p+3],eigenvectors[p+4],eigenvectors[p+5]);
+  }
+  fclose(fptr);
+}
 int
 embedded_twiss(void)
   /* controls twiss module to create a twiss table for interpolated nodes

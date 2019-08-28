@@ -1040,6 +1040,8 @@ const char *const_command_def =
 "keeporbit= [s, default, default], "
 "tolerance= [r, 1.e-6], "
 "deltap   = [s, none], "
+"eigenvector= [l, false, true], "
+"eigenfile= [s, eigenvectors, eigenvectors], "
 "notable  = [l, false, true]; "
 " "
 "match: match match 1 0 "

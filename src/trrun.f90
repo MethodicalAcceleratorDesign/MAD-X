@@ -1,5 +1,6 @@
 subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
-                 z, dxt, dyt, last_orbit, eigen, coords, e_flag, code_buf, l_buf)
+                 z, dxt, dyt, last_orbit, eigen, coords, e_flag, code_buf, & 
+                 l_buf)
   use twtrrfi
   use bbfi
   use time_varfi
@@ -11,6 +12,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   use matrices, only : EYE
   use math_constfi, only : zero, one, two
   use code_constfi
+  use track_enums
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -44,9 +46,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   integer :: part_id(*), last_turn(*), code_buf(*)
   double precision :: last_pos(*), z(6,*), dxt(*), dyt(*)
   double precision :: last_orbit(6,*),  l_buf(*)
-
-  logical :: onepass, onetable, last_out, info, aperflag, doupdate
-  logical :: run=.false.,dynap=.false.
+  double precision :: theta
+  double precision, dimension (:), allocatable :: theta_buf   
+  logical :: onepass, onetable, last_out, info, aperflag, doupdate, debug
+  logical :: run=.false.,dynap=.false., thin_foc
   logical, save :: first=.true.
   logical :: bb_sxy_update, virgin_state, emittance_update
   logical :: checkpnt_restart, fast_error_func, exit_loss_turn
@@ -83,13 +86,14 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   double precision  :: Summ_t_square    ! local for rms value
 !-------------------------------------------------------------------
 
-  integer, external :: restart_sequ, advance_node, get_option, node_al_errors
-  double precision, external :: node_value, get_variable, get_value
+  integer, external :: restart_sequ, advance_node, get_option, node_al_errors, get_nnodes
+  double precision, external :: node_value, get_variable, get_value, node_obs_point
+  external :: set_tt_attrib, alloc_tt_attrib, set_tt_multipoles, get_tt_multipoles
 
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
   dynap = switch .eq. 2
-
+  allocate ( theta_buf(get_nnodes()) )
   !--- Initialize
   deltap = get_value('probe ','deltap ')
   betas  = get_value('probe ','beta ')
@@ -108,6 +112,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   damp = get_option('damp ') .ne. 0
   quantum = get_option('quantum ') .ne. 0
 
+  debug = get_option('debug ') .ne. 0
+  thin_foc = get_option('thin_foc ').eq.1
+
+  call init_elements()
   !-------added by Yipeng SUN 01-12-2008--------------
   if (deltap .eq. zero) then
      onepass = get_option('onepass ') .ne. 0
@@ -455,6 +463,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         !-----------------------------------------------------------------
      endif
 
+
+
      do !--- loop over nodes
 
         bbd_pos = j
@@ -465,9 +475,14 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            if (code .eq. code_placeholder) code = code_instrument
 
            el = node_value('l ')
+           theta = node_value('tilt ')
+           theta_buf(nlm+1) = theta
            code_buf(nlm+1) = code
            l_buf(nlm+1) = el
-           call element_name(el_name,len(el_name))
+           !param(nlm+1, enum_bvk) = 
+           !param(nlm+1, enum_lrad) -= 
+           !param(nlm+1, enum_bvk)
+           !param(nlm+1, enum_bvk)
 
            if ((code.eq.code_sextupole .or. &
               code.eq.code_octupole .or. &
@@ -475,6 +490,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               code.eq.code_rfcavity .or. &
               code.eq.code_crabcavity) .and. el.ne.zero) then
               !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
+              call element_name(el_name,len(el_name))
               print *," "
               print *,el_name, "code: ",code," el: ",el,"   THICK ELEMENT FOUND"
               print *," "
@@ -491,9 +507,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         else
            el = l_buf(nlm+1)
            code = code_buf(nlm+1)
+           theta = theta_buf(nlm+1)
         endif
 
-        if (run) nobs = node_value('obs_point ')
+        if (run) nobs = node_obs_point()
 
         !--------  Misalignment at beginning of element (from twissfs.f)
         if (code .ne. code_drift)  then
@@ -506,10 +523,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               enddo
            endif
         endif
-
+        
         !-------- Track through element  // suppress dxt 13.12.04
         call ttmap(switch, code, el, z, jmax, dxt, dyt, sum, tot_turn+turn, part_id, &
-             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass)
+             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass, debug, theta, thin_foc)
 
         !-------- Space Charge update
 !frs on 04.06.2016 - fixing
@@ -693,13 +710,57 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 100 call fort_fail('TRACK: Fatal ', 'checkpoint_restart file corrupted')
 end subroutine trrun
 
+subroutine init_elements
+  use track_enums
+  use trackfi
+  use twtrrfi
+  use code_constfi
+  implicit none
+  integer:: j, code
+  integer, external :: restart_sequ, advance_node
+  double precision, external :: node_value
+ 
+  
+  j = restart_sequ()
+  do !---- loop over nodes
+    code    = node_value('mad8_type ')
+  !        if (code .eq. code_tkicker)     code = code_kicker
+    if(code .eq. code_multipole) then
+     call alloc_tt_attrib(total_enums)
+     call set_tt_attrib(enum_other_bv, node_value('other_bv '))
+     call set_tt_attrib(enum_lrad, node_value('lrad '))
+     call set_tt_attrib(enum_noise, node_value('noise '))
+     call set_tt_attrib(enum_angle, node_value('angle '))
+     call set_tt_attrib(enum_time_var, node_value('time_var '))
+     call set_tt_multipoles(maxmul)
+    endif
+
+    if(code.eq.code_hkicker .or. code.eq.code_vkicker .or. &
+      code.eq.code_kicker .or.  code.eq.code_tkicker) then
+      call alloc_tt_attrib(total_enums)
+      call set_tt_attrib(enum_other_bv, node_value('other_bv '))
+      call set_tt_attrib(enum_sinkick, node_value('sinkick '))
+      call set_tt_attrib(enum_kick, node_value('kick '))
+      call set_tt_attrib(enum_chkick, node_value('chkick '))
+      call set_tt_attrib(enum_cvkick, node_value('chkick '))
+      call set_tt_attrib(enum_hkick, node_value('hkick '))
+      call set_tt_attrib(enum_vkick, node_value('vkick '))
+    endif 
+    
+    if (advance_node() .eq. 0)  exit
+
+  end do !--- end of loop over nodes to set upt things
+
+end subroutine init_elements
+
 subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
-     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass)
+     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc)
   use twtrrfi
   use twiss0fi
   use name_lenfi
   use math_constfi, only : zero, one
   use code_constfi
+  use aperture_enums
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -718,34 +779,28 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   double precision :: el, sum
   double precision :: track(6,*), dxt(*), dyt(*), last_pos(*)
   double precision :: last_orbit(6,*), maxaper(6), al_errors(align_max)
-  logical :: aperflag, onepass
+  logical :: aperflag, onepass, lost_global
 
   logical :: fmap, debug
-  logical :: run=.false., dynap=.false.
-  integer :: i, nn, jtrk
+  logical :: run=.false., dynap=.false., thin_foc
+  integer :: i, nn, jtrk, apint
   double precision :: ct, tmp, st, theta
   double precision :: ap1, ap2, ap3, ap4, aperture(maxnaper)
   double precision :: offset(2), offx, offy
   double precision :: ek(6), re(6,6), te(6,6,6), craporb(6)
   character(len=name_len) :: aptype
 
-  integer, external :: get_option
+  integer, external :: get_option, node_apertype
   double precision, external :: get_value, node_value
 
   double precision, parameter :: min_double = 1.e-36
-
+  external :: node_aperture_vector, node_aperture_offset
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
   dynap = switch .eq. 2
 
-  debug = get_option('debug ') .ne. 0
-
   fmap=.false.
-  EK(:6) = zero
-  CRAPORB(:6) = zero
-  RE(:6,:6) = zero
-  TE(:6,:6,:6) = zero
-
+ 
   !---- Drift space; no rotation or aperture check, go straight to tracking and return
   if (code .eq. code_drift) then
      call ttdrf(el,track,ktrack)
@@ -754,7 +809,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   endif
 
   !---- Rotate trajectory before entry
-  theta = node_value('tilt ')
+
   if (theta .ne. zero)  then
      st = sin(theta)
      ct = cos(theta)
@@ -771,16 +826,39 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
-     call node_string('apertype ',aptype,nn)
+    
+     apint=node_apertype()
+     if(apint .eq. ap_notset) then
+    ! make global check even if aperture is not defined
+    lost_global =.false.
+      do jtrk = 1,ktrack
+        lost_global =  ISNAN(track(2,jtrk)) .or. ISNAN(track(4,jtrk)) .or. &
+          ISNAN(track(5,jtrk)) .or. ISNAN(track(6,jtrk))                                .or. &
+          abs(track(1, jtrk)) .gt. maxaper(1) .or.  abs(track(2, jtrk)) .gt. maxaper(2) .or. &
+          abs(track(3, jtrk)) .gt. maxaper(3) .or.  abs(track(4, jtrk)) .gt. maxaper(4) .or. &
+          abs(track(5, jtrk)) .gt. maxaper(5) .or.  abs(track(6, jtrk)) .gt. maxaper(6)
+          if(lost_global) then
+          APERTURE(:maxnaper) = zero
+          call get_node_vector('aperture ',nn,aperture)
 
-     APERTURE(:maxnaper) = zero
-     call get_node_vector('aperture ',nn,aperture)
+          OFFSET = zero
+          call get_node_vector('aper_offset ',nn,offset)
+          call trcoll(apint,  aperture, offset, al_errors,  maxaper, &
+                turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack, debug)
+          EXIT ! They are anway checked against all the particles so no need to continue to loop
+          endif 
+        enddo 
 
-     OFFSET = zero
-     call get_node_vector('aper_offset ',nn,offset)
+     else
+     !APERTURE(:maxnaper) = zero
+     !call get_node_vector('aperture ',nn,aperture)
+     call node_aperture_vector(aperture)
+     call node_aperture_offset(offset)
+     !OFFSET = zero
+     !call get_node_vector('aper_offset ',nn,offset)
 
      if (debug) then
-        print *, " aperture type       ", aptype
+        print *, " aperture type       ", apint
         print *, "          parameters ", (aperture(i),i=1,4)
         print *, "          offsets    ", (offset(i),i=1,2)
         print *, " alignment errors    ", (al_errors(i),i=11,12)
@@ -788,8 +866,9 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
         print *, " "
      endif
 
-     call trcoll(aptype, aperture, offset, al_errors,  maxaper, &
-          turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack)
+     call trcoll(apint,  aperture, offset, al_errors,  maxaper, &
+          turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack, debug)
+     endif
   endif ! Test aperture
 
   ! Switch based on element code for element specific tracking
@@ -799,6 +878,10 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call tttdipole(track,ktrack)
 
     case (code_matrix)
+       EK(:6) = zero
+       RE(:6,:6) = zero
+       TE(:6,:6,:6) = zero
+       CRAPORB(:6) = zero
        call tmarb(.false.,.false.,craporb,fmap,ek,re,te)
        call tttrak(ek,re,track,ktrack)
 
@@ -806,7 +889,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call tttquad(track,ktrack)
 
     case (code_multipole)
-       call ttmult(track,ktrack,dxt,dyt,turn)
+       call ttmult(track,ktrack,dxt,dyt,turn,thin_foc)
 
     case (code_solenoid)
        call trsol(track, ktrack,dxt,dyt)
@@ -829,7 +912,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call ttxrot(track, ktrack)
 
     case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
-       call ttcorr(el, track, ktrack, turn)
+       call ttcorr(el, track, ktrack, turn, code)
 
     !case (code_ecollimator)
     !   call fort_warn('TRRUN: ','found deprecated ECOLLIMATOR element; should be replaced by COLLIMATOR')
@@ -892,12 +975,13 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   return
 end subroutine ttmap
 
-subroutine ttmult(track,ktrack,dxt,dyt,turn)
+subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   use twtrrfi
   use name_lenfi
   use trackfi
   use time_varfi
   use math_constfi, only : zero, one, two, three
+  use track_enums
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -907,19 +991,22 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   !   KTRACK    (integer) Number of surviving tracks.                    *
   !   dxt       (double)  local buffer                                   *
   !   dyt       (double)  local buffer                                   *
+  !   el_num    (integer) elemenent number in sequence                   *
+  !   para(*,20)(double)  matrix containing the values                   *
   !----------------------------------------------------------------------*
   double precision :: track(6,*), dxt(*), dyt(*)
   integer :: ktrack, turn
 
   logical, save :: first=.true.
-  logical ::  time_var
+  logical ::  time_var,thin_foc
   integer :: iord, jtrk, nd, nord, i, j, n_ferr, nn, ns, noisemax, nn1, in, mylen
+  integer :: nnt, nst
   double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad
   double precision :: pt, px, py, rfac
   double precision :: f_errors(0:maxferr)
   double precision :: field(2,0:maxmul)
   !double precision :: vals(2,0:maxmul)
-  double precision :: normal(0:maxmul), skew(0:maxmul), an
+  double precision :: normal(0:maxmul), skew(0:maxmul),normalt(0:maxmul),skewt(0:maxmul),an
   double precision, save :: ordinv(maxmul), const
   double precision :: bvk, node_value, ttt
   double precision :: npeak(100), nlag(100), ntune(100), temp, noise
@@ -927,6 +1014,8 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   double precision :: beta_sqr, f_damp_t
   
   integer :: node_fd_errors, store_no_fd_err, get_option
+  double precision , external:: get_tt_attrib  
+  external:: get_tt_multipoles
 
   !---- Precompute reciprocals of orders and radiation constant
   if (first) then
@@ -940,20 +1029,24 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   F_ERRORS(0:maxferr) = zero
   n_ferr = node_fd_errors(f_errors)
 
-  bvk = node_value('other_bv ')
+  bvk = get_tt_attrib(enum_other_bv)
+    !---- Multipole length for radiation.
+  elrad = get_tt_attrib(enum_lrad)
+  noise = get_tt_attrib(enum_noise)
+  an = get_tt_attrib(enum_angle)
+  time_var = get_tt_attrib(enum_time_var) .ne. 0  
 
-  !---- Multipole length for radiation.
-  elrad = node_value('lrad ')
-  noise = node_value('noise ')
-
+  
   !---- Multipole components.
-  NORMAL(0:maxmul) = zero ; call get_node_vector('knl ',nn,normal)
-  SKEW(0:maxmul) = zero   ; call get_node_vector('ksl ',ns,skew)
+  NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
+  SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
+
+  call get_tt_multipoles(nn,normal,ns,skew)
+
 
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !---- Angle (no bvk in track)
-  an = node_value('angle ')
   if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
 
   !----
@@ -975,8 +1068,8 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
 
   !--- Time variation for fields in matrix, multipole or RF-cavity
   ! 2015-Jun-24  18:55:43  ghislain: DOC FIXME not documented!!!
-  time_var = node_value('time_var ') .ne. zero
-
+ ! time_var = node_value('time_var ') .ne. zero
+ time_var = .false.
   if (time_var .and. time_var_m) then
      time_var_m_cnt = time_var_m_cnt + 1
      time_var_m_lnt = time_var_m_lnt + 1
@@ -1036,7 +1129,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      dxt(:ktrack) = zero
      dyt(:ktrack) = zero
      !----------- introduction of dipole focusing
-     if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
+     if (elrad.gt.zero .and. thin_foc) then
 
         DXT(:ktrack) = dipr*dipr*TRACK(1,:ktrack)/elrad
         DYT(:ktrack) = dipi*dipi*TRACK(3,:ktrack)/elrad
@@ -1054,7 +1147,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
            dyt(jtrk) = dx*track(3,jtrk) + dy*track(1,jtrk)
         enddo
      enddo
-     if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
+     if (elrad.gt.zero .and. thin_foc) then
         DXT(:ktrack) = DXT(:ktrack) + dipr*dipr*TRACK(1,:ktrack)/elrad
         DYT(:ktrack) = DYT(:ktrack) + dipi*dipi*TRACK(3,:ktrack)/elrad
      endif
@@ -1678,11 +1771,12 @@ subroutine ttsep(track,ktrack)
 
 end subroutine ttsep
 
-subroutine ttcorr(el,track,ktrack,turn)
+subroutine ttcorr(el,track,ktrack,turn, code)
   use twtrrfi
   use trackfi
   use math_constfi, only : zero, one, two, three, twopi
   use code_constfi
+  use track_enums
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1707,19 +1801,28 @@ subroutine ttcorr(el,track,ktrack,turn)
 
   integer :: node_fd_errors, get_option
   double precision :: get_variable, get_value, node_value
+  double precision :: external, get_tt_attrib
 
   !---- Initialize.
-  bvk = node_value('other_bv ')
-  deltas = get_variable('track_deltap ')
-  arad = get_value('probe ','arad ')
-  betas = get_value('probe ','beta ')
-  gammas = get_value('probe ','gamma ')
-  dtbyds = get_value('probe ','dtbyds ')
-  radiate = get_value('probe ','radiate ') .ne. zero
-  damp = get_option('damp ') .ne. 0
-  quantum = get_option('quantum ') .ne. 0
+        
+      
+  bvk = get_tt_attrib(enum_other_bv)
+  sinkick = get_tt_attrib(enum_sinkick)
+  
 
-  code = node_value('mad8_type ')
+  
+  !deltas = get_variable('track_deltap ')
+  
+  !arad = get_value('probe ','arad ')
+  !betas = get_value('probe ','beta ')
+  !gammas = get_value('probe ','gamma ')
+  !dtbyds = get_value('probe ','dtbyds ')
+  !radiate = get_value('probe ','radiate ') .ne. zero
+  
+  !damp = get_option('damp ') .ne. 0
+  !quantum = get_option('quantum ') .ne. 0
+
+  
 !  if (code .eq. code_tkicker)      code = code_kicker
   !if (code .eq. code_placeholder) code = code_instrument
 
@@ -1735,21 +1838,20 @@ subroutine ttcorr(el,track,ktrack,turn)
 
   select case (code)
     case (code_hkicker)
-       xkick = bvk*(node_value('kick ')+node_value('chkick ')+field(1)/div)
+       xkick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_chkick)+field(1)/div)
        ykick = zero
     case (code_kicker, code_tkicker)
-       xkick = bvk*(node_value('hkick ')+node_value('chkick ')+field(1)/div)
-       ykick = bvk*(node_value('vkick ')+node_value('cvkick ')+field(2)/div)
+       xkick = bvk*(get_tt_attrib(enum_hkick)+get_tt_attrib(enum_chkick)+field(1)/div)
+       ykick = bvk*(get_tt_attrib(enum_vkick)+get_tt_attrib(enum_cvkick)+field(2)/div)
     case (code_vkicker)
        xkick = zero
-       ykick = bvk*(node_value('kick ')+node_value('cvkick ')+field(2)/div)
+       ykick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_cvkick)+field(2)/div)
     case default
        xkick = zero
        ykick = zero
   end select
 
   !---- Sinusoidal kick (not supported by tkicker)
-  sinkick = node_value('sinkick ')
   if (sinkick .eq. 1) then
      sinpeak = node_value('sinpeak ')
      sintune = node_value('sintune ')
@@ -2602,12 +2704,13 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   call augment_count(table)
 end subroutine tt_puttab
 
-subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
-                 turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk)
+subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
+                 turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk, debug)
   use twiss0fi
   use name_lenfi
   use Inf_NaN_Detection
   use math_constfi, only : zero, one, pi
+  use aperture_enums
   implicit none
   ! 2015-Feb-20  18:46:05  ghislain: rewrite of trcoll
   ! 2015-Mar-09  14:50:37  ghislain: adapted to new racetrack parameter definition
@@ -2615,7 +2718,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   ! Purpose:                                                             *
   !   test for aperture limit.                                           *
   ! input:                                                               *
-  !   apertype  (string)   aperture type among                           *
+  !   apint  (integer)   aperture type among                           *
   !                       circle,rectangle,ellipse,rectcircle,lhcscreen, *
   !                       rectellipse,racetrack,octagon                  *
   !   aperture  (array double) aperture parameters,                      *
@@ -2638,30 +2741,30 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   character(len=name_len) :: apertype
   double precision :: aperture(*), offset(2), al_errors(align_max), maxaper(6)
   double precision :: sum, last_pos(*), last_orbit(6,*), z(6,*)
-  integer :: turn, part_id(*), last_turn(*), ntrk
+  integer :: turn, part_id(*), last_turn(*), ntrk, apint
 
-  integer :: i, n, nn
+  integer :: i, n, nn, nna
   double precision :: ap1, ap2, ap3, ap4, x, y!, pi
   logical :: lost, debug
 
-  integer, external :: get_option
+  integer, external :: get_option, inside_userdefined_geometry
   double precision, parameter :: min_double=1.d-36
 
-  debug = get_option('debug ') .ne. 0
+ ! debug = get_option('debug ') .ne. 0
 
   !--- First check aperture parameters
   ap1 = zero ; ap2 = zero ; ap3 = zero ; ap4 = zero
 
-  select case (apertype)
+  select case (apint)
 
-     case ("circle")
+     case (ap_circle)
         ap1 = aperture(1)
         if (ap1.lt.min_double) then
            if (debug) print *, " zero or negative circle radius ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
         endif
 
-     case ("ellipse")
+     case (ap_ellipse)
         ap1 = aperture(1)
         ap2 = aperture(2)
         if (ap1.lt.min_double) then
@@ -2673,7 +2776,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("rectangle")
+     case (ap_rectangle)
         ap1 = aperture(1)
         ap2 = aperture(2)
         if (ap1.lt.min_double) then
@@ -2685,7 +2788,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("lhcscreen", "rectcircle")
+     case (ap_lhcscreen, ap_rectcircle)
         !*****         test circle
         ap3 = aperture(3)
         if (ap3.lt.min_double) then
@@ -2704,7 +2807,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("rectellipse")
+     case (ap_rectellipse)
         !*****         test ellipse
         ap3 = aperture(3)
         ap4 = aperture(4)
@@ -2728,7 +2831,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = maxaper(3)
         endif
 
-     case ("racetrack")
+     case (ap_racetrack)
         ap1 = aperture(1)
         ap2 = aperture(2)
         ap3 = aperture(3)
@@ -2762,7 +2865,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap4 = ap2
         endif
 
-     case ("octagon")
+     case (ap_octagon)
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape
         ap1 = aperture(1)
         ap2 = aperture(2)
@@ -2788,10 +2891,17 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            call fort_warn('trcoll:','octagon aperture: first and second angles inverted. exit from trcoll')
            return
         endif
+     case(ap_custom)
+        ap1 = aperture(1)
+        ap2 = aperture(2)
+     case(ap_notset)
+     ! Intenitionaly left blank. 
+
 
      case default
         ! add error case for un-identified aperture type;
         ! this INCLUDES the case of aperture data given in file with input APERTYPE=filename!
+        print *, "nummmmer", apint
         call fort_warn('trcoll:','called with unknown aperture type. Ignored')
 
   end select
@@ -2815,24 +2925,23 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
      x = abs(z(1,i) - al_errors(11) - offset(1))
      y = abs(z(3,i) - al_errors(12) - offset(2))
 
-     select case (apertype)
-
-     case ("circle")
+     select case (apint)
+     case (ap_circle)
         lost = (x/ap1)**2 + (y/ap1)**2 .gt. one
 
-     case ("ellipse")
+     case (ap_ellipse)
         lost = (x/ap1)**2 + (y/ap2)**2 .gt. one
 
-     case ("rectangle")
+     case (ap_rectangle)
         lost =  x .gt. ap1 .or. y .gt. ap2
 
-     case ("lhcscreen", "rectcircle")
+     case (ap_lhcscreen, ap_rectcircle)
         lost = x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap3)**2 .gt. one
 
-     case ("rectellipse")
+     case (ap_rectellipse)
        lost =  x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap4)**2 .gt. one
 
-     case ("racetrack")
+     case (ap_racetrack)
         ! 2015-Mar-09  15:05:39  ghislain: adapted to new racetrack parameter definition
         !*** case of racetrack: test outer rectangle (ap1,ap2) first
         !    then test ellipse for corner part.
@@ -2840,12 +2949,18 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
              ( x .gt. ap1-ap3 .and. y .gt. ap2-ap4 .and. &
                ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap4)) / ap4)**2 .gt. one )
 
-     case ("octagon")
+     case (ap_octagon)
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape
         !*** case of octagon: test outer rectangle (ap1,ap2) then test cut corner.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. &
              (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. zero
-
+     case (ap_custom)
+        lost =  x .gt. ap1 .or. y .gt. ap2 ! First checks the user defined rectangle
+        if(lost) then
+          x = z(1,i) - al_errors(11) - offset(1)
+        y = z(3,i) - al_errors(12) - offset(2)
+        lost = inside_userdefined_geometry(x,y) .eq. 0
+      endif
      case default
 
      end select
@@ -2858,10 +2973,11 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
                 abs(z(5, i)) .gt. maxaper(5) .or.  abs(z(6, i)) .gt. maxaper(6)
      endif
 
-
      ! lose particle if it is outside aperture
 99   if (lost) then
         n = i
+        nna=name_len
+        call node_string('apertype ',apertype,nna)
         call trkill(n, turn, sum, ntrk, part_id, last_turn, last_pos, last_orbit, z, apertype)
         if (ntrk .eq. 0) then
            call fort_warn('trcoll: ','Particle Number equals zero: exit from trcoll')
@@ -2873,6 +2989,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
 
   enddo
 end subroutine trcoll
+
 
 subroutine ttrfloss(turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk)
   use twiss0fi
@@ -3424,6 +3541,7 @@ subroutine trupdate(turn)
   call pro_input(cmd)
   write(cmd, '(''exec, tr$macro($tr$turni) ; '')')
   call pro_input(cmd)
+  call init_elements() ! added since now temporary variables are used and need to update
 end subroutine trupdate
 
 subroutine trclor(switch,orbit0)
@@ -3447,7 +3565,7 @@ subroutine trclor(switch,orbit0)
   integer :: switch
   double precision :: orbit0(6)
 
-  logical :: aperflag, onepass
+  logical :: aperflag, onepass, debug, thin_foc
   integer :: itra
 
   integer :: i, j, k, bbd_pos, j_tot, code, irank, n_align
@@ -3457,14 +3575,14 @@ subroutine trclor(switch,orbit0)
   double precision :: z(6,7), zz(6), z0(6,7), z00(6,7), a(6,7), ddd(6)
   double precision :: cotol, err, deltap, el, dxt(200), dyt(200)
   double precision :: al_errors(align_max)
-  double precision :: sum, orbit(6)
+  double precision :: sum, orbit(6), theta
   double precision :: last_pos(6), last_orbit(6,1), maxaper(6)
   character(len=12) :: char_a
 
   integer, parameter :: itmax=10
 
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
-  double precision, external :: node_value, get_value, get_variable
+  double precision, external :: node_value, get_value, get_variable, get_length
 
   write (*,'(/a)')          'Full 6D closed orbit search.'
   write (*,'(a)')           'Initial value of 6-D closed orbit from Twiss: '
@@ -3512,6 +3630,8 @@ subroutine trclor(switch,orbit0)
   ORBIT = ORBIT0
 
   !---- Iteration for closed orbit.
+  debug = get_option('debug ') .ne. 0
+  thin_foc = get_option('thin_foc ') .eq. 1
   do itra = 1, itmax
      j = restart_sequ()
 
@@ -3522,6 +3642,8 @@ subroutine trclor(switch,orbit0)
 !        if (code .eq. code_tkicker)     code = code_kicker
         if (code .eq. code_placeholder) code = code_instrument
         el      = node_value('l ')
+        
+        
       !  if (itra .eq. 1 .and. &
       !      code.ne.code_drift .and. &
       !      code.ne.code_quadrupole .and. &
@@ -3554,10 +3676,11 @@ subroutine trclor(switch,orbit0)
               enddo
            endif
         endif
-
+    
+    theta = node_value('tilt ')
         !-------- Track through element
         call ttmap(switch,code,el,z,pmax,dxt,dyt,sum,turn,part_id, &
-             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass)
+             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc)
 
         !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. code_drift .and. n_align .ne. 0)  then

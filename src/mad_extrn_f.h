@@ -80,7 +80,17 @@
 #define store_node_value store_node_value_
 #define store_node_vector store_node_vector_
 #define store_no_fd_err store_no_fd_err_
+#define node_apertype node_apertype_
+#define inside_userdefined_geometry inside_userdefined_geometry_
+#define node_aperture_vector node_aperture_vector_
+#define node_aperture_offset node_aperture_offset_
+#define node_obs_point node_obs_point_
 
+#define alloc_tt_attrib alloc_tt_attrib_
+#define set_tt_attrib set_tt_attrib_
+#define get_tt_attrib get_tt_attrib_
+#define set_tt_multipoles set_tt_multipoles_
+#define get_tt_multipoles get_tt_multipoles_
 // from mad_option.c
 #define get_option get_option_ // *
 #define set_option set_option_
@@ -117,6 +127,7 @@
 
 // from mad_seq.c
 #define restart_sequ restart_sequ_
+#define get_nnodes get_nnodes_
 
 // from mad_table.c
 // warning:augment_counts is provided by madx_ptc_knobs.f90
