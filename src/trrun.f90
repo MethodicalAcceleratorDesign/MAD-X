@@ -2745,9 +2745,9 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
 
   integer :: i, n, nn, nna
   double precision :: ap1, ap2, ap3, ap4, x, y!, pi
-  logical :: lost, debug
+  logical :: lost, debug, is_custom
 
-  integer, external :: get_option, inside_userdefined_geometry
+  integer, external :: get_option, inside_userdefined_geometry, is_custom_set
   double precision, parameter :: min_double=1.d-36
 
  ! debug = get_option('debug ') .ne. 0
@@ -2891,8 +2891,9 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
            call fort_warn('trcoll:','octagon aperture: first and second angles inverted. exit from trcoll')
            return
         endif
-     case(ap_custom_file)
-
+     case(ap_custom)
+        ap1 = aperture(1)
+        ap2 = aperture(2)
      case(ap_notset)
      ! Intenitionaly left blank. 
 
@@ -2919,6 +2920,7 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
 
 
      lost = .false.
+
      x = abs(z(1,i) - al_errors(11) - offset(1))
      y = abs(z(3,i) - al_errors(12) - offset(2))
 
@@ -2951,24 +2953,21 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
         !*** case of octagon: test outer rectangle (ap1,ap2) then test cut corner.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. &
              (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. zero
-     
-
-
-     case (ap_custom_file)
+     case (ap_custom)
         lost =  x .gt. ap1 .or. y .gt. ap2 ! First checks the user defined rectangle
         if(lost) then
-          x = z(1,i) - al_errors(11) - offset(1)
-        y = z(3,i) - al_errors(12) - offset(2)
-        lost = inside_userdefined_geometry(x,y) .eq. 0
-     endif
-
+          !x = z(1,i) - al_errors(11) - offset(1)
+          !y = z(3,i) - al_errors(12) - offset(2)
+          lost = inside_userdefined_geometry(x,y) .eq. 0
+      endif
      case default
 
      end select
-
-     if(lost .and. apint.eq.ap_custom_internal) then
+     is_custom = is_custom_set() .eq. 1
+     if(lost .and. is_custom) then
        lost = inside_userdefined_geometry(x,y) .eq. 0
      endif
+
 
      if (.not. lost) then
         lost =  ISNAN(z(2,i)) .or. ISNAN(z(4,i))                                .or. &

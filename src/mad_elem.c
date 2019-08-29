@@ -275,6 +275,7 @@ void set_aperture_element(struct element *el, struct command* def){
   char *type;
 //enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon};
   type = command_par_string("apertype", def);
+  el->aper->custom_inter = 0; 
   if(type!=NULL){
     if(strcmp(type,"circle")==0){
       
@@ -354,6 +355,7 @@ void set_aperture_element(struct element *el, struct command* def){
       mad_error("Different length of aper_vx and aper_vy for element:",el->name);
     }
     else{
+      el->aper->custom_inter = 1;//sets the flagg that it should be used
       el->aper->xlist = mycalloc("aperlist", tmp_l+1, sizeof *el->aper->xlist);
       el->aper->ylist = mycalloc("aperlist", tmp_l+1, sizeof *el->aper->ylist);
 
@@ -366,14 +368,16 @@ void set_aperture_element(struct element *el, struct command* def){
       el->aper->xlist[tmp_l]=el->aper->xlist[0];
       el->aper->ylist[tmp_l]=el->aper->ylist[0];
       if(el->aper->apertype==-1){ //If no other aperture is defined then a 10 meter rectangle is set! 
-        el->aper->apertype=rectangle; 
-        el->aper->aperture[0] = 10;
-        el->aper->aperture[1] = 10;
+        el->aper->apertype=circle; // sets it to a rcircle so the check is still done
+        el->aper->aperture[0] = 1e-30; // trick to not end up in the case where it is ignored 
       }
-      //el->aper->apertype = custom;
-
     }
   }
+}
+
+int is_custom_set(void){
+
+  return current_node->p_elem->aper->custom_inter;
 }
 
 void

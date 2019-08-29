@@ -37,6 +37,7 @@ struct aperture
   double *xlist;
   double *ylist;
   int length;
+  int custom_inter;
 };
 struct multipole
 {
@@ -93,6 +94,7 @@ void    add_to_el_list(struct element**, int inf, struct el_list*, int flag);
 void    grow_el_list(struct el_list*);
 
 void    set_aperture_element(struct element *el, struct command* def);
+int     is_custom_set(void);
 // used by mad_mkthin.c
 struct command_parameter* return_param(const char* par, const struct element*);
 struct command_parameter* return_param_recurse(const char* par, const struct element*);
