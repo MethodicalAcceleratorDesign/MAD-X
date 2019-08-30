@@ -1359,10 +1359,8 @@ contains
        if (doNormal) call normalFormAnalysis(theTransferMap ,A_script_probe, orbit)
        call oneTurnSummary(theTransferMap ,A_script_probe%x, orbit, suml)
     else
-       if (getdebug() > 1) then
-        print*, "Reduced SUMM Table (Inital parameters specified)"
-       endif
-       call onePassSummary(theTransferMap%x , orbit, suml)
+      print*, "Reduced SUMM Table (Inital parameters specified)"
+      call onePassSummary(theTransferMap%x , orbit, suml)
     endif
 
 
