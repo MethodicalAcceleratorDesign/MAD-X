@@ -32,6 +32,7 @@
 #define el_par_vector el_par_vector_
 #define get_node_vector get_node_vector_
 #define is_custom_set is_custom_set_
+#define update_node_aperture update_node_aperture_
 
 // from mad_elemerr.c
 #define node_al_errors node_al_errors_

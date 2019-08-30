@@ -284,7 +284,7 @@ void set_aperture_element(struct element *el, struct command* def){
       if(vector[0] > ten_m_12)
         el->aper->apertype = circle;
       else
-        el->aper->apertype = -1;
+        el->aper->apertype = notdefined;
     }
     else if(strcmp(type,"ellipse")==0)
       el->aper->apertype = ellipse;
@@ -330,28 +330,30 @@ void set_aperture_element(struct element *el, struct command* def){
     }
   }
 
-  element_vector(el, "aperture", el->aper->aperture);
+  element_vector(el, "aperture" ,el->aper->aperture);
   element_vector(el, "aper_offset",el->aper->aper_offset);
-  int l_arry=100;
-  double tmpx [l_arry];
-  double tmpy [l_arry];
-  for(int i=0;i<l_arry;i++){
+
+
+  double tmpx [MAXARRAY];
+  double tmpy [MAXARRAY];
+  for(int i=0;i<MAXARRAY;i++){
     tmpx[i] = -999;
     tmpy[i] = -999;
   }
+  
   element_vector(el, "aper_vx", tmpx);
-  element_vector(el, "aper_vx", tmpy);
-  int tmp_l=l_arry+1;
+  element_vector(el, "aper_vy", tmpy);
+  int tmp_l=MAXARRAY+1;
   if(tmpx[0]!=-1){
 
-    for(int i=0;i<l_arry;i++){
+    for(int i=0;i<MAXARRAY;i++){
       if(tmpx[i]==-999 && tmpy[i]==-999){
         tmp_l = i;
         break; 
       }
     }
 
-    if(tmp_l > l_arry){
+    if(tmp_l > MAXARRAY){
       mad_error("Different length of aper_vx and aper_vy for element:",el->name);
     }
     else{
@@ -364,14 +366,55 @@ void set_aperture_element(struct element *el, struct command* def){
         el->aper->ylist[i] = tmpy[i];
       }
 
+
       el->aper->length = tmp_l; // minus 1 or not ?? has to be there because of how the algorithm is done.  
       el->aper->xlist[tmp_l]=el->aper->xlist[0];
       el->aper->ylist[tmp_l]=el->aper->ylist[0];
-      if(el->aper->apertype==-1){ //If no other aperture is defined then a 10 meter rectangle is set! 
+      if(el->aper->apertype==notdefined){ //If no other aperture is defined then a 10 meter rectangle is set! 
         el->aper->apertype=circle; // sets it to a rcircle so the check is still done
-        el->aper->aperture[0] = 1e-30; // trick to not end up in the case where it is ignored 
+        el->aper->aperture[0] = 1e-30; // trick to not end up in the case where it is ignored
       }
     }
+  }
+}
+
+void update_node_aperture(void){
+  char *type;
+//enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon};
+  type = command_par_string("apertype", current_node->p_elem->def);
+  current_node->p_elem->aper->custom_inter = 0; 
+  if(type!=NULL){
+    if(strcmp(type,"circle")==0){
+      
+      double vector [4]; 
+      element_vector(current_node->p_elem,"aperture", vector);
+      if(vector[0] > ten_m_12)
+        current_node->p_elem->aper->apertype = circle;
+      else
+        current_node->p_elem->aper->apertype = notdefined;
+    }
+    else if(strcmp(type,"ellipse")==0)
+      current_node->p_elem->aper->apertype = ellipse;
+    else if(strcmp(type,"rectangle")==0)
+      current_node->p_elem->aper->apertype = rectangle;
+    else if(strcmp(type,"lhcscreen")==0)
+      current_node->p_elem->aper->apertype = lhcscreen;
+    else if(strcmp(type,"rectcircle")==0)
+      current_node->p_elem->aper->apertype = rectcircle;
+    else if(strcmp(type,"rectellipse")==0)
+      current_node->p_elem->aper->apertype = rectellipse;
+    else if(strcmp(type,"racetrack")==0)
+      current_node->p_elem->aper->apertype = racetrack;
+    else if(strcmp(type,"octagon")==0)
+      current_node->p_elem->aper->apertype = octagon;
+  }
+
+  element_vector(current_node->p_elem, "aperture", current_node->p_elem->aper->aperture);
+  element_vector(current_node->p_elem, "aper_offset",current_node->p_elem->aper->aper_offset);
+
+  if(current_node->p_elem->aper->custom_inter==1){
+    element_vector(current_node->p_elem, "aper_vx", current_node->p_elem->aper->xlist);
+    element_vector(current_node->p_elem, "aper_vy", current_node->p_elem->aper->ylist);
   }
 }
 

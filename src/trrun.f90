@@ -716,10 +716,13 @@ subroutine init_elements
   use twtrrfi
   use code_constfi
   implicit none
+  logical:: aperflag
   integer:: j, code
-  integer, external :: restart_sequ, advance_node
+  integer, external :: restart_sequ, advance_node, get_option
   double precision, external :: node_value
+  external :: update_node_aperture
  
+  aperflag = get_option('aperture ') .ne. 0
   
   j = restart_sequ()
   do !---- loop over nodes
@@ -745,7 +748,10 @@ subroutine init_elements
       call set_tt_attrib(enum_cvkick, node_value('chkick '))
       call set_tt_attrib(enum_hkick, node_value('hkick '))
       call set_tt_attrib(enum_vkick, node_value('vkick '))
-    endif 
+    endif
+    if(aperflag .and. code .ne. code_drift) then
+       call update_node_aperture()
+    endif
     
     if (advance_node() .eq. 0)  exit
 
@@ -2762,6 +2768,7 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
         if (ap1.lt.min_double) then
            if (debug) print *, " zero or negative circle radius ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
+           print *, ap1,"kkkkkkk"
         endif
 
      case (ap_ellipse)

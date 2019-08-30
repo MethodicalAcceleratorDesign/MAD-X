@@ -116,7 +116,7 @@ end module code_constfi
 module aperture_enums
   implicit none
   public
-  integer, parameter :: ap_notset = -1
+  
   integer, parameter :: ap_circle = 0
   integer, parameter :: ap_ellipse = 1
   integer, parameter :: ap_rectangle = 2
@@ -126,7 +126,7 @@ module aperture_enums
   integer, parameter :: ap_racetrack = 6
   integer, parameter :: ap_octagon = 7
   integer, parameter :: ap_custom = 8
-
+  integer, parameter :: ap_notset = 9
 end module aperture_enums
 module track_enums
   implicit none
