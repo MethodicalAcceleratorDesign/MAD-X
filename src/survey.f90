@@ -22,7 +22,7 @@ subroutine survey
   integer :: i, j, code, add_pass, passes, n_add_angle
   integer :: angle_count, node_count, node_ref(100)
   double precision :: dphi, dpsi, dtheta, phi, phi0, psi, psi0, theta, theta0
-  double precision :: sums, el, suml, tilt, globaltilt
+  double precision :: sums, el, suml, tilt !, globaltilt
   double precision :: v(3), v0(3), ve(3), w(3,3), w0(3,3), we(3,3), tx(3)
   double precision :: add_angle(10), org_ang(100)
 
@@ -86,11 +86,11 @@ subroutine survey
      V = V + matmul(W,VE)
      W = matmul(W,WE)
      !**  Compute globaltilt HERE : it's the value at the entrance
-     globaltilt = psi + tilt
+     ! globaltilt = psi + tilt ! this quantity has no physical meaning.
      !**  Compute the survey angles at each point
      call suangl(w, theta, phi, psi)
      !**  Fill the survey table
-     call sufill(suml,v, theta, phi, psi,globaltilt)
+     call sufill(suml,v, theta, phi, psi) !, globaltilt)
      if (advance_node().ne.0)  goto 10
      !---- end of loop over elements  ***********************************
   enddo
@@ -318,7 +318,7 @@ subroutine suelem(el, ve, we, tilt)
 
 end subroutine suelem
 
-subroutine sufill(suml, v, theta, phi, psi, globaltilt)
+subroutine sufill(suml, v, theta, phi, psi) !, globaltilt)
   use twtrrfi
   use math_constfi, only : zero
   use code_constfi
@@ -331,7 +331,7 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   !   V(3)     (real)    Coordinate at the end of the element            *
   !   theta, phi, psi(real) : the survey angles                            *
   !----------------------------------------------------------------------*
-  double precision, intent(IN) :: suml, v(3), theta, phi, psi, globaltilt
+  double precision, intent(IN) :: suml, v(3), theta, phi, psi !, globaltilt
 
   integer :: code, nn, ns, i
   double precision :: ang, el, tmp, surv_vect(7)
@@ -351,7 +351,7 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   call double_to_table_curr('survey ', 'theta ',theta)
   call double_to_table_curr('survey ', 'phi ',phi)
   call double_to_table_curr('survey ', 'psi ',psi)
-  call double_to_table_curr('survey ', 'globaltilt ',globaltilt)
+!  call double_to_table_curr('survey ', 'globaltilt ',globaltilt)
 
   i = node_value('pass_flag ')
   if (i .eq. 0) then

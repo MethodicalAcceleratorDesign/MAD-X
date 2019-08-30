@@ -181,7 +181,7 @@ endif
 TESTCMD = $(TIMER) $(MADX) $(@F).madx
 
 ifneq ($(filter tests%,$(MAKECMDGOALS)),)
-$(info on lxplus with gnu64? $(call onlx64,will run tests: $(user-cases),no))
+$(info on lxplus with gnu64? $(call onlx64,will run tests: $(user-cases),none))
 endif
 
 # end of makefile

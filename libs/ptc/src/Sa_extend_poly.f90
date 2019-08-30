@@ -10,7 +10,7 @@ module S_extend_poly
 
   ! LD: 22.03.2019 (see Sc_euclidean.f90, Sh_def_kinf.f90 and Sr_spin.f90)
   character(len=150) :: ELEM_NAME = "UNKNOWN"
-  integer            :: MAPDUMP = 0 ! 0 or 1 enable/disable PRTP
+  integer            :: MAPDUMP = 0 ! 0: no dump, 1: dump no=0, 2: dump no=1
 
 CONTAINS
 
@@ -23,10 +23,15 @@ CONTAINS
     ! cancel all PRTP
     if (MAPDUMP .eq. 0) return
 
-    ! @@ + elem + func + 7 columns
-    WRITE(*, '(a,a15,a,a15,7E25.16)') '@@ ', ELEM_NAME, ' ', S, X.sub.'000000'&
-                              , X.sub.'100000', X.sub.'010000', X.sub.'001000'&
-                              , X.sub.'000100',-X.sub.'000001', X.sub.'000010'
+    if (X%KIND /= 1) then
+      ! @@ + elem + func + 7 columns
+      WRITE(*, '(a,a15,a,a15,7E25.16)') '@@ ', ELEM_NAME, ' ', S, X.sub.'000000'&
+                                , X.sub.'100000', X.sub.'010000', X.sub.'001000'&
+                                , X.sub.'000100',-X.sub.'000001', X.sub.'000010'
+    else
+      ! @@ + elem + func + 1 columns
+      WRITE(*, '(a,a15,a,a15,1E25.16)') '@@ ', ELEM_NAME, ' ', S, X%R
+    endif
   END SUBROUTINE PRTP1
 
   ! LD: 22.03.2019

@@ -92,12 +92,12 @@ CONTAINS
     integer maxnmul
 
     use_quaternion=.true.
-    
+
     piotr_freq=.true. ! PTC flag in cavity tracking to have correct phasing with time=false
-    
+
     check_longitudinal = .true. ! PTC flag to check stability of the closed orbit in longitudinal
                                 ! to prevent finding unstable fixed point
-    
+
     call set_aperture_all_case0(.true.)
 
     print77=.false.
@@ -263,9 +263,9 @@ CONTAINS
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2),myfield(2*maxmul+2)
     real(dp) gamma,gamma2,gammatr2,freq,offset_deltap
     real(dp) fint,fintx,div,muonfactor,edge,rhoi,hgap,corr,tanedg,secedg,psip
-    real(dp) sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
+    real(dp) sk0,sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
     REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
-    real(dp) gammatr,ks,ksi
+    real(dp) gammatr,ks,ksi,ex,ey ! LD
     real(kind(1d0)) get_value,node_value
     character(name_len) name
     character(name_len) aptype
@@ -605,10 +605,10 @@ CONTAINS
     endif
 
     !special node keys
-    key%list%permfringe=transfer(node_value("permfringe ") .ne. zero, key%list%permfringe)
+    key%list%permfringe=node_value("fringe ") ! transfer(node_value("fringe ") .ne. zero, key%list%permfringe)
+    key%list%bend_fringe=node_value("bend_fringe ") .ne. zero
     key%list%kill_ent_fringe=node_value("kill_ent_fringe ") .ne. zero
     key%list%kill_exi_fringe=node_value("kill_exi_fringe ") .ne. zero
-    key%list%bend_fringe=node_value("bend_fringe ") .ne. zero
 
     nn=name_len
     call node_string('apertype ',aptype,nn)
@@ -719,7 +719,7 @@ CONTAINS
     case(22)
        key%magnet="marker"
     !case(1,11)
-    case(1,11,20,21,44)
+    case(1,20,21,44)
        key%magnet="drift"
        CALL CONTEXT(key%list%name)
 
@@ -890,8 +890,8 @@ CONTAINS
          print*,"K=", key%list%k
          print*,"KS=", key%list%ks
          print*,"TILT=", key%tiltd
-         print*,"T1=", key%list%t1
-         print*,"T2=", key%list%t2
+         print*,"T1=", key%list%t1 ! e1
+         print*,"T2=", key%list%t2 ! e2
          print*,"H1=", key%list%h1
          print*,"H2=", key%list%h2
        endif
@@ -903,6 +903,9 @@ CONTAINS
 
        ! Read data & fill %k(:), %ks(:) arrays which are
        ! summs of multipoles and errors
+
+! LD: 19.06.2019
+       sk0=node_value('k0 ')
 
        ! quadrupole components
        sk1= node_value('k1 ')
@@ -916,21 +919,35 @@ CONTAINS
        !print*,'sk1 sk1s dum1 dum2'
        !print*, sk1, sk1s, dum1, dum2
 
-       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
+! LD: 19.06.2019
+!       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
           sk1= sk1 +dum1                                          !
           sk1s=sk1s+dum2                                          !
-       endif                                                      !
-       if (sk1s .ne. zero) then                                   !
-          tilt = -atan2(sk1s, sk1)/two + tilt                     !
-          sk1 = sqrt(sk1**2 + sk1s**2)                            !
+!       endif                                                      !
+
+! LD: 19.06.2019
+       if (sk1s .ne. zero) then
+          if (ord_max .le. 2 .and. sk0 .eq. 0 .and. key%list%permfringe .eq. 0) then !
+            tilt = -atan2(sk1s, sk1)/two + tilt
+            sk1  = sqrt(sk1**2 + sk1s**2)
+            sk1s = zero
+          elseif (metd .lt. 4 .and. model .ne. 1) then
+            call fort_warn('quadrupole with k1s and k0, k2, k2s or permfringe detected: ',&
+                           'use method=4 or 6 for better results with model=2')
+          endif
+!          key%list%k(2) =sk1
+!          key%list%ks(2)=zero
+!          key%tiltd=tilt
        endif                                                      !
        key%list%k(2) =sk1                                         !
-       key%list%ks(2)=zero  ! added by VK                         !
+       key%list%ks(2) =sk1s                                        !
+!       key%list%ks(2)=zero  ! added by VK                         !
        key%tiltd=tilt  !==========================================!
 
        !================================================================
        ! dipole component not active in MAD-X proper
-       key%list%k(1)=key%list%k(1)+bvk*node_value('k0 ')
+! LD: 19.06.2019
+       key%list%k(1)=key%list%k(1)+bvk*sk0
 
     case(6)
        key%magnet="sextupole"
@@ -944,16 +961,18 @@ CONTAINS
        dum1=key%list%k(3)-normal_0123(2)
        dum2=key%list%ks(3)-skew_0123(2)
 
-       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
+! LD: 19.06.2019
+!       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
           sk2= sk2 +dum1                                          !
           sk2s=sk2s+dum2                                          !
-       endif                                                      !
-       if (sk2s .ne. zero) then                                   !
-          tilt = -atan2(sk2s, sk2)/three + tilt                   !
-          sk2 =  sqrt(sk2**2 + sk2s**2)                           !
-       endif                                                      !
+!       endif                                                      !
+!       if (sk2s .ne. zero) then                                   !
+!          tilt = -atan2(sk2s, sk2)/three + tilt                   !
+!          sk2 =  sqrt(sk2**2 + sk2s**2)                           !
+!       endif                                                      !
        key%list%k(3) =sk2                                         !
-       key%list%ks(3)=zero  ! added by VK                         !
+       key%list%ks(3) =sk2s                                         !
+!       key%list%ks(3)=zero  ! added by VK                         !
        key%tiltd=tilt  !==========================================!
 
        !================================================================
@@ -979,22 +998,22 @@ CONTAINS
        ! octupole components
        sk3= node_value('k3 ')
        sk3s=node_value('k3s ')
-
        tilt=node_value('tilt ')
        dum1=key%list%k(4)-normal_0123(3)
        dum2=key%list%ks(4)-skew_0123(3)
 
-       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
+! ! LD: 19.06.2019
+!       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
           sk3= sk3 +dum1                                          !
           sk3s=sk3s+dum2                                          !
-       endif                                                      !
-       if (sk3s .ne. zero) then                                   !
-          tilt = -atan2(sk3s, sk3)/four + tilt                    !
-          sk3 = sqrt(sk3**2 + sk3s**2)                            !
-       endif                                                      !
+!       endif                                                      !
+!       if (sk3s .ne. zero) then                                   !
+!          tilt = -atan2(sk3s, sk3)/four + tilt                    !
+!          sk3 = sqrt(sk3**2 + sk3s**2)                            !
+!       endif                                                      !
        key%list%k(4) =sk3                                         !
-       key%list%ks(4)=zero  ! added by VK                         !
-
+       key%list%ks(4)= sk3s
+!       key%list%ks(4)=zero  ! added by VK                         !
        key%tiltd=tilt  !==========================================!
 
        !================================================================
@@ -1168,6 +1187,17 @@ CONTAINS
 !                                    " lag : ", key%list%lag, &
 !                                    " harm: ", key%list%harmon, &
 !                                    " freq: ", key%list%freq0
+
+    case(11) ! LD: 04.07.2019
+      key%magnet="elseparator"
+      ex = node_value('ex ')
+      ey = node_value('ey ')
+      if (l .ne. 0) then
+        ex = ex + node_value('ex_l ')/l
+        ey = ey + node_value('ey_l ')/l
+      endif
+      key%list%volt=sqrt(ex**2 + ey**2)
+      key%list%lag=atan2(ey,ex)
 
     case(12)
        ! actually our SROT element
@@ -2571,9 +2601,9 @@ CONTAINS
 
     !    call killparresult()
     call resetknobs()  !remove the knobs
-    
+
     call kill_map_cp()
-     
+
     if ( associated(m_u%n) .eqv. .false. ) then
        print*, "We attempt to kill not initialized universe!"
     endif
@@ -3167,11 +3197,11 @@ CONTAINS
        name(:len_trim(name2)-1)=name2(:len_trim(name2)-1)
        call context(name)
        call move_to(my_ring,p,name,pos)
-       
+
        !madxtilt =  get_orginal_madx_tilt(name)
-       
+
        tilt=-(p%mag%p%tiltd)! - madxtilt)   ! here we should read tilt from MADX lattice and deduce back the automatic tilt from skew (+ normal)
-       
+
        if(pos/=0) then
           if(p%mag%l/=zero) then
              do k=1,maxmul
@@ -3223,7 +3253,7 @@ CONTAINS
     integer j,code,k,pos,nfac(maxmul)
     integer restart_sequ,advance_node
     type(fibre),pointer :: p
-    real(dp) sk,sks,tilt,b(maxmul),a(maxmul),bvk
+    real(dp) sk0,sk,sks,tilt,b(maxmul),a(maxmul),bvk
     real(kind(1d0))   :: get_value,node_value
     character(name_len) name
     logical(lp) :: overwrite
@@ -3253,9 +3283,12 @@ CONTAINS
        sks=node_value('k1s ')
        tilt=node_value('tilt ')
        b(k)=sk
-       if (sks .ne. zero) then
+! LD: 19.06.2019
+       sk0= node_value('k0 ')
+       if (sks .ne. zero .and. sk0 .eq. zero) then ! should also consider permfringe
           tilt = -atan2(sks, sk)/two + tilt
-          b(k)=sqrt(sk**2+sks**2)/abs(sk)*sk                            !
+          b(k)=sqrt(sk**2+sks**2)/abs(sk)*sk
+          ! bug: sks not updated
        endif
     elseif(code.eq.6) then
        ! sextupole components code = 6
@@ -3264,10 +3297,11 @@ CONTAINS
        sks=node_value('k2s ')
        tilt=node_value('tilt ')
        b(k)=sk
-       if (sks .ne. zero) then
-          tilt = -atan2(sks, sk)/three + tilt
-          b(k)=sqrt(sk**2+sks**2)/abs(sk)*sk                           !
-       endif
+! LD: 19.06.2019
+!       if (sks .ne. zero) then
+!          tilt = -atan2(sks, sk)/three + tilt
+!          b(k)=sqrt(sk**2+sks**2)/abs(sk)*sk                           !
+!       endif
     endif
 
     call element_name(name,name_len)
@@ -3347,7 +3381,7 @@ CONTAINS
          (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
 
   end subroutine getfk
- 
+
   !____________________________________________________________________________________________
   ! Configures beam-beam for every beambeam element defined in MADX lattice
   subroutine getBeamBeam()
