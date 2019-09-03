@@ -3300,8 +3300,9 @@ SUBROUTINE tw_summ(rt,tt)
   orbit5 = -opt_fun0(13)
 
   !---- check rmat
-  if (abs(opt_fun0(29)).gt.1d-10 .or. abs(opt_fun0(30)).gt.1d-10 .or. &
-      abs(opt_fun0(31)).gt.1d-10 .or. abs(opt_fun0(32)).gt.1d-10) then
+  if (abs(opt_fun0(29)).gt.1d-8 .or. abs(opt_fun0(30)).gt.1d-8 .or. &
+      abs(opt_fun0(31)).gt.1d-8 .or. abs(opt_fun0(32)).gt.1d-8) then
+      print *, 'rmat=', opt_fun0(29:32)
       call fort_warn('Chromaticity calculation wrong due to coupling, ',&
                      'use chrom option or manual calculation')
   endif
