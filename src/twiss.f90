@@ -3302,7 +3302,7 @@ SUBROUTINE tw_summ(rt,tt)
   !---- check rmat
   if (abs(opt_fun0(29)).gt.1d-10 .or. abs(opt_fun0(30)).gt.1d-10 .or. &
       abs(opt_fun0(31)).gt.1d-10 .or. abs(opt_fun0(32)).gt.1d-10) then
-      call fort_warn('Chromaticity calculation wrong due to coupling',&
+      call fort_warn('Chromaticity calculation wrong due to coupling, ',&
                      'use chrom option or manual calculation')
   endif
 
