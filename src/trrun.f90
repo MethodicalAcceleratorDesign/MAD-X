@@ -2768,7 +2768,6 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
         if (ap1.lt.min_double) then
            if (debug) print *, " zero or negative circle radius ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
-           print *, ap1,"kkkkkkk"
         endif
 
      case (ap_ellipse)
@@ -2963,18 +2962,19 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
      case (ap_custom)
         lost =  x .gt. ap1 .or. y .gt. ap2 ! First checks the user defined rectangle
         if(lost) then
-          !x = z(1,i) - al_errors(11) - offset(1)
-          !y = z(3,i) - al_errors(12) - offset(2)
+          x = z(1,i) - al_errors(11) - offset(1)
+          y = z(3,i) - al_errors(12) - offset(2)
           lost = inside_userdefined_geometry(x,y) .eq. 0
       endif
      case default
 
      end select
      is_custom = is_custom_set() .eq. 1
-     if(lost .and. is_custom) then
+
+     if(is_custom) then
        lost = inside_userdefined_geometry(x,y) .eq. 0
      endif
-
+     print *, "heeereee "
 
      if (.not. lost) then
         lost =  ISNAN(z(2,i)) .or. ISNAN(z(4,i))                                .or. &

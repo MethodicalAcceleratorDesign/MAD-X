@@ -344,8 +344,9 @@ void set_aperture_element(struct element *el, struct command* def){
   element_vector(el, "aper_vx", tmpx);
   element_vector(el, "aper_vy", tmpy);
   int tmp_l=MAXARRAY+1;
+printf("deffininiggggg0 aperture %f \n", tmpx[0]);
   if(tmpx[0]!=-1){
-
+printf("deffininiggggg1 aperture \n");
     for(int i=0;i<MAXARRAY;i++){
       if(tmpx[i]==-999 && tmpy[i]==-999){
         tmp_l = i;
@@ -370,9 +371,11 @@ void set_aperture_element(struct element *el, struct command* def){
       el->aper->length = tmp_l; // minus 1 or not ?? has to be there because of how the algorithm is done.  
       el->aper->xlist[tmp_l]=el->aper->xlist[0];
       el->aper->ylist[tmp_l]=el->aper->ylist[0];
+       printf("deffininigggggap_not aperture %d \n", el->aper->apertype);
       if(el->aper->apertype==notdefined){ //If no other aperture is defined then a 10 meter rectangle is set! 
         el->aper->apertype=circle; // sets it to a rcircle so the check is still done
-        el->aper->aperture[0] = 1e-30; // trick to not end up in the case where it is ignored
+        el->aper->aperture[0] = 1e-11; // trick to not end up in the case where it is ignored
+        printf("deffininigggggap00000 aperture \n");
       }
     }
   }
