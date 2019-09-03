@@ -263,7 +263,7 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   ORBIT0 = zero
   !---- Get closed orbit and coupled transfer matrix.
   call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
-  call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,ithr_on)
+  call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,ithr_on) ! useless?
 end SUBROUTINE tmrefo
 
 SUBROUTINE twinifun(opt_fun0,rt)
@@ -2424,13 +2424,13 @@ SUBROUTINE tmsigma_emit(rt, s0mat)
   ex = get_value('probe ','ex ')!BEAM->Ex
   ey = get_value('probe ','ey ')!BEAM->Ey
   et = get_value('probe ','et ')!BEAM->Ez
-  
+
   saveig = get_value('twiss ','eigenvector ').ne.zero
   if(saveig) then
     tmp_e = RESHAPE(em, shape(tmp_e))
     call print_eigenvectors(tmp_e)
   end if
-  
+
   do j = 1, 6
     do k = 1, 6
       s0mat(j,k) = ex * (em(j,1)*em(k,1) + em(j,2)*em(k,2)) + &
@@ -3282,16 +3282,16 @@ SUBROUTINE tw_summ(rt,tt)
 
   !---- Initialization transverse
   !---  fix length problem - HG 14.4.08 ! ghislain : ???
-  suml    = opt_fun(2)  ! ???
+  suml    = opt_fun (2)
   betx    = opt_fun0(3)
   alfx    = opt_fun0(4)
 
-  amux    = opt_fun(5)
+  amux    = opt_fun (5)
 
   bety    = opt_fun0(6)
   alfy    = opt_fun0(7)
 
-  amuy    = opt_fun(8)
+  amuy    = opt_fun (8)
 
   qx = amux / twopi
   qy = amuy / twopi
@@ -3299,13 +3299,12 @@ SUBROUTINE tw_summ(rt,tt)
   !---- Adjust values
   orbit5 = -opt_fun0(13)
 
-  ! if (opt_fun0(29).ne.zero.or.opt_fun0(30).ne.zero.or.             &
-  !     opt_fun0(31).ne.zero.or.opt_fun0(32).ne.zero) then
-  !     call fort_warn('Chromaticity calculation wrong due to coupling',&
-  !       'use manual derivative or madxp')
-  !     xix=zero ! frs : The punishment was too harsh!!!!
-  !     xiy=zero
-  ! endif
+  !---- check rmat
+  if (abs(opt_fun0(29)).gt.1d-10 .or. abs(opt_fun0(30)).gt.1d-10 .or. &
+      abs(opt_fun0(31)).gt.1d-10 .or. abs(opt_fun0(32)).gt.1d-10) then
+      call fort_warn('Chromaticity calculation wrong due to coupling',&
+                     'use chrom option or manual calculation')
+  endif
 
   !---- Fill summary table
   call double_to_table_curr('summ ','length ' ,suml)
@@ -3512,7 +3511,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   double precision :: bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
-  
+
   !---- Initialize.
   EK0 = zero
   RW = EYE
@@ -3620,9 +3619,9 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      if (ftrk) then
         call tmtrak(ek,re,te,orbit,orbit)
      endif
-     
+
      if (fcentre) return
-     
+
      !---- Half radiation effects at exit.
      if (ftrk .and. radiate) then
         x =   orbit(1) * ct + orbit(3) * st
@@ -3638,7 +3637,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
         orbit(4) = orbit(4) * f_damp_t;
         orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
      endif
-     
+
 end SUBROUTINE tmbend
 
 SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
@@ -4417,7 +4416,7 @@ SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   double precision :: bet0, bet_sqr, f_damp_t
 
   bet0  =  get_value('beam ','beta ')
-  
+
   !---Initializasion
   rfac=0.d0
 
@@ -5624,14 +5623,14 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk, fmap
   double precision :: el
-  double precision :: orbit(6), ek(6), re(6,6), ek_t1(6), ek_t2(6), re_t1(6,6) 
+  double precision :: orbit(6), ek(6), re(6,6), ek_t1(6), ek_t2(6), re_t1(6,6)
   double precision :: re_t2(6,6), te(6,6,6), te_t1(6,6,6), ek2(6)
   double precision :: ek_s(6), re_s(6,6), te_s(6,6,6)
   logical :: cplxy
   double precision :: sks, sk, skl, bvk, pxbeta, beta0, startrot
   double precision :: co, si, sibk, temp, xtilt,xtilt_rad, dl
 
-  double precision, external :: node_value, get_value 
+  double precision, external :: node_value, get_value
   double precision, parameter :: ten5m=1d-5
   double precision :: rfac, kx, ky
   double precision :: pt, bet0, bet_sqr, f_damp_t
@@ -5650,8 +5649,8 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !---- Strength.
   sks = node_value('ks ')
   xtilt_rad = node_value('xtilt ')
-  startrot =node_value('rot_start ') 
-  
+  startrot =node_value('rot_start ')
+
   re_t1 = EYE
   re_t2 = EYE
   ek_t1 = zero
@@ -5687,7 +5686,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
      orbit(4) = orbit(4) * f_damp_t;
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
-  
+
   !---- First-order terms.
   re_s(1,1) = co**2
   re_s(2,2) = re_s(1,1)
@@ -5742,10 +5741,10 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
      te_s(5,6,6) = - three * re_s(5,6) / (two * beta)
      call tmsymm(te_s)
   endif
-  
+
 
   !---- Track orbit.
- 
+
   if (ftrk) then
 
     if(abs(xtilt_rad) > ten5m) then
@@ -5755,25 +5754,25 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
       pxbeta = xtilt*startrot/beta
       ek_t1(1) =  startrot*xtilt
       ek_t1(2) =  xtilt
-      ek_t1(5) = -0.5d0*pxbeta*xtilt      
+      ek_t1(5) = -0.5d0*pxbeta*xtilt
       re_t1(1,6) = -pxbeta
       re_t1(5,2) = -pxbeta
       call tmtrak(ek_t1,re_t1,te_t1,orbit,orbit)
-      call tmcat(.true.,re_t1,te_t1,re,te,re,te)  
+      call tmcat(.true.,re_t1,te_t1,re,te,re,te)
 
 
       call tmtrak(ek_s,re_s,te_s,orbit,orbit) ! Calls the normal solenoid
       call tmcat(.true.,re_s,te_s,re,te,re,te)
-      
+
       !To tilt it back
       xtilt=-xtilt
       pxbeta = xtilt*(el+startrot)/beta
       ek_t2(1) =  (el+startrot)*xtilt
       ek_t2(2) =  xtilt
-      ek_t2(5) = -0.5d0*pxbeta*xtilt      
+      ek_t2(5) = -0.5d0*pxbeta*xtilt
       re_t2(1,6) = -pxbeta
       re_t2(5,2) = -pxbeta
-      
+
       call tmtrak(ek_t2,re_t2,te_t1 ,orbit,orbit)
       call tmcat(.true.,re_t2,te_t1,re,te,re,te)
 
@@ -5826,7 +5825,7 @@ SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
   logical :: ftrk, fmap,fsec
   double precision :: orbit(6);
 
-  double precision :: x, y, z 
+  double precision :: x, y, z
   double precision :: node_value, ek(6), re(6,6), te(6,6,6)
 
 
@@ -5834,9 +5833,9 @@ SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
  x    = node_value('dx ')
  y    = node_value('dy ')
  z    = node_value('ds ')
- 
+
  call tmdrf(fsec,ftrk,orbit,fmap,-z,ek,re,te)
- 
+
  ek(1) = ek(1) - x
  ek(3) = ek(3) - y
   !---- Track orbit.
@@ -7617,7 +7616,7 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
   sksl    = node_value('ksi ')
   sks     = node_value('ks ')
   elrad  = node_value('lrad ')
-  
+
   !---- BV flag
   bvk = node_value('other_bv ')
   sks = sks * bvk
