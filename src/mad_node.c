@@ -760,6 +760,35 @@ int inside_userdefined_geometry(double* x, double *y){
     current_node->p_elem->aper->ylist, current_node->p_elem->aper->length );
 }
 
+/*
+Returns aperture defined as arbitrary polygon
+x -> x coordinates
+y -> y coordinates
+maxlen -> length of the x and y arrays 
+returns: total length of the aperture (can be bigger than maxlen)
+*/
+int get_userdefined_geometry(double* x, double *y, int* maxlen)
+{
+  double* xi = current_node->p_elem->aper->xlist;
+  double* yi = current_node->p_elem->aper->ylist;
+  int mx = current_node->p_elem->aper->length;
+  
+  if (*maxlen < mx) mx = *maxlen;
+  
+  for(int i=0; i<mx; i++)
+   {
+     x[i] =  xi[i];
+     y[i] =  yi[i];
+   }
+
+  return current_node->p_elem->aper->length;
+
+}
+
+int get_userdefined_geometry_len()
+{
+  return current_node->p_elem->aper->length;
+}
 
 int
 remove_one(struct node* node)

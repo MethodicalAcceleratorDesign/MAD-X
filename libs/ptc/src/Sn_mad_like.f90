@@ -72,7 +72,10 @@ module Mad_like
      INTEGER KIND,nmul,nst,method
      LOGICAL(LP) APERTURE_ON
      INTEGER APERTURE_KIND
-     REAL(DP) APERTURE_R(2),APERTURE_X,APERTURE_Y
+     REAL(DP) APERTURE_R(2),APERTURE_X,APERTURE_Y,APERTURE_DX,APERTURE_DY
+     INTEGER :: APERTURE_POLYGN = 0
+     REAL(DP), pointer, dimension (:) :: APERTURE_POLYGX => null() ! length defined with APERTURE_POLYGN 
+     REAL(DP), pointer, dimension (:) :: APERTURE_POLYGY => null()
      LOGICAL(LP) KILL_ENT_FRINGE,KILL_EXI_FRINGE,BEND_FRINGE
      LOGICAL(LP) KILL_ENT_SPIN,KILL_EXI_SPIN
      integer PERMFRINGE,highest_fringe
@@ -726,6 +729,10 @@ CONTAINS
        S2%APERTURE_R(2)=absolute_aperture  !!! just in case !!!
        S2%APERTURE_X=absolute_aperture
        S2%APERTURE_Y=absolute_aperture
+       S2%APERTURE_DX=0
+       S2%APERTURE_DY=0
+       S2%APERTURE_POLYGX => null()
+       S2%APERTURE_POLYGY => null()
        s2%KILL_ENT_FRINGE=my_false
        s2%KILL_EXI_FRINGE=my_false
        s2%KILL_ENT_SPIN=my_false
@@ -2035,6 +2042,12 @@ CONTAINS
        rectaETILT%APERTURE_R=list%APERTURE_R
        rectaETILT%APERTURE_X=list%APERTURE_X
        rectaETILT%APERTURE_Y=list%APERTURE_Y
+       rectaETILT%APERTURE_DX=list%APERTURE_DX
+       rectaETILT%APERTURE_DY=list%APERTURE_DY
+
+       rectaETILT%APERTURE_POLYGX => list%APERTURE_POLYGX
+       rectaETILT%APERTURE_POLYGY => list%APERTURE_POLYGY
+       
        rectaETILT%KILL_ENT_FRINGE=list%KILL_ENT_FRINGE
        rectaETILT%KILL_EXI_FRINGE=list%KILL_EXI_FRINGE
        rectaETILT%KILL_ENT_SPIN=list%KILL_ENT_SPIN
@@ -3034,6 +3047,19 @@ CONTAINS
           s2%p%aperture%r    = s1%APERTURE_R
           s2%p%aperture%x    = s1%APERTURE_X
           s2%p%aperture%y    = s1%APERTURE_y
+          s2%p%aperture%dx    = s1%APERTURE_DX
+          s2%p%aperture%dy    = s1%APERTURE_DY
+          
+          if (s2%p%aperture%kind == 6) then
+          
+            allocate(s2%p%aperture%polygn)
+            s2%p%aperture%polygn = size(s1%APERTURE_POLYGX)
+          
+            s2%p%aperture%polygx => s1%APERTURE_POLYGX
+            s2%p%aperture%polygy => s1%APERTURE_POLYGY
+            
+          endif
+          
        endif
     endif
     !   goto 113 ! sagan

@@ -255,13 +255,14 @@ CONTAINS
     use name_lenfi
     implicit none
     logical(lp) particle,doneit,isclosedlayout
-    integer i,j,k,code,nt,icount,nn,ns,nd,mg,get_string
+    integer i,j,k,code,nt,icount,nn,ns,nd,mg,napoffset,get_string
     !    integer get_option
     integer double_from_table_row,table_cell_exists
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
+    integer, external :: get_userdefined_geometry, get_userdefined_geometry_len
     integer, parameter :: nt0=20000
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge
-    real(dp) f_errors(0:maxferr),aperture(maxnaper),normal(0:maxmul)
+    real(dp) f_errors(0:maxferr),aperture(maxnaper),normal(0:maxmul), apoffset(2)
     real(dp) patch_ang(3),patch_trans(3)
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2),myfield(2*maxmul+2)
     real(dp) gamma,gamma2,gammatr2,freq,offset_deltap
@@ -290,6 +291,12 @@ CONTAINS
     integer mheli,helit,ihelit
     type(fibre), pointer :: p => null()
     double precision, parameter :: zero=0.d0
+    integer, parameter :: aplen=0
+    REAL(DP), pointer, dimension (:) :: apx => null()
+    REAL(DP), pointer, dimension (:) :: apy => null()
+    
+
+
     !real :: tstart, tfinish, tsum
     !tsum = 0d0
     !call cpu_time(tstart)
@@ -617,14 +624,26 @@ CONTAINS
     nn=name_len
     call node_string('apertype ',aptype,nn)
     APERTURE = zero
+    nn = 0
     call get_node_vector('aperture ',nn,aperture)
-
+    
+    apoffset = zero
+    napoffset = 0
+    call get_node_vector('aper_offset ',napoffset,apoffset)
+    
     if (getdebug() > 2) then
        print*,' Aperture type: >',aptype,'< ',nn,' parameters:'
        do i=1,nn
          print*,'             ',i,' : ',aperture(i)
        enddo
+       print*,'          offset: napoffset=', napoffset
+       do i=1,napoffset
+         print*,'             ',i,' : ',apoffset(i)
+       enddo
     endif
+    
+    
+    
     !print*, name,'madx_ptc_module: Got for aperture nn=',nn, aperture(1), aperture(2)
 
     if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then
@@ -685,20 +704,63 @@ CONTAINS
           key%list%aperture_r(2)=aperture(4)
         case("octagon") ! 2015-Mar-10  14:25:37  ghislain: added octagon
           key%list%aperture_on=.true.
-          key%list%aperture_kind=6
+          key%list%aperture_kind=7
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
           key%list%aperture_r(1)=aperture(3)
           key%list%aperture_r(2)=aperture(4)
-        case("general") ! 2015-Mar-10  14:25:48  ghislain: kind was 6
-          key%list%aperture_kind=7
-          print*,"General aperture not implemented"
-          call aafail('ptc_input:','General aperture not implemented. Program stops')
-        case DEFAULT
-          write(whymsg,*) 'Aperture: <<',aptype,'>> at magnet ',name(:len_trim(name)),' is not recognized by PTC'
+
+          write(whymsg,*) 'Aperture: <<',aptype,'>> at magnet ',name(:len_trim(name)),' is not implemented by PTC'
           call fort_warn('ptc_createlayout: ',whymsg(:len_trim(whymsg)))
           call aafail('ptc_input:','Aperture type not implemented. Program stops')
+          
+        case("general") ! 2015-Mar-10  14:25:48  ghislain: kind was 6
+          key%list%aperture_kind=8
+          print*,"General aperture not implemented"
+          call aafail('ptc_input:','General aperture not implemented. Program stops')
+        
+        case DEFAULT
+          
+          ! in case aperture is defined as file with arbitrary polygon points
+          i = get_userdefined_geometry_len()
+          if (i > 0) then
+            if(nn > 1) then
+              key%list%aperture_x=aperture(1)
+              key%list%aperture_y=aperture(2)
+            else
+              key%list%aperture_x=0
+              key%list%aperture_y=0
+            endif
+             
+            allocate(apx(i))
+            allocate(apy(i))
+            
+            i = get_userdefined_geometry(apx,apy,i)
+            
+            key%list%APERTURE_POLYGX => apx
+            key%list%APERTURE_POLYGY => apy
+            
+            key%list%aperture_on=.true.
+            key%list%aperture_kind=6
+            
+            if (getdebug()>1)  then
+              print*, "Aperture defined as a polygon with ", i, " points "
+            endif
+          
+          else
+          
+          
+            write(whymsg,*) 'Aperture: <<',aptype,'>> at magnet ',name(:len_trim(name)),' is not recognized by PTC'
+            call fort_warn('ptc_createlayout: ',whymsg(:len_trim(whymsg)))
+            call aafail('ptc_input:','Aperture type not implemented. Program stops')
+          endif
        end select
+       
+       
+       key%list%aperture_dx=apoffset(1)
+       key%list%aperture_dy=apoffset(2)
+       
+       
   !  else
   !   if( .not. ((code.eq.1) .or. (code.eq.4)) ) then
   !     write(*,'(a10,1x,a16,1x,a14,1x,6f10.6)') 'Aperture: ',aptype(1:16),'aperture pars:', aperture(1:6)

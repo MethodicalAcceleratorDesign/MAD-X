@@ -131,6 +131,7 @@ module S_status
   PRIVATE B2PERPR,B2PERPP !,S_init_berz0
   type(tilting) tilt
   private minu
+  private chkAperPolygon
   real(dp) MADFAC(NMAX)
   CHARACTER(24) MYTYPE(-100:100)
   private check_S_APERTURE_r,check_S_APERTURE_out_r
@@ -288,6 +289,7 @@ CONTAINS
     P%KIND=0; P%R=0.0_dp;P%X=0.0_dp;P%Y=0.0_dp;P%pos=aperture_pos_default;
     ALLOCATE(P%DX);ALLOCATE(P%DY);
     P%DX=0.0_dp;P%DY=0.0_dp;
+    
   end subroutine alloc_A
 
   SUBROUTINE  dealloc_A(p)
@@ -298,6 +300,13 @@ CONTAINS
        DEALLOCATE(P%R);DEALLOCATE(P%X);DEALLOCATE(P%Y);DEALLOCATE(P%KIND);
        DEALLOCATE(P%DX);DEALLOCATE(P%DY);DEALLOCATE(P%pos);
     endif
+    
+    if (associated(p%POLYGN)) then
+       DEALLOCATE(p%POLYGN)
+       DEALLOCATE(p%POLYGX)
+       DEALLOCATE(p%POLYGY)
+    endif
+    
   end SUBROUTINE  dealloc_A
 
 
@@ -562,6 +571,7 @@ CONTAINS
     implicit none
     type (MADX_APERTURE),INTENT(IN)::E
     REAL(DP), INTENT(IN):: X(6)
+    logical flag
     !    real(dp) xx,yy,dx,dy,ex,ey
 
     !  real(dp) :: xlost(6)=zero
@@ -628,7 +638,26 @@ CONTAINS
           ENDIF
 
        CASE(6) ! PILES OF POINTS
-          STOP 222
+          
+          IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) then
+            ! first check insribed square (user defined)
+            ! if it is out if this square only then check the polygon
+            
+            flag = chkAperPolygon(E,X)
+          
+            if ( flag ) then
+               print*,"OUT polyg"
+               CHECK_STABLE=.FALSE.
+               STABLE_DA=.false.
+               xlost=0.0_dp
+               xlost=x
+               !messagelost="Lost in real kind=6 racetrack Aperture"
+               write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=6 polygon Aperture. ",&
+                                    "Orbit: X=",X(1)," Y=",X(3)   
+            endif
+           
+           endif
+           
        CASE DEFAULT
           !   STOP 223
        END SELECT
@@ -651,6 +680,97 @@ CONTAINS
 
 
 
+
+!int
+!aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipelength )
+!{
+!// winding number test for a point in a polygon
+!// Input:   p,q = a point,
+!//          pipex[], pipey[] = vertex points of the polygon with pipe[len]=pipe[0]
+!// Return:  wn = the winding number (=0 only when point is outside polygon)
+!// source : wn_PnInPoly() at http://geomalgorithms.com/a03-_inclusion.html
+! int    wn = 0;    // the  winding number counter
+! // loop through all edges of the polygon
+! for (int i=0; i<=pipelength; i++) { // edge from V[i] to  V[i+1]
+!   if (pipey[i] <= q  &&  pipey[i+1]  > q) {
+!     // first vertex is below point; second vertex is above; upward crossing
+!     if ( (pipex[i+1] - pipex[i]) * (q - pipey[i]) - (p - pipex[i]) * (pipey[i+1] - pipey[i])  > 0 ) {
+!       // Point left of  edge
+!       ++wn;
+!       continue;
+!     }
+!   }
+!   if (pipey[i] > q  &&  pipey[i+1]  <= q) {
+!     // first vertex is above point; second vertex is below; downward crossing
+!     if ( (pipex[i+1] - pipex[i]) * (q - pipey[i]) - (p - pipex[i]) * (pipey[i+1] - pipey[i])  < 0) {
+!       // Point right of  edge
+!       --wn;
+!       continue;
+!     }
+!   }
+! }
+! return wn;
+!}
+
+  
+  ! checks aperture of aribtrary polygon
+  ! returns true if out of aperture
+  ! algorithm: winding number https://en.wikipedia.org/wiki/Point_in_polygon
+  function chkAperPolygon(E,X)
+    implicit none
+    logical(lp) chkAperPolygon
+    type (MADX_APERTURE),INTENT(IN)::E
+    REAL(DP), INTENT(IN):: X(6)
+    real(dp) p, q
+    integer i,wn
+    REAL(DP),pointer :: pipex(:), pipey(:)
+    
+    wn = 0
+    
+    p = x(1) - E%DX
+    q = x(3) - E%DY
+    
+    if ( .NOT. associated(E%POLYGN) ) then
+       print*, "chkAperPolygon: POLYGN is NULL"
+       chkAperPolygon = .true.
+       return
+    endif
+    
+   ! print*,"chkAperPolygon POLYGN = ",E%POLYGN
+    
+    pipex => E%POLYGX
+    pipey => E%POLYGY
+    
+    do i=1,E%POLYGN !! edge from V[i] to  V[i+1]
+      !print*,"chkAperPolygon i = ",i,E%POLYGX(i),E%POLYGY(i)
+      if( pipey(i) <= q  .and.  pipey(i+1) > q) then
+      ! first vertex is below point; second vertex is above; upward crossing
+        if ( (pipex(i+1)-pipex(i)) * (q-pipey(i)) - (p-pipex(i))*(pipey(i+1)-pipey(i)) > 0 ) then
+         ! Point left of  edge
+         wn = wn + 1
+         continue;
+        endif
+      endif
+     
+      if (pipey(i) > q  .and.  pipey(i+1)  <= q) then
+      ! first vertex is above point; second vertex is below; downward crossing
+        if ( (pipex(i+1)-pipex(i))*(q - pipey(i)) - (p-pipex(i))*(pipey(i+1)-pipey(i)) < 0) then
+          ! Point right of  edge
+          wn = wn - 1
+          continue
+        endif
+      endif
+    enddo    
+    
+    if (wn == 0) then
+      !outside the aperture
+      chkAperPolygon = .true.
+    else
+      chkAperPolygon = .false.
+    endif
+    
+    
+  end function chkAperPolygon
  
 
 

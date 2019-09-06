@@ -112,6 +112,8 @@ TYPE MADX_APERTURE
    INTEGER,pointer ::  KIND  => null()  ! 1,2,3,4
    REAL(DP),pointer :: R(:)  => null()
    REAL(DP),pointer :: X => null(),Y => null(),DX => null(),DY => null()
+   REAL(DP),pointer :: POLYGX(:)  => null(), POLYGY(:)  => null() !arbitrary polygon
+   INTEGER, pointer :: POLYGN => null() ! arbitrary polygon number of points
 END TYPE MADX_APERTURE
 
 TYPE S_APERTURE

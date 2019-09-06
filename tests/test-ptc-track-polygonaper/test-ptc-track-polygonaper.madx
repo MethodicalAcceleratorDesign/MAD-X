@@ -26,14 +26,9 @@ ptc_create_universe;
   ptc_setswitch, debuglevel=0, maxacceleration=false, exact_mis=true, time=true, totalpath=false, fringe=true, modulation=false;
 
   ptc_create_layout, model=1, method=2, nst=5, exact=false, closed_layout=true;
-
-  
   
   ptc_start, x=0, px=1e-4, y=0, py=5e-7, t=0, pt=0;
-
-
   ptc_track, onetable, file="track.out", icase=56, element_by_element,  dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6}, turns=100, ffile=1;
-
   ptc_track_end;
 
 ptc_end;
