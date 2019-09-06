@@ -8,9 +8,9 @@ mqf: quadrupole, l=1, k1:=mqf.k1, apertype=myge.dat, aperture={0.001,0.002}  ;
 
 ! sequence
 fodo: sequence, l=10, refer=entry ;
-mqf,at=0;
+mqf, at=0;
 dff: drift,      at=1, l=4 ;
-mqd: quadrupole, at=5, l=1, k1:=mqd.k1, apertype=myge.dat ;
+mqd: quadrupole, at=5, l=1, k1:=mqd.k1, apertype=myge.dat, aper_offset={1e-5,-2e-5} ;
 dfd: drift,      at=6, l=4 ;
 endsequence ;
 
@@ -20,9 +20,22 @@ endsequence ;
 !show, mqd;
 ! track
 use, sequence=fodo ;
-track, onepass, onetable, APERTURE=true, file="track.out" ;
-start, x=0, px=1e-6, y=0, py=5e-7, t=0, pt=0;
-run, turns=1000 ;
-endtrack ;
-stop;
 
+
+ptc_create_universe;
+  ptc_setswitch, debuglevel=0, maxacceleration=false, exact_mis=true, time=true, totalpath=false, fringe=true, modulation=false;
+
+  ptc_create_layout, model=1, method=2, nst=5, exact=false, closed_layout=true;
+
+  
+  
+  ptc_start, x=0, px=1e-4, y=0, py=5e-7, t=0, pt=0;
+
+
+  ptc_track, onetable, file="track.out", icase=56, element_by_element,  dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6}, turns=100, ffile=1;
+
+  ptc_track_end;
+
+ptc_end;
+
+stop;
