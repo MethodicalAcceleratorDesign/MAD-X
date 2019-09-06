@@ -1181,10 +1181,11 @@ CONTAINS
          key%list%d_volt = node_value('volterr ')
          key%list%d_phas = node_value('lagerr ')
 
-         print*,"RF Cavity modulation ON volt", key%list%d_volt, " lag ", key%list%d_phas
-       else
-         print*,"RF Cavity modulation OFF"
+         !print*,"RF Cavity modulation ON volt", key%list%d_volt, " lag ", key%list%d_phas
        endif
+       !else
+       !  print*,"RF Cavity modulation OFF"
+       !endif
 
        ! LD: 09.04.2019
 !       write (*,'(3(a,E25.16))') "@@ RF freq= ", freq," lag= ", key%list%lag, " lag= ", node_value('lag ')
@@ -1370,10 +1371,14 @@ CONTAINS
         ! need to convert voltage (E field) to corresponding B field
         if (L .gt. 0) then
           key%list%d_bn(1) =  0.3 * node_value('volt ')  / ( L * beta0 * get_value('beam ','pc '))
-          print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
         else
           key%list%d_bn(1) =  0.3 * node_value('volt ')  / (beta0 * get_value('beam ','pc '))
         endif
+
+        if (getdebug() > 1) then
+          print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
+        endif
+        
         key%list%d_an(1) = zero
 
         key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
@@ -1403,10 +1408,14 @@ CONTAINS
         key%list%n_ac = 1 ! only dipole
         if (L .gt. 0) then
           key%list%d_an(1) =  0.3 * node_value('volt ') / ( L * beta0 * get_value('beam ','pc '))
-          print*,"VACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
         else
           key%list%d_an(1) =  0.3 * node_value('volt ')  / (beta0 * get_value('beam ','pc '))
         endif
+        
+        if (getdebug() > 1) then
+          print*,"VACD bn(1)=", key%list%d_an(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
+        endif
+        
         key%list%d_bn(1) = zero
 
         key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
@@ -1552,7 +1561,10 @@ CONTAINS
 
     if(key%list%n_ac > 0 ) then
       !save pointer to the AC dipole element for ramping in tracking
-      print*,"Adding Element: ",name, "of type ",code," to clock ",key%list%clockno_ac
+      if (getdebug() > 1) then
+         print*,"Adding Modulated Element: ",name, " of type ",code," to clock ",key%list%clockno_ac
+      endif
+      
       call addelementtoclock(my_ring%end,key%list%clockno_ac)
     endif
 
@@ -1571,9 +1583,7 @@ CONTAINS
        print*,' Length of machine: ',l_machine
     endif
     
-    print*,"skowron check beta0, before: ",beta0
     CALL GET_ENERGY(ENERGY,kin,BRHO,beta0,P0C)
-    print*,"skowron check beta0, after: ",beta0
     beta0start = beta0
     
     isclosedlayout=get_value('ptc_create_layout ','closed_layout ') .ne. 0
@@ -3579,7 +3589,9 @@ CONTAINS
 
     clocks(nclocks)%nelements = 0
     
-    print*,"getclockidx: Created new clock"
+    if (getdebug() > 1) then
+      print*,"getclockidx: Created new clock. nclocks = ", nclocks
+    endif
 
 
   end function getclockidx
@@ -3619,7 +3631,7 @@ CONTAINS
     real(dp) r
     type(fibre), pointer :: p
     
-    print*,"acdipoleramping t=",t
+    !print*,"acdipoleramping t=",t
     
     do n=1,nclocks
 
@@ -3627,7 +3639,7 @@ CONTAINS
 
         p => clocks(n)%elements(i)%p
 
-        print*,"Setting ramp to clock ",n," element ", p%mag%name
+        !print*,"Setting ramp to clock ",n," element ", p%mag%name
 
         if (clocks(n)%rampupstop < 1) then
           ! no ramping, always full amplitude
@@ -3664,7 +3676,7 @@ CONTAINS
 
     enddo
     
-    print*,"acdipoleramping d_ac=",p%mag%d_ac
+    !print*,"acdipoleramping d_ac=",p%mag%d_ac
   end subroutine acdipoleramping
 
   !_________________________________________

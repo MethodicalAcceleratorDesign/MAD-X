@@ -879,7 +879,6 @@ contains
     ! n_rf is a variable of PTC that must be set accordingly
     
     
-    print*," Set relativistic beta correctly for AC dipole BETA0start=",BETA0start
     do i=1,nclocks
       A_script_probe%ac(i)%om = twopi*clocks(i)%tune * BETA0start / my_ring_length
       !omega of the the modulation
