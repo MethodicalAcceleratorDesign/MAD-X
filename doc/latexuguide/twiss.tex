@@ -28,6 +28,7 @@ TWISS, \=SEQUENCE=seqname, LINE=linename, RANGE=range,  \\
        \>RMATRIX=logical, SECTORMAP=logical, \\
        \>SECTORTABLE=tabname, SECTORFILE=filename,\\
        \>SECTORPURE=logical,\\
+       \>EIGENVECTOR=tabname, EIGENFILE=filename,\\
        \>KEEPORBIT=name, USEORBIT=name,\\
        \>COUPLE=logical,\\
        \>RIPKEN=logical;
@@ -154,7 +155,10 @@ The  attributes of the \texttt{TWISS} command are:
   %% SECTORFILE="filename", if missing the output of SECTORMAP
   %% will go to the file "sectormap" with the format as found in
   %% \href{../Introduction/sectormap.html}{SECTORMAP}.    
-  
+
+  \ttitem{EIGENVECTOR} a logical flag to output the eigenvectors in the beginning of the sequence. Multiplying with this matrix brings normalized coordinates to physical coordinates.
+  \ttitem{EIGENFILE} the name of the file to which the \texttt{EIGENVECTOR} is written. 
+
   \ttitem{KEEPORBIT} The keeporbit attribute (with an optional name,
   keeporbit="name") stores the orbit under this name at the
   start, and at all monitors.    

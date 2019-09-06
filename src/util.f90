@@ -113,7 +113,37 @@ module code_constfi
   integer, parameter :: code_collimator = 44
 end module code_constfi
 
+module aperture_enums
+  implicit none
+  public
+  integer, parameter :: ap_notset = -1
+  integer, parameter :: ap_circle = 0
+  integer, parameter :: ap_ellipse = 1
+  integer, parameter :: ap_rectangle = 2
+  integer, parameter :: ap_lhcscreen = 3
+  integer, parameter :: ap_rectcircle = 4
+  integer, parameter :: ap_rectellipse = 5
+  integer, parameter :: ap_racetrack = 6
+  integer, parameter :: ap_octagon = 7
+  integer, parameter :: ap_custom = 8
 
+end module aperture_enums
+module track_enums
+  implicit none
+  public
+  integer, parameter :: enum_other_bv = 1
+  integer, parameter :: enum_lrad = 2
+  integer, parameter :: enum_noise = 3
+  integer, parameter :: enum_angle = 4
+  integer, parameter :: enum_time_var = 5
+  integer, parameter :: enum_sinkick = 6
+  integer, parameter :: enum_kick = 7
+  integer, parameter :: enum_chkick = 8
+  integer, parameter :: enum_cvkick = 9
+  integer, parameter :: enum_hkick = 10 
+  integer, parameter :: enum_vkick = 11  
+  integer, parameter :: total_enums = 11
+end module track_enums
 module Inf_NaN_Detection
 
   !!     Inf_NaN_Detection module
