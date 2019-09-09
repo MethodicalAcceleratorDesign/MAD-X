@@ -292,6 +292,7 @@ const char *const_command_def =
 "twiss_print  = [l, true, true], "
 "warn     = [l, true, true], "
 "update_from_parent = [l, false, true], "
+"keep_exp_move = [l, true, false], "
   /* BB and SPCH related options */
 "bborbit          = [l, false, true], " /* frs */
 "bb_ultra_relati  = [l, false, true], " /* frs */

@@ -3481,9 +3481,10 @@ subroutine tttrans(track,ktrack)
   t_z    = node_value('ds ')
 
   !---- Loop over particles
+
+  call ttdrf(-t_z,track,ktrack)
 !$OMP PARALLEL PRIVATE(i)
 !$OMP DO
-  call ttdrf(-t_z,track,ktrack)
   do  i = 1, ktrack
      ! Add vector to particle coordinates
      track(1,i) = track(1,i) - t_x
