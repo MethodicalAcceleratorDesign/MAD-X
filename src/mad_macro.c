@@ -66,7 +66,11 @@ disable_line( /* prevents line from further expansion by "use" */
   char* name, struct macro_list* nll)
 {
   int pos;
-  if ((pos = name_list_pos(name, nll->list)) > -1) nll->macros[pos]->dead = 1;
+  if ((pos = name_list_pos(name, nll->list)) > -1) 
+   {
+     printf("skowron disable_line: %s \n", name);
+     nll->macros[pos]->dead = 1;
+   }
 }
 
 #if 0 // not used
