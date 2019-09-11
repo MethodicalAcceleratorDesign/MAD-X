@@ -990,6 +990,7 @@ seq_move_noexpression(struct in_cmd* cmd)
   struct node *node, *next;
   struct element* el;
   int pos;
+
   name = command_par_string_user("element", cmd->clone);
   if (name)
   {
@@ -1077,8 +1078,10 @@ seq_move_noexpression(struct in_cmd* cmd)
         {
           by = command_par_value("by", cmd->clone);
           at = node->position + by;
+
         }
         el = node->p_elem;
+       
         if (remove_one(node) > 0)
         {
           install_one(el, NULL, at, NULL, at);
@@ -1102,6 +1105,9 @@ seq_move_expression(struct in_cmd* cmd)
       struct expression* expr = NULL;
       struct expression* newexp = NULL;
       struct name_list* movelist;  
+     
+
+
 
       name = command_par_string_user("element", cmd->clone);
       if (name)
@@ -1155,17 +1161,19 @@ seq_move_expression(struct in_cmd* cmd)
 
                     expr = clone_expression(command_par_expr("by", cmd->clone));
                     tmp = clone_expression(node->at_expr);
+
                     if(expr==NULL)
                     {
                       char *result = malloc(max_c * sizeof(char));
-                      sprintf(result, "%f", by);
+
+                      sprintf(result, "%.16f", by);
                       expr = new_expression(result,NULL);
                       free(result);
                     }
                     if(tmp==NULL)
                     { 
                      char *result = malloc(max_c * sizeof(char));
-                     sprintf(result, "%f", node->position);
+                     sprintf(result, "%.16f", node->position);
                      tmp = new_expression(result,NULL);
                      free(result);
                     }
@@ -1219,8 +1227,8 @@ seq_move_expression(struct in_cmd* cmd)
                       {
                         char *result = malloc(max_c * sizeof(char));
                         char *result2 = malloc(max_c * sizeof(char));
-                        sprintf(result, "%f", node->at_value);
-                        sprintf(result2, "%f", 0.0);
+                        sprintf(result, "%.16f", node->at_value);
+                        sprintf(result2, "%.16f", 0.0);
                         tmp = new_expression(result,NULL);
                         expr = new_expression(result2,NULL);
                         free(result);
@@ -1233,28 +1241,35 @@ seq_move_expression(struct in_cmd* cmd)
                     {
                       expr = clone_expression(command_par_expr("by", cmd->clone));
                       tmp = clone_expression(node->at_expr);
-                      if(expr==NULL)
-                      { 
+                        if(expr==NULL)
+                        { 
 
-                        char *result = malloc(max_c * sizeof(char));
-                        sprintf(result, "%f", by);
-                        expr = new_expression(result,NULL);
-                        free(result);
-                      }
-                      if(tmp==NULL)
-                      { 
-                        char *result = malloc(max_c * sizeof(char));
-                        sprintf(result, "%f", node->at_value);
-                        tmp = new_expression(result,NULL);
-                        free(result);
-                      }
-                      newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                          char *result = malloc(max_c * sizeof(char));
+                          sprintf(result, "%.16f", by);
+                          expr = new_expression(result,NULL);
+                          free(result);
+                        }
+                        if(tmp==NULL)
+                        { 
+                          char *result = malloc(max_c * sizeof(char));
+                          sprintf(result, "%.16f", node->at_value);
+
+                          tmp = new_expression(result,NULL);
+                          free(result);
+                        }
+
+                        //printf("heereeeby %e \n", by);
+                        newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                        //printf("heeeereee %e %e\n", expression_value(tmp, 2), expression_value(expr, 2));
+                        //printf("heeeereeea %.16e, %.16e \n", expression_value(newexp, 2), at);
+                        //dump_expression(newexp);
                       
                     }
                   }
+
                   if (remove_one(node) > 0)
                   { 
-                    install_one(el, from_name, at, newexp, at);
+                     install_one(el, from_name, at, newexp, at);
 
                     node->moved = 1;
                     seqedit_move++;
@@ -1314,7 +1329,7 @@ seq_move_expression(struct in_cmd* cmd)
             { 
 
               char *result = malloc(max_c * sizeof(char));
-              sprintf(result, "%f", by);
+              sprintf(result, "%.16f", by);
               expr = new_expression(result,NULL);
               free(result);
               
@@ -1323,7 +1338,7 @@ seq_move_expression(struct in_cmd* cmd)
             { 
               
               char *result = malloc(max_c * sizeof(char));
-              sprintf(result, "%f", node->at_value);
+              sprintf(result, "%.16f", node->at_value);
               tmp = new_expression(result,NULL);
               free(result);
             }
@@ -1339,12 +1354,15 @@ seq_move_expression(struct in_cmd* cmd)
         }
       }
     }
+    seq_end_ex();
+    edit_is_on = 1;
   }
 
 static void
 seq_move(struct in_cmd* cmd){
   int keep_exp = get_option("keep_exp_move");
-  if(keep_exp) seq_move_expression(cmd);
+
+  if(keep_exp==1) seq_move_expression(cmd);
   else seq_move_noexpression(cmd);
 }
 

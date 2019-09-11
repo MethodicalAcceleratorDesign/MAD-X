@@ -1,15 +1,15 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2018.10.25 10:39:44      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.09.11 11:32:49      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! try to keep expressions for strengths and positions when saving a sequence
 
  option, echo, info, warn;
 
-
+option, keep_exp_move;
 
  mq: quadrupole, l=0;
 
