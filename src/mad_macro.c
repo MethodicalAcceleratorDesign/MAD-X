@@ -68,7 +68,6 @@ disable_line( /* prevents line from further expansion by "use" */
   int pos;
   if ((pos = name_list_pos(name, nll->list)) > -1) 
    {
-     printf("skowron disable_line: %s \n", name);
      nll->macros[pos]->dead = 1;
    }
 }

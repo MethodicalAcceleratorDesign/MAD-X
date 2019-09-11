@@ -623,8 +623,6 @@ make_sequ_from_line(char* name)
   struct command* clone = clone_command(defined_commands->commands[mpos]);
   struct element* el;
   
-  printf("skowron make_sequ_from_line: %s \n",name);
-  
   if (pos < 0) fatal_error("unknown line: ", name);
   line = line_list->macros[pos];
   line->dead = 1;   /* prevent line from further conversion to sequence */
@@ -659,7 +657,7 @@ make_sequ_from_line(char* name)
   current_sequ->end->next = current_sequ->start;
   
   /*current_sequ->line = 1; /* remember origin of sequence */
-  printf("skowron: warning make_sequ_from_line line=0 \n");
+  //printf("skowron: warning make_sequ_from_line line=0 \n");
   current_sequ->line = 0; /* remember origin of sequence */
 
   if(line_buffer) delete_char_p_array(line_buffer,1);
