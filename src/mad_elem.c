@@ -343,6 +343,7 @@ void set_aperture_element(struct element *el, struct command* def){
   
   element_vector(el, "aper_vx", tmpx);
   element_vector(el, "aper_vy", tmpy);
+
   int tmp_l=MAXARRAY+1;
   if(tmpx[0]!=-1){
     for(int i=0;i<MAXARRAY;i++){
@@ -376,6 +377,7 @@ void set_aperture_element(struct element *el, struct command* def){
       }
     }
   }
+
 }
 
 void update_node_aperture(void){
@@ -411,7 +413,8 @@ void update_node_aperture(void){
   element_vector(current_node->p_elem, "aperture", current_node->p_elem->aper->aperture);
   element_vector(current_node->p_elem, "aper_offset",current_node->p_elem->aper->aper_offset);
 
-  if(current_node->p_elem->aper->custom_inter==1){
+  if(current_node->p_elem->aper->custom_inter ==1){
+
     element_vector(current_node->p_elem, "aper_vx", current_node->p_elem->aper->xlist);
     element_vector(current_node->p_elem, "aper_vy", current_node->p_elem->aper->ylist);
     

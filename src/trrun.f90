@@ -830,12 +830,12 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   endif
 
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
-       print *, "apint", apint, "ap_notset", ap_notset
+  !     print *, "apint", apint, "ap_notset", ap_notset
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
     
      apint=node_apertype()
-     print *, "apint", apint, "ap_notset", ap_notset
+
      if(apint .eq. ap_notset) then
     ! make global check even if aperture is not defined
     lost_global =.false.
