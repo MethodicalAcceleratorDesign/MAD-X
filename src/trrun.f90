@@ -875,7 +875,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   select case (code)
 
     case (code_rbend, code_sbend)
-       call tttdipole(track,ktrack)
+       call tttdipole(track,ktrack, code)
 
     case (code_matrix)
        EK(:6) = zero
@@ -4550,6 +4550,7 @@ end subroutine ttcfd
 subroutine tttquad(track, ktrack)
   use twtrrfi
   use trackfi
+  use twiss_elpfi
   use math_constfi, only : zero, one, two, three, half
   implicit none
   !-------------------------*
@@ -4574,7 +4575,7 @@ subroutine tttquad(track, ktrack)
 
   double precision :: hx, hy, rfac, gamma, beta, curv
   double precision :: beta_gamma, beta_sqr, f_damp_t
-  integer :: jtrk
+  integer :: jtrk, elpar_vl
 
   double precision, external :: node_value
   double precision, parameter ::  sqrt2=1.41421356237310d0
@@ -4582,20 +4583,26 @@ subroutine tttquad(track, ktrack)
   double precision, external :: get_value
 
   double precision :: f_errors(0:maxferr)
-  integer, external :: node_fd_errors
+  integer, external :: node_fd_errors, el_par_vector
   integer :: n_ferr
-
-  gamma = get_value('probe ','gamma ')
-  beta = get_value('probe ','beta ')
+  elpar_vl = el_par_vector(q_k1s, g_elpar)
+  !gamma = get_value('probe ','gamma ')
+  !beta = get_value('probe ','beta ')
 
   !---- Read-in the parameters
+  elpar_vl = el_par_vector(r_freq, g_elpar)
+  
   length = node_value('l ');
-  tilt = node_value('tilt ');
+  tilt = g_elpar(q_tilt)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = node_value('k1 ')
-  k1s = node_value('k1s ')
+  k1  = g_elpar(q_k1)
+  k1s = g_elpar(q_k1s)
+  
+  !k1  = node_value('k1 ')
+  !k1s = node_value('k1s ')
+
 
   if (length.ne.zero) then
      k1  = k1  + f_errors(2)/length
@@ -4722,12 +4729,12 @@ subroutine tttquad(track, ktrack)
 
 end subroutine tttquad
 
-subroutine tttdipole(track, ktrack)
+subroutine tttdipole(track, ktrack, code)
   use twtrrfi
   use trackfi
   use math_constfi, only : zero, one, two, three, half
   use code_constfi
-
+  use twiss_elpfi
   implicit none
   !-------------------------*
   ! Andrea Latina 2013-2014 *
@@ -4752,29 +4759,43 @@ subroutine tttdipole(track, ktrack)
 
   double precision, external :: node_value, get_value
   double precision :: f_errors(0:maxferr)
-  integer, external :: node_fd_errors
-  integer :: n_ferr, code
+  integer, external :: node_fd_errors, el_par_vector
+  integer :: n_ferr, code, elpar_vl
 
-  code    = node_value('mad8_type ')
-  arad    = get_value('probe ','arad ')
-  beta    = get_value('probe ','beta ')
-  gamma   = get_value('probe ','gamma ')
-  radiate = get_value('probe ','radiate ') .ne. zero
-
+  !code    = node_value('mad8_type ')
+  !arad    = get_value('probe ','arad ')
+  !beta    = get_value('probe ','beta ')
+  !gamma   = get_value('probe ','gamma ')
+  !radiate = get_value('probe ','radiate ') .ne. zero
+  !All these were removed since they were global parameters. 
+  
+  elpar_vl = el_par_vector(b_k3s, g_elpar)
   !---- Read-in dipole edges angles
-  e1    = node_value('e1 ');
-  e2    = node_value('e2 ');
-  h1    = node_value('h1 ')
-  h2    = node_value('h2 ')
-  hgap  = node_value('hgap ')
-  fint  = node_value('fint ')
-  fintx = node_value('fintx ')
+  !e1    = node_value('e1 ');
+  !e2    = node_value('e2 ');
+  e1 = g_elpar(b_e1)
+  e2 = g_elpar(b_e2)
+  !h1    = node_value('h1 ')
+  !h2    = node_value('h2 ')
+  h1 = g_elpar(b_h1)
+  h2 = g_elpar(b_h2)
+  !hgap  = node_value('hgap ')
+  !fint  = node_value('fint ')
+  !fintx = node_value('fintx ')
+  hgap = g_elpar(b_hgap)
+  fint = g_elpar(b_fint)
+  fintx = g_elpar(b_fintx)
+  
   length = node_value('l ')
-  angle = node_value('angle ')
+  angle  = g_elpar(b_angle)
+
   rho = abs(length/angle)
   h = angle/length
-  k0 = node_value('k0 ') ! was h
-  k1 = node_value('k1 ')
+  k0 = g_elpar(b_k0)
+  k1 = g_elpar(b_k1)
+  !k0 = node_value('k0 ') ! was h
+  !k1 = node_value('k1 ')
+
 
   if (code .eq. code_rbend) then
      e1 = e1 + angle / two;
@@ -4818,7 +4839,7 @@ subroutine tttdipole(track, ktrack)
            curv = sqrt(hx**2+hy**2);
            call trphot(length * (one + h*x) - two * tan(e1)*x, curv, rfac, pt);
         else
-           beta_gamma = delta_plus_1 * gamma * beta;
+           beta_gamma = delta_plus_1 * gammas * beta;
            rfac = (arad * beta_gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e1)*x)
         endif
         if (damp) then
@@ -4850,7 +4871,7 @@ subroutine tttdipole(track, ktrack)
            curv = sqrt(hx**2+hy**2);
            call trphot(length * (one + h*x) - two * tan(e2)*x, curv, rfac, pt);
         else
-           beta_gamma = delta_plus_1 * gamma * beta;
+           beta_gamma = delta_plus_1 * gammas * beta;
            rfac = (arad * beta_gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e2)*x)
         endif
         if (damp) then
