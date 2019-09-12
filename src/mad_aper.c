@@ -437,15 +437,16 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 
   element_vector(current_node->p_elem, "aperture", aperture_vec);
 
+  if(current_node->p_elem->aper->custom_inter==1){
+      element_vector(current_node->p_elem, "aper_vx", pipex);
+      *pipelength = element_vector(current_node->p_elem, "aper_vy", pipey);
+      *ap1 = *ap2 = *ap3 = *ap4 = 0;
+      return 1;
+  }
 
   int debug = get_option("debug");
   if (debug)
     printf("+++ aper_build_screen; apertype = '%s' quarterlength = %d\n",apertype, quarterlength);
-
-
-  if(pipex[0]!=-1) return 0;
-  
-  *pipelength = -1;
 
   if (!strcmp(apertype,"circle")) {
     *ap3 = aperture_vec[0]; /*radius circle*/
@@ -584,12 +585,6 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     *pipelength = aper_external_file(apertype, pipex, pipey);
     *ap1 = *ap2 = *ap3 = *ap4 = 0;
     if (*pipelength > -1) return 1; else return 0;
-  }
-  if(current_node->p_elem->aper->custom_inter==1){
-      element_vector(current_node->p_elem, "aper_vx", pipex);
-      *pipelength = element_vector(current_node->p_elem, "aper_vy", pipey);
-      *ap1 = *ap2 = *ap3 = *ap4 = 0;
-      return 1;
   }
 
   *pipelength = -1;

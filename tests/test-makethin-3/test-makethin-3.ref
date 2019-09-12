@@ -1,11 +1,9 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.08.30 10:30:52      +
-  +     MAD-X 5.05.02  (64 bit, Darwin)      +
-  + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2019.08.30 11:48:39      +
+  + Execution date: 2019.09.12 16:58:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
