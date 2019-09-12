@@ -4575,7 +4575,7 @@ subroutine tttquad(track, ktrack)
 
   double precision :: hx, hy, rfac, gamma, beta, curv
   double precision :: beta_gamma, beta_sqr, f_damp_t
-  integer :: jtrk
+  integer :: jtrk, elpar_vl
 
   double precision, external :: node_value
   double precision, parameter ::  sqrt2=1.41421356237310d0
@@ -4583,13 +4583,14 @@ subroutine tttquad(track, ktrack)
   double precision, external :: get_value
 
   double precision :: f_errors(0:maxferr)
-  integer, external :: node_fd_errors
+  integer, external :: node_fd_errors, el_par_vector
   integer :: n_ferr
-
+  elpar_vl = el_par_vector(q_k1s, g_elpar)
   !gamma = get_value('probe ','gamma ')
   !beta = get_value('probe ','beta ')
 
   !---- Read-in the parameters
+  elpar_vl = el_par_vector(r_freq, g_elpar)
   
   length = node_value('l ');
   tilt = g_elpar(q_tilt)
@@ -4758,8 +4759,8 @@ subroutine tttdipole(track, ktrack, code)
 
   double precision, external :: node_value, get_value
   double precision :: f_errors(0:maxferr)
-  integer, external :: node_fd_errors
-  integer :: n_ferr, code
+  integer, external :: node_fd_errors, el_par_vector
+  integer :: n_ferr, code, elpar_vl
 
   !code    = node_value('mad8_type ')
   !arad    = get_value('probe ','arad ')
@@ -4767,7 +4768,8 @@ subroutine tttdipole(track, ktrack, code)
   !gamma   = get_value('probe ','gamma ')
   !radiate = get_value('probe ','radiate ') .ne. zero
   !All these were removed since they were global parameters. 
-
+  
+  elpar_vl = el_par_vector(b_k3s, g_elpar)
   !---- Read-in dipole edges angles
   !e1    = node_value('e1 ');
   !e2    = node_value('e2 ');
