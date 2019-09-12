@@ -373,8 +373,9 @@ printf("deffininiggggg1 aperture \n");
       el->aper->ylist[tmp_l]=el->aper->ylist[0];
        printf("deffininigggggap_not aperture %d \n", el->aper->apertype);
       if(el->aper->apertype==notdefined){ //If no other aperture is defined then a 10 meter rectangle is set! 
-        el->aper->apertype=circle; // sets it to a rcircle so the check is still done
-        el->aper->aperture[0] = 1e-11; // trick to not end up in the case where it is ignored
+        el->aper->apertype=custom; // sets it to a rcircle so the check is still done
+        el->aper->aperture[0] = 0; // trick to not end up in the case where it is ignored
+        el->aper->aperture[1] = 0;
         printf("deffininigggggap00000 aperture \n");
       }
     }
@@ -382,7 +383,7 @@ printf("deffininiggggg1 aperture \n");
 }
 
 void update_node_aperture(void){
-  char *type;
+ /* char *type;
 //enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon};
   type = command_par_string("apertype", current_node->p_elem->def);
   current_node->p_elem->aper->custom_inter = 0; 
@@ -419,6 +420,7 @@ void update_node_aperture(void){
     element_vector(current_node->p_elem, "aper_vx", current_node->p_elem->aper->xlist);
     element_vector(current_node->p_elem, "aper_vy", current_node->p_elem->aper->ylist);
   }
+  */
 }
 
 int is_custom_set(void){

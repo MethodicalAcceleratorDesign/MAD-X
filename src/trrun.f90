@@ -19,7 +19,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !          Interface RUN and DYNAP command to tracking routine         *
   !                                                                      *
   !-- Input:                                                             *
-  !   switch  (int)         1: RUN, 2: DYNAP fastune                     *
+  !   switch  (int)         1: RUN, 2: DYNAP fastune            f         *
   !   turns   (int)         number of turns to track                     *
   !   orbit0  (dp. array)   start of closed orbit                        *
   !   rt      (dp. matrix)  one-turn matrix                              *
@@ -830,10 +830,12 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   endif
 
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
+       print *, "apint", apint, "ap_notset", ap_notset
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
     
      apint=node_apertype()
+     print *, "apint", apint, "ap_notset", ap_notset
      if(apint .eq. ap_notset) then
     ! make global check even if aperture is not defined
     lost_global =.false.
