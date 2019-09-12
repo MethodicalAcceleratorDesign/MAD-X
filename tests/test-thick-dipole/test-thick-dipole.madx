@@ -14,16 +14,16 @@ endsequence;
 beam,energy=1.e6; ! default is positron, 1 GeV,  use 1000 TeV to get beta close to 1  and dispersion terms to 1.e-13
 use, sequence=myseq;
 
-select, flag=makethin, class=sbend, thick=true; ! thick slice, with dipedge conversion    with dipedge  perfect  (to e-16)
+!select, flag=makethin, class=sbend, rbend, quadrupole thick=true; ! thick slice, with dipedge conversion    with dipedge  perfect  (to e-16)
 
-makethin, sequence=myseq,style=teapot, makedipedge=false;
+!makethin, sequence=myseq,style=teapot, makedipedge=false;
 
-use, sequence=myseq;
+!use, sequence=myseq;
 
-track, onepass, dump;
-start, x=0, px=0, y=1e-6, py=0, t=0, pt=-1e-2;
+track, onepass;
+!start, x=0, px=0, y=1e-6, py=0, t=0, pt=-1e-2;
 start, x=0, px=0, y=1e-6, py=0, t=0, pt=0;
-start, x=0, px=0, y=1e-6, py=0, t=0, pt=1e-2;
-run, turns=1;
+!start, x=0, px=0, y=1e-6, py=0, t=0, pt=1e-2;
+run, turns=1000000;
 endtrack;
 stop;

@@ -4766,6 +4766,7 @@ subroutine tttdipole(track, ktrack, code)
   !beta    = get_value('probe ','beta ')
   !gamma   = get_value('probe ','gamma ')
   !radiate = get_value('probe ','radiate ') .ne. zero
+  !All these were removed since they were global parameters. 
 
   !---- Read-in dipole edges angles
   !e1    = node_value('e1 ');
