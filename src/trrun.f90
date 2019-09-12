@@ -2902,7 +2902,7 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
      case(ap_custom)
         ap1 = aperture(1)
         ap2 = aperture(2)
-     case(ap_notset)
+     case(ap_custom_inter)
      ! Intenitionaly left blank. 
 
 
@@ -2968,15 +2968,20 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
           y = z(3,i) - al_errors(12) - offset(2)
           lost = inside_userdefined_geometry(x,y) .eq. 0
       endif
+      case(ap_custom_inter)
+        lost = .true.
      case default
 
      end select
-     is_custom = is_custom_set() .eq. 1
-
-     if(is_custom) then
-       lost = inside_userdefined_geometry(x,y) .eq. 0
+     if(lost) then
+       is_custom = is_custom_set() .eq. 1
+       if(is_custom) then
+          x = z(1,i) - al_errors(11) - offset(1)
+          y = z(3,i) - al_errors(12) - offset(2)
+          lost = inside_userdefined_geometry(x,y) .eq. 0  
+       endif
      endif
-     print *, "heeereee "
+    
 
      if (.not. lost) then
         lost =  ISNAN(z(2,i)) .or. ISNAN(z(4,i))                                .or. &

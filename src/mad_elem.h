@@ -2,7 +2,7 @@
 #define MAD_ELEM_H
 
 // types
-enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon, custom, notdefined};
+enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon, custom, notdefined, custom_inter};
 enum track_enums{non_existing, enum_other_bv, enum_lrad, enum_noise, enum_angle, enum_time_var};
 struct node;
 struct name_list;
