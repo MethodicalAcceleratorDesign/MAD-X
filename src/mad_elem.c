@@ -365,15 +365,14 @@ void set_aperture_element(struct element *el, struct command* def){
         el->aper->xlist[i] = tmpx[i];
         el->aper->ylist[i] = tmpy[i];
       }
+      printf("2nd last %f, and last %f %d", el->aper->xlist[tmp_l-2], el->aper->xlist[tmp_l-1], tmp_l);
 
 
-      el->aper->length = tmp_l; // minus 1 or not ?? has to be there because of how the algorithm is done.  
+      el->aper->length = tmp_l-2; // minus 1 or not ?? has to be there because of how the algorithm is done.  
       el->aper->xlist[tmp_l]=el->aper->xlist[0];
       el->aper->ylist[tmp_l]=el->aper->ylist[0];
       if(el->aper->apertype==notdefined){ //If no other aperture is defined then a 10 meter rectangle is set! 
         el->aper->apertype=custom_inter; // sets it to a rcircle so the check is still done
-        //el->aper->aperture[0] = 0; // trick to not end up in the case where it is ignored
-        //el->aper->aperture[1] = 0;
       }
     }
   }
