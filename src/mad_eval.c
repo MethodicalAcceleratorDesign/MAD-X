@@ -286,13 +286,10 @@ pro_input(char* statement)
     {
       if (type == 6)
       {
-        get_bracket_range(&statement[start], '(', ')', &rs, &re);
-        ktmp = re+1;
-        if (re > rs && strchr(&statement[ktmp], ':')) /* formal arg.s */
-        {
-          get_bracket_range(&statement[ktmp], '(', ')', &rs, &re);
-          rs += ktmp; re += ktmp;
-        }
+        /* search parens after formal args:  m(a, b): line=(...); */
+        ktmp = strchr(&statement[start], ':') - &statement[start];
+        get_bracket_range(&statement[start+ktmp], '(', ')', &rs, &re);
+        rs += ktmp; re += ktmp;
       }
       else get_bracket_range(&statement[start], '{', '}', &rs, &re);
       if (re > rs)
