@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:08:43      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.09.18 03:58:46      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "test of line expansion in MAD-X"; 
 
@@ -123,6 +123,41 @@ Use, sequence=T4;
 TOP Expand_sequence name t4 with length 6.000000e+00, ref_flag 0
 Survey, sequence=T4;
 
+
+
+! Regression tests:
+
+
+
+! This snippet previously resulted in T5 not being defined correctly,
+
+! leading to the message "++++++ warning: unknown sequence skipped: t5":
+
+kappa=0; T5: LINE=(D1);
+
+Use, sequence=T5;
+
+   in get_node_pos: name: t5$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: t5$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: d1, pos: 5.000000e-01, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: d1, from: 0.000000e+00			  ---> final pos: 5.000000e-01 
+   in get_node_pos: name: t5$end, pos: 1.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: t5$end, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+
+
+TOP Expand_sequence name t5 with length 1.000000e+00, ref_flag 0
+
+
+! This snippet previously resulted in the `kappa=2` statement being ignored,
+
+! leading to the message "kappa not found":
+
+D3: drift, L=1; T6: LINE=(D1); kappa=2;
+
+++++++ info: kappa redefined
+show, kappa;
+
+kappa               =                  2 ;
 
 
 Exit;
