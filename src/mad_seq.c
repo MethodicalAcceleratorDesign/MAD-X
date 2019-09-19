@@ -1973,6 +1973,48 @@ exec_save(struct in_cmd* cmd)
   struct command_parameter* clp;
   default_beam_saved = 0;
 
+      //restart_sequ();
+    //double tmp = 0;
+  //while(1){
+   // set_command_par_value("chkick",current_node->p_elem->def,current_node->chkick);
+    //set_command_par_value("cvkick",current_node->p_elem->def, current_node->cvkick);
+    //if (advance_node()==0) break;
+      
+ // }
+//    printf("kkkkkk %d \n", l);
+  dump_name_list(sequences->list);
+    for (int l =0;  l< sequences->list->curr; l ++){
+
+  //for (int l=0; l<sequences->max; l++){
+    printf("kkkkkk %d \n", l);
+    if(sequences->sequs[l] == 0x0) break;
+    
+    printf("kkkkkk2 %d \n", l);
+    //sequ=sequences->sequs[l];
+    //current_sequ = sequences->sequs[l];
+    //store_orbit_correctors();
+
+    
+      //current_sequ = sequences->sequs[l];
+      set_sequence(sequences->list->names[l]);
+      store_orbit_correctors();
+
+      printf("namemeeee %s %d", current_sequ->name, l);
+    
+   /* c_node = sequ->start;
+    
+      while(1){
+        set_command_par_value("chkick",c_node->p_elem->def,c_node->chkick);
+        set_command_par_value("cvkick",c_node->p_elem->def, c_node->cvkick);
+        if (c_node == sequ->end) break;
+          c_node = c_node->next;
+      }
+     }*/
+
+  }
+  
+  //store_orbit_correctors();
+
   filename = command_par_string_user("file", cmd->clone);
   if (!filename) {
     warning("save without file:", "ignored");
@@ -2043,6 +2085,8 @@ exec_save(struct in_cmd* cmd)
     while (c_node != NULL) {
       if ((el = c_node->p_elem) != NULL && strchr(el->name, '$') == NULL
           && strcmp(el->base_type->name, "drift") != 0) {
+         
+
         while (el->base_type != el) {
           add_to_el_list(&el, 0, ell, 0);
           el = el->parent;
@@ -2058,6 +2102,7 @@ exec_save(struct in_cmd* cmd)
                                   recursive, since elements may be added */
       prev = ell->curr;
       for (i = n; i < ell->curr; i++)
+
         fill_elem_var_list(ell->elem[i], ell, varl);
       n = prev;
     }

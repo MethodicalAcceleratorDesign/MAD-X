@@ -311,7 +311,10 @@ node_value(const char* par)
   if (strcmp(lpar, "l") == 0) value = current_node->length;
 /*  else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;*/
   else if (strcmp(lpar, "other_bv") == 0) value = current_node->other_bv;
-  else if (strcmp(lpar, "chkick") == 0) value = current_node->chkick;
+  else if (strcmp(lpar, "chkick") == 0) {
+    value = current_node->chkick;
+    //printf("uuuuuuuu %s %s %e \n",current_sequ->name, current_node->name,current_node->chkick );
+  }
   else if (strcmp(lpar, "cvkick") == 0) value = current_node->cvkick;
   else if (strcmp(lpar, "obs_point") == 0) value = current_node->obs_point;
   else if (strcmp(lpar, "sel_sector") == 0) value = current_node->sel_sector;
@@ -330,6 +333,7 @@ node_value(const char* par)
 double node_obs_point(void){
   return current_node->obs_point;
 }
+
 
 void set_tt_multipoles(int *maxmul){
   int tmp_n, tmp_s;
@@ -448,6 +452,19 @@ retreat_node(void)
   current_node = current_node->previous;
   return 1;
 }
+void store_orbit_correctors(void){
+
+
+    restart_sequ();
+    double tmp = 0;
+  while(1){
+    set_command_par_value("chkick",current_node->p_elem->def,current_node->chkick);
+    set_command_par_value("cvkick",current_node->p_elem->def, current_node->cvkick);
+    if (advance_node()==0) break;
+      
+  }
+
+}
 
 void
 store_node_value(const char* par, double* value)
@@ -458,7 +475,7 @@ store_node_value(const char* par, double* value)
 
   mycpy(lpar, par);
   if (strcmp(lpar, "chkick") == 0) current_node->chkick = *value;
-  else if (strcmp(lpar, "cvkick") == 0) current_node->cvkick = *value;
+  else if (strcmp(lpar, "cvkick") == 0)current_node->cvkick = *value;
 /*  else if (strcmp(lpar, "dipole_bv") == 0) current_node->dipole_bv = *value;*/
   else if (strcmp(lpar, "other_bv") == 0) current_node->other_bv = *value;
   else if (strcmp(lpar, "obs_point") == 0) current_node->obs_point = *value;
@@ -674,8 +691,10 @@ advance_node(void)
   /* advances to next node in expanded sequence;
      returns 0 if end of range, else 1 */
 {
+
   if (current_node == current_sequ->range_end)  return 0;
   current_node = current_node->next;
+
   return 1;
 }
 
