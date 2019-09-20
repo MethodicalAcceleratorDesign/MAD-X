@@ -1378,7 +1378,7 @@ const char *const_command_def =
 " "
 "add2expr: control none 0 0 "
 "var = [s, none], "
-"expr = [s, none], "
+"expr = [s, none]; "
 " "
 "setvars_knob: control none 0 0 "
 "table = [s, none], "
