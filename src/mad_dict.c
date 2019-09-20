@@ -293,6 +293,7 @@ const char *const_command_def =
 "warn     = [l, true, true], "
 "update_from_parent = [l, false, true], "
 "keep_exp_move = [l, false, true], "
+"thin_cf = [l, false, true], "
   /* BB and SPCH related options */
 "bborbit          = [l, false, true], " /* frs */
 "bb_ultra_relati  = [l, false, true], " /* frs */
@@ -376,6 +377,7 @@ const char *const_command_def =
 "beam     = [l, false, true],"
 "mad8     = [l, false, true], "
 "noexpr   = [l, false, true], "
+"csave   = [l, false, true], "
 "file     = [s, save, save], "
 "newname  = [s, dummy, dummy]; "
 " "

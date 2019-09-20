@@ -56,7 +56,9 @@ clone_node(struct node* p, int flag)
   clone->rfm_freq = p->rfm_freq;
   clone->rfm_volt = p->rfm_volt;
   clone->rfm_harmon = p->rfm_harmon;
-  //
+
+  clone->chkick = p->chkick;
+  clone->cvkick = p->cvkick;
   return clone;
 }
 
@@ -311,10 +313,7 @@ node_value(const char* par)
   if (strcmp(lpar, "l") == 0) value = current_node->length;
 /*  else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;*/
   else if (strcmp(lpar, "other_bv") == 0) value = current_node->other_bv;
-  else if (strcmp(lpar, "chkick") == 0) {
-    value = current_node->chkick;
-    //printf("uuuuuuuu %s %s %e \n",current_sequ->name, current_node->name,current_node->chkick );
-  }
+  else if (strcmp(lpar, "chkick") == 0) value = current_node->chkick;
   else if (strcmp(lpar, "cvkick") == 0) value = current_node->cvkick;
   else if (strcmp(lpar, "obs_point") == 0) value = current_node->obs_point;
   else if (strcmp(lpar, "sel_sector") == 0) value = current_node->sel_sector;
@@ -456,7 +455,6 @@ void store_orbit_correctors(void){
 
 
     restart_sequ();
-    double tmp = 0;
   while(1){
     set_command_par_value("chkick",current_node->p_elem->def,current_node->chkick);
     set_command_par_value("cvkick",current_node->p_elem->def, current_node->cvkick);

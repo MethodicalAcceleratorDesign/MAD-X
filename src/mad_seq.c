@@ -1972,45 +1972,15 @@ exec_save(struct in_cmd* cmd)
   struct var_list* varl;
   struct command_parameter* clp;
   default_beam_saved = 0;
+  char tmp_s[100];
 
-      //restart_sequ();
-    //double tmp = 0;
-  //while(1){
-   // set_command_par_value("chkick",current_node->p_elem->def,current_node->chkick);
-    //set_command_par_value("cvkick",current_node->p_elem->def, current_node->cvkick);
-    //if (advance_node()==0) break;
-      
- // }
-//    printf("kkkkkk %d \n", l);
-  dump_name_list(sequences->list);
+
+  if(command_par_value("csave", cmd->clone)!=0){
     for (int l =0;  l< sequences->list->curr; l ++){
-
-  //for (int l=0; l<sequences->max; l++){
-    printf("kkkkkk %d \n", l);
-    if(sequences->sequs[l] == 0x0) break;
-    
-    printf("kkkkkk2 %d \n", l);
-    //sequ=sequences->sequs[l];
-    //current_sequ = sequences->sequs[l];
-    //store_orbit_correctors();
-
-    
-      //current_sequ = sequences->sequs[l];
-      set_sequence(sequences->list->names[l]);
+      strcpy(tmp_s,sequences->list->names[l] ); //otherwise there is a warning from the fact that it is not expecting const
+      set_sequence(tmp_s);
       store_orbit_correctors();
-
-      printf("namemeeee %s %d", current_sequ->name, l);
-    
-   /* c_node = sequ->start;
-    
-      while(1){
-        set_command_par_value("chkick",c_node->p_elem->def,c_node->chkick);
-        set_command_par_value("cvkick",c_node->p_elem->def, c_node->cvkick);
-        if (c_node == sequ->end) break;
-          c_node = c_node->next;
-      }
-     }*/
-
+    }
   }
   
   //store_orbit_correctors();

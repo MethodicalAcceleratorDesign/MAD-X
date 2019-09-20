@@ -742,7 +742,7 @@ subroutine init_elements
       call set_tt_attrib(enum_sinkick, node_value('sinkick '))
       call set_tt_attrib(enum_kick, node_value('kick '))
       call set_tt_attrib(enum_chkick, node_value('chkick '))
-      call set_tt_attrib(enum_cvkick, node_value('chkick '))
+      call set_tt_attrib(enum_cvkick, node_value('cvkick '))
       call set_tt_attrib(enum_hkick, node_value('hkick '))
       call set_tt_attrib(enum_vkick, node_value('vkick '))
     endif 
