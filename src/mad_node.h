@@ -114,6 +114,7 @@ double get_tt_attrib(int *index);
 void set_tt_multipoles(int *maxmul);
 void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl);
 double node_obs_point(void);
+void store_orbit_correctors(void);
 
 #endif // MAD_NODE_H
 

@@ -1972,6 +1972,18 @@ exec_save(struct in_cmd* cmd)
   struct var_list* varl;
   struct command_parameter* clp;
   default_beam_saved = 0;
+  char tmp_s[100];
+
+
+  if(command_par_value("csave", cmd->clone)!=0){
+    for (int l =0;  l< sequences->list->curr; l ++){
+      strcpy(tmp_s,sequences->list->names[l] ); //otherwise there is a warning from the fact that it is not expecting const
+      set_sequence(tmp_s);
+      store_orbit_correctors();
+    }
+  }
+  
+  //store_orbit_correctors();
 
   filename = command_par_string_user("file", cmd->clone);
   if (!filename) {
@@ -2043,6 +2055,8 @@ exec_save(struct in_cmd* cmd)
     while (c_node != NULL) {
       if ((el = c_node->p_elem) != NULL && strchr(el->name, '$') == NULL
           && strcmp(el->base_type->name, "drift") != 0) {
+         
+
         while (el->base_type != el) {
           add_to_el_list(&el, 0, ell, 0);
           el = el->parent;
@@ -2058,6 +2072,7 @@ exec_save(struct in_cmd* cmd)
                                   recursive, since elements may be added */
       prev = ell->curr;
       for (i = n; i < ell->curr; i++)
+
         fill_elem_var_list(ell->elem[i], ell, varl);
       n = prev;
     }
