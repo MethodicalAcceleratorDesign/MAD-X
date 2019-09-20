@@ -67,6 +67,7 @@ control(struct in_cmd* cmd)
   // known control command in the same order as in mad_dict.c
   if      (strcmp(toks[k], "assign")      == 0) exec_assign(cmd);
   else if (strcmp(toks[k], "beam")        == 0) exec_beam(cmd, 0);
+  else if (strcmp(toks[k], "add2expr")    == 0) exec_add_expression(cmd);
   else if (strcmp(toks[k], "beta0")       == 0) store_beta0(cmd);
   else if (strcmp(toks[k], "call")        == 0) exec_call(cmd);
   else if (strcmp(toks[k], "chdir")       == 0) exec_chdir(cmd);
@@ -753,6 +754,58 @@ add_to_command_list_list(char* label, struct command_list* cl, struct command_li
     if (sl->curr == sl->max) grow_command_list_list(sl);
     add_to_name_list(permbuff(label), 0, sl->list);
     sl->command_lists[sl->curr++] = cl;
+  }
+}
+
+void exec_add_expression(struct in_cmd* cmd){
+  char* varname = command_par_string_user("var", cmd->clone);
+  char* expchar = command_par_string_user("expr", cmd->clone);
+  if(expchar==NULL){
+    warning("Need to add an expression for: ", varname);
+    return;
+  }
+  struct variable* var;
+  struct expression* expr1, *expr2; 
+  struct expression* exprcomb;
+
+  if ((var = find_variable(varname, variable_list)) != NULL){
+      
+    if(var->type==2){
+      if(var->expr==NULL){
+
+        char *result = malloc(100 * sizeof(char));
+        sprintf(result, "%.16f", var->value);
+        expr1 = new_expression(result,NULL);
+        free(result);
+        var->expr = mymalloc("add expression", sizeof *var->expr);
+      }
+      else {
+        expr1 = clone_expression(var->expr);
+      }
+      expr2 = new_expression(expchar,NULL);
+      exprcomb = compound_expr(expr1, expression_value(expr1, 2), "+", expr2, expression_value(expr2, 2));
+      memcpy (var->expr, exprcomb, sizeof(*exprcomb));
+    }
+    else if (var->type==1){
+
+      char *result = malloc(100 * sizeof(char));
+      sprintf(result, "%.16f", var->value);
+      expr1 = new_expression(result,NULL);
+      free(result);
+      
+      expr2 = new_expression(expchar,NULL);
+      exprcomb = compound_expr(expr1, expression_value(expr1, 2), "+", expr2, expression_value(expr2, 2));
+      var->expr = mymalloc("add expression", sizeof *var->expr);
+      memcpy (var->expr, exprcomb, sizeof(*exprcomb));
+      var->type=2; //makes it an expression
+    }
+    else{
+      warning("Varialbe has to be declared as defered expression or as an assignment: ", varname);
+    }
+
+  }
+  else{
+    warning("The variable that trying to add expression to is not existing: ", varname);
   }
 }
 

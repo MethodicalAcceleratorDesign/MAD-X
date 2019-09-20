@@ -1,0 +1,21 @@
+x:=1;
+y=2;
+z=z1;
+
+add2expr, var = x, expr=a;
+add2expr, var = y, expr=b;
+add2expr, var = z, expr=c;
+
+z1=100; ! Doesn't change because not a defered expression
+
+a=2; 
+b=3;
+c=4;
+
+show, x;
+show, y;
+show, z;
+
+value, x;
+value, y;
+value, z;

@@ -1,0 +1,61 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.09.20 16:43:59      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+x:=1;
+
+y=2;
+
+z=z1;
+
+
+
+add2expr, var = x, expr=a;
+
+add2expr, var = y, expr=b;
+
+add2expr, var = z, expr=c;
+
+
+
+z1=100; ! Doesn't change because not a defered expression
+
+
+
+a=2; 
+
+b=3;
+
+c=4;
+
+
+
+show, x;
+
+x                  := ( 1.0000000000000000 ) + ( a )  ;
+show, y;
+
+y                  := ( 2.0000000000000000 ) + ( b )  ;
+show, z;
+
+z                  := ( 0.0000000000000000 ) + ( c )  ;
+
+
+value, x;
+
+x                  =                  3 ;
+value, y;
+
+y                  =                  5 ;
+value, z;
+
+z                  =                  4 ;
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
