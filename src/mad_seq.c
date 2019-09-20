@@ -1178,7 +1178,7 @@ seq_move_expression(struct in_cmd* cmd)
                      free(result);
                     }
 
-                    newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                    newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2),1);
                   }
                   else
                   {
@@ -1233,7 +1233,7 @@ seq_move_expression(struct in_cmd* cmd)
                         expr = new_expression(result2,NULL);
                         free(result);
                         free(result2);
-                        newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                        newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2),1);
                       }
 
                     }
@@ -1259,7 +1259,7 @@ seq_move_expression(struct in_cmd* cmd)
                         }
 
                         //printf("heereeeby %e \n", by);
-                        newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+                        newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2),1);
                         //printf("heeeereee %e %e\n", expression_value(tmp, 2), expression_value(expr, 2));
                         //printf("heeeereeea %.16e, %.16e \n", expression_value(newexp, 2), at);
                         //dump_expression(newexp);
@@ -1342,7 +1342,7 @@ seq_move_expression(struct in_cmd* cmd)
               tmp = new_expression(result,NULL);
               free(result);
             }
-            newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2));
+            newexp = compound_expr(tmp, expression_value(tmp, 2), "+", expr, expression_value(expr, 2),1);
 
           }
           el = node->p_elem;

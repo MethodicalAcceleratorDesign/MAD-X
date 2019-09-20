@@ -3,6 +3,7 @@ y=2;
 z=z1;
 
 add2expr, var = x, expr=a;
+add2expr, var = x, expr=b;
 add2expr, var = y, expr=b;
 add2expr, var = z, expr=c;
 

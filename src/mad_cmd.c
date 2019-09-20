@@ -783,7 +783,7 @@ void exec_add_expression(struct in_cmd* cmd){
         expr1 = clone_expression(var->expr);
       }
       expr2 = new_expression(expchar,NULL);
-      exprcomb = compound_expr(expr1, expression_value(expr1, 2), "+", expr2, expression_value(expr2, 2));
+      exprcomb = compound_expr(expr1, expression_value(expr1, 2), "+", expr2, expression_value(expr2, 2), 0);
       memcpy (var->expr, exprcomb, sizeof(*exprcomb));
     }
     else if (var->type==1){
@@ -794,7 +794,7 @@ void exec_add_expression(struct in_cmd* cmd){
       free(result);
       
       expr2 = new_expression(expchar,NULL);
-      exprcomb = compound_expr(expr1, expression_value(expr1, 2), "+", expr2, expression_value(expr2, 2));
+      exprcomb = compound_expr(expr1, expression_value(expr1, 2), "+", expr2, expression_value(expr2, 2),0);
       var->expr = mymalloc("add expression", sizeof *var->expr);
       memcpy (var->expr, exprcomb, sizeof(*exprcomb));
       var->type=2; //makes it an expression
