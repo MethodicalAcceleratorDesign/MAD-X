@@ -432,10 +432,14 @@ make_elem_node(struct element* el, int occ_cnt)
   prev_node = current_node;
   current_node = new_elem_node(el, occ_cnt);
   current_node->occ_cnt = occ_cnt;
+  current_node->chkick = el_par_value("chkick", el);
+  current_node->cvkick = el_par_value("cvkick", el);
   add_to_node_list(current_node, 0, current_sequ->nodes);
+
   if (prev_node != NULL) prev_node->next = current_node;
   current_node->previous = prev_node;
   current_node->next = NULL;
+
 }
 
 struct element*

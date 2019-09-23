@@ -293,6 +293,7 @@ const char *const_command_def =
 "warn     = [l, true, true], "
 "update_from_parent = [l, false, true], "
 "keep_exp_move = [l, false, true], "
+"thin_cf = [l, false, true], "
   /* BB and SPCH related options */
 "bborbit          = [l, false, true], " /* frs */
 "bb_ultra_relati  = [l, false, true], " /* frs */
@@ -376,6 +377,7 @@ const char *const_command_def =
 "beam     = [l, false, true],"
 "mad8     = [l, false, true], "
 "noexpr   = [l, false, true], "
+"csave   = [l, false, true], "
 "file     = [s, save, save], "
 "newname  = [s, dummy, dummy]; "
 " "
@@ -1373,6 +1375,10 @@ const char *const_command_def =
 "row1 = [i, 0], "
 "row2 = [i, 0], "
 "param = [s, interp]; " // change default t to interp
+" "
+"add2expr: control none 0 0 "
+"var = [s, none], "
+"expr = [s, none]; "
 " "
 "setvars_knob: control none 0 0 "
 "table = [s, none], "
