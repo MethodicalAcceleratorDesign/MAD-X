@@ -365,7 +365,7 @@ void set_aperture_element(struct element *el, struct command* def){
         el->aper->xlist[i] = tmpx[i];
         el->aper->ylist[i] = tmpy[i];
       }
-      printf("2nd last %f, and last %f %d", el->aper->xlist[tmp_l-2], el->aper->xlist[tmp_l-1], tmp_l);
+      //printf("2nd last %f, and last %f %d", el->aper->xlist[tmp_l-2], el->aper->xlist[tmp_l-1], tmp_l);
 
 
       el->aper->length = tmp_l-2; // minus 1 or not ?? has to be there because of how the algorithm is done.  
