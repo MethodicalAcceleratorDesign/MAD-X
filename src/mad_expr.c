@@ -432,41 +432,53 @@ scan_expr(int c_item, char** item)   /* split input */
 }
 
 struct expression*
-compound_expr(struct expression* e1, double v1, const char* oper, struct expression* e2, double v2)
+compound_expr(struct expression* e1, double v1, const char* oper, struct expression* e2, double v2, int parentheses)
 /* make one out of two expressions, using oper to connect them
  hbu 9/2005 moved from madxn.c to makethin.c as only used here
  and increased precision   sprintf(tmp, "%e"  ->   sprintf(tmp, "%.14g" */
 {
-  static char lb[] = "(", rb[] = ")";
+   char lb[] = "(", rb[] = ")";
   char** toks = tmp_l_array->p;
   struct expression* expr = NULL;
   char tmp[30], op[30];
   int n;
   strcpy(op, oper);
+  if(parentheses== 0) { //In this way if no parenthesis are chosen they 
+    lb[0] =  (char) 0;
+    rb[0] =  (char) 0;
+    if(e2->string[0]=='-') op[0] =' ';
+  }
+  
   if (e1 != NULL || e2 != NULL)
   {
     if (e1 != NULL)
     {
       if (e2 != NULL)
       {
-        toks[0] = lb; toks[1] = e1->string; toks[2] = rb;
+        toks[0] = lb;
+        toks[1] = e1->string; toks[2] = rb;
         toks[3] = op;
-        toks[4] = lb; toks[5] = e2->string; toks[6] = rb;
+        toks[4] = lb; 
+        toks[5] = e2->string; toks[6] = rb;
       }
       else
       {
         sprintf(tmp, "%.14g", v2); /* hbu */
-        toks[0] = lb; toks[1] = e1->string; toks[2] = rb;
+        toks[0] = lb; 
+        toks[1] = e1->string; toks[2] = rb;
         toks[3] = op;
-        toks[4] = lb; toks[5] = tmp; toks[6] = rb;
+        toks[4] = lb; 
+        toks[5] = tmp; toks[6] = rb;
       }
     }
     else
     {
       sprintf(tmp, "%.14g", v1);  /* hbu */
-      toks[0] = lb; toks[1] = tmp; toks[2] = rb;
+      toks[0] = lb; 
+      toks[1] = tmp; toks[2] = rb;
       toks[3] = op;
-      toks[4] = lb; toks[5] = e2->string; toks[6] = rb;
+      toks[4] = lb; 
+      toks[5] = e2->string; toks[6] = rb;
     }
     join(toks, 7);
     pre_split(c_join->c, l_wrk, 0);
@@ -480,7 +492,7 @@ compound_expr(struct expression* e1, double v1, const char* oper, struct express
 struct expression*
 scale_expr(struct expression* expr,double scale)
 {
-  if (expr) return compound_expr(expr,0,"*",NULL,scale);
+  if (expr) return compound_expr(expr,0,"*",NULL,scale,1);
   return NULL;
 }
 
