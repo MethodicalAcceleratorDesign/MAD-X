@@ -3391,7 +3391,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
      case (code_rbend, code_sbend)
-        call tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
+        call tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te, code)
 
      case (code_matrix)
         call tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
@@ -3467,7 +3467,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
 end SUBROUTINE tmmap
 
-SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
+SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
@@ -3519,9 +3519,11 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   TW = zero
   ct=0.d0; st=0.d0
 
-  code = node_value('mad8_type ')
+  !code = node_value('mad8_type ')
   kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
   kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0 .or. fcentre
+
+
 
   !---- Test for non-zero length.
   fmap = el .ne. zero

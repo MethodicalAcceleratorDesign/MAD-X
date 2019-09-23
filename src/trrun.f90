@@ -19,7 +19,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !          Interface RUN and DYNAP command to tracking routine         *
   !                                                                      *
   !-- Input:                                                             *
-  !   switch  (int)         1: RUN, 2: DYNAP fastune                     *
+  !   switch  (int)         1: RUN, 2: DYNAP fastune            f         *
   !   turns   (int)         number of turns to track                     *
   !   orbit0  (dp. array)   start of closed orbit                        *
   !   rt      (dp. matrix)  one-turn matrix                              *
@@ -716,10 +716,13 @@ subroutine init_elements
   use twtrrfi
   use code_constfi
   implicit none
+  logical:: aperflag
   integer:: j, code
-  integer, external :: restart_sequ, advance_node
+  integer, external :: restart_sequ, advance_node, get_option
   double precision, external :: node_value
+  external :: update_node_aperture
  
+  aperflag = get_option('aperture ') .ne. 0
   
   j = restart_sequ()
   do !---- loop over nodes
@@ -745,7 +748,10 @@ subroutine init_elements
       call set_tt_attrib(enum_cvkick, node_value('cvkick '))
       call set_tt_attrib(enum_hkick, node_value('hkick '))
       call set_tt_attrib(enum_vkick, node_value('vkick '))
-    endif 
+    endif
+    if(aperflag .and. code .ne. code_drift) then
+       call update_node_aperture()
+    endif
     
     if (advance_node() .eq. 0)  exit
 
@@ -824,10 +830,12 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   endif
 
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
+  !     print *, "apint", apint, "ap_notset", ap_notset
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
     
      apint=node_apertype()
+
      if(apint .eq. ap_notset) then
     ! make global check even if aperture is not defined
     lost_global =.false.
@@ -2745,9 +2753,9 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
 
   integer :: i, n, nn, nna
   double precision :: ap1, ap2, ap3, ap4, x, y!, pi
-  logical :: lost, debug
+  logical :: lost, debug, is_custom
 
-  integer, external :: get_option, inside_userdefined_geometry
+  integer, external :: get_option, inside_userdefined_geometry, is_custom_set
   double precision, parameter :: min_double=1.d-36
 
  ! debug = get_option('debug ') .ne. 0
@@ -2894,14 +2902,13 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
      case(ap_custom)
         ap1 = aperture(1)
         ap2 = aperture(2)
-     case(ap_notset)
+     case(ap_custom_inter)
      ! Intenitionaly left blank. 
 
 
      case default
         ! add error case for un-identified aperture type;
         ! this INCLUDES the case of aperture data given in file with input APERTYPE=filename!
-        print *, "nummmmer", apint
         call fort_warn('trcoll:','called with unknown aperture type. Ignored')
 
   end select
@@ -2958,12 +2965,23 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
         lost =  x .gt. ap1 .or. y .gt. ap2 ! First checks the user defined rectangle
         if(lost) then
           x = z(1,i) - al_errors(11) - offset(1)
-        y = z(3,i) - al_errors(12) - offset(2)
-        lost = inside_userdefined_geometry(x,y) .eq. 0
+          y = z(3,i) - al_errors(12) - offset(2)
+          lost = inside_userdefined_geometry(x,y) .eq. 0
       endif
+      case(ap_custom_inter)
+        lost = .true.
      case default
 
      end select
+     if(lost) then
+       is_custom = is_custom_set() .eq. 1
+       if(is_custom) then
+          x = z(1,i) - al_errors(11) - offset(1)
+          y = z(3,i) - al_errors(12) - offset(2)
+          lost = inside_userdefined_geometry(x,y) .eq. 0  
+       endif
+     endif
+    
 
      if (.not. lost) then
         lost =  ISNAN(z(2,i)) .or. ISNAN(z(4,i))                                .or. &
