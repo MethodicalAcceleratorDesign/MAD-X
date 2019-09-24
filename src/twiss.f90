@@ -4224,6 +4224,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   F_ERRORS(0:maxferr) = zero
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
+  print *, "ollldd nord", nord
   ! The "normal" components are considered here as the expansion coefficients of
   ! B_y wrt. the reference plane, while the "skew" components are considered as the
   ! corresponding expansion coefficients of B_x, see documentation. This can
@@ -4241,8 +4242,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   ! Re[\lambda_k] = 1/k! \partial^k B_y / \partial_r^k |_{\varphi = tilt} .
   !
   ! play the role as the k'th skew- and normal field component.
-  kx = normal(0)/(one + deltap)/elrad ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
-  ky = - skew(0)/(one + deltap)/elrad !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
+
 
     !---- Nominal dipole strength.
   dipr = normal(0) / (one + deltap)
@@ -4275,16 +4275,16 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   dbi = bvk * dbi
   dipr = bvk * dipr
   dipi = bvk * dipi
-  !Below here should not be commented out
+  !Below here should not be commented output
   !---- Other components and errors.
-  !nord = 0
+  nord = 0
   ! that loop should start at one since nominal dipole strength already taken into account above
   !needs to be here though
-!  do iord = 0, max(nn, ns, n_ferr/2-1)
-     ! get the maximum effective order; loop runs over maximum of user given values
-!     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
-!          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord
-!  enddo
+  do iord = 0, max(nn, ns, n_ferr/2-1)
+ !    get the maximum effective order; loop runs over maximum of user given values
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
+          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1 
+  enddo
 
   do iord = 1, nord
      f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))   / (one + deltap)
@@ -4305,21 +4305,24 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   enddo
   !Done with all the setting up... 
 
-
+  
   if (elrad.gt.zero) then
-     do k = 0, nord
+  lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad/Factorial(k)
+     do k = 1, nord
         ! The factor (one + deltap) below is taken from the original MAD-X routine.
-        lambda(k) = (normal(k) + (0, 1)*skew(k))/(one + deltap)/elrad/Factorial(k)
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/(one + deltap)/elrad/Factorial(k)
      enddo
   else
      lambda = zero
   endif
-  kx = real(lambda(0))
-  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
-
+  
   !kx = real(lambda(0))    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
   !ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in 
                           ! Phys. Rev. AccelBeams 19.054002
+
+  kx = normal(0)/(one + deltap)/elrad ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
+  ky = - skew(0)/(one + deltap)/elrad !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
+
   kappa = kx + (0, 1)*ky
   barkappa = conjg(kappa)
 
@@ -4327,6 +4330,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   g(0, 0) = (0, 0)
   g(1, 0) = -lambda(0)
   g(1, 1) = conjg(g(1, 0))
+
   do k = 1, nord
      do j = 0, k - 1
         ! Eq. (6), in Ref. above
@@ -4361,9 +4365,9 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      pkick = elrad*(barkappa*(one + deltap) + del_p_g)
      dpx = real(pkick)
      dpy = - aimag(pkick)
-
-     orbit(2) = orbit(2) + dpx
-     orbit(4) = orbit(4) + dpy
+     print *, "dbrrrrllll_cf", dbr, dpx
+     orbit(2) = orbit(2) + dpx - dbr
+     orbit(4) = orbit(4) + dpy - dbi
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
                 *(one + beta*orbit(6))/(one + deltap)/beta
@@ -4580,6 +4584,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      endif
 
      !---- Track orbit.
+     print *, "dbrrrrllll_no", dbr
      orbit(2) = orbit(2) - dpx + dipr * (deltap + bi*orbit(6))
      orbit(4) = orbit(4) + dpy - dipi * (deltap + bi*orbit(6))
      orbit(5) = orbit(5) - (dipr*x + dipi*y) * bi
