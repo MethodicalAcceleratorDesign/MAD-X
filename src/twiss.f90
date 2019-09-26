@@ -4218,7 +4218,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   an = node_value('angle ')
   if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
 
-
   !---- Dipole error.
   dbr = f_errors(0) / (one + deltap)
   dbi = f_errors(1) / (one + deltap)

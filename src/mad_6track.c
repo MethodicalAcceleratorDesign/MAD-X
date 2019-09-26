@@ -3019,10 +3019,9 @@ write_f16_errors(void)
         tmp_buff[i] = current_element->p_fd_err->a_dble[i];
 
       if(fabs(current_element->value[10])>0){
-      
 
       if(tmp_buff[0]==999)
-        tmp_buff[0] = -(current_element->value[12] - current_element->value[10]); // opposite from MADX-X  
+        tmp_buff[0] = -(current_element->value[12] - current_element->value[10]); // SixTrack is opposite from MAD-X -> Change of sign compared to TWISS
       else
         tmp_buff[0] = tmp_buff[0] - (current_element->value[12] + current_element->value[10]);
       }
