@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.08.19 13:40:18      +
+  + Execution date: 2019.09.27 12:10:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Links definitions
 
@@ -352,8 +352,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "19/08/19"
-@ TIME             %08s "13.40.23"
+@ DATE             %08s "27/09/19"
+@ TIME             %08s "12.10.49"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP5"                      6664.568433        11.00260699        11.00650363     0.002850892684    0.0007548514235    0.0004950767763   -2.680921442e-05        15.59181943        14.29786066
@@ -432,8 +432,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "19/08/19"
-@ TIME             %08s "13.40.24"
+@ DATE             %08s "27/09/19"
+@ TIME             %08s "12.10.50"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP1"                                0        11.00474119        11.00406663    -0.003641817309   -0.0006151400488    0.0005597189687   -2.942489079e-05                  0                  0
@@ -445,6 +445,35 @@ enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: cannot open output file: temp/optics0_MB.mad
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003217837049        55.74654754 
+
+                q1                dq1            betxmax              dxmax 
+             64.28                  3        604.9506176        2.855629315 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.355939772                  0                  0              59.31 
+
+               dq2            betymax              dymax              dyrms 
+                 3        614.2388128                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: cannot open output file: temp/optics0_inser.mad
 
 ++++++ table: summ
 
@@ -495,33 +524,10 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
             nflips 
                  0 
-enter Twiss module
-  
-iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
-orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-
-++++++ table: summ
-
-            length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217837049        55.74654754 
-
-                q1                dq1            betxmax              dxmax 
-             64.28                  3        604.9506176        2.855629315 
-
-             dxrms             xcomax             xcorms                 q2 
-       1.355939772                  0                  0              59.31 
-
-               dq2            betymax              dymax              dyrms 
-                 3        614.2388128                 -0                  0 
-
-            ycomax             ycorms             deltap            synch_1 
-                 0                  0                  0                  0 
-
-           synch_2            synch_3            synch_4            synch_5 
-                 0                  0                  0                  0 
-
-            nflips 
-                 0 
+++++++ warning: cannot open output file: temp/alignment_errors.m.tfs
+++++++ warning: cannot open output file: temp/alignment_errors.bpm.tfs
+++++++ warning: cannot open output file: temp/alignment_errors.mb.tfs
+++++++ warning: cannot open output file: temp/alignment_errors.mb.tfs
 Want to make named table: my_target
 enter Twiss module
   
@@ -1327,6 +1333,7 @@ kcs.a12b1          =                  0 ;
 kcs.a78b1          =                  0 ;
 kcs.a12b2          =                  0 ;
 kcs.a78b2          =                  0 ;
+++++++ warning: cannot open output file: temp/MB.errors
 kcs.a12b1          =       0.1464698273 ;
 kcs.a78b1          =      0.08039643636 ;
 kcs.a12b2          =                  0 ;
@@ -2118,6 +2125,7 @@ closest1           =    0.0002224719864 ;
 closest2           =    5.291692548e-05 ;
 cmrskew            =    -0.001808379605 ;
 cmiskew            =    -0.009231412701 ;
+++++++ warning: cannot open output file: temp/MB.static-dynamic.errors
 enter Twiss module
   
 iteration:   1 error:   3.629377E-05 deltap:   1.000000E-06
@@ -3832,8 +3840,8 @@ Determined SECTOR NMUL MAX :  0
        ACCELERATE  =  FALSE
  Closed orbit:   -1.2343454322566903E-005   1.2345112115887018E-006   5.5793498812599410E-006  -5.4998384178734080E-008   0.0000000000000000     
 
-  Number of warnings: 269
-234 in C and 35 in Fortran
+  Number of warnings: 277
+242 in C and 35 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
