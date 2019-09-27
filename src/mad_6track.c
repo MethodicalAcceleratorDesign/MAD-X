@@ -2429,18 +2429,20 @@ pro_elem(struct node* cnode)
     current_element->ref_radius = ref_def;
     get_error_refs(current_element);
   }
-  else if(cnode->p_fd_err==NULL && (strcmp(cnode->base_name, "multipole") == 0)){
-    if(el_par_value("angle",cnode->p_elem)!=0){
-      field_cnt++;
-      current_element->nf_err = 1;
-      current_element->p_fd_err = make_obj("FDDUM",0,FIELD_MAX,0,0);
-      current_element->p_fd_err->c_dble = 1;
-      current_element->p_fd_err->a_dble[0]=-999; //maybe 0 works to be seen.. .
-      current_element->mult_order = 0;
-      current_element->ref_radius = ref_def;
-      get_error_refs(current_element);
-    }
-
+  else if(cnode->p_fd_err==NULL && (strcmp(cnode->base_name, "multipole") == 0) && el_par_value("angle",cnode->p_elem)!=0){
+      double knl_tmp [FIELD_MAX];
+      element_vector(cnode->p_elem, "knl", knl_tmp);
+      //printf("angggleee", knl[0],  )
+      if(fabs(knl_tmp[0] - el_par_value("angle",cnode->p_elem))>1e-7){
+        field_cnt++;
+        current_element->nf_err = 1;
+        current_element->p_fd_err = make_obj("FDDUM",0,FIELD_MAX,0,0);
+        current_element->p_fd_err->c_dble = 1;
+        current_element->p_fd_err->a_dble[0]=-999; //maybe 0 works to be seen.. .
+        current_element->mult_order = 0;
+        current_element->ref_radius = ref_def;
+        get_error_refs(current_element);
+      } 
   }
 
   if (cnode->p_al_err) {
@@ -3023,7 +3025,7 @@ write_f16_errors(void)
       if(tmp_buff[0]==999)
         tmp_buff[0] = -(current_element->value[12] - current_element->value[10]); // SixTrack is opposite from MAD-X -> Change of sign compared to TWISS
       else
-        tmp_buff[0] = tmp_buff[0] - (current_element->value[12] + current_element->value[10]);
+        tmp_buff[0] = tmp_buff[0] - (current_element->value[12] - current_element->value[10]);
       }
 
       for (i = current_element->nf_err; i < FIELD_MAX; i++)
