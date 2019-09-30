@@ -341,11 +341,10 @@ void set_aperture_element(struct element *el, struct command* def){
     tmpy[i] = -999;
   }
   
-  element_vector(el, "aper_vx", tmpx);
-  element_vector(el, "aper_vy", tmpy);
-
+  int lx = element_vector(el, "aper_vx", tmpx);
+  int ly = element_vector(el, "aper_vy", tmpy);
   int tmp_l=MAXARRAY+1;
-  if(tmpx[0]!=-1){
+  if(tmpx[0]!=-1 && ly > 1 && lx >1){
     for(int i=0;i<MAXARRAY;i++){
       if(tmpx[i]==-999 && tmpy[i]==-999){
         tmp_l = i;
