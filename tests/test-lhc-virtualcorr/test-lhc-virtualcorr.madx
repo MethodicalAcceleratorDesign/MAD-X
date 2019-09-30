@@ -5,7 +5,7 @@ option, warn,info;
 !###################################################################################################################################
 !System,"rm -r temp";
 !System,"rm -r output";
-!System,"mkdir -p temp";
+System,"mkdir -p temp";
 System,"mkdir -p output";
 !######################################################################
 system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
