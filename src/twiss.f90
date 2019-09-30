@@ -4224,7 +4224,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   F_ERRORS(0:maxferr) = zero
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
-  print *, "ollldd nord", nord
+
   ! The "normal" components are considered here as the expansion coefficients of
   ! B_y wrt. the reference plane, while the "skew" components are considered as the
   ! corresponding expansion coefficients of B_x, see documentation. This can
@@ -4307,7 +4307,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
 
   
   if (elrad.gt.zero) then
-  lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad/Factorial(k)
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad/Factorial(k)
      do k = 1, nord
         ! The factor (one + deltap) below is taken from the original MAD-X routine.
         lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/(one + deltap)/elrad/Factorial(k)
@@ -4342,8 +4342,8 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      do j = 1, k
        sum0 = sum0 - (k + 1 - j)*g(k + 1, j)*exp(-2*(0, 1)*j*tilt)
      enddo
-     g(k + 1, 0) = ( sum0 - 2**k*exp(-(0, 1)*k*tilt)*( lambda(k) &
-                    + 1/two*(barkappa*exp((0, 1)*tilt) + kappa*exp(-(0, 1)*tilt)) &
+     g(k + 1, 0) = ( sum0 - two**k*exp(-(0, 1)*k*tilt)*( lambda(k) &
+                    + one/two*(barkappa*exp((0, 1)*tilt) + kappa*exp(-(0, 1)*tilt)) &
                     *lambda(k - 1) ) )/(k + one)
      g(k + 1, k + 1) = conjg(g(k + 1, 0))
   enddo
@@ -4365,7 +4365,6 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      pkick = elrad*(barkappa*(one + deltap) + del_p_g)
      dpx = real(pkick)
      dpy = - aimag(pkick)
-     print *, "dbrrrrllll_cf", dbr, dpx
      orbit(2) = orbit(2) + dpx - dbr
      orbit(4) = orbit(4) + dpy - dbi
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
