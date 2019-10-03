@@ -98,6 +98,10 @@ module precision_constants
    real(dp),parameter::class_e_radius=qelect/4.0_dp/pi/eps_0/pmae/1e9_dp ![m]
    real(dp),parameter::CGAM=4.0_dp*pi/3.0_dp*class_e_radius/pmae**3 ![m/Gev^3] old: 8.846056192e-5_dp
    real(dp),parameter::HBC=hbar*CLIGHT              ![GeV*m] old: HBC=1.9732858e-16_dp
+  real(dp),parameter:: alpha_fine= 137.035999084_dp
+   real(dp),parameter::class_c_radius=qelect/4.0_dp/pi/eps_0/1e9_dp ![m]
+   real(dp),parameter::CGAM0=4.0_dp*pi/3.0_dp*class_c_radius   !/pmae**4 ![m/Gev^3] old: 8.846056192e-5_dp
+
   ![GeV*m] old: HBC=1.9732858e-16_dp
   !Smallness Parameters
    !Smallness Parameters

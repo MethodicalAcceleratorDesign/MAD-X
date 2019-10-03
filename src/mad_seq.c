@@ -622,6 +622,7 @@ make_sequ_from_line(char* name)
   int mpos = name_list_pos("marker", defined_commands->list);
   struct command* clone = clone_command(defined_commands->commands[mpos]);
   struct element* el;
+  
   if (pos < 0) fatal_error("unknown line: ", name);
   line = line_list->macros[pos];
   line->dead = 1;   /* prevent line from further conversion to sequence */
@@ -654,7 +655,10 @@ make_sequ_from_line(char* name)
   current_sequ->end = current_node;
   current_sequ->start->previous = current_sequ->end;
   current_sequ->end->next = current_sequ->start;
-  current_sequ->line = 1; /* remember origin of sequence */
+  
+  /*current_sequ->line = 1; /* remember origin of sequence */
+  //printf("skowron: warning make_sequ_from_line line=0 \n");
+  current_sequ->line = 0; /* remember origin of sequence */
 
   if(line_buffer) delete_char_p_array(line_buffer,1);
 }
