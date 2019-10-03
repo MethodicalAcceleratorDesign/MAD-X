@@ -3,9 +3,9 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.08.09 10:44:39      +
+  + Execution date: 2019.10.03 16:12:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
-option, -info ;
+option, -info;
 
 
 
@@ -13,9 +13,7 @@ beam ;
 
 
 
-mqf.k1 =  0.3037241107 ;
-
-mqd.k1 = -0.3037241107 ;
+mqd.k1 = -0.3037241107e-3 ;
 
 mqf: quadrupole, l=1, k1:=mqf.k1, apertype=myge.dat, aperture={0.001,0.002}  ;
 
@@ -23,15 +21,9 @@ mqf: quadrupole, l=1, k1:=mqf.k1, apertype=myge.dat, aperture={0.001,0.002}  ;
 
 ! sequence
 
-fodo: sequence, l=10, refer=entry ;
+fodo: sequence, l=1, refer=entry ;
 
-mqf,at=0;
-
-dff: drift,      at=1, l=4 ;
-
-mqd: quadrupole, at=5, l=1, k1:=mqd.k1, apertype=myge.dat ;
-
-dfd: drift,      at=6, l=4 ;
+mqd: quadrupole, at=0.5, l=0.1, k1:=mqd.k1, apertype=myge.dat, aper_offset={1e-5,-2e-5} ;
 
 endsequence ;
 
@@ -39,28 +31,67 @@ endsequence ;
 
 
 
-! check values
-
-!value, mqf->k1, mqd->k1 ;
-
-!show, mqd;
-
-! track
-
 use, sequence=fodo ;
 
-track, onepass, onetable, APERTURE=true, file="track.out" ;
 
-enter TRACK module
-one pass is on
-aperture tracking is on
-start, x=0, px=1e-6, y=0, py=5e-7, t=0, pt=0;
 
-run, turns=1000 ;
 
-endtrack ;
 
-exit TRACK module
+ptc_create_universe;
+
+Determined SECTOR NMUL MAX :  0
+  ptc_setswitch, debuglevel=0, maxacceleration=false, exact_mis=true, time=true, totalpath=false, fringe=true, modulation=false;
+
+
+
+  ptc_create_layout, model=1, method=2, nst=5, exact=false, closed_layout=true;
+
+  
+
+  ptc_observe, place=fodo$end;
+
+obs_points: 2 
+  
+
+  n=50;
+
+  i=0;
+
+  
+
+  while (i <= n)
+
+   {
+
+     j=0;
+
+     while (j <= n)
+
+      {
+
+        ptc_start, x=(i-n/2)*5e-4, px=0, y=(j-n/2)*5e-4, py=0, t=0, pt=0;
+
+        j = j + 1;
+
+      }
+
+     i=i+1;
+
+   }  
+
+  
+
+  ptc_track, onetable, file="track.out", icase=56, element_by_element,  dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6}, turns=1, ffile=1;
+
+  ptc_track_end;
+
+
+
+ptc_end;
+
+
+
+
 
 stop;
 

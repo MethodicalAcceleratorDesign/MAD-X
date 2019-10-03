@@ -646,7 +646,7 @@ CONTAINS
             flag = chkAperPolygon(E,X)
           
             if ( flag ) then
-               print*,"OUT polyg"
+               !print*,"OUT polyg"
                CHECK_STABLE=.FALSE.
                STABLE_DA=.false.
                xlost=0.0_dp
