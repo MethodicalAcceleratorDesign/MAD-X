@@ -437,6 +437,12 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 
   element_vector(current_node->p_elem, "aperture", aperture_vec);
 
+  if(current_node->p_elem->aper->custom_inter==1){
+      element_vector(current_node->p_elem, "aper_vx", pipex);
+      *pipelength = element_vector(current_node->p_elem, "aper_vy", pipey);
+      *ap1 = *ap2 = *ap3 = *ap4 = 0;
+      return 1;
+  }
 
   int debug = get_option("debug");
   if (debug)

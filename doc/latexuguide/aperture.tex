@@ -150,6 +150,13 @@ and \texttt{APX} and \texttt{APY} are the settings for the rectangle
 that is checked first. The rectangle parameters are optional and are 
 only used to speed up the aperture checks in tracking.
 
+There is also another way to define an arbitrary polygon aperture using 
+the attributes \texttt{APER\_VX} and \texttt{APER\_VY}. They can also be
+defined in combination standard aperture defintions. The standard
+aperture definitions are then checked first and in case it is outside
+the standard definition of aperture the arbitrary is checked. An example
+of how to use it can be found in: 
+\href{https://github.com/MethodicalAcceleratorDesign/MAD-X/blob/master/tests/test-track-13/test-track-13.madx}. 
 \textbf{Notes}
 \begin{itemize}
    \item There are inconsistencies in the parameter definition for the

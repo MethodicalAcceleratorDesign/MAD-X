@@ -24,4 +24,16 @@ T4: LINE=(D1, -3*(Q1), D2);
 Use, sequence=T4;
 Survey, sequence=T4;
 
+! Regression tests:
+
+! This snippet previously resulted in T5 not being defined correctly,
+! leading to the message "++++++ warning: unknown sequence skipped: t5":
+kappa=0; T5: LINE=(D1);
+Use, sequence=T5;
+
+! This snippet previously resulted in the `kappa=2` statement being ignored,
+! leading to the message "kappa not found":
+D3: drift, L=1; T6: LINE=(D1); kappa=2;
+show, kappa;
+
 Exit;
