@@ -64,12 +64,7 @@ ptc_create_universe;
   ptc_start, x=0, px=0, y=0, py=0, pt=0, t=0.0;
 
 
-  ptc_setswitch, debuglevel=5, maxacceleration=false, exact_mis=true, time=true, totalpath=false, fringe=true, modulation=true;
-  
-  !ptc_twiss, table=twiss,icase=5, no=2, closed_orbit;
-  ptc_twiss, table=twiss,icase=5, no=2, betx=10, bety=10;
-  write, table=twiss, file="ptc.twiss.tfs";
-  return;
+  ptc_setswitch, debuglevel=1, maxacceleration=false, exact_mis=true, time=true, totalpath=false, fringe=true, modulation=true;
 
   ptc_track, icase=6, element_by_element,  dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6}, turns=1000, ffile=1;
 

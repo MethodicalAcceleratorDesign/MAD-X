@@ -884,8 +884,8 @@ contains
       A_script_probe%ac(i)%om = twopi*clocks(i)%tune * BETA0start / my_ring_length
       !omega of the the modulation
       !savedProbe%ac%om = twopi*clocks(1)%tune
-      A_script_probe%ac(i)%x(1)  = zero
-      A_script_probe%ac(i)%x(2)  = one  ! initial clock vector (sin like)
+      A_script_probe%ac(i)%x(1)  = one
+      A_script_probe%ac(i)%x(2)  = zero  ! initial clock vector (sin like)
     enddo
 
     

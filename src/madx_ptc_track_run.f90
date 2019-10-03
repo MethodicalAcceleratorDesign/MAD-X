@@ -3818,8 +3818,8 @@ CONTAINS
       savedProbe%ac(i)%om = twopi*clocks(i)%tune * BETA0 / circumference
       !omega of the the modulation
       !savedProbe%ac%om = twopi*clocks(1)%tune
-      savedProbe%ac(i)%x(1)  = zero
-      savedProbe%ac(i)%x(2)  = one  ! initial clock vector (sin like)
+      savedProbe%ac(i)%x(1)  = one
+      savedProbe%ac(i)%x(2)  = zero  ! initial clock vector (sin like)
     enddo
        
   end subroutine ptc_track_ini_modulation
