@@ -230,7 +230,7 @@ aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipeleng
 // source : wn_PnInPoly() at http://geomalgorithms.com/a03-_inclusion.html
  int    wn = 0;    // the  winding number counter
  // loop through all edges of the polygon
- for (int i=0; i<=pipelength-1; i++) { // edge from V[i] to  V[i+1]
+ for (int i=0; i<=pipelength-1  ; i++) { // edge from V[i] to  V[i+1]
    if (pipey[i] <= q  &&  pipey[i+1]  > q) {
      // first vertex is below point; second vertex is above; upward crossing
      if ( (pipex[i+1] - pipex[i]) * (q - pipey[i]) - (p - pipex[i]) * (pipey[i+1] - pipey[i])  > 0 ) {
@@ -349,7 +349,7 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
     polyy[i] = polyy[0];
   }
 
-  *halolength=i-1;
+  *halolength=i;
 
   if (debug) {
     for (j=0; j<=i; j++) printf("  %d  %10.5e  %10.5e \n", j, polyx[j], polyy[j]);
@@ -1156,7 +1156,7 @@ aper_calc(double p, double q, double* minhl,
 	  && 0 != aper_on_line(p,q,haloxadj[j],haloyadj[j],xm,ym,dist_limit) )
 	      break; // valid point is found
 
-      if (++i == pipelength + 1) i = 0; // cycle through the pipeline
+      if (++i == pipelength ) i = 0; // cycle through the pipeline
     }
 
     h = sqrt((xm-p)*(xm-p) + (ym-q)*(ym-q));
