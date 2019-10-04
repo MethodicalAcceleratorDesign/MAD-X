@@ -323,7 +323,7 @@ void set_aperture_element(struct element *el, struct command* def){
       while (2==fscanf(fp, "%lf %lf", &el->aper->xlist[i], &el->aper->ylist[i])) i++;
       /* closing the shape: a last point is inserted in table
      with coordinates equal to those of the first point */
-    el->aper->length = i-1; // this minus 1 has to be there because of how the algorithm is done.  
+    el->aper->length = i; // this minus 1 has to be there because of how the algorithm is done.  
     el->aper->xlist[i]=el->aper->xlist[0];
     el->aper->ylist[i]=el->aper->ylist[0];   
     
@@ -367,7 +367,7 @@ void set_aperture_element(struct element *el, struct command* def){
       //printf("2nd last %f, and last %f %d", el->aper->xlist[tmp_l-2], el->aper->xlist[tmp_l-1], tmp_l);
 
 
-      el->aper->length = tmp_l-2; // minus 1 or not ?? has to be there because of how the algorithm is done.  
+      el->aper->length = tmp_l; // minus 1 or not ?? has to be there because of how the algorithm is done.  
       el->aper->xlist[tmp_l]=el->aper->xlist[0];
       el->aper->ylist[tmp_l]=el->aper->ylist[0];
       if(el->aper->apertype==notdefined){ //If no other aperture is defined then a 10 meter rectangle is set! 
