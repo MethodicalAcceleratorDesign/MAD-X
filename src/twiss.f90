@@ -3408,7 +3408,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      case (code_multipole)
-        if(get_option('thin_cf ').ne.zero) then
+        if(get_option('thin_cf ').ne.zero .and. node_value('lrad ') .gt. zero) then
           call tmmult_cf(fsec,ftrk,orbit,fmap,re,te)
         else
           call tmmult(fsec,ftrk,orbit,fmap,re,te)
@@ -4195,12 +4195,12 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !     Detailed description:                                            *
-  !     See Phys. Rev. AccelBeams 19.054002 & code documentation         *
+  !     See Phys. Rev. AccelBeams 19.054002 by M.Titze                   *
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk, fmap
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr
   integer, external :: Factorial
-  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
   double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double precision :: orbit(6), re(6,6), te(6,6,6)
@@ -4306,7 +4306,6 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   enddo
   !Done with all the setting up... 
 
-  
   if (elrad.gt.zero) then
     lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad/Factorial(k)
      do k = 1, nord
@@ -4317,12 +4316,9 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      lambda = zero
   endif
   
-  !kx = real(lambda(0))    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
-  !ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in 
+  kx = real(lambda(0))    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
+  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in 
                           ! Phys. Rev. AccelBeams 19.054002
-
-  kx = normal(0)/(one + deltap)/elrad ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
-  ky = - skew(0)/(one + deltap)/elrad !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
 
   kappa = kx + (0, 1)*ky
   barkappa = conjg(kappa)
@@ -4341,7 +4337,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      ! Eq. (8) in Ref. above
      sum0 = 0
      do j = 1, k
-       sum0 = sum0 - (k + 1 - j)*g(k + 1, j)*exp(-2*(0, 1)*j*tilt)
+       sum0 = sum0 - (k + 1 - j)*g(k + 1, j)*exp(-two*(0, 1)*j*tilt)
      enddo
      g(k + 1, 0) = ( sum0 - two**k*exp(-(0, 1)*k*tilt)*( lambda(k) &
                     + one/two*(barkappa*exp((0, 1)*tilt) + kappa*exp(-(0, 1)*tilt)) &
@@ -4364,15 +4360,17 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
      pkick = elrad*(barkappa*(one + deltap) + del_p_g)
+
      dpx = real(pkick)
      dpy = - aimag(pkick)
+
      orbit(2) = orbit(2) + dpx - dbr
      orbit(4) = orbit(4) + dpy - dbi
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
                 *(one + beta*orbit(6))/(one + deltap)/beta
   endif
-
+  print *, "heeereeee"
   ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! re(6,6) is assumed to be a unit matrix as input
   if (nord .ge. 1) then
