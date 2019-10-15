@@ -994,6 +994,7 @@ seq_move_noexpression(struct in_cmd* cmd)
   struct node *node, *next;
   struct element* el;
   int pos;
+  char tmp[2*NAME_L];
 
   name = command_par_string_user("element", cmd->clone);
   if (name)
@@ -1024,9 +1025,11 @@ seq_move_noexpression(struct in_cmd* cmd)
           next = node->next;
           if (node->moved == 0)
           {
+
             if (any
                 || name_list_pos(node->name, selected_ranges->list) > -1)
             {
+              
               name = NULL;
               for (k = 0; k < seqedit_select->curr; k++)
               {
@@ -1039,11 +1042,30 @@ seq_move_noexpression(struct in_cmd* cmd)
               {
                 at = node->position + by;
                 el = node->p_elem;
+
                 if (remove_one(node) > 0)
                 {
                   node = install_one(el, NULL, at, NULL, at);
                   node->moved = 1;
                   seqedit_move++;
+                }
+              }
+            }
+            else{
+              if(node->from_name!=NULL){
+                strcpy(tmp, node->from_name);
+                square_to_colon(tmp);
+
+                 if (name_list_pos(tmp, selected_ranges->list) > -1)
+                {
+                  at = node->position;
+                  el = node->p_elem;
+                  if (remove_one(node) > 0)
+                  {
+                    node = install_one(el, NULL, at, NULL, at);
+                    node->moved = 1;
+                    seqedit_move++;
+                  }
                 }
               }
             }
