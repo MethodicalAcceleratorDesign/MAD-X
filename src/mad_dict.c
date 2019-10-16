@@ -2410,6 +2410,7 @@ const char *const_element_def =
 "aper_tol = [r, {0, 0, 0}], "
 "aper_vx  = [r, {-1}],  "
 "aper_vy  = [r, {-1}],  "
+"aper_tilt = [r, 0], "
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "
 "mech_sep = [r, 0], "

@@ -1596,11 +1596,11 @@ convert_madx_to_c6t(struct node* p)
 
       if ((aper_param = return_param_recurse("aper_tilt", p->p_elem)))
       {
-        if (aper_param->expr_list != NULL)
-          update_vector(aper_param->expr_list, aper_param->double_array);
-        j = 1;
-        if (aper_param->double_array->curr == 1)
-          tag_aperture.value[7] = aper_param->double_array->a[0];
+
+        printf("heeeeree \n");
+        printf("heeeeree %f \n", el_par_value("aper_tilt", p->p_elem) );
+        tag_aperture.value[7] = el_par_value("aper_tilt", p->p_elem);
+  
       }
     }
 
