@@ -1178,7 +1178,7 @@ create_aperture(const char* name, const char* type, double ap1, double ap2, doub
   aper_element->value[5] = ap4 * 1e3;
   aper_element->value[6] = offx * 1e3;
   aper_element->value[7] = offy * 1e3;
-  aper_element->value[8] = tilt ; // sixtrack units are radians for this
+  aper_element->value[8] = tilt / M_PI * 180 ; // sixtrack units are degrees
 
   if (aper_element->value[1] == 7) // Octagon
   {
