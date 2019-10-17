@@ -1706,7 +1706,7 @@ subroutine ttmult_explicit(track,ktrack,dxt,dyt,turn, thin_foc)
 
      gstr = normal(1)/elrad
      sstr =  normal(2)/elrad
-     print *, "ggggg", gstr, sstr, elrad , dipi, dipr
+   
 
      do jtrk = 1,ktrack
 
@@ -1740,7 +1740,7 @@ subroutine ttmult_explicit(track,ktrack,dxt,dyt,turn, thin_foc)
      &dipi**2*gstr*y**3/6.0d0 - dipi**2*y +&
      &0.5*dipi*dipr*gstr*x*y**2 - dipi*dipr*x +&
      &dipr**2*gstr*y**3/6.0d0)/elrad
-       print *, "ttttttt", dipr**2*gstr*y**3/6.0d0, elrad
+    
        track(5, jtrk) = (bet0*orb50*deltapp - (bet0*orb60 +&
      &1.0)*(dipi*y + dipr*x))/(bet0*deltapp)
 
