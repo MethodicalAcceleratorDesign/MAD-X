@@ -580,7 +580,7 @@ module plotfi
   integer, parameter :: mntmax = 20, mksmax = 10
   integer, parameter :: mplred = 46, mplout = 47
 
-  integer, parameter :: maxseql = 50000, mtwcol = 46, mpparm = 10
+  integer, parameter :: maxseql = 150000, mtwcol = 46, mpparm = 10
   integer, parameter :: mxcurv = 10, mopt = 60, mfile = 120, marg = 60
   integer, parameter :: maxarg = 1000, mxdp = 25, mxplot = 100
 
