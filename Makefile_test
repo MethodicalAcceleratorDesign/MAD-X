@@ -47,7 +47,7 @@ test-memory test-control \
 test-makethin test-makethin-2 test-makethin-3 test-makethin-4 test-elseparator\
 test-survey test-survey-2 test-survey-3 \
 test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 \
-test-track-7 test-track-8 test-track-9 test-track-10 test-track-11 test-track-12 test-track-13 \
+test-track-7 test-track-8 test-track-9 test-track-10 test-track-11 test-track-12 test-track-13 test-track-14 \
 test-track-acd test-track-rotations \
 test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 \
 test-twiss-6 test-twiss-8 test-twiss-9 test-twiss-10 test-twiss-11 \
