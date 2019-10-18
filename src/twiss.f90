@@ -4366,7 +4366,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      dpy = - aimag(pkick)
 
      orbit(2) = orbit(2) + dpx - dbr
-     orbit(4) = orbit(4) + dpy - dbi
+     orbit(4) = orbit(4) + dpy + dbi
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
                 *(one + beta*orbit(6))/(one + deltap)/beta

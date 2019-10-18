@@ -505,7 +505,7 @@ module trackfi
   double precision, save :: arad=0.d0, betas=0.d0, beti=0.d0, gammas=0.d0, dtbyds=0.d0
   double precision, save :: bet0=0.d0, bet0i=0.d0
   double precision :: deltas=0.d0, t_max=1.d20, pt_max=1.d20
-  logical :: radiate=.false., damp=.false., quantum=.false., fsecarb=.false.
+  logical :: radiate=.false., damp=.false., quantum=.false., fsecarb=.false., thin_cf=.false.
 end module trackfi
 
 module time_varfi
