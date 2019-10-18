@@ -4203,7 +4203,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
   double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
-  double precision :: orbit(6), re(6,6), te(6,6,6)
+  double precision :: orbit(6), re(6,6), te(6,6,6), tilt2
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
                     dxx, dxy, dyy, rp, rm
   double complex :: lambda(0:maxmul)
@@ -4224,6 +4224,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   F_ERRORS(0:maxferr) = zero
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
+  tilt2 = 0 !This is a dumy parameter now that can be changed to have a relative tilf of the different orders
 
 
   ! The "normal" components are considered here as the expansion coefficients of
@@ -4337,10 +4338,10 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      ! Eq. (8) in Ref. above
      sum0 = 0
      do j = 1, k
-       sum0 = sum0 - (k + 1 - j)*g(k + 1, j)*exp(-two*(0, 1)*j*tilt)
+       sum0 = sum0 - (k + 1 - j)*g(k + 1, j)*exp(-two*(0, 1)*j*tilt2)
      enddo
-     g(k + 1, 0) = ( sum0 - two**k*exp(-(0, 1)*k*tilt)*( lambda(k) &
-                    + one/two*(barkappa*exp((0, 1)*tilt) + kappa*exp(-(0, 1)*tilt)) &
+     g(k + 1, 0) = ( sum0 - two**k*exp(-(0, 1)*k*tilt2)*( lambda(k) &
+                    + one/two*(barkappa*exp((0, 1)*tilt2) + kappa*exp(-(0, 1)*tilt2)) &
                     *lambda(k - 1) ) )/(k + one)
      g(k + 1, k + 1) = conjg(g(k + 1, 0))
   enddo
@@ -4370,7 +4371,6 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
                 *(one + beta*orbit(6))/(one + deltap)/beta
   endif
-  print *, "heeereeee"
   ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! re(6,6) is assumed to be a unit matrix as input
   if (nord .ge. 1) then
@@ -4436,8 +4436,8 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      te(5, 6, 1) = - te(1, 1, 2)*bp1
      te(5, 6, 3) = - te(1, 2, 3)*bp1
   endif
-  
 end SUBROUTINE tmmult_cf
+
 
 SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   use twtrrfi
