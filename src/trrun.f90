@@ -102,12 +102,13 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   arad   = get_value('probe ','arad ')
   radiate  = get_value('probe ','radiate ') .ne. zero
 
-  bet0  =  get_value('beam ','beta ')
+  thin_cf =  get_option('thin_cf ').ne.zero
+  bet0    =  get_value('beam ','beta ')
 
-  bet0i  = one / bet0
-  beti   = one / betas
+  bet0i   = one / bet0
+  beti    = one / betas
 
-  deltas = get_variable('track_deltap ')
+  deltas  = get_variable('track_deltap ')
 
   damp = get_option('damp ') .ne. 0
   quantum = get_option('quantum ') .ne. 0
@@ -767,6 +768,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   use math_constfi, only : zero, one
   use code_constfi
   use aperture_enums
+  use trackfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -897,7 +899,11 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call tttquad(track,ktrack)
 
     case (code_multipole)
-       call ttmult(track,ktrack,dxt,dyt,turn,thin_foc)
+      if(thin_cf .and. node_value('lrad ') .gt. zero ) then
+        call ttmult_cf(track,ktrack,dxt,dyt,turn,thin_foc)
+      else
+        call ttmult(track,ktrack,dxt,dyt,turn,thin_foc)
+      endif
 
     case (code_solenoid)
        call trsol(track, ktrack,dxt,dyt)
@@ -982,6 +988,174 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
 
   return
 end subroutine ttmap
+
+
+SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
+  use twtrrfi
+  use twissbeamfi, only : deltap, beta
+  use math_constfi, only : zero, one, two, three
+  use time_varfi
+  use trackfi
+  use time_varfi
+  use track_enums
+
+  implicit none 
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Computes thin-lens kick through combined-function magnet.        *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !     Detailed description:                                            *
+  !     Phys. Rev. AccelBeams 19.054002 by M. Titze
+  !----------------------------------------------------------------------*
+  double precision :: track(6,*), dxt(*), dyt(*), ttt
+  logical ::  time_var,thin_foc
+  integer :: ktrack, turn
+  logical :: fsec, ftrk, fmap
+  integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
+  integer, external :: Factorial
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
+  double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle, tilt2
+  double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
+  !double precision :: orbit(6),
+  double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
+                    dxx, dxy, dyy, rp, rm
+  double complex :: lambda(0:maxmul)
+  double complex :: g(0:maxmul, 0:maxmul)
+
+  double precision, external :: node_value, get_tt_attrib
+  integer, external :: node_fd_errors
+  fmap = .true.
+  
+  ! Read magnetic field components & fill lambda's according to field
+  ! components relative to given plane
+  F_ERRORS(0:maxferr) = zero
+  n_ferr = node_fd_errors(f_errors)
+
+  bvk = get_tt_attrib(enum_other_bv)
+    !---- Multipole length for radiation.
+  elrad = get_tt_attrib(enum_lrad)
+  an = get_tt_attrib(enum_angle)
+  time_var = get_tt_attrib(enum_time_var) .ne. 0  
+
+  
+  !---- Multipole components.
+  NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
+  SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
+  tilt2 = 0
+  call get_tt_multipoles(nn,normal,ns,skew)
+
+  !---- Angle (no bvk in track)
+  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
+
+
+
+  !-----added FrankS, 10-12-2008
+  !nd = 2 * max(nn, ns, n_ferr/2-1)
+
+  !---- Dipole error.
+  !      dbr = bvk * field(1,0) / (one + deltas)
+  !      dbi = bvk * field(2,0) / (one + deltas)
+  dbr = bvk * f_errors(0) !field(1,0)
+  dbi = bvk * f_errors(1) !field(2,0)
+
+  !---- Nominal dipole strength.
+  !      dipr = bvk * vals(1,0) / (one + deltas)
+  !      dipi = bvk * vals(2,0) / (one + deltas)
+  dipr = bvk * normal(0) !vals(1,0)
+  dipi = bvk * skew(0)   !vals(2,0)
+
+
+  !Below here should not be commented output
+  !---- Other components and errors.
+  ! that loop should start at one since nominal dipole strength already taken into account above
+  !needs to be here though
+  nord = 0
+  nd = 2 * max(nn, ns, n_ferr/2-1)
+
+  do iord = 1, nd/2
+     f_errors(2*iord)   = bvk * (f_errors(2*iord) + normal(iord))
+     f_errors(2*iord+1) = bvk * (f_errors(2*iord+1) + skew(iord))
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) nord=iord
+  enddo
+  !Done with all the setting up... 
+
+  lambda(0:maxmul) = 0
+
+  if (elrad.gt.zero) then
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad
+     do k = 1, nord
+        ! The factor (one + deltap) below is taken from the original MAD-X routine.
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)
+     enddo
+  else
+     lambda = zero
+  endif
+
+  kx = real(lambda(0))    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
+  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in 
+                          ! Phys. Rev. AccelBeams 19.054002
+
+  kappa = kx + (0, 1)*ky
+  barkappa = conjg(kappa)
+
+  ! Now fill up the g_{ij}'s for j = 0, ..., i and i = 0, ..., nord + 1.
+  g(0, 0) = (0, 0)
+  g(1, 0) = -lambda(0)
+  g(1, 1) = conjg(g(1, 0))
+
+  do k = 1, nord
+     do j = 0, k - 1
+        ! Eq. (6), in Ref. above
+        g(k + 1, j + 1) = (barkappa*g(k, j + 1)*(j + one)*(j - k + three/two) +  &
+             kappa*g(k, j)*(k - j)*(one/two - j))/(k - j)/(j + one)
+     enddo
+     ! Eq. (8) in Ref. above
+     sum0 = 0
+     do j = 1, k
+       sum0 = sum0 - (k + 1 - j)*g(k + 1, j)*exp(-two*(0, 1)*j*tilt2)
+     enddo
+     g(k + 1, 0) = ( sum0 - two**k*exp(-(0, 1)*k*tilt2)*( lambda(k) &
+                    + one/two*(barkappa*exp((0, 1)*tilt2) + kappa*exp(-(0, 1)*tilt2)) &
+                    *lambda(k - 1) ) )/(k + one)
+     g(k + 1, k + 1) = conjg(g(k + 1, 0))
+  enddo
+
+   do jtrk = 1,ktrack
+     rp = (track(1,jtrk) + (0, 1)*track(3,jtrk))/two
+     rm = conjg(rp)
+
+     ! Compute \partial_+ G using Eq. (7) in Ref. above     
+     del_p_g = 0
+     do k = 1, nord
+        sum0 = 0
+        do j = 0, k - 1
+           sum0 = sum0 + (k - j)*g(k, j)*rp**(k - 1 - j)*rm**j
+        enddo
+        del_p_g = del_p_g + sum0
+     enddo
+     ! Now compute kick (Eqs. (38) in Ref. above)
+     pkick = elrad*(barkappa*(one + deltap) + del_p_g)
+
+     dpx = real(pkick)
+     dpy = - aimag(pkick)
+     track(2,jtrk) = track(2,jtrk) + dpx - dbr
+     track(4,jtrk) = track(4,jtrk) + dpy + dbi
+     ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
+     track(5,jtrk) = track(5,jtrk) - elrad*(kx*track(1,jtrk) + ky*track(3,jtrk)) &
+                *(one + beta*track(6,jtrk))/(one + deltap)/beta
+  
+  enddo
+
+
+end subroutine ttmult_cf
 
 subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   use twtrrfi
@@ -1077,7 +1251,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   !--- Time variation for fields in matrix, multipole or RF-cavity
   ! 2015-Jun-24  18:55:43  ghislain: DOC FIXME not documented!!!
  ! time_var = node_value('time_var ') .ne. zero
- time_var = .false.
+
   if (time_var .and. time_var_m) then
      time_var_m_cnt = time_var_m_cnt + 1
      time_var_m_lnt = time_var_m_lnt + 1

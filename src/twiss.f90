@@ -3372,6 +3372,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
   double precision :: plot_tilt, el
   double precision :: node_value
 
+  integer, external :: get_option
+
   !---- Initialization
   EK = zero
   RE = EYE
@@ -3406,8 +3408,11 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      case (code_multipole)
-        call tmmult(fsec,ftrk,orbit,fmap,re,te)
-
+        if(get_option('thin_cf ').ne.zero .and. node_value('lrad ') .gt. zero) then
+          call tmmult_cf(fsec,ftrk,orbit,fmap,re,te)
+        else
+          call tmmult(fsec,ftrk,orbit,fmap,re,te)
+        endif
      case (code_solenoid)
         call tmsol(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
@@ -4159,6 +4164,280 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   endif
 
 end SUBROUTINE tmcorr
+
+INTEGER FUNCTION Factorial(n)
+  implicit none
+  integer, intent(in) :: n
+  integer :: i, Ans
+  
+  Ans = 1
+  do i = 1, n
+    Ans = Ans * i
+  enddo
+  Factorial = Ans
+END FUNCTION Factorial
+
+SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
+  use twtrrfi, only : maxmul, maxferr
+  use twissbeamfi, only : deltap, beta
+  use math_constfi, only : zero, one, two, three
+  implicit none 
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Computes thin-lens kick through combined-function magnet.        *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !     Detailed description:                                            *
+  !     See Phys. Rev. AccelBeams 19.054002 by M.Titze                   *
+  !----------------------------------------------------------------------*
+  logical :: fsec, ftrk, fmap
+  integer :: nord, k, j, nn, ns, bvk, iord, n_ferr
+  integer, external :: Factorial
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
+  double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle
+  double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
+  double precision :: orbit(6), re(6,6), te(6,6,6), tilt2
+  double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
+                    dxx, dxy, dyy, rp, rm
+  double complex :: lambda(0:maxmul)
+  double complex :: g(0:maxmul, 0:maxmul)
+
+  double precision, external :: node_value
+  integer, external :: node_fd_errors
+  fmap = .true.
+  
+  ! Read magnetic field components & fill lambda's according to field
+  ! components relative to given plane
+  normal = zero ; call get_node_vector('knl ', nn, normal)
+  skew   = zero ; call get_node_vector('ksl ', ns, skew)
+  nord = max(nn, ns)
+  tilt = node_value('tilt ')
+  elrad = node_value('lrad ')
+
+  F_ERRORS(0:maxferr) = zero
+  n_ferr = node_fd_errors(f_errors)
+  bvk = node_value('other_bv ')
+  tilt2 = 0 !This is a dumy parameter now that can be changed to have a relative tilf of the different orders
+
+
+  ! The "normal" components are considered here as the expansion coefficients of
+  ! B_y wrt. the reference plane, while the "skew" components are considered as the
+  ! corresponding expansion coefficients of B_x, see documentation. This can
+  ! be modified in the future, in particular to use tilted components,
+  ! but bare in mind that the bending curvature (the
+  ! lambda(0) terms) should be unchanged.
+  !
+  ! The above means precisely, that we currently implemented the following scheme:
+  !
+  ! B_y |_{\varphi = tilt} + i B_x |_{\varphi = tilt} = \sum_{k = 0}^nord \lambda_k r^k
+  !
+  ! with complex coefficients \lambda_k and in which
+  !
+  ! Im[\lambda_k] = 1/k! \partial^k B_x / \partial_r^k |_{\varphi = tilt} ,
+  ! Re[\lambda_k] = 1/k! \partial^k B_y / \partial_r^k |_{\varphi = tilt} .
+  !
+  ! play the role as the k'th skew- and normal field component.
+
+
+    !---- Nominal dipole strength.
+  dipr = normal(0) / (one + deltap)
+  dipi = skew(0)   / (one + deltap)
+
+  !####SETTING UP THE MULTIPLES
+  an = node_value('angle ')
+  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
+
+  !---- Dipole error.
+  dbr = f_errors(0) / (one + deltap)
+  dbi = f_errors(1) / (one + deltap)
+
+
+  if (tilt .ne. zero)  then
+     if (dipi.ne.zero .or. dipr.ne.zero) then
+        angle = atan2(dipi, dipr) - tilt
+     else
+        angle = -tilt
+     endif
+     dtmp = sqrt(dipi**2 + dipr**2)
+     dipr = dtmp * cos(angle)
+     dipi = dtmp * sin(angle)
+     dtmp = sqrt(dbi**2 + dbr**2)
+     dbr = dtmp * cos(angle)
+     dbi = dtmp * sin(angle)
+  endif
+
+  dbr = bvk * dbr
+  dbi = bvk * dbi
+  dipr = bvk * dipr
+  dipi = bvk * dipi
+  !Below here should not be commented output
+  !---- Other components and errors.
+  nord = 0
+  ! that loop should start at one since nominal dipole strength already taken into account above
+  !needs to be here though
+  do iord = 0, max(nn, ns, n_ferr/2-1)
+ !    get the maximum effective order; loop runs over maximum of user given values
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
+          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1 
+  enddo
+
+  do iord = 1, nord
+     f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))   / (one + deltap)
+     f_errors(2*iord+1) = (skew(iord)   + f_errors(2*iord+1)) / (one + deltap)
+     if (tilt .ne. zero) then
+        if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) then
+           angle = atan2(f_errors(2*iord+1), f_errors(2*iord)) / (iord+1) - tilt
+        else
+           angle = -tilt
+        endif
+        angle = (iord+1) * angle
+        dtmp = sqrt(f_errors(2*iord)**2 + f_errors(2*iord+1)**2)
+        f_errors(2*iord)   = dtmp * cos(angle)
+        f_errors(2*iord+1) = dtmp * sin(angle)
+     endif
+     f_errors(2*iord)   = bvk * f_errors(2*iord)
+     f_errors(2*iord+1) = bvk * f_errors(2*iord+1)
+  enddo
+  !Done with all the setting up... 
+
+  if (elrad.gt.zero) then
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad/Factorial(k)
+     do k = 1, nord
+        ! The factor (one + deltap) below is taken from the original MAD-X routine.
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/(one + deltap)/elrad/Factorial(k)
+     enddo
+  else
+     lambda = zero
+  endif
+  
+  kx = real(lambda(0))    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
+  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in 
+                          ! Phys. Rev. AccelBeams 19.054002
+
+  kappa = kx + (0, 1)*ky
+  barkappa = conjg(kappa)
+
+  ! Now fill up the g_{ij}'s for j = 0, ..., i and i = 0, ..., nord + 1.
+  g(0, 0) = (0, 0)
+  g(1, 0) = -lambda(0)
+  g(1, 1) = conjg(g(1, 0))
+
+  do k = 1, nord
+     do j = 0, k - 1
+        ! Eq. (6), in Ref. above
+        g(k + 1, j + 1) = (barkappa*g(k, j + 1)*(j + one)*(j - k + three/two) +  &
+             kappa*g(k, j)*(k - j)*(one/two - j))/(k - j)/(j + one)
+     enddo
+     ! Eq. (8) in Ref. above
+     sum0 = 0
+     do j = 1, k
+       sum0 = sum0 - (k + 1 - j)*g(k + 1, j)*exp(-two*(0, 1)*j*tilt2)
+     enddo
+     g(k + 1, 0) = ( sum0 - two**k*exp(-(0, 1)*k*tilt2)*( lambda(k) &
+                    + one/two*(barkappa*exp((0, 1)*tilt2) + kappa*exp(-(0, 1)*tilt2)) &
+                    *lambda(k - 1) ) )/(k + one)
+     g(k + 1, k + 1) = conjg(g(k + 1, 0))
+  enddo
+
+  if (ftrk) then
+     rp = (orbit(1) + (0, 1)*orbit(3))/two
+     rm = conjg(rp)
+
+     ! Compute \partial_+ G using Eq. (7) in Ref. above     
+     del_p_g = 0
+     do k = 1, nord
+        sum0 = 0
+        do j = 0, k - 1
+           sum0 = sum0 + (k - j)*g(k, j)*rp**(k - 1 - j)*rm**j
+        enddo
+        del_p_g = del_p_g + sum0
+     enddo
+     ! Now compute kick (Eqs. (38) in Ref. above)
+     pkick = elrad*(barkappa*(one + deltap) + del_p_g)
+
+     dpx = real(pkick)
+     dpy = - aimag(pkick)
+
+     orbit(2) = orbit(2) + dpx - dbr
+     orbit(4) = orbit(4) + dpy + dbi
+     ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
+     orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
+                *(one + beta*orbit(6))/(one + deltap)/beta
+  endif
+  ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
+  ! re(6,6) is assumed to be a unit matrix as input
+  if (nord .ge. 1) then
+     ! The next two expressions emerge by the first
+     ! derivative of \partial_+ G wrt. x and y at zero, see documentation.
+     dxdpg = elrad/two*(two*g(2, 0) + g(2, 1))
+     dydpg = elrad/two*(0, 1)*(two*g(2, 0) - g(2, 1))
+     
+     re(2, 1) = real(dxdpg)
+     re(2, 3) = real(dydpg)
+     re(2, 6) = elrad*kx/beta
+     
+     re(4, 1) = - aimag(dxdpg)
+     re(4, 3) = - aimag(dydpg)
+     re(4, 6) = elrad*ky/beta
+
+     re(5, 1) = - elrad*kx/beta
+     re(5, 3) = - elrad*ky/beta
+  endif
+
+  ! Second-order terms by derivation of Eqs. (39) in Ref. above, at zero
+  ! te(6,6,6) is assumed to be a zero tensor as input
+  if ((fsec) .and. (nord .ge. 2)) then
+     ! The next three expressions emerge by the second
+     ! derivative of \partial_+ G wrt. x and y at zero, see documentation.
+     ! The additional factor two in the end accounts for the fact
+     ! that the te(6,6,6) tensor and the 2nd derivative are related
+     ! by the usual Taylor-expansion factorials.
+     dxx = elrad/two*(three*g(3, 0) + two*g(3, 1) + g(3, 2))/two
+     dxy = elrad/two*(0, 1)*(three*g(3, 0) - g(3, 2))/two
+     dyy = -elrad/two*(three*g(3, 0) - two*g(3, 1) + g(3, 2))/two
+     
+     bp1 = one - one/beta**2
+
+     te(1, 1, 2) = 0.5*elrad*kx
+     te(1, 2, 1) = te(1, 1, 2)
+     te(1, 2, 3) = 0.5*elrad*ky
+     te(1, 3, 2) = te(1, 2, 3)
+       
+     te(2, 1, 1) = real(dxx)   ! cf
+     te(2, 1, 3) = real(dxy)   ! cf
+     te(2, 3, 1) = te(2, 1, 3) ! cf
+     te(2, 3, 3) = real(dyy)   ! cf
+     te(2, 2, 2) = - te(1, 1, 2)
+     te(2, 4, 4) = - te(1, 1, 2)
+     te(2, 6, 6) = te(1, 1, 2)*bp1
+       
+     te(3, 1, 4) = te(1, 1, 2)
+     te(3, 3, 4) = te(1, 2, 3)
+     te(3, 4, 1) = te(1, 1, 2)
+     te(3, 4, 3) = te(1, 2, 3)
+       
+     te(4, 1, 1) = - aimag(dxx)  ! cf
+     te(4, 1, 3) = - aimag(dxy)  ! cf
+     te(4, 3, 1) = te(4, 1, 3)   ! cf
+     te(4, 3, 3) = - aimag(dyy)  ! cf
+     te(4, 2, 2) = - te(1, 2, 3)
+     te(4, 4, 4) = - te(1, 2, 3)
+     te(4, 6, 6) = te(1, 2, 3)*bp1
+       
+     te(5, 1, 6) = - te(1, 1, 2)*bp1
+     te(5, 3, 6) = - te(1, 2, 3)*bp1
+     te(5, 6, 1) = - te(1, 1, 2)*bp1
+     te(5, 6, 3) = - te(1, 2, 3)*bp1
+  endif
+end SUBROUTINE tmmult_cf
+
 
 SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   use twtrrfi
