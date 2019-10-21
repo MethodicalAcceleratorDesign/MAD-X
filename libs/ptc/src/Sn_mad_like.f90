@@ -72,7 +72,10 @@ module Mad_like
      INTEGER KIND,nmul,nst,method
      LOGICAL(LP) APERTURE_ON
      INTEGER APERTURE_KIND
-     REAL(DP) APERTURE_R(2),APERTURE_X,APERTURE_Y
+     REAL(DP) APERTURE_R(2),APERTURE_X,APERTURE_Y,APERTURE_DX,APERTURE_DY
+     INTEGER :: APERTURE_POLYGN = 0
+     REAL(DP), pointer, dimension (:) :: APERTURE_POLYGX => null() ! length defined with APERTURE_POLYGN 
+     REAL(DP), pointer, dimension (:) :: APERTURE_POLYGY => null()
      LOGICAL(LP) KILL_ENT_FRINGE,KILL_EXI_FRINGE,BEND_FRINGE
      LOGICAL(LP) KILL_ENT_SPIN,KILL_EXI_SPIN
      integer PERMFRINGE,highest_fringe
@@ -80,7 +83,8 @@ module Mad_like
      logical(lp) usethin
      INTEGER N_BESSEL
      INTEGER n_ac  ! number of oscillating multipoles 
-     REAL(DP) d_bn(NMAX), d_an(NMAX) ! oscillation amplitudes of multipoles
+     REAL(DP) d_bn(NMAX), d_an(NMAX) ! oscillation amplitudes of multipoles (modulation)
+     real(dp) d_volt, d_phas ! oscillation amplitudes of RF voltage and phase (modulation)
      REAL(DP) D_ac        ! factor for oscillation amplitude set by d_bn and d_an
      REAL(DP) DC_ac, A_ac ! factors for base field oscillation (D0_BN) : BN(N) = (DC_AC+A_AC*clock)*D0_BN(N) + D_AC*clock*D_BN(N)
      INTEGER  clockno_ac ! number (index) of the clock that this element is driven by
@@ -725,6 +729,10 @@ CONTAINS
        S2%APERTURE_R(2)=absolute_aperture  !!! just in case !!!
        S2%APERTURE_X=absolute_aperture
        S2%APERTURE_Y=absolute_aperture
+       S2%APERTURE_DX=0
+       S2%APERTURE_DY=0
+       S2%APERTURE_POLYGX => null()
+       S2%APERTURE_POLYGY => null()
        s2%KILL_ENT_FRINGE=my_false
        s2%KILL_EXI_FRINGE=my_false
        s2%KILL_ENT_SPIN=my_false
@@ -740,6 +748,8 @@ CONTAINS
        s2%n_ac = 0
        s2%d_bn(:) = 0.0_dp
        s2%d_an(:) = 0.0_dp
+       s2%d_volt = 0.0_dp
+       s2%d_phas = 0.0_dp
        s2%D_ac  = 0.0_dp 
        s2%DC_ac = 0.0_dp
        s2%A_ac  = 0.0_dp
@@ -2032,6 +2042,12 @@ CONTAINS
        rectaETILT%APERTURE_R=list%APERTURE_R
        rectaETILT%APERTURE_X=list%APERTURE_X
        rectaETILT%APERTURE_Y=list%APERTURE_Y
+       rectaETILT%APERTURE_DX=list%APERTURE_DX
+       rectaETILT%APERTURE_DY=list%APERTURE_DY
+
+       rectaETILT%APERTURE_POLYGX => list%APERTURE_POLYGX
+       rectaETILT%APERTURE_POLYGY => list%APERTURE_POLYGY
+       
        rectaETILT%KILL_ENT_FRINGE=list%KILL_ENT_FRINGE
        rectaETILT%KILL_EXI_FRINGE=list%KILL_EXI_FRINGE
        rectaETILT%KILL_ENT_SPIN=list%KILL_ENT_SPIN
@@ -3031,6 +3047,19 @@ CONTAINS
           s2%p%aperture%r    = s1%APERTURE_R
           s2%p%aperture%x    = s1%APERTURE_X
           s2%p%aperture%y    = s1%APERTURE_y
+          s2%p%aperture%dx    = s1%APERTURE_DX
+          s2%p%aperture%dy    = s1%APERTURE_DY
+          
+          if (s2%p%aperture%kind == 6) then
+          
+            allocate(s2%p%aperture%polygn)
+            s2%p%aperture%polygn = size(s1%APERTURE_POLYGX)
+          
+            s2%p%aperture%polygx => s1%APERTURE_POLYGX
+            s2%p%aperture%polygy => s1%APERTURE_POLYGY
+            
+          endif
+          
        endif
     endif
     !   goto 113 ! sagan
@@ -3058,8 +3087,9 @@ CONTAINS
 
     ! SLOW AC MODULATION this must be after copy
     !print*,S2%NAME, " N_AC ", s1%n_ac
+    
     if(s1%n_ac > 0) then
-      !print*, "EL_Q ", s1%n_ac       
+      !print*, "EL_Q ", s1%n_ac
       allocate(S2%DC_ac)
       allocate(S2%A_ac)
       allocate(S2%theta_ac)
@@ -3094,6 +3124,7 @@ CONTAINS
          CALL ADD(S22,s1%n_ac,0,0.0_dp)
       endif
 
+
       allocate(S2%d_an(S2%p%nmul))
       allocate(S2%d_bn(S2%p%nmul))
       allocate(S2%d0_an(S2%p%nmul))
@@ -3120,7 +3151,8 @@ CONTAINS
          s2p%d0_bn(i)=S2%bn(i)
          s2p%d0_an(i)=S2%an(i)
       enddo
-
+      
+      ! Fill amplitudes of the modulation
       do i=1,s1%n_ac
       
          !print*,"skowron: ", S2%NAME, " ACD ", i, " AN ",s1%d_an(i), " BN ", s1%d_bn(i)
@@ -3131,13 +3163,55 @@ CONTAINS
          S2p%d_bn(i) =s1%d_bn(i)
          
       enddo
+      
+      if(s1%kind==kind4) then
+        allocate(S2%d_volt )  ! amplitude of RF voltage modulation
+        allocate(S2%d_phas )  ! amplitude of RF phase (lag in MADX) modulation
+        allocate(S2%d0_volt )
+        allocate(S2%d0_phas )
+
+        allocate(S2p%d_volt )  
+        allocate(S2p%d_phas )  
+        allocate(S2p%d0_volt )
+        allocate(S2p%d0_phas )
+
+        S2%d_volt=0.0_dp
+        S2%d_phas=0.0_dp
+
+
+        call alloc(s2p%d_volt)
+        call alloc(s2p%d_phas)
+        call alloc(s2p%d0_volt)
+        call alloc(s2p%d0_phas)
+
+        print*,'S2%volt = ', S2%volt
+        print*,'S2%phas = ', S2%phas
+
+        S2%d0_volt=S2%volt
+        S2p%d0_volt=S2%volt
+        S2%d0_phas=S2%phas
+        S2p%d0_phas=S2%phas
+
+        print*,'S2%volt = '
+        print*,'S2%phas = '
+        call print(S2p%d0_volt)
+        call print(S2p%d0_phas)
+
+        S2%d_volt=S1%d_volt
+        S2p%d_volt=S1%d_volt
+        S2%d_phas=-S1%d_phas
+        S2p%d_phas=-S1%d_phas
+
+      
+      endif 
+      
       !
     else
      S2%slow_ac  = 0
      S2p%slow_ac = 0
     endif
-
-
+     
+     
     ! end of machida stuff here
     ! Default survey stuff here
     !         s22%CHART%A_XY=s2%P%tilTd      ! THAT SHIT SHOULD NOT BE CHANGED NORMALLY
@@ -3538,6 +3612,7 @@ CONTAINS
 !    CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/XMC2**3
     CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/pmae**3
     CRAD=CGAM*TWOPII   !*ERG**3
+    cfluc0=3.0_dp*CU*CGAM0*HBC/2.0_dp 
     CFLUC=CON  !*ERG**5
     GAMMA2=erg**2/XMC2**2
     BRHO=SQRT(ERG**2-XMC2**2)*10.0_dp/cl

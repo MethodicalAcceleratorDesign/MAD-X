@@ -1178,7 +1178,7 @@ create_aperture(const char* name, const char* type, double ap1, double ap2, doub
   aper_element->value[5] = ap4 * 1e3;
   aper_element->value[6] = offx * 1e3;
   aper_element->value[7] = offy * 1e3;
-  aper_element->value[8] = tilt / M_PI * 180; // sixtrack units are degrees
+  aper_element->value[8] = tilt / M_PI * 180 ; // sixtrack units are degrees
 
   if (aper_element->value[1] == 7) // Octagon
   {
@@ -1596,11 +1596,7 @@ convert_madx_to_c6t(struct node* p)
 
       if ((aper_param = return_param_recurse("aper_tilt", p->p_elem)))
       {
-        if (aper_param->expr_list != NULL)
-          update_vector(aper_param->expr_list, aper_param->double_array);
-        j = 1;
-        if (aper_param->double_array->curr == 1)
-          tag_aperture.value[7] = aper_param->double_array->a[0];
+        tag_aperture.value[7] = el_par_value("aper_tilt", p->p_elem);
       }
     }
 

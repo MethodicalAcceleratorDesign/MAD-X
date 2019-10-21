@@ -622,6 +622,7 @@ make_sequ_from_line(char* name)
   int mpos = name_list_pos("marker", defined_commands->list);
   struct command* clone = clone_command(defined_commands->commands[mpos]);
   struct element* el;
+  
   if (pos < 0) fatal_error("unknown line: ", name);
   line = line_list->macros[pos];
   line->dead = 1;   /* prevent line from further conversion to sequence */
@@ -654,7 +655,10 @@ make_sequ_from_line(char* name)
   current_sequ->end = current_node;
   current_sequ->start->previous = current_sequ->end;
   current_sequ->end->next = current_sequ->start;
-  current_sequ->line = 1; /* remember origin of sequence */
+  
+  /*current_sequ->line = 1; /* remember origin of sequence */
+  //printf("skowron: warning make_sequ_from_line line=0 \n");
+  current_sequ->line = 0; /* remember origin of sequence */
 
   if(line_buffer) delete_char_p_array(line_buffer,1);
 }
@@ -990,6 +994,7 @@ seq_move_noexpression(struct in_cmd* cmd)
   struct node *node, *next;
   struct element* el;
   int pos;
+  char tmp[2*NAME_L];
 
   name = command_par_string_user("element", cmd->clone);
   if (name)
@@ -1020,9 +1025,11 @@ seq_move_noexpression(struct in_cmd* cmd)
           next = node->next;
           if (node->moved == 0)
           {
+
             if (any
                 || name_list_pos(node->name, selected_ranges->list) > -1)
             {
+              
               name = NULL;
               for (k = 0; k < seqedit_select->curr; k++)
               {
@@ -1035,11 +1042,30 @@ seq_move_noexpression(struct in_cmd* cmd)
               {
                 at = node->position + by;
                 el = node->p_elem;
+
                 if (remove_one(node) > 0)
                 {
                   node = install_one(el, NULL, at, NULL, at);
                   node->moved = 1;
                   seqedit_move++;
+                }
+              }
+            }
+            else{
+              if(node->from_name!=NULL){
+                strcpy(tmp, node->from_name);
+                square_to_colon(tmp);
+
+                 if (name_list_pos(tmp, selected_ranges->list) > -1)
+                {
+                  at = node->position;
+                  el = node->p_elem;
+                  if (remove_one(node) > 0)
+                  {
+                    node = install_one(el, NULL, at, NULL, at);
+                    node->moved = 1;
+                    seqedit_move++;
+                  }
                 }
               }
             }

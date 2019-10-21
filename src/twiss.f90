@@ -675,7 +675,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   integer, parameter :: max_rep=100
 
   debug = get_option('debug ')
-
+  
   !---- Initialize
   !---- corr_pick stores for both projection the last pickup used by the
   !     threader in order to avoid corrections in front of it when
@@ -7031,6 +7031,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
   integer, external ::  get_option
   double precision, external :: node_value
+  double precision, external :: get_value
 
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
@@ -7049,7 +7050,8 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
   long_coup_on  = get_option('long_coup_off ') .eq. 0
-
+  
+     
 !frs on 06.06.2016
 !  safeguard TWISS from failing due to undefined SC elements
   if (bb_sxy_update .and. long_coup_on .and. N_spch .gt. 0) then
@@ -7073,7 +7075,16 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
      sx = node_value('sigx ')
      sy = node_value('sigy ')
   endif
-
+  
+  if (sx < 1e-16 .or. sy < 1e-16) then
+     re = zero;
+     re(1,1) = 1;
+     re(2,2) = 1;
+     re(3,3) = 1;
+     re(4,4) = 1;
+     return;
+  endif
+  
   xm = node_value('xma ')
   ym = node_value('yma ')
 
@@ -7317,6 +7328,15 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
   fmap = .true.
   r0x = node_value('sigx ')
   r0y = node_value('sigy ')
+  if (r0x < 1e-16 .or. r0y < 1e-16) then
+     re = zero;
+     re(1,1) = 1;
+     re(2,2) = 1;
+     re(3,3) = 1;
+     re(4,4) = 1;
+     return;
+  endif
+
   wi = node_value('width ')
   xm = node_value('xma ')
   ym = node_value('yma ')
@@ -7499,6 +7519,15 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
   fmap = .true.
   r0x = node_value('sigx ')
   r0y = node_value('sigy ')
+  if (r0x < 1e-16 .or. r0y < 1e-16) then
+     re = zero;
+     re(1,1) = 1;
+     re(2,2) = 1;
+     re(3,3) = 1;
+     re(4,4) = 1;
+     return;
+  endif
+
   !     width is given as FWHM of the parabolic density profile,
   !     but formulas were derived with half width at the bottom of this
   !     density profile

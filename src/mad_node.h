@@ -105,6 +105,9 @@ void    set_new_position(struct sequence*);
 int     advance_to_pos(char* table, int* t_pos);
 int     node_apertype(void);
 int     inside_userdefined_geometry(double *x, double *y);
+int     get_userdefined_geometry(double* x, double *y, int* maxlen);
+int     get_userdefined_geometry_len(void);
+
 double  get_length_(void);
 void    node_aperture_vector(double * vec);
 void    node_aperture_offset(double * vec);
