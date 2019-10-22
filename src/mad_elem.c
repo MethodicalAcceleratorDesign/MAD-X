@@ -5,6 +5,9 @@ new_element(const char* name)
 {
   const char *rout_name = "new_element";
   struct element* el = mycalloc(rout_name, 1, sizeof *el);
+  el->aper =           mycalloc(rout_name, 1, sizeof *el->aper);
+  el->aper->aperture = mycalloc(rout_name, 4, sizeof *el->aper->aperture);
+  el->aper->aper_offset = mycalloc(rout_name, 2, sizeof *el->aper->aper_offset);
   strcpy(el->name, name);
   el->stamp = 123456;
   el->def = 0x0;
@@ -14,7 +17,7 @@ new_element(const char* name)
   return el;
 }
 
-static void
+void
 grow_el_list(struct el_list* p)
 {
   const char *rout_name = "grow_el_list";
@@ -259,10 +262,166 @@ make_element(const char* name, const char* parent, struct command* def, int flag
     if((el->parent = find_element(parent, element_list)) == NULL)
       fatal_error("unknown class type:", parent);
     el->base_type = el->parent->base_type;
+    if(command_par_value("l",def) !=0 && belongs_to_class(el,"multipole"))
+      warning("Multipole defined with non-zero length:", el->name);
     el->length = el_par_value("l", el);
+    set_aperture_element(el, def);
   }
+  
   add_to_el_list(&el, def->mad8_type, element_list, flag);
   return el;
+}
+void set_aperture_element(struct element *el, struct command* def){
+  char *type;
+//enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon};
+  type = command_par_string("apertype", def);
+  el->aper->custom_inter = 0; 
+  if(type!=NULL){
+    if(strcmp(type,"circle")==0){
+      
+      double vector [4]; 
+      element_vector(el,"aperture", vector);
+      if(vector[0] > ten_m_12)
+        el->aper->apertype = circle;
+      else
+        el->aper->apertype = notdefined;
+    }
+    else if(strcmp(type,"ellipse")==0)
+      el->aper->apertype = ellipse;
+    else if(strcmp(type,"rectangle")==0)
+      el->aper->apertype = rectangle;
+    else if(strcmp(type,"lhcscreen")==0)
+      el->aper->apertype = lhcscreen;
+    else if(strcmp(type,"rectcircle")==0)
+      el->aper->apertype = rectcircle;
+    else if(strcmp(type,"rectellipse")==0)
+      el->aper->apertype = rectellipse;
+    else if(strcmp(type,"racetrack")==0)
+      el->aper->apertype = racetrack;
+    else if(strcmp(type,"octagon")==0)
+      el->aper->apertype = octagon;
+    else{
+      el->aper->apertype = custom;
+      int lines=0, ch;
+      FILE *fp = fopen(type,"r");
+      if(fp==NULL){
+          fatal_error("Aperture File is not existing ",type);
+        }
+
+      while(!feof(fp))
+      {
+        ch = fgetc(fp);
+        if(ch == '\n'){
+          lines++;
+        }
+      }
+      
+      el->aper->xlist = mycalloc("aperlist", lines+1, sizeof *el->aper->xlist);
+      el->aper->ylist = mycalloc("aperlist", lines+1, sizeof *el->aper->ylist);
+      rewind(fp);
+      int i=0;
+      while (2==fscanf(fp, "%lf %lf", &el->aper->xlist[i], &el->aper->ylist[i])) i++;
+      /* closing the shape: a last point is inserted in table
+     with coordinates equal to those of the first point */
+    el->aper->length = i; // this minus 1 has to be there because of how the algorithm is done.  
+    el->aper->xlist[i]=el->aper->xlist[0];
+    el->aper->ylist[i]=el->aper->ylist[0];   
+    
+    }
+  }
+
+  element_vector(el, "aperture" ,el->aper->aperture);
+  element_vector(el, "aper_offset",el->aper->aper_offset);
+
+
+  double tmpx [MAXARRAY];
+  double tmpy [MAXARRAY];
+  for(int i=0;i<MAXARRAY;i++){
+    tmpx[i] = -999;
+    tmpy[i] = -999;
+  }
+  
+  int lx = element_vector(el, "aper_vx", tmpx);
+  int ly = element_vector(el, "aper_vy", tmpy);
+  int tmp_l=MAXARRAY+1;
+  if(tmpx[0]!=-1 && ly > 1 && lx >1){
+    for(int i=0;i<MAXARRAY;i++){
+      if(tmpx[i]==-999 && tmpy[i]==-999){
+        tmp_l = i;
+        break; 
+      }
+    }
+
+    if(tmp_l > MAXARRAY){
+      mad_error("Different length of aper_vx and aper_vy for element:",el->name);
+    }
+    else{
+      el->aper->custom_inter = 1;//sets the flagg that it should be used
+      el->aper->xlist = mycalloc("aperlist", tmp_l+1, sizeof *el->aper->xlist);
+      el->aper->ylist = mycalloc("aperlist", tmp_l+1, sizeof *el->aper->ylist);
+
+      for(int i=0;i<tmp_l;i++){
+        el->aper->xlist[i] = tmpx[i];
+        el->aper->ylist[i] = tmpy[i];
+      }
+      //printf("2nd last %f, and last %f %d", el->aper->xlist[tmp_l-2], el->aper->xlist[tmp_l-1], tmp_l);
+
+
+      el->aper->length = tmp_l; // minus 1 or not ?? has to be there because of how the algorithm is done.  
+      el->aper->xlist[tmp_l]=el->aper->xlist[0];
+      el->aper->ylist[tmp_l]=el->aper->ylist[0];
+      if(el->aper->apertype==notdefined){ //If no other aperture is defined then a 10 meter rectangle is set! 
+        el->aper->apertype=custom_inter; // sets it to a rcircle so the check is still done
+      }
+    }
+  }
+
+}
+
+void update_node_aperture(void){
+  char *type;
+//enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon};
+  type = command_par_string("apertype", current_node->p_elem->def);
+  if(type!=NULL && current_node->p_elem->aper->apertype!=custom_inter){
+    if(strcmp(type,"circle")==0){
+      
+      double vector [4]; 
+      element_vector(current_node->p_elem,"aperture", vector);
+      if(vector[0] > ten_m_12)
+        current_node->p_elem->aper->apertype = circle;
+      else
+        current_node->p_elem->aper->apertype = notdefined;
+    }
+    else if(strcmp(type,"ellipse")==0)
+      current_node->p_elem->aper->apertype = ellipse;
+    else if(strcmp(type,"rectangle")==0)
+      current_node->p_elem->aper->apertype = rectangle;
+    else if(strcmp(type,"lhcscreen")==0)
+      current_node->p_elem->aper->apertype = lhcscreen;
+    else if(strcmp(type,"rectcircle")==0)
+      current_node->p_elem->aper->apertype = rectcircle;
+    else if(strcmp(type,"rectellipse")==0)
+      current_node->p_elem->aper->apertype = rectellipse;
+    else if(strcmp(type,"racetrack")==0)
+      current_node->p_elem->aper->apertype = racetrack;
+    else if(strcmp(type,"octagon")==0)
+      current_node->p_elem->aper->apertype = octagon;
+  }
+
+  element_vector(current_node->p_elem, "aperture", current_node->p_elem->aper->aperture);
+  element_vector(current_node->p_elem, "aper_offset",current_node->p_elem->aper->aper_offset);
+
+  if(current_node->p_elem->aper->custom_inter ==1){
+
+    element_vector(current_node->p_elem, "aper_vx", current_node->p_elem->aper->xlist);
+    element_vector(current_node->p_elem, "aper_vy", current_node->p_elem->aper->ylist);
+    
+  }
+}
+
+int is_custom_set(void){
+
+  return current_node->p_elem->aper->custom_inter;
 }
 
 void
@@ -272,10 +431,14 @@ make_elem_node(struct element* el, int occ_cnt)
   prev_node = current_node;
   current_node = new_elem_node(el, occ_cnt);
   current_node->occ_cnt = occ_cnt;
+  current_node->chkick = el_par_value("chkick", el);
+  current_node->cvkick = el_par_value("cvkick", el);
   add_to_node_list(current_node, 0, current_sequ->nodes);
+
   if (prev_node != NULL) prev_node->next = current_node;
   current_node->previous = prev_node;
   current_node->next = NULL;
+
 }
 
 struct element*
@@ -286,6 +449,7 @@ delete_element(struct element* el)
   if (stamp_flag && el->stamp != 123456)
     fprintf(stamp_file, "d_e double delete --> %s\n", el->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", el->name);
+  myfree(rout_name, el->aper);
   myfree(rout_name, el);
   return NULL;
 }
@@ -443,7 +607,7 @@ export_el_def_8(struct element* el, char* string)
 }
 
 int
-belongs_to_class(struct element* el, char* class)
+belongs_to_class(struct element* el, const char* class)
   /* returns 1 if an element belongs to a class, else 0 */
 {
   int in = 0;
@@ -478,26 +642,26 @@ element_value(const struct node* node, const char* par)
   double e_val;
 
   if (node == 0) {
-     error("element_value","node parameter is NULL.");
+     mad_error("element_value","node parameter is NULL.");
      return 0.0;
    }
 
   const struct element* el = node->p_elem;
 
    if (el == 0) {
-     error("element_value","node has NULL element pointer.");
+     mad_error("element_value","node has NULL element pointer.");
      return 0.0;
    }
 
    if (strcmp(el->name,"in_cmd") == 0) {
-     error("element_value","node '%.47s' refers to invalid element (improper (re)definition?).", node->name);
+     mad_error("element_value","node '%.47s' refers to invalid element (improper (re)definition?).", node->name);
      return 0.0;
    }
 
    const struct command* def = el->def;
 
    if (def == 0) {
-     error("element_value","element has NULL defintion pointer.");
+     mad_error("element_value","element has NULL defintion pointer.");
      return 0.0;
    }
 
@@ -803,8 +967,21 @@ update_element(struct element* el, struct command* update)
       }
     }
   }
+  set_aperture_element(el, update); //updates contains all the info of the element
 }
 
+void
+update_element_children(struct element* el, struct command* update)
+  /* updates the parameters of the children to el. Note that it is only updating one layer (not recursive) */
+{
+
+  for(int i=0; i<element_list->max;i++){
+    if(element_list->elem[i]==NULL) break;
+
+    if(strcmp(el->name,element_list->elem[i]->parent->name)==0)
+      update_element(element_list->elem[i], update);
+  }
+}
 void
 add_to_el_list( /* adds element to alphabetic element list */
   struct element** el, int inf, struct el_list* ell, int flag)

@@ -9,6 +9,7 @@ struct in_cmd;
 
 int   select_ptc_idx(void);
 void  select_ptc_normal(struct in_cmd*);
+void  pro_ptc_normal(void);
 void  pro_ptc_twiss(void);
 int   minimum_acceptable_order(void);
 void  pro_ptc_read_errors(void);

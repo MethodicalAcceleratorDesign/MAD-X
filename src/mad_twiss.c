@@ -574,7 +574,7 @@ complete_twiss_table(struct table* t)
   t->s_cols[0][i] = tmpbuff(c_node->name);
   t->s_cols[1][i] = tmpbuff(c_node->base_name);
   t->s_cols[twiss_fill_end+1][i] = tmpbuff(c_node->p_elem->parent->name);
-  t->s_cols[twiss_fill_end+2][i] = command_par_string("comments",c_node->p_elem->def);
+  t->s_cols[twiss_fill_end+2][i] = tmpbuff(command_par_string("comments",c_node->p_elem->def));
   for (j = twiss_opt_end+1; j<= twiss_fill_end; j++)
   {
     el = c_node->length;
@@ -762,11 +762,19 @@ pro_twiss(void)
     }
   }
 
-  if(par_present("centre", current_twiss)) set_option("centre", &k);
+  if(par_present("centre", current_twiss)) {
+    set_option("centre", &k);
+    // Special check that it really is set to TRUE (not only included in the argument)
+    if(command_par_value("centre", current_twiss)>0){
+      current_sequ->tw_centre=1;
+    }
+  }
   else {
     k = 0;
+    current_sequ->tw_centre=0;
     set_option("centre", &k);
     k = 1;
+
   }
 
   name = command_par_string_user("keeporbit", current_twiss);
@@ -973,6 +981,22 @@ pro_twiss(void)
   current_sequ->range_end = use_range[1];
 }
 
+void print_eigenvectors_(double *eigenvectors){
+  int i,p;
+  char *filename;
+  FILE *fptr;
+  
+  filename = command_par_string_user("eigenfile", current_twiss);
+  if ((fptr = fopen(filename, "w")) == NULL)
+      fatal_error("cannot open output file:", filename);
+  
+  for(i=0; i < 6; i ++){
+    p=i*6;
+    fprintf(fptr, "%.9e %.9e %.9e %.9e %.9e %.9e \n", eigenvectors[p],eigenvectors[p+1],
+    eigenvectors[p+2],eigenvectors[p+3],eigenvectors[p+4],eigenvectors[p+5]);
+  }
+  fclose(fptr);
+}
 int
 embedded_twiss(void)
   /* controls twiss module to create a twiss table for interpolated nodes
@@ -1023,6 +1047,7 @@ embedded_twiss(void)
   {
     /* beta0 specified */
     embedded_twiss_beta[0] = buffer(cp->m_string->p[0]);
+
 
     /* START defining a TWISS input command for the sequence */
     tnl = local_twiss[0]->cmd_def->par_names;

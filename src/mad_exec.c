@@ -1,4 +1,5 @@
 #include "madx.h"
+#include <unistd.h>
 
 static void
 exec_delete_sequ(const char* name)
@@ -181,6 +182,18 @@ exec_call(struct in_cmd* cmd)
     if (down_unit(file)) madx_input(top);
   }
   else warning("call without filename:", "ignored");
+}
+
+void
+exec_chdir(struct in_cmd* cmd)
+/* change directory */
+{
+
+  char* dir = command_par_string_user("dir", cmd->clone);
+  if (dir) {
+    chdir(dir);
+  }
+  else warning("chdir without dirname:", "ignored");
 }
 
 void

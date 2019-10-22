@@ -976,7 +976,10 @@ contains
     do i=l,1,-1
        if(idal(i).le.nomax+2.or.idal(i).gt.nda_dab) then
           write(line,'(a38,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL(I),NDA = ',idal(i),nda_dab
-          ipause=mypauses(13,line)
+!          ipause=mypauses(13,line)
+          C_%STABLE_DA = .false.
+          l = 1
+          return
           call dadeb !(31,'ERR DADAL ',1)
        endif
        if(idal(i).eq.nda_dab) then
@@ -1014,7 +1017,10 @@ contains
 !    endif
     if(idal.le.nomax+2.or.idal.gt.nda_dab) then
        write(line,'(a35,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL,NDA = ',idal,nda_dab
-       ipause=mypauses(14,line)
+       !ipause=mypauses(14,line)
+       C_%STABLE_DA = .false.
+       idal = 0
+       return
        call dadeb !(31,'ERR DADAL ',1)
     endif
     if(idal.eq.nda_dab) then
@@ -4538,7 +4544,6 @@ contains
     ilma = idalm(ina)
     illa = idall(ina)
     !
-!  if(longprint)write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
 !         '*********************************************'
     if(longprint) then
        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
@@ -4602,7 +4607,8 @@ contains
     enddo
     if(iout.eq.0) iout=1
 if(longprint) write(iunit,502) -iout,zero,(j(i),i=1,inva)
-if((.not.longprint).and.(.not.some)) write(iunit,*) " Real Polynomial is zero "
+if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero "
+if(.not.longprint) write(6,*) " "
     !
     return
       end subroutine dapri77
@@ -4761,10 +4767,12 @@ if((.not.longprint).and.(.not.some)) write(iunit,*) " Real Polynomial is zero "
     iwarin = 0
     !
     read(iunit,'(A10)') c10
-    read(iunit,'(18X,I4)') nno
-    read(iunit,'(A10)') c10
-    read(iunit,'(A10)') c10
-    read(iunit,'(A10)') c10
+    if(longprint) then
+     read(iunit,'(18X,I4)') nno
+     read(iunit,'(A10)') c10
+     read(iunit,'(A10)') c10
+     read(iunit,'(A10)') c10
+    endif
     !
     !
     iin = 0

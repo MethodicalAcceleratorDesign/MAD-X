@@ -25,9 +25,13 @@ endif
 # Libraries on Linux
 
 ifeq ($(OSTYPE),Linux)
-LIBS   += $(if $(call eq,$(ARCH),32),$(call libdir,/usr/lib),) -lpthread -lX11
+LIBS   += $(if $(call eq,$(ARCH),32),$(call libdir,/usr/lib),) -lpthread
 LDLIBS += -lstdc++ -lm
+  ifeq ($(X11),yes)
+    LIBS += -lX11
+  endif
 endif
+
 
 # Garbage Collector
 
@@ -40,7 +44,7 @@ endif
 
 ifeq ($(OSTYPE),Darwin)
   ifeq ($(STATIC),yes)
-  	# X11
+    ifeq ($(X11),yes)
   	X11PATH := /opt/local/lib/
   	X11LIBS := libX11.a libxcb.a libXau.a libXdmcp.a
   	ifneq ($(wildcard /opt/local/lib/),)
@@ -48,6 +52,7 @@ ifeq ($(OSTYPE),Darwin)
   	else
   	  LIBS  += $(call libdir,/usr/X11/lib) -lX11
   	endif
+    endif
   
     # C/C++
     GNULIBS := $(wildcard $(call GNULIB,libstdc++.a) $(call GNULIB,libgcc_eh.a))
@@ -58,7 +63,9 @@ ifeq ($(OSTYPE),Darwin)
     endif
   
   else
+    ifeq ($(X11),yes)
     LIBS   += $(call libdir,/usr/X11/lib) -lX11
+    endif
     LDLIBS += -lstdc++ -lm
   endif
 

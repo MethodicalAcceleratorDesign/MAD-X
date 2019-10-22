@@ -147,6 +147,8 @@ contains
        intstate = intstate  - delta0 - only_4d0 - nocavity0 + totalpath0
     endif
 
+    gcs = get_value('ptc_trackline ','gcs ') .ne. 0
+
     if (gcs .and.  intstate%TOTALPATH==1) then
        call fort_warn("ptc_trackline","Having global coordinates and totalpath for z is sensless")
        gcs = .false.
@@ -170,7 +172,6 @@ contains
 
     rplot = get_value('ptc_trackline ','rootntuple ') .ne. 0
 
-    
 
     allocate(observedelements(1:my_ring%n)); observedelements(:)=0 ! zero means that this element is not an obs. point
 
@@ -732,7 +733,7 @@ contains
              pathlegth = pathlegth + p%mag%p%ld
 
              if (getdebug() > 2 ) then
-                write(6,*) e, 'l=',pathlegth
+                write(6,*) e, ' ', p%mag%name, 'l=',pathlegth
                 write(6,'(5f8.4, f16.8)') x(1),x(2),x(3),x(4),x(5),x(6)
              endif
 
@@ -884,7 +885,9 @@ contains
        ! totalpath0==false cavity is rephased for each turn (phase set to 0)
        intstate = intstate  - delta0 - only_4d0 - nocavity0 + totalpath0
     endif
-
+     
+    gcs = get_value('ptc_trackline ','gcs ') .ne. 0
+     
     if (gcs .and.  intstate%TOTALPATH==1) then
        call fort_warn("ptc_trackline","Having global coordinates and totalpath for z is sensless")
        call fort_warn("ptc_trackline","Disabling gcs")
@@ -1031,7 +1034,7 @@ contains
              pathlegth = pathlegth + p%mag%p%ld
 
              if (getdebug() > 2 ) then
-                write(6,*) e, 'l=',pathlegth
+                write(6,*) e, ' ', p%mag%name, 'l=',pathlegth
                 write(6,'(5f8.4, f16.8)') x(1),x(2),x(3),x(4),x(5),x(6)
              endif
 

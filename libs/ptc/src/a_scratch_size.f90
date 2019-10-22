@@ -22,7 +22,7 @@
 module precision_constants
   implicit none
   public
-  integer,parameter  :: newscheme_max =200
+  integer,parameter  :: newscheme_max =200 
   integer,private,parameter::n_read_max=20,NCAR=120
   private read_d,read_int,read_int_a,read_d_a
   !Double precision
@@ -98,6 +98,10 @@ module precision_constants
    real(dp),parameter::class_e_radius=qelect/4.0_dp/pi/eps_0/pmae/1e9_dp ![m]
    real(dp),parameter::CGAM=4.0_dp*pi/3.0_dp*class_e_radius/pmae**3 ![m/Gev^3] old: 8.846056192e-5_dp
    real(dp),parameter::HBC=hbar*CLIGHT              ![GeV*m] old: HBC=1.9732858e-16_dp
+  real(dp),parameter:: alpha_fine= 137.035999084_dp
+   real(dp),parameter::class_c_radius=qelect/4.0_dp/pi/eps_0/1e9_dp ![m]
+   real(dp),parameter::CGAM0=4.0_dp*pi/3.0_dp*class_c_radius   !/pmae**4 ![m/Gev^3] old: 8.846056192e-5_dp
+
   ![GeV*m] old: HBC=1.9732858e-16_dp
   !Smallness Parameters
    !Smallness Parameters
@@ -185,7 +189,7 @@ module precision_constants
   real(dp) :: lmax=1.e38_dp
   logical(lp) :: printdainfo=my_false
   integer   lielib_print(15)
-  DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0,1,0,1,1/
+  DATA lielib_print /0,0,0,1,0,0,0,0,0,0,0,1,0,1,1/
   integer :: SECTOR_NMUL_MAX=22
   INTEGER, target :: SECTOR_NMUL = 11
  
@@ -197,17 +201,20 @@ module precision_constants
   character(1024) :: messagelost
   integer, target :: ndpt_bmad = 0, only2d =0, addclock=0
   integer,TARGET :: HIGHEST_FRINGE=2
+  logical :: use_quaternion = .false.
+  logical :: use_tpsa = .false.
+  logical :: conversion_xprime_in_abell=.true.
   !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence
   !  lielib_print(3)=1   Shows details in flofacg
-  !  lielib_print(4)=1   tunes and damping
+  !  lielib_print(4)=1   prints thin layout information
   !  lielib_print(5)=1  order in orbital normal form
   !  lielib_print(6)=1  symplectic condition
   !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
   !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
   !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
-  !  lielib_print(10)=1  print lingyun's checks
+  !  lielib_print(10)=1  print radation gain 
   !  lielib_print(11)=1  print warning about Teng-Edwards
   !  lielib_print(12)=1  print info in make_node_layout
   !  lielib_print(13)=1  print info of normal form kernel into file kernel.txt and kernel_spin.txt
@@ -235,9 +242,16 @@ module precision_constants
      integer,pointer :: nspin => null()       ! number of spin variables (0 or 3)
      integer,pointer :: SPIN_pos => null()       ! position of spin variables (0 or 3)
      integer,pointer :: ndpt     => null() ! constant energy variable position is different from zero
+     integer,pointer ::ndptb  => null()  
      integer,pointer :: NPARA    => null() ! PARAMETER LOCATION IN PTC in fpp
      integer,pointer :: npara_fpp=> null()     ! PARAMETER LOCATION IN FPP or PTC
      integer,pointer :: np_pol   => null()  ! parameters produced through pol_block
+     integer,pointer :: nd2t   => null()  ! harmonic planes minus clocks
+     integer,pointer :: nd2harm   => null()  ! harmonic plane
+     integer,pointer :: ndc2t   => null()  ! 0 or 2 : jordan planes     
+     integer,pointer :: pos_of_delta   => null()  !  constant delta
+     integer,pointer :: rf   => null()  !   # of modulated planes
+
      logical(lp),pointer :: knob => null()
      logical(lp),pointer :: valishev => null()
      !     integer, pointer :: NDPT_OTHER
@@ -753,18 +767,20 @@ CONTAINS
   END SUBROUTINE ReportOpenFiles
 
 
-  SUBROUTINE CONTEXT( STRING, nb,dollar )
+  SUBROUTINE CONTEXT( STRING, nb,dollar,maj )
     IMPLICIT NONE
     CHARACTER(*) STRING
     CHARACTER(1) C1
     integer, optional :: nb
-    logical(lp), optional :: dollar
+    logical(lp), optional :: dollar ,maj
     integer I,J,K,nb0,count
-     logical(lp) dol
+     logical(lp) dol,ma
     nb0=0
     dol=.false.
+    ma=.true.
     if(present(nb)) nb0=1
     if(present(dollar)) dol=dollar
+    if(present(maj)) ma=maj
     J = 0
     count=0
     DO I = 1, LEN (STRING)
@@ -781,7 +797,7 @@ CONTAINS
           endif
           J = J + 1
           K = ICHAR( C1 )
-          IF( K .GE. ICHAR('a') .AND. K .LE. ICHAR('z') ) THEN
+          IF( K .GE. ICHAR('a') .AND. K .LE. ICHAR('z').and.ma ) THEN
              C1 = CHAR( K - ICHAR('a') + ICHAR('A') )
           ENDIF
           STRING(J:J) = C1

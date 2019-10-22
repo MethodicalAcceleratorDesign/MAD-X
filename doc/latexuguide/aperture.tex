@@ -67,9 +67,9 @@ The minimum aperture definition uses the following two attributes:
   \end{madlist}
   If a filename is provided as argument, the file must contain a 
   list of x and y coordinates, one pair per line, outlining the complete aperture shape, 
-  i.e. no symmetry is assumed. This option is only supported by the 
-  \hyperref[chap:aperture]{\texttt{APERTURE}} module and an aperture thus defined is 
-  ignored in the \hyperref[chap:thintrack]{\texttt{TRACK}} module.
+  i.e. no symmetry is assumed. In order to speed up the tracking it is also possible to
+  provide an rectangle that is checked before the arbitrary polygon is checked. If the 
+  rectangel is bigger than the polygon the arbitrary shape is not checked. 
   When a filename is provided as argument, the \texttt{APERTURE} attribute is ignored.\\
   \\
   \ttitem{APERTURE} is an array of values, the number and meaning 
@@ -77,7 +77,7 @@ The minimum aperture definition uses the following two attributes:
 \end{madlist}
 
 \begin{table}[ht]
-  \caption{Predefined aperture types}
+  \caption{Defintion of aperture types}
   \label{table:apertype}
   \vspace{1ex}
   \begin{tabular}{|l | c | p{7.5cm}|}
@@ -102,7 +102,12 @@ The minimum aperture definition uses the following two attributes:
     \hline
     \texttt{OCTAGON} & 4 & half width and half height along main axes, 
     two angles sustaining the cut corner in the first quadrant, 
-    given in radians and in order of increasing values. \\   
+    given in radians and in order of increasing values. \\
+    \hline
+    \texttt{"FileName"} & 2 & In addition to the points in the file which
+    are defining geometry it is also possible add two parameters
+    to APERTURE attribute. These values are used for a check identical to 
+    the RECTANGLE check. \\    
     \hline
   \end{tabular}
 \end{table}
@@ -130,7 +135,7 @@ and \texttt{APR:=SQRT(APX**2+APY**2)}:
 When the aperture is described in a file, the only parameter to be provided is 
 a filename given as value to the \texttt{APERTYPE} attribute:
 \madxmp{
-MB: SBEND, L=l.MB, APERTYPE="MB-aper.txt";
+MB: SBEND, L=l.MB, APERTYPE="MB-aper.txt", APERTURE=\{APH, APV\} ;
 }
 where \texttt{"MB-aper.txt"} contains the list of x-y coordinates defining the
 aperture shape:
@@ -141,7 +146,17 @@ xi   \>yi \\
 \ldots \\
 xn   \>yn
 }
+and \texttt{APX} and \texttt{APY} are the settings for the rectangle 
+that is checked first. The rectangle parameters are optional and are 
+only used to speed up the aperture checks in tracking.
 
+There is also another way to define an arbitrary polygon aperture using 
+the attributes \texttt{APER\_VX} and \texttt{APER\_VY}. They can also be
+defined in combination standard aperture defintions. The standard
+aperture definitions are then checked first and in case it is outside
+the standard definition of aperture the arbitrary is checked. An example
+of how to use it can be found in: 
+\href{https://github.com/MethodicalAcceleratorDesign/MAD-X/blob/master/tests/test-track-13/test-track-13.madx}. 
 \textbf{Notes}
 \begin{itemize}
    \item There are inconsistencies in the parameter definition for the

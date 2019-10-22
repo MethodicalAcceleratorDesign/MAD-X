@@ -103,6 +103,21 @@ int     retreat_node(void);
 void    set_node_bv(struct sequence*);
 void    set_new_position(struct sequence*);
 int     advance_to_pos(char* table, int* t_pos);
+int     node_apertype(void);
+int     inside_userdefined_geometry(double *x, double *y);
+int     get_userdefined_geometry(double* x, double *y, int* maxlen);
+int     get_userdefined_geometry_len(void);
+
+double  get_length_(void);
+void    node_aperture_vector(double * vec);
+void    node_aperture_offset(double * vec);
+void    alloc_tt_attrib(int *length);
+void    set_tt_attrib(int *index, double *value);
+double  get_tt_attrib(int *index);
+void    set_tt_multipoles(int *maxmul);
+void    get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl);
+double  node_obs_point(void);
+void    store_orbit_correctors(void);
 
 #endif // MAD_NODE_H
 

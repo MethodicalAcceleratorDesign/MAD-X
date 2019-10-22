@@ -1,0 +1,5 @@
+chdir, dir="../..";
+call, file="tests/test-control/callee.madx";
+
+chdir, dir="tests/test-control";
+call, file="callee.madx";

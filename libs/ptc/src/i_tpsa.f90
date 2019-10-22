@@ -23,18 +23,20 @@ MODULE TPSA
   private unaryADD,add,daddsc,dscadd,addsc,scadd,iaddsc,iscadd 
   private unarySUB,subs,dsubsc,dscsub,subsc,scsub,isubsc,iscsub
   private allocda,KILLda,A_OPT,K_opt
-  private dexpt,dcost,dsint,dsqrtt,dtant,datanht,dtanht
+  private dexpt,dcost,dsint,dsqrtt,dtant,datanht,dtanht,c_exp_quaternion
   PRIVATE GETCHARnd2,GETintnd2,dputchar,dputint, filter,check_j,dsinHt,dCOSHt
-  private GETintnd2t,print_for_bmad_parse
-  PRIVATE DEQUAL,REQUAL,varf,varf001  !,CHARINT
+  private GETintnd2t,print_for_bmad_parse,cdivq,cmulq,csubq,caddq
+  PRIVATE DEQUAL,REQUAL,varf,varf001,dputint0  !,CHARINT
   !  PUBLIC VAR,ASS
   private pbbra,full_absT,asstaylor,getcharnd2s,GETintnd2s,GETintk
-  private shiftda,shift000
+  private shiftda,shift000,cunaryADDq,cunarySUBq,cinvq,cabsq,cabsq2
   !PRIVATE null_0,ALLOC_U,FILL_N,REFILL_N
   !  public, alloc_uni, null_uni, fill_uni, refill_uni
-
+  private rcmulq,cmulqr,ccmulq,cmulqc
   private fill_uni_r ! new sagan
-
+! quaternion
+   private subq,unarysubq,addq,unaryADDq,absq,absq2,mulq,divq,EQUALq,EQUALqr,EQUALqi,powq,printq ,invq
+   private EQUALcq,cEQUALqr,cEQUALqi,cPOWq,EQUALq_cq,EQUALcq_q
   private NO,ND,ND2,NP,NDPT,NV
   integer NP,NO,ND,ND2,NDPT,NV
   integer, TARGET :: NSPIN=0
@@ -53,7 +55,7 @@ private norm_bessel_Ir,nbit,nbittr,nbitrt,etienne_bessel_Ir,etienne_bessel_It,et
 private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
   type(dalevel) scratchda(ndumt)   !scratch levels of DA using linked list
   real(dp), pointer :: tn0(:)=>null()
- 
+  
  INTERFACE nbi
      MODULE PROCEDURE nbitreal
      MODULE PROCEDURE nbittaylor
@@ -79,6 +81,14 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL
+     MODULE PROCEDURE EQUALq
+     MODULE PROCEDURE EQUALcq
+     MODULE PROCEDURE EQUALq_cq
+     MODULE PROCEDURE EQUALcq_q
+     MODULE PROCEDURE EQUALqi
+     MODULE PROCEDURE EQUALqr
+     MODULE PROCEDURE cEQUALqr
+     MODULE PROCEDURE cEQUALqi
      !     MODULE PROCEDURE DAABSEQUAL  ! remove 2002.10.17
      !     MODULE PROCEDURE AABSEQUAL   ! remove 2002.10.17
      MODULE PROCEDURE DEQUAL  ! added 2002.10.17    ! check2002.10.17
@@ -113,99 +123,18 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
 
   INTERFACE print
      MODULE PROCEDURE printunitaylor
+     MODULE PROCEDURE printq
+     MODULE PROCEDURE cprintq
   END INTERFACE
 
 
-
-
-  !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber2" width="400" height="135">
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">+</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@         <font face="Times New Roman" size="1">Taylor</font></span></td>
-  !@         <td width="77" height="20" align="center">
-  !@         <span style="text-transform: uppercase">
-  !@         <font face="Times New Roman" size="1">
-  !@         Real(dp)</font></span></td>
-  !@         <td width="78" height="20" align="center">
-  !@         <span style="text-transform: uppercase">
-  !@         <font face="Times New Roman" size="1">Real(sp)</font></span></td>
-  !@         <td width="56" height="20" align="center">
-  !@         <span style="text-transform: uppercase">
-  !@         <font face="Times New Roman" size="1">Integer</font></span></td>
-  !@       </tr>
-  !@       <tr>
-  !@         <td width="77" height="20" align="center">
-  !@         <span style="text-transform: uppercase">
-  !@         <font face="Times New Roman" size="1">Taylor</font></span></td>
-  !@         <td width="77" height="20" align="center">
-  !@         <span style="text-transform: uppercase; font-weight:700">
-  !@         <font face="Times New Roman" size="1">
-  !@         <a href="i_tpsa.htm#ADD" style="text-decoration: none">add</a></font></span></td>
-  !@         <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase; font-weight:700">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#DADDSC" style="text-decoration: none">daddsc</a></font></span></td>
-  !@        <td width="78" height="20" align="center"><b>
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#ADDSC" style="text-decoration: none">ADDSC</a></font></b></td>
-  !@        <td width="56" height="20" align="center"><b>
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#IADDSC" style="text-decoration: none">
-  !@        IADDSC</a></font></b></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        Real(dp)</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase; font-weight:700">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#DSCADD" style="text-decoration: none">dscadd</a></font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
-  !@        <td width="77" height="20" align="center"><b>
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#SCADD" style="text-decoration: none">SCADD</a></font></b></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
-  !@        <td width="77" height="20" align="center"><b>
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#ISCADD" style="text-decoration: none">
-  !@        ISCADD</a></font></b></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@     </table>
   INTERFACE OPERATOR (+)
      MODULE PROCEDURE unaryADD  !@2 This is a unary operation
      MODULE PROCEDURE add
+     MODULE PROCEDURE unaryADDq  !@2 This is a unary operation
+     MODULE PROCEDURE cunaryADDq
+     MODULE PROCEDURE addq
+     MODULE PROCEDURE caddq
      MODULE PROCEDURE daddsc
      MODULE PROCEDURE dscadd
      MODULE PROCEDURE addsc
@@ -215,96 +144,13 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
   END INTERFACE
 
 
-
-
-  !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber1" width="400" height="135">
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">-</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        Real(dp)</font></span></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#SUBS" style="text-decoration: none; font-weight: 700">SUBS</a></font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#DSUBSC" style="text-decoration: none; font-weight: 700">dSUBsc</a></font></span></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#SUBSC" style="text-decoration: none; font-weight: 700">SUBSC</a></font></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#ISUBSC" style="text-decoration: none; font-weight: 700">ISUBSC</a></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        Real(dp)</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#DSCSUB" style="text-decoration: none; font-weight: 700">dscSUB</a></font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#SCSUB" style="text-decoration: none; font-weight: 700">
-  !@        SCSUB</a></font></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#ISCSUB" style="text-decoration: none; font-weight: 700">
-  !@        ISCSUB</a></font></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@     </table>
   INTERFACE OPERATOR (-)
      MODULE PROCEDURE unarySUB
      MODULE PROCEDURE subs
+     MODULE PROCEDURE unarySUBq
+     MODULE PROCEDURE cunarySUBq
+     MODULE PROCEDURE subq
+     MODULE PROCEDURE csubq
      MODULE PROCEDURE dsubsc
      MODULE PROCEDURE dscsub
      MODULE PROCEDURE subsc
@@ -313,189 +159,28 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
      MODULE PROCEDURE iscsub
   END INTERFACE
 
-
-
-  !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber1" width="400" height="134">
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">*</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        Real(dp)</font></span></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#MUL" style="text-decoration: none; font-weight:700">MUL</a></font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#DMULSC" style="text-decoration: none; font-weight:700">dMULsc</a></font></span></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#MULSC" style="text-decoration: none; font-weight:700">MULSC</a></font></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#IMULSC" style="text-decoration: none; font-weight:700">IMULSC</a></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="19" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        Real(dp)</font></span></td>
-  !@        <td width="77" height="19" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#DSCMUL" style="text-decoration: none; font-weight:700">dscMUL</a></font></span></td>
-  !@        <td width="77" height="19" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="78" height="19" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="56" height="19" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#SCMUL" style="text-decoration: none; font-weight:700">
-  !@        SCMUL</a></font></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="77" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="1" face="Times New Roman">
-  !@        <a href="i_tpsa.htm#ISCMUL" style="text-decoration: none; font-weight:700">
-  !@        ISCMUL</a></font></td>
-  !@        <td width="77" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="78" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="56" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@     </table>
-
   INTERFACE OPERATOR (*)
      MODULE PROCEDURE mul
+     MODULE PROCEDURE mulq
+     MODULE PROCEDURE cmulq
      MODULE PROCEDURE dmulsc
      MODULE PROCEDURE dscmul
      MODULE PROCEDURE mulsc
      MODULE PROCEDURE scmul
      MODULE PROCEDURE imulsc
      MODULE PROCEDURE iscmul
+     MODULE PROCEDURE rcmulq 
+     MODULE PROCEDURE cmulqr 
+     MODULE PROCEDURE ccmulq 
+     MODULE PROCEDURE cmulqc
   END INTERFACE
 
-  !@    <table border="4" cellspacing="1" bordercolor="#000000" id="AutoNumber1" width="400" height="135">
-  !@      <tr>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">/</font></span></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        Real(dp)</font></span></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Taylor</font></span></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#DIV" style="text-decoration: none; font-weight: 700">div</a></font></span></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#DDIVSC" style="text-decoration: none; font-weight: 700">dDIVsc</a></font></span></td>
-  !@        <td width="0" height="20" align="center"><font size="1">
-  !@        <a href="i_tpsa.htm#DIVSC" style="text-decoration: none; font-weight: 700">DIVSC</a></font></td>
-  !@        <td width="0" height="20" align="center"><font size="1">
-  !@        <a href="i_tpsa.htm#IDIVSC" style="text-decoration: none; font-weight: 700">
-  !@        IDIVSC</a></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        Real(dp)</font></span></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">
-  !@        <a href="i_tpsa.htm#DSCDIV" style="text-decoration: none; font-weight: 700">dscDIV</a></font></span></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Real(sp)</font></span></td>
-  !@        <td width="0" height="20" align="center"><font size="1">
-  !@        <a href="i_tpsa.htm#SCDIV" style="text-decoration: none; font-weight: 700">
-  !@        SCDIV</a></font></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@      <tr>
-  !@        <td width="0" height="20" align="center">
-  !@        <span style="text-transform: uppercase">
-  !@        <font face="Times New Roman" size="1">Integer</font></span></td>
-  !@        <td width="0" height="20" align="center"><font size="1">
-  !@        <a href="i_tpsa.htm#ISCDIV" style="text-decoration: none; font-weight: 700">
-  !@        ISCDIV</a></font></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@        <td width="0" height="20" align="center">
-  !@        <font size="2" face="Times New Roman"><b>F90</b></font></td>
-  !@      </tr>
-  !@    </table>
+
 
   INTERFACE OPERATOR (/)
      MODULE PROCEDURE div
+     MODULE PROCEDURE divq
+     MODULE PROCEDURE cdivq
      MODULE PROCEDURE ddivsc
      MODULE PROCEDURE dscdiv
      MODULE PROCEDURE divsc
@@ -507,6 +192,8 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
 
   INTERFACE OPERATOR (**)
      MODULE PROCEDURE POW
+     MODULE PROCEDURE POWq
+     MODULE PROCEDURE cPOWq
      MODULE PROCEDURE POWR
      MODULE PROCEDURE POWR8
   END INTERFACE
@@ -572,14 +259,25 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
 
   INTERFACE abs
      MODULE PROCEDURE DAABSEQUAL  ! remove 2002.10.17
+     MODULE PROCEDURE absq 
+     MODULE PROCEDURE cabsq  
   END INTERFACE
+
+
+  INTERFACE abs_square
+     MODULE PROCEDURE absq2
+     MODULE PROCEDURE cabsq2
+  END INTERFACE
+
   INTERFACE dabs
      MODULE PROCEDURE DAABSEQUAL  ! remove 2002.10.17
   END INTERFACE
 
   INTERFACE exp
      MODULE PROCEDURE dexpt
+     MODULE PROCEDURE c_exp_quaternion
   END INTERFACE
+
   INTERFACE dexp
      MODULE PROCEDURE dexpt
   END INTERFACE
@@ -642,6 +340,8 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
   INTERFACE clog
      MODULE PROCEDURE dlogt
   END INTERFACE
+
+
 
   INTERFACE sqrt
      MODULE PROCEDURE dsqrtt
@@ -804,6 +504,283 @@ CONTAINS
   end subroutine count_taylor
 
 
+
+
+  FUNCTION unaryADDq( S1 )
+    implicit none
+    TYPE (quaternion) unaryADDq
+    TYPE (quaternion), INTENT (IN) :: S1
+ 
+
+ 
+
+
+    unaryADDq=s1
+
+  END FUNCTION unaryADDq
+
+  FUNCTION unarySUBq( S1 )
+    implicit none
+    TYPE (quaternion) unarySUBq
+    TYPE (quaternion), INTENT (IN) :: S1
+ 
+
+         unarySUBq%x= -s1%x
+
+  END FUNCTION unarySUBq
+
+
+  FUNCTION invq( S1 )
+    implicit none
+    TYPE (quaternion) invq
+    TYPE (quaternion), INTENT (IN) :: S1
+    real(dp) norm
+     integer i
+  
+              invq=s1
+              do i=1,3
+                invq%x(i)=-invq%x(i)
+              enddo
+                norm=abs_square(invq)
+              do i=0,3
+                invq%x(i)=invq%x(i)/norm
+              enddo
+      
+  END FUNCTION invq
+
+
+  FUNCTION absq( S1 )
+    implicit none
+    real(dp) absq
+    TYPE (quaternion), INTENT (IN) :: S1
+    integer i
+
+ 
+   
+     absq=sqrt(abs_square(s1))
+  END FUNCTION absq
+
+
+  FUNCTION absq2( S1 )
+    implicit none
+    real(dp) absq2
+    TYPE (quaternion), INTENT (IN) :: S1
+    integer i
+
+  
+           absq2=0
+       do i=0,3
+         absq2 = s1%x(i)**2+absq2
+       enddo
+  END FUNCTION absq2
+
+
+! complex quaternion
+
+  FUNCTION cunaryADDq( S1 )
+    implicit none
+    TYPE (complex_quaternion) cunaryADDq
+    TYPE (complex_quaternion), INTENT (IN) :: S1
+ 
+
+ 
+
+    cunaryADDq=s1
+
+  END FUNCTION cunaryADDq
+
+  FUNCTION cunarySUBq( S1 )
+    implicit none
+    TYPE (complex_quaternion) cunarySUBq
+    TYPE (complex_quaternion), INTENT (IN) :: S1
+ 
+
+         cunarySUBq%x= -s1%x
+
+  END FUNCTION cunarySUBq
+
+
+  FUNCTION cinvq( S1 )
+    implicit none
+    TYPE (complex_quaternion) cinvq
+    TYPE (complex_quaternion), INTENT (IN) :: S1
+    real(dp) norm
+     integer i
+ 
+              cinvq=s1
+              do i=1,3
+                cinvq%x(i)=-cinvq%x(i)
+              enddo
+                norm=abs_square(cinvq)
+              do i=0,3
+                cinvq%x(i)=cinvq%x(i)/norm
+              enddo
+      
+  END FUNCTION cinvq
+
+
+  FUNCTION cabsq( S1 )
+    implicit none
+    real(dp) cabsq
+    TYPE (complex_quaternion), INTENT (IN) :: S1
+    integer i
+
+ 
+   
+     cabsq=sqrt(abs_square(s1))
+  END FUNCTION cabsq
+
+
+  FUNCTION cabsq2( S1 )
+    implicit none
+    complex(dp) cabsq2
+    TYPE (complex_quaternion), INTENT (IN) :: S1
+    integer i
+
+  
+           cabsq2=0
+       do i=0,3
+         cabsq2 = abs(s1%x(i))**2+cabsq2
+       enddo
+  END FUNCTION cabsq2
+
+
+ subroutine log_complex_quaternion(qn0,logqn0,epso) 
+!#restricted: normal
+!# This routine takes the log assuming no orbital map
+!# 
+  implicit none
+
+  type(complex_quaternion), intent (inout) :: qn0,logqn0
+  type(complex_quaternion)  q1,qs,dr
+  complex(dp) s
+  real(dp) sn,normb,norma,eps
+  real(dp), optional :: epso
+  complex(dp) cn
+  logical diff
+  integer i,k
+ 
+  eps=1.d-3
+  if(present(epso)) eps=epso
+  sn=sqrt(qn0%x(1)**2+qn0%x(2)**2+qn0%x(3)**2)
+
+if(sn>eps) then 
+  q1=qn0
+  q1%x(0)=0.0_dp
+  qs=0.0_dp
+  s=sqrt(q1%x(1)**2+q1%x(2)**2+q1%x(3)**2)
+  qs%x(0)=1.0_dp/s
+  logqn0=q1*qs   ! q1=n
+  s= sqrt(1.0_dp-s**2) + i_* s
+  s=-i_*log(s)
+
+  logqn0%x(0)=0.0_dp
+  do i=1,3
+   logqn0%x(i)=s*logqn0%x(i)
+  enddo
+goto 1
+else
+  diff=.false.
+!write(6,*) "small quaternion "
+
+ q1=qn0
+ q1%x(0)=q1%x(0)-1.0_dp
+ logqn0=0.0_dp
+ qs=q1
+normb=1.d38
+ do i=1,100
+  cn=-(-1.0_dp)**i/i
+dr=logqn0
+  logqn0=logqn0+cn*qs
+dr=dr-logqn0
+  qs=qs*q1
+  
+! call c_full_norm_quaternion(dr,k,norma)
+norma=abs(dr)
+    if(diff) then
+      if(normb>=norma) goto 1
+      normb=norma
+    else
+     if(norma<1.d-10) then
+      diff=.true.
+      normb=norma
+     endif
+    endif
+ enddo
+endif
+
+write(6,*) " no convergence  in  log_quaternion"
+
+1 continue
+ 
+
+ end  subroutine log_complex_quaternion
+
+  function c_exp_quaternion(h_axis,ds) ! spin routine
+    implicit none
+    TYPE(complex_quaternion) c_exp_quaternion
+    TYPE(complex_quaternion),optional, INTENT(INout) :: DS
+    TYPE(complex_quaternion), INTENT(IN) :: h_axis
+    integer  nmax
+    integer i,localmaster,k
+    TYPE(complex_quaternion) dh,dhn,dr,dst
+    real(dp) eps,norm1,norm2
+    complex(dp) c
+    logical check
+
+  
+
+
+    check=.true.
+    eps=1.d-5
+    nmax=1000
+
+     c_exp_quaternion=1.0_dp
+  
+    dh=h_axis
+ 
+
+    dhn=1.0_dp
+    c=1.0_dp
+    norm1=mybig
+    do i=1,nmax
+       dhn=dhn*dh
+       c=1.0_dp/i
+       dhn=c*dhn
+
+       dr=c_exp_quaternion
+
+       c_exp_quaternion=c_exp_quaternion+dhn 
+
+       dr=c_exp_quaternion+(-1.0_dp,0.0_dp)*dr
+
+       norm2=abs(dr)
+
+
+       if(check) then
+          if(norm2<eps.and.i>10) then
+             check=.false.
+          endif
+       else
+          if(norm2>=norm1) exit
+       endif
+       norm1=norm2
+    enddo
+
+    if(i>nmax-10) then
+       write(6,*) "no convergence in c_exp_quaternion, enter 0 to stop "
+       read(5,*) norm1
+       if(norm1==0)  stop 1066
+    endif
+    if(present(ds)) c_exp_quaternion=c_exp_quaternion*ds
+
+
+  end   function c_exp_quaternion
+
+
+
+!!!!!!!!!!!!!!!!!!!!!
+
   FUNCTION unaryADD( S1 )
     implicit none
     TYPE (TAYLOR) unaryADD
@@ -846,6 +823,7 @@ CONTAINS
     master=localmaster
 
   END FUNCTION unarySUB
+
 
   SUBROUTINE  maketree(S1,s2)
     implicit none
@@ -984,6 +962,112 @@ CONTAINS
     !      call newdacop(S1%j,S2%j)
     !   endif
   END SUBROUTINE EQUAL
+
+  SUBROUTINE  EQUALq(S2,S1)
+    implicit none
+    type (quaternion),INTENT(inOUT)::S2
+    type (quaternion),INTENT(IN)::S1
+    integer i
+ 
+    
+    do i=0,3
+    s2%x(i)=s1%x(i)
+    enddo
+
+  end SUBROUTINE  EQUALq
+
+
+  SUBROUTINE  EQUALcq(S2,S1)
+    implicit none
+    type (complex_quaternion),INTENT(inOUT)::S2
+    type (complex_quaternion),INTENT(IN)::S1
+    integer i
+ 
+    
+    do i=0,3
+    s2%x(i)=s1%x(i)
+    enddo
+
+  end SUBROUTINE  EQUALcq
+
+
+  SUBROUTINE  EQUALcq_q(S2,S1)
+    implicit none
+    type (complex_quaternion),INTENT(inOUT)::S2
+    type (quaternion),INTENT(IN)::S1
+    integer i
+     
+    do i=0,3
+    s2%x(i)=s1%x(i)
+    enddo
+
+  end SUBROUTINE  EQUALcq_q
+
+  SUBROUTINE  EQUALq_cq(S2,S1)
+    implicit none
+    type (quaternion),INTENT(inOUT)::S2
+    type (complex_quaternion),INTENT(IN)::S1
+    integer i
+ 
+    
+    do i=0,3
+    s2%x(i)=s1%x(i)
+    enddo
+
+  end SUBROUTINE  EQUALq_cq
+
+  SUBROUTINE  EQUALqr(S2,S1)
+    implicit none
+    type (quaternion),INTENT(inOUT)::S2
+    real(dp),INTENT(IN)::S1
+    integer i
+ 
+
+    do i=0,3
+    s2%x(i)=0
+    enddo
+    s2%x(0)=s1
+  end SUBROUTINE  EQUALqr
+
+
+  SUBROUTINE  cEQUALqr(S2,S1)
+    implicit none
+    type (complex_quaternion),INTENT(inOUT)::S2
+    real(dp),INTENT(IN)::S1
+    integer i
+ 
+
+    do i=0,3
+    s2%x(i)=0
+    enddo
+    s2%x(0)=s1
+  end SUBROUTINE  cEQUALqr
+
+  SUBROUTINE  EQUALqi(S2,S1)
+    implicit none
+    type (quaternion),INTENT(inOUT)::S2
+    integer,INTENT(IN)::S1
+    integer i
+ 
+
+    do i=0,3
+    s2%x(i)=0
+    enddo
+    s2%x(s1)=1
+  end SUBROUTINE  EQUALqi
+
+
+  SUBROUTINE  cEQUALqi(S2,S1)
+    implicit none
+    type (complex_quaternion),INTENT(inOUT)::S2
+    integer,INTENT(IN)::S1
+    integer i
+
+    do i=0,3
+    s2%x(i)=0
+    enddo
+    s2%x(s1)=1
+  end SUBROUTINE  cEQUALqi
 
   SUBROUTINE  DEQUAL(R1,S2)
     implicit none
@@ -1866,6 +1950,50 @@ endif
 
   END FUNCTION GETdatra
 
+
+  FUNCTION POWq( S1, R2 )
+    implicit none
+    TYPE (quaternion) POWq,temp
+    TYPE (quaternion), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: R2
+    INTEGER I,R22
+    integer localmaster
+ 
+    temp=1.0_dp
+
+    R22=IABS(R2)
+    DO I=1,R22
+       temp=temp*s1
+    ENDDO
+    IF(R2.LT.0) THEN
+       temp=invq(temp)
+    ENDIF
+     powq=temp
+ 
+  END FUNCTION POWq
+
+
+  FUNCTION cPOWq( S1, R2 )
+    implicit none
+    TYPE (complex_quaternion) cPOWq,temp
+    TYPE (complex_quaternion), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) :: R2
+    INTEGER I,R22
+    integer localmaster
+ 
+    temp=1.0_dp
+
+    R22=IABS(R2)
+    DO I=1,R22
+       temp=temp*s1
+    ENDDO
+    IF(R2.LT.0) THEN
+       temp=cinvq(temp)
+    ENDIF
+     cpowq=temp
+ 
+  END FUNCTION cPOWq
+
   FUNCTION POW( S1, R2 )
     implicit none
     TYPE (taylor) POW
@@ -2343,6 +2471,164 @@ endif
 
   END FUNCTION add
 
+
+  FUNCTION addq( S1, S2 )
+    implicit none
+    TYPE (quaternion) addq
+    TYPE (quaternion), INTENT (IN) :: S1, S2
+
+ 
+       addq%x=s1%x+s2%x
+  END FUNCTION addq
+
+
+  FUNCTION subq( S1, S2 )
+    implicit none
+    TYPE (quaternion) subq
+    TYPE (quaternion), INTENT (IN) :: S1, S2
+ 
+          subq%x=s1%x-s2%x
+
+  END FUNCTION subq
+
+  FUNCTION mulq( S1, S2 )
+    implicit none
+    TYPE (quaternion) mulq
+    TYPE (quaternion), INTENT (IN) :: S1, S2
+    integer i
+
+  
+          mulq=0.0_dp
+
+          mulq%x(0)=s1%x(0)*s2%x(0)-s1%x(1)*s2%x(1)-s1%x(2)*s2%x(2)-s1%x(3)*s2%x(3)
+
+         mulq%x(1)=  s1%x(2)*s2%x(3)-s1%x(3)*s2%x(2)
+         mulq%x(2)=  s1%x(3)*s2%x(1)-s1%x(1)*s2%x(3)
+         mulq%x(3)=  s1%x(1)*s2%x(2)-s1%x(2)*s2%x(1)
+
+        do i=1,3
+         mulq%x(i)= mulq%x(i) + s1%x(0)*s2%x(i)+ s1%x(i)*s2%x(0)
+        enddo
+
+  END FUNCTION mulq
+
+  FUNCTION divq( S1, S2 )
+    implicit none
+    TYPE (quaternion) divq
+    TYPE (quaternion), INTENT (IN) :: S1, S2
+
+ 
+        
+       divq=s1*invq(s2)
+
+  END FUNCTION divq
+
+!!!! complex_quaternion
+
+
+  FUNCTION caddq( S1, S2 )
+    implicit none
+    TYPE (complex_quaternion) caddq
+    TYPE (complex_quaternion), INTENT (IN) :: S1, S2
+
+   
+       caddq%x=s1%x+s2%x
+  END FUNCTION caddq
+
+
+  FUNCTION csubq( S1, S2 )
+    implicit none
+    TYPE (complex_quaternion) csubq
+    TYPE (complex_quaternion), INTENT (IN) :: S1, S2
+
+  
+          csubq%x=s1%x-s2%x
+
+  END FUNCTION csubq
+
+  FUNCTION cmulq( S1, S2 )
+    implicit none
+    TYPE (complex_quaternion) cmulq
+    TYPE (complex_quaternion), INTENT (IN) :: S1, S2
+    integer i
+
+   
+          cmulq=0.0_dp
+
+          cmulq%x(0)=s1%x(0)*s2%x(0)-s1%x(1)*s2%x(1)-s1%x(2)*s2%x(2)-s1%x(3)*s2%x(3)
+
+         cmulq%x(1)=  s1%x(2)*s2%x(3)-s1%x(3)*s2%x(2)
+         cmulq%x(2)=  s1%x(3)*s2%x(1)-s1%x(1)*s2%x(3)
+         cmulq%x(3)=  s1%x(1)*s2%x(2)-s1%x(2)*s2%x(1)
+
+        do i=1,3
+         cmulq%x(i)= cmulq%x(i) + s1%x(0)*s2%x(i)+ s1%x(i)*s2%x(0)
+        enddo
+
+  END FUNCTION cmulq
+
+  FUNCTION cmulqc( S1, c )
+    implicit none
+    TYPE (complex_quaternion) cmulqc
+    TYPE (complex_quaternion), INTENT (IN) :: S1
+    complex(dp), INTENT (IN) :: c
+    integer i
+ 
+
+          cmulqc%x= s1%x*c
+
+  END FUNCTION cmulqc
+
+  FUNCTION ccmulq( c,s1 )
+    implicit none
+    TYPE (complex_quaternion) ccmulq
+    TYPE (complex_quaternion), INTENT (IN) :: S1
+    complex(dp), INTENT (IN) :: c
+    integer i
+ 
+          ccmulq%x= s1%x*c
+
+  END FUNCTION ccmulq
+
+  FUNCTION cmulqr( S1, c )
+    implicit none
+    TYPE (complex_quaternion) cmulqr
+    TYPE (complex_quaternion), INTENT (IN) :: S1
+    real(dp), INTENT (IN) :: c
+    integer i
+  
+
+          cmulqr%x= s1%x*c
+
+  END FUNCTION cmulqr
+
+  FUNCTION rcmulq( c,s1 )
+    implicit none
+    TYPE (complex_quaternion) rcmulq
+    TYPE (complex_quaternion), INTENT (IN) :: S1
+    real(dp), INTENT (IN) :: c
+    integer i
+
+  
+
+          rcmulq%x= s1%x*c
+
+  END FUNCTION rcmulq
+
+
+  FUNCTION cdivq( S1, S2 )
+    implicit none
+    TYPE (complex_quaternion) cdivq
+    TYPE (complex_quaternion), INTENT (IN) :: S1, S2
+
+  
+        
+       cdivq=s1*cinvq(s2)
+
+  END FUNCTION cdivq
+
+!!!!!  
+
   FUNCTION daddsc( S1, sc )
     implicit none
     TYPE (taylor) daddsc
@@ -2738,6 +3024,7 @@ endif
     master=localmaster
 
   END FUNCTION varf001
+
 
 
 
@@ -3269,6 +3556,56 @@ endif
 
   !  i/o routines
 
+  SUBROUTINE  printq(S1,MFILE,PREC)
+    implicit none
+    INTEGER,OPTIONAL,INTENT(IN)::MFILE
+    type (quaternion),INTENT(IN)::S1
+    REAL(DP),OPTIONAL,INTENT(IN)::PREC
+    INTEGER I,mfi
+     mfi=6
+     if(present(mfile)) mfi=mfile
+      write(mfi,*) " real quaternion "
+    DO I=0,3
+      write(mfi,*) s1%x(i)
+    ENDDO
+  END SUBROUTINE printq
+
+
+  SUBROUTINE  cprintq(S1,MFILE,PREC,pr)
+    implicit none
+    INTEGER,OPTIONAL,INTENT(IN)::MFILE
+    type (complex_quaternion),INTENT(IN)::S1
+    REAL(DP),OPTIONAL,INTENT(IN)::PREC
+    logical,OPTIONAL,INTENT(INout)::pr
+    real(dp) norm
+    INTEGER I,mfi
+     mfi=6
+     if(present(mfile)) mfi=mfile
+     if(present(prec) ) then
+     norm=0
+      do i=0,3
+       norm=norm+abs(s1%x(i))
+      enddo
+     if(norm>prec) then
+     if(present(pr))pr=.true.
+     if(mfi/=0) then
+     write(mfi,*) " complex_quaternion "
+       DO I=0,3
+         write(mfi,*) s1%x(i)
+       ENDDO
+      endif
+      else
+            if(present(pr))pr=.false.
+      endif
+     else 
+
+      write(mfi,*) " complex_quaternion "
+    DO I=0,3
+      write(mfi,*) s1%x(i)
+    ENDDO
+   endif
+  END SUBROUTINE cprintq
+
   SUBROUTINE  print_for_bmad_parse(S1,MFILE,prec,ind)
     implicit none
         INTEGER,OPTIONAL,INTENT(IN)::MFILE
@@ -3600,7 +3937,7 @@ endif
   subroutine crap1(STRING)
     implicit none
     CHARACTER(*) STRING
-
+ 
  
       write(6,*) "ERROR IN :"
       write(6,*) STRING

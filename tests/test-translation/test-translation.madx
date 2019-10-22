@@ -2,8 +2,8 @@ circum=2;
 beam, particle=proton, energy = 5500;
 
 
-newquad:  MULTIPOLE, KNL={0.00, 0.001};
-trans: TRANSLATION, X=0.01, Y=0.002, PX=0.001, PY=0.001, T=0.0001, PT = 0.0002;
+newquad:  MULTIPOLE, KNL={0.00, 0.001}, comments="testing the comments";
+trans: TRANSLATION, DX=0.01, DY=0.002, DS=0.1;
 
 seq: sequence, refer=center, l=circum;
 trans:trans, at=1.000;
@@ -17,13 +17,9 @@ twiss,X=-0.0,Y=0.000, BETX=1, BETY=1, file="translation.twiss";
 SURVEY, SEQUENCE=seq, FILE= survey.out, x0=0.01;
 
 
-seq_notrans: sequence, refer=center, l=circum;
-newquad: newquad at=1.5;
-endsequence;
-
-use, sequence=seq_notrans;
-select, flag=twiss, column=name, s, x,px, y, py, PT, T;
-twiss,X=0.01, Y=0.002, PX=0.001, PY=0.001, T=0.0001, PT = 0.0002, BETX=1, BETY=1, file="offset.twiss";
-
+TRACK, file = "trackFile.out",ONEPASS, ONETABLE;
+OBSERVE, PLACE="trans";
+START,  x=0, y=0, t=0.0;
+run, turns=1;
 
 stop;

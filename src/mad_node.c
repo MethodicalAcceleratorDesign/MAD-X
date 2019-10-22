@@ -56,7 +56,9 @@ clone_node(struct node* p, int flag)
   clone->rfm_freq = p->rfm_freq;
   clone->rfm_volt = p->rfm_volt;
   clone->rfm_harmon = p->rfm_harmon;
-  //
+
+  clone->chkick = p->chkick;
+  clone->cvkick = p->cvkick;
   return clone;
 }
 
@@ -290,7 +292,9 @@ get_refpos(struct sequence* sequ)
   // else return zero;
   else return sequ->length/2.;
 }
-
+double get_length_(void){
+  return current_node->length;
+}
 
 double
 node_value(const char* par)
@@ -324,6 +328,57 @@ node_value(const char* par)
 //
   else value =  element_value(current_node, lpar);
   return value;
+}
+double node_obs_point(void){
+  return current_node->obs_point;
+}
+
+
+void set_tt_multipoles(int *maxmul){
+  int tmp_n, tmp_s;
+  double tmp_nv[*maxmul] ;
+  double tmp_sv[*maxmul] ;
+  current_node->p_elem->multip = mycalloc("alloc mult struct", 1, sizeof (*current_node->p_elem->multip));
+  current_node->p_elem->multip->knl = mycalloc("alloc multip normal", *maxmul, sizeof (*current_node->p_elem->multip->knl));
+  current_node->p_elem->multip->ksl = mycalloc("alloc multip skew"  , *maxmul, sizeof (*current_node->p_elem->multip->ksl));
+
+  get_node_vector("knl", &tmp_n, tmp_nv);
+  get_node_vector("ksl", &tmp_s, tmp_sv);
+  current_node->p_elem->multip->nn = tmp_n;
+  current_node->p_elem->multip->ns = tmp_s;
+  
+  for(int i=0;i<tmp_n;i++){
+    current_node->p_elem->multip->knl[i] = tmp_nv[i];
+  }
+  for(int i=0;i<tmp_s;i++){
+    current_node->p_elem->multip->ksl[i] = tmp_sv[i];
+  }
+
+
+}
+
+void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl){
+    nn[0]=current_node->p_elem->multip->nn;
+    ns[0]=current_node->p_elem->multip->ns;
+    for(int i=0;i<*nn;i++){
+      knl[i] = current_node->p_elem->multip->knl[i];
+    }
+    for(int i=0;i<*ns;i++){
+      ksl[i] = current_node->p_elem->multip->ksl[i];
+    }
+
+
+}
+void alloc_tt_attrib(int *length){
+  current_node->p_elem->tt_attrib = mycalloc("tmp_array_tt", (*length+1), sizeof (*current_node->p_elem->tt_attrib));
+}
+
+void set_tt_attrib(int *index, double *value){
+  current_node->p_elem->tt_attrib[*index] = *value;
+}
+
+double get_tt_attrib(int *index){
+  return current_node->p_elem->tt_attrib[*index];
 }
 
 void
@@ -396,6 +451,18 @@ retreat_node(void)
   current_node = current_node->previous;
   return 1;
 }
+void store_orbit_correctors(void){
+
+
+    restart_sequ();
+  while(1){
+    set_command_par_value("chkick",current_node->p_elem->def,current_node->chkick);
+    set_command_par_value("cvkick",current_node->p_elem->def, current_node->cvkick);
+    if (advance_node()==0) break;
+      
+  }
+
+}
 
 void
 store_node_value(const char* par, double* value)
@@ -406,7 +473,7 @@ store_node_value(const char* par, double* value)
 
   mycpy(lpar, par);
   if (strcmp(lpar, "chkick") == 0) current_node->chkick = *value;
-  else if (strcmp(lpar, "cvkick") == 0) current_node->cvkick = *value;
+  else if (strcmp(lpar, "cvkick") == 0)current_node->cvkick = *value;
 /*  else if (strcmp(lpar, "dipole_bv") == 0) current_node->dipole_bv = *value;*/
   else if (strcmp(lpar, "other_bv") == 0) current_node->other_bv = *value;
   else if (strcmp(lpar, "obs_point") == 0) current_node->obs_point = *value;
@@ -622,8 +689,10 @@ advance_node(void)
   /* advances to next node in expanded sequence;
      returns 0 if end of range, else 1 */
 {
+
   if (current_node == current_sequ->range_end)  return 0;
   current_node = current_node->next;
+
   return 1;
 }
 
@@ -687,6 +756,55 @@ node_string(const char* key, char* string, int* l)
     strfcpy(string, p, *l);
   else
     memset(string, ' ', *l);
+}
+
+int node_apertype(void){
+  return current_node->p_elem->aper->apertype;
+}
+void node_aperture_vector(double *vec){
+  for(int i=0;i<4; i++){
+  vec[i] = current_node->p_elem->aper->aperture[i];
+  }
+}
+void node_aperture_offset(double *vec){
+  for(int i=0;i<2; i++){
+  vec[i] = current_node->p_elem->aper->aper_offset[i];
+  }
+}
+
+int inside_userdefined_geometry(double* x, double *y){
+  return aper_chk_inside(*x, *y, current_node->p_elem->aper->xlist, 
+    current_node->p_elem->aper->ylist, current_node->p_elem->aper->length );
+}
+
+/*
+Returns aperture defined as arbitrary polygon
+x -> x coordinates
+y -> y coordinates
+maxlen -> length of the x and y arrays 
+returns: total length of the aperture (can be bigger than maxlen)
+*/
+int get_userdefined_geometry(double* x, double *y, int* maxlen)
+{
+  double* xi = current_node->p_elem->aper->xlist;
+  double* yi = current_node->p_elem->aper->ylist;
+  int mx = current_node->p_elem->aper->length;
+  
+  if (*maxlen < mx) mx = *maxlen;
+  
+  for(int i=0; i<mx; i++)
+   {
+     x[i] =  xi[i];
+     y[i] =  yi[i];
+   }
+
+  return current_node->p_elem->aper->length;
+
+}
+
+int get_userdefined_geometry_len()
+{
+  return current_node->p_elem->aper->length;
 }
 
 int

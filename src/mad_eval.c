@@ -286,13 +286,10 @@ pro_input(char* statement)
     {
       if (type == 6)
       {
-        get_bracket_range(&statement[start], '(', ')', &rs, &re);
-        ktmp = re+1;
-        if (re > rs && strchr(&statement[ktmp], ':')) /* formal arg.s */
-        {
-          get_bracket_range(&statement[ktmp], '(', ')', &rs, &re);
-          rs += ktmp; re += ktmp;
-        }
+        /* search parens after formal args:  m(a, b): line=(...); */
+        ktmp = strchr(&statement[start], ':') - &statement[start];
+        get_bracket_range(&statement[start+ktmp], '(', ')', &rs, &re);
+        rs += ktmp; re += ktmp;
       }
       else get_bracket_range(&statement[start], '{', '}', &rs, &re);
       if (re > rs)
@@ -435,6 +432,8 @@ process(void)  /* steering routine: processes one command */
           strcpy(this_cmd->clone->name, name);
           scan_in_cmd(this_cmd);
           update_element(el, this_cmd->clone);
+          if(get_option("update_from_parent ")==1)
+            update_element_children(el, this_cmd->clone);
         }
       }
       break;

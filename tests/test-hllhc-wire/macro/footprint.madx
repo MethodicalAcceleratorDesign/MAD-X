@@ -1,0 +1,34 @@
+!========================================================================================================!
+!                                             FOOTPRINT MACRO                                            !
+!========================================================================================================!
+
+MAKEFOOTPRINT_V1(mydynapfile, mydynaptunefile):macro={
+small=0.02;
+big=sqrt(1.-small^2);
+track;
+xs=small;
+ys=small;
+value,xs,ys;
+start,fx=xs,fy=ys;
+n=1;
+m=0;
+while (n <= 6)
+{
+angle = 15*m*pi/180;
+if (m == 0) {xs=n*big; ys=n*small;}
+elseif (m == 6) {xs=n*small; ys=n*big;}
+else
+{
+xs=n*cos(angle);
+ys=n*sin(angle);
+}
+value,xs,ys;
+start,fx=xs,fy=ys;
+m=m+1;
+if (m == 7) { m=0; n=n+1;}
+};
+dynap,fastune,turns=1024;
+endtrack;
+write,table=dynap,file=mydynapfile;
+write,table=dynaptune,file=mydynaptunefile;
+};

@@ -3,6 +3,8 @@
 ! Note that in this version the dispersion is corrected (multiplied by beta) 
 ! within the module as in the twiss table the disperion is given in the pt
 ! frame (dx/dpt) while for the ibs calculations the dx/dp is needed.
+!
+! 12/02/2019 A. Saa Hernandez. Formulas for coasting beam corrected
 ! ***************************************************************************
 
 subroutine ibs
@@ -462,8 +464,7 @@ subroutine twclog(bxbar, bybar, dxbar, dybar, const)
      densty = parnum / vol
   else
      vol    = four * pi * sigxcm * sigycm * ot2 * circ
-     pnbtot = currnt * circ / (qion * qelect * betas * clight)
-     densty = pnbtot / vol
+     densty = parnum / vol
   endif
 
   !---- Calculate RMAX as smaller of SIGXCM and DEBYE length.
@@ -482,8 +483,8 @@ subroutine twclog(bxbar, bybar, dxbar, dybar, const)
           (eight * pi * betas **3 * gammas**4 * ex * ey * sige * sigt)
      cbunch = qion * parnum * qelect * betas * clight / circ
   else
-     const = currnt * coulog * arad**2 / &
-          (four * sqrt(pi) * qion * qelect * bgam**4 * ex * ey * sige)
+     const = parnum * coulog * arad**2 * clight / &
+          (four * sqrt(pi) * betas **3 * gammas**4 * ex * ey * sige * circ)
   endif
 
   write (*,'(/t6,a,1p,e14.6)')       "CONST               = ",const

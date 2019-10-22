@@ -758,8 +758,8 @@ CONTAINS
           s2%AN(I)%I=S1%IAN(I)+S1%NPARA
           s2%AN(I)%S=S1%SAN(I)
           s2%AN(I)%KIND=3
-          s2%AN(I)%g=S1%g
-          s2%AN(I)%nb=S1%nb
+!          s2%AN(I)%g=S1%g
+!          s2%AN(I)%nb=S1%nb
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%aN(I)%R=s2%aN(I)%R+scale_tpsafit*s2%AN(I)%S*s1%TPSAFIT(S1%IAN(I))
@@ -772,8 +772,8 @@ CONTAINS
           s2%BN(I)%I=S1%IBN(I)+S1%NPARA
           s2%BN(I)%S=S1%SBN(I)
           s2%BN(I)%KIND=3
-          s2%BN(I)%g=S1%g
-          s2%BN(I)%nb=S1%nb
+!          s2%BN(I)%g=S1%g
+!          s2%BN(I)%nb=S1%nb
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%BN(I)%R=s2%BN(I)%R+scale_tpsafit*s2%BN(I)%S*s1%TPSAFIT(S1%IBN(I))
@@ -792,8 +792,8 @@ CONTAINS
           s2%VOLT%I=S1%IVOLT+S1%NPARA
           s2%VOLT%S=S1%SVOLT
           s2%VOLT%KIND=3
-          s2%VOLT%g=S1%g
-          s2%VOLT%nb=S1%nb
+!          s2%VOLT%g=S1%g
+!          s2%VOLT%nb=S1%nb
           DONEIT=.TRUE.
           if(S1%IVOLT>c_%np_pol) c_%np_pol=S1%IVOLT
           IF(S1%SET_TPSAFIT) THEN
@@ -806,8 +806,8 @@ CONTAINS
        IF(S1%IFREQ>0) THEN
           s2%FREQ%I=S1%IFREQ+S1%NPARA
           s2%FREQ%S=S1%SFREQ
-          s2%FREQ%g=S1%g
-          s2%FREQ%nb=S1%nb
+!          s2%FREQ%g=S1%g
+!          s2%FREQ%nb=S1%nb
           s2%FREQ%KIND=3
           if(S1%IFREQ>c_%np_pol) c_%np_pol=S1%IFREQ
           IF(S1%SET_TPSAFIT) THEN
@@ -822,8 +822,8 @@ CONTAINS
           s2%PHAS%I=S1%IPHAS+S1%NPARA
           s2%PHAS%S=S1%SPHAS
           s2%PHAS%KIND=3
-          s2%PHAS%g=S1%g
-          s2%PHAS%nb=S1%nb
+ !         s2%PHAS%g=S1%g
+ !         s2%PHAS%nb=S1%nb
           DONEIT=.TRUE.
           if(S1%IPHAS>c_%np_pol) c_%np_pol=S1%IPHAS
           IF(S1%SET_TPSAFIT) THEN
@@ -839,8 +839,8 @@ CONTAINS
        IF(S1%IVOLT>0) THEN
           s2%VOLT%I=S1%IVOLT+S1%NPARA
           s2%VOLT%S=S1%SVOLT
-          s2%PHAS%g=S1%g
-          s2%PHAS%nb=S1%nb
+!          s2%PHAS%g=S1%g
+!          s2%PHAS%nb=S1%nb
           s2%VOLT%KIND=3
           if(S1%IVOLT>c_%np_pol) c_%np_pol=S1%IVOLT
           DONEIT=.TRUE.
@@ -854,8 +854,8 @@ CONTAINS
        IF(S1%IFREQ>0) THEN
           s2%FREQ%I=S1%IFREQ+S1%NPARA
           s2%FREQ%S=S1%SFREQ
-          s2%FREQ%g=S1%g
-          s2%FREQ%nb=S1%nb
+!          s2%FREQ%g=S1%g
+!          s2%FREQ%nb=S1%nb
           s2%FREQ%KIND=3
           if(S1%IFREQ>c_%np_pol) c_%np_pol=S1%IFREQ
           IF(S1%SET_TPSAFIT) THEN
@@ -869,8 +869,8 @@ CONTAINS
        IF(S1%IPHAS>0) THEN
           s2%PHAS%I=S1%IPHAS+S1%NPARA
           s2%PHAS%S=S1%SPHAS
-          s2%PHAS%g=S1%g
-          s2%PHAS%nb=S1%nb
+  !        s2%PHAS%g=S1%g
+  !        s2%PHAS%nb=S1%nb
           s2%PHAS%KIND=3
           if(S1%IPHAS>c_%np_pol) c_%np_pol=S1%IPHAS
           DONEIT=.TRUE.
@@ -887,8 +887,8 @@ CONTAINS
        IF(S1%IB_SOL>0) THEN
           s2%B_SOL%I=S1%IB_SOL+S1%NPARA
           s2%B_SOL%S=S1%SB_SOL
-          s2%B_SOL%g=S1%g
-          s2%B_SOL%nb=S1%nb
+    !      s2%B_SOL%g=S1%g
+    !      s2%B_SOL%nb=S1%nb
           s2%B_SOL%KIND=3
           DONEIT=.TRUE.
           if(S1%IB_SOL>c_%np_pol) c_%np_pol=S1%IB_SOL
@@ -2014,6 +2014,10 @@ CONTAINS
     TYPE(REAL_8),OPTIONAL :: VP
     TYPE(REAL_8),OPTIONAL :: DVP
     INTEGER N
+    !     DV=(XS%AC(n)%X(1)*COS(EL%theta_ac)-XS%AC(n)%X(2)*SIN(EL%theta_ac))
+    !     V=EL%DC_ac+EL%A_ac*DV
+    !     DV=el%D_ac*DV
+    !CALL transfer_ANBN(EL,ELP,VR=V,DVR=DV)
 
     if(EL%KIND==kind1) return
 
@@ -2044,7 +2048,7 @@ CONTAINS
           
     else
 
-      IF(EL%P%NMUL>=1) THEN
+      IF(EL%P%NMUL>=1.and.associated(EL%D_BN)) THEN
         if(present(VR))then
           do n=1,EL%P%NMUL
              EL%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N) 
@@ -2056,13 +2060,45 @@ CONTAINS
           do n=1,EL%P%NMUL
              EL%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
              EL%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
+             
+             print*,"skowron anbn twiss "
+             call print(DVp, 6)
+             call print(ELP%BN(N), 6)
+             call print(ELP%AN(N), 6)
+             
              ELP%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
              ELP%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
+             print*,"skowron - - - - - -  "
+             call print(ELP%BN(N), 6)
+             call print(ELP%AN(N), 6)
+             print*,"skowron anbn twiss end"
+             
           enddo
        endif
+       
     
-    
-     endif 
+      endif 
+      if(associated(el%volt)) then
+        if(present(VR))then
+             EL%volt=  vR*EL%D0_Volt+DVR*EL%D_Volt
+             ELP%volt= vR*EL%D0_Volt+DVR*EL%D_Volt
+        else
+             EL%volt=  vp*EL%D0_Volt+DVp*EL%D_Volt
+             ELP%volt= vp*EL%D0_Volt+DVp*EL%D_Volt
+        endif
+      endif
+      
+      if(associated(el%phas)) then
+        if(present(VR))then
+             print*, "Doing phase modulation DVR=",DVR," d_phas=",EL%D_phas
+             EL%phas=  vR*EL%D0_phas+DVR*EL%D_phas
+             ELP%phas= vR*EL%D0_phas+DVR*EL%D_phas
+        else
+             EL%phas=  vp*EL%D0_phas+DVp*EL%D_phas
+             ELP%phas= vp*EL%D0_phas+DVp*EL%D_phas
+        endif
+      endif
+      
    endif
        if(el%kind==kind10) then
           call GETANBN(EL%TP10)
@@ -2483,6 +2519,8 @@ nullify(EL%filef,el%fileb);
     nullify(EL%theta_ac);
     nullify(EL%DC_ac);
     nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN);nullify(EL%D0_AN);nullify(EL%D0_BN);
+    nullify(EL%D_volt);nullify(EL%D0_volt);
+    nullify(EL%D_phas);nullify(EL%D0_phas);
     nullify(EL%THIN);
     nullify(EL%MIS); !nullify(EL%EXACTMIS);
     !    nullify(EL%D);nullify(EL%R);
@@ -2540,6 +2578,8 @@ nullify(EL%filef,el%fileb);
     nullify(EL%theta_ac);
     nullify(EL%DC_ac);
     nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN);nullify(EL%D0_AN);nullify(EL%D0_BN);
+    nullify(EL%D_volt);nullify(EL%D0_volt);
+    nullify(EL%D_phas);nullify(EL%D0_phas);
     nullify(EL%THIN);
     nullify(EL%MIS);  !nullify(EL%EXACTMIS);
     !    nullify(EL%D);nullify(EL%R);
@@ -2615,6 +2655,10 @@ nullify(EL%filef,el%fileb);
        IF(ASSOCIATED(EL%D_BN)) DEALLOCATE(EL%D_BN)
        IF(ASSOCIATED(EL%D0_AN)) DEALLOCATE(EL%D0_AN)
        IF(ASSOCIATED(EL%D0_BN)) DEALLOCATE(EL%D0_BN)
+              IF(ASSOCIATED(EL%D0_volt)) DEALLOCATE(EL%D0_volt)
+              IF(ASSOCIATED(EL%D_volt)) DEALLOCATE(EL%D_volt)
+              IF(ASSOCIATED(EL%D0_phas)) DEALLOCATE(EL%D0_phas)
+              IF(ASSOCIATED(EL%D_phas)) DEALLOCATE(EL%D_phas)
        IF(ASSOCIATED(EL%THIN)) DEALLOCATE(EL%THIN)
        IF(ASSOCIATED(EL%d0)) DEALLOCATE(EL%d0)       ! drift
 !       IF(ASSOCIATED(EL%K2)) DEALLOCATE(EL%K2)       ! INTEGRATOR
@@ -3005,7 +3049,23 @@ nullify(EL%filef,el%fileb);
           DEALLOCATE(EL%D0_BN)
        endif
 
-
+       IF(ASSOCIATED(EL%D0_volt)) then
+          call kill(EL%D0_volt)
+          DEALLOCATE(EL%D0_volt)
+       endif
+       IF(ASSOCIATED(EL%D_volt)) then
+          call kill(EL%D_volt)
+          DEALLOCATE(EL%D_volt)
+       endif
+ 
+       IF(ASSOCIATED(EL%D0_phas)) then
+          call kill(EL%D0_phas)
+          DEALLOCATE(EL%D0_phas)
+       endif
+       IF(ASSOCIATED(EL%D_phas)) then
+          call kill(EL%D_phas)
+          DEALLOCATE(EL%D_phas)
+       endif
 
        call kill(EL%P)        ! call kill(EL%P)    ! AIMIN MS 4.0
 
@@ -3154,7 +3214,38 @@ nullify(EL%filef,el%fileb);
     endif
 
 
-
+   IF(ASSOCIATED(EL%D0_volt)) then
+            if(associated(ELP%D0_volt)) then
+              call kill(ELP%D0_volt);
+              call kill(ELP%D_volt);
+               DEALLOCATE(ELP%D0_volt);
+               DEALLOCATE(ELP%D_volt);
+             endif
+           if(.not.ASSOCIATED(ELP%D0_volt)) THEN
+             ALLOCATE(ELP%D0_volt,ELP%D_volt)
+          ENDIF
+          CALL ALLOC(ELP%D0_volt)
+          CALL ALLOC(ELP%D_volt)
+          ELP%D0_volt=EL%D0_volt
+          ELP%D_volt=EL%D_volt
+   endif
+  
+   
+   IF(ASSOCIATED(EL%D0_phas)) then
+            if(associated(ELP%D0_phas)) then
+              call kill(ELP%D0_phas);
+              call kill(ELP%D_phas);
+               DEALLOCATE(ELP%D0_phas);
+               DEALLOCATE(ELP%D_phas);
+             endif
+           if(.not.ASSOCIATED(ELP%D0_phas)) THEN
+             ALLOCATE(ELP%D0_phas,ELP%D_phas)
+          ENDIF
+          CALL ALLOC(ELP%D0_phas)
+          CALL ALLOC(ELP%D_phas)
+          ELP%D0_phas=EL%D0_phas
+          ELP%D_phas=EL%D_phas
+  endif
 
     IF(EL%P%NMUL>0) THEN
        IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
@@ -3528,9 +3619,30 @@ nullify(EL%filef,el%fileb);
 
     endif
 
+   IF(ASSOCIATED(EL%D0_volt)) then
+            if(associated(ELP%D0_volt)) then
+               DEALLOCATE(ELP%D0_volt);
+               DEALLOCATE(ELP%D_volt);
+             endif
+           if(.not.ASSOCIATED(ELP%D0_volt)) THEN
+             ALLOCATE(ELP%D0_volt,ELP%D_volt)
+          ENDIF
 
+          ELP%D0_volt=EL%D0_volt
+          ELP%D_volt=EL%D_volt
+  endif
 
-
+   IF(ASSOCIATED(EL%D0_phas)) then
+            if(associated(ELP%D0_phas)) then
+               DEALLOCATE(ELP%D0_phas);
+               DEALLOCATE(ELP%D_phas);
+             endif
+           if(.not.ASSOCIATED(ELP%D0_phas)) THEN
+             ALLOCATE(ELP%D0_phas,ELP%D_phas)
+          ENDIF
+          ELP%D0_phas=EL%D0_phas
+          ELP%D_phas=EL%D_phas
+  endif
 
     IF(EL%P%NMUL>0) THEN
        IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
@@ -3915,7 +4027,29 @@ nullify(EL%filef,el%fileb);
     endif
 
 
-
+   IF(ASSOCIATED(EL%D0_volt)) then
+            if(associated(ELP%D0_volt)) then
+               DEALLOCATE(ELP%D0_volt);
+               DEALLOCATE(ELP%D_volt);
+             endif
+           if(.not.ASSOCIATED(ELP%D0_volt)) THEN
+             ALLOCATE(ELP%D0_volt,ELP%D_volt)
+          ENDIF
+          ELP%D0_volt=EL%D0_volt
+          ELP%D_volt=EL%D_volt
+   endif
+   
+      IF(ASSOCIATED(EL%D0_phas)) then
+            if(associated(ELP%D0_phas)) then
+               DEALLOCATE(ELP%D0_phas);
+               DEALLOCATE(ELP%D_phas);
+             endif
+           if(.not.ASSOCIATED(ELP%D0_phas)) THEN
+             ALLOCATE(ELP%D0_phas,ELP%D_phas)
+          ENDIF
+          ELP%D0_phas=EL%D0_phas
+          ELP%D_phas=EL%D_phas
+  endif
 
     IF(EL%P%NMUL>0) THEN
        IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
@@ -4268,6 +4402,14 @@ nullify(EL%filef,el%fileb);
              CALL resetpoly_R31(ELP%d0_BN(I))
           ENDDO
        ENDIF
+        IF(associated(ELP%d_volt)) THEN             ! SHARED BY A LOT
+             CALL resetpoly_R31(ELP%d_volt)
+             CALL resetpoly_R31(ELP%d0_volt)
+        ENDIF
+        IF(associated(ELP%d_phas)) THEN             ! SHARED BY A LOT
+             CALL resetpoly_R31(ELP%d_phas)
+             CALL resetpoly_R31(ELP%d0_phas)
+       ENDIF        
     endif
     IF(ELP%P%NMUL>0) THEN             ! SHARED BY A LOT
        DO I=1,ELP%P%NMUL
@@ -4426,6 +4568,7 @@ nullify(EL%filef,el%fileb);
     CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/pmae**3
 !    CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/XMC2**3
     CRAD=CGAM*TWOPII   !*ERG**3
+    cfluc0=3.0_dp*CU*CGAM0*HBC/2.0_dp 
     CFLUC=CON  !*ERG**5
     GAMMA2=erg**2/XMC2**2
     brho1=SQRT(ERG**2-XMC2**2)*10.0_dp/cl

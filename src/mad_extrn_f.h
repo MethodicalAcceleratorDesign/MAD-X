@@ -31,6 +31,8 @@
 #define element_name element_name_
 #define el_par_vector el_par_vector_
 #define get_node_vector get_node_vector_
+#define is_custom_set is_custom_set_
+#define update_node_aperture update_node_aperture_
 
 // from mad_elemerr.c
 #define node_al_errors node_al_errors_
@@ -80,7 +82,20 @@
 #define store_node_value store_node_value_
 #define store_node_vector store_node_vector_
 #define store_no_fd_err store_no_fd_err_
+#define node_apertype node_apertype_
+#define inside_userdefined_geometry inside_userdefined_geometry_
+#define get_userdefined_geometry get_userdefined_geometry_
+#define get_userdefined_geometry_len get_userdefined_geometry_len_
 
+#define node_aperture_vector node_aperture_vector_
+#define node_aperture_offset node_aperture_offset_
+#define node_obs_point node_obs_point_
+
+#define alloc_tt_attrib alloc_tt_attrib_
+#define set_tt_attrib set_tt_attrib_
+#define get_tt_attrib get_tt_attrib_
+#define set_tt_multipoles set_tt_multipoles_
+#define get_tt_multipoles get_tt_multipoles_
 // from mad_option.c
 #define get_option get_option_ // *
 #define set_option set_option_
@@ -117,6 +132,7 @@
 
 // from mad_seq.c
 #define restart_sequ restart_sequ_
+#define get_nnodes get_nnodes_
 
 // from mad_table.c
 // warning:augment_counts is provided by madx_ptc_knobs.f90
@@ -172,7 +188,7 @@
 /*
  * Provided by Fortran
  */
- 
+
 // from mad_init_f.F90
 void mad_init_f_(void);
 
@@ -198,12 +214,12 @@ void ibs_(void);
 void collect_(F_INTEGER ncon, F_DOUBLE fsum, F_DOUBLE fvect);
 void mtlmdf_(F_INTEGER ncon, F_INTEGER nvar, F_DOUBLE tol, F_INTEGER calls,
 	     F_INTEGER call_lim, F_DOUBLE vect, F_DOUBLE dvect, F_DOUBLE fun_vec,
-	     F_DOUBLE diag, F_DOUBLE w_ifjac, F_DOUBLE w_ipvt, F_DOUBLE w_qtf, 
-	     F_DOUBLE w_iwa1, F_DOUBLE w_iwa2, F_DOUBLE w_iwa3, F_DOUBLE w_iwa4, 
+	     F_DOUBLE diag, F_DOUBLE w_ifjac, F_DOUBLE w_ipvt, F_DOUBLE w_qtf,
+	     F_DOUBLE w_iwa1, F_DOUBLE w_iwa2, F_DOUBLE w_iwa3, F_DOUBLE w_iwa4,
 	     F_DOUBLE xold);
 void mtmigr_(F_INTEGER ncon, F_INTEGER nvar, F_INTEGER strategy, F_DOUBLE tol,
 	     F_INTEGER calls, F_INTEGER call_lim, F_DOUBLE vect, F_DOUBLE dvect,
-	     F_DOUBLE fun_vect, F_DOUBLE w_iwa1, F_DOUBLE w_iwa2, F_DOUBLE w_iwa3, 
+	     F_DOUBLE fun_vect, F_DOUBLE w_iwa1, F_DOUBLE w_iwa2, F_DOUBLE w_iwa3,
 	     F_DOUBLE w_iwa4, F_DOUBLE w_iwa5, F_DOUBLE w_iwa6, F_DOUBLE w_iwa7, F_DOUBLE w_iwa8);
 void mtsimp_(F_INTEGER ncon, F_INTEGER nvar, F_DOUBLE tol, F_INTEGER calls, F_INTEGER call_lim,
 	     F_DOUBLE vect, F_DOUBLE dvect, F_DOUBLE fun_vect, F_DOUBLE w_iwa1, F_DOUBLE w_iwa2,
@@ -211,7 +227,7 @@ void mtsimp_(F_INTEGER ncon, F_INTEGER nvar, F_DOUBLE tol, F_INTEGER calls, F_IN
 
 // from matchjc.f90
 void mtsvd_(F_INTEGER M, F_INTEGER N, F_DOUBLE fjac, F_DOUBLE SV, F_DOUBLE U, F_DOUBLE VT);
-void mtjac_(F_INTEGER ncon, F_INTEGER nvar, F_INTEGER strategy, F_DOUBLE cool, F_DOUBLE balance, 
+void mtjac_(F_INTEGER ncon, F_INTEGER nvar, F_INTEGER strategy, F_DOUBLE cool, F_DOUBLE balance,
 	    F_DOUBLE random, F_INTEGER nrep, F_INTEGER bisec, F_DOUBLE cond, F_INTEGER match_mode,
 	    F_DOUBLE tol, F_INTEGER calls, F_INTEGER call_lim, F_DOUBLE vect, F_DOUBLE dvect,
 	    F_DOUBLE fun_vec, F_DOUBLE w_ifjac, F_DOUBLE w_iwa4, F_DOUBLE fval, F_DOUBLE xstart,
@@ -219,7 +235,7 @@ void mtjac_(F_INTEGER ncon, F_INTEGER nvar, F_INTEGER strategy, F_DOUBLE cool, F
 
 // from matchsa.f90
 void mtsa_(F_INTEGER ncon, F_INTEGER nvar, F_DOUBLE tol, F_INTEGER calls, F_INTEGER call_lim,
-	   F_DOUBLE vect, F_DOUBLE fun_vect, F_INTEGER iseed, F_INTEGER iprint, F_DOUBLE lb, 
+	   F_DOUBLE vect, F_DOUBLE fun_vect, F_INTEGER iseed, F_INTEGER iprint, F_DOUBLE lb,
 	   F_INTEGER nacp, F_DOUBLE ub, F_DOUBLE xopt, F_DOUBLE c, F_DOUBLE vm, F_DOUBLE xp);
 
 // from orbf.f90
@@ -234,11 +250,11 @@ void micit_(F_DOUBLE a, F_CHARACTER conm, F_DOUBLE xin, F_DOUBLE cin, F_DOUBLE r
 void haveit_(F_DOUBLE a, F_DOUBLE xin, F_DOUBLE cin, F_DOUBLE res, F_INTEGER nx, F_INTEGER im,
 	     F_INTEGER ic, F_DOUBLE cb, F_DOUBLE xmeas, F_DOUBLE xres, F_DOUBLE y, F_DOUBLE z,
 	     F_DOUBLE xd);
-void svddec_(F_DOUBLE a, F_DOUBLE svdmat, F_DOUBLE umat, F_DOUBLE vmat, F_DOUBLE ws, F_DOUBLE wvec, 
-	     F_INTEGER sortw, F_DOUBLE sngcut, F_DOUBLE sngval, F_INTEGER im, F_INTEGER ic, 
+void svddec_(F_DOUBLE a, F_DOUBLE svdmat, F_DOUBLE umat, F_DOUBLE vmat, F_DOUBLE ws, F_DOUBLE wvec,
+	     F_INTEGER sortw, F_DOUBLE sngcut, F_DOUBLE sngval, F_INTEGER im, F_INTEGER ic,
 	     F_INTEGER iflag, F_INTEGER sing, F_INTEGER dbg);
 void svdcorr_(F_DOUBLE a, F_DOUBLE svdmat, F_DOUBLE umat, F_DOUBLE vmat, F_DOUBLE wmat, F_DOUBLE utmat,
-	      F_DOUBLE vtmat, F_DOUBLE wtmat, F_DOUBLE xin, F_DOUBLE xc, F_DOUBLE xout, 
+	      F_DOUBLE vtmat, F_DOUBLE wtmat, F_DOUBLE xin, F_DOUBLE xc, F_DOUBLE xout,
 	      F_DOUBLE xpred, F_DOUBLE ws, F_DOUBLE wvec, F_INTEGER sortw, F_INTEGER nx,
 	      F_INTEGER im, F_INTEGER ic, F_INTEGER iflag, F_INTEGER dbg);
 
@@ -264,7 +280,7 @@ void touschek_(void);
 
 // from trrun.f90
 void trrun_(F_INTEGER switch_, F_INTEGER turns, F_DOUBLE orbit0, F_DOUBLE rt, F_INTEGER part_id,
-	    F_INTEGER last_turn, F_DOUBLE last_pos, F_DOUBLE z, F_DOUBLE dxt, F_DOUBLE dyt, 
+	    F_INTEGER last_turn, F_DOUBLE last_pos, F_DOUBLE z, F_DOUBLE dxt, F_DOUBLE dyt,
 	    F_DOUBLE last_orbit, F_DOUBLE eigen, F_DOUBLE coords, F_INTEGER e_flag,
 	    F_INTEGER code_buf, F_DOUBLE l_buf);
 
@@ -307,6 +323,7 @@ void w_ptc_refreshtables_(void);
 void w_ptc_script_(F_INTEGER scriptname);
 void w_ptc_setaccel_method_(F_INTEGER method);
 void w_ptc_setdebuglevel_(F_INTEGER level);
+void w_ptc_setmapdumplevel_(F_INTEGER level);
 void w_ptc_setseed_(F_INTEGER level);
 void w_ptc_setstochastic_(F_INTEGER method);
 void w_ptc_setfieldcomp_(F_INTEGER fibreidx);

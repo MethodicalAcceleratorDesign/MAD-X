@@ -44,7 +44,7 @@ TYPE girder_list
 
 END TYPE girder_list
 
-
+ 
 
 TYPE MUL_BLOCK
    ! stuff for setting multipole
@@ -112,6 +112,8 @@ TYPE MADX_APERTURE
    INTEGER,pointer ::  KIND  => null()  ! 1,2,3,4
    REAL(DP),pointer :: R(:)  => null()
    REAL(DP),pointer :: X => null(),Y => null(),DX => null(),DY => null()
+   REAL(DP),pointer :: POLYGX(:)  => null(), POLYGY(:)  => null() !arbitrary polygon
+   INTEGER, pointer :: POLYGN => null() ! arbitrary polygon number of points
 END TYPE MADX_APERTURE
 
 TYPE S_APERTURE
@@ -188,7 +190,9 @@ TYPE ELEMENT
    !
    real(dp), POINTER :: VOLT => null(), FREQ => null(),PHAS => null(),DELTA_E => null(),LAG => null()       ! Cavity information
    real(dp), POINTER :: DC_ac => null(),A_ac => null(),theta_ac => null(),D_AC => null()      ! slow RF: amplitude and phase
-   real(dp),   DIMENSION(:), POINTER:: D_AN => null(),D_BN => null(),D0_AN => null(),D0_BN => null()  !Multipole component
+   real(dp),   DIMENSION(:), POINTER:: D_AN => null(),D_BN => null(),D0_AN => null(),D0_BN => null();  !Multipole component
+   real(dp), POINTER:: D_Volt=> null(),D0_Volt=> null();
+   real(dp), POINTER:: D_phas=> null(),D0_phas=> null();
    logical(lp), POINTER :: THIN => null()
    integer(2), pointer :: slow_ac => null()
    real(dp), POINTER ::  B_SOL  => null()
@@ -256,7 +260,8 @@ TYPE ELEMENTP
    real(dp), POINTER :: DELTA_E  => null()    ! CAVITY ENERGY GAIN
    TYPE(REAL_8), POINTER :: DC_ac => null(),A_ac => null(),theta_ac => null(),D_AC => null()      ! slow RF: amplitude and phase
    TYPE(REAL_8),   DIMENSION(:), POINTER:: D_AN => null(),D_BN => null(),D0_AN => null(),D0_BN => null()         !Multipole component
-   !
+   TYPE(REAL_8),  POINTER :: D_Volt=> null(),D0_Volt=> null();
+   TYPE(REAL_8), POINTER :: D_phas=> null(),D0_phas=> null();
    TYPE(REAL_8), POINTER :: B_SOL => null()
    logical(lp), POINTER :: THIN => null() 
    integer(2), pointer :: slow_ac => null()
@@ -312,6 +317,7 @@ type info
    real(dp), pointer:: m(:,:)  => null()
 END type info
 
+
 TYPE INTEGRATION_NODE
    INTEGER, POINTER :: pos_in_fibre => null(), CAS  => null()
    INTEGER, POINTER ::  pos => null(),lost  => null()
@@ -346,7 +352,8 @@ TYPE FIBRE
    !  POINTING TO PARENT LAYOUT AND PARENT FIBRE DATA
    TYPE (LAYOUT),POINTER :: PARENT_LAYOUT => null()
    type(info),pointer ::i => null()
-   TYPE(INTEGRATION_NODE),POINTER :: T1 => null(),T2 => null()  ! FIRST AND LAST INTEGRATION_NODE CHILDREN CORRESPOUNDING TO PATCHES
+   TYPE(INTEGRATION_NODE),POINTER :: T1 => null()  ! FIRST AND LAST INTEGRATION_NODE CHILDREN CORRESPOUNDING TO PATCHES
+   TYPE(INTEGRATION_NODE),POINTER ::  T2 => null()  ! FIRST AND LAST INTEGRATION_NODE CHILDREN CORRESPOUNDING TO PATCHES
    TYPE(INTEGRATION_NODE),POINTER :: TM  => null()     ! MIDDLE INTEGRATION_NODE
    INTEGER,POINTER ::pos  => null()             ! POSITION IN LAYOUT
    ! NEW STUFF....
@@ -359,8 +366,6 @@ TYPE FIBRE
    INTEGER,POINTER :: loc => null()
 
 END TYPE FIBRE
-
-
 
 TYPE LAYOUT
    CHARACTER(120), POINTER ::  NAME  => null()! IDENTIFICATION

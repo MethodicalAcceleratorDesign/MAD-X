@@ -61,7 +61,7 @@ madx-macosx-intel:  madx-macosx64-intel  madx-macosx32-intel
 
 MACOSX_STATIC := $(if $(call eq,$(PLUGIN),yes),no,yes)
 
-madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=$(MACOSX_STATIC) USEGC=yes APPENDLD=yes
+madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=$(MACOSX_STATIC) USEGC=yes APPENDLD=yes X11=yes
 madx-macosx%: MAKE_OPTS = -j9 $(MAKEARGS)
 madx-macosx%: MAKE_LINK = ln -sf $(DESTDIR)$@ && ln -sf $@
 

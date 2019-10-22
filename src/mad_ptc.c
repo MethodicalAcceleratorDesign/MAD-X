@@ -13,13 +13,13 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   static const int tmplen=16;
   char tmp[tmplen];
   int row;
-  
+
   static const char * const beampars[] = {"mass", "charge", "energy", "pc",
                                           "gamma", "kbunch", "bcurrent",
 		  "sige","sigt",
 		  "npart",
 		  "ex","ey","et"};
-		  
+
   int Nbeampars = sizeof(beampars)/sizeof(beampars[0]);
 
   static const char * const ptcpars[] = {"length", "alpha_c", "alpha_c_p", "alpha_c_p2",
@@ -41,11 +41,11 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
 		 "pycomin", "pycomax",
 		 "tcomin",  "tcomax",
 		 "ptcomin", "ptcomax"};
-		  
+
   int Nptcpars = sizeof(ptcpars)/sizeof(ptcpars[0]);
-  
+
   /*printf("There is %d beam parameters and %d PTC pars to add\n",Nbeampars,Nptcpars);*/
-  
+
   if (t == NULL) return;
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
@@ -53,7 +53,7 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),
           strlen(tmp),stoupper(tmp));
   addto_char_p_array(t->header,c_dum);
-  
+
   i = get_string("beam", "particle", tmp);
   sprintf(c_dum->c, v_format("@ PARTICLE         %%%02ds \"%s\""),
           i, stoupper(tmp));
@@ -61,23 +61,23 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
 
 
   for (i=0; i<Nbeampars;i++)
-   {  
+   {
       strncpy(tmp,beampars[i],tmplen);  /*we have to copy for stoupper that can not change a constant string*/
-      dtmp = get_value("beam", tmp);    
+      dtmp = get_value("beam", tmp);
       sprintf(c_dum->c, v_format("@ %-16.16s %%le  %F"),stoupper(tmp) ,dtmp);
       addto_char_p_array(t->header,c_dum);
    }
-  
+
   sprintf(c_dum->c, v_format("@ DELTAP           %%le  %F"), ptc_deltap);
   addto_char_p_array(t->header,c_dum);
-  
+
   if (get_option("ptc_twiss_summary") != zero){
     /* one-turn information gets computed iff ptc_twiss_summary set to 1 in madx_ptc_twiss.f90 */
     /* retreive all pieces of information from the ptc_twiss*/
     row = 1; /* this particular table has only one row filled-in */
-    
+
     for (i=0; i<Nptcpars;i++)
-     {  
+     {
         strncpy(tmp,ptcpars[i],tmplen);
         double_from_table_row("ptc_twiss_summary",tmp,&row,&dtmp);
         sprintf(c_dum->c, v_format("@ %-16.16s %%le  %F"),stoupper(tmp) ,dtmp);
@@ -146,7 +146,7 @@ pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, 
   pos = name_list_pos(columnname,aTable->columns);
   if (pos < 0)
   {
-    error("mad_ptc.c: pro_ptc_select","Can not find column named <<%s>> in table <<%s>>.",
+    mad_error("mad_ptc.c: pro_ptc_select","Can not find column named <<%s>> in table <<%s>>.",
           columnname,aTable->name);
     return 7;
   }
@@ -197,16 +197,16 @@ ptc_track_end(void)
     stored_track_start->commands[i] =
       delete_command(stored_track_start->commands[i]);
   stored_track_start->curr = 0;
-  
-  if (current_sequ)  
+
+  if (current_sequ)
    {
      c_node = current_sequ->ex_start;
    }
   else
-   { 
+   {
      c_node = 0x0;
-   }   
-   
+   }
+
   while(c_node != NULL) /* clean observation points */
   {
     c_node->obs_point = 0;
@@ -263,6 +263,29 @@ ptc_oneturnmap(struct in_cmd* cmd)
 }
 
 void
+pro_ptc_normal(void)
+  /* controls ptc_normal module */
+{
+  // need to set probe_beam to read beam parameters for beam-beam, for example
+  struct command* keep_beam = current_beam;
+  double ptc_deltap;  
+  ptc_deltap = get_value(current_command->name,"deltap");
+  
+  adjust_beam();
+  
+  probe_beam = clone_command(current_beam);
+  
+  adjust_probe_fp(ptc_deltap); /* sets correct gamma, beta, etc. */
+  
+  w_ptc_normal_();
+
+  /* cleanup */
+  current_beam = keep_beam;
+  probe_beam = delete_command(probe_beam);
+  
+  
+}
+void
 pro_ptc_twiss(void)
   /* controls ptc_twiss module */
 {
@@ -277,8 +300,8 @@ pro_ptc_twiss(void)
   int j, w_file,beta_def;
   int w_file_summary; /* toggle to write the summary table into a file */
   struct table* nonlin_table = 0;
-  
-  
+
+
   /*
     start command decoding
   */
@@ -346,7 +369,7 @@ pro_ptc_twiss(void)
 
   adjust_probe_fp(ptc_deltap); /* sets correct gamma, beta, etc. */
 
-  
+
   nonlin_table = make_table("nonlin", "nonlin", nonlin_table_cols,
                            nonlin_table_types, current_sequ->n_nodes);
   /*nonlin_table->dynamic = 1;*/
@@ -363,12 +386,12 @@ pro_ptc_twiss(void)
   current_sequ->tw_table = twiss_table;
   twiss_table->org_sequ = current_sequ;
   twiss_table->curr= 0;
-  
-  
+
+
   current_node = current_sequ->ex_start;
   /* w_ptc_twiss_(tarr->i); */
 
-  
+
   if (command_par_value("trackrdts",current_twiss) != 0)
    {
      makerdtstwisstable();
@@ -410,7 +433,7 @@ pro_ptc_twiss(void)
   delete_int_array(summary_tarr);
   /* --- */
 
-  
+
   ptc_twiss_summary = get_option("ptc_twiss_summary");
   if (ptc_twiss_summary) {
     print_table(ptc_twiss_summary_table);
@@ -496,7 +519,7 @@ pro_ptc_refresh_k(void)
   struct command* keep_beam = current_beam;
   if (attach_beam(current_sequ) == 0)
     fatal_error("ptc_refresh_k - sequence without beam:", current_sequ->name);
-  
+
   // LD 2016.04.19
   adjust_beam();
   probe_beam = clone_command(current_beam);
@@ -642,7 +665,7 @@ select_ptc_normal(struct in_cmd* cmd)
               double_to_table_curr("normal_results", "order4", &n4);
               augment_count("normal_results");
             }
-            
+
             string_to_table_curr("normal_results", "name", "gnfu");
             double_to_table_curr("normal_results", "order1", &order[0]);
             double_to_table_curr("normal_results", "order2", &order[1]);
@@ -677,10 +700,10 @@ select_ptc_normal(struct in_cmd* cmd)
       if (min_order < min_req_order) min_order = min_req_order;
     }
   }
- if (debuglevel > 2) 
+ if (debuglevel > 2)
   {
     printf("The minimum required order is %d \n--------------------------------\n",min_order);
-  }  
+  }
 }
 
 void
@@ -717,25 +740,25 @@ pro_ptc_trackline(struct in_cmd* cmd)
     printf("Now is %f\n", command_par_value("onetable",cmd->clone));
   }
 
-  
+
   parexist = command_par_value2("onetable",cmd->clone,&value);
-  
+
   if (parexist)
-   { 
+   {
      ivalue = (int)value;
      set_option("onetable", &ivalue);
    }
-   
+
   // LD 2016.04.19
   adjust_beam();
   probe_beam = clone_command(current_beam);
   adjust_probe_fp(0);
 
   track_tables_delete(); /* deleting all track related tables*/
-  
+
   track_tables_create(cmd);
-  
-  
+
+
   if (command_par_value("everystep",cmd->clone) != 0)
   {
     /*printf("Calling PTC track line every step\n");*/
@@ -752,7 +775,7 @@ pro_ptc_trackline(struct in_cmd* cmd)
   /* cleanup */
   current_beam = keep_beam;
   probe_beam = delete_command(probe_beam);
-  
+
 }
 
 void
@@ -772,7 +795,7 @@ pro_ptc_enforce6d(struct in_cmd* cmd)
 
   if (cmd->clone == 0x0)
   {
-    error("pro_ptc_enforce6d","Command Definintion is null!!!");
+    mad_error("pro_ptc_enforce6d","Command Definintion is null!!!");
     return;
   }
 
@@ -833,6 +856,13 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     printf("debuglevel is not present (keeping current value)\n");
   }
 
+  /*MAPDUMP LEVEL*/
+  if ( name_list_pos("mapdump", nl) >=0 )
+  {
+    found = command_par_value2("mapdump", cmd->clone, &switchvalue);
+    int mapdump = (int)switchvalue;
+    w_ptc_setmapdumplevel_(&mapdump);
+  }
 
   /*ACCELERATION SWITCH*/
   found = command_par_value_user2("maxacceleration", cmd->clone, &switchvalue);
@@ -845,7 +875,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
   else
    {
      if (debuglevel > 0) printf("maxaccel is not present (keeping current value)\n");
-   }  
+   }
 
   /*EXACT_MIS SWITCH*/
   found = command_par_value_user2("exact_mis", cmd->clone, &switchvalue);
@@ -1040,11 +1070,11 @@ pro_ptc_printframes(struct in_cmd* cmd)
   char*                          filename    = 0x0;
   struct int_array*              filenameIA  = 0x0;
   char*                          format      = 0x0;
-/* 
+/*
  * Piotr.Skowronski@cern.ch
  *  Routine that writes coordinates of magnets from PTC
  *  either as text or ROOT macro which executed gives 3d image of the layout
- *  Requires one parameter: filename 
+ *  Requires one parameter: filename
  */
   pos   = name_list_pos("file", c_parnames);
   if (pos < 0)
@@ -1157,14 +1187,14 @@ pro_ptc_eplacement(struct in_cmd* cmd)
        warning("mad_ptc.c: pro_ptc_eplacement: did not recognize string describing refframe, using default  ", s_refframe);
        refframe = 0;
      }
-    
+
   }
     else
     {
       warning("mad_ptc.c: pro_ptc_eplacement: string describing refframe is null: ", "using default");
       refframe = 0;
     }
-  
+
 
   element = command_par_string_user("range", cmd->clone);
   if ( !element )
@@ -1863,34 +1893,34 @@ pro_ptc_track(struct in_cmd* cmd)
     warning("track_run: no START command seen yet", "ignored");
     return;
   }
-  
+
 
   track_tables_delete(); /* deleting all track related tables*/
- 
+
   track_tables_create(cmd);
-  if (debuglevel > 2) 
+  if (debuglevel > 2)
    {
      printf("obs_points ptc_track: %d \n",curr_obs_points);
    }
-  
+
   w_ptc_track_(&curr_obs_points);
   t = find_table("tracksumm");
   if (get_option("info"))  print_table(t);
   if (get_option("track_dump")) track_tables_dump();
-  
- if (debuglevel > 1) 
+
+ if (debuglevel > 1)
   {
     fprintf(prt_file, "\n*****  end of ptc_run  *****\n");
-  }  
+  }
 }
 /*_______________________________________________________*/
 
 void printpoly(int p[6], int dim )
 {
  int i;
- 
+
  printf("f"); /*icase*/
- 
+
  for (i=0; i<dim; i++)
   {
     printf("%1d",p[i]); /*icase*/
@@ -1908,29 +1938,29 @@ void makerdtstwisstable()
   struct table* rdts_table;
   char** table_cols;
   int*  table_type;
-  
-  
+
+
   table_cols = mymalloc_atomic("",9*sizeof(char*));
   table_type = mymalloc_atomic("",9*sizeof(int));
-  
+
   for (i=0; i<9; i++)
-  {   
+  {
     table_cols[i] = mymalloc_atomic("",10*sizeof(char));
     table_type[i] = 2;
-  }  
+  }
   table_type[0] = 3;
 
   strcpy(table_cols[0], "name");
   strcpy(table_cols[1], "s"); /*can not be s becuase it will not plot than*/
-  strcpy(table_cols[2], "k1l"); 
-  strcpy(table_cols[3], "k1sl"); 
-  strcpy(table_cols[4], "k2l"); 
-  strcpy(table_cols[5], "k2sl"); 
-  strcpy(table_cols[6], "k3l"); 
-  strcpy(table_cols[7], "k3sl"); 
+  strcpy(table_cols[2], "k1l");
+  strcpy(table_cols[3], "k1sl");
+  strcpy(table_cols[4], "k2l");
+  strcpy(table_cols[5], "k2sl");
+  strcpy(table_cols[6], "k3l");
+  strcpy(table_cols[7], "k3sl");
   strcpy(table_cols[8], " ");
 
-  
+
   char name[] = "twissrdt";
 
   rdts_table = make_table2(name, name, table_cols,
@@ -1940,6 +1970,6 @@ void makerdtstwisstable()
   add_to_table_list(rdts_table, table_register);
   rdts_table->org_sequ = current_sequ;
   rdts_table->curr= 0;
-  
-  
+
+
 }

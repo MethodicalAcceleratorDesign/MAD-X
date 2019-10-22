@@ -6,12 +6,16 @@ module madx_ptc_module
   TYPE(INTERNAL_STATE),POINTER :: my_state
   TYPE(layout),POINTER :: my_ring,bmadl
   type(mad_universe), pointer :: m_u=>null(),m_t=>null();
-
+  type(probe) :: probe_graphical 
 contains
 
   subroutine ptc_INI()
     implicit none
-
+      real(dp)  xs(6)
+    xs=0
+    probe_graphical=xs
+    probe_graphical%nac=-1
+    
     allocate(m_u)
     allocate(m_t)
     allocate(bmadl)
@@ -39,7 +43,11 @@ contains
 
   subroutine ptc_ini_no_append()
     implicit none
-
+    real(dp)  xs(6)
+    xs=0
+    probe_graphical=xs
+    probe_graphical%nac=-1
+    
     allocate(m_u)
     call set_up_universe(m_u)
     allocate(m_t)
@@ -108,6 +116,8 @@ contains
        endif
       endif
     endif
+
+    call kill_map_cp()
     call kill_universe(m_t)
     call kill_universe(m_u)
     call kill_tpsa
@@ -123,6 +133,8 @@ contains
     firsttime_coef=.true.
 
   end subroutine ptc_end
+
+
 
 
 end module madx_ptc_module

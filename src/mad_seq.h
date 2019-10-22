@@ -50,6 +50,7 @@ struct sequence
   struct node_list* ex_nodes;   /* alphabetic list of nodes (no drifts) */
   struct table* tw_table;       /* pointer to latest twiss table created */
   int           tw_valid;       /* true if current tw_table is valid */
+  int           tw_centre;      /* true if twiss center option is triggered */        
   struct constraint_list* cl;   /* pointer to constraint list during match */
   struct vector_list* orbits;   /* pointer to list of stored orbits */
 };
@@ -91,6 +92,7 @@ int     set_enable(const char* type, struct in_cmd*);
 void    set_sequence(char* name);
 int     set_cont_sequence(void);
 int     sequ_check_valid_twiss(struct sequence*);
+int     get_nnodes(void);
 
 #endif // MAD_SEQ_H
 

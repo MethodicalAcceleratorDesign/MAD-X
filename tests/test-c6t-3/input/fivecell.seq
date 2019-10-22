@@ -20,7 +20,7 @@ bb : marker;
 m0: marker;
 //mm:multipole,lrad=dummy,knl={0,dummy,bang*3,1},ksl={1.1,3*acbv1+5.,4,0};
 qf.1: mq, k1:=kqf;
-qf.2: mq, k1:=kqf, apertype=rectellipse, aperture={0.022,0.020,0.023,0.021}, aper_offset={1e-3,2e-3};
+qf.2: mq, k1:=kqf, apertype=rectellipse, aperture={0.022,0.020,0.023,0.021}, aper_offset={1e-3,2e-3}, aper_tilt=pi/2;
 qf.3: mq, k1:=kqf, apertype=lhcscreen, aperture={0.024,0.023,0.022}, aper_offset={3e-3,4e-3};
 qf.4: mq, k1:=kqf, apertype=rectcircle, aperture={0.026,0.025,0.024};
 qf.5: mq, k1:=kqf, apertype=rectangle, aperture={0.03,0.035}, aper_offset={1.e-6,1.e-7};

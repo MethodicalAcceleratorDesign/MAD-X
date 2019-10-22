@@ -4,6 +4,7 @@
 
 #define MIN_DOUBLE 1.e-36
 
+int isSliced = 0;
 struct table;
 struct aper_node            /* aperture limit node */
 {
@@ -219,7 +220,7 @@ aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat,
   }
 }
 
-static int
+int
 aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipelength )
 {
 // winding number test for a point in a polygon
@@ -228,9 +229,8 @@ aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipeleng
 // Return:  wn = the winding number (=0 only when point is outside polygon)
 // source : wn_PnInPoly() at http://geomalgorithms.com/a03-_inclusion.html
  int    wn = 0;    // the  winding number counter
-
  // loop through all edges of the polygon
- for (int i=0; i<=pipelength; i++) { // edge from V[i] to  V[i+1]
+ for (int i=0; i<=pipelength-1  ; i++) { // edge from V[i] to  V[i+1]
    if (pipey[i] <= q  &&  pipey[i+1]  > q) {
      // first vertex is below point; second vertex is above; upward crossing
      if ( (pipex[i+1] - pipex[i]) * (q - pipey[i]) - (p - pipex[i]) * (pipey[i+1] - pipey[i])  > 0 ) {
@@ -248,7 +248,6 @@ aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipeleng
      }
    }
  }
-
  return wn;
 }
 
@@ -350,7 +349,7 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
     polyy[i] = polyy[0];
   }
 
-  *halolength=i-1;
+  *halolength=i;
 
   if (debug) {
     for (j=0; j<=i; j++) printf("  %d  %10.5e  %10.5e \n", j, polyx[j], polyy[j]);
@@ -410,7 +409,7 @@ aper_external_file(char *file, double tablex[], double tabley[])
     tabley[i]=tabley[0];
     fclose(filept);
 
-    return i-1;
+    return i;
 }
 
 static int
@@ -438,6 +437,12 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 
   element_vector(current_node->p_elem, "aperture", aperture_vec);
 
+  if(current_node->p_elem->aper->custom_inter==1){
+      element_vector(current_node->p_elem, "aper_vx", pipex);
+      *pipelength = element_vector(current_node->p_elem, "aper_vy", pipey);
+      *ap1 = *ap2 = *ap3 = *ap4 = 0;
+      return 1;
+  }
 
   int debug = get_option("debug");
   if (debug)
@@ -1151,7 +1156,7 @@ aper_calc(double p, double q, double* minhl,
 	  && 0 != aper_on_line(p,q,haloxadj[j],haloyadj[j],xm,ym,dist_limit) )
 	      break; // valid point is found
 
-      if (++i == pipelength + 1) i = 0; // cycle through the pipeline
+      if (++i == pipelength ) i = 0; // cycle through the pipeline
     }
 
     h = sqrt((xm-p)*(xm-p) + (ym-q)*(ym-q));
@@ -1240,6 +1245,11 @@ pro_aperture(struct in_cmd* cmd)
   struct aper_node *limit_pt = &limit_node;
 
   limit_pt = aperture(table, use_range, tw_cp, &tw_cnt, limit_pt);
+  /*If TWISS CENTRE is used and some elements with a non-zero length and aperture. Than the node interpolation is wrong. */
+  if(current_sequ->tw_centre==1 && isSliced==1){
+       warning("Aperture module - not possible to use TWISS, CENTRE=TRUE with thick apperture elements.", "Aperture command ignored");
+    return;
+  }
 
   if (limit_pt->n1 != -1) {
     printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
@@ -1391,6 +1401,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   /* get initial twiss parameters, from start of first element in range */
   aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy);
+  
   // LD: shift further results by one step (?) and finish outside the table
   //  (*tw_cnt)++;
   aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
@@ -1470,7 +1481,6 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       n1=999999; n1x_m=999999; n1y_m=999999; on_ap=-999999; nint=1;
 
       aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy);
-
       aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
 		       apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec,
                        &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, table);
@@ -1503,6 +1513,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       node_n1   = 999999;
       true_node = 0;
       offs_node = 0;
+      
 
       /* calculate the number of slices per node */
       if (true_flag == 0)
@@ -1518,7 +1529,13 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       if (!nint) nint = 1;
 
       /* do not interpolate 0-length elements*/
-      if (fabs(length) < MIN_DOUBLE ) is_zero_len = 1;
+      if (fabs(length) < MIN_DOUBLE ) {
+        is_zero_len = 1;
+      }
+      else{
+        isSliced = 1;
+      }
+
 
       /* slice the node, call survey if necessary, make twiss for slices*/
       interpolate_node(&nint);

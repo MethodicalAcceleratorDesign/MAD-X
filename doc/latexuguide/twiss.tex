@@ -27,6 +27,8 @@ TWISS, \=SEQUENCE=seqname, LINE=linename, RANGE=range,  \\
        \>TABLE=tabname, NOTABLE=logical,\\
        \>RMATRIX=logical, SECTORMAP=logical, \\
        \>SECTORTABLE=tabname, SECTORFILE=filename,\\
+       \>SECTORPURE=logical,\\
+       \>EIGENVECTOR=tabname, EIGENFILE=filename,\\
        \>KEEPORBIT=name, USEORBIT=name,\\
        \>COUPLE=logical,\\
        \>RIPKEN=logical;
@@ -136,7 +138,7 @@ The  attributes of the \texttt{TWISS} command are:
   \ttitem{SECTORACC} a logical flag to save composition of maps instead of individual maps of a
   \hyperref[sec:sectormap]{sector map}.
 
-  \item{SECTORPURE} a logical flag to save the transfer map Rij without effects from higher order map (Tijk). This option should be used to get it in the correct format for TRAIN.
+  \ttitem{SECTORPURE} a logical flag to save the transfer map Rij without effects from higher order map (Tijk). This option should be used to get it in the correct format for TRAIN.
 
   \ttitem{SECTORTABLE} the name of the table containing the \texttt{SECTORMAP}
   values. The elements (lines) and parameters (columns) 
@@ -146,14 +148,17 @@ The  attributes of the \texttt{TWISS} command are:
 
   \ttitem{SECTORFILE} the name of the file to which the \texttt{SECTORMAP} is
   written. 
-  The format of the output can be adjusted as specified in 
+  In order to specify the output use the SECTORTABLE as specified in
   \hyperref[sec:sectormap]{\texttt{SECTORMAP}} \\
   (Default: "sectormap")
   %% Used to write SECTORMAPs to the file
   %% SECTORFILE="filename", if missing the output of SECTORMAP
   %% will go to the file "sectormap" with the format as found in
   %% \href{../Introduction/sectormap.html}{SECTORMAP}.    
-  
+
+  \ttitem{EIGENVECTOR} a logical flag to output the eigenvectors in the beginning of the sequence. Multiplying with this matrix brings normalized coordinates to physical coordinates.
+  \ttitem{EIGENFILE} the name of the file to which the \texttt{EIGENVECTOR} is written. 
+
   \ttitem{KEEPORBIT} The keeporbit attribute (with an optional name,
   keeporbit="name") stores the orbit under this name at the
   start, and at all monitors.    
@@ -428,21 +433,21 @@ TWISS, BETX=initial-$>$BETX, BETY=initial-$>$BETY;}
 \label{sec:sectormap}
 % Begin New version: Jean-Luc Nougaret, 18-Dec-2008 
 
-The flag \texttt{SECTORMAP} of the \texttt{TWISS} command (together with an element
-selection via \texttt{SELECT, FLAG=sectormap,...}) causes a file "sectormap" to be
+The flag \texttt{SECTORMAP} of the \texttt{TWISS} command causes a file "sectormap" to be
 written.
 
 For each user-selected element, it contains the user-selected coefficients of 
 the kick vector \texttt{K} ($6$ values), of the first-order map \texttt{R} 
 ($6\times6$ values) and of the second-order map \texttt{T} ($6\times6\times6$ 
 values)
-
-The sector file is the output of a standard TFS table, which means that
-the set of columns of interest may be selected through a SELECT command
-as in the following example:  
+If only certain elemenents and values are desired a SELECT command can be used. 
+Note that it should be used on the TABLE as shown in the following example:
+  
 
 \madxmp{
+TWISS,,SECTORMAP,SECTORTABLE=my\_sect\_table;
 SELECT, FLAG=my\_sect\_table, COLUMN=name, pos, k1, r11, r66, t111;
+WRITE, TABLE=my\_sect\_table, FILE="sectormap.tfs";
 }
 
 The sectormap file contains for each selected element, one element per

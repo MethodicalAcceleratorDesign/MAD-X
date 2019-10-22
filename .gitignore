@@ -11,6 +11,8 @@
 *.pdf
 *.toc
 doc/latexuguide/1
+doc/latexuguide/*.ilg
+doc/latexuguide/*.ind
 
 # Build/Binaries:
 *.o
@@ -37,33 +39,13 @@ libs/gc/**/.deps
 libs/gc/**/.libs
 libs/gc/**/.dirstamp
 libs/gc/**/Makefile
-libs/gc/gc-7.6.4/bdw-gc.pc
-libs/gc/gc-7.6.4/config.status
-libs/gc/gc-7.6.4/gctest
-libs/gc/gc-7.6.4/hugetest
-libs/gc/gc-7.6.4/include/private/config.h
-libs/gc/gc-7.6.4/include/private/stamp-h1
-libs/gc/gc-7.6.4/leaktest
-libs/gc/gc-7.6.4/libtool
-libs/gc/gc-7.6.4/middletest
-libs/gc/gc-7.6.4/realloc_test
-libs/gc/gc-7.6.4/smashtest
-libs/gc/gc-7.6.4/staticrootstest
-
-libs/gc/gc-7.2f/bdw-gc.pc
-libs/gc/gc-7.2f/config.status
-libs/gc/gc-7.2f/gctest
-libs/gc/gc-7.2f/hugetest
-libs/gc/gc-7.2f/include/private/config.h
-libs/gc/gc-7.2f/include/private/stamp-h1
-libs/gc/gc-7.2f/leaktest
-libs/gc/gc-7.2f/libtool
-libs/gc/gc-7.2f/middletest
-libs/gc/gc-7.2f/realloc_test
-libs/gc/gc-7.2f/smashtest
-libs/gc/gc-7.2f/staticrootstest
-
-
+libs/gc/gc-*/bdw-gc.pc
+libs/gc/gc-*/config.status
+libs/gc/gc-*/*test
+libs/gc/gc-*/include/config.h
+libs/gc/gc-*/include/stamp-h1
+libs/gc/gc-*/libtool
+libs/gc/gc-*/disclaim_bench
 
 # Tests:
 # (could also exclude whole tests folder?)

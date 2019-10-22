@@ -1,0 +1,51 @@
+! try to keep expressions for strengths and positions when saving a sequence
+ option, echo, info, warn;
+option, keep_exp_move;
+ mq: quadrupole, l=0;
+ kq1 = 0.1; mq1:   mq, k1:=kq1;
+ kq2 = 0.2; mq2:   mq, k1:=kq2;
+ kq3 = 0.3; mq3:   mq, k1:=kq3;
+ kq4 = 0.3; mq4:   mq, k1:=kq4;
+
+ ds  = 0.1;
+ dds = 10;
+ a = 2;
+ b = 4;
+ f = 4;
+ g = -1;
+ myseq: sequence, l=100;
+ mq1, at:= 30 +b ;
+ mq2, at:= 40 ;
+ mq3, at:= b, from=mq2;
+ mq4, at:= 60 + 4*ds+b;
+ endsequence;
+
+ beam;
+ use,     sequence=myseq;
+
+ select,  flag=twiss, class=mq, column=name,keyword,s,l,k1l;
+ set,     format="12.6f";
+
+seqedit, sequence=myseq; 
+move, element=mq1, to:=10*a; 
+move, element=mq2, to:=42+a; 
+move, element=mq3, by:=a; 
+move, element=mq4, to:=2; 
+endedit;
+
+SELECT, FLAG=seqedit, class=mq, pattern=mq3;
+seqedit, sequence=myseq;
+move, element=SELECTED, by:=f;
+endedit;
+
+select, flag=seqedit, clear;
+SELECT, FLAG=seqedit, class=mq;
+seqedit, sequence=myseq;
+move, element=SELECTED, by:=g;
+endedit;
+
+save,    file="zz.seq", sequence=myseq;              ! expression for "at" of "mq2" is now replaced by its numerical value
+use,     sequence=myseq;
+twiss, betx=1, bety=1, file="after.twiss";
+
+stop;

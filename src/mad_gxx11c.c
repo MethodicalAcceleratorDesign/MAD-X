@@ -1,4 +1,4 @@
-#ifndef _WIN32
+#ifdef _USE_X11
 
 /* X include files */
 #define _HPUX_SOURCE
@@ -284,7 +284,7 @@ wstring( char *s, int *l )
   s[loc] = '\0';
 }
 
-#else // case _WIN32
+#else // case _USE_X11
 
 #include <time.h>
 #include "mad_extrn_f.h"

@@ -113,7 +113,38 @@ module code_constfi
   integer, parameter :: code_collimator = 44
 end module code_constfi
 
-
+module aperture_enums
+  implicit none
+  public
+ 
+  integer, parameter :: ap_circle = 0
+  integer, parameter :: ap_ellipse = 1
+  integer, parameter :: ap_rectangle = 2
+  integer, parameter :: ap_lhcscreen = 3
+  integer, parameter :: ap_rectcircle = 4
+  integer, parameter :: ap_rectellipse = 5
+  integer, parameter :: ap_racetrack = 6
+  integer, parameter :: ap_octagon = 7
+  integer, parameter :: ap_custom = 8
+  integer, parameter :: ap_notset = 9
+  integer, parameter :: ap_custom_inter = 10
+end module aperture_enums
+module track_enums
+  implicit none
+  public
+  integer, parameter :: enum_other_bv = 1
+  integer, parameter :: enum_lrad = 2
+  integer, parameter :: enum_noise = 3
+  integer, parameter :: enum_angle = 4
+  integer, parameter :: enum_time_var = 5
+  integer, parameter :: enum_sinkick = 6
+  integer, parameter :: enum_kick = 7
+  integer, parameter :: enum_chkick = 8
+  integer, parameter :: enum_cvkick = 9
+  integer, parameter :: enum_hkick = 10 
+  integer, parameter :: enum_vkick = 11  
+  integer, parameter :: total_enums = 11
+end module track_enums
 module Inf_NaN_Detection
 
   !!     Inf_NaN_Detection module
@@ -465,7 +496,7 @@ module trackfi
   double precision, save :: arad=0.d0, betas=0.d0, beti=0.d0, gammas=0.d0, dtbyds=0.d0
   double precision, save :: bet0=0.d0, bet0i=0.d0
   double precision :: deltas=0.d0, t_max=1.d20, pt_max=1.d20
-  logical :: radiate=.false., damp=.false., quantum=.false., fsecarb=.false.
+  logical :: radiate=.false., damp=.false., quantum=.false., fsecarb=.false., thin_cf=.false.
 
   !! AL
   integer, save :: tot_turn = 0;
@@ -474,7 +505,6 @@ module trackfi
 
   integer, parameter :: max_part=20000
   integer, save :: part_id_keep(max_part), last_turn_keep(max_part)
-
 end module trackfi
 
 module time_varfi
@@ -527,7 +557,7 @@ module plotfi
   integer, parameter :: mntmax = 20, mksmax = 10
   integer, parameter :: mplred = 46, mplout = 47
 
-  integer, parameter :: maxseql = 50000, mtwcol = 46, mpparm = 10
+  integer, parameter :: maxseql = 150000, mtwcol = 46, mpparm = 10
   integer, parameter :: mxcurv = 10, mopt = 60, mfile = 120, marg = 60
   integer, parameter :: maxarg = 1000, mxdp = 25, mxplot = 100
 

@@ -22,7 +22,7 @@ mad_init_c(void)
   // quick and dirty fix to accept jobs from filename
   in->input_files[0] = mad_argc > 1 ? fopen(mad_argv[1], "r") : stdin;
   if (!in->input_files[0]) {
-    error("invalid input filename ", " %s", mad_argv[1]);
+    mad_error("invalid input filename ", " %s", mad_argv[1]);
     in->input_files[0] = stdin;
   }
   interactive = intrac();
@@ -62,12 +62,15 @@ mad_init_c(void)
   /* make dynamic copies to avoid sbrk calls on load disliked by Valgrind */
   constant_def = mymalloc_atomic("mad_init_c", strlen(const_constant_def)+1);
   command_def  = mymalloc_atomic("mad_init_c", strlen(const_command_def )+1);
+  element_def  = mymalloc_atomic("mad_init_c", strlen(const_element_def )+1);
   strcpy(constant_def, const_constant_def);
   strcpy(command_def , const_command_def );
+  strcpy(element_def , const_element_def );
 
   deco_init();
   get_defined_constants();
-  get_defined_commands();
+  get_defined_commands(command_def);
+  get_defined_commands(element_def);
   get_sxf_names();
 
   pi = get_variable("pi");

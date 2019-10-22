@@ -43,14 +43,14 @@ echo "PWD   : `echo $PWD`"
 echo -e "\n===== Git clone/update/clean ====="
 if [ "$1" = "clone" ] ; then
   shift # git clone
-  rm -rf madx-nightly7 && \
-  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly7
+  rm -rf madx-nightly && \
+  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly
   check_error "git clone failed"
-  [ -d madx-nightly7 ] && cd madx-nightly7 && echo "moving down to cloned madx-nightly7"
+  [ -d madx-nightly7 ] && cd madx-nightly && echo "moving down to cloned madx-nightly"
 
 elif [ "$1" = "update" ] ; then
   shift # faster "clone" + git cleanup
-  [ -d madx-nightly7 ] && cd madx-nightly7 && echo "moving down to updated madx-nightly7"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to updated madx-nightly"
   git fetch && \
   git fetch --tags && \
   git reset --hard origin/master
@@ -60,7 +60,7 @@ elif [ "$1" = "update" ] ; then
 
 elif [ "$1" = "clean" ] ; then
   shift # git cleanup
-  [ -d madx-nightly7 ] && cd madx-nightly7 && echo "moving down to cleaned madx-nightly7"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to cleaned madx-nightly"
   git clean -fqx
   check_error "git cleanup failed" "no-exit"
 
@@ -96,7 +96,7 @@ echo -e "\n===== Gnu build ====="
 #make all-linux32-gnu
 #check_error "make all-linux32-gnu failed" "no-exit"
 
-source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/x86_64-slc6/setup.sh
+#source source /afs/cern.ch/sw/lcg/contrib/gcc/6.3.0/x86_64-centos7/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
@@ -118,7 +118,7 @@ if [ "`which icc`" != "" -a "`which ifort`" != "" ] ; then
 #  make all-linux32-intel
 #  check_error "make all-linux32-intel failed" "no-exit"
 
-  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/all-setup.sh intel64
+  source /cvmfs/projects.cern.ch/intelsw/psxe/linux/18-all-setup.sh intel64
   icc      --version
   ifort    --version
 
@@ -191,6 +191,10 @@ fi
 #make madx-linux32-gnu > /dev/null && \
 make madx-linux64-gnu > /dev/null
 check_error "unable to restore the default version" "no-exit"
+
+# alias linux to lxplus7
+ln -sf madx-linux64-gnu    madx-lxplus764-gnu
+ln -sf numdiff-linux64-gnu numdiff-lxplus764-gnu
 
 # date & end marker
 echo -e "\nFinish: `date`"

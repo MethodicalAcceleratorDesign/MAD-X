@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.04.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.26 12:11:13      +
+  + Release   date: 2018.10.03               +
+  + Execution date: 2019.04.30 14:42:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -93,7 +93,6 @@ Determined SECTOR NMUL MAX :  2
      method                   6
      Num. of steps            5
      charge           1.0000000000000000     
- RF frequency    12333467.886365037       Hz, lag   -0.0000000000000000       [radian]
   Length of machine:    24.200000000000006     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
@@ -169,7 +168,7 @@ Determined SECTOR NMUL MAX :  2
                  0                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    6.655669633e-08                  0    1.905024369e-08 
+                 0    6.655669633e-08                  0    1.905024369e-08 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0                  0 
@@ -211,7 +210,6 @@ Determined SECTOR NMUL MAX :  2
      method                   6
      Num. of steps            5
      charge           1.0000000000000000     
- RF frequency    7813812.0507672187       Hz, lag   -0.0000000000000000       [radian]
   Length of machine:    24.200000000000006     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------

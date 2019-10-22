@@ -16,14 +16,16 @@ module c_dabnew
   public c_dacsu,c_dasuc,c_dacmu,c_dadal1,c_dapri,c_dapri77,c_darea,c_darea77,c_daeps
   public c_dacdi,c_dadic,c_count_da,c_mtree,c_dafun,c_DAABS,c_dadiv,c_take,c_datrunc,c_dader,c_datra
   public c_daran,c_dacfu,c_matinv,c_dapek0,c_dapok0,c_dacct,c_dainv,c_etcom,c_danot
-
+  public c_print_eps
   integer,private,parameter:: lsw=1
   integer :: c_lda_max_used=0
   ! integer,private,parameter::nmax=400,lsw=1
   ! real(dp),private,parameter::tiny=c_1d_20
   character(120),private :: line
   logical(lp) C_STABLE_DA,C_watch_user,C_check_stable
-  real(dp), private :: eps=1.d-38
+  real(dp), private :: eps=1.d-38,epsprint=1.d-38
+!real(dp),public :: eps_clean=0
+complex(dp), private :: i_=(0.0_dp,1.0_dp)
 contains
   !******************************************************************************
   !                                                                             *
@@ -970,7 +972,10 @@ contains
     do i=l,1,-1
        if(idal(i).le.c_nomax+2.or.idal(i).gt.c_nda_dab) then
           write(line,'(a38,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL(I),NDA = ',idal(i),c_nda_dab
-          ipause=mypauses(13,line)
+          !ipause=mypauses(13,line)
+          C_%STABLE_DA = .false.
+          l = 1
+          return
           call dadeb !(31,'ERR DADAL ',1)
        endif
        if(idal(i).eq.c_nda_dab) then
@@ -1221,6 +1226,27 @@ contains
     !
     return
   end subroutine c_daeps
+
+  subroutine c_print_eps(deps)
+    implicit none
+    !     **********************
+    !
+    !     THIS SUBROUTINE RESETS THE TRUNCATION ORDER c_nocut TO A NEW VALUE
+    !
+    !-----------------------------------------------------------------------------
+    !
+    real(dp) deps
+    !
+    if(deps.ge.0.0_dp) then
+       epsprint = deps
+    else
+       deps=epsprint
+    endif
+    !
+    return
+  end subroutine c_print_eps
+
+
   !
   subroutine c_dapek(ina,jv,cjj)
     implicit none
@@ -3882,7 +3908,9 @@ contains
     integer,dimension(c_lnv)::j
     real(dp) a,b
     complex(dp) ccc
-    !
+    logical  long
+     long=longprint
+      if(iunit/=6) longprint=.true.
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
           write(6,*) "big problem in dabnew ", sqrt(crash)
@@ -3908,7 +3936,7 @@ contains
     if(inva.eq.0) then
        write(iunit,'(A)') '    I  VALUE  '
        do i = ipoa,ipoa+illa-1
-          write(iunit,'(I6,2X,G20.13)') i-ipoa, c_cc(i)
+          write(iunit,'(I6,2X,G20.13)') i-ipoa, c_clean_complex(c_cc(i))
        enddo
     elseif(c_nomax.eq.1) then
        if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
@@ -3922,8 +3950,8 @@ contains
              j(i-1)=1
              ioa=1
           endif
-          write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout,c_cc(ipoa+i-1),ioa,(j(iii),iii=1,c_nvmax)
-          write(iunit,*) c_cc(ipoa+i-1)
+          write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout,c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
+          write(iunit,*) c_clean_complex(c_cc(ipoa+i-1))
        enddo
     else
        if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
@@ -3933,10 +3961,10 @@ contains
              if(c_ieo(c_ia1(c_i_1(ii))+c_ia2(c_i_2(ii))).ne.ioa) goto 100
              call dancd(c_i_1(ii),c_i_2(ii),j)
              !ETIENNE
-             if(abs(c_cc(ii)).gt.eps) then
+             if(abs(c_cc(ii)).gt.epsprint) then
              a=0; b=0;
-             if(abs(real(c_cc(ii)))> eps) a=c_cc(ii)
-             if(abs(aimag(c_cc(ii)))> eps) b=aimag(c_cc(ii))
+             if(abs(real(c_cc(ii)))> epsprint) a=c_cc(ii)
+             if(abs(aimag(c_cc(ii)))> epsprint) b=aimag(c_cc(ii))
              ccc=a+(0.0_dp,1.0_dp)*b
 
                 !ETIENNE
@@ -3956,7 +3984,22 @@ contains
     write(iunit,'(A)') '                                      '
     !
     return
+longprint=long
   end subroutine c_dapri
+
+function c_clean_complex(c)
+implicit none 
+complex(dp) c_clean_complex,c
+real(dp) cr,ci
+
+cr=c
+if(abs(cr)<epsprint) cr=0
+ci=-i_*c
+if(abs(ci)<epsprint) ci=0
+c_clean_complex=cr+i_*ci
+
+end function c_clean_complex 
+
 
   subroutine c_dapri77(ina,iunit)
     implicit none
@@ -3972,6 +4015,9 @@ contains
     real(dp) a,b
     complex(dp) ccc
     logical some,imprime
+    logical  long
+     long=longprint
+      if(iunit/=6) longprint=.true.
     some=.false.
     !
     if(iunit.eq.0) return
@@ -4016,14 +4062,14 @@ contains
              if(c_ieo(c_ia1(c_i_1(ii))+c_ia2(c_i_2(ii))).ne.ioa) goto 100
           endif
           !ETIENNE
-          if(abs(c_cc(ii)).gt.eps) then
+          if(abs(c_cc(ii)).gt.epsprint) then
              !ETIENNE
              a=0; b=0; imprime=.false.
-             if(abs(real(c_cc(ii)))> eps) then
+             if(abs(real(c_cc(ii)))> epsprint) then
                  a=real(c_cc(ii))
                  imprime=.true.
             endif
-             if(abs(aimag(c_cc(ii)))> eps) then
+             if(abs(aimag(c_cc(ii)))> epsprint) then
                b=aimag(c_cc(ii))
                imprime=.true.
              endif 
@@ -4045,7 +4091,7 @@ contains
              !      WRITE(IUNIT,*) IOA,c_cc(II),(J(I),I=1,INVA)
              if(imprime) then
                  some=.true.
-                if(eps.gt.1e-37_dp) then
+                if(epsprint.gt.1e-37_dp) then
                    write(iunit,501) ioa,ccc,(j(i),i=1,inva)
                 else
                    write(iunit,503) ioa,ccc,(j(i),i=1,inva)
@@ -4067,8 +4113,10 @@ contains
     if(iout.eq.0) iout=1
 if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
     if((.not.longprint).and.(.not.some)) write(iunit,*) " Complex Polynomial is zero "
+if(.not.longprint) write(6,*) " "
     !
     return
+longprint=long
   end subroutine c_dapri77
 
   subroutine c_dashift(ina,inc,ishift)
@@ -4193,6 +4241,7 @@ if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
     integer,dimension(c_lnv)::j
     complex(dp) c
     character(10) c10
+ 
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
           write(6,*) "big problem in dabnew ", sqrt(crash)
@@ -4206,6 +4255,7 @@ if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
        !        X = SQRT(-ONE)
        !        PRINT*,X
     endif
+
     !
     inoa = c_idano(ina)
     inva = c_idanv(ina)
@@ -4231,6 +4281,7 @@ if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
     read(iunit,'(A10)') c10
     read(iunit,'(A10)') c10
     read(iunit,'(A10)') c10
+     
     !
     !
     iin = 0
@@ -4283,6 +4334,7 @@ if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
     if(c_nomax.ne.1) call dapac(ina)
     !
     return
+ 
   end subroutine c_darea
   !FF
   !
@@ -4300,6 +4352,7 @@ if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
     real(dp) cr,ci
     character(10) c10,k10
     complex ik
+ 
     ik=( 0.0_dp,1.0_dp )
     !
     if((.not.C_STABLE_DA)) then
@@ -4327,12 +4380,14 @@ if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
     call daclr(ina)   ! etienne 2008
     !
     !
+
     read(iunit,'(A10)') c10
     read(iunit,'(A10)') c10
     read(iunit,'(A10)') c10
     read(iunit,'(A10)') c10
+
     read(iunit,'(A10)') c10
-    read(iunit,'(A10,I6,A10,I6)') c10,nojoh,k10,nvjoh
+     read(iunit,'(A10,I6,A10,I6)') c10,nojoh,k10,nvjoh
     !
     iin = 0
     !
@@ -4364,7 +4419,7 @@ if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
 20  continue
     !
     if(c_nomax.ne.1) call dapac(ina)
-    !
+ 
     return
   end subroutine c_darea77
 

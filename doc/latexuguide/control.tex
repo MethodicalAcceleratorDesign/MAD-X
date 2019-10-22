@@ -155,10 +155,12 @@ they are set to \texttt{TRUE} are listed in table \ref{table:options}. Note that
     \texttt{NO\_FATAL\_STOP} & false & Prevents madx from stopping in case of a fatal error \\
     &       & \textbf{Use at your own risk !} \\
     \hline
+    \texttt{KEEP\_EXP\_MOVE}& true & keeps the expression of the location after a move command \\
+    \hline
     \texttt{RBARC}     & true & converts the RBEND straight length into the arc length \\
     \texttt{THIN\_FOC} & true & enables the $1/\rho^2$ focusing of thin dipoles \\
     \texttt{BBORBIT}   & false & the closed orbit is modified by beam-beam kicks \\
-    \texttt{SYMPL}     & false & all element matrices are symplectified in Twiss \\
+    \texttt{SYMPL}     & true & all element matrices are symplectified in Twiss \\
     \texttt{TWISS\_PRINT} & true & controls whether the twiss command produces output \\
     \texttt{THREADER}  & false & enables the threader for closed orbit finding in Twiss \\ 
     &       & (see Twiss module) \\ 
@@ -465,7 +467,7 @@ treatment by the \hyperref[chap:error]{\texttt{ERROR}} module.
 SELECT, FLAG=SAVE, CLASS=variable, PATTERN="abc.*"; \\
 SAVE, FILE=mysave;
 }
-saves all variables (and sequences) containing "abc" in their name, 
+saves all variables containing "abc" in their name,
 but does not save elements with names containing "abc" since the class
 "variable" does not exist.  
 

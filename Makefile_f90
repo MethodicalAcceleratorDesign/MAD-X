@@ -27,12 +27,12 @@ FC_DIR_PTC := libs/ptc/src
 FC_SRC_PTC := $(notdir $(wildcard $(FC_DIR_PTC)/*.f90 $(FC_DIR_PTC)/*.F90))
 
  # x11 dependencies
-ifeq ($(OSTYPE),Windows)
-FC_SRC_MAD += gxx11ps.f90
-FC_SRC_RM  += gxx11.f90
-else
+ifeq ($(X11),yes)
 FC_SRC_MAD += gxx11.f90
 FC_SRC_RM  += gxx11ps.f90
+else
+FC_SRC_MAD += gxx11ps.f90
+FC_SRC_RM  += gxx11.f90
 endif
 
 # ptc dependencies
@@ -53,12 +53,12 @@ FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC_MAD) $(FC_SRC_PTC))
 OPENMPFILES += trrun.f90
 
 # files specific compiler flag (i.e. "internal compiler error" message)
-l_complex_taylor.o: override NOPT := 2
-Sg_sagan_wiggler.o: override NOPT := 2
-ifeq ($(ARCH),32)
-c_dabnew_berz.o   : override NOPT := 1
-endif
-matchlib2.o       : override NOPT := 0
+#l_complex_taylor.o: override NOPT := 2
+#Sg_sagan_wiggler.o: override NOPT := 2
+#ifeq ($(ARCH),32)
+#c_dabnew_berz.o   : override NOPT := 1
+#endif
+#matchlib2.o       : override NOPT := 0
 
 ifneq ($(FCNAME),nagfor)
 Sg_sagan_wiggler.o: FFLAGS += $(if $(call eq,$(FCNAME),lf95),-dollar-ok,-fdollar-ok)

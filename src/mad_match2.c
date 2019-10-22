@@ -37,7 +37,7 @@ match2_augmentnconstraints(void)
   struct expression* * new_match2_cons_lhs = 0x0;
 
   if(MAX_MATCH_MACRO == 0) {
-    error("match2_augmentnconstraints","match with use_maco was not initialized");
+    mad_error("match2_augmentnconstraints","match with use_maco was not initialized");
     return 1;
   }
 
@@ -205,7 +205,7 @@ match2_disasambleconstraint(struct in_cmd* cmd)
     k = get_ex_range(name, sequ, nodes);
     if (k == 0)
     {
-      error("match2_disasambleconstraint","Bad range! Ignoring\n");
+      mad_error("match2_disasambleconstraint","Bad range! Ignoring\n");
       return;
     }
   }
@@ -290,7 +290,7 @@ match2_augmentnmacros(void)
   struct expression* **new_match2_cons_lhs;
 
   if(MAX_MATCH_MACRO == 0) {
-    error("match2_augmentnconstraints","match with use_maco was not initialized");
+    mad_error("match2_augmentnconstraints","match with use_maco was not initialized");
     return 1;
   }
 

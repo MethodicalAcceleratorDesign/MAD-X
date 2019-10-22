@@ -1,0 +1,708 @@
+! Links definitions
+option, warn,info;
+!###################################################################################################################################
+!############################## CREATE SOFT LINKS AND DIRECTORIES ##################################################################
+!###################################################################################################################################
+!System,"rm -r temp";
+!System,"rm -r output";
+System,"mkdir -p temp";
+System,"mkdir -p output";
+!######################################################################
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/SLHCV1.0 slhc";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/FiDeL fidel";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/WISE wise";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/2016 optics2016";
+!######################################################################
+!######################################################################
+Option, -echo,warn,-info;
+
+!###################################################################################################################################
+!############################## TUNE AND CHROMA ####################################################################################
+!###################################################################################################################################
+qxinit=64.27;
+qyinit=59.355;
+   ptcqxinit=qxinit-64.0;
+   ptcqyinit=qyinit-59.0;
+	qxinitint=qxinit-ptcqxinit;
+	qyinitint=qyinit-ptcqyinit; ! WATCH OUT - ALL THESE VALUES ARE USED BY MATCHING ROUTINES AND THE DQMIN CALCULATION LATER ON IN THE SCIPT...
+dqxinit=3.0;
+dqyinit=3.0;
+
+!because macros...
+qx0 = 64.28;   qy0 = 59.31;  qprime = 2.0;
+ tsplit=  5.0;
+ qx00  = 64.0;
+ qy00  = 59.0;
+
+
+!###################################################################################################################################
+!!!!POINTS TO CHECK WHEN EDITING THE SCRIPT
+!###################################################################################################################################
+
+
+!###################################################################################################################################
+!############################## OPTIONS ############################################################################################
+!###################################################################################################################################
+mylhcbeam=1;
+is_thin=1;
+
+MOpowering=0.0; ! INJECTION early 2016 = +9
+		! INJECTION late  2016 = +18 (as of 19/08/2016)
+		! END of RAMP = +6 (?? -> May)
+		! END of RAMP = +15 (as of 11/05/2016)
+		! END of RAMP = +13.38 (as of 03/09/2016)
+		! LSA history shows constant KO powering in 2016 from end of ramp to end of squeeze
+		!
+		! NOTE THAT ROD.A56.B1 IS HARWARE LIMITED TO A WEAKER VALUE THAN ALL OTHER CIRCUITS. So Runii does not have uniform powering of all MO.
+
+targetorbit=1; ! FLAG TO MATCH FINAL ORBIT TO ZERO OR TO TARGET USING VIRTUAL CORRECTORS. IF ZERO USE MCB WITH OLD ROUTINES FROM CARMEN.
+orbittol=1e-9; ! Tolerance on orbit matching. ! Something small eg e-9 is decent for matching to zero or to target. Can increase if want to have qualitative reproduction of RMS using old routines.
+
+!###################################################################################################################################
+!############################## SET UP LATTICE #####################################################################################
+!###################################################################################################################################
+if(mylhcbeam<3){ call,file="optics2016/lhc_as-built.seq";   };
+if(mylhcbeam>3){ call,file="optics2016/lhcb4_as-built.seq"; };
+if(is_thin==1) { call,file="optics2016/toolkit/slice.madx"; };
+
+if(targetorbit==1){ call, file="./scripts/install.vcs.2015.madx";};
+
+!Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
+if(mylhcbeam==1) {seqedit,sequence=lhcb1;flatten;cycle,start=IP3;endedit;}
+if(mylhcbeam>1)  {seqedit,sequence=lhcb2;flatten;cycle,start=IP3;endedit;}
+
+if(is_thin==0){ call, file="optics2016/opt_inj.madx";
+}
+else {         call, file="optics2016/opt_inj_thin.madx";
+     	       !call, file="optics2016/opt_3000_10000_3000_6000_thin.madx";
+       	       !call, file="optics2016/opt_800_10000_800_3000_thin.madx";
+      	       !call, file="optics2016/opt_400_10000_400_3000_thin.madx"; 
+}
+
+thisemit:=3.75e-6/(NRJ/0.938);
+value, NRJ;
+value, thisemit;
+
+if (mylhcbeam<3){ beam, sequence=lhcb1, bv= 1, energy=NRJ, particle=proton, npart=1.0e10, kbunch=1, ex=thisemit,ey=thisemit;
+   		  beam, sequence=lhcb2, bv=-1, energy=NRJ, particle=proton, npart=1.0e10, kbunch=1, ex=thisemit,ey=thisemit;};
+if (mylhcbeam>3){ beam, sequence=lhcb2, bv= 1, energy=NRJ, particle=proton, npart=1.0e10, kbunch=1, ex=thisemit,ey=thisemit;};
+
+
+!###################################################################################################################################
+!################################ SETUP FOR ORBIT and ERROR CORRECTIONS ############################################################
+!###################################################################################################################################
+on_x1= 0    ; on_sep1= 0 ; on_o1= 0 ;
+on_x2= 0    ; on_sep2= 0 ; on_o2= 0 ; on_oe2=0; on_a2= 0 ;                                       
+on_x5= 0    ; on_sep5= 0 ; on_o5= 0 ;                                                 
+on_x8= 0    ; on_sep8= 0 ; on_o8= 0 ; on_a8= 0 ;  on_sep8h= 0 ; on_x8v= 0 ;   
+on_alice= 0 ;  
+on_sol_alice=0;                                                                    
+on_lhcb = 0 ;  
+on_sol_atlas=0;
+on_sol_cms=0;
+
+
+select,flag=twiss,clear;
+if(mylhcbeam==1) {twiss,sequence=lhcb1,table=nominal; };
+if(mylhcbeam>1)  {twiss,sequence=lhcb2,table=nominal; };
+beta.ip1=table(twiss,IP1,betx);
+
+Use, sequence=lhcb1;
+select,flag=twiss,clear;
+select, flag=twiss, pattern="IP1",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP2",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP5",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP8",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+twiss,sequence=lhcb1,file=twiss.b1;system,"cat twiss.b1";
+
+Use, sequence=lhcb2;
+select,flag=twiss,clear;
+select, flag=twiss, pattern="IP1",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP2",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP5",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+select, flag=twiss, pattern="IP8",   column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy;
+twiss, sequence=lhcb2,file=twiss.b2;system,"cat twiss.b2";
+
+/*
+Use, sequence=lhcb1;
+select,flag=twiss,clear;
+select, flag=twiss, pattern="IP1",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP2",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP5",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP8",   column=name,s,x,y,px,py;
+twiss, sequence=lhcb1, file=twiss.b1;system,"cat twiss.b1";
+
+Use, sequence=lhcb2;
+select,flag=twiss,clear;
+select, flag=twiss, pattern="IP1",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP2",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP5",   column=name,s,x,y,px,py;
+select, flag=twiss, pattern="IP8",   column=name,s,x,y,px,py;
+twiss, sequence=lhcb2, file=twiss.b2;system,"cat twiss.b2";
+*/
+
+if(mylhcbeam==1) {Use, sequence=lhcb1;}
+if(mylhcbeam>1) {Use, sequence=lhcb2;}
+
+! print nominal optics parameter at the MB, MQS and MSS for
+! b2, b3, b4, b5, a2 and a3 correction
+ select, flag=twiss, clear;
+ select, flag=twiss,pattern=MB\.   ,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MBH\.   ,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.14,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.15,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.16,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.17,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.18,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.19,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.20,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.21,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MQS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MSS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MCO                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MCD                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MCS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ twiss,  file='temp/optics0_MB.mad';
+
+! print nominal optics parameter at the D1, MQX and triplet corrector
+! for triplet correction
+ select, flag=twiss, clear;
+ select, flag=twiss, pattern=MQX  , class=multipole, column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MBX  , class=multipole, column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MBRC , class=multipole, column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MQSX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCSX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCTX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCOSX                 , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCOX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCSSX                 , column=name,betx,bety,x,y;
+ twiss,  file='temp/optics0_inser.mad';
+
+
+select, flag=twiss, clear;
+twiss, table=zero_orbit;
+
+
+
+!###################################################################################################################################
+!################################ CALL ERROR SUBROUTINES ###########################################################################
+!###################################################################################################################################
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!         Call error subroutines (nominal machine and new IT/D1)
+!                         and error tables
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+! Error routine and measured error table for nominal LHC
+call,file="optics2016/measured_errors/Msubroutines_new.madx";  ! think the new subroutines are only relevant for MSS - not used pre-2017 so shouldn't make a difference compared to old Msubroutines...
+call,file="optics2016/measured_errors/Msubroutines_MS_MSS_MO_new.madx";
+call,file="optics2016/toolkit/Orbit_Routines.madx";
+call,file="optics2016/toolkit/SelectLHCMonCor.madx";
+readtable, file="optics2016/measured_errors/rotations_Q2_integral.tab";
+call,file="optics2016/errors/macro_error.madx";  ! some macros for error generation
+
+!###################################################################################################################################
+!################################ ALIGN SEPARATION MAGNETS  ########################################################################
+!###################################################################################################################################
+if(mylhcbeam==1) { 
+ call, file = "optics2016/measured_errors/align_D1_slices.b1.madx";
+ call, file = "optics2016/measured_errors/align_D2_slices.b1.madx";
+ call, file = "optics2016/measured_errors/align_D3_slices.b1.madx";
+ call, file = "optics2016/measured_errors/align_D4_slices.b1.madx";}
+elseif(mylhcbeam==2) {
+ call, file = "optics2016/measured_errors/align_D1_slices.b2.madx";
+ call, file = "optics2016/measured_errors/align_D2_slices.b2.madx";
+ call, file = "optics2016/measured_errors/align_D3_slices.b2.madx";
+ call, file = "optics2016/measured_errors/align_D4_slices.b2.madx";}
+elseif(mylhcbeam==4) {
+ call, file = "optics2016/measured_errors/align_D1_slices.b4.madx";
+ call, file = "optics2016/measured_errors/align_D2_slices.b4.madx";
+ call, file = "optics2016/measured_errors/align_D3_slices.b4.madx";
+ call, file = "optics2016/measured_errors/align_D4_slices.b4.madx";}
+
+!select,flag=twiss,clear;
+!select, flag=twiss, column=name,s,x,y,px,py,betx,bety;
+!twiss, chrom, file=output/twiss.orbitcheck1.dat;
+
+!###################################################################################################################################
+!################################ ALIGNMENT ERRORS #################################################################################
+!###################################################################################################################################
+if(mylhcbeam==1){readtable, file="scripts/LHC-egeoc-0001-b1.tfs";}
+
+!!!!################### OLD BLOCK TO APPLY ALIGNMENTS ####################
+Align_one_element(j_elem) : macro = {
+     select, flag=error, clear;
+     select, flag=error, pattern=^tabstring(egeoc, name, j_elem);
+     ealign, dx     = table(egeoc, mc_dx,    j_elem),
+             dy     = table(egeoc, mc_dy,    j_elem),
+             ds     = table(egeoc, mc_ds,    j_elem),
+             dphi   = table(egeoc, mc_phi,   j_elem),
+             dtheta = table(egeoc, mc_theta, j_elem),
+             dpsi   = table(egeoc, mc_psi,   j_elem);
+  }
+ n_elem = table(egeoc, tablelength); i_elem = 0;
+ while (i_elem < n_elem) { i_elem = i_elem + 1; exec,  Align_one_element($i_elem); }
+
+
+!########### TABLE OF ERRORS ######################
+select, flag=error, clear;
+  select, flag=error, pattern=^M;
+  esave,  file="temp/alignment_errors.m.tfs";
+select, flag=error, clear;
+  select, flag=error, pattern=^BPM;
+  esave,  file="temp/alignment_errors.bpm.tfs";
+select, flag=error, clear;
+  select, flag=error, pattern=^MB\.;
+  esave,  file="temp/alignment_errors.mb.tfs";
+select, flag=error, clear;
+  select, flag=error, pattern=^MQX\.;
+  esave,  file="temp/alignment_errors.mb.tfs";
+
+
+
+!select,flag=twiss,clear;
+!select, flag=twiss, column=name,s,x,y,px,py,betx,bety;
+!twiss, chrom, file=output/twiss.orbitcheck2.dat;
+
+!###################################################################################################################################
+!################################ ORBIT MATCHING   ############################################
+!###################################################################################################################################
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!   Disable monitors and correctors
+!!!   All correctors disabled first, then virtual correctors are enabled
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!call,file="slhc/errors/SelectLHCMonCor_phaseI.madx";
+usekick, status=off, class=kicker;
+usekick, status=off, class=hkicker;
+usekick, status=off, class=vkicker;
+usekick, status=on, class=virtualcorrector;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+usemonitor, status=on, class=monitor;
+
+if (mylhcbeam==1){
+readmytable, file="./scripts/target.orbit.B1-2016.new.tfs", table=my_target;
+call, file="./scripts/target.orbit.B1-2016.madx";
+};
+
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=1,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=1,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+
+!select,flag=twiss,clear;
+!select, flag=twiss, column=name,s,x,y,px,py,betx,bety;
+!twiss, chrom, file=output/twiss.orbitcheck3.dat;
+
+
+
+
+if(mylhcbeam==1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b1, step=1.0E-7 ;
+     vary,   name=kqtd.b1, step=1.0E-7 ;
+     vary,   name=ksf.b1, step=1.0E-7 ;
+     vary,   name=ksd.b1, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+if(mylhcbeam>1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b2, step=1.0E-7 ;
+     vary,   name=kqtd.b2, step=1.0E-7 ;
+     vary,   name=ksf.b2, step=1.0E-7 ;
+     vary,   name=ksd.b2, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                   fine tuning of coupling                     
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ call,   file="scripts/FineTuneCoupling.madx";
+
+/*
+   match;
+     global, q1=64.295, q2=59.295;
+     vary,   name=kqtf.b1, step=1.0E-7 ;
+     vary,   name=kqtd.b1, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+
+dqminacorr = table(summ,q1)-table(summ,q2)-5.0;
+value, dqminacorr   ;
+*/
+
+
+!###################################################################################################################################
+!################################ LINEAR OPTICS ERRORS ########################################################################
+!###################################################################################################################################
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                Switch ON/OFF some multipole
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+exec ON_ALL_MULT;
+ON_LSF:=0;             ! to be set to 0 if run is performed on BOINC. ! double check if this is still true - and if wise actually includes any of these errors
+
+ ON_A1s  =  0 ; ON_A1r  =  0 ; ON_B1s  =  0 ; ON_B1r  =  0 ;
+ ON_A2s  =  0 ; ON_A2r  =  0 ; ON_B2s  =  0 ; ON_B2r  =  0 ;
+ ON_A3s  =  1 ; ON_A3r  =  1 ; ON_B3s  =  1 ; ON_B3r  =  1 ;
+ ON_A4s  =  1 ; ON_A4r  =  1 ; ON_B4s  =  1 ; ON_B4r  =  1 ;
+ ON_A5s  =  1 ; ON_A5r  =  1 ; ON_B5s  =  1 ; ON_B5r  =  1 ;
+ ON_A6s  =  1 ; ON_A6r  =  1 ; ON_B6s  =  1 ; ON_B6r  =  1 ;
+ ON_A7s  =  1 ; ON_A7r  =  1 ; ON_B7s  =  1 ; ON_B7r  =  1 ;
+ ON_A8s  =  1 ; ON_A8r  =  1 ; ON_B8s  =  1 ; ON_B8r  =  1 ;
+ ON_A9s  =  1 ; ON_A9r  =  1 ; ON_B9s  =  1 ; ON_B9r  =  1 ;
+ ON_A10s =  1 ; ON_A10r =  1 ; ON_B10s =  1 ; ON_B10r =  1 ;
+ ON_A11s =  1 ; ON_A11r =  1 ; ON_B11s =  1 ; ON_B11r =  1 ;
+ ON_A12s =  ON_LSF; ON_A12r = ON_LSF; ON_B12s = ON_LSF; ON_B12r =  ON_LSF;
+ ON_A13s =  ON_LSF; ON_A13r = ON_LSF; ON_B13s = ON_LSF; ON_B13r =  ON_LSF;
+ ON_A14s =  ON_LSF; ON_A14r = ON_LSF; ON_B14s = ON_LSF; ON_B14r =  ON_LSF;
+ ON_A15s =  ON_LSF; ON_A15r = ON_LSF; ON_B15s = ON_LSF; ON_B15r =  ON_LSF;
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+! Define the seed number (for statistical error assignment in the new IT/D1)
+! and call the corresponding measured error table for nominal LHC magnets
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!For the madx file
+eoption,seed=1;
+if (NRJ==450) {readtable, file="wise/After_sector_3-4_repair/injection/injection_errors-emfqcs-1.tfs" ;}
+if (NRJ==6500){stop;}
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!             apply field errors to MB and MQ magnets
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ call,   file="optics2016/measured_errors/Efcomp_MB.madx"  ;
+ call,   file="optics2016/measured_errors/Efcomp_MQ.madx"  ;
+
+!!!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!!!           apply field errors to all other quads and dipoles
+!!!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!!! Nominal LHC magnets
+ call,   file="optics2016/measured_errors/Efcomp_MBRB.madx"; ! for IP4
+ call,   file="optics2016/measured_errors/Efcomp_MBRS.madx"; ! for IP4
+ call,   file="optics2016/measured_errors/Efcomp_MBRC.madx"; ! this is the D2 
+ call,   file="optics2016/measured_errors/Efcomp_MBX.madx" ; ! D in IP2 and 8
+ call,   file="optics2016/measured_errors/Efcomp_MBW.madx" ; ! this is for IP7 and IP3
+ call,   file="optics2016/measured_errors/Efcomp_MBXW.madx"; ! this is the D1 in IP1 and IP5
+!
+ call,   file="optics2016/measured_errors/Efcomp_MQM.madx" ;
+ call,   file="optics2016/measured_errors/Efcomp_MQMC.madx";
+ call,   file="optics2016/measured_errors/Efcomp_MQML.madx";
+ call,   file="optics2016/measured_errors/Efcomp_MQTL.madx";
+ call,   file="optics2016/measured_errors/Efcomp_MQW.madx" ;
+ call,   file="optics2016/measured_errors/Efcomp_MQY.madx" ;
+ call,   file="optics2016/measured_errors/Efcomp_MQX.madx" ; 
+
+!##############################################################################
+!########## GET NOMINAL CORRECTIONS FOR DIPOLES & TRIPLETS ETC ################
+!##############################################################################
+if(is_thin==1) { 
+	value,NRJ;
+       !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+       !               correction of field errors in MB (compatible with V6.503 & SLHC)
+       !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        !select, flag=error, clear;
+	!select, flag=error, pattern=MB\.,class=multipole;
+	!esave,  file="temp/MB.errors";
+	!system, "slhc/errors/corr_MB_phaseI";
+	!call, file="temp/MB_corr_setting.mad";
+	value, kcs.a12b1;
+	value, kcs.a78b1;
+	value, kcs.a12b2;
+        value, kcs.a78b2;
+	select, flag=error, clear;
+	select, flag=error, pattern=MB\.,class=multipole;
+	esave,  file="temp/MB.errors";
+	!system, "optics2016/errors/corr_MB_v3";
+	call, file="savedcorr/MB_corr_setting_saved.mad";
+	value, kcs.a12b1;
+	value, kcs.a78b1;
+	value, kcs.a12b2;
+        value, kcs.a78b2;
+}
+
+
+
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+
+!select,flag=twiss,clear;
+!select, flag=twiss, column=name,s,x,y,px,py,betx,bety;
+!twiss, chrom, file=output/twiss.orbitcheck4.dat;
+
+if(mylhcbeam==1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b1, step=1.0E-7 ;
+     vary,   name=kqtd.b1, step=1.0E-7 ;
+     vary,   name=ksf.b1, step=1.0E-7 ;
+     vary,   name=ksd.b1, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+if(mylhcbeam>1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b2, step=1.0E-7 ;
+     vary,   name=kqtd.b2, step=1.0E-7 ;
+     vary,   name=ksf.b2, step=1.0E-7 ;
+     vary,   name=ksd.b2, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                   fine tuning of coupling                     
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ call,   file="scripts/FineTuneCoupling.madx";
+
+/*
+   match;
+     global, q1=64.295, q2=59.295;
+     vary,   name=kqtf.b1, step=1.0E-7 ;
+     vary,   name=kqtd.b1, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+
+dqminacorr = table(summ,q1)-table(summ,q2)-5.0;
+value, dqminacorr   ;
+*/
+
+
+
+
+b3dynamic=1.116661112781816*1E-4;
+select,flag=error,clear;
+select,flag=error,pattern="MB\.",class=multipole;
+EOPTION, ADD=TRUE;
+Efcomp,  radius = 0.017, order = 0,
+dknr:={0,0,b3dynamic,0,0,0,0,0,0,0,0,0,0,0,0},
+dksr:={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+select, flag=error, clear;
+	select, flag=error, pattern=MB\.,class=multipole;
+	esave,  file="temp/MB.static-dynamic.errors";
+
+
+ SELECT, FLAG=ERROR, CLEAR;
+ SELECT,FLAG=ERROR,CLASS=MCO;
+ EOPTION,ADD=TRUE;
+ EALIGN,DX:=-0.00020,DY:=0.000;
+ SELECT, FLAG=ERROR, CLEAR;
+ SELECT,FLAG=ERROR,CLASS=MCD;
+ EOPTION,ADD=TRUE;
+ EALIGN,DX:=-0.00020,DY:=0.000;
+
+
+
+
+
+kMCOSXmax:=0.0475*6/0.017^3*0.299792458/NRJ;
+kcosx3.r1 = kMCOSXmax*(0.5) ;
+kcosx3.l1 = kMCOSXmax*(0.5) ;
+kcosx3.r5 = kMCOSXmax*(0.5) ;
+kcosx3.l5 = kMCOSXmax*(0.5) ;
+kcosx3.r2 = kMCOSXmax*(0.5) ;
+kcosx3.l2 = kMCOSXmax*(0.5) ;
+kcosx3.r8 = kMCOSXmax*(0.5) ;
+kcosx3.l8 = kMCOSXmax*(0.5) ;
+
+
+
+
+
+
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+if(mylhcbeam==1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b1, step=1.0E-7 ;
+     vary,   name=kqtd.b1, step=1.0E-7 ;
+     vary,   name=ksf.b1, step=1.0E-7 ;
+     vary,   name=ksd.b1, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+if(mylhcbeam>1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b2, step=1.0E-7 ;
+     vary,   name=kqtd.b2, step=1.0E-7 ;
+     vary,   name=ksf.b2, step=1.0E-7 ;
+     vary,   name=ksd.b2, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                   fine tuning of coupling                     
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ call,   file="scripts/FineTuneCoupling.madx";
+if(mylhcbeam==1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b1, step=1.0E-7 ;
+     vary,   name=kqtd.b1, step=1.0E-7 ;
+     vary,   name=ksf.b1, step=1.0E-7 ;
+     vary,   name=ksd.b1, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+if(mylhcbeam>1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b2, step=1.0E-7 ;
+     vary,   name=kqtd.b2, step=1.0E-7 ;
+     vary,   name=ksf.b2, step=1.0E-7 ;
+     vary,   name=ksd.b2, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+twiss,chrom,table;
+correct, flag=ring, mode=svd, plane=y, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+correct, flag=ring, mode=svd, plane=x, error=1.0e-90, corzero=0,  extern=true, cond=0, resout=0, target=my_target;
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                   fine tuning of coupling                     
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ call,   file="scripts/FineTuneCoupling.madx";
+qxinit=64.31;
+qyinit=59.32;
+   ptcqxinit=qxinit-64.0;
+   ptcqyinit=qyinit-59.0;
+	qxinitint=qxinit-ptcqxinit;
+	qyinitint=qyinit-ptcqyinit; ! WATCH OUT - ALL THESE VALUES ARE USED BY MATCHING ROUTINES AND THE DQMIN CALCULATION LATER ON IN THE SCIPT...
+dqxinit=3.0;
+dqyinit=3.0;
+
+if(mylhcbeam==1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b1, step=1.0E-7 ;
+     vary,   name=kqtd.b1, step=1.0E-7 ;
+     vary,   name=ksf.b1, step=1.0E-7 ;
+     vary,   name=ksd.b1, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+if(mylhcbeam>1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b2, step=1.0E-7 ;
+     vary,   name=kqtd.b2, step=1.0E-7 ;
+     vary,   name=ksf.b2, step=1.0E-7 ;
+     vary,   name=ksd.b2, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+
+
+
+
+!###################################################################################################################################
+!################################ OUTPUT ###########################################################################################
+!###################################################################################################################################
+select,flag=twiss,clear;
+select, flag=twiss, pattern="IP",   column=name,s,x,y,px,py,betx,bety;
+twiss, chrom, file=twiss.ip.final.dat;
+
+  ptc_create_universe;
+  ptc_create_layout,model=3,method=6,nst=3,resplit,thin=0.0005,xbend=0.0005;
+  ptc_align;
+!  ptc_setswitch, fringe=True;
+  select_ptc_normal,  q1=0, q2=0;
+  select_ptc_normal, dq1=1,dq2=1;
+  select_ptc_normal, dq1=2,dq2=2;
+  select_ptc_normal, dq1=3,dq2=3;
+  select_ptc_normal, anhx=1,0,0; ! dQx/dex
+  select_ptc_normal, anhy=0,1,0; ! dQy/dey
+  select_ptc_normal, anhx=0,1,0;
+  select_ptc_normal, anhy=1,0,0;
+  select_ptc_normal, anhx=2,0,0; ! d2Qx/dex^2
+  select_ptc_normal, anhx=1,1,0;
+  select_ptc_normal, anhx=0,2,0;
+  select_ptc_normal, anhy=0,2,0; ! d2Qy/dey^2
+  select_ptc_normal, anhy=1,1,0; ! d2Qy/deydex
+  select_ptc_normal, anhy=2,0,0;
+  ptc_normal,closed_orbit,normal,icase=5,no=5;
+  write, table=normal_results,file="ptc_normal.final.dat"; 
+  ptc_end;
+
+
+
+stop;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

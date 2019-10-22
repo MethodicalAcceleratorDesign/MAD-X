@@ -32,7 +32,7 @@ find_index_in_table2(const char * const cols[], int ncols, const char *name )
 
 
 static void
-pro_error_make_efield_table(void)
+pro_error_make_efield_table(const char *tablename)
 {
   struct table *ttb = efield_table;
   struct node *nanf;
@@ -45,7 +45,7 @@ pro_error_make_efield_table(void)
 
       while (nanf != nend) {
         if(nanf->sel_err == 1) {
-           string_to_table_curr("efield","name",nanf->name);
+           string_to_table_curr(tablename,"name",nanf->name);
 /* */
                   /*
            printf("=> %s %e %e %e\n",nanf->name,nanf->p_fd_err,nanf->p_al_err);
@@ -88,7 +88,7 @@ pro_error_make_efield_table(void)
               }
            }
 /* */
-           augment_count("efield");
+           augment_count(tablename);
         }
         nanf = nanf->next;
       }
@@ -257,10 +257,24 @@ error_esave(struct in_cmd* cmd)
        efield_table = make_table("efield", "efield", efield_table_cols,
                                efield_table_types, 10000);
        add_to_table_list(efield_table, table_register);
-       pro_error_make_efield_table();
+       pro_error_make_efield_table("efield");
 /*  }                          */
     ef_table_file = command_par_string("file",cmd->clone);
     out_table("efield",efield_table,ef_table_file);
+}
+static void
+error_etable(struct in_cmd* cmd)
+{
+    char *ef_table;
+    ef_table = command_par_string("table",cmd->clone);
+/*  if(efield_table == NULL) { */
+       efield_table = make_table(ef_table, ef_table, efield_table_cols,
+                               efield_table_types, 10000);
+       add_to_table_list(efield_table, table_register);
+       pro_error_make_efield_table(ef_table);
+/*  }                          */
+    //ef_table_file = command_par_string("file",cmd->clone);
+    //out_table("efield",efield_table,ef_table_file);
 }
 
 static void
@@ -669,7 +683,7 @@ error_efcomp(struct in_cmd* cmd)
 		      /* NORMAL COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
               if(i==2) {
 		            if(rr < 1.0E-6) {
-		              error("trying to assign relative field errors with no or zero reference radius specified","");
+		              mad_error("trying to assign relative field errors with no or zero reference radius specified","");
 		            }
 		            double norfac = pow(rr,(order-j)) * (fact(j)/fact(order));
 
@@ -694,7 +708,7 @@ error_efcomp(struct in_cmd* cmd)
   		    /* SKEW COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
               if(i==3) {
                 if(rr < 1.0E-6) {
-                  error("trying to assign relative field errors with no or zero reference radius specified","");
+                  mad_error("trying to assign relative field errors with no or zero reference radius specified","");
       		      }
 		            double norfac = pow(rr,(order-j)) * (fact(j)/fact(order));
 
@@ -888,5 +902,7 @@ pro_error(struct in_cmd* cmd)
   else if (strcmp(cmd->tok_list->p[0], "eprint") == 0) error_eprint(cmd);
   else if (strcmp(cmd->tok_list->p[0], "seterr") == 0) error_seterr(cmd);
   else if (strcmp(cmd->tok_list->p[0], "esave" ) == 0) error_esave(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "etable") == 0) error_etable(cmd);
+
 }
 

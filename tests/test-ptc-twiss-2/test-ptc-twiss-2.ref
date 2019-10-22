@@ -65,7 +65,7 @@ Determined SECTOR NMUL MAX :  2
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After    end:    1.2170347930495041E-004   2.9337307977728667E-014  -7.9690752521344166E-005
  HARMONIC NUMBER defined in the ring:    35640.000000000000     
-++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
+++++++ warning: my_state:   no cavity - dimensionality reduced 6 -> 5 and 1/2
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 

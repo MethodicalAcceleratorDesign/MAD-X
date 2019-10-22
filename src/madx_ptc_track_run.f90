@@ -40,7 +40,7 @@ MODULE madx_ptc_track_run_module
   !------------------------------------------------------------------!
   !  Variables from input files and probably corrected by this code: !
   !------------------------------------------------------------------!
-  INTEGER, PUBLIC :: icase_ptc    ! Phase-space (4, 5 or 6) in input command
+  INTEGER, PUBLIC :: icase_ptc    ! Phase-space (4, 5, 56 or 6) in input command
   INTEGER, PUBLIC :: nvariables   !  actul number of variables
   INTEGER, PUBLIC :: turns        ! The current turn and Total number of turns
 
@@ -119,8 +119,16 @@ MODULE madx_ptc_track_run_module
   
   type(probe), private     :: savedProbe ! probe at last step 
                                           ! the tracking loop logic is inversed, so need to do cumbersome gymnastic with probes
-		  
-		  
+  
+  ! variables for keeping 6th variable within limits whet totalpath=true
+  ! totpath_maxwavelen is value to subtract every (few) turns, it must be multiple of any RF wavelength present in the machine
+  REAL(dp) , private     :: totpath_maxwavelen
+  REAL(dp) , private     :: totpath_ct_subtracted
+  integer  , private     :: totpath_turncount ! counts how many turns passed from last substraction
+  ! flag to decide if totalpath subtraction is done
+  logical  , private     :: dototpathsubtraction ! true if all the frequencies are multiples of the lowest one
+  
+  REAL(dp)   , private     :: circumference 
   !real(KIND(1d0)) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures
 
 CONTAINS
@@ -295,6 +303,8 @@ CONTAINS
             'the table headers mean:  PT -> delta_p, T -> pathlength')
     ENDIF warn_coordinate_system_changed
 
+    call get_length(my_ring,circumference)
+
     ! initialize the closed orbit coordinates  at START of the ring
     ! Closed_orbit_at_START:
     IF(closed_orbit) then 
@@ -375,7 +385,20 @@ CONTAINS
        print *,'The line <MY_RING> consists of <MY_RING%n>=', MY_RING%n, ' nodes'
        print *, "Number of observation points max_obs =", max_obs
     END IF debug_print_1
+    
+    
     if (rplot) call rplotstartcoord()
+
+    totpath_maxwavelen = 0.0
+    totpath_ct_subtracted = 0.0
+    totpath_turncount = 0
+    dototpathsubtraction = .false.
+    if ( (nvariables .gt. 5) .and. (MYSTATE%TOTALPATH .gt. 0) ) then       !   !
+      ! must be after ptc_track_ini_modulation, clocks must be already initialized
+      call calculate_nrfwavelen()
+    endif
+    
+    
     loop_over_turns: do i_th_turn=1,turns ! ================loop over turn =======!
        debug_print_2: IF (ptc_track_debug) then                                   !
           print *; print*, 'start ',i_th_turn, '-th turn  '                       !
@@ -420,7 +443,10 @@ CONTAINS
        ! all particles are lost                                                   !
        !
        
-       
+       if ( (nvariables .gt. 5) .and. (MYSTATE%TOTALPATH .gt. 0) ) then       !   !
+         call subtract_nrfwavelen(i_th_turn)
+       endif 
+
        
        
     end do Loop_over_turns !===========loop over turn ============================!
@@ -460,7 +486,7 @@ CONTAINS
 
 
     Beam_envelope_with_PTC: IF (beam_envelope) THEN 
-        call fort_warn('ptc_track: ',' Calculation of Equilibrim emittance was moved to ptc_twiss')
+        call fort_warn('ptc_track: ',' Calculation of Equilibrium emittance was moved to ptc_twiss')
     endif Beam_envelope_with_PTC
 
 !     Beam_envelope_with_PTC: IF (beam_envelope) THEN !###############################!
@@ -590,7 +616,7 @@ CONTAINS
 
 
       icase_ptc    = get_value('ptc_track ','icase ')
-      if(icase_ptc.eq.56) nvariables=5
+      if(icase_ptc.eq.56) nvariables=6
       if(icase_ptc.ne.4.and.icase_ptc.ne.5.and.icase_ptc.ne.6.and.icase_ptc.ne.56) then
          write(text, '(i4)') icase_ptc
          call aafail('Values_from_ptc_track_command: ',' ICASE not 4, 5, 6 or 56 found: ' // text)
@@ -798,7 +824,7 @@ CONTAINS
         print *, "********************************************************************"
       endif
       
-      
+       
       
     END SUBROUTINE Call_my_state_and_update_states
     !=============================================================================
@@ -827,7 +853,8 @@ CONTAINS
       if(nvariables.ge.5) THEN !------------------------!                   !
          if(mytime) then !----------------------!      !                   !
             call Convert_dp_to_dt (deltap, dt)  !      !                   !
-         else                                   !      !                   !
+         else
+            print*, 'Converted deltap ', deltap, ' to ', dt                                   !      !                   !
             dt=deltap                           !      !                   !
          endif !--------------------------------!      !                   !
          x_coord_co(5)=dt                              !                   !
@@ -926,6 +953,359 @@ CONTAINS
       enddo
       
     END SUBROUTINE  rplotstartcoord
+
+    !=============================================================================
+    ! must be called after ptc_track_ini_modulation, clocks must be already initialized
+
+    SUBROUTINE calculate_nrfwavelen()
+      USE madx_keywords, only: kind4, kind21
+      implicit none
+      integer, parameter :: maxnwavelens = 100
+      real(dp) :: wavelens(maxnwavelens)
+      real(dp) :: nominators(maxnwavelens)
+      real(dp) :: denominators(maxnwavelens)
+      real(dp) ::  wavelen, maxwavelen
+      integer i,j, nwavelens
+      type(fibre), pointer:: p
+      logical :: found
+      integer(kind=8) :: d,n
+      real(dp) ::  f
+      real(dp) ::  MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
+      
+      Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)        !
+      
+      
+      nwavelens = 0
+
+      p=>my_ring%start
+      
+      ! Search form all frequencies
+      
+      ! 1. RF cavities (including RF multipoles) and TW cavities
+      DO j=1, my_ring%n
+         
+         !print*, "Element ", p%mag%name, " kind ", p%mag%kind
+         if( (p%mag%kind /= kind21) .and. (p%mag%kind/=kind4) ) then
+           !print*, "Not a cavity"
+           p=>p%next
+           cycle
+         endif
+         
+         if(p%mag%freq==zero) then
+            !print*, "Frequency is zero"
+            p=>p%next
+            cycle
+         endif
+         
+         !print*, "Getting wavelength"
+         wavelen = (clight/p%mag%freq)
+         !print*, "Getting wavelength = ",wavelen
+         
+         found = .false.
+         
+         do i=1,nwavelens
+           if ( abs(wavelens(i) - wavelen) < 1e-12) then
+              found = .true.
+              exit ! this loop 
+           endif
+         enddo
+         
+         if (.not. found) then
+           nwavelens = nwavelens + 1
+           wavelens(nwavelens) = wavelen
+
+           if (getdebug()>1) then
+              !print*," RF Cav  no. ", nwavelens, " wavelength ", wavelen
+              print*,"calculate_nrfwavelen:  Added wavelen no ", nwavelens," f=", wavelens(nwavelens)
+           endif
+           
+         endif
+         
+         p=>p%next
+         
+      enddo
+
+      !__________________________________________
+      ! 2. AC dipoles 
+      ! AC dipoles are ignored, the way they work is completely independent of X6 variable
+      ! Clock arms are moved only by travelled S (nominal length of elements)
+      ! it was verified on a relistic use case that big X6 (disabled totpath subtraction) 
+      ! makes bigger error than ignoring clock frequencies 
+      ! I leave the code commented out if it changes in the future 
+      !    if (.false. ) then
+      !      do j=1,nclocks
+      ! 
+      !        wavelen = twopi / savedProbe%ac(j)%om
+      ! 
+      !        if (getdebug()>1) then
+      !           print*," Clock  no. ", j, " wavelength ", wavelen
+      !        endif
+      ! 
+      !         found = .false.
+      ! 
+      !         do i=1,nwavelens
+      !           if ( abs(wavelens(i) - wavelen) < 1e-12) then
+      !	 found = .true.
+      !	 exit ! this loop 
+      !           endif
+      !         enddo
+      ! 
+      !         if (.not. found) then
+      !           nwavelens = nwavelens + 1
+      !           wavelens(nwavelens) = wavelen
+      ! 
+      !           print*, nwavelens, " Added wavelen no ", wavelens(nwavelens)
+      !         endif
+      ! 
+      !      enddo
+      !    endif
+      
+      !__________________________________________
+      
+      if (nwavelens < 1) then
+        ! No cavities, it means we run icase=56
+        ! Let's use the circumference
+        totpath_maxwavelen = circumference
+        dototpathsubtraction = .true.
+        if (getdebug()>1) then
+           print*,"calculate_nrfwavelen:  No RF cavity was found: using circumference "
+        endif
+        return
+      endif
+      
+      ! find the biggest wave length
+      maxwavelen = 0
+      do i=1,nwavelens
+        if (wavelens(i) > maxwavelen) then
+          maxwavelen = wavelens(i)
+        endif
+      enddo
+      
+      if (getdebug()>1) then
+        print*,"calculate_nrfwavelen: max wavelength = ", maxwavelen
+      endif
+      
+      dototpathsubtraction  = .true.
+            
+      do i=1,nwavelens
+
+        wavelen = wavelens(i)
+        f = wavelen / (maxwavelen)
+        call rationalize(f,n,d)
+        nominators(i) = n
+        denominators(i) = d
+
+      enddo
+
+      ! find common denominator
+      d = 1.0
+      n = 1.0
+      do i=1,nwavelens
+      
+        d = d*denominators(i)
+        n = n*  nominators(i)
+        
+        if (abs(n) > 1e5) then
+
+           call fort_warn('ptc_track: ','Can not enable TOTALPATH subtraction schema')
+           print*, 'ptc_track: Common denominator of the present wavelengths corresponds to more than 100000 max wavelengths'
+           
+           dototpathsubtraction = .false.
+           return
+
+        endif
+      
+      enddo
+      
+      totpath_maxwavelen = n*maxwavelen 
+      
+      if (getdebug()>1) then
+        print*," Final result: nominator product = ",n, " denominators product = ", d
+        print*," totpath_maxwavelen = ", totpath_maxwavelen
+      endif
+      
+       
+      ! A check
+      do i=1,nwavelens
+        
+        wavelen = wavelens(i)
+        j = nint(totpath_maxwavelen / wavelen)
+
+        if (getdebug()>1) then
+          print*,'Check rf ',i," (int)ratio = ", j, " (float)ratio = ", totpath_maxwavelen / wavelen
+        endif
+
+        if ( abs( totpath_maxwavelen -  (j*wavelen) ) > 1e-8 ) then
+           call fort_warn('ptc_track: ','Can not enable TOTALPATH subtraction schema')
+           print*,'Problem: please report to mad.support'
+           print*,'abs( totpath_maxwavelen -  (j*wavelen) ) = ', abs( totpath_maxwavelen -  (j*wavelen) )
+           dototpathsubtraction  = .false.
+        endif
+      enddo
+      
+      
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+      ! 
+      !do i=1,nwavelens
+      !  
+      !  wavelen = wavelens(i)
+      !  j = nint(maxwavelen / wavelen)
+      !  
+      !  if (getdebug()>1) then
+      !    print*," WLmax[ ", i, "]/WL ", maxwavelen / wavelen 
+      !  endif
+      !
+      !  if ( abs( maxwavelen -  (j*wavelen) ) > 1e-8 ) then
+      !  
+      !     call fort_warn('ptc_track: ','Can not enable TOTALPATH subtraction schema')
+      !     print*,'Can not find common multiple of all the wavelengths, disabling TOTALPATH subtraction schema'
+      !     dototpathsubtraction  = .false.
+      !  endif
+      !enddo
+      !totpath_maxwavelen = maxwavelen 
+      
+      if (getdebug()>1) then
+        print*,"dototpathsubtraction = ", dototpathsubtraction
+        print*," Found  ", nwavelens, " distinct wavelengths. Max wavelength is ", totpath_maxwavelen
+      endif
+      
+    END SUBROUTINE calculate_nrfwavelen
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    SUBROUTINE rationalize(f,n,d)
+      implicit none
+      real(dp), intent (IN)           :: f
+      integer(kind=8), intent (OUT) :: n,d
+      integer(kind=8)               :: ni,di
+      
+      call rationalize1(f,n,d)
+      !often some numbers give huge d and n numbers while invers gives small numbers
+      ! best example 0.1
+      call rationalize1(1./f,ni,di)
+      
+      if ( (di < d) .and. (ni < n) ) then
+        d = ni
+        n = di
+      endif
+      if (getdebug() > 1) then
+        print*,"rationalize: f = ", f, " = ", n ," / ", d  
+      endif
+    
+    END SUBROUTINE rationalize
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    
+    SUBROUTINE rationalize1(f,n,d)
+    !Returns f as d/n, where d and n are integers
+      implicit none
+      real(dp), intent (IN)           :: f
+      integer(kind=8), intent (OUT) :: n,d
+      real(dp)  float_part
+      integer(kind=8) exponent_part, expshift
+      integer i
+      
+      d = 0
+      n = 0
+      
+      float_part = fraction(f)
+      exponent_part = exponent(f)
+      
+     ! print*, "f       : ", f
+     ! print*, "fraction: ", float_part
+     ! print*, "exponent: ", exponent_part
+      
+      do i=0,300
+        !print*, " i=",i, float_part , floor(float_part,8)
+        if (float_part .eq. floor(float_part,8)) then
+          exit
+        endif
+        
+        float_part = float_part*2.0;
+        exponent_part = exponent_part - 1
+      
+      enddo
+      
+     ! print*,"After the loop "
+     ! print*,"float_part    = ", float_part
+     ! print*,"exponent_part = ", exponent_part
+      n = float_part
+      
+     ! print*,"n ini = ", n
+      
+      d = 1
+      
+      expshift = abs(exponent_part)
+      
+      if (exponent_part .gt. 0) then
+        n = LSHIFT(n,expshift)
+      else
+        d = LSHIFT(d,expshift)
+      endif
+      
+
+    !  print*, " ", n      
+    !  print*, "                ----------"      
+    !  print*, " ", d
+    !  print*, " "      
+      
+    
+    END SUBROUTINE rationalize1
+
+
+    !=============================================================================
+
+    SUBROUTINE  subtract_nrfwavelen(turn)
+      implicit none
+      integer   :: turn
+      integer   :: j
+      real(dp)  :: totpath_ct_to_subtract
+      real(dp)  :: sumt
+      
+      if ( dototpathsubtraction .eqv. .false.) return
+      
+      totpath_turncount = totpath_turncount + 1
+      
+      if ( totpath_turncount*circumference < totpath_maxwavelen) then
+        return
+      endif
+      
+      if ( modulo(turn,100) /= 0 ) then
+        ! integer number of wavelengths in circumference
+        j = (totpath_turncount*circumference) / totpath_maxwavelen;  
+      else
+        ! every houndred turns compensate if something builds up
+        ! take average to 0
+         sumt = 0.0
+         DO j=1, jmax_numb_particl_at_i_th_turn  
+            sumt = sumt + x_coord_incl_co(6,j)
+         enddo
+         
+         sumt = sumt/jmax_numb_particl_at_i_th_turn
+         
+         j = sumt/totpath_maxwavelen;
+         
+         ! print*, "subtract_nrfwavelen: moving average to zero by ",j," wavelengths"
+        
+      endif
+      
+      ! value to subtract
+      totpath_ct_to_subtract = j * totpath_maxwavelen
+      
+      DO j=1, jmax_numb_particl_at_i_th_turn  
+        
+        ! print*, j, " ", x_coord_incl_co(6,j), totpath_ct_to_subtract 
+         x_coord_incl_co(6,j) = x_coord_incl_co(6,j) - totpath_ct_to_subtract 
+        ! print*, "              ", x_coord_incl_co(6,j)
+       
+      enddo
+      
+      totpath_ct_subtracted = totpath_ct_subtracted + totpath_ct_to_subtract
+      
+      totpath_turncount = 0
+      
+    END SUBROUTINE  subtract_nrfwavelen
+
     !=============================================================================
     SUBROUTINE   ffile_and_segm_for_switch
       ! copy a fragment from trrun.f
@@ -2175,8 +2555,9 @@ CONTAINS
       character(name_len) ::      local_name
 
       debug_printing_1: if (ptc_track_debug) then
-         Print *, 'Start subr. <Prepare_Observation_points> max_obs=', max_obs
-         Print *, 'x_coord_co_at_START=', x_coord_co_at_START
+         Print *, 'Start subroutine <Prepare_Observation_points> max_obs=', max_obs
+         Print *, 'Closed orbit:'
+         Print *, '      x_coord_co_at_START=', x_coord_co_at_START
       endif debug_printing_1
       ! Define the number of element at observation point
 
@@ -2232,11 +2613,11 @@ CONTAINS
 
          ENDIF
          if (ptc_track_debug) then
-            Print *, 'i_el ', i_ring_element,' num_obs=', number_obs
-            Print *, ' l_c_code=',length_current_element_c,' l_f90=', &
+            Print *, '      i_el ', i_ring_element,' num_obs=', number_obs
+            Print *, '      l_c_code=',length_current_element_c,' l_f90=', &
                  length_current_element_f90, &
                  ' name_c=', local_name, ' &_f90=', current%MAG%name
-            Print *, 'x_coord_co_temp=', x_coord_co_temp
+            Print *, '      x_coord_co_temp=', x_coord_co_temp
 
          endif
 
@@ -2246,19 +2627,24 @@ CONTAINS
          current=>current%next     ! f90-code bring to the next mode
       ENDDO element_number
 
-      debug_print_2: if (ptc_track_debug) then
-         Print *, 'elem_number_at_observ(i_obs)= ', elem_number_at_observ
-         Print *, 'sum_length_at_observ(i_obs)= ', sum_length_at_observ
-         print_CO_for_el_by_el: IF (element_by_element) THEN
-            Print *, ' === CO at observations x_co_at_all_observ(i_coord,number_obs)='
+
+      if (ptc_track_debug) then
+         Print *, ''
+         Print *, 'Observation points:'
+         Print *, '  Indexes of the observation points ', elem_number_at_observ
+         Print *, '  S of the observation points  ', sum_length_at_observ
+         
+         IF (element_by_element) THEN
+            Print *, ''
+            Print *, 'Closed orbit at observation points'
             DO number_obs=1, max_obs
-               Print *, 'number_obs=', number_obs, &
+               Print *, '      number_obs=', number_obs, &
                     ' elem_numb=', elem_number_at_observ(number_obs), &
                     ' name=', name_el_at_obsrv(number_obs)
                Print *, (x_co_at_all_observ(i_coord,number_obs),i_coord=1,6)
             END DO
-         ENDIF  print_CO_for_el_by_el
-      endif debug_print_2
+         ENDIF 
+      endif
 
     END SUBROUTINE Prepare_Observation_points
     !==============================================================================
@@ -2823,16 +3209,16 @@ CONTAINS
       character(120) msg(2) ! text stings for messages
 
       debug_print_1: if (ptc_track_debug) then
-         print *; print *, "<subr. ptc_track_ini_conditions>:"
-         print *,'  Initialise orbit, emittances and eigenvectors etc.'
+         print * 
+         print *, "Subroutine ptc_track_ini_conditions:"
+         print *, '      Initialise orbit, emittances and eigenvectors etc.'
       end if debug_print_1
       !k      j = 0
       j_particle_line_counter=0 !k
 
       debug_print_2: if (ptc_track_debug) then
-         print *, " j_particle_line_counter =", j_particle_line_counter
-         print *, 'Get values and variables:  '
-         print *, ' twopi  =',  twopi
+         print *, "      j_particle_line_counter =", j_particle_line_counter
+         print *, '      Get values and variables:  '
          print *, ''
       end if debug_print_2
 
@@ -2844,10 +3230,9 @@ CONTAINS
                       fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input)    !
 
       if (ptc_track_debug) then                                          !
-         print *, "The next command line from input file is read."                    ! p
-         print *, "The keyword <ptc_start> provides the following data:"              ! a
-         print *, "j_particle_line_counter=",j_particle_line_counter                  ! r
-         print *, "x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit=", &                    ! t
+         print *, "      <ptc_start> provides the following data:"                    ! a
+         print *, "           j_particle_line_counter=",j_particle_line_counter       ! r
+         print *, "           x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit=", &         ! t
               x_input,px_input,y_input,py_input,t_input,deltae_input, &               ! i
               fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input             ! c
       endif                                                             ! l
@@ -2878,14 +3263,17 @@ CONTAINS
             !                                                                 ! c   t   f
 
             if (getdebug() > 2) then
-               print*, 'X_MAD: ', X_MAD
+               print*, '      X_MAD: ', X_MAD
             endif
             
             ! Very dodgy
             ! add momentum offset defined by 'deltap' to all tracks 
+            !print*, "ptc_track_ini_conditions: mytime=",mytime,", closed_orbit=",closed_orbit
             IF(nvariables.gt.4 .AND. (.NOT.closed_orbit)) THEN !--!            ! h   i   o
                if(mytime) then !----------------------!          !              !
+                  !print*, "ptc_track_ini_conditions: mytime=TRUE, calling Convert_dp_to_dt"
                   call Convert_dp_to_dt (deltap, dt)  !          !              !
+                  !print*, "ptc_track_ini_conditions: deltap=",deltap," -> dt=",dt
                else                                   !          !              !
                   dt=deltap                           !          !              !
                endif !--------------------------------!          !              !
@@ -3125,7 +3513,13 @@ CONTAINS
       IF (nvariables.gt.5) THEN
          X_MAD(5)=X_PTC(6); 
          X_MAD(6)=X_PTC(5);
-         X_MAD(5)=-X_MAD(5) ! reverse sign
+         
+         if ( MYSTATE%TOTALPATH > 0) then
+           X_MAD(5) =  X_PTC(6) + totpath_ct_subtracted
+           !print*,"mad ptc tot_subtracted ",X_MAD(5) , X_PTC(6) ,  totpath_ct_subtracted
+         else
+           X_MAD(5) = -X_PTC(6) ! reverse sign
+         endif
          
       elseif(nvariables.eq.5) THEN
       
@@ -3414,12 +3808,10 @@ CONTAINS
     USE  madx_ptc_module, ONLY: my_ring, get_one, n_rf
     implicit none
     integer i
-    real(dp)  circumference
     real(dp) ::  MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
     Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)        !
 
-    call get_length(my_ring,circumference) 
-    
+    ! n_rf is a variable of PTC that must be set accordingly
     n_rf = nclocks
     
     do i=1,nclocks

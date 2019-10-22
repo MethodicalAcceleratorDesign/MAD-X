@@ -21,16 +21,18 @@ module pointer_lattice
   integer :: kind_ap=2,file_ap=0                      ! Single aperture position and kind of aperture + file unit
   character(nlp) name_ap,namet(2)
   character(255) :: filename_ap = "Tracking.txt"
+  character(255), private :: file_zher,filezhe, name_zhe
+  integer, private :: k_zhe,number_zhe_maps
   integer last_npara 
-  integer :: i_layout=0,i_layout_t=1
+  integer :: i_layout=0,i_layout_t=1,pos_layout=1
   integer my_lost_position
   private thin
   real(dp) thin
   !  BEAM STUFF
   REAL(DP) SIG(6) 
   REAL(DP) ait(6,6)
-
-
+ 
+  logical :: nophase=.false. 
   INTEGER :: N_BEAM=0,USE_BEAM=1
   logical, private :: m_u_t = .true.
   TYPE(REAL_8),private :: Y(6)
@@ -49,7 +51,8 @@ module pointer_lattice
   real(dp), allocatable :: a_f(:),a_f0(:),yfit(:),dyfit(:,:)
   integer sizeind1
   logical :: onefunc = .true.,skipzero=.false.,skipcomplex=.true.
- 
+ type(probe), pointer :: xs0g(:) => null()
+
 
    
   INTERFACE SCRIPT
@@ -58,46 +61,46 @@ module pointer_lattice
 
 !!  new stuff on non-perturbative !
 
-type  vector_field_fourier 
-     real(dp) fix(6)    !   closed orbit of map
-     integer :: ns(3)=0   ! integer for Fourier transform
-     real(dp), pointer :: mr(:,:,:,:,:) =>null()   ! spin matrices produced by code (i,j,k,1:3,1:3)
-     real(dp), pointer ::  x_i(:,:,:,:) =>null()   ! starting position in phase  x_i(i,j,k,1:6)=r%x(1:6)
-     real(dp), pointer :: phis(:,:,:,:) =>null()   ! %phis(i,j,k,2)=j*dphi2
-     type(spinor), pointer :: sp(:,:,:)            ! sp(:i,j,k)   spinor for all the matrices mr  
-     integer n1,n2,n3,nd                           ! # fourier modes -n1:n1, etc... nd=degree of freedom
-     real(dp)  mu(3),muf(3),em(3)                  ! tune and initial emitances
-     complex(dp),  DIMENSION(:,:,:,:), POINTER :: f  !  vector field expansion f(1:3,-n1:n1,-n2:n2,-n3:n3)
-end  type vector_field_fourier
-   type(vector_field_fourier) af
+!type  vector_field_fourier 
+!     real(dp) fix(6)    !   closed orbit of map
+!     integer :: ns(3)=0   ! integer for Fourier transform
+!     real(dp), pointer :: mr(:,:,:,:,:) =>null()   ! spin matrices produced by code (i,j,k,1:3,1:3)
+!     real(dp), pointer ::  x_i(:,:,:,:) =>null()   ! starting position in phase  x_i(i,j,k,1:6)=r%x(1:6)
+!     real(dp), pointer :: phis(:,:,:,:) =>null()   ! %phis(i,j,k,2)=j*dphi2
+!     type(spinor), pointer :: sp(:,:,:)            ! sp(:i,j,k)   spinor for all the matrices mr  
+!     integer n1,n2,n3,nd                           ! # fourier modes -n1:n1, etc... nd=degree of freedom
+!     real(dp)  mu(3),muf(3),em(3)                  ! tune and initial emitances
+!     complex(dp),  DIMENSION(:,:,:,:), POINTER :: f  !  vector field expansion f(1:3,-n1:n1,-n2:n2,-n3:n3)
+!end  type vector_field_fourier
+!   type(vector_field_fourier) af
 
-type  spinor_fourier 
-     integer n1,n2,n3
-     complex(dp),  DIMENSION(:,:,:,:), POINTER :: s
-end  type spinor_fourier 
+!type  spinor_fourier 
+!     integer n1,n2,n3
+!     complex(dp),  DIMENSION(:,:,:,:), POINTER :: s
+!end  type spinor_fourier 
 
-type  matrix_fourier 
-      real(dp) muf(3)
-     type(spinor_fourier) v(3)
-end  type matrix_fourier 
+!type  matrix_fourier 
+!      real(dp) muf(3)
+!     type(spinor_fourier) v(3)
+!end  type matrix_fourier 
 
-  type  explogs  
-     integer n1,n2
-     complex(dp),  DIMENSION(:,:,:), POINTER :: h
-  end  type explogs
+!  type  explogs  
+!     integer n1,n2
+!     complex(dp),  DIMENSION(:,:,:), POINTER :: h
+!  end  type explogs
 
 
-  type  logs 
-     integer  m(3),ms  
-     integer  ns,no
-     type(explogs) h,a,n
-     type(explogs), pointer ::  af(:)
-     real(dp), pointer :: as(:,:,:)
-     type(spinor), pointer :: sp(:,:)
-     real(dp), pointer :: s(:,:,:,:)  !   spin matrices
-     real(dp) em(2),mu(2),fix(6)
-     real(dp), pointer :: x_i(:,:,:),phis(:,:,:)
-  end  type logs
+!  type  logs 
+!     integer  m(3),ms  
+!     integer  ns,no
+!     type(explogs) h,a,n
+!     type(explogs), pointer ::  af(:)
+!     real(dp), pointer :: as(:,:,:)
+!     type(spinor), pointer :: sp(:,:)
+!     real(dp), pointer :: s(:,:,:,:)  !   spin matrices
+!     real(dp) em(2),mu(2),fix(6)
+!     real(dp), pointer :: x_i(:,:,:),phis(:,:,:)
+!  end  type logs
 
 
 contains
@@ -146,6 +149,15 @@ endif
 
   end  subroutine set_lattice_pointers
 
+  subroutine piotr()
+    implicit none
+    TYPE(REAL_8) :: a
+    TYPE(REAL_8) :: b
+    
+    a = b
+    
+  end subroutine piotr
+  
 
   subroutine read_ptc_command(ptc_fichier)
     use madx_ptc_module !etienne , piotr_state=>my_state,piotr_my_ring=>my_ring
@@ -167,7 +179,7 @@ endif
     integer ntune(2)
     ! fitting and scanning tunes
     real(dp) tune_ini(2),tune_fin(2),dtu(2),fint,hgap
-    integer nstep(2),i1,i2,I3,n_bessel
+    integer nstep(2),i1,i2,I3,n_bessel,i11,i22,di12
     LOGICAL(LP) STRAIGHT,skip,fixp,skipcav,fact
     ! end
     ! TRACK 4D NORMALIZED
@@ -198,8 +210,10 @@ endif
     type(fibre),pointer ::p,f1,f2,ft
     ! TRACKING RAYS
     INTEGER IBN,N_name
-    REAL(DP) X(6),DT(3),x_ref(6),sc,NLAM,A1,B1,HPHA,B_TESLA,CUR1,CUR2
-    REAL(DP)VOLT,PHASE
+    REAL(DP) X(6),DT(3),sc,NLAM,A1,B1,HPHA,B_TESLA,CUR1,CUR2
+    REAL(DP)VOLT,PHASE,x_ref(6),x_ref0(6)
+    type(internal_state) state0
+    logical do_state0
     INTEGER HARMONIC_NUMBER
     ! changing magnet
     logical(lp) bend_like
@@ -216,13 +230,13 @@ endif
     REAL(DP) RA(2)
     REAL(DP) XA,YA,DXA,DYA, DC_ac,A_ac,theta_ac,D_ac
     real(dp), allocatable :: an(:),bn(:) !,n_co(:)
-    integer icnmin,icnmax,n_ac,inode !,n_coeff
+    real(dp) d_volt,d_phas
+    integer icnmin,icnmax,n_ac,inode,icavv !,n_coeff
     logical :: longprintt,onemap
 !    logical :: log_estate=.true. 
     integer :: mftune=6,nc
     real(dp), allocatable :: tc(:)
     type(integration_node), pointer  :: t
-
      longprintt=longprint 
      longprint=.true.
 !    if(log_estate) then
@@ -410,11 +424,11 @@ endif
            call context(name)
            orbitname(i1)=name
           enddo
-!       case('SETORBITPHASORFREQUENCY')
-!          read(mf,*) xsm%ac%om
-!          xsm0%ac%om=xsm%ac%om
-!          ptc_node_old=-1
-!          first_particle=my_false
+       case('USER1')
+         call my_user_routine1
+       case('SPINTWISSCAS')
+           read(mf,*) no,noca   !  order and general canonise
+         call SMALL_CODE_TWISS(my_ering,no,noca)
        case('SETORBITPHASORTIME','ORBITTIME')
           read(mf,*) xsmt
           xsm0t=xsmt
@@ -713,6 +727,13 @@ endif
        case("PRINTSTATEONSCREEN")
          CALL print(MY_ESTATE,6)
 
+       case("KILLPROBE","KILLPROBES")
+        deallocate(xs0g)
+        nullify(xs0g)
+       case("READPROBE","READPROBES")
+        read(mf,*) file_zher
+        call  read_ptc_rays(file_zher)
+
        case('BERZ','GERMANIC','MARTIN')
           CALL change_package(2)
        case('YANG','CHINESE','LINGYUN')
@@ -886,6 +907,16 @@ endif
                 TL=>TL%NEXT
              ENDDO
           endif
+       case('E1CAS','E1WM')
+       read(MF,*) sc
+       if(sc/=e1_cas) then
+         write(6,*) "E1 of the wonderful magnet company was ", e1_cas
+         write(6,*) "                     |  "
+         write(6,*) "                     |  "
+         write(6,*) "                    \|/  "
+           e1_cas=sc
+         write(6,*) "E1 of the wonderful magnet company is now ", e1_cas     
+        endif
        case('BEAMBEAM')
           READ(MF,*) SC,pos,patchbb
           read(mf,*) X_ref(1), X_ref(2), X_ref(3), X_ref(4)
@@ -1341,11 +1372,232 @@ endif
       !    if(n_coeff>0) then
       !       deallocate(n_co)
       !    endif
+        case('MODULATERF','ACMAGNETRF')
+          READ(MF,*) NAME , posr
 
+          CALL CONTEXT(NAME)
+          N_NAME=0
+          IF(NAME(1:2)=='NO') THEN
+             READ(MF,*) NAME
+             call context(name)
+             N_NAME=len_trim(name)
+          ENDIF
+          READ(MF,*)  DC_ac,A_ac,theta_ac
+          READ(MF,*)  D_ac,n_ac !,n_coeff
+          i2=0
+          if(n_ac>0) then        !n_ac>0
+             allocate(an(n_ac))
+             allocate(bn(n_ac))
+             an=0.0_dp
+             bn=0.0_dp
+             do while(.true.)
+                read(mf,*) i1,dtu(1:2)
+                if(i1<=0) exit
+                if(i1>i2) i2=i1
+                an(i1)=dtu(2)
+                bn(i1)=dtu(1)
+             enddo
+          else
+              n_ac=1
+              allocate(an(n_ac))
+             allocate(bn(n_ac))
+             an=0.0_dp
+             bn=0.0_dp
+             i2=1             
+          endif                  !n_ac>0
+
+          p=>my_ering%start
+          do ii=1,my_ering%N
+             found_it=MY_FALSE
+             IF(N_NAME==0) THEN
+                found_it=P%MAG%NAME==NAME
+             ELSE
+                found_it=P%MAG%NAME(1:N_NAME)==NAME(1:N_NAME)
+             ENDIF
+
+             IF(FOUND_IT) THEN
+                write(6,*) " slow ac magnet found ",P%MAG%name
+                 if(associated(p%mag%volt)) then
+                    write(6,*) " It is an electric element "
+                else
+                  write(6,*) " Not electric element "
+                  stop
+                endif
+                READ(MF,*) d_volt , d_phas
+                if(.not.associated(P%MAG%DC_ac)) then
+                   allocate(P%MAG%DC_ac)
+                   allocate(P%MAG%A_ac)
+                   allocate(P%MAG%theta_ac)
+                   allocate(P%MAG%D_ac)
+
+                   allocate(P%MAGP%DC_ac)
+                   allocate(P%MAGP%A_ac)
+                   allocate(P%MAGP%theta_ac)
+                   CALL alloc(P%MAGP%DC_ac)
+                   CALL alloc(P%MAGP%A_ac)
+                   CALL alloc(P%MAGP%theta_ac)
+                   allocate(P%MAGp%D_ac)
+                   CALL alloc(P%MAGP%D_ac)
+
+
+
+                   P%MAG%D_ac=D_ac
+                   P%MAG%DC_ac=DC_ac
+                   P%MAG%A_ac=A_ac
+                   P%MAG%theta_ac=theta_ac*twopi
+                   P%MAGP%D_ac=D_ac
+                   P%MAGP%DC_ac=DC_ac
+                   P%MAGP%A_ac=A_ac
+                   P%MAGP%theta_ac=theta_ac*twopi
+                 if(P%MAG%slow_ac/=0) then
+                  write(6,*) P%MAG%name, " already modulated "
+                  stop 180
+                 endif
+                   P%MAG%slow_ac=posr
+                   P%MAGP%slow_ac=posr
+
+                   if(i2>p%mag%p%nmul) then
+                      CALL ADD(P,i2,0,0.0_dp)
+                   endif
+                              
+                   allocate(P%MAG%d_an(p%mag%p%nmul))
+                   allocate(P%MAG%d_bn(p%mag%p%nmul))
+                   allocate(P%MAGp%d_an(p%mag%p%nmul))
+                   allocate(P%MAGp%d_bn(p%mag%p%nmul))
+                   allocate(P%MAG%d0_an(p%mag%p%nmul))
+                   allocate(P%MAG%d0_bn(p%mag%p%nmul))
+                   allocate(P%MAGp%d0_an(p%mag%p%nmul))
+                   allocate(P%MAGp%d0_bn(p%mag%p%nmul))
+
+
+                   P%MAG%d_an=0.0_dp
+                   P%MAG%d_bn=0.0_dp
+
+                   call alloc(P%MAGp%d_an,p%mag%p%nmul)
+                   call alloc(P%MAGp%d_bn,p%mag%p%nmul)
+                   call alloc(P%MAGp%d0_an,p%mag%p%nmul)
+                   call alloc(P%MAGp%d0_bn,p%mag%p%nmul)
+                   do i1=1,p%mag%p%nmul
+                      P%MAG%d0_bn(i1)=P%MAG%bn(i1)
+                      P%MAG%d0_an(i1)=P%MAG%an(i1)
+                      P%MAGp%d0_bn(i1)=P%MAG%bn(i1)
+                      P%MAGp%d0_an(i1)=P%MAG%an(i1)
+                   enddo
+
+                   do i1=1,n_ac
+                      P%MAG%d_an(i1) =an(i1)
+                      P%MAGp%d_an(i1)=an(i1)
+                      P%MAG%d_bn(i1) =bn(i1)
+                      P%MAGp%d_bn(i1)=bn(i1)
+                   enddo
+                                
+                            allocate(P%MAG%D0_Volt)         
+                            allocate(P%MAGp%D0_Volt)
+                            allocate(P%MAG%D_Volt)         
+                            allocate(P%MAGp%D_Volt) 
+                            allocate(P%MAG%D0_phas)         
+                            allocate(P%MAGp%D0_phas)         
+                            allocate(P%MAG%D_phas)         
+                            allocate(P%MAGp%D_phas) 
+         
+                       call alloc(P%MAGp%D0_Volt)             
+                       call alloc(P%MAGp%D_Volt) 
+                       call alloc(P%MAGp%D0_phas)             
+                       call alloc(P%MAGp%D_phas) 
+                       
+             
+                         P%MAG%D0_Volt= P%MAG%Volt
+                         P%MAGp%D0_Volt= P%MAG%Volt
+                         P%MAG%D_Volt= d_volt
+                         P%MAGp%D_Volt= d_volt
+                         P%MAG%D0_phas= P%MAG%phas
+                         P%MAGp%D0_phas= P%MAG%phas
+                         P%MAG%D_phas= d_phas
+                         P%MAGp%D_phas= d_phas
+             
+             
+                else
+                   write(6,*) " already associated --> change code "
+                   stop 166
+                ENDIF
+             ENDIF
+
+
+             p=>p%next
+          enddo
+
+
+          if(n_ac>0) then
+             deallocate(an,bn)
+          endif
+
+      !    if(n_coeff>0) then
+      !       deallocate(n_co)
+      !    endif
+
+       case('MAPSFORZHE')
+          READ(MF,*) i11,I22,number_zhe_maps ,hgap ! position  i1=i2 one turn map,  fact is precision of stochastic kick
+          READ(MF,*) MY_A_NO,do_state0   ! ORDER OF THE MAP  
+          READ(MF,*) filename
+          state0=my_estate-radiation0-envelope0
+          if(do_state0) then
+           do_state0=my_estate%radiation.or.my_estate%envelope
+          endif
+          if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
+          if(i11==i22) i22=i11+my_ering%n
+          di12=float(i22-i11)/number_zhe_maps
+                        do k_zhe=1,number_zhe_maps
+                             write(name_zhe,*) k_zhe
+                           file_zher(1:len_trim(filename))=filename(1:len_trim(filename))
+                           file_zher(1+len_trim(filename):len_trim(filename)+len_trim(name_zhe))=name_zhe(1:len_trim(name_zhe))
+                           call context(file_zher)
+                          write(6,*) "out file ",file_zher(1:len_trim(file_zher))
+           
+          i1=i11+(k_zhe-1)*di12
+          i2=i1+di12
+          if(i2>i22.or.k_zhe==number_zhe_maps) i2=i22
+          write(6,*)" from to ", i1,i2,i22
+!pause 873
+           p=>my_ering%start
+           f1=>p          
+           do ii=2,i1
+            p=>p%next
+             f1=>p
+           enddo
+           if(I2==i1) then
+            f2=>f1
+           else
+            p=>my_ering%start
+            f2=>p 
+            do ii=2,i2
+              p=>p%next
+              f2=>p
+            enddo
+            endif
+             x_ref=0.0_dp
+
+
+if(.not.my_estate%envelope) hgap=-1
+            call FIND_ORBIT_x(x_ref,my_estate,1.d-7,fibre1=f1)
+ if(do_state0)            call FIND_ORBIT_x(x_ref0,state0,1.d-7,fibre1=f1)
+
+ if(do_state0)   then
+              call fill_tree_element_line_zhe0(state0,my_estate,f1,f2,MY_A_NO,x_ref0,x_ref,file_zher,stochprec=hgap) 
+
+ else
+              call fill_tree_element_line_zhe(my_estate,f1,f2,MY_A_NO,x_ref,file_zher,stochprec=hgap) 
+ endif
+
+write(6,*) " State used "
+          call print(my_estate,6)
+write(6,*) " closed orbit at position ",i1
+           write(6,*) x_ref(1:3)
+           write(6,*) x_ref(4:6)
+                  enddo
 
        case('MAPFORZHE')
           READ(MF,*) i1,I2,hgap  ! position  i1=i2 one turn map,  fact is precision of stochastic kick
-          READ(MF,*) MY_A_NO  ! ORDER OF THE MAP
+          READ(MF,*) MY_A_NO   ! ORDER OF THE MAP  
           READ(MF,*) filename
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
           
@@ -1368,9 +1620,11 @@ endif
              x_ref=0.0_dp
 
 
+if(.not.my_estate%envelope) hgap=-1
+ if(my_a_no>0)            call FIND_ORBIT_x(x_ref,my_estate,1.d-7,fibre1=f1)
 
-             call FIND_ORBIT_x(x_ref,my_estate,1.d-7,fibre1=f1)
-              call fill_tree_element_line_zhe(my_estate,f1,f2,MY_A_NO,x_ref,filename,stochprec=hgap) 
+              call fill_tree_element_line_zhe(my_estate,f1,f2,iabs(MY_A_NO),x_ref,filename,stochprec=hgap) 
+
 
 write(6,*) " State used "
           call print(my_estate,6)
@@ -1383,7 +1637,7 @@ write(6,*) " closed orbit at position ",i1
           READ(MF,*) i1,I2,i3  ! position
           READ(MF,*) MY_A_NO  ! ORDER OF THE MAP
           READ(MF,*) fixp,fact,noca  !  SYMPLECTIC , factored
-    !      READ(MF,*) filename
+          READ(MF,*) filename
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
           
            
@@ -1409,9 +1663,22 @@ write(6,*) " closed orbit at position ",i1
              else
                 ft=>my_fring%start       
              endif
+
+if(noca) then
+             call FIND_ORBIT_x(x_ref,time0+nocavity0,1.d-7,fibre1=f1)
+else
              call FIND_ORBIT_x(x_ref,time0,1.d-7,fibre1=f1)
+endif  
+
+             name_root=filename
+             call context(name_root)
+             if(name_root(1:2)=='NO') then
+              call fill_tree_element_line(f1,f2,ft,i2,x_ref,fact,nocav=noca)
+             else
+              call fill_tree_element_line(f1,f2,ft,i2,x_ref,fact,nocav=noca,file=filename)
+             endif
   
-              call fill_tree_element_line(f1,f2,ft,MY_A_NO,x_ref,fact,nocav=noca)
+
 
                     ft%mag%forward(3)%symptrack=FIXP
                     ft%magP%forward(3)%symptrack=FIXP
@@ -1433,7 +1700,7 @@ write(6,*) " closed orbit at position ",i1
           READ(MF,*) i1,i3  ! position
           READ(MF,*) I2  ! ORDER OF THE MAP
           READ(MF,*) fixp,fact,noca  !  SYMPLECTIC , factored
-    !      READ(MF,*) filename
+          READ(MF,*) filename
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
           
            p=>my_ering%start
@@ -1453,14 +1720,20 @@ write(6,*) " closed orbit at position ",i1
              else
                 ft=>my_fring%start       
              endif
+if(noca) then
+             call FIND_ORBIT_x(x_ref,time0+nocavity0,1.d-7,fibre1=f1)
+else
              call FIND_ORBIT_x(x_ref,time0,1.d-7,fibre1=f1)
-         !    name_root=filename
-        !     call context(name_root)
-       !      if(name_root(1:2)=='NO') then
+endif  
+write(6,*) x_ref
+       
+             name_root=filename
+             call context(name_root)
+             if(name_root(1:2)=='NO') then
               call fill_tree_element_line(f1,f2,ft,i2,x_ref,fact,nocav=noca)
-       !      else
-        !      call fill_tree_element_line(f1,f2,ft,i2,x_ref,fact,nocav=noca,file=filename)
-      !       endif
+             else
+              call fill_tree_element_line(f1,f2,ft,i2,x_ref,fact,nocav=noca,file=filename)
+             endif
                     ft%mag%forward(3)%symptrack=FIXP
                     ft%magP%forward(3)%symptrack=FIXP
                     ft%mag%do1mapf=.true.
@@ -1537,6 +1810,7 @@ write(6,*) " closed orbit at position ",i1
           READ(MF,*) skipcav  !  skip cavity 
           icnmin=0
           icnmax=0
+          icavv=0
           x_ref=0.0_DP
            n_ac=0
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
@@ -1567,7 +1841,8 @@ write(6,*) " closed orbit at position ",i1
                     p%mag%BACKward(3)%symptrack=FIXP
                     p%magP%BACKward(3)%symptrack=FIXP
                    ENDIF
-  
+              else
+                icavv=icavv+1
               endif
              else
               icnmin=icnmin+1
@@ -1578,6 +1853,7 @@ write(6,*) " closed orbit at position ",i1
           enddo
          write(6,*) icnmax, " changed into Taylor maps "
          write(6,*) icnmin, " markers "
+         write(6,*) icavv, " cavities left alone "
          write(6,*) my_ering%N, " total number of fibres "
        case('REMOVEALLMAPS')
        READ(MF,*) I1,I2  ! ORDER OF THE MAP
@@ -2536,7 +2812,6 @@ fmd1='(1X,a3,I1,a3,i1,a4,2(D18.11,1x),(f10.3,1x),a2)'
     endif
      if(present(fix)) fix=x
 
-
     call GET_loss(r,energy,deltap)
        if(present(FILE1)) then
     write(mf1,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
@@ -3065,7 +3340,38 @@ endif
  
 
 
-!!!!!!!  stuff for demin  !!!!!!!
+
+
+subroutine read_ptc_rays(filename)
+implicit none
+character(*) filename
+integer mf,nr,i
+type(probe) r0
+real(dp) X(6)
+
+call kanalnummer(mf,filename)
+r0=0
+X=0
+R0=X
+
+read(mf,*) nr,r0%nac
+
+allocate(xs0g(nr))
+
+do i=1,r0%nac
+ read(mf,*) r0%ac(i)%om
+ read(mf,*) r0%ac(i)%x
+enddo
+
+do i=1,nr
+ xs0g(i)=0
+ xs0g(i)=r0
+ read(mf,*) xs0g(i)%x
+enddo
+close(mf)
+
+end subroutine read_ptc_rays
+
 
 
 end module pointer_lattice
@@ -3143,3 +3449,125 @@ subroutine read_mad_command77(ptc_fichier)
 
 end  subroutine read_mad_command77
 
+subroutine my_user_routine1 
+use madx_ptc_module
+!use pointer_lattice
+!use duan_zhe_map, probe_zhe=>probe,tree_element_zhe=>tree_element,dp_zhe=>dp, & 
+!DEFAULT0_zhe=>DEFAULT0,TOTALPATH0_zhe=>TOTALPATH0,TIME0_zhe=>TIME0,ONLY_4d0_zhe=>ONLY_4d0,RADIATION0_zhe=>RADIATION0, &
+!NOCAVITY0_zhe=>NOCAVITY0,FRINGE0_zhe=>FRINGE0,STOCHASTIC0_zhe=>STOCHASTIC0,ENVELOPE0_zhe=>ENVELOPE0, &
+!DELTA0_zhe=>DELTA0,SPIN0_zhe=>SPIN0,MODULATION0_zhe=>MODULATION0,only_2d0_zhe=>only_2d0 , &
+!INTERNAL_STATE_zhe=>INTERNAL_STATE
+implicit none
+ 
+type(layout),pointer :: fodo
+type(c_normal_form) normal_form
+integer pos,no,np,mf,i
+real(dp) closed_orbit(6)
+type(probe) xs0
+type(probe_8) xs
+type(c_damap) id,one_turn_map,a_cs,a0,a1,a2,a
+type(c_taylor) x2div2,x2div2_f,phase(3),phase_one_turn_map(3)
+type(internal_state) state
+type(fibre), pointer :: f
+
+
+
+ 
+!!!! reading the flat file produced by MAD-X
+!call ptc_ini_no_append
+call read_lattice_append(M_U,"../../files_for_cas/guido_fodo/flat.txt")
+!call read_lattice_append(M_U,"C:\msys64\home\Etienne\MAD-X\files_for_cas\guido_fodo\flat.txt")
+!call read_lattice_append(M_U,"guido_fodo_ubuntu.txt")
+fodo=>m_u%end
+
+
+call in_bmad_units   ! units similar to MAD-X
+ 
+
+! finds the closed orbit at position 1 (should be (0,0,0,0,0,0))
+pos=1
+closed_orbit=0.d0;  
+                                                
+call find_orbit_x(fodo,closed_orbit(1:6),STATE,1.e-8_dp,fibre1=pos)  
+ 
+state=nocavity   ! state that produces map with delta dependence
+no=3
+np=0
+call init_all(state,no,np)
+ 
+
+!   create these TPSA objects
+call alloc(id,one_turn_map,a_cs,a0,a1,a2,a)
+call alloc(xs)
+call alloc(normal_form)
+call alloc(x2div2,x2div2_f)
+call alloc(phase)
+call alloc(phase_one_turn_map)
+
+xs0=closed_orbit   ! xs0 contains orbit and spin 
+id=1   !    identity map
+xs=id+xs0   !  xs is a probe_8 which can become a Taylor series
+ 
+ 
+call propagate(fodo,xs,state,fibre1=pos) ! computes one turn map around closed orbit
+ 
+one_turn_map=xs
+ 
+ 
+call c_normal(one_turn_map,normal_form,phase=phase_one_turn_map)  ! one_turn_map= normal_form%atot o  rotation o  normal_form%atot^-1
+ 
+call c_canonise(normal_form%atot,a_cs,a0,a1,a2) 
+
+xs =  a_cs +xs0
+
+call kanalnummer(mf,"twiss_from_guido.txt")
+
+phase=0.0_dp
+x2div2=2.0_dp*(1.0_dp.cmono.1)**2
+call C_AVERAGE(x2div2,a1,x2div2_f)  
+
+write(mf,*) " Phase advance in x "
+call clean(phase,phase,prec=1.d-10)
+call print(phase(1),mf)
+write(mf,*) " Beginning of lattice "
+call print(x2div2_f,mf)
+
+f=>fodo%start
+do i=1,fodo%n
+ call propagate(fodo,xs,state,fibre1=i,fibre2=i+1)
+
+write(mf,*) " end of Magnet ",f%mag%name
+
+ a=xs  ! creates tracked canonical transformation
+ xs0=xs
+call c_canonise(a,a_cs,a0,a1,a2,phase) ;call clean(a1,a1,prec=1.d-10);
+ 
+call C_AVERAGE(x2div2,a1,x2div2_f)  
+
+write(mf,*) " Phase advance in x "
+call clean(phase,phase,prec=1.d-10)
+call print(phase(1),mf)
+write(mf,*) " 2(x^2> ~ beta"
+call print(x2div2_f,mf)
+
+xs=xs0+a_cs
+
+f=>f%next
+enddo
+
+
+write(mf,*) " Tune in x from one turn map"
+call clean(phase_one_turn_map,phase_one_turn_map,prec=1.d-10)
+call print(phase_one_turn_map(1),mf)
+
+close(mf)
+
+call kill(id,one_turn_map,a_cs,a0,a1,a2,a)
+call kill(xs)
+call kill(normal_form)
+call kill(x2div2,x2div2_f)
+call kill(phase)
+call kill(phase_one_turn_map)
+
+
+end  subroutine my_user_routine1

@@ -1,0 +1,23 @@
+option, -debug, -echo, -info;
+
+title, "thick-rbend tracking test";
+
+lmb := 1.;
+amb := 0.1;
+
+mb1: rbend, l:=lmb, angle:=amb;
+
+myseq: sequence, l=1.1, refer=centre;
+mb1, at= 1.1/2;
+endsequence;
+
+beam,energy=1000;
+use, sequence=myseq;
+
+track, onepass, dump;
+start, x=0, px=0, y=1e-6, py=0, t=0, pt=-1e-2;
+start, x=0, px=0, y=1e-6, py=0, t=0, pt=0;
+start, x=0, px=0, y=1e-6, py=0, t=0, pt=1e-2;
+run, turns=1;
+endtrack;
+stop;
