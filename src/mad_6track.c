@@ -1178,7 +1178,7 @@ create_aperture(const char* name, const char* type, double ap1, double ap2, doub
   aper_element->value[5] = ap4 * 1e3;
   aper_element->value[6] = offx * 1e3;
   aper_element->value[7] = offy * 1e3;
-  aper_element->value[8] = tilt / M_PI * 180; // sixtrack units are degrees
+  aper_element->value[8] = tilt / M_PI * 180 ; // sixtrack units are degrees
 
   if (aper_element->value[1] == 7) // Octagon
   {
@@ -1278,6 +1278,7 @@ convert_madx_to_c6t(struct node* p)
     strcpy(c6t_elem->org_name,t_name);
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
     c6t_elem->value[6] = el_par_value_recurse("tilt",p->p_elem);
+    c6t_elem->value[10] = el_par_value_recurse("angle",p->p_elem);
     c6t_elem->value[11] = el_par_value_recurse("lrad",p->p_elem);
     for (i=0; i<j; i++)
     {
@@ -1595,11 +1596,7 @@ convert_madx_to_c6t(struct node* p)
 
       if ((aper_param = return_param_recurse("aper_tilt", p->p_elem)))
       {
-        if (aper_param->expr_list != NULL)
-          update_vector(aper_param->expr_list, aper_param->double_array);
-        j = 1;
-        if (aper_param->double_array->curr == 1)
-          tag_aperture.value[7] = aper_param->double_array->a[0];
+        tag_aperture.value[7] = el_par_value("aper_tilt", p->p_elem);
       }
     }
 
@@ -2414,6 +2411,7 @@ pro_elem(struct node* cnode)
   current_element->position = cnode->position;
 
   /* errors in MADX are stored in the same way as c6t */
+
   if (cnode->p_fd_err) {
     field_cnt++;
     current_element->nf_err = cnode->p_fd_err->curr;
@@ -2426,6 +2424,21 @@ pro_elem(struct node* cnode)
     current_element->mult_order = i-12;
     current_element->ref_radius = ref_def;
     get_error_refs(current_element);
+  }
+  else if(cnode->p_fd_err==NULL && (strcmp(cnode->base_name, "multipole") == 0) && el_par_value("angle",cnode->p_elem)!=0){
+      double knl_tmp [FIELD_MAX];
+      element_vector(cnode->p_elem, "knl", knl_tmp);
+      //printf("angggleee", knl[0],  )
+      if(fabs(knl_tmp[0] - el_par_value("angle",cnode->p_elem))>1e-7){
+        field_cnt++;
+        current_element->nf_err = 1;
+        current_element->p_fd_err = make_obj("FDDUM",0,FIELD_MAX,0,0);
+        current_element->p_fd_err->c_dble = 1;
+        current_element->p_fd_err->a_dble[0]=-999; //maybe 0 works to be seen.. .
+        current_element->mult_order = 0;
+        current_element->ref_radius = ref_def;
+        get_error_refs(current_element);
+      } 
   }
 
   if (cnode->p_al_err) {
@@ -3002,6 +3015,15 @@ write_f16_errors(void)
       fprintf(f16,"%s\n", current_element->equiv->name);
       for (i = 0; i < current_element->nf_err; i++)
         tmp_buff[i] = current_element->p_fd_err->a_dble[i];
+
+      if(fabs(current_element->value[10])>0){
+
+      if(tmp_buff[0]==999)
+        tmp_buff[0] = -(current_element->value[12] - current_element->value[10]); // SixTrack is opposite from MAD-X -> Change of sign compared to TWISS
+      else
+        tmp_buff[0] = tmp_buff[0] - (current_element->value[12] - current_element->value[10]);
+      }
+
       for (i = current_element->nf_err; i < FIELD_MAX; i++)
         tmp_buff[i] = zero;
       factor = c1p3 / current_element->ref_delta;

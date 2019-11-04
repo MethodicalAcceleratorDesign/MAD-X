@@ -334,6 +334,10 @@ CONTAINS
       if (modulationtype == 1) then
         V=zero
         DV=el%D_ac*XS%AC(n)%X(2)
+        
+        print*,"skowron: ac modp ",el%name," clock no ",n
+        call print(DV,6)
+        
       else
         DV=(XS%AC(n)%X(1)*COS(ELP%theta_ac)-XS%AC(n)%X(2)*SIN(ELP%theta_ac))
         V=ELP%DC_ac+ELP%A_ac*DV
@@ -344,7 +348,8 @@ CONTAINS
       V=0.0_dp
       DV=0.0_dp
     endif
- 
+    
+    
     CALL transfer_ANBN(EL,ELP,VP=V,DVP=DV)
 
     CALL KILL(V)

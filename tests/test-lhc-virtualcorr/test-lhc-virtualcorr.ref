@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.08.19 13:40:18      +
+  + Execution date: 2019.09.30 09:17:22      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Links definitions
 
@@ -19,7 +19,7 @@ option, warn,info;
 
 !System,"rm -r output";
 
-!System,"mkdir -p temp";
+System,"mkdir -p temp";
 
 System,"mkdir -p output";
 
@@ -352,8 +352,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "19/08/19"
-@ TIME             %08s "13.40.23"
+@ DATE             %08s "30/09/19"
+@ TIME             %08s "09.17.28"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP5"                      6664.568433        11.00260699        11.00650363     0.002850892684    0.0007548514235    0.0004950767763   -2.680921442e-05        15.59181943        14.29786066
@@ -432,8 +432,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "19/08/19"
-@ TIME             %08s "13.40.24"
+@ DATE             %08s "30/09/19"
+@ TIME             %08s "09.17.29"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP1"                                0        11.00474119        11.00406663    -0.003641817309   -0.0006151400488    0.0005597189687   -2.942489079e-05                  0                  0

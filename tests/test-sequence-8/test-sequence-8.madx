@@ -1,6 +1,6 @@
 ! try to keep expressions for strengths and positions when saving a sequence
  option, echo, info, warn;
-
+option, keep_exp_move;
  mq: quadrupole, l=0;
  kq1 = 0.1; mq1:   mq, k1:=kq1;
  kq2 = 0.2; mq2:   mq, k1:=kq2;

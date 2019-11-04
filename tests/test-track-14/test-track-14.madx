@@ -1,0 +1,75 @@
+circum=120.;
+lcell=20.;
+f=lcell/sin(pi/5)/4;
+k=1.0/f;
+value, f;
+beam, particle=proton, energy = 20;
+angle = 2*pi/6;
+
+qfstart_a: multipole, knl={0,0,0,1,0},  lrad=0.0;
+
+
+qfstart2: multipole, knl={0.3, 0.5, 0.4}, lrad=1;
+
+qf: multipole, knl={0, k};
+qd: multipole, knl={0, -k};
+dip: multipole, knl={0.00001,0,0.0000}, lrad=3;
+hkick: HKICKER,L=real, KICK=0.00012, TILT=real;
+vkick: VKICKER,L=real, KICK=0.00133, TILT=real;
+rfcav: RFCAVITY, VOLT=0.1, LAG=0.0, L =0.0, HARMON=100;
+ip5: marker;
+
+
+seq: sequence, refer=center, l=circum;
+!qfstart_b: qfstart_b, at = 2.5 ;
+qfstart2, at=2.555;
+ip5, at = 2.555;
+qd: qd, at = 0.5 * lcell;
+qf: qf, at = 1.0 * lcell;
+qd: qd, at = 1.5 * lcell;
+qf: qf, at = 2.0 * lcell;
+qd: qd, at = 2.5 * lcell;
+hkick, at = 2.51 * lcell;
+vkick, at = 2.52 * lcell;
+qf: qf, at =  3*lcell;
+rfcav:rfcav, at = 3.001*lcell;
+qd: qd, at = 0.5 * lcell+3*lcell;
+qf: qf, at = 1.0 * lcell+3*lcell;
+qd: qd, at = 1.5 * lcell+3*lcell;
+qf: qf, at = 2.0 * lcell+3*lcell;
+qd: qd, at = 2.5 * lcell+3*lcell;
+endsequence;
+use, sequence=seq;
+
+
+
+xin = 0.001;
+yin = 0.001;
+
+
+select, flag=twiss, column=name, s, x,px, y,py, betx, bety;
+twiss, file="no_cf.twiss", betx=1, bety=1, x=xin, y =yin;
+
+
+
+TRACK, FILE="no_cf.dat",ONEPASS=true;
+START, X=xin, Y=yin;
+OBSERVE, PLACE=ip5;
+RUN, TURNS=1;
+ENDTRACK;
+
+option, thin_cf;
+twiss, file="cf.twiss", betx=1, bety=1, x=xin, y =yin;
+
+
+TRACK, DELTAP=0,FILE="cf.dat",ONEPASS=true;
+START, X=xin, Y=yin, pt=ptin;
+OBSERVE, PLACE=ip5;
+RUN, TURNS=1;
+ENDTRACK;
+
+
+
+
+stop;
+

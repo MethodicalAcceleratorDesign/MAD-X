@@ -2,7 +2,7 @@
 #define MAD_ELEM_H
 
 // types
-enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon, custom};
+enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon, custom, notdefined, custom_inter};
 enum track_enums{non_existing, enum_other_bv, enum_lrad, enum_noise, enum_angle, enum_time_var};
 struct node;
 struct name_list;
@@ -37,6 +37,7 @@ struct aperture
   double *xlist;
   double *ylist;
   int length;
+  int custom_inter;
 };
 struct multipole
 {
@@ -93,6 +94,8 @@ void    add_to_el_list(struct element**, int inf, struct el_list*, int flag);
 void    grow_el_list(struct el_list*);
 
 void    set_aperture_element(struct element *el, struct command* def);
+int     is_custom_set(void);
+void    update_node_aperture(void);
 // used by mad_mkthin.c
 struct command_parameter* return_param(const char* par, const struct element*);
 struct command_parameter* return_param_recurse(const char* par, const struct element*);

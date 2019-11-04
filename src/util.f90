@@ -116,7 +116,7 @@ end module code_constfi
 module aperture_enums
   implicit none
   public
-  integer, parameter :: ap_notset = -1
+ 
   integer, parameter :: ap_circle = 0
   integer, parameter :: ap_ellipse = 1
   integer, parameter :: ap_rectangle = 2
@@ -126,7 +126,8 @@ module aperture_enums
   integer, parameter :: ap_racetrack = 6
   integer, parameter :: ap_octagon = 7
   integer, parameter :: ap_custom = 8
-
+  integer, parameter :: ap_notset = 9
+  integer, parameter :: ap_custom_inter = 10
 end module aperture_enums
 module track_enums
   implicit none
@@ -504,7 +505,7 @@ module trackfi
   double precision, save :: arad=0.d0, betas=0.d0, beti=0.d0, gammas=0.d0, dtbyds=0.d0
   double precision, save :: bet0=0.d0, bet0i=0.d0
   double precision :: deltas=0.d0, t_max=1.d20, pt_max=1.d20
-  logical :: radiate=.false., damp=.false., quantum=.false., fsecarb=.false.
+  logical :: radiate=.false., damp=.false., quantum=.false., fsecarb=.false., thin_cf=.false.
 end module trackfi
 
 module time_varfi
@@ -579,7 +580,7 @@ module plotfi
   integer, parameter :: mntmax = 20, mksmax = 10
   integer, parameter :: mplred = 46, mplout = 47
 
-  integer, parameter :: maxseql = 50000, mtwcol = 46, mpparm = 10
+  integer, parameter :: maxseql = 150000, mtwcol = 46, mpparm = 10
   integer, parameter :: mxcurv = 10, mopt = 60, mfile = 120, marg = 60
   integer, parameter :: maxarg = 1000, mxdp = 25, mxplot = 100
 
