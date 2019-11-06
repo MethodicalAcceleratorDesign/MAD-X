@@ -2111,6 +2111,9 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   !---- Kick at dipole corrector magnet
   !     including PT-dependence
+  if(el.gt.zero) then
+    call ttdrf(el/two,track,ktrack); !Tracks to the middle
+  endif
   do i = 1, ktrack
      px = track(2,i)
      py = track(4,i)
@@ -2147,7 +2150,9 @@ subroutine ttcorr(el,track,ktrack,turn, code)
      !        ((one + bet0*track(6,i))/ddd)*bet0i
 
   enddo
-
+  if(el .gt. zero) then
+    call ttdrf(el/two,track,ktrack); !Tracks from the middle to the
+  endif
   !---- Half radiation effects at exit.
   !     If not random, use same RFAC as at entrance.
   if (radiate  .and.  el .ne. 0) then

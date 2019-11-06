@@ -656,9 +656,9 @@ make_sequ_from_line(char* name)
   current_sequ->start->previous = current_sequ->end;
   current_sequ->end->next = current_sequ->start;
   
-  /*current_sequ->line = 1; /* remember origin of sequence */
+  /*current_sequ->line = 1;  remember origin of sequence */
   //printf("skowron: warning make_sequ_from_line line=0 \n");
-  current_sequ->line = 0; /* remember origin of sequence */
+  current_sequ->line = 0; // remember origin of sequence 
 
   if(line_buffer) delete_char_p_array(line_buffer,1);
 }
