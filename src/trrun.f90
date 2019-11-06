@@ -5005,6 +5005,10 @@ subroutine tttdipole(track, ktrack, code)
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
+  if (k0.eq.zero .and. k1.eq.zero) then
+     call ttdrf(length,track,ktrack);
+     return
+  endif
   !---- Apply entrance dipole edge effect
   if (node_value('kill_ent_fringe ') .eq. zero) &
        call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, zero)
