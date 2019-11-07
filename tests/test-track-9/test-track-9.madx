@@ -41,7 +41,7 @@ tr$macro(turn): macro = {
     print, text="Number turn";
 }
 
-track, onepass, update, dump;
+track, onepass, update, dump, onetable, only_average;
 start, x=1e-6, px=0, y=1e-6, py=0, t=-0.25;
 start, x=1e-6, px=0, y=1e-6, py=0, t=-1.0;
 start, x=1e-6, px=0, y=1e-6, py=0, t=-1.75;

@@ -1317,6 +1317,7 @@ const char *const_command_def =
 "recloss  = [l, false, true], "
 "keeptrack= [l, false, true], "
 "file     = [s, track, track], "
+"only_average = [l, false, true], "
 "extension= [s, none, none]; "
 " "
 "dynap: track track 0 0 "
