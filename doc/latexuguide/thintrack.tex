@@ -85,7 +85,7 @@ xxxxxxx\= \kill
 TRACK, \>DELTAP=real, ONEPASS=logical, DAMP=logical; \\
       \>QUANTUM=logical, SEED=real, UPDATE=logical, \\
       \>ONETABLE=logical, RECLOSS=logical, FILE=filename, \\
-      \>APERTURE=logical; \\
+      \>APERTURE=logical,ONLY\_AVERAGE=logical; \\
 xxxx\=xxxxxxx\= \kill
   \>\ldots \\
   \>START, X=real, PX=real, Y=real, PY=real, T=real, PT=real;  \\
@@ -131,7 +131,9 @@ Hence filenames look like \texttt{track.obs0001.p0001}.
 Tracking creates a number of internal tables and can create files on disk: 
 \texttt{TRACKSUMM, TRACKLOSS}, and \texttt{TRACKONE} or
 \texttt{TRACK.OBS\$\$\$\$.P\$\$\$\$} (depending on the attribute
-\texttt{ONETABLE} of the \texttt{RUN} command).
+\texttt{ONETABLE} of the \texttt{RUN} command)
+\texttt{ONLY\_AVERAGE} when used with ONETABLE it will only output
+the average of all the particles. 
 
 These internal tables can be accessed via the
 \hyperref[chap:tables]{\texttt{TABLE}}-access functions.
