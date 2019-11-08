@@ -1315,10 +1315,15 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
     if (ipos2 >= 0)
     {
       sequence* thick_sequ = sequences->sequs[ipos2];
-      sequence* sliced_seq = sliced_seqlist.slice_sequence(slice_style,thick_sequ,LastSequenceSliced,LastStyle); // slice the sequence
-      disable_line(sliced_seq->name, line_list);
-      sliced_seq->start->previous = sliced_seq->end;
-      LastSequenceSliced=thick_sequ->name;
+      if(thick_sequ->ref_flag!=0){
+        warning("REFER in lattice must be set to CENTER, MAKETHIN:", "ignored");
+      }
+      else{
+        sequence* sliced_seq = sliced_seqlist.slice_sequence(slice_style,thick_sequ,LastSequenceSliced,LastStyle); // slice the sequence
+        disable_line(sliced_seq->name, line_list);
+        sliced_seq->start->previous = sliced_seq->end;
+        LastSequenceSliced=thick_sequ->name;
+      }
     }
     else warning("unknown sequence ignored:", name);
   }
