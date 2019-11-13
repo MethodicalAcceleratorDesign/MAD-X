@@ -59,7 +59,7 @@
         if (strategy .ge. 1) then
 !          calls=0
           call jacob(mtfcn,ncon,nvar,strategy,calls,call_lim,           &
-     &vect,fun_vec,tol,                                                 &
+     &vect,dvect,fun_vec,tol,                                                 &
      &w_ifjac,w_iwa4,                                                   &
      &xstart,xold,cool,balance,random,bisec,cond,match_mode)
         endif
@@ -68,7 +68,7 @@
 
 
       subroutine jacob(fcn,m,n,strategy,calls,call_lim,                 &
-     &x,fvec,epsfcn,                                                    &
+     &x,dvect,fvec,epsfcn,                                                    &
      &fjac,wa4,                                                         &
      &xstart,xold,cool,balance,random,bisec,cond,match_mode)
 
@@ -104,7 +104,7 @@
       double precision ftol,gtol
       double precision dxnorm,xnorm,dx(n),fmin_start,fmin_old2
       double precision vdot
-      double precision xtol,x(n),xstart(n),xold(n),fvec(m)
+      double precision xtol,x(n),xstart(n),xold(n),fvec(m), dvect(n)
       double precision xopt(n),xbest(n),fminbest,condnum
       double precision fjac(m,n),wa4(m),zero,one,two
       double precision epsil,epsmch,cool,balance,random
@@ -188,7 +188,7 @@
       ireset=0
 
 !---- Calculate the jacobian
-      call fdjac2(fcn,m,n,x,fvec,fjac,m,iflag,xtol,wa4)
+      call fdjac2(fcn,m,n,x,fvec,fjac,m,iflag,xtol,wa4, dvect)
 
       if (strategy.eq.2) then
 !        call DGESDD('A',M,N,fjac,M,SV,U,M,VT,N,                         &

@@ -1039,7 +1039,7 @@ next_vary(char* name, int* name_l, double* lower, double* upper, double* step, i
   strfcpy(name, v_name, *name_l);
   *lower = command_par_value("lower", comm);
   *upper = command_par_value("upper", comm);
-  if ((l_step = command_par_value("step", comm)) < ten_m_12) l_step = ten_m_12;
+  if ((l_step = command_par_value("step", comm)) < ten_m_12) l_step = 1e-8;
   *step = l_step;
   *slope = command_par_value("slope", comm);
   *opt = command_par_value("opt", comm);

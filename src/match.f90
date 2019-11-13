@@ -276,14 +276,14 @@
       ipvt(:) = 0
       call mtgeti(vect,dvect)
       call lmdif(mtfcn,ncon,nvar,calls,call_lim,vect,fun_vec,tol,diag,  &
-     &one,w_ifjac,ncon,ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,xold)
+     &one,w_ifjac,ncon,ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,xold, dvect)
       do i=1,nvar
          w_ipvt(i)=ipvt(i)
       enddo
  9999 end
 
       subroutine lmdif(fcn,m,n,calls,call_lim,x,fvec,epsfcn,diag,factor,&
-     &fjac,ldfjac,ipvt,qtf,wa1,wa2,wa3,wa4,xold)
+     &fjac,ldfjac,ipvt,qtf,wa1,wa2,wa3,wa4,xold, dvect)
 
       use matchfi
       implicit none
@@ -373,6 +373,8 @@
 !       WA1, WA2, and WA3 are work arrays of length N.                 *
 !                                                                      *
 !       WA4 is a work array of length M.                               *
+!                                                                      *
+!       DVECT is the vectors with the step sizes                       *
 ! Source:                                                              *
 !   Argonne National Laboratory. MINPACK Project. March 1980.          *
 !   Burton S. Garbow, Kenneth E. Hillstrom, Jorge J. More.             *
@@ -383,8 +385,8 @@
       double precision fmin_old,actred,delta,dirder,epsfcn,factor,fnorm,&
      &fnorm1,ftol,gnorm,gtol,par,pnorm,prered,ratio,sum,temp,temp1,     &
      &temp2,vmod,xnorm,xtol,x(n),xold(n),fvec(m),diag(n),fjac(ldfjac,n),&
-     &qtf(n),wa1(n),wa2(n),wa3(n),wa4(m),zero,one,two,p1,p25,p5,p75,p90,&
-     &p0001,epsil,epsmch
+     &qtf(n),wa1(n),wa2(n),wa3(n),wa4(m),dvect(n),p1,p25,p5,p75,p90,    &
+     &p0001,epsil,epsmch,zero,one,two
       parameter(zero=0d0,one=1d0,two=2d0,p1=0.1d0,p5=0.5d0,p25=0.25d0,  &
      &p75=0.75d0,p90=0.9d0,p0001=0.0001d0,epsil=1d-8,epsmch=1d-16)
       external fcn, mtcond
@@ -435,7 +437,7 @@
 !      write(*,*) 'outer ',calls,fmin,fmin_old
 
 !---- Calculate the Jacobian matrix.
-      call fdjac2(fcn,m,n,x,fvec,fjac,ldfjac,iflag,xtol,wa4)
+      call fdjac2(fcn,m,n,x,fvec,fjac,ldfjac,iflag,xtol,wa4, dvect)
       calls = calls + n
       if (iflag .ne. 0) then
         info = - 1
@@ -656,7 +658,7 @@
   831 format('Initial Penalty Function = ',e16.8,//)
   830 format('call:',I8,3x,'Penalty function = ',e16.8)
       end
-      subroutine fdjac2(fcn,m,n,x,fvec,fjac,ldfjac,iflag,epsfcn,wa)
+      subroutine fdjac2(fcn,m,n,x,fvec,fjac,ldfjac,iflag,epsfcn,wa,dvect)
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -713,16 +715,18 @@
 !   Burton S. Garbow, Kenneth E. Hillstrom, Jorge J. More.             *
 !----------------------------------------------------------------------*
       integer i,iflag,j,ldfjac,m,n
-      double precision eps,epsfcn,fjac(ldfjac,n),fvec(m),h,temp,wa(m),  &
+      double precision eps,epsfcn,fjac(ldfjac,n),fvec(m),h,temp,wa(m),dvect(n), &
      &x(n),zero,epsmch
       parameter(zero=0d0,epsmch=1d-16)
       external fcn
 
-      eps = sqrt(max(epsfcn,epsmch))
+      
+      
       iflag = 0
 
       do j = 1, n
         temp = x(j)
+        eps = sqrt(max(dvect(j),epsmch))
         h = eps*abs(temp)
         if (h .eq. zero) h = eps
         x(j) = temp + h
