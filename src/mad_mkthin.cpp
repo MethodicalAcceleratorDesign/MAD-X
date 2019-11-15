@@ -2674,7 +2674,7 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
     if (theSeqElList.current_node() == thick_sequ->end)
     {
       break;
-    }
+    } 
     if(theSeqElList.current_node()->p_elem!=nullptr){
       if(strcmp(theSeqElList.current_node()->p_elem->base_type->name, "rfcavity")==0 &&
         find_element(theSeqElList.current_node()->p_elem->name, sliced_seq->cavities) == nullptr){
