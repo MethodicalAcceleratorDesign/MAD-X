@@ -3560,7 +3560,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
 
            !---- Radiation loss at entrance (step.eq.1) and exit (step.eq.3)
            if ((step.eq.1).or.(step.eq.3)) then
-              if (radiate) then
+              if (radiate .and. elrad .gt. zero) then
                  !---- Full damping.
                  if (damp) then
                     curv = sqrt(dxt(i)**2 + dyt(i)**2) / elrad;
@@ -3630,7 +3630,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
               dyt(i) = pyf_ - track(4,i);
 
               if ((step.eq.1).or.(step.eq.3)) then
-                 if (radiate) then
+                 if (radiate .and. elrad .gt. zero) then
                     !---- Full damping.
                     if (damp) then
                        curv = sqrt(dxt(i)**2 + dyt(i)**2) / length;
