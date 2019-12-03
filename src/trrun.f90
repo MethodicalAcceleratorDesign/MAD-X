@@ -901,7 +901,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
 
     case (code_multipole)
       if(thin_cf .and. node_value('lrad ') .gt. zero ) then
-        call ttmult_cf(track,ktrack,dxt,dyt,turn,thin_foc)
+        call ttmult_cf_mini(track,ktrack,dxt,dyt,turn,thin_foc)
       else
         call ttmult(track,ktrack,dxt,dyt,turn,thin_foc)
       endif
@@ -990,6 +990,122 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   return
 end subroutine ttmap
 
+SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
+  use twtrrfi
+  use twissbeamfi, only : deltap, beta
+  use math_constfi, only : zero, one, two, three
+  use time_varfi
+  use trackfi
+  use time_varfi
+  use track_enums
+
+  implicit none 
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Computes thin-lens kick through combined-function magnet.        *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !     Detailed description:                                            *
+  !     Phys. Rev. AccelBeams 19.054002 by M. Titze
+  !----------------------------------------------------------------------*
+  double precision :: track(6,*), dxt(*), dyt(*), ttt
+  logical ::  time_var,thin_foc
+  integer :: ktrack, turn
+  logical :: fsec, ftrk, fmap
+  integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
+  integer, external :: Factorial
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
+  double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle, tilt2
+  double precision :: gstr, sstr, x, px0, y, py0, orb50, orb60, deltapp
+  double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
+  !double precision :: orbit(6),
+  double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
+                    dxx, dxy, dyy, rp, rm
+  double complex :: lambda(0:maxmul)
+  double complex :: g(0:maxmul, 0:maxmul)
+
+  double precision, external :: node_value, get_tt_attrib, get_value
+  integer, external :: node_fd_errors
+  fmap = .true.
+  ! Read magnetic field components & fill lambda's according to field
+  ! components relative to given plane
+  F_ERRORS(0:maxferr) = zero
+  n_ferr = node_fd_errors(f_errors)
+
+  bvk = get_tt_attrib(enum_other_bv)
+    !---- Multipole length for radiation.
+  elrad = get_tt_attrib(enum_lrad)
+  an = get_tt_attrib(enum_angle)
+  time_var = get_tt_attrib(enum_time_var) .ne. 0  
+  
+  !dbr = bvk * f_errors(0) !field(1,0)
+  !dbi = bvk * f_errors(1) !field(2,0)
+
+  !---- Nominal dipole strength.
+  !      dipr = bvk * vals(1,0) / (one + deltas)
+  !      dipi = bvk * vals(2,0) / (one + deltas)
+
+  bet0   = get_value('probe ','beta ')
+  !---- Multipole components.
+  NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
+  SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
+
+  call get_tt_multipoles(nn,normal,ns,skew)
+
+  dipr = bvk * normal(0) !vals(1,0)
+  dipi = bvk * skew(0)  
+
+  !!print *, "ggggg_old", gstr, sstr
+     ! cf magnet with quadrupole & sextupole
+     gstr = normal(1)/elrad
+     sstr = normal(2)/elrad
+     !print *, "uuuu", gstr, sstr, dipr, dipi
+    do jtrk = 1,ktrack
+       x = track(1,jtrk)
+       px0 = track(2,jtrk)
+       y = track(3,jtrk)
+       py0 = track(4,jtrk)
+       orb50 = track(5,jtrk)
+       orb60 = track(6,jtrk)
+
+       ! get \Delta p/p + 1 (which we denote by the variable
+       ! deltapp here) out of orbit(6), for the corresponding
+       ! particle
+       deltapp = bet0i*sqrt((1d0 + bet0*orb60)**2 - 1 + bet0**2)
+       
+       !deltapp = 0 !HASSSSSSSSSSSSSSSST TOB CHANGE 
+       ! orbit transformation:
+       ! attention: The following formulas constitute only the kick part
+       ! of the CF in a drift-kick-drift decomposition.
+       track(2, jtrk) = (elrad**2*(-gstr*x - 0.5*x**2*sstr +&
+     &0.5*y**2*sstr) + elrad*px0 +&
+     &elrad*(dipi*y**3*sstr/6.0d0 - dipr*gstr*x**2 +&
+     &0.5*dipr*gstr*y**2 - 0.5*dipr*x**3*sstr + dipr*x*y**2*sstr +&
+     &dipr*deltapp - dipr) -&
+     &dipr*(-dipi*gstr*y**3/6.0d0 + dipi*y +&
+     &dipr*x))/elrad
+
+       track(4, jtrk) = (elrad**2*y*(gstr + x*sstr) + elrad*py0 +&
+     &elrad*(0.5*dipi*gstr*y**2 + 0.5*dipi*x*y**2*sstr + dipi*deltapp&
+     & - dipi + dipr*gstr*x*y + dipr*x**2*y*sstr -&
+     &dipr*y**3*sstr/6.0d0) -&
+     &dipi**2*gstr*y**3/6.0d0 - dipi**2*y +&
+     &0.5*dipi*dipr*gstr*x*y**2 - dipi*dipr*x +&
+     &dipr**2*gstr*y**3/6.0d0)/elrad
+
+       track(5, jtrk) = (bet0*orb50*deltapp - (bet0*orb60 +&
+     &1.0)*(dipi*y + dipr*x))/(bet0*deltapp)
+
+    enddo
+
+end SUBROUTINE ttmult_cf_mini
 
 SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   use twtrrfi
@@ -1143,12 +1259,12 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
         del_p_g = del_p_g + sum0
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
-     pkick = elrad*(barkappa*(one + deltap) + del_p_g)
-
+     !pkick = elrad*(barkappa*(one + deltap) + del_p_g)
+    pkick = elrad*(barkappa+ del_p_g)
      dpx = real(pkick)
      dpy = - aimag(pkick)
-     track(2,jtrk) = track(2,jtrk) + dpx - dbr
-     track(4,jtrk) = track(4,jtrk) + dpy + dbi
+     track(2,jtrk) = track(2,jtrk) + dpx! - dbr
+     track(4,jtrk) = track(4,jtrk) + dpy! + dbi
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      track(5,jtrk) = track(5,jtrk) - elrad*(kx*track(1,jtrk) + ky*track(3,jtrk)) &
                 *(one + beta*track(6,jtrk))/(one + deltap)/beta
