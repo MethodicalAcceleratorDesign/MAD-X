@@ -157,8 +157,10 @@ Bending magnets have the following attributes:
 
 
    \ttitem{THICK} If this logical flag is set to true the bending
-   magnet is tracked through as a thick-element, instead of being
-   converted into thin-lenses. \\
+   magnet is kept as a thick-element, instead of being
+   converted into thin-lenses after MAKETHIN. Note that
+   if used in tracking without a MAKETHIN command it will
+   remain THICK even if this attribute is false.  \\
    (Default: false)
 
    \ttitem{KILL\_ENT\_FRINGE} If this logical flag is set to true the fringe fields on the entrance of the element are not taken into account (not calculated). \\
@@ -297,10 +299,12 @@ A \texttt{QUADRUPOLE} has five attributes:
      about the actual meaning of the \texttt{TILT} attribute for
      various elements.}
 
-    \ttitem{THICK} If this logical flag is set to true the quadrupole
-    is tracked through as a thick-element, instead of being
-    converted into thin-lenses.\\
-    (Default: false)
+    \ttitem{THICK} If this logical flag is set to true the bending
+   magnet is kept as a thick-element, instead of being
+   converted into thin-lenses after MAKETHIN. Note that
+   if used in tracking without a MAKETHIN command it will
+   remain THICK even if this attribute is false. \\
+   (Default: false)
 \end{madlist}
 
 \textbf{Note also that $K_1$ or $K_{1s}$ can be considered as
@@ -895,6 +899,11 @@ An \texttt{RFCAVITY} has eight real attributes and one integer attribute:
     Please refer to \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}} command,
     in particular to \texttt{TIME} and \texttt{TOTALPATH} switches,
     concerning RF behaviour of cavities in PTC.
+
+  \item The charge is not taken into account by the RF-cavity.
+  
+  \item The RF-cavity has to be thin for TRACKING in MAD-X. This is handled by 
+  \texttt{MAKETHIN} but note that it is always sliced into a single slice.  
 
 \end{itemize}
 

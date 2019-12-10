@@ -49,7 +49,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   double precision :: theta
   double precision, dimension (:), allocatable :: theta_buf   
   logical :: onepass, onetable, last_out, info, aperflag, doupdate, debug
-  logical :: run=.false.,dynap=.false., thin_foc
+  logical :: run=.false.,dynap=.false., thin_foc, onlyaver
   logical, save :: first=.true.
   logical :: bb_sxy_update, virgin_state, emittance_update
   logical :: checkpnt_restart, fast_error_func, exit_loss_turn
@@ -116,6 +116,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   debug = get_option('debug ') .ne. 0
   thin_foc = get_option('thin_foc ').eq.1
 
+  onlyaver = get_option('only_average ') .ne. 0
   call init_elements()
   !-------added by Yipeng SUN 01-12-2008--------------
   if (deltap .eq. zero) then
@@ -273,7 +274,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         if (first) then
            call track_pteigen(eigen)
            call tt_putone(jmax, tot_turn, tot_segm, segment, part_id, &
-                z, orbit0, spos, nlm, el_name)
+                z, orbit0, spos, nlm, el_name, onlyaver)
         endif
      else
         do i = 1, jmax
@@ -581,7 +582,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               spos = sum
               call element_name(el_name,len(el_name))
               call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
-                   z, obs_orb,spos,nlm,el_name)
+                   z, obs_orb,spos,nlm,el_name,onlyaver)
            else
               if (mod(turn, ffile) .eq. 0)  then
                  do i = 1, jmax
@@ -603,7 +604,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               spos=sum
               call element_name(el_name,len(el_name))
               call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
-                   z, orbit0,spos,nlm,el_name)
+                   z, orbit0,spos,nlm,el_name,onlyaver)
            else
               do i = 1, jmax
                  call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0, spos)
@@ -669,7 +670,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         spos = sum
         call element_name(el_name,len(el_name))
         call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
-             z, orbit0,spos,nlm,el_name)
+             z, orbit0,spos,nlm,el_name,onlyaver)
      else
         do i = 1, jmax
            call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0,spos)
@@ -2111,6 +2112,9 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   !---- Kick at dipole corrector magnet
   !     including PT-dependence
+  if(el.gt.zero) then
+    call ttdrf(el/two,track,ktrack); !Tracks to the middle
+  endif
   do i = 1, ktrack
      px = track(2,i)
      py = track(4,i)
@@ -2147,7 +2151,9 @@ subroutine ttcorr(el,track,ktrack,turn, code)
      !        ((one + bet0*track(6,i))/ddd)*bet0i
 
   enddo
-
+  if(el .gt. zero) then
+    call ttdrf(el/two,track,ktrack); !Tracks from the middle to the
+  endif
   !---- Half radiation effects at exit.
   !     If not random, use same RFAC as at entrance.
   if (radiate  .and.  el .ne. 0) then
@@ -2800,7 +2806,7 @@ subroutine tt_ploss(npart,turn,spos,orbit,el_name)
 end subroutine tt_ploss
 
 subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
-                     spos,ielem,el_name)
+                     spos,ielem,el_name, onlyaver)
   use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
@@ -2819,8 +2825,9 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
   character(len=name_len) :: el_name
 
   logical, save :: first = .true.
+  logical :: onlyaver
   integer :: i, j, length
-  double precision :: tmp, tt, ss, spos
+  double precision :: tmp, tt, ss, spos, tmp_v(6)
   character(len=120) :: table = 'trackone', comment
   character(len=4) :: vec_names(7)
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
@@ -2830,19 +2837,38 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
 
   write(comment, '(''#segment'',4i8,1X,A)') segment, tot_segm, npart, ielem, el_name
   if (first) call comment_to_table_curr(table, comment, length)
+  if(onlyaver) then
+    call double_to_table_curr(table, 'turn ', tt)
+    ss = -1.0
+    call double_to_table_curr(table, 'number ', ss)
+    do j = 1, 6
+    tmp = 0
+      do i = 1, npart
+        tmp = tmp + (z(j,i) - orbit0(j))
+      enddo
+      call double_to_table_curr(table, vec_names(j), tmp/npart)
+    enddo
+    
+    call double_to_table_curr(table,vec_names(7),spos)
+    call augment_count(table)
+  else 
+    tt = turn
+    do i = 1, npart
+       call double_to_table_curr(table, 'turn ', tt)
+       ss = part_id(i)
+       call double_to_table_curr(table, 'number ', ss)
+       do j = 1, 6
+          tmp = z(j,i) - orbit0(j)
+          call double_to_table_curr(table, vec_names(j), tmp)
+       enddo
+       call double_to_table_curr(table,vec_names(7),spos)
+       call augment_count(table)
+    enddo
+  endif
+  
 
-  tt = turn
-  do i = 1, npart
-     call double_to_table_curr(table, 'turn ', tt)
-     ss = part_id(i)
-     call double_to_table_curr(table, 'number ', ss)
-     do j = 1, 6
-        tmp = z(j,i) - orbit0(j)
-        call double_to_table_curr(table, vec_names(j), tmp)
-     enddo
-     call double_to_table_curr(table,vec_names(7),spos)
-     call augment_count(table)
-  enddo
+
+
 end subroutine tt_putone
 
 subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
@@ -3534,7 +3560,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
 
            !---- Radiation loss at entrance (step.eq.1) and exit (step.eq.3)
            if ((step.eq.1).or.(step.eq.3)) then
-              if (radiate) then
+              if (radiate .and. elrad .gt. zero) then
                  !---- Full damping.
                  if (damp) then
                     curv = sqrt(dxt(i)**2 + dyt(i)**2) / elrad;
@@ -3604,7 +3630,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
               dyt(i) = pyf_ - track(4,i);
 
               if ((step.eq.1).or.(step.eq.3)) then
-                 if (radiate) then
+                 if (radiate .and. elrad .gt. zero) then
                     !---- Full damping.
                     if (damp) then
                        curv = sqrt(dxt(i)**2 + dyt(i)**2) / length;
@@ -5005,9 +5031,13 @@ subroutine tttdipole(track, ktrack, code)
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
+  if (k0.eq.zero .and. k1.eq.zero) then
+     call ttdrf(length,track,ktrack);
+     return
+  endif
   !---- Apply entrance dipole edge effect
   if (node_value('kill_ent_fringe ') .eq. zero) &
-       call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, zero)
+       call ttdpdg_map(track, ktrack, e1, h, hgap, fint, zero)
 
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
@@ -5096,7 +5126,7 @@ subroutine tttdipole(track, ktrack, code)
   !---- Apply exit dipole edge effect
   if (node_value('kill_exi_fringe ') .eq. zero) then
      if (fintx .lt. zero) fintx = fint
-     call ttdpdg_map(track, ktrack, e2, h2, hgap, fintx, zero)
+     call ttdpdg_map(track, ktrack, e2, h, hgap, fintx, zero)
   endif
 
 end subroutine tttdipole

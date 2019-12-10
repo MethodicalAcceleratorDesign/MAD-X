@@ -7943,15 +7943,20 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
 
   !---- Half radiation effect at entry.
   if (radiate .and. ftrk) then
-     kx = ((sk**2)*orbit(1)-sk*orbit(4))*elrad;
-     ky = ((sk**2)*orbit(3)+sk*orbit(2))*elrad;
-     rfac = (arad * gamma**3 / three) * (kx**2 + ky**2) / elrad;
-     pt = orbit(6);
-     bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
-     f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     orbit(2) = orbit(2) * f_damp_t;
-     orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+    if(elrad .eq. zero) then 
+      call fort_warn('TWCPGO: ','Radiation effects ignored for solenoid '// &
+                         'with l=0, lrad=0 and radiate=true')
+    else
+       kx = ((sk**2)*orbit(1)-sk*orbit(4))*elrad;
+       ky = ((sk**2)*orbit(3)+sk*orbit(2))*elrad;
+       rfac = (arad * gamma**3 / three) * (kx**2 + ky**2) / elrad;
+       pt = orbit(6);
+       bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+       f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
+       orbit(2) = orbit(2) * f_damp_t;
+       orbit(4) = orbit(4) * f_damp_t;
+       orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+    endif
   endif
 
   !---- First-order terms.
@@ -7977,15 +7982,20 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
 
   !---- Half radiation effect at exit.
   if (radiate .and. ftrk) then
-     kx = ((sk**2)*orbit(1)-sk*orbit(4))*elrad;
-     ky = ((sk**2)*orbit(3)+sk*orbit(2))*elrad;
-     rfac = (arad * gamma**3 / three) * (kx**2 + ky**2) / elrad;
-     pt = orbit(6);
-     bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
-     f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-     orbit(2) = orbit(2) * f_damp_t;
-     orbit(4) = orbit(4) * f_damp_t;
-     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+      if(elrad .eq. zero) then 
+      call fort_warn('TWCPGO: ','Radiation effects ignored for solenoid '// &
+                         'with l=0, lrad=0 and radiate=true')
+    else
+       kx = ((sk**2)*orbit(1)-sk*orbit(4))*elrad;
+       ky = ((sk**2)*orbit(3)+sk*orbit(2))*elrad;
+       rfac = (arad * gamma**3 / three) * (kx**2 + ky**2) / elrad;
+       pt = orbit(6);
+       bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+       f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
+       orbit(2) = orbit(2) * f_damp_t;
+       orbit(4) = orbit(4) * f_damp_t;
+       orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+    endif
   endif
 
 end SUBROUTINE tmsol_th
