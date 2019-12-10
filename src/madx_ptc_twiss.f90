@@ -1107,10 +1107,10 @@ contains
           s = nodePtr%next%s(1) ! s(1) is the total arc-length, s(3) the total integration-distance
 
           !I do not know what JL meant here
-          if ((s .eq. 0d0) .and. (nodePtr%pos .eq. (my_ring%t%n+posstart-1))) then
-             s = nodePtr%s(1) + nodePtr%next%s(5) ! s of previous node + local offset
-          endif
-
+          !if ((s .eq. 0d0) .and. (nodePtr%pos .eq. (my_ring%t%n+posstart-1))) then
+          !   s = nodePtr%s(1) + nodePtr%next%s(5) ! s of previous node + local offset
+          !endif
+          s = nodePtr%s(1)
           if (getdebug() > 2) then
              write(6,*) "##### SLICE MAGNETS NODE ",&
                       & nodePtr%pos," => ",nodePtr%pos+1," s=",s
@@ -1148,7 +1148,9 @@ contains
           !!!!!!!!!!!!!!!
 
           if (center_magnets ) then
+            
             if ( associated(nodePtr,current%tm) ) then
+              
               if (mod(current%mag%p%nst,2)/=0) then !checking if number od slices is even
                  !here it is odd (we should be in the middle)
                  if (current%mag%L==0) then
@@ -1165,7 +1167,9 @@ contains
                  isputdata = .true.
               endif
             endif
+            
           else
+          
             if (nodePtr%next%cas==case0) then
               !not center_magnets, take every reasonable node
               ! this an inner integration node i.e. neither an extremity nor a fringe node, both to be discarded
