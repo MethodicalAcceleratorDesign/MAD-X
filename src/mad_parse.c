@@ -101,14 +101,16 @@ in_spec_list(char* string)
   int i = 0, n = imin((int)strlen(string), 100);
   strncpy(c_dum->c, string, n); stolower(c_dum->c);
   supp_char(' ', c_dum->c);
+  char* semicolon = strchr(c_dum->c, ';');
   while (special_comm_cnt[i])
   {
     if (special_comm_desc[i][0] == '>')
     {
       if ((cp = strchr(c_dum->c, special_comm_desc[i][1])) != NULL)
       {
-        if (strncmp(++cp, &special_comm_desc[i][2], special_comm_cnt[i])
-            == 0)  return i+1;
+        if (strncmp(++cp, &special_comm_desc[i][2], special_comm_cnt[i]) == 0
+                && (semicolon == NULL || cp < semicolon))
+            return i+1;
       }
     }
     else if (strncmp(c_dum->c, &special_comm_desc[i][0],special_comm_cnt[i])

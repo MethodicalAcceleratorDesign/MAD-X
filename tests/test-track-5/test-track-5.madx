@@ -22,7 +22,9 @@ use,  sequence= smachd;
 ! ********** Track 10000 particles
 ! Note the usage of the options
 ! 'onepass': 
+
 track, onepass, onetable, file= "out_rellipse", aperture, dump;
+
   n=0;  
   while(n<20) {
      n= n+1; 

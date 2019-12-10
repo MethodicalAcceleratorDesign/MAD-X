@@ -2,7 +2,7 @@
 !Copyright (C) Etienne Forest and CERN
 module S_euclidean
   use S_extend_poly
-  use s_extend_poly, only : PRTP ! LD: 22.03.2019
+  !use s_extend_poly, only : PRTP ! LD: 22.03.2019
   implicit none
   public
 

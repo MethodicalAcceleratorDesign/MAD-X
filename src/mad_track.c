@@ -94,9 +94,11 @@ track_run(struct in_cmd* cmd)
   buf4    = mymalloc_atomic(rout_name, 36      * sizeof *buf4);
   buf6    = mymalloc_atomic(rout_name, nnode   * sizeof *buf6);
 
+
   // run track rountine
   trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2,
-         buf_dxt, buf_dyt, buf3, buf4, &buf5, &e_flag, ibuf3, buf6);
+         buf_dxt, buf_dyt, buf3, buf4, &buf5, &e_flag, ibuf3, 
+         buf6);
 
   // summary
   t = find_table("tracksumm");
@@ -206,6 +208,8 @@ track_track(struct in_cmd* cmd)
   set_option("track_dump", &k);
   k = get_value(current_command->name,"onetable");
   set_option("onetable", &k);
+  k = get_value(current_command->name,"only_average");
+  set_option("only_average", &k);
   track_deltap=get_value(current_command->name,"deltap");
   set_variable("track_deltap", &track_deltap);
   if(track_deltap != 0) fprintf(prt_file, v_format("track_deltap: %F\n"),

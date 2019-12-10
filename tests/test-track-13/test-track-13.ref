@@ -1,0 +1,98 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.05.02  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.11.06 10:19:27      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+beam;
+
+cell: sequence, l=4;
+
+k:=0.1;
+
+ak=0.0000001;
+
+myrb:rbend, at=2, angle=0.01, l=2, apertype=circle, aperture:={ak},  aper_vx:={-k,k,k,-k} , aper_vy:={-k,-k,k,k };
+
+endsequence;
+
+
+
+use, sequence=cell;
+
+tr$macro(turn): macro = {
+
+    if(turn == 20){
+
+    	print, text="Number turn";
+
+	k:=0.0000001;	
+
+    }
+
+}
+
+
+
+track, onepass,  APERTURE=true, update ;
+
+enter TRACK module
+one pass is on
+update is on
+aperture tracking is on
+start, x=0.009, px=0e-6, y=0.009, py=0e-7, t=0, pt=0;
+
+run, turns=100;
+
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+++++++ info: tr$turni redefined
+Number 20
+++++++ info: k redefined
+particle #     1 lost turn     20  at pos. s =      1.00 element=myrb                                             aperture =circle                                          
+    X=   9.0000000000011963E-003   Y=   8.6685998860731913E-003   T=  -1.7100154224156763E-003
+++++++ warning: trcoll:  Particle Number equals zero: exit from trcoll
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0              0.009                  0 
+         1         20              0.009    3.084510182e-17 
+
+                 y                 py                  t                 pt 
+             0.009                  0                  0    2.220446049e-16 
+    0.008668599886    -8.44759052e-06    -0.001710015422    2.220446049e-16 
+
+                 s                  e 
+                 0                  0 
+      0.9999958333                  0 
+endtrack ;
+
+exit TRACK module
+
+stop;
+
+
+  Number of warnings: 1
+0 in C and 1 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

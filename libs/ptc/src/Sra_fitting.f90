@@ -4989,14 +4989,14 @@ mux=mux*twopi
 Write(mf,*) " phase, total phase and beta "
  write(mf,*) phx,mux,betx(1)
 
-phx=phx*twopi
-d_CS=8*i_*exp(-i_*4*phx)/(1.0_dp-exp(-i_*4.0_dp*mux))*h**4+16*i_*exp(-i_*2*phx)/(1.0_dp-exp(-i_*2.0_dp*mux))*h**3*hb
-d_cs=d_cs*(a_cs.cut.2)**(-1)
-d_cs=2.0_dp*real(d_cs)*betasfx**2/64.0_dp
-d_cs=d_cs.o.eval
-call clean(d_cs,d_cs,prec=1.d-10)
-Write(mf,*) " change in invariant due to octupole : analytical "
-call print(d_cs,mf)
+!phx=phx*twopi
+!d_CS=8*i_*exp(-i_*4*phx)/(1.0_dp-exp(-i_*4.0_dp*mux))*h**4+16*i_*exp(-i_*2*phx)/(1.0_dp-exp(-i_*2.0_dp*mux))*h**3*hb
+!d_cs=d_cs*(a_cs.cut.2)**(-1)
+!d_cs=2.0_dp*real(d_cs)*betasfx**2/64.0_dp
+!d_cs=d_cs.o.eval
+!call clean(d_cs,d_cs,prec=1.d-10)
+!Write(mf,*) " change in invariant due to octupole : analytical "
+!call print(d_cs,mf)
 
 
 write(6,*) "dnu_dko = ",dnu_dko

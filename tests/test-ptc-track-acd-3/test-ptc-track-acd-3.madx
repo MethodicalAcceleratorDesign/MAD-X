@@ -1,0 +1,108 @@
+!Example file showing the usage of PTC_TRACK command 
+!that sets the internal state (i.e switches) of PTC
+!
+!Piotr Skowronski (CERN)
+!
+! examples/ptc_madx_interface/intstate/intstate.ptc.madx
+!
+option,-echo;
+option,-info;
+
+LQL := 0.220; ! length of QL
+LQS := 0.124; ! length of QS
+QL  : QUADRUPOLE, L=LQL; ! QL quadrupole
+QS  : QUADRUPOLE, L=LQS; ! QS quadrupole
+
+
+!HACD: hACdipole, L= 0.25, volt=0.001, freq=0.01,
+!                 ramp1=100,
+!                 ramp2=200,
+!                 ramp3=800,
+!                 ramp4=900; 
+
+!VACD: vACdipole, L= 0.25, volt=0.001, freq=0.98, 
+!                 ramp1= 50,
+!                 ramp2=200,
+!                 ramp3=800,
+!                 ramp4=950; 
+                 
+
+HACD: drift, l=0.25;                 
+VACD: drift, l=0.25;                 
+
+ds_ql     : drift, l=0.25;    ! short drift between quads in Daniels design
+ds_trip   : drift, l=0.5; ! long drift between quads in Daniels design
+b1        : rbend, l=0.5, angle=0.05;
+
+rfc       : rfcavity, l=0.25, volt=0.1, freq=61.056230, lag=0.5,
+                 modulationq=0.001, lagerr=0.1,
+                 ramp1=10,
+                 ramp2=20,
+                 ramp3=80,
+                 ramp4=90; 
+beforecav : marker;
+aftercav  : marker;
+k_ls1     := -1.55*.56/LQL; ! weaker foc.
+k_ls2     :=  1.55/LQL;     ! weaker foc.
+quad_l1   : quadrupole, l=LQL,   k1=k_ls1;
+quad_l2   : quadrupole, l=LQL/2, k1=k_ls2;
+LDLS      :=(LQL-LQS)/2.; ! half L difference of QL and QS
+dls       : DRIFT, L=LDLS; ! 0.048 m
+
+ctfcell  : line=( quad_l2,ds_ql,quad_l1,
+                  ds_trip , b1, ds_trip,
+                  HACD,
+                  rfc,
+                  VACD,
+                  ds_trip , b1, ds_trip,
+                  quad_l1,ds_ql,quad_l2, 
+);
+
+ctf   : line=(1*ctfcell);
+
+! calculate Twiss parameters for regular cell structure
+beam, PARTICLE=ELECTRON, ENERGY=5d0;
+
+USE, period=ctf;
+
+twiss, file="twiss.tfs";
+
+plot, haxis=s, vaxis=betx, bety;
+plot, haxis=s, vaxis=dx;
+
+
+
+ptc_create_universe;
+  ptc_setswitch, debuglevel=1, time=true, totalpath=false, modulation=false;
+  ptc_create_layout, model=1, method=2, nst=5, exact=false, closed_layout=true;
+
+  ptc_twiss, table=twiss,icase=6, no=2, closed_orbit;
+  write, table=twiss, file="ptctwiss.tfs";
+
+  ptc_setswitch, debuglevel=1, time=true, totalpath=false, modulation=false;
+  ptc_setswitch, debuglevel=1, time=true, totalpath=false, modulation=true;
+  
+  
+!  ptc_start, x=0, px=0, y=0, py=0, pt=0, t=0.03;
+!  ptc_start, x=0, px=0, y=0, py=0, pt=0, t=0.02;
+  ptc_start, x=0, px=0, y=0, py=0, pt=0, t=0.01;
+
+  ptc_track, closed_orbit=false, icase=6, element_by_element,  dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6}, turns=91, ffile=1;
+
+  ptc_track_end;
+
+ptc_end;
+
+
+!renamefile, file="trackone", to="trackoneLag0";
+
+
+
+stop;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  SSSSS  TTTTT   OOO   PPP
+!  S        T    O   O  P  P
+!  SSSSS    T    O   O  PPP
+!      S    T    O   O  P
+!  SSSSS    T     OOO   P
+!

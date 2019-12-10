@@ -1,0 +1,152 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.09.27 13:36:38      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+SET, FORMAT="12d", "-18.5e", "25s";
+
+circum = 1;
+
+
+
+
+
+m2: sbend, l=1, angle=1.2, k0=1;
+
+
+
+bend_seq: sequence, refer=center, l=circum;
+
+m2, at=0.5;
+
+endsequence;
+
+
+
+
+
+beam;
+
+x_in = 0.005;
+
+y_in = 0.007;
+
+use, sequence=bend_seq;	
+
+
+
+select, flag=twiss, clear;
+
+select, flag=twiss, column=name,s,x,px,y,py;
+
+twiss, betx=1, bety=1, x=x_in, y=y_in, file="bend.dat";
+
+enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   5.000000E-03  0.000000E+00  7.000000E-03  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     9.577548E-02  1.506523E-01  7.000000E-03  1.265709E-03 -4.810720E-02  0.000000E+00
+
+++++++ table: summ
+
+length             orbit5             alfa               gammatr            
+1.00000e+00        -0.00000e+00       0.00000e+00        0.00000e+00        
+
+q1                 dq1                betxmax            dxmax              
+1.65990e-01        0.00000e+00        1.00898e+00        5.01354e-01        
+
+dxrms              xcomax             xcorms             q2                 
+4.09353e-01        9.57755e-02        7.82536e-02        1.28264e-01        
+
+dq2                betymax            dymax              dyrms              
+0.00000e+00        2.08545e+00        3.03229e-06        2.47585e-06        
+
+ycomax             ycorms             deltap             synch_1            
+7.00000e-03        7.00000e-03        0.00000e+00        0.00000e+00        
+
+synch_2            synch_3            synch_4            synch_5            
+0.00000e+00        0.00000e+00        0.00000e+00        0.00000e+00        
+
+nflips             
+0.00000e+00        
+
+
+select, flag=makethin, slice=1 ;
+
+makethin, sequence=bend_seq;
+
+makethin: slicing sequence : bend_seq
+use, sequence=bend_seq;
+
+
+
+SELECT, FLAG=ERROR, class=multipole;
+
+
+
+EFCOMP,DKN= {-0.2,1};
+
+Assigned field errors to 1 elements
+twiss, betx=1, bety=1, x=x_in, y=y_in, file="thin.dat";
+
+enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   5.000000E-03  0.000000E+00  7.000000E-03  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     2.000000E-01  3.900000E-01  1.050000E-02  7.000000E-03 -4.303726E-02  0.000000E+00
+
+++++++ table: summ
+
+length             orbit5             alfa               gammatr            
+1.00000e+00        -0.00000e+00       0.00000e+00        0.00000e+00        
+
+q1                 dq1                betxmax            dxmax              
+2.50000e-01        0.00000e+00        1.25000e+00        3.05000e-01        
+
+dxrms              xcomax             xcorms             q2                 
+1.99669e-01        2.00000e-01        1.30985e-01        1.10571e-01        
+
+dq2                betymax            dymax              dyrms              
+0.00000e+00        3.81250e+00        3.50000e-03        2.29129e-03        
+
+ycomax             ycorms             deltap             synch_1            
+1.05000e-02        8.67468e-03        0.00000e+00        0.00000e+00        
+
+synch_2            synch_3            synch_4            synch_5            
+0.00000e+00        0.00000e+00        0.00000e+00        0.00000e+00        
+
+nflips             
+0.00000e+00        
+sixtrack;
+
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+Reference radius set to : 1.000000
+++++++ info: MADX sequence converted to c6t internal. 
+
+total block length: 1.000000
+
+c6t terminated - total number of elements: 5
+                    field errors    MAD-X: 1
+                    field errors SixTrack: 1
+                 alignment errors   MAD-X: 0
+                alignment errors SixTrack: 0
+                          sequence length: 1.000000 [m]
+save, sequence=bend_seq, file="thin.seq";	
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+
+  Number of warnings: 1
+1 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

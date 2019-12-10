@@ -1,0 +1,256 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.10.18 16:47:55      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+circum=120.;
+
+lcell=20.;
+
+f=lcell/sin(pi/5)/4;
+
+k=1.0/f;
+
+value, f;
+
+f                  =        8.506508084 ;
+beam, particle=proton, energy = 20;
+
+angle = 2*pi/6;
+
+
+
+qfstart_a: multipole, knl={0,0,0,1,0},  lrad=0.0;
+
+
+
+
+
+qfstart2: multipole, knl={0.3, 0.5, 0.4}, lrad=1;
+
+
+
+qf: multipole, knl={0, k};
+
+qd: multipole, knl={0, -k};
+
+dip: multipole, knl={0.00001,0,0.0000}, lrad=3;
+
+hkick: HKICKER,L=real, KICK=0.00012, TILT=real;
+
+vkick: VKICKER,L=real, KICK=0.00133, TILT=real;
+
+rfcav: RFCAVITY, VOLT=0.1, LAG=0.0, L =0.0, HARMON=100;
+
+ip5: marker;
+
+
+
+
+
+seq: sequence, refer=center, l=circum;
+
+!qfstart_b: qfstart_b, at = 2.5 ;
+
+qfstart2, at=2.555;
+
+ip5, at = 2.555;
+
+qd: qd, at = 0.5 * lcell;
+
+qf: qf, at = 1.0 * lcell;
+
+qd: qd, at = 1.5 * lcell;
+
+qf: qf, at = 2.0 * lcell;
+
+qd: qd, at = 2.5 * lcell;
+
+hkick, at = 2.51 * lcell;
+
+vkick, at = 2.52 * lcell;
+
+qf: qf, at =  3*lcell;
+
+rfcav:rfcav, at = 3.001*lcell;
+
+qd: qd, at = 0.5 * lcell+3*lcell;
+
+qf: qf, at = 1.0 * lcell+3*lcell;
+
+qd: qd, at = 1.5 * lcell+3*lcell;
+
+qf: qf, at = 2.0 * lcell+3*lcell;
+
+qd: qd, at = 2.5 * lcell+3*lcell;
+
+endsequence;
+
+use, sequence=seq;
+
+
+
+
+
+
+
+xin = 0.001;
+
+yin = 0.001;
+
+
+
+
+
+select, flag=twiss, column=name, s, x,px, y,py, betx, bety;
+
+twiss, file="no_cf.twiss", betx=1, bety=1, x=xin, y =yin;
+
+enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   1.000000E-03  0.000000E+00  1.000000E-03  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:    -1.523064E-02 -1.123889E-03 -1.675578E-02  3.577352E-04 -4.261928E-04  8.541595E-09
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+               120                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.584123493                  0         323.170041         8.33838863 
+
+             dxrms             xcomax             xcorms                 q2 
+       4.332274985      0.01680944263     0.008126620192        1.216198098 
+
+               dq2            betymax              dymax              dyrms 
+                 0        1833.002867       0.1185371781      0.03649225431 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.03288506979      0.01285144935                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+
+
+
+
+
+
+TRACK, FILE="no_cf.dat",ONEPASS=true;
+
+enter TRACK module
+one pass is on
+START, X=xin, Y=yin;
+
+OBSERVE, PLACE=ip5;
+
+RUN, TURNS=1;
+
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0              0.001                  0 
+         1          1     -0.01523071459    -0.001123890285 
+
+                 y                 py                  t                 pt 
+             0.001                  0                  0    2.220446049e-16 
+    -0.01675583158    0.0003577577093   -0.0004261934024    8.541596487e-09 
+
+                 s                  e 
+                 0                  0 
+               120                  0 
+ENDTRACK;
+
+exit TRACK module
+
+
+
+option, thin_cf;
+
+twiss, file="cf.twiss", betx=1, bety=1, x=xin, y =yin;
+
+enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   1.000000E-03  0.000000E+00  1.000000E-03  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:    -1.523261E-02 -1.124030E-03 -1.675448E-02  3.577539E-04 -4.261899E-04  8.541747E-09
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+               120                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.583938799                  0        322.2652611        8.338387385 
+
+             dxrms             xcomax             xcorms                 q2 
+       4.332276773      0.01681152584     0.008127693609        1.216210371 
+
+               dq2            betymax              dymax              dyrms 
+                 0        1831.136944       0.1185155727       0.0364871942 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.03288251068      0.01285065849                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+
+
+
+
+TRACK, DELTAP=0,FILE="cf.dat",ONEPASS=true;
+
+enter TRACK module
+one pass is on
+START, X=xin, Y=yin, pt=ptin;
+
+OBSERVE, PLACE=ip5;
+
+RUN, TURNS=1;
+
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0              0.001                  0 
+         1          1      -0.0152307146    -0.001123890285 
+
+                 y                 py                  t                 pt 
+             0.001                  0                  0    2.220446049e-16 
+    -0.01675930878      0.00035770781   -0.0004262260054    8.541517324e-09 
+
+                 s                  e 
+                 0                  0 
+               120                  0 
+ENDTRACK;
+
+exit TRACK module
+
+
+
+
+
+
+
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
