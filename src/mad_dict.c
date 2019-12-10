@@ -723,18 +723,18 @@ const char *const_command_def =
 " "
 "ptc_setswitch: ptc_setswitch none 0 0 "
 "debuglevel = [i,1], "/*sets the level of debugging printout 0 none, 4 everything */
-"mapdump  = [i, 0], " /*sets the level of map dump printout in all tracking codes 0: none, 1: order 0, 2: order 1 */
-"seed     = [i, 123456789], "
+"mapdump    = [i, 0], " /*sets the level of map dump printout in all tracking codes 0: none, 1: order 0, 2: order 1 */
+"seed       = [i, 123456789], "
 "maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
-"exact_mis = [l, false, true], " /* switch to ensure exact misaligment treatment */
-"totalpath = [l, false, true], "      /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
-"radiation = [l, false, true], "  /*sets the radiation switch/internal state of PTC */
+"exact_mis  = [l, false, true], "  /* switch to ensure exact misaligment treatment */
+"totalpath  = [l, false, true], "  /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
+"radiation  = [l, false, true], "  /*sets the radiation switch/internal state of PTC */
 "modulation = [l, false, true], "  /*sets the modulation switch/internal state of PTC */
 "stochastic = [l, false, true], "  /*sets the stochastic switch/internal state of PTC */
-"envelope = [l, false, true], "  /*sets the envelope switch/internal state of PTC */
-"fringe = [l, false, true], "  /*sets the fringe switch/internal state of PTC */
-"nocavity = [l, false, true], "  /*sets the nocavity switch/internal state of PTC */
-"time = [l, true, true]; "      /* switch to use time rather than pathlength, modifies PTC states by adding TIME0 flag */
+"envelope   = [l, false, true], "  /*sets the envelope switch/internal state of PTC */
+"fringe     = [l, false, true], "  /*sets the fringe switch/internal state of PTC */
+"nocavity   = [l, false, true], "  /*sets the nocavity switch/internal state of PTC */
+"time       = [l, true, true]; "   /* switch to use time rather than pathlength, modifies PTC states by adding TIME0 flag */
 " "
 "ptc_enforce6d: ptc_enforce6d none 0 0 "
 "flag = [l, false, false]; " /* normally 6D is reduced to 4D if no cavities are present. This switch prevents it. It is needed to calcualte  fg R56 in a chicane */
@@ -2376,15 +2376,15 @@ const char *const_element_def =
 "mech_sep = [r, 0], "
 "v_pos = [r, 0], "
 "bbdir = [i, -1], "
-"long_coup_off    = [l, false, true], " // frs add-on
-"model            = [i, -1], "
-"method           = [i, -1], "
-"exact            = [i, -1, 1], "
-"nst              = [i, -1], "
-"fringe           = [i, 0, 1], "
-"bend_fringe      = [l, false, true], "
-"kill_ent_fringe  = [l, false, true], "
-"kill_exi_fringe  = [l, false, true], "
+"long_coup_off   = [l, false, true], " // frs add-on
+"model           = [i, -1], "
+"method          = [i, -1], "
+"exact           = [i, -1, 1], "
+"nst             = [i, -1], "
+"fringe          = [i, 0, 1], "
+"bend_fringe     = [l, false, true], "
+"kill_ent_fringe = [l, false, true], "
+"kill_exi_fringe = [l, false, true], "
 "comments = [s, none, none]; "
 " "
 "instrument: element none 0 24 "
