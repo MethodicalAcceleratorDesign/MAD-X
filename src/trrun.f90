@@ -19,7 +19,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !          Interface RUN and DYNAP command to tracking routine         *
   !                                                                      *
   !-- Input:                                                             *
-  !   switch  (int)         1: RUN, 2: DYNAP fastune                     *
+  !   switch  (int)         1: RUN, 2: DYNAP fastune            f         *
   !   turns   (int)         number of turns to track                     *
   !   orbit0  (dp. array)   start of closed orbit                        *
   !   rt      (dp. matrix)  one-turn matrix                              *
@@ -49,7 +49,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   double precision :: theta
   double precision, dimension (:), allocatable :: theta_buf   
   logical :: onepass, onetable, last_out, info, aperflag, doupdate, debug
-  logical :: run=.false.,dynap=.false., thin_foc
+  logical :: run=.false.,dynap=.false., thin_foc, onlyaver
   logical, save :: first=.true.
   logical :: bb_sxy_update, virgin_state, emittance_update
   logical :: checkpnt_restart, fast_error_func, exit_loss_turn
@@ -102,12 +102,13 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   arad   = get_value('probe ','arad ')
   radiate  = get_value('probe ','radiate ') .ne. zero
 
-  bet0  =  get_value('beam ','beta ')
+  thin_cf =  get_option('thin_cf ').ne.zero
+  bet0    =  get_value('beam ','beta ')
 
-  bet0i  = one / bet0
-  beti   = one / betas
+  bet0i   = one / bet0
+  beti    = one / betas
 
-  deltas = get_variable('track_deltap ')
+  deltas  = get_variable('track_deltap ')
 
   damp = get_option('damp ') .ne. 0
   quantum = get_option('quantum ') .ne. 0
@@ -115,6 +116,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   debug = get_option('debug ') .ne. 0
   thin_foc = get_option('thin_foc ').eq.1
 
+  onlyaver = get_option('only_average ') .ne. 0
   call init_elements()
   !-------added by Yipeng SUN 01-12-2008--------------
   if (deltap .eq. zero) then
@@ -272,7 +274,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         if (first) then
            call track_pteigen(eigen)
            call tt_putone(jmax, tot_turn, tot_segm, segment, part_id, &
-                z, orbit0, spos, nlm, el_name)
+                z, orbit0, spos, nlm, el_name, onlyaver)
         endif
      else
         do i = 1, jmax
@@ -580,7 +582,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               spos = sum
               call element_name(el_name,len(el_name))
               call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
-                   z, obs_orb,spos,nlm,el_name)
+                   z, obs_orb,spos,nlm,el_name,onlyaver)
            else
               if (mod(turn, ffile) .eq. 0)  then
                  do i = 1, jmax
@@ -602,7 +604,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               spos=sum
               call element_name(el_name,len(el_name))
               call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
-                   z, orbit0,spos,nlm,el_name)
+                   z, orbit0,spos,nlm,el_name,onlyaver)
            else
               do i = 1, jmax
                  call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0, spos)
@@ -668,7 +670,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         spos = sum
         call element_name(el_name,len(el_name))
         call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
-             z, orbit0,spos,nlm,el_name)
+             z, orbit0,spos,nlm,el_name,onlyaver)
      else
         do i = 1, jmax
            call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0,spos)
@@ -716,10 +718,13 @@ subroutine init_elements
   use twtrrfi
   use code_constfi
   implicit none
+  logical:: aperflag
   integer:: j, code
-  integer, external :: restart_sequ, advance_node
+  integer, external :: restart_sequ, advance_node, get_option
   double precision, external :: node_value
+  external :: update_node_aperture
  
+  aperflag = get_option('aperture ') .ne. 0
   
   j = restart_sequ()
   do !---- loop over nodes
@@ -742,10 +747,13 @@ subroutine init_elements
       call set_tt_attrib(enum_sinkick, node_value('sinkick '))
       call set_tt_attrib(enum_kick, node_value('kick '))
       call set_tt_attrib(enum_chkick, node_value('chkick '))
-      call set_tt_attrib(enum_cvkick, node_value('chkick '))
+      call set_tt_attrib(enum_cvkick, node_value('cvkick '))
       call set_tt_attrib(enum_hkick, node_value('hkick '))
       call set_tt_attrib(enum_vkick, node_value('vkick '))
-    endif 
+    endif
+    if(aperflag .and. code .ne. code_drift) then
+       call update_node_aperture()
+    endif
     
     if (advance_node() .eq. 0)  exit
 
@@ -761,6 +769,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   use math_constfi, only : zero, one
   use code_constfi
   use aperture_enums
+  use trackfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -824,10 +833,12 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   endif
 
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
+  !     print *, "apint", apint, "ap_notset", ap_notset
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
     
      apint=node_apertype()
+
      if(apint .eq. ap_notset) then
     ! make global check even if aperture is not defined
     lost_global =.false.
@@ -875,7 +886,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   select case (code)
 
     case (code_rbend, code_sbend)
-       call tttdipole(track,ktrack)
+       call tttdipole(track,ktrack, code)
 
     case (code_matrix)
        EK(:6) = zero
@@ -889,7 +900,11 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call tttquad(track,ktrack)
 
     case (code_multipole)
-       call ttmult(track,ktrack,dxt,dyt,turn,thin_foc)
+      if(thin_cf .and. node_value('lrad ') .gt. zero ) then
+        call ttmult_cf(track,ktrack,dxt,dyt,turn,thin_foc)
+      else
+        call ttmult(track,ktrack,dxt,dyt,turn,thin_foc)
+      endif
 
     case (code_solenoid)
        call trsol(track, ktrack,dxt,dyt)
@@ -974,6 +989,174 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
 
   return
 end subroutine ttmap
+
+
+SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
+  use twtrrfi
+  use twissbeamfi, only : deltap, beta
+  use math_constfi, only : zero, one, two, three
+  use time_varfi
+  use trackfi
+  use time_varfi
+  use track_enums
+
+  implicit none 
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Computes thin-lens kick through combined-function magnet.        *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !     Detailed description:                                            *
+  !     Phys. Rev. AccelBeams 19.054002 by M. Titze
+  !----------------------------------------------------------------------*
+  double precision :: track(6,*), dxt(*), dyt(*), ttt
+  logical ::  time_var,thin_foc
+  integer :: ktrack, turn
+  logical :: fsec, ftrk, fmap
+  integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
+  integer, external :: Factorial
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
+  double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle, tilt2
+  double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
+  !double precision :: orbit(6),
+  double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
+                    dxx, dxy, dyy, rp, rm
+  double complex :: lambda(0:maxmul)
+  double complex :: g(0:maxmul, 0:maxmul)
+
+  double precision, external :: node_value, get_tt_attrib
+  integer, external :: node_fd_errors
+  fmap = .true.
+  
+  ! Read magnetic field components & fill lambda's according to field
+  ! components relative to given plane
+  F_ERRORS(0:maxferr) = zero
+  n_ferr = node_fd_errors(f_errors)
+
+  bvk = get_tt_attrib(enum_other_bv)
+    !---- Multipole length for radiation.
+  elrad = get_tt_attrib(enum_lrad)
+  an = get_tt_attrib(enum_angle)
+  time_var = get_tt_attrib(enum_time_var) .ne. 0  
+
+  
+  !---- Multipole components.
+  NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
+  SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
+  tilt2 = 0
+  call get_tt_multipoles(nn,normal,ns,skew)
+
+  !---- Angle (no bvk in track)
+  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
+
+
+
+  !-----added FrankS, 10-12-2008
+  !nd = 2 * max(nn, ns, n_ferr/2-1)
+
+  !---- Dipole error.
+  !      dbr = bvk * field(1,0) / (one + deltas)
+  !      dbi = bvk * field(2,0) / (one + deltas)
+  dbr = bvk * f_errors(0) !field(1,0)
+  dbi = bvk * f_errors(1) !field(2,0)
+
+  !---- Nominal dipole strength.
+  !      dipr = bvk * vals(1,0) / (one + deltas)
+  !      dipi = bvk * vals(2,0) / (one + deltas)
+  dipr = bvk * normal(0) !vals(1,0)
+  dipi = bvk * skew(0)   !vals(2,0)
+
+
+  !Below here should not be commented output
+  !---- Other components and errors.
+  ! that loop should start at one since nominal dipole strength already taken into account above
+  !needs to be here though
+  nord = 0
+  nd = 2 * max(nn, ns, n_ferr/2-1)
+
+  do iord = 1, nd/2
+     f_errors(2*iord)   = bvk * (f_errors(2*iord) + normal(iord))
+     f_errors(2*iord+1) = bvk * (f_errors(2*iord+1) + skew(iord))
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) nord=iord
+  enddo
+  !Done with all the setting up... 
+
+  lambda(0:maxmul) = 0
+
+  if (elrad.gt.zero) then
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad
+     do k = 1, nord
+        ! The factor (one + deltap) below is taken from the original MAD-X routine.
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)
+     enddo
+  else
+     lambda = zero
+  endif
+
+  kx = real(lambda(0))    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
+  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in 
+                          ! Phys. Rev. AccelBeams 19.054002
+
+  kappa = kx + (0, 1)*ky
+  barkappa = conjg(kappa)
+
+  ! Now fill up the g_{ij}'s for j = 0, ..., i and i = 0, ..., nord + 1.
+  g(0, 0) = (0, 0)
+  g(1, 0) = -lambda(0)
+  g(1, 1) = conjg(g(1, 0))
+
+  do k = 1, nord
+     do j = 0, k - 1
+        ! Eq. (6), in Ref. above
+        g(k + 1, j + 1) = (barkappa*g(k, j + 1)*(j + one)*(j - k + three/two) +  &
+             kappa*g(k, j)*(k - j)*(one/two - j))/(k - j)/(j + one)
+     enddo
+     ! Eq. (8) in Ref. above
+     sum0 = 0
+     do j = 1, k
+       sum0 = sum0 - (k + 1 - j)*g(k + 1, j)*exp(-two*(0, 1)*j*tilt2)
+     enddo
+     g(k + 1, 0) = ( sum0 - two**k*exp(-(0, 1)*k*tilt2)*( lambda(k) &
+                    + one/two*(barkappa*exp((0, 1)*tilt2) + kappa*exp(-(0, 1)*tilt2)) &
+                    *lambda(k - 1) ) )/(k + one)
+     g(k + 1, k + 1) = conjg(g(k + 1, 0))
+  enddo
+
+   do jtrk = 1,ktrack
+     rp = (track(1,jtrk) + (0, 1)*track(3,jtrk))/two
+     rm = conjg(rp)
+
+     ! Compute \partial_+ G using Eq. (7) in Ref. above     
+     del_p_g = 0
+     do k = 1, nord
+        sum0 = 0
+        do j = 0, k - 1
+           sum0 = sum0 + (k - j)*g(k, j)*rp**(k - 1 - j)*rm**j
+        enddo
+        del_p_g = del_p_g + sum0
+     enddo
+     ! Now compute kick (Eqs. (38) in Ref. above)
+     pkick = elrad*(barkappa*(one + deltap) + del_p_g)
+
+     dpx = real(pkick)
+     dpy = - aimag(pkick)
+     track(2,jtrk) = track(2,jtrk) + dpx - dbr
+     track(4,jtrk) = track(4,jtrk) + dpy + dbi
+     ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
+     track(5,jtrk) = track(5,jtrk) - elrad*(kx*track(1,jtrk) + ky*track(3,jtrk)) &
+                *(one + beta*track(6,jtrk))/(one + deltap)/beta
+  
+  enddo
+
+
+end subroutine ttmult_cf
 
 subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   use twtrrfi
@@ -1069,7 +1252,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   !--- Time variation for fields in matrix, multipole or RF-cavity
   ! 2015-Jun-24  18:55:43  ghislain: DOC FIXME not documented!!!
  ! time_var = node_value('time_var ') .ne. zero
- time_var = .false.
+
   if (time_var .and. time_var_m) then
      time_var_m_cnt = time_var_m_cnt + 1
      time_var_m_lnt = time_var_m_lnt + 1
@@ -1929,6 +2112,9 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   !---- Kick at dipole corrector magnet
   !     including PT-dependence
+  if(el.gt.zero) then
+    call ttdrf(el/two,track,ktrack); !Tracks to the middle
+  endif
   do i = 1, ktrack
      px = track(2,i)
      py = track(4,i)
@@ -1965,7 +2151,9 @@ subroutine ttcorr(el,track,ktrack,turn, code)
      !        ((one + bet0*track(6,i))/ddd)*bet0i
 
   enddo
-
+  if(el .gt. zero) then
+    call ttdrf(el/two,track,ktrack); !Tracks from the middle to the
+  endif
   !---- Half radiation effects at exit.
   !     If not random, use same RFAC as at entrance.
   if (radiate  .and.  el .ne. 0) then
@@ -2618,7 +2806,7 @@ subroutine tt_ploss(npart,turn,spos,orbit,el_name)
 end subroutine tt_ploss
 
 subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
-                     spos,ielem,el_name)
+                     spos,ielem,el_name, onlyaver)
   use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
@@ -2637,8 +2825,9 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
   character(len=name_len) :: el_name
 
   logical, save :: first = .true.
+  logical :: onlyaver
   integer :: i, j, length
-  double precision :: tmp, tt, ss, spos
+  double precision :: tmp, tt, ss, spos, tmp_v(6)
   character(len=120) :: table = 'trackone', comment
   character(len=4) :: vec_names(7)
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
@@ -2648,19 +2837,38 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
 
   write(comment, '(''#segment'',4i8,1X,A)') segment, tot_segm, npart, ielem, el_name
   if (first) call comment_to_table_curr(table, comment, length)
+  if(onlyaver) then
+    call double_to_table_curr(table, 'turn ', tt)
+    ss = -1.0
+    call double_to_table_curr(table, 'number ', ss)
+    do j = 1, 6
+    tmp = 0
+      do i = 1, npart
+        tmp = tmp + (z(j,i) - orbit0(j))
+      enddo
+      call double_to_table_curr(table, vec_names(j), tmp/npart)
+    enddo
+    
+    call double_to_table_curr(table,vec_names(7),spos)
+    call augment_count(table)
+  else 
+    tt = turn
+    do i = 1, npart
+       call double_to_table_curr(table, 'turn ', tt)
+       ss = part_id(i)
+       call double_to_table_curr(table, 'number ', ss)
+       do j = 1, 6
+          tmp = z(j,i) - orbit0(j)
+          call double_to_table_curr(table, vec_names(j), tmp)
+       enddo
+       call double_to_table_curr(table,vec_names(7),spos)
+       call augment_count(table)
+    enddo
+  endif
+  
 
-  tt = turn
-  do i = 1, npart
-     call double_to_table_curr(table, 'turn ', tt)
-     ss = part_id(i)
-     call double_to_table_curr(table, 'number ', ss)
-     do j = 1, 6
-        tmp = z(j,i) - orbit0(j)
-        call double_to_table_curr(table, vec_names(j), tmp)
-     enddo
-     call double_to_table_curr(table,vec_names(7),spos)
-     call augment_count(table)
-  enddo
+
+
 end subroutine tt_putone
 
 subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
@@ -2745,9 +2953,9 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
 
   integer :: i, n, nn, nna
   double precision :: ap1, ap2, ap3, ap4, x, y!, pi
-  logical :: lost, debug
+  logical :: lost, debug, is_custom
 
-  integer, external :: get_option, inside_userdefined_geometry
+  integer, external :: get_option, inside_userdefined_geometry, is_custom_set
   double precision, parameter :: min_double=1.d-36
 
  ! debug = get_option('debug ') .ne. 0
@@ -2894,14 +3102,13 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
      case(ap_custom)
         ap1 = aperture(1)
         ap2 = aperture(2)
-     case(ap_notset)
+     case(ap_custom_inter)
      ! Intenitionaly left blank. 
 
 
      case default
         ! add error case for un-identified aperture type;
         ! this INCLUDES the case of aperture data given in file with input APERTYPE=filename!
-        print *, "nummmmer", apint
         call fort_warn('trcoll:','called with unknown aperture type. Ignored')
 
   end select
@@ -2958,12 +3165,23 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
         lost =  x .gt. ap1 .or. y .gt. ap2 ! First checks the user defined rectangle
         if(lost) then
           x = z(1,i) - al_errors(11) - offset(1)
-        y = z(3,i) - al_errors(12) - offset(2)
-        lost = inside_userdefined_geometry(x,y) .eq. 0
+          y = z(3,i) - al_errors(12) - offset(2)
+          lost = inside_userdefined_geometry(x,y) .eq. 0
       endif
+      case(ap_custom_inter)
+        lost = .true.
      case default
 
      end select
+     if(lost) then
+       is_custom = is_custom_set() .eq. 1
+       if(is_custom) then
+          x = z(1,i) - al_errors(11) - offset(1)
+          y = z(3,i) - al_errors(12) - offset(2)
+          lost = inside_userdefined_geometry(x,y) .eq. 0  
+       endif
+     endif
+    
 
      if (.not. lost) then
         lost =  ISNAN(z(2,i)) .or. ISNAN(z(4,i))                                .or. &
@@ -3342,7 +3560,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
 
            !---- Radiation loss at entrance (step.eq.1) and exit (step.eq.3)
            if ((step.eq.1).or.(step.eq.3)) then
-              if (radiate) then
+              if (radiate .and. elrad .gt. zero) then
                  !---- Full damping.
                  if (damp) then
                     curv = sqrt(dxt(i)**2 + dyt(i)**2) / elrad;
@@ -3412,7 +3630,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
               dyt(i) = pyf_ - track(4,i);
 
               if ((step.eq.1).or.(step.eq.3)) then
-                 if (radiate) then
+                 if (radiate .and. elrad .gt. zero) then
                     !---- Full damping.
                     if (damp) then
                        curv = sqrt(dxt(i)**2 + dyt(i)**2) / length;
@@ -3481,9 +3699,10 @@ subroutine tttrans(track,ktrack)
   t_z    = node_value('ds ')
 
   !---- Loop over particles
+
+  call ttdrf(-t_z,track,ktrack)
 !$OMP PARALLEL PRIVATE(i)
 !$OMP DO
-  call ttdrf(-t_z,track,ktrack)
   do  i = 1, ktrack
      ! Add vector to particle coordinates
      track(1,i) = track(1,i) - t_x
@@ -4549,6 +4768,7 @@ end subroutine ttcfd
 subroutine tttquad(track, ktrack)
   use twtrrfi
   use trackfi
+  use twiss_elpfi
   use math_constfi, only : zero, one, two, three, half
   implicit none
   !-------------------------*
@@ -4573,7 +4793,7 @@ subroutine tttquad(track, ktrack)
 
   double precision :: hx, hy, rfac, gamma, beta, curv
   double precision :: beta_gamma, beta_sqr, f_damp_t
-  integer :: jtrk
+  integer :: jtrk, elpar_vl
 
   double precision, external :: node_value
   double precision, parameter ::  sqrt2=1.41421356237310d0
@@ -4581,20 +4801,26 @@ subroutine tttquad(track, ktrack)
   double precision, external :: get_value
 
   double precision :: f_errors(0:maxferr)
-  integer, external :: node_fd_errors
+  integer, external :: node_fd_errors, el_par_vector
   integer :: n_ferr
-
-  gamma = get_value('probe ','gamma ')
-  beta = get_value('probe ','beta ')
+  elpar_vl = el_par_vector(q_k1s, g_elpar)
+  !gamma = get_value('probe ','gamma ')
+  !beta = get_value('probe ','beta ')
 
   !---- Read-in the parameters
+  elpar_vl = el_par_vector(r_freq, g_elpar)
+  
   length = node_value('l ');
-  tilt = node_value('tilt ');
+  tilt = g_elpar(q_tilt)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = node_value('k1 ')
-  k1s = node_value('k1s ')
+  k1  = g_elpar(q_k1)
+  k1s = g_elpar(q_k1s)
+  
+  !k1  = node_value('k1 ')
+  !k1s = node_value('k1s ')
+
 
   if (length.ne.zero) then
      k1  = k1  + f_errors(2)/length
@@ -4721,12 +4947,12 @@ subroutine tttquad(track, ktrack)
 
 end subroutine tttquad
 
-subroutine tttdipole(track, ktrack)
+subroutine tttdipole(track, ktrack, code)
   use twtrrfi
   use trackfi
   use math_constfi, only : zero, one, two, three, half
   use code_constfi
-
+  use twiss_elpfi
   implicit none
   !-------------------------*
   ! Andrea Latina 2013-2014 *
@@ -4751,29 +4977,43 @@ subroutine tttdipole(track, ktrack)
 
   double precision, external :: node_value, get_value
   double precision :: f_errors(0:maxferr)
-  integer, external :: node_fd_errors
-  integer :: n_ferr, code
+  integer, external :: node_fd_errors, el_par_vector
+  integer :: n_ferr, code, elpar_vl
 
-  code    = node_value('mad8_type ')
-  arad    = get_value('probe ','arad ')
-  beta    = get_value('probe ','beta ')
-  gamma   = get_value('probe ','gamma ')
-  radiate = get_value('probe ','radiate ') .ne. zero
-
+  !code    = node_value('mad8_type ')
+  !arad    = get_value('probe ','arad ')
+  !beta    = get_value('probe ','beta ')
+  !gamma   = get_value('probe ','gamma ')
+  !radiate = get_value('probe ','radiate ') .ne. zero
+  !All these were removed since they were global parameters. 
+  
+  elpar_vl = el_par_vector(b_k3s, g_elpar)
   !---- Read-in dipole edges angles
-  e1    = node_value('e1 ');
-  e2    = node_value('e2 ');
-  h1    = node_value('h1 ')
-  h2    = node_value('h2 ')
-  hgap  = node_value('hgap ')
-  fint  = node_value('fint ')
-  fintx = node_value('fintx ')
+  !e1    = node_value('e1 ');
+  !e2    = node_value('e2 ');
+  e1 = g_elpar(b_e1)
+  e2 = g_elpar(b_e2)
+  !h1    = node_value('h1 ')
+  !h2    = node_value('h2 ')
+  h1 = g_elpar(b_h1)
+  h2 = g_elpar(b_h2)
+  !hgap  = node_value('hgap ')
+  !fint  = node_value('fint ')
+  !fintx = node_value('fintx ')
+  hgap = g_elpar(b_hgap)
+  fint = g_elpar(b_fint)
+  fintx = g_elpar(b_fintx)
+  
   length = node_value('l ')
-  angle = node_value('angle ')
+  angle  = g_elpar(b_angle)
+
   rho = abs(length/angle)
   h = angle/length
-  k0 = node_value('k0 ') ! was h
-  k1 = node_value('k1 ')
+  k0 = g_elpar(b_k0)
+  k1 = g_elpar(b_k1)
+  !k0 = node_value('k0 ') ! was h
+  !k1 = node_value('k1 ')
+
 
   if (code .eq. code_rbend) then
      e1 = e1 + angle / two;
@@ -4791,9 +5031,13 @@ subroutine tttdipole(track, ktrack)
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
+  if (k0.eq.zero .and. k1.eq.zero) then
+     call ttdrf(length,track,ktrack);
+     return
+  endif
   !---- Apply entrance dipole edge effect
   if (node_value('kill_ent_fringe ') .eq. zero) &
-       call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, zero)
+       call ttdpdg_map(track, ktrack, e1, h, hgap, fint, zero)
 
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
@@ -4817,7 +5061,7 @@ subroutine tttdipole(track, ktrack)
            curv = sqrt(hx**2+hy**2);
            call trphot(length * (one + h*x) - two * tan(e1)*x, curv, rfac, pt);
         else
-           beta_gamma = delta_plus_1 * gamma * beta;
+           beta_gamma = delta_plus_1 * gammas * beta;
            rfac = (arad * beta_gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e1)*x)
         endif
         if (damp) then
@@ -4849,7 +5093,7 @@ subroutine tttdipole(track, ktrack)
            curv = sqrt(hx**2+hy**2);
            call trphot(length * (one + h*x) - two * tan(e2)*x, curv, rfac, pt);
         else
-           beta_gamma = delta_plus_1 * gamma * beta;
+           beta_gamma = delta_plus_1 * gammas * beta;
            rfac = (arad * beta_gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e2)*x)
         endif
         if (damp) then
@@ -4882,7 +5126,7 @@ subroutine tttdipole(track, ktrack)
   !---- Apply exit dipole edge effect
   if (node_value('kill_exi_fringe ') .eq. zero) then
      if (fintx .lt. zero) fintx = fint
-     call ttdpdg_map(track, ktrack, e2, h2, hgap, fintx, zero)
+     call ttdpdg_map(track, ktrack, e2, h, hgap, fintx, zero)
   endif
 
 end subroutine tttdipole

@@ -1,7 +1,7 @@
 import numpy as np
 import os,shutil
 import matplotlib.pyplot as plt
-from convert import convert_files
+
 import sys
 import subprocess
 
@@ -23,6 +23,16 @@ f = open("myge.dat", "w")
 for i in range(0,len(x)):
 	f.write(str(x[i]) + " "+ str(y[i]) +"\n")
 f.close()
+f = open("internal.dat", "w")
+for i in range(0,len(x)):
+	f.write(str(x[i]) +" ,")
+
+f.write("\n")
+for i in range(0,len(x)):
+	f.write(str(y[i]) +" ,")
+f.close()
+
+
 
 xo=[]
 yo=[]

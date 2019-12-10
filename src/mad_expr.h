@@ -35,7 +35,7 @@ struct expression* new_expression(const char* in_string, struct int_array*);
 struct expression* clone_expression(struct expression*);
 struct expression* delete_expression(struct expression*);
 struct expression* scale_expr(struct expression*, double scale);
-struct expression* compound_expr(struct expression*, double v1, const char* oper, struct expression*, double v2);
+struct expression* compound_expr(struct expression*, double v1, const char* oper, struct expression*, double v2, int parentheses);
 double             expr_combine(struct expression*, double v1, const char* oper, struct expression*, double v2, struct expression**);
 double             expression_value(struct expression*, int flag); /* recursive */
 void               dump_expression(struct expression*);

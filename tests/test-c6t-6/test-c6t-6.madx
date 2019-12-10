@@ -1,0 +1,31 @@
+SET, FORMAT="12d", "-18.5e", "25s";
+circum = 1;
+
+
+m2: sbend, l=1, angle=1.2, k0=1;
+
+bend_seq: sequence, refer=center, l=circum;
+m2, at=0.5;
+endsequence;
+
+
+beam;
+x_in = 0.005;
+y_in = 0.007;
+use, sequence=bend_seq;	
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,x,px,y,py;
+twiss, betx=1, bety=1, x=x_in, y=y_in, file="bend.dat";
+
+select, flag=makethin, slice=1 ;
+makethin, sequence=bend_seq;
+use, sequence=bend_seq;
+
+SELECT, FLAG=ERROR, class=multipole;
+
+EFCOMP,DKN= {-0.2,1};
+twiss, betx=1, bety=1, x=x_in, y=y_in, file="thin.dat";
+sixtrack;
+save, sequence=bend_seq, file="thin.seq";	
+

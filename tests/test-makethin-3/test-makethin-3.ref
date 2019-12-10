@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.08.30 11:48:39      +
+  + Execution date: 2019.10.16 14:56:55      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
@@ -153,6 +153,8 @@ parameter: apertype   string: circle
 parameter: aperture   double array: 0.000000e+00 
 parameter: aper_offset   double array: 0.000000e+00 
 parameter: aper_tol   double array: 0.000000e+00 0.000000e+00 0.000000e+00 
+parameter: aper_vx   double array: -1.000000e+00 
+parameter: aper_vy   double array: -1.000000e+00 
 parameter: slot_id   expression: none :: value:     0.000000
 integer:          0
 parameter: assembly_id   expression: none :: value:     0.000000
@@ -170,6 +172,7 @@ parameter: fringe   integer:          0
 parameter: bend_fringe   logical: false
 parameter: kill_ent_fringe   logical: false
 parameter: kill_exi_fringe   logical: false
+parameter: aper_tilt   double value:     0.000000
 parameter: time_var   logical: false
 parameter: comments   string: (null)
 show mqxb.a2l2..2;
@@ -200,6 +203,8 @@ parameter: apertype   string: circle
 parameter: aperture   double array: 0.000000e+00 
 parameter: aper_offset   double array: 0.000000e+00 
 parameter: aper_tol   double array: 0.000000e+00 0.000000e+00 0.000000e+00 
+parameter: aper_vx   double array: -1.000000e+00 
+parameter: aper_vy   double array: -1.000000e+00 
 parameter: slot_id   expression: none :: value:     0.000000
 integer:          0
 parameter: assembly_id   expression: none :: value:     0.000000
@@ -217,6 +222,7 @@ parameter: fringe   integer:          0
 parameter: bend_fringe   logical: false
 parameter: kill_ent_fringe   logical: false
 parameter: kill_exi_fringe   logical: false
+parameter: aper_tilt   double value:     0.000000
 parameter: time_var   logical: false
 parameter: comments   string: (null)
 

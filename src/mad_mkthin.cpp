@@ -776,7 +776,7 @@ static command_parameter* par_scaled(const command_parameter* par_inp, const com
     if (length_param->expr ) // first * l, expression or value
     {
       if(!par_out->expr) par_out->expr=my_get_param_expression(par_out);
-      par_out->expr = compound_expr(par_out->expr,par_out->double_value,"*",length_param->expr,length_param->double_value); // multiply expression with length
+      par_out->expr = compound_expr(par_out->expr,par_out->double_value,"*",length_param->expr,length_param->double_value,1); // multiply expression with length
     }
     else
     {
@@ -786,7 +786,7 @@ static command_parameter* par_scaled(const command_parameter* par_inp, const com
     }
     if (nslices > 1) // 2nd step, divide by nslices, expression or number
     {
-      if (par_out->expr) par_out->expr = compound_expr(par_out->expr,0.,"/",nullptr,nslices);
+      if (par_out->expr) par_out->expr = compound_expr(par_out->expr,0.,"/",nullptr,nslices,1);
       else par_out->double_value /= nslices;
     }
     if( MaTh::iMoreExpressions<1 && par_out->expr)
@@ -926,12 +926,12 @@ scale_and_slice(command_parameter* kn_param,const command_parameter* length_para
       if (kl_flag == 0 && (mult_with_length||i>0)) // apply mult_with_length only to zero order multipole
       {
         if (length_param->expr || kn_i_expr)
-          kn_i_expr = compound_expr(kn_i_expr, kn_i_val, "*", length_param->expr, length_param->double_value); // multiply expression with length
+          kn_i_expr = compound_expr(kn_i_expr, kn_i_val, "*", length_param->expr, length_param->double_value,1); // multiply expression with length
         else kn_i_val *= length_param->double_value; // multiply value with length
       }
       if (nslices > 1) // give the correct weight by slice (divide by the number of slices)
       {
-        if (kn_i_expr) kn_i_expr = compound_expr(kn_i_expr,kn_i_val,"/",nullptr,nslices);
+        if (kn_i_expr) kn_i_expr = compound_expr(kn_i_expr,kn_i_val,"/",nullptr,nslices,1);
         else kn_i_val *= 1./nslices;
       }
       if(MaTh::Verbose>1)
@@ -966,7 +966,7 @@ static void set_lrad(command* cmd,const command_parameter* length_param,const in
       strcpy(l_par->name,"lrad"); // rename to lrad
       if (nslices > 1) // and divide numbers or expressions by the number of nslices
       {
-        if (l_par->expr) l_par->expr = compound_expr(l_par->expr,0.,"/",nullptr,nslices);
+        if (l_par->expr) l_par->expr = compound_expr(l_par->expr,0.,"/",nullptr,nslices,1);
         else l_par->double_value /= nslices;
       }
       if( MaTh::iMoreExpressions<1 && l_par->expr)
@@ -992,7 +992,7 @@ static expression* curved_from_straight_length(const element* rbend_el)
     std::string anglestr = my_get_cmd_expr_str( return_param_recurse("angle", rbend_el) );
     const std::string rat = "1.0/sinc("+anglestr+"*0.5)"; // L_sbend / L_rbend
     expression* rat_expr = new_expression(rat.c_str(),deco);
-    l_sbend_expr = compound_expr(l_rbend_expr,0,"*",rat_expr,0); // this also updates the value
+    l_sbend_expr = compound_expr(l_rbend_expr,0,"*",rat_expr,0,1); // this also updates the value
     if(MaTh::Verbose>1)
     {
       bool found=false;
@@ -1036,12 +1036,12 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const std::
 {
   if(rbend_el && to_el)
   {
-    expression* half_angle_expr  = compound_expr(my_get_param_expression(rbend_el,"angle"),0.,"/",nullptr,2); // angle/0.5  add this to any existing to_parm_name (e1 or e2)
+    expression* half_angle_expr  = compound_expr(my_get_param_expression(rbend_el,"angle"),0.,"/",nullptr,2,1); // angle/0.5  add this to any existing to_parm_name (e1 or e2)
     command_parameter* to_param = return_param_recurse(to_parm_name.c_str(),to_el); // get param from element, use here the non const version of return_param_recurse, to modify to_el
     if(to_param) // modify the existing parameter in to_el
     {
       if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " to_parm_name=" << to_parm_name << "    original to_param " << my_dump_expression(my_get_param_expression(to_param)) << '\n';
-      to_param->expr = compound_expr( my_get_param_expression(to_param) ,0,"+",half_angle_expr,0);
+      to_param->expr = compound_expr( my_get_param_expression(to_param) ,0,"+",half_angle_expr,0,1);
     }
     else // param was null in to_el, start from parameter definition
     {
@@ -1096,11 +1096,11 @@ static void place_thin_slice(const node* node, sequence* to_sequ, element* slice
       ostr << std::setprecision(17) << at + at_shift;
       std::string expr_str=ostr.str().c_str();
       expression* new_at_expr = new_expression(expr_str.c_str(), nullptr);
-      at_expr = compound_expr(new_at_expr, at + at_shift, "+", nullptr,  0 ); // use compound_expr to get value updated
+      at_expr = compound_expr(new_at_expr, at + at_shift, "+", nullptr,  0,1 ); // use compound_expr to get value updated
       strcpy(at_expr->string,expr_str.c_str()); // keep the string, avoid expression with  "+ ( 0 )"
       if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " at=" << at << " at_shift=" << at_shift << " expr_str=" << expr_str << " at_expr=" << my_dump_expression(at_expr) << std::endl;
     }
-    else at_expr = compound_expr(node->at_expr, at, "+", scale_expr(length_param_expr,rel_shift),  0 ); // use length expression and rel_shift value, this also updates the value
+    else at_expr = compound_expr(node->at_expr, at, "+", scale_expr(length_param_expr,rel_shift),  0 ,1); // use length expression and rel_shift value, this also updates the value
     place_node_at(node,to_sequ,sliced_elem,at_expr);
   }
   else
@@ -1315,10 +1315,15 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
     if (ipos2 >= 0)
     {
       sequence* thick_sequ = sequences->sequs[ipos2];
-      sequence* sliced_seq = sliced_seqlist.slice_sequence(slice_style,thick_sequ,LastSequenceSliced,LastStyle); // slice the sequence
-      disable_line(sliced_seq->name, line_list);
-      sliced_seq->start->previous = sliced_seq->end;
-      LastSequenceSliced=thick_sequ->name;
+      if(thick_sequ->ref_flag!=0){
+        warning("REFER in lattice must be set to CENTER, MAKETHIN:", "ignored");
+      }
+      else{
+        sequence* sliced_seq = sliced_seqlist.slice_sequence(slice_style,thick_sequ,LastSequenceSliced,LastStyle); // slice the sequence
+        disable_line(sliced_seq->name, line_list);
+        sliced_seq->start->previous = sliced_seq->end;
+        LastSequenceSliced=thick_sequ->name;
+      }
     }
     else warning("unknown sequence ignored:", name);
   }
@@ -1703,7 +1708,7 @@ element* SeqElList::create_bend_dipedge_element(element* thick_elem,const bool E
     expression* l_par_expr=my_get_param_expression(thick_elem, "l"); // with this l_par_expr should not be NULL
     expression* angle_par_expr = my_get_param_expression(thick_elem,"angle");
     command_parameter* hparam=new_command_parameter("h",k_double);
-    hparam->expr=compound_expr(angle_par_expr,0.,"/",l_par_expr,0); // this also updates the value
+    hparam->expr=compound_expr(angle_par_expr,0.,"/",l_par_expr,0,1); // this also updates the value
 
     command* dipedge_cmd = new_cmdptr( find_element("dipedge", base_type_list) );
 
@@ -1848,8 +1853,8 @@ element* SeqElList::create_thick_slice(const element* thick_elem,const int slice
   if(entry_fl || exit_fl) LengthFraction=SP.delta; // start / end slice
   else                    LengthFraction=SP.Delta; // the middle or body piece
 
-  l_par_expr                        = compound_expr(l_par_expr,    0, "*", nullptr, LengthFraction); // multiply length parameter expression with LengthFraction
-  if(angle_par_expr) angle_par_expr = compound_expr(angle_par_expr,0, "*", nullptr, LengthFraction); // multiply angle  parameter expression with LengthFraction, only relevant for bends
+  l_par_expr                        = compound_expr(l_par_expr,    0, "*", nullptr, LengthFraction,1); // multiply length parameter expression with LengthFraction
+  if(angle_par_expr) angle_par_expr = compound_expr(angle_par_expr,0, "*", nullptr, LengthFraction,1); // multiply angle  parameter expression with LengthFraction, only relevant for bends
 
   command* cmd = new_cmdptr( thick_elem );
   copy_params_from_elem(cmd,thick_elem,MaTh::DoNotCopy);
@@ -2031,7 +2036,7 @@ element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no
 
     if(multipole_angle_param && nslices>1) // case of angle different from k0l
     {
-      if (angle_param->expr) multipole_angle_param->expr  =  compound_expr(angle_param->expr,0.,"/",nullptr,nslices);
+      if (angle_param->expr) multipole_angle_param->expr  =  compound_expr(angle_param->expr,0.,"/",nullptr,nslices,1);
       else multipole_angle_param->double_value /= nslices;
     }
   }
@@ -2244,7 +2249,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
     std::ostringstream ostr;
     ostr << std::setprecision(15) << at; // use the value as string
     at_expr = new_expression(ostr.str().c_str(), nullptr);    // where deco is a global.   Seems expression value not well defined
-    at_expr = compound_expr( at_expr,0,"+",0,0); // trick to update value
+    at_expr = compound_expr( at_expr,0,"+",0,0,1); // trick to update value
     if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " from at value=" << std::setw(8) << at << " new at_expr " << my_dump_expression(at_expr) << '\n';
   }
 
@@ -2288,8 +2293,8 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       }
       if (fabs(at_shift(nslices,i,local_slice_style))>0.0)
       {
-        if( MaTh::iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",  nullptr, length*at_shift(nslices,i,local_slice_style) );  // use length and shift values, no expressions
-        else thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",scale_expr(l_expr,at_shift(nslices,i,local_slice_style)),length*at_shift(nslices,i,local_slice_style)); // use length expressions
+        if( MaTh::iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",  nullptr, length*at_shift(nslices,i,local_slice_style),1 );  // use length and shift values, no expressions
+        else thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",scale_expr(l_expr,at_shift(nslices,i,local_slice_style)),length*at_shift(nslices,i,local_slice_style),1); // use length expressions
       }
       else
       {
@@ -2335,7 +2340,7 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
     std::ostringstream ostr;
     ostr << std::setprecision(15) << at; // use the value as string
     at_expr = new_expression(ostr.str().c_str(), nullptr);    // where deco is a global.   Seems expression value not well defined
-    at_expr = compound_expr( at_expr,0,"+",0,0); // trick to update value
+    at_expr = compound_expr( at_expr,0,"+",0,0,1); // trick to update value
     if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " from at value=" << std::setw(8) << at << " new at_expr " << my_dump_expression(at_expr) << '\n';
   }
 
@@ -2356,8 +2361,8 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
     expression* thin_at_expr=nullptr;
     if (fabs(at_shift(nslices,i,local_slice_style))>0.0)
     {
-      if( MaTh::iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",  nullptr, length*at_shift(nslices,i,local_slice_style) );  // use length and shift values, no expressions
-      else thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",scale_expr(l_expr,at_shift(nslices,i,local_slice_style)),length*at_shift(nslices,i,local_slice_style)); // use length expressions
+      if( MaTh::iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",  nullptr, length*at_shift(nslices,i,local_slice_style) ,1);  // use length and shift values, no expressions
+      else thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",scale_expr(l_expr,at_shift(nslices,i,local_slice_style)),length*at_shift(nslices,i,local_slice_style),1); // use length expressions
     }
     else
     {
@@ -2511,8 +2516,8 @@ void SeqElList::place_thick_slice(const element* thick_elem, element* sliced_ele
     else if(i==nslices)  rel_shift= 0.5 - SP.delta/2.; // exit
     else                 rel_shift=-0.5 + SP.delta + (i-1.5)*SP.Delta; // body
     if(verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " rel_shift=" << rel_shift << '\n';
-    if(MaTh::iMoreExpressions<1) at_expr = compound_expr(at_expr,at, "+", nullptr, el_par_value("l",thick_elem) *rel_shift );  // use length and shift values, no expressions
-    else at_expr = compound_expr(at_expr,at, "+", scale_expr(l_par_expr,rel_shift),  0 ); // MaTh::iMoreExpressions==1, use length expression and shift value
+    if(MaTh::iMoreExpressions<1) at_expr = compound_expr(at_expr,at, "+", nullptr, el_par_value("l",thick_elem) *rel_shift,1 );  // use length and shift values, no expressions
+    else at_expr = compound_expr(at_expr,at, "+", scale_expr(l_par_expr,rel_shift),  0 ,1); // MaTh::iMoreExpressions==1, use length expression and shift value
   }
   else
   { //
@@ -2524,23 +2529,23 @@ void SeqElList::place_thick_slice(const element* thick_elem, element* sliced_ele
     else if(i==1) // entry piece -1/2 + 1./(2.*SP.delta_inv)
     {
       std::string tstr1="-1/2";
-      rel_shift_expr = compound_expr(new_expression(tstr1.c_str(),nullptr), 0., "+", new_expression(SP.delta_half_str.c_str(),nullptr), 0); // entry
+      rel_shift_expr = compound_expr(new_expression(tstr1.c_str(),nullptr), 0., "+", new_expression(SP.delta_half_str.c_str(),nullptr), 0,1); // entry
     }
     else if(i==nslices) // 0.5 - 1./(2.*SP.delta_inv); // exit
     {
       std::string tstr1="1/2";
-      rel_shift_expr = compound_expr(new_expression(tstr1.c_str(),nullptr), 0., "-", new_expression(SP.delta_half_str.c_str(),nullptr), 0); // exit
+      rel_shift_expr = compound_expr(new_expression(tstr1.c_str(),nullptr), 0., "-", new_expression(SP.delta_half_str.c_str(),nullptr), 0,1); // exit
     }
     else // -0.5 + 1./SP.delta_inv + (i-1.5)*SP.Delta; // body
     {
       std::string tstr1="-1/2";
       std::string tstr2=SP.delta_str+"+"+std::to_string(2*i-3)+"*"+SP.Delta_half_str;
-      rel_shift_expr = compound_expr(new_expression(tstr1.c_str(),nullptr), 0., "+", new_expression(tstr2.c_str(),nullptr), 0); // entry
+      rel_shift_expr = compound_expr(new_expression(tstr1.c_str(),nullptr), 0., "+", new_expression(tstr2.c_str(),nullptr), 0,1); // entry
     }
     // multiply with lpar
-    rel_shift_expr=compound_expr(l_par_expr,at, "*", rel_shift_expr,  0 );
+    rel_shift_expr=compound_expr(l_par_expr,at, "*", rel_shift_expr,  0,1 );
     if(verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " rel_shift_expr " << my_dump_expression(rel_shift_expr) << '\n';
-    at_expr = compound_expr(at_expr,at, "+", rel_shift_expr,  0 ); // this also updates the value
+    at_expr = compound_expr(at_expr,at, "+", rel_shift_expr,  0,1 ); // this also updates the value
   }
   place_node_at(work_node,sliced_seq,sliced_elem,at_expr);
 }
@@ -2669,6 +2674,12 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
     if (theSeqElList.current_node() == thick_sequ->end)
     {
       break;
+    } 
+    if(theSeqElList.current_node()->p_elem!=nullptr){
+      if(strcmp(theSeqElList.current_node()->p_elem->base_type->name, "rfcavity")==0 &&
+        find_element(theSeqElList.current_node()->p_elem->name, sliced_seq->cavities) == nullptr){
+        add_to_el_list(&theSeqElList.current_node()->p_elem, 0, sliced_seq->cavities, 0);
+      }
     }
     theSeqElList.current_node(theSeqElList.current_node()->next); // set current_node
   }
@@ -2690,5 +2701,7 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
   put_sequ(thick_sequ); // Slicing done for this sequence. Add to list of sequences sliced
   if(MaTh::Verbose) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " before print theSeqElList" << std::endl;
   if(MaTh::Verbose) theSeqElList.Print(); // print final list
+
+
   return sliced_seq;
 } // slice_sequence
