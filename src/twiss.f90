@@ -675,7 +675,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   integer, parameter :: max_rep=100
 
   debug = get_option('debug ')
-  
+
   !---- Initialize
   !---- corr_pick stores for both projection the last pickup used by the
   !     threader in order to avoid corrections in front of it when
@@ -3300,12 +3300,12 @@ SUBROUTINE tw_summ(rt,tt)
   orbit5 = -opt_fun0(13)
 
   !---- check rmat
-  if (abs(opt_fun0(29)).gt.1d-8 .or. abs(opt_fun0(30)).gt.1d-8 .or. &
-      abs(opt_fun0(31)).gt.1d-8 .or. abs(opt_fun0(32)).gt.1d-8) then
-      print *, 'rmat=', opt_fun0(29:32)
-      call fort_warn('Chromaticity calculation wrong due to coupling, ',&
-                     'use chrom option or manual calculation')
-  endif
+  ! if (abs(opt_fun0(29)).gt.1d-8 .or. abs(opt_fun0(30)).gt.1d-8 .or. &
+  !     abs(opt_fun0(31)).gt.1d-8 .or. abs(opt_fun0(32)).gt.1d-8) then
+  !     print *, 'rmat=', opt_fun0(29:32)
+  !     call fort_warn('Chromaticity calculation wrong due to coupling, ',&
+  !                    'use chrom option or manual calculation')
+  ! endif
 
   !---- Fill summary table
   call double_to_table_curr('summ ','length ' ,suml)
@@ -4169,7 +4169,7 @@ INTEGER FUNCTION Factorial(n)
   implicit none
   integer, intent(in) :: n
   integer :: i, Ans
-  
+
   Ans = 1
   do i = 1, n
     Ans = Ans * i
@@ -4181,7 +4181,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   use twtrrfi, only : maxmul, maxferr
   use twissbeamfi, only : deltap, beta
   use math_constfi, only : zero, one, two, three
-  implicit none 
+  implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Computes thin-lens kick through combined-function magnet.        *
@@ -4212,7 +4212,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   double precision, external :: node_value
   integer, external :: node_fd_errors
   fmap = .true.
-  
+
   ! Read magnetic field components & fill lambda's according to field
   ! components relative to given plane
   normal = zero ; call get_node_vector('knl ', nn, normal)
@@ -4285,7 +4285,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   do iord = 0, max(nn, ns, n_ferr/2-1)
  !    get the maximum effective order; loop runs over maximum of user given values
      if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
-          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1 
+          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
   enddo
 
   do iord = 1, nord
@@ -4305,7 +4305,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      f_errors(2*iord)   = bvk * f_errors(2*iord)
      f_errors(2*iord+1) = bvk * f_errors(2*iord+1)
   enddo
-  !Done with all the setting up... 
+  !Done with all the setting up...
 
   if (elrad.gt.zero) then
     lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad/Factorial(k)
@@ -4316,9 +4316,9 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   else
      lambda = zero
   endif
-  
+
   kx = real(lambda(0))    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
-  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in 
+  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
                           ! Phys. Rev. AccelBeams 19.054002
 
   kappa = kx + (0, 1)*ky
@@ -4350,7 +4350,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      rp = (orbit(1) + (0, 1)*orbit(3))/two
      rm = conjg(rp)
 
-     ! Compute \partial_+ G using Eq. (7) in Ref. above     
+     ! Compute \partial_+ G using Eq. (7) in Ref. above
      del_p_g = 0
      do k = 1, nord
         sum0 = 0
@@ -4378,11 +4378,11 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      ! derivative of \partial_+ G wrt. x and y at zero, see documentation.
      dxdpg = elrad/two*(two*g(2, 0) + g(2, 1))
      dydpg = elrad/two*(0, 1)*(two*g(2, 0) - g(2, 1))
-     
+
      re(2, 1) = real(dxdpg)
      re(2, 3) = real(dydpg)
      re(2, 6) = elrad*kx/beta
-     
+
      re(4, 1) = - aimag(dxdpg)
      re(4, 3) = - aimag(dydpg)
      re(4, 6) = elrad*ky/beta
@@ -4402,14 +4402,14 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      dxx = elrad/two*(three*g(3, 0) + two*g(3, 1) + g(3, 2))/two
      dxy = elrad/two*(0, 1)*(three*g(3, 0) - g(3, 2))/two
      dyy = -elrad/two*(three*g(3, 0) - two*g(3, 1) + g(3, 2))/two
-     
+
      bp1 = one - one/beta**2
 
      te(1, 1, 2) = 0.5*elrad*kx
      te(1, 2, 1) = te(1, 1, 2)
      te(1, 2, 3) = 0.5*elrad*ky
      te(1, 3, 2) = te(1, 2, 3)
-       
+
      te(2, 1, 1) = real(dxx)   ! cf
      te(2, 1, 3) = real(dxy)   ! cf
      te(2, 3, 1) = te(2, 1, 3) ! cf
@@ -4417,12 +4417,12 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      te(2, 2, 2) = - te(1, 1, 2)
      te(2, 4, 4) = - te(1, 1, 2)
      te(2, 6, 6) = te(1, 1, 2)*bp1
-       
+
      te(3, 1, 4) = te(1, 1, 2)
      te(3, 3, 4) = te(1, 2, 3)
      te(3, 4, 1) = te(1, 1, 2)
      te(3, 4, 3) = te(1, 2, 3)
-       
+
      te(4, 1, 1) = - aimag(dxx)  ! cf
      te(4, 1, 3) = - aimag(dxy)  ! cf
      te(4, 3, 1) = te(4, 1, 3)   ! cf
@@ -4430,7 +4430,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      te(4, 2, 2) = - te(1, 2, 3)
      te(4, 4, 4) = - te(1, 2, 3)
      te(4, 6, 6) = te(1, 2, 3)*bp1
-       
+
      te(5, 1, 6) = - te(1, 1, 2)*bp1
      te(5, 3, 6) = - te(1, 2, 3)*bp1
      te(5, 6, 1) = - te(1, 1, 2)*bp1
@@ -7050,8 +7050,8 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
   long_coup_on  = get_option('long_coup_off ') .eq. 0
-  
-     
+
+
 !frs on 06.06.2016
 !  safeguard TWISS from failing due to undefined SC elements
   if (bb_sxy_update .and. long_coup_on .and. N_spch .gt. 0) then
@@ -7075,7 +7075,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
      sx = node_value('sigx ')
      sy = node_value('sigy ')
   endif
-  
+
   if (sx < 1e-16 .or. sy < 1e-16) then
      re = zero;
      re(1,1) = 1;
@@ -7084,7 +7084,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
      re(4,4) = 1;
      return;
   endif
-  
+
   xm = node_value('xma ')
   ym = node_value('yma ')
 
@@ -7943,7 +7943,7 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
 
   !---- Half radiation effect at entry.
   if (radiate .and. ftrk) then
-    if(elrad .eq. zero) then 
+    if(elrad .eq. zero) then
       call fort_warn('TWCPGO: ','Radiation effects ignored for solenoid '// &
                          'with l=0, lrad=0 and radiate=true')
     else
@@ -7982,7 +7982,7 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
 
   !---- Half radiation effect at exit.
   if (radiate .and. ftrk) then
-      if(elrad .eq. zero) then 
+      if(elrad .eq. zero) then
       call fort_warn('TWCPGO: ','Radiation effects ignored for solenoid '// &
                          'with l=0, lrad=0 and radiate=true')
     else
