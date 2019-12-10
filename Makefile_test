@@ -167,6 +167,7 @@ onlxp  = $(if $(and $(call eq,$(OSTYPE),Linux),\
                       $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
 onlx64 = $(if $(and $(call eq,$(ARCH),64),\
                     $(call eq,$(OSTYPE),Linux),\
+                    $(call eq,$(COMP),gnu),\
                     $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
 
 # info on macros above
