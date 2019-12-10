@@ -7,11 +7,11 @@
  | Gnu General Public License
  |
  o---------------------------------------------------------------------o
-  
+
    Purpose:
      numerical diff of files
      provides the main ndiff loop
- 
+
  o---------------------------------------------------------------------o
 */
 
@@ -226,7 +226,7 @@ ndiff_setup (T *dif, int n, int r)
     .blank = dif->blank, .check = dif->check,
     .max_i = dif->max_i,
     .reg = dif->reg, .reg_n = r,
-    .cxt = dif->cxt,      
+    .cxt = dif->cxt,
     .buf_n = n
   };
 }
@@ -372,8 +372,8 @@ ndiff_fillLine (T *dif, const char *lhs_b, const char *rhs_b)
 
   ndiff_reset_buf(dif);
 
-  int s1 = strlen(lhs_b)+1; 
-  int s2 = strlen(rhs_b)+1; 
+  int s1 = strlen(lhs_b)+1;
+  int s2 = strlen(rhs_b)+1;
   ndiff_grow(dif, imax(s1,s2));
   memcpy(dif->lhs_b, lhs_b, s1);
   memcpy(dif->rhs_b, rhs_b, s2);
@@ -538,7 +538,7 @@ lhs_done: ;
   char tag[sizeof _c.eps.tag];
   memcpy(tag, dif->lhs_b, sizeof tag);
   memcpy(dif->lhs_b, _c.eps.tag, sizeof _c.eps.tag);
-  int cmd = _c.eps.cmd | eps_swap; 
+  int cmd = _c.eps.cmd | eps_swap;
   _c.eps.cmd = (enum eps_cmd)cmd;
 
   while (1) {
@@ -778,21 +778,17 @@ ndiff_testNum (T *dif, const C *c)
     if (abs_d > abs || abs_d < _abs) ret |= eps_abs;
   }
 
-  // relative comparison 
+  // relative comparison
   if (c->eps.cmd & eps_rel) {
-    if (f1 || f2) {
-       rel = c->eps. rel_reg ?                                             reg_getval(dif->reg, dif->reg_n, c->eps. rel_reg)  : c->eps. rel;
-      _rel = c->eps._rel_reg ? (c->eps._rel_reg == c->eps.rel_reg ? -rel : reg_getval(dif->reg, dif->reg_n, c->eps._rel_reg)) : c->eps._rel;
-    } else rel = _rel = 0; // integer case
+     rel = c->eps. rel_reg ?                                             reg_getval(dif->reg, dif->reg_n, c->eps. rel_reg)  : c->eps. rel;
+    _rel = c->eps._rel_reg ? (c->eps._rel_reg == c->eps.rel_reg ? -rel : reg_getval(dif->reg, dif->reg_n, c->eps._rel_reg)) : c->eps._rel;
     if (rel_d > rel || rel_d < _rel) ret |= eps_rel;
   }
 
   // input-specific relative comparison
   if (c->eps.cmd & eps_dig) {
-    if (f1 || f2) {
-       dig = c->eps. dig_reg ?                                             reg_getval(dif->reg, dif->reg_n, c->eps. dig_reg)  : c->eps. dig;
-      _dig = c->eps._dig_reg ? (c->eps._dig_reg == c->eps.dig_reg ? -dig : reg_getval(dif->reg, dif->reg_n, c->eps._dig_reg)) : c->eps._dig;
-    } else dig = _dig = 0; // integer case
+     dig = c->eps. dig_reg ?                                             reg_getval(dif->reg, dif->reg_n, c->eps. dig_reg)  : c->eps. dig;
+    _dig = c->eps._dig_reg ? (c->eps._dig_reg == c->eps.dig_reg ? -dig : reg_getval(dif->reg, dif->reg_n, c->eps._dig_reg)) : c->eps._dig;
     if (dig_d > dig || dig_d < _dig) ret |= eps_dig;
   }
 
@@ -864,9 +860,9 @@ void
 ndiff_option  (T *dif, const int *keep_, const int *blank_, const int *check_, const int *recycle_)
 {
   assert(dif);
-  
+
   if (keep_ )   dif->max_i   = *keep_;
-  if (blank_)   dif->blank   = *blank_; 
+  if (blank_)   dif->blank   = *blank_;
   if (check_)   dif->check   = *check_;
   if (recycle_) dif->recycle = *recycle_;
 
@@ -1029,7 +1025,7 @@ ut_teardown(T *dif)
 
 // ----- test
 
-static void 
+static void
 ut_testPow10(struct utest *utest, T* dif)
 {
   (void)dif;
