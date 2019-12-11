@@ -12,6 +12,59 @@
 <h1>Changes</h1>
 <hr class="h1">
 <!-- -------- -->
+<h3>MAD-X release 5.05.03 (2019.12.YYY)</h3>
+<ul>
+<li> Possible to write the eigenvectors of the one turn map to a file.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/804">#804</a>. (Tobias)
+<li> Arbitrary aperture definition in TRACK.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/806">#806</a>. (Tobias)
+<li> Signficant speed up of the thin TRACK.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/807">#807</a>. (Tobias)
+<li> Fixed a bug in the move command when FROM was used for location.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/815">#815</a>. (Tobias)
+<li> OPENMP compilation restored.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/815">#815</a>. (Tobias, Laurent)
+<li> Signficant speed up of the thick TRACK.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/817">#817</a>. (Tobias)
+<li> Implement flag to save the calculated corrector strength in sequence.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/820">#820</a>. (Tobias)
+<li> Implement a new add expression command.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/822">#822</a>. (Tobias)
+<li> Additional format to define arbitrary aperture geometry. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/823">#823</a>. (Tobias)
+<li> When k0 is not equal to the angle is now exported to SixTrack. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/826">#826</a>. (Tobias)
+<li> When k0 is not equal to the angle is now exported to SixTrack. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/826">#826</a>. (Tobias)
+<li> Thin combine function magnet implemented in TRACK and TWISS. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/826">#826</a>. (Tobias, Malte)
+<li> Thin combine function magnet implemented in TRACK and TWISS. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/826">#826</a>. (Tobias, Malte)
+<li> 3rd clock in PTC which enables RF-modulation. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/833">#833</a>. (Piotr)
+<li> Arbitrary aperture geometry in PTC.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/834">#834</a>. (Piotr)
+<li> Tilted aperture exported to SixTrack.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/836">#836</a>. (Tobias)
+<li> Enables the plotting of longer sequences.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/838">#838</a>. (Tobias)
+<li> If strength is 0 of a dipole it uses the exact drift in TRACK. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/846">#846</a>. (Tobias)
+<li> A corrector could have a length that was disregarded by TRACK. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/851">#851</a>. (Tobias)
+<li> Segmentation fault when weights were used wrongly with MACRO. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/854">#854</a>. (Tobias)
+<li> Radiation and thin solenoid gave NaN values in TWISS. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/858">#858</a>. (Tobias)
+<li> Radiation and thin solenoid gave NaN values in TWISS. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/858">#858</a>. (Tobias)
+<li> RF cavity defined with HARMON and zero LENGTH gets FREQ set to zero. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/858">#858</a>. (Tobias)
+<li> PTC_TWISS with CENTRE option gave one element offset for the S postion. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/859">#859</a>. (Piotr)
+</ul>
+
+
 <h3>MAD-X release 5.05.02 (2019.07.26)</h3>
 <ul>
 <li> Bug fix in MAKETHIN. In version 5.05.00 and 5.05.01 correctors were sliced but the strength was not changed. 
