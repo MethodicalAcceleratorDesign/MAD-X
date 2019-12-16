@@ -2837,6 +2837,7 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
 
   write(comment, '(''#segment'',4i8,1X,A)') segment, tot_segm, npart, ielem, el_name
   if (first) call comment_to_table_curr(table, comment, length)
+  tt = turn
   if(onlyaver) then
     call double_to_table_curr(table, 'turn ', tt)
     ss = -1.0
@@ -2851,8 +2852,7 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
     
     call double_to_table_curr(table,vec_names(7),spos)
     call augment_count(table)
-  else 
-    tt = turn
+  else
     do i = 1, npart
        call double_to_table_curr(table, 'turn ', tt)
        ss = part_id(i)
