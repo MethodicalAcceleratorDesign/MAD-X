@@ -10,7 +10,7 @@ module madx_ptc_twiss_module
   USE madx_ptc_knobs_module
   USE madx_ptc_distrib_module
 
-  implicit none 
+  implicit none
 
   save
 
@@ -878,8 +878,8 @@ contains
     !############################################################################
 
     ! n_rf is a variable of PTC that must be set accordingly
-    
-    
+
+
     do i=1,nclocks
       A_script_probe%ac(i)%om = twopi*clocks(i)%tune * BETA0start / my_ring_length
       !omega of the the modulation
@@ -888,7 +888,7 @@ contains
       A_script_probe%ac(i)%x(2)  = zero  ! initial clock vector (sin like)
     enddo
 
-    
+
 
 
        doRDTtracking = get_value('ptc_twiss ','trackrdts ') .ne. 0
@@ -1919,9 +1919,10 @@ contains
       opt_fun(mu3)=tw%mu(3) !* deltae
 
       ! write(0,*),"DEBUG = ", tw%mu(3) ! should give Qs
-      if ( default%time ) then
-        tw%disp(:) = tw%disp(:) * relativisticBeta
-      endif
+      ! LD: 2019.12.18 removed after complains of FS
+!      if ( default%time ) then
+!        tw%disp(:) = tw%disp(:) * relativisticBeta
+!      endif
 
       opt_fun(disp1)=tw%disp(1) ! was 31 instead of 57
       opt_fun(disp2)=tw%disp(2) ! was 32 instead of 58
@@ -3494,9 +3495,10 @@ contains
          chromaticities(1) = tuneFromComplexVF(vf_kernel%v(1).sub.'10001') ! as in So_fitting.f90
          chromaticities(2) = tuneFromComplexVF(vf_kernel%v(3).sub.'00101') ! as in So_fitting.f90
 
-         if (default%time) then
-            chromaticities(:) = chromaticities(:) * betaRelativistic
-         endif
+      ! LD: 2019.12.18 removed after complains of FS
+!         if (default%time) then
+!            chromaticities(:) = chromaticities(:) * betaRelativistic
+!         endif
          ! to get chromaticities, went to higher order with above "call init_default(default,2,0)"
       else
          ! if icase = 6, delta_p is a phase-space variable and not an external parameter hence we can't compute chromaticies
