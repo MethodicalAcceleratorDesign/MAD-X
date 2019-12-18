@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2019.04.30 14:42:45      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.12.18 10:53:30      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -156,10 +156,10 @@ Determined SECTOR NMUL MAX :  2
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0         1.82657111 
+                 0                  0                  0        1.834664739 
 
           disp2min           disp2max           disp3min           disp3max 
-      -0.362883693       0.3628836818                  0                  0 
+     -0.3644916491       0.3644916378                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 

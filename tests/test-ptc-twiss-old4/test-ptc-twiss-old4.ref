@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.01  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.06.07               +
-  + Execution date: 2019.06.27 10:34:31      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.12.18 10:54:04      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -279,17 +279,17 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.000000000000     
+     energy           100.00000000000000     
      method                   6
      Num. of steps           10
-     charge           1.00000000000000     
-  Length of machine:    534.600000000000     
+     charge           1.0000000000000000     
+  Length of machine:    534.59999999999957     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   -40.5807584670257       0.000000000000000E+000   532.533460530796     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
 ptc_align;
 
 
@@ -324,7 +324,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2,rmatrix;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   3.260716132748987E-004  2.596346677780604E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    3.2607161327489868E-004   2.5963466777806038E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 ++++++ table: ptc_twiss_summary
 
@@ -335,7 +335,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2,rmatrix;
           -1000000    0.0003550636364        47.50612124       0.2546759882 
 
                 q2                dq1                dq2                 qs 
-       0.254674956        1.051019373        1.046713362                  0 
+       0.254674956         1.05106564        1.046759439                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        32.03433146        177.7089538        32.03308004        177.7231017 
@@ -353,10 +353,10 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2,rmatrix;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0        2.177311421 
+                 0                  0                  0        2.177407267 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.02966479784      0.02965774672                  0                  0 
+     -0.0296661037      0.02965905227                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    0.0003260716133 
@@ -406,7 +406,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   3.260716132748987E-004  2.596346677780604E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    3.2607161327489868E-004   2.5963466777806038E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 
 ptc_end;
@@ -465,17 +465,17 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.000000000000     
+     energy           100.00000000000000     
      method                   6
      Num. of steps           10
-     charge           1.00000000000000     
-  Length of machine:    534.600000000000     
+     charge           1.0000000000000000     
+  Length of machine:    534.59999999999957     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   -40.5807584670257       0.000000000000000E+000   532.533460530796     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
 ptc_align;
 
                                     
@@ -552,8 +552,8 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
-++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            1  r^2 =   0.999999997370445       delta =   2.629555129196604E-009
-++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            2  r^2 =   0.999999997370445       delta =   2.629555129196604E-009
+++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            1  r^2 =   0.99999999737044487       delta =    2.6295551291966035E-009
+++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            2  r^2 =   0.99999999737044487       delta =    2.6295551291966035E-009
 
 ++++++ table: ptc_twiss_summary
 
@@ -582,10 +582,10 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0        2.177311417 
+                 0                  0                  0        2.177407264 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.02966479784      0.02965774666                  0                  0 
+     -0.0296661037      0.02965905221                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    0.0003260715489 
