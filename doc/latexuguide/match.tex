@@ -747,7 +747,7 @@ USE_MACRO, NAME=macro1;
      or
 macro1: MACRO={ ... madx statements};
 CONSTRAINT, expr=  "lhs1 < | = | > rhs1";
-CONSTRAINT, expr=  "lhs2 < | = | > rhs2";
+CONSTRAINT, weight=2, expr=  "lhs2 < | = | > rhs2";
 ...  CONSTRAINT statements ...
 MACRO 2 definition
 ... CONSTRAINT statements ...
