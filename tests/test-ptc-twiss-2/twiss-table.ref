@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %30s "LHC Version 6.503 -  July 2009"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.54.06"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "18/12/19"
+@ TIME             %08s "11.26.16"
 * NAME                                S               BETX               BETY                 DX                 DY                  X                 PX                  Y                 PY                 PT                  T 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "LHCB1$START"                        0        11.00000336        11.00000569     -0.01345605803     0.009387970053    -0.002000002022   -6.829939483e-10    3.774259866e-11    0.0001699999934                  0                  0

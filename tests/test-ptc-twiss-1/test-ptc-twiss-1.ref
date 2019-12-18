@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.01  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.06.07               +
-  + Execution date: 2019.06.27 10:38:52      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.12.18 10:53:31      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -83,17 +83,17 @@ Determined SECTOR NMUL MAX :  2
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.000000000000     
+     energy           100.00000000000000     
      method                   6
      Num. of steps           10
-     charge           1.00000000000000     
-  Length of machine:    534.600000000000     
+     charge           1.0000000000000000     
+  Length of machine:    534.59999999999957     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   -40.5807584670257       0.000000000000000E+000   532.533460530796     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -116,7 +116,7 @@ Determined SECTOR NMUL MAX :  2
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   8.892827545188191E-005  7.277289689547276E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    8.8928275451881912E-005   7.2772896895472756E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 ++++++ table: ptc_twiss_summary
 
@@ -127,7 +127,7 @@ Determined SECTOR NMUL MAX :  2
           -1000000     0.000355079062        47.50529435       0.2546195015 
 
                 q2                dq1                dq2                 qs 
-      0.2546003528        1.051123466        1.046912007                  0 
+      0.2546003528        1.051169737        1.046958093                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
         32.0497509        177.6889149        32.05081522        177.7045042 
@@ -145,10 +145,10 @@ Determined SECTOR NMUL MAX :  2
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0        2.176209918 
+                 0                  0                  0        2.176305716 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.02964507527       0.0296450073                  0                  0 
+    -0.02964638027      0.02964631229                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    8.892827545e-05 
@@ -192,7 +192,7 @@ Determined SECTOR NMUL MAX :  2
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   8.892827545188191E-005  7.277289689547276E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    8.8928275451881912E-005   7.2772896895472756E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
   Number of warnings: 0
 

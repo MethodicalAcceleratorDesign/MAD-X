@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.00  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.03.02               +
-  + Execution date: 2018.05.15 18:53:31      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.12.18 11:25:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs" ;
 
@@ -192,13 +192,13 @@ ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -2.745599292         2.81616018 
+                 0                  0        -2.74560526        2.816166302 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.04812295785      0.05033575197      -0.1856647973       0.1450794052 
+    -0.04812306245      0.05033586139      -0.1856652009       0.1450797205 
 
           disp4min           disp4max             deltap            orbit_x 
-   -0.005458852055     0.004780211494                  0    -0.001999999066 
+   -0.005458863921     0.004780221885                  0    -0.001999999066 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
   -5.385903609e-12   -6.470081705e-10    0.0001700000459                  0 
