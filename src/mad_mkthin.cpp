@@ -1315,10 +1315,15 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
     if (ipos2 >= 0)
     {
       sequence* thick_sequ = sequences->sequs[ipos2];
-      sequence* sliced_seq = sliced_seqlist.slice_sequence(slice_style,thick_sequ,LastSequenceSliced,LastStyle); // slice the sequence
-      disable_line(sliced_seq->name, line_list);
-      sliced_seq->start->previous = sliced_seq->end;
-      LastSequenceSliced=thick_sequ->name;
+      if(thick_sequ->ref_flag!=0){
+        warning("REFER in lattice must be set to CENTER, MAKETHIN:", "ignored");
+      }
+      else{
+        sequence* sliced_seq = sliced_seqlist.slice_sequence(slice_style,thick_sequ,LastSequenceSliced,LastStyle); // slice the sequence
+        disable_line(sliced_seq->name, line_list);
+        sliced_seq->start->previous = sliced_seq->end;
+        LastSequenceSliced=thick_sequ->name;
+      }
     }
     else warning("unknown sequence ignored:", name);
   }
@@ -2669,6 +2674,12 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
     if (theSeqElList.current_node() == thick_sequ->end)
     {
       break;
+    } 
+    if(theSeqElList.current_node()->p_elem!=nullptr){
+      if(strcmp(theSeqElList.current_node()->p_elem->base_type->name, "rfcavity")==0 &&
+        find_element(theSeqElList.current_node()->p_elem->name, sliced_seq->cavities) == nullptr){
+        add_to_el_list(&theSeqElList.current_node()->p_elem, 0, sliced_seq->cavities, 0);
+      }
     }
     theSeqElList.current_node(theSeqElList.current_node()->next); // set current_node
   }
@@ -2690,5 +2701,7 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
   put_sequ(thick_sequ); // Slicing done for this sequence. Add to list of sequences sliced
   if(MaTh::Verbose) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " before print theSeqElList" << std::endl;
   if(MaTh::Verbose) theSeqElList.Print(); // print final list
+
+
   return sliced_seq;
 } // slice_sequence

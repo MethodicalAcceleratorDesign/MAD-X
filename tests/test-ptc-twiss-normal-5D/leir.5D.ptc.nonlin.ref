@@ -1,9 +1,9 @@
 @ NAME             %06s "NONLIN"
 @ TYPE             %06s "NONLIN"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.24.31"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "18/12/19"
+@ TIME             %08s "10.56.54"
 * NAME               NICKNAME           BASEVARIABLE                    VALUE      ORDER    ORDER_X   ORDER_PX    ORDER_Y   ORDER_PY   ORDER_PT    ORDER_T 
 $ %s                 %s                 %s                                %le         %d         %d         %d         %d         %d         %d         %d 
  "Q1"                "Q1"                "Q1"                      0.8215130809          0          0          0          0          0          0          0
@@ -296,7 +296,7 @@ $ %s                 %s                 %s                                %le   
  "GNFS_2_0_0_0_2_0"  "F_200020_IM"       "GEN_FUN_SIN"              42.19817043          4          2          0          0          0          2          0
  "GNFC_2_0_0_0_2_0"  "F_200020_RE"       "GEN_FUN_COS"             -18.06151285          4          2          0          0          0          2          0
  "GNFA_1_1_0_0_2_0"  "F_110020"          "GEN_FUN_AMP"              32.86180887          4          1          1          0          0          2          0
- "GNFS_1_1_0_0_2_0"  "F_110020_IM"       "GEN_FUN_SIN"         -1.381257439e-14          4          1          1          0          0          2          0
+ "GNFS_1_1_0_0_2_0"  "F_110020_IM"       "GEN_FUN_SIN"          -1.31042778e-14          4          1          1          0          0          2          0
  "GNFC_1_1_0_0_2_0"  "F_110020_RE"       "GEN_FUN_COS"             -32.86180887          4          1          1          0          0          2          0
  "GNFA_0_2_0_0_2_0"  "F_020020"          "GEN_FUN_AMP"              45.90102215          4          0          2          0          0          2          0
  "GNFS_0_2_0_0_2_0"  "F_020020_IM"       "GEN_FUN_SIN"             -42.19817043          4          0          2          0          0          2          0
@@ -335,7 +335,7 @@ $ %s                 %s                 %s                                %le   
  "GNFS_0_1_0_1_2_0"  "F_010120_IM"       "GEN_FUN_SIN"             -79.31841504          4          0          1          0          1          2          0
  "GNFC_0_1_0_1_2_0"  "F_010120_RE"       "GEN_FUN_COS"             -30.72625545          4          0          1          0          1          2          0
  "GNFA_0_0_1_1_2_0"  "F_001120"          "GEN_FUN_AMP"              78.57540696          4          0          0          1          1          2          0
- "GNFS_0_0_1_1_2_0"  "F_001120_IM"       "GEN_FUN_SIN"         -9.728331553e-14          4          0          0          1          1          2          0
+ "GNFS_0_0_1_1_2_0"  "F_001120_IM"       "GEN_FUN_SIN"         -8.866483408e-14          4          0          0          1          1          2          0
  "GNFC_0_0_1_1_2_0"  "F_001120_RE"       "GEN_FUN_COS"             -78.57540696          4          0          0          1          1          2          0
  "GNFA_1_0_0_0_3_0"  "F_100030"          "GEN_FUN_AMP"              1021.427028          4          1          0          0          0          3          0
  "GNFS_1_0_0_0_3_0"  "F_100030_IM"       "GEN_FUN_SIN"             -66.58151336          4          1          0          0          0          3          0

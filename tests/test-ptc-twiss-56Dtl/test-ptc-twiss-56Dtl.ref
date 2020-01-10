@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.26 12:08:33      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.12.18 10:55:04      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -885,7 +885,7 @@ obs_points pro_ptc_setswitch Done
           -1000000      -0.6258930447         2.83857575       0.8200596224 
 
                 q2                dq1                dq2                 qs 
-      0.7198292883       -2.176620133        -4.74110766                  0 
+      0.7198292883       -4.353247487       -9.482231049                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282153615        15.12420817        1.633285387        20.07025827 
@@ -903,10 +903,10 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0        -10.3020712    0.0005941579858 
+                 0                  0       -20.60417657     0.001188317943 
 
           disp2min           disp2max           disp3min           disp3max 
-       -4.54310719         4.54310719                  0                  0 
+      -9.086229451        9.086229451                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886242e-08 

@@ -925,6 +925,10 @@ match_weight(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* plc = cmd->clone->par;
+  if(current_weight==NULL) {
+    warning("WEIGHTS have to be given at the CONSTRAINT command when using: ", "MACRO");
+    return;
+  }
   struct command_parameter_list* pl = current_weight->par;
   int j;
   for (j = 0; j < pl->curr; j++)
@@ -936,6 +940,7 @@ match_weight(struct in_cmd* cmd)
     }
   }
 }
+
 
 // public interface
 

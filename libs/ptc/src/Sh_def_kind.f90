@@ -3,7 +3,7 @@
 
 MODULE S_DEF_KIND
   USE S_def_all_kinds   ! not needed because of things below
-  use s_extend_poly, only : PRTP, PRTP1 ! LD: 22.03.2019
+  use s_extend_poly, only : PRTR, PRTP, PRTP1 ! LD: 22.03.2019, 21.11.2019
   public
   PRIVATE DRIFTP  !,DRIFT   ! ,DRIFTR
   PRIVATE SPARR,SPARP !,SPAR
@@ -1190,6 +1190,8 @@ CONTAINS !----------------------------------------------------------------------
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("FRNG_STRAIGHT:0", X)
+
     ! J=1 front
     IF(PRESENT(EL)) THEN
        !       DO I=1,B%N
@@ -1317,9 +1319,10 @@ CONTAINS !----------------------------------------------------------------------
              CALL EDGE(EL7%P,EL7%BN,EL7%H1,EL7%H2,EL7%FINT,EL7%HGAP,1,X,k)
           ENDIF
        ENDIF
-
-
     ENDIF
+
+    call PRTR("FRNG_STRAIGHT:1", X)
+
   END SUBROUTINE fringe_STRAIGHTr
 
 
@@ -1476,6 +1479,8 @@ CONTAINS !----------------------------------------------------------------------
     integer,INTENT(IN):: J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("ADJTIME_CAV4:0", X)
+
     IF(J==1) THEN
        EL%DELTA_E=X(5)
        IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
@@ -1497,6 +1502,8 @@ CONTAINS !----------------------------------------------------------------------
 
        EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
     ENDIF
+
+    call PRTR("ADJTIME_CAV4:1", X)
 
   END SUBROUTINE ADJUSTR_TIME_CAV4
 
@@ -1940,6 +1947,9 @@ CALL FRINGECAV(EL,X,k,2)
     real(dp) O,X1,X3,BBYTWT,BBYTW,BBXTW
     integer j,ko,it
     real(dp) dir
+
+    call PRTR("CAVITY:0", X)
+
     it=tot_t*k%totalpath+(1-tot_t)
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
@@ -2011,6 +2021,8 @@ CALL FRINGECAV(EL,X,k,2)
     !          IF(.NOT.PRESENT(MID)) x(5)=x(5)-HALF*EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+EL%phase0)/EL%P%P0C
     !    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
     IF(PRESENT(MID)) CALL XMID(MID,X,1)
+
+    call PRTR("CAVITY:1", X)
 
   END SUBROUTINE CAVITYR
 
@@ -3491,6 +3503,7 @@ CALL FRINGECAV(EL,X,k,2)
     REAL(DP) C1,S1,V,O,z
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     REAL(DP) KBMAD
+
     !return
     !  As of June 2007, Etienne believes that the fringe approximately cancels
     ! it is a mystery perhaps due to the use of canonical variables.
@@ -3513,6 +3526,8 @@ CALL FRINGECAV(EL,X,k,2)
     ELSE
      KBMAD=0
     ENDIF
+
+    call PRTR("FRNG_CAV4:0", X)
 
        if(freq_redefine) then
         O=EL%freq
@@ -3538,6 +3553,8 @@ CALL FRINGECAV(EL,X,k,2)
     x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
 
    enddo
+
+   call PRTR("FRNG_CAV4:1", X)
 
   END SUBROUTINE FRINGECAVR
 
@@ -3629,6 +3646,8 @@ CALL FRINGECAV(EL,X,k,2)
     it=tot_t*k%totalpath+(1-tot_t)
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
+    call PRTR("KICKCAV:0", X)
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
        if(freq_redefine) then
@@ -3718,6 +3737,8 @@ CALL FRINGECAV(EL,X,k,2)
 
        X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*EL%R*sin(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0)
     enddo    ! over modes
+
+    call PRTR("KICKCAV:1", X)
 
 END SUBROUTINE KICKCAVR
 
@@ -3848,6 +3869,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp) PZ,b
     logical(lp) EXACT,CTIME
 
+    call PRTR("DRIFT:0", X)
+
     IF(EXACT) THEN
        if(CTIME) then
           PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
@@ -3875,6 +3898,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+T*L
        endif
     ENDIF
+
+    call PRTR("DRIFT:1", X)
 
   END SUBROUTINE DRIFTR
 
@@ -3938,6 +3963,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     INTEGER J,I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) myCOS,mySIN,ANG,XT(6)
+
+    call PRTR("KICKT:0", X)
 
     x(1)=x(1)-el%dx   ! sadistic stuff
     x(3)=x(3)-el%dy
@@ -4042,6 +4069,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     x(1)=x(1)+el%dx
     x(3)=x(3)+el%dy
 
+    call PRTR("KICKT:1", X)
 
   END SUBROUTINE KICKTR
 
@@ -4197,6 +4225,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     IF(K1==1.AND.EL%KILL_ENT_FRINGE) RETURN
     IF(K1==2.AND.EL%KILL_EXI_FRINGE) RETURN
 
+    call PRTR("FRNG_MULT:0", X)
 
     IF(K1==1) THEN
        I= EL%CHARGE
@@ -4284,6 +4313,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     endif
     !    CALL CHECK_STABILITY(X)
     call check_root_drift(el,X,k)
+
+    call PRTR("FRNG_MULT:1", X)
+
   END SUBROUTINE MULTIPOLE_FRINGER
 
   SUBROUTINE MULTIPOLE_FRINGEP(EL,AN,BN,K1,X,k)
@@ -4410,6 +4442,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp) XI,PM,DXI_PX,DXI_DDEL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("NEWFACE:0", X)
+
     IF(EL%DIR==1) THEN   ! NOT IMPORTANT; JUST TO INSURE REVERSAL SYMMETRY
        ! HORIZONTAL WEDGE
        X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/2.0_dp)*X(1)**2
@@ -4438,6 +4472,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ENDIF
     !    CALL check_stability(X)
     call check_root_drift(el,X,k)
+
+    call PRTR("NEWFACE:1", X)
+
   END SUBROUTINE NEWFACER
 
   SUBROUTINE NEWFACEP(EL,BN,H,X,k)
@@ -4495,11 +4532,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp) C
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("FACE:0", X)
+
     C=1.0_dp/COS(E)**3
 
     X(2)=X(2)+(DIR*BN(1)*H/2.0_dp)*X(1)**2
     X(2)=X(2)-(DIR*BN(1)*H*C/2.0_dp)*X(3)**2
     X(4)=X(4)-(DIR*BN(1)*H*C)*X(1)*X(3)
+
+    call PRTR("FACE:1", X)
 
   END SUBROUTINE FACER
 
@@ -4547,6 +4588,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     IF(.not.EL%BEND_FRINGE) RETURN
     IF(K1==1.AND.EL%KILL_ENT_FRINGE) RETURN
     IF(K1==2.AND.EL%KILL_EXI_FRINGE) RETURN
+
+    call PRTR("FRNG_DIPOLE:0", X)
 
     fsad=0.0_dp
     if(fint*hgap/=0.0_dp) then
@@ -4626,6 +4669,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     !    CALL check_stability(X)
     call check_root_drift(el,X,k)
+
+    call PRTR("FRNG_DIPOLE:1", X)
+
   END SUBROUTINE FRINGE_dipoleR
 
 
@@ -4773,6 +4819,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     IF(K1==1.AND.EL%KILL_ENT_FRINGE) RETURN
     IF(K1==2.AND.EL%KILL_EXI_FRINGE) RETURN
 
+    call PRTR("FRNG_QUAD:0", X)
+
     if(k%TIME) then
        PZ=ROOT(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2)
        TIME_FAC=(1.0_dp/el%beta0+X(5))/PZ
@@ -4807,6 +4855,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     x(4)=x(4)*exp(f1)
 
     call ROT_XY(-Ang,X)
+
+    call PRTR("FRNG_QUAD:1", X)
 
   END SUBROUTINE FRINGE2QUADR
 
@@ -4894,6 +4944,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     INTEGER, INTENT(IN) :: I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("EDGE_PARALLEL:0", X)
+
     IF(EL%EXACT) THEN
        IF(EL%DIR==1) THEN
           IF(I==1) then                !doubling entrance angle if first half  (1/2 magnet for designer)
@@ -4923,6 +4975,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        WRITE(6,*) "ERROR 777"
        STOP 777
     ENDIF
+
+    call PRTR("EDGE_PARALLEL:1", X)
 
   END SUBROUTINE EDGE_TRUE_PARALLELR
 
@@ -4982,6 +5036,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     INTEGER, INTENT(IN) :: I
     real(dp) c3,fsad
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+    call PRTR("EDGE:0", X)
 
     IF(EL%EXACT) THEN
        IF(EL%DIR==1) THEN
@@ -5062,6 +5118,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
 
     ENDIF
+
+    call PRTR("EDGE:1", X)
 
   END SUBROUTINE EDGER
 
@@ -5174,6 +5232,7 @@ integer :: kkk=0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
 
+    call PRTR("KICK:0", X)
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -5225,6 +5284,8 @@ integer :: kkk=0
     !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
     !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
     !outvalishev    endif !valishev
+
+    call PRTR("KICK:1", X)
 
   END SUBROUTINE KICKR
 
@@ -5591,6 +5652,8 @@ integer :: kkk=0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     integer i
 
+    call PRTR("KICK_SOL:0", X)
+
     bsol=EL%B_SOL*EL%P%CHARGE
     xp=x(2)+bsol*x(3)/2.0_dp
     yp=x(4)-bsol*x(1)/2.0_dp
@@ -5648,6 +5711,8 @@ integer :: kkk=0
     else
        x(6)=x(6)+yl*dl*(1.0_dp+X(5))/h-(1-k%totalpath)*yl
     endif
+
+    call PRTR("KICK_SOL:1", X)
 
   END SUBROUTINE KICK_SOLR
 
@@ -5737,6 +5802,8 @@ integer :: kkk=0
     real(dp) X1,X3,BBYTW,BBXTW,BBYTWT
     INTEGER J
 
+    call PRTR("GETNEWB:0", X)
+
     X1=X(1)
     X3=X(3)
 
@@ -5754,6 +5821,8 @@ integer :: kkk=0
        BBXTW=0.0_dp
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;B(3)=B_SOL;
+
+    call PRTR("GETNEWB:1", X)
 
   END SUBROUTINE GETNEWBR
 
@@ -5799,6 +5868,8 @@ integer :: kkk=0
     INTEGER J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("GETMULB_SOL:0", X)
+
     x(1)=x(1)-el%dx
     x(3)=x(3)-el%dy
     call GETNEWB(el%an,el%bn,el%b_sol,EL%P%NMUL,B,X)
@@ -5810,6 +5881,8 @@ integer :: kkk=0
     !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
     !outvalishev     B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
     !outvalishev    endif !valishev
+
+    call PRTR("GETMULB_SOL:1", X)
 
   END SUBROUTINE GETMULB_SOLR
 
@@ -5841,10 +5914,14 @@ integer :: kkk=0
     real(dp) B(3)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("KICKMUL:0", X)
+
     CALL GETMULB_SOL(EL,B,X,k)
 
     X(2)=X(2)-YL*EL%P%DIR*EL%P%CHARGE*B(2)
     X(4)=X(4)+YL*EL%P%DIR*EL%P%CHARGE*B(1)
+
+    call PRTR("KICKMUL:1", X)
 
   END SUBROUTINE KICKMULR
 
@@ -6123,6 +6200,8 @@ integer :: kkk=0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
 
+    call PRTR("GETMAT:0", X)
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
 
@@ -6199,6 +6278,8 @@ integer :: kkk=0
     ELSE
        EL%LX(1)=EL%LX(1)+k%TOTALPATH*DH
     ENDIF
+
+    call PRTR("GETMAT:1", X)
 
   END SUBROUTINE GETMATR
 
@@ -6836,6 +6917,8 @@ integer :: kkk=0
     TYPE(KTK),INTENT(IN):: EL
     real(dp) T(6)
 
+    call PRTR("PUSHKTK:0", X)
+
     T(1)=EL%MATX(1,1)*X(1)+EL%MATX(1,2)*X(2)+EL%MATX(1,3)*X(5)
     T(2)=EL%MATX(2,1)*X(1)+EL%MATX(2,2)*X(2)+EL%MATX(2,3)*X(5)
     T(3)=EL%MATY(1,1)*X(3)+EL%MATY(1,2)*X(4)
@@ -6845,6 +6928,8 @@ integer :: kkk=0
     T(6)=T(6)+EL%LY(1)*X(3)**2+EL%LY(2)*X(3)*X(4)+EL%LY(3)*X(4)**2
 
     X(1)=T(1);X(2)=T(2);X(3)=T(3);X(4)=T(4);X(6)=T(6);
+
+    call PRTR("PUSHKTK:1", X)
 
   END SUBROUTINE PUSHKTKR
 
@@ -6884,6 +6969,8 @@ integer :: kkk=0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
 
+    call PRTR("KICKKTK:0", X)
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
     X1=X(1)
@@ -6920,6 +7007,8 @@ integer :: kkk=0
     !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
     !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
     !outvalishev    endif !valishev
+
+    call PRTR("KICKKTK:1", X)
 
   END SUBROUTINE KICKKTKR
 
@@ -7038,6 +7127,8 @@ integer :: kkk=0
 !!!!  SPEED STUFF !!!
     real(dp) OMEGA, OMEGA2,C,S
     INTEGER S_OMEGA
+
+    call PRTR("GETMAT7:0")
 
     IF(MOD(EL%P%METHOD,2)==1) THEN
        DH=(EL%L/EL%P%NST)  ! method=1,3,5
@@ -7255,17 +7346,9 @@ integer :: kkk=0
        CALL EXPCOSY7(HY,EL%RMATY,EL%RLX)
        CALL EXPCOSY7(HX,EL%RMATX,EL%RLX)
 
-
-
-
-
-
-
     ENDIF
 
-
-
-
+    call PRTR("GETMAT7:1")
 
   END SUBROUTINE GETMAT7R
 
@@ -7519,6 +7602,8 @@ integer :: kkk=0
     real(dp) T(4)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("PUSHTKT7:0", X)
+
     ! BUG FOUND BY SCHMIDT (SUBTLE ONE; AFFECTS PTC LOGIC; YUCK!)
     !    T(1)=EL%MATX(1,1)*X(1)+EL%MATX(1,2)*X(2)+EL%MATX(1,3)*X(5)
     !    T(2)=EL%MATX(2,1)*X(1)+EL%MATX(2,2)*X(2)+EL%MATX(2,3)*X(5)
@@ -7554,6 +7639,8 @@ integer :: kkk=0
     ENDIF
 
     X(1)=T(1);X(2)=T(2);X(3)=T(3);X(4)=T(4);
+
+    call PRTR("PUSHTKT7:1", X)
 
   END SUBROUTINE PUSHTKT7R
 
@@ -7633,6 +7720,8 @@ integer :: kkk=0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
 
+    call PRTR("KICKTKT7:0", X)
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
     X1=X(1)
@@ -7670,6 +7759,8 @@ integer :: kkk=0
     !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
     !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
     !outvalishev    endif !valishev
+
+    call PRTR("KICKTKT7:1", X)
 
   END SUBROUTINE KICKTKT7R
 
@@ -7758,6 +7849,9 @@ integer :: kkk=0
     real(dp),INTENT(IN):: YL
     real(dp) PZ,PZ0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+    call PRTR("KICKPATH6:0", X)
+
     ! ETIENNE
     IF(.NOT.EL%P%EXACT) RETURN
     if(k%TIME) then
@@ -7776,6 +7870,8 @@ integer :: kkk=0
        X(1)=X(1)+YL*X(2)*PZ
        X(3)=X(3)+YL*X(4)*PZ
     endif
+
+    call PRTR("KICKPATH6:1", X)
 
   END SUBROUTINE KICKPATH6R
 
@@ -7822,6 +7918,9 @@ integer :: kkk=0
     real(dp),INTENT(IN):: YL
     real(dp) X1,X5,PZ
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+    call PRTR("KICKPATH:0", X)
+
     ! ETIENNE
     if(k%TIME) then
        if(EL%P%EXACT) THEN
@@ -7852,6 +7951,8 @@ integer :: kkk=0
 
        endif
     endif
+
+    call PRTR("KICKPATH:1", X)
 
   END SUBROUTINE KICKPATHR
 
@@ -11076,6 +11177,9 @@ integer :: kkk=0
     real(dp) XN(6),PZ,PT
     real(dp)  A,b,R
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+    call PRTR("SPROT:0", X)
+
     if(EL%P%B0/=0.0_dp) then
        A=YL*EL%P%B0
        R=1.0_dp/EL%P%B0
@@ -11107,6 +11211,9 @@ integer :: kkk=0
     endif
     !    CALL CHECK_STABILITY(X)
     call check_root_drift(el%p,X,k)
+
+    call PRTR("SPROT:1", X)
+
   END SUBROUTINE Sprotr
 
   SUBROUTINE SPROTP(EL,YL,DL,X,k)
@@ -11175,6 +11282,8 @@ integer :: kkk=0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
 
+    call PRTR("SSEC:0", X)
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
 
@@ -11214,6 +11323,9 @@ integer :: kkk=0
     X(6)=XN(6)
     !    CALL CHECK_STABILITY(X)
     call check_root_drift(EL%P,X,k)
+
+    call PRTR("SSEC:1", X)
+
   END SUBROUTINE Ssecr
 
 
@@ -11295,6 +11407,8 @@ integer :: kkk=0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
 
+    call PRTR("SKICK:0", X)
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
 !    call GETMULB_TEAPOT(EL,B,VM,X,kick=my_true)
@@ -11306,6 +11420,8 @@ integer :: kkk=0
     IF(.NOT.EL%DRIFTKICK) THEN
        X(2)=X(2)+YL*DIR*EL%BN(1)*(1.0_dp+X(1)*EL%P%B0)
     ENDIF
+
+    call PRTR("SKICK:1", X)
 
   END SUBROUTINE SKICKR
 
@@ -11855,6 +11971,8 @@ integer :: kkk=0
     integer,INTENT(IN):: J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("FRNG_TEAPOT:0", X)
+
     IF (EL%P%DIR==1) THEN
 
        IF (J==1) THEN
@@ -11951,6 +12069,8 @@ integer :: kkk=0
        ENDIF
 
     ENDIF
+
+    call PRTR("FRNG_TEAPOT:1", X)
 
   END SUBROUTINE fringe_TEAPOTr
 
@@ -12473,6 +12593,8 @@ integer :: kkk=0
     TYPE(ESEPTUM),INTENT(INOUT):: EL
     real(dp) EM,C1,S1
 
+    call PRTR("ELEC_SEPTUM:0", X)
+
        EM=EL%VOLT*volt_c/EL%P%P0C
 
        C1=COS(EL%PHAS); S1=SIN(-EL%PHAS)
@@ -12480,6 +12602,8 @@ integer :: kkk=0
        E(1)=-S1*EM
        e(3)=0.0_dp
        phi=-E(1)*X(1)-E(2)*X(3)
+
+    call PRTR("ELEC_SEPTUM:1", X)
 
   END SUBROUTINE electric_field_septumR
 
@@ -12517,6 +12641,8 @@ integer :: kkk=0
     REAL(DP) DH,DD
     integer, intent(IN) ::i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+    call PRTR("SEPTUM:0", XO)
 
         if(.NOT.EL%P%EXACT) THEN
           DH=EL%L/4.0_dp/el%p%nst
@@ -12627,6 +12753,8 @@ integer :: kkk=0
         ENDIF
 
           global_e=EL%P%p0c*(XO(5)+K1*XO(3))
+
+    call PRTR("SEPTUM:1", XO)
 
   END SUBROUTINE SEPR
 
@@ -12808,6 +12936,8 @@ integer :: kkk=0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
 
+    call PRTR("KICKEX:0", X)
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
     X1=X(1)
@@ -12846,6 +12976,8 @@ integer :: kkk=0
     !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
     !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
     !outvalishev    endif !valishev
+
+    call PRTR("KICKEX:1", X)
 
   END SUBROUTINE KICKEXR
 
@@ -13255,6 +13387,8 @@ integer :: kkk=0
     ! J=1 front
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("FRNG_STREX:0", X)
+
     IF(EL%P%DIR==1) THEN
 
        IF(J==1) THEN
@@ -13333,6 +13467,8 @@ integer :: kkk=0
        ENDIF ! J
 
     ENDIF
+
+    call PRTR("FRNG_STREX:1", X)
 
   END SUBROUTINE fringe_STREXr
 
@@ -13478,6 +13614,8 @@ integer :: kkk=0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
 
+    call PRTR("SPAR:0", X)
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
     if(k%TIME) then
@@ -13513,6 +13651,8 @@ integer :: kkk=0
     X(2)=XN(2)
     X(3)=XN(3)
     X(6)=XN(6)
+
+    call PRTR("SPAR:1", X)
 
   END SUBROUTINE SPARr
 
@@ -13607,6 +13747,8 @@ integer :: kkk=0
     logical(lp) time,EXACT
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("WEDGE:0", X)
+
     EXACT=.TRUE.
 
     !    if(abs(x(1))+abs(x(3))+abs(x(2))+abs(x(4))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
@@ -13678,6 +13820,8 @@ integer :: kkk=0
        X(6)=XN(6)
     ENDIF
     !    CALL CHECK_STABILITY(X)
+
+    call PRTR("WEDGE:1", X)
 
   END SUBROUTINE wedger
 
@@ -13780,11 +13924,15 @@ integer :: kkk=0
 
     IF(J==1) RETURN
 
+    call PRTR("ADJTIME_TWCAV:0", X)
+
     if(k%TIME) then
        X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0
     else
        X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD
     endif
+
+    call PRTR("ADJTIME_TWCAV:1", X)
 
   END SUBROUTINE ADJUST_TIME_CAV_TRAV_OUTR
 
@@ -14012,6 +14160,9 @@ integer :: kkk=0
 
         IF(I==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
         IF(I==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
+
+    call PRTR("FRNG_TWCAV:0", X)
+
     eps1=1
     eps2=-1
     if(EL%P%DIR*I==1) then
@@ -14046,6 +14197,8 @@ integer :: kkk=0
     X(2)=X(2)+V*(CPSI*S1+SPSI*S2)*X(1)
     X(4)=X(4)+V*(CPSI*S1+SPSI*S2)*X(3)
     x(5)=x(5)-0.5_dp*(X(1)**2+X(3)**2)*V*(CPSI*C1+SPSI*C2)*O
+
+    call PRTR("FRNG_TWCAV:1", X)
 
   END SUBROUTINE FRINGECAVR_TRAV
 
@@ -19191,9 +19344,13 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
     real(dp) DA2(2)
     TYPE(INTERNAL_STATE) K
 
+    call PRTR("KICK_HE:0", X)
+
     CALL compute_f4(EL,X,Z,DA2=DA2)
     X(2)=X(2)+EL%p%charge*el%p%dir*L*DA2(1)
     X(4)=X(4)+EL%p%charge*el%p%dir*L*DA2(2)
+
+    call PRTR("KICK_HE:1", X)
 
   END SUBROUTINE KICKR_HE
 
@@ -19458,15 +19615,38 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
     real(dp),INTENT(INOUT):: X(6)
     TYPE(HELICAL_DIPOLE),INTENT(INOUT):: EL
 
+    call PRTR("FAKE_SHIFT:0", X)
+
     x=x-el%fake_shift
 
+    call PRTR("FAKE_SHIFT:1", X)
+
   end subroutine fake_shiftr
+
+  subroutine fake_shiftp(EL,X)
+    IMPLICIT NONE
+    type(real_8),INTENT(INOUT):: X(6)
+    TYPE(HELICAL_DIPOLEP),INTENT(INOUT):: EL
+    integer i
+
+    call PRTP("FAKE_SHIFT:0", X)
+
+    do i=1,6
+     x(i)=x(i)-el%fake_shift(i)
+    enddo
+
+    call PRTP("FAKE_SHIFT:1", X)
+
+  end subroutine fake_shiftp
 
   subroutine fringe_helr(EL,X,i)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(HELICAL_DIPOLE),INTENT(INOUT):: EL
     integer i
+
+    call PRTR("FRNG_HEL:0", X)
+
      if(.false.) then
        if(i==1) then
        x(2)=x(2)-el%p%dir*el%bn(1)*sin(EL%PHAS)/EL%freq
@@ -19476,6 +19656,8 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
        x(4)=x(4)+el%p%dir*el%bn(1)*cos(EL%freq*EL%L+EL%PHAS)/EL%freq
       endif
      endif
+
+    call PRTR("FRNG_HEL:1", X)
 
   end subroutine fringe_helr
 
@@ -19499,22 +19681,6 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
 
     call PRTP("FRNG_HEL:1", X)
   end subroutine fringe_help
-
-  subroutine fake_shiftp(EL,X)
-    IMPLICIT NONE
-    type(real_8),INTENT(INOUT):: X(6)
-    TYPE(HELICAL_DIPOLEP),INTENT(INOUT):: EL
-    integer i
-
-    call PRTP("FAKE_SHIFT:0", X)
-
-    do i=1,6
-     x(i)=x(i)-el%fake_shift(i)
-    enddo
-
-    call PRTP("FAKE_SHIFT:1", X)
-
-  end subroutine fake_shiftp
 
   SUBROUTINE INTR_HE_TOT(EL,X,k,mid)
     IMPLICIT NONE
@@ -19565,6 +19731,9 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
     real(dp),INTENT(IN):: L,Z
     real(dp) PZ,PZ0,DPZ
     TYPE(INTERNAL_STATE),OPTIONAL :: K
+
+    call PRTR("KICKPATH_HE:0", X)
+
     ! ETIENNE
     !     CALL compute_f4(EL,X,Z,A=A,int_ax_dy=int_ax_dy)
     !      X(2)=X(2)-el%p%charge*A(1)
@@ -19607,6 +19776,8 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
        endif
     ENDIF
 
+    call PRTR("KICKPATH_HE:1", X)
+
   END SUBROUTINE KICKPATHR_HE
 
   SUBROUTINE KICKPATHR_HE_exact_nonsymp(EL,L,Z,X,k)
@@ -19618,6 +19789,8 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
     real(dp) A(3),da(3,3) !,int_ax_dy !,int_aY_dX
     TYPE(INTERNAL_STATE),OPTIONAL :: K
     ! ETIENNE
+
+    call PRTR("KICKPATH_HE_X:0", X)
 
     IF(EL%P%EXACT) THEN
        CALL compute_f4(EL,X,Z,A=A,d=da)    !,int_ax_dy=int_ax_dy)
@@ -19650,6 +19823,8 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
           X(6)=X(6)+k%TOTALPATH*L
        endif
     ENDIF
+
+    call PRTR("KICKPATH_HE_X:1", X)
 
 
   END SUBROUTINE KICKPATHR_HE_exact_nonsymp
@@ -19771,6 +19946,9 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
     TYPE(INTERNAL_STATE) K
     !DRIFT(EL,DH,Z,1,X,K)
     if(el%p%exact) return
+
+    call PRTR("DRIFT_HE:0", X)
+
     IF(PLANE==1) THEN
        CALL compute_f4(EL,X,Z,A=A,int_ax_dy=int_ax_dy)
        X(2)=X(2)-el%p%charge*A(1)
@@ -19802,6 +19980,9 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
        X(2)=X(2)+el%p%charge*int_aY_dX
        X(4)=X(4)+el%p%charge*A(2)
     ENDIF
+
+    call PRTR("DRIFT_HE:1", X)
+
   END SUBROUTINE DRIFTR_HE
 
   SUBROUTINE DRIFTP_HE(EL,L,Z,PLANE,X,k)

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.09 10:20:09      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.12.18 10:55:10      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test for ptc_twiss,initial_map_manual=true;
 
@@ -881,10 +881,10 @@ Determined SECTOR NMUL MAX :  2
    2.799089335e-07        129.3455325                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11645       -10.30207043    0.0005932657653 
+                 1        38793.11645       -20.60417504     0.001186533499 
 
           disp2min           disp2max           disp3min           disp3max 
-      -4.543106603        4.543106298                  0                  0 
+      -9.086228277        9.086227667                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886484e-08 
@@ -945,10 +945,10 @@ Determined SECTOR NMUL MAX :  2
    2.799089335e-07        129.3455325                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11645       -10.30207043    0.0005932657653 
+                 1        38793.11645       -20.60417504     0.001186533499 
 
           disp2min           disp2max           disp3min           disp3max 
-      -4.543106603        4.543106298                  0                  0 
+      -9.086228277        9.086227667                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886484e-08 
@@ -1005,10 +1005,10 @@ Determined SECTOR NMUL MAX :  2
    2.799156765e-07        129.3455324                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11575       -10.30207043     0.000593009746 
+                 1        38793.11575       -20.60417504     0.001186021459 
 
           disp2min           disp2max           disp3min           disp3max 
-      -4.543106603        4.543106303                  0                  0 
+      -9.086228277        9.086227678                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 

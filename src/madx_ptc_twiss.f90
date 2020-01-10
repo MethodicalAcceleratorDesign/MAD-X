@@ -10,7 +10,7 @@ module madx_ptc_twiss_module
   USE madx_ptc_knobs_module
   USE madx_ptc_distrib_module
 
-  implicit none 
+  implicit none
 
   save
 
@@ -878,8 +878,8 @@ contains
     !############################################################################
 
     ! n_rf is a variable of PTC that must be set accordingly
-    
-    
+
+
     do i=1,nclocks
       A_script_probe%ac(i)%om = twopi*clocks(i)%tune * BETA0start / my_ring_length
       !omega of the the modulation
@@ -888,7 +888,7 @@ contains
       A_script_probe%ac(i)%x(2)  = zero  ! initial clock vector (sin like)
     enddo
 
-    
+
 
 
        doRDTtracking = get_value('ptc_twiss ','trackrdts ') .ne. 0
@@ -1107,10 +1107,10 @@ contains
           s = nodePtr%next%s(1) ! s(1) is the total arc-length, s(3) the total integration-distance
 
           !I do not know what JL meant here
-          if ((s .eq. 0d0) .and. (nodePtr%pos .eq. (my_ring%t%n+posstart-1))) then
-             s = nodePtr%s(1) + nodePtr%next%s(5) ! s of previous node + local offset
-          endif
-
+          !if ((s .eq. 0d0) .and. (nodePtr%pos .eq. (my_ring%t%n+posstart-1))) then
+          !   s = nodePtr%s(1) + nodePtr%next%s(5) ! s of previous node + local offset
+          !endif
+          s = nodePtr%s(1)
           if (getdebug() > 2) then
              write(6,*) "##### SLICE MAGNETS NODE ",&
                       & nodePtr%pos," => ",nodePtr%pos+1," s=",s
@@ -1148,7 +1148,9 @@ contains
           !!!!!!!!!!!!!!!
 
           if (center_magnets ) then
+            
             if ( associated(nodePtr,current%tm) ) then
+              
               if (mod(current%mag%p%nst,2)/=0) then !checking if number od slices is even
                  !here it is odd (we should be in the middle)
                  if (current%mag%L==0) then
@@ -1165,7 +1167,9 @@ contains
                  isputdata = .true.
               endif
             endif
+            
           else
+          
             if (nodePtr%next%cas==case0) then
               !not center_magnets, take every reasonable node
               ! this an inner integration node i.e. neither an extremity nor a fringe node, both to be discarded
@@ -1915,9 +1919,10 @@ contains
       opt_fun(mu3)=tw%mu(3) !* deltae
 
       ! write(0,*),"DEBUG = ", tw%mu(3) ! should give Qs
-      if ( default%time ) then
-        tw%disp(:) = tw%disp(:) * relativisticBeta
-      endif
+      ! LD: 2019.12.18 removed after complains of FS
+!      if ( default%time ) then
+!        tw%disp(:) = tw%disp(:) * relativisticBeta
+!      endif
 
       opt_fun(disp1)=tw%disp(1) ! was 31 instead of 57
       opt_fun(disp2)=tw%disp(2) ! was 32 instead of 58
@@ -3490,9 +3495,10 @@ contains
          chromaticities(1) = tuneFromComplexVF(vf_kernel%v(1).sub.'10001') ! as in So_fitting.f90
          chromaticities(2) = tuneFromComplexVF(vf_kernel%v(3).sub.'00101') ! as in So_fitting.f90
 
-         if (default%time) then
-            chromaticities(:) = chromaticities(:) * betaRelativistic
-         endif
+      ! LD: 2019.12.18 removed after complains of FS
+!         if (default%time) then
+!            chromaticities(:) = chromaticities(:) * betaRelativistic
+!         endif
          ! to get chromaticities, went to higher order with above "call init_default(default,2,0)"
       else
          ! if icase = 6, delta_p is a phase-space variable and not an external parameter hence we can't compute chromaticies
