@@ -1946,3 +1946,90 @@ subroutine seterrorflag(errorcode,from,descr)
   call seterrorflagfort(errorcode,from,n,descr,m)
 
 end subroutine seterrorflag
+
+integer function get_file_unit (lu_max)
+  !
+  !   get_file_unit returns a unit number that is not in use
+  integer lu_max,  lu, m, iostat
+  logical   opened
+  !
+  m = lu_max  ;  if (m < 1) m = 97
+  do lu = m,1,-1
+     inquire (unit=lu, opened=opened, iostat=iostat)
+     if (iostat.ne.0) cycle
+     if (.not.opened) exit
+  end do
+  !
+  get_file_unit = lu
+  return
+end function get_file_unit
+
+double precision function lInt(n,r,u,v)
+  use SCdat
+  implicit none
+  integer n,i,ii,i1,i2,j
+  double precision r,u,v,result
+  !********************************************************************************
+  result=0.d0
+  SELECT CASE (n)
+  CASE (1:20)
+     i=2*n
+     ii=i-1
+     i1=i
+     i2=0
+     result=result+scbinom(ii,1)*u**i
+     do j=2,n
+        i1=i1-2
+        i2=i2+2
+        result=result+scbinom(ii,j)*u**i1*v**i2
+     enddo
+     result=result+scbinom(ii,n+1)*v**i
+     lInt=lIntdfact(n)*(-1d0+r**2)**n*result
+  CASE DEFAULT
+     call aafail('lInt: Fatal: ',                                     &
+          'Out of range in function lInt: Program stops')
+     stop
+  END SELECT
+end function lInt
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+double precision function eInt(n,r,u,v)
+  use SCdat
+  implicit none
+  integer n,i,i1,i2,j
+  double precision r,u,v,result
+  !********************************************************************************
+  result=0.d0
+  SELECT CASE (n)
+  CASE (1:20)
+     i=2*n
+     i1=i
+     i2=0
+     result=result+scbinom(i,1)*u**i
+     do j=2,n
+        i1=i1-2
+        i2=i2+2
+        result=result+scbinom(i,j)*u**i1*v**i2
+     enddo
+     result=result+scbinom(i,n+1)*v**i
+     eInt=eIntdfact(n)*(-1d0+r**2)**n*u*result
+  CASE DEFAULT
+     call aafail('eInt: Fatal: ',                                     &
+          'Out of range in function eInt: Program stops')
+     stop
+  END SELECT
+end function eInt
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+double precision function bips(a, mmax1)
+
+  implicit none
+  integer mmax1
+  double precision a,r,u,v
+  !********************************************************************************
+  bips=(8388608d0/dble(1+mmax1)+a*(-(4194304d0/dble(2+mmax1))+&
+       &a*(3145728d0/dble(3+mmax1)+a*(-(2621440d0/dble(4+mmax1))+&
+       &a*(2293760d0/dble(5+mmax1)+a*(-(2064384d0/dble(6+mmax1))+&
+       &a*(1892352d0/dble(7+mmax1)+a*(-(1757184d0/dble(8+mmax1))+&
+       &a*(1647360d0/dble(9+mmax1)+17d0*a*(-(91520d0/dble(10+mmax1))+19d0*&
+       &a*(4576d0/dble(11+mmax1)+7d0*a*(-(624d0/dble(12+mmax1))+(598d0*&
+       &a)/dble(13+mmax1)-(575d0*a**2)/dble(14+mmax1)))))))))))))/8388608d0;
+end function bips

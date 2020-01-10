@@ -12,22 +12,196 @@ module spch_bbfi
   use bbfi
   implicit none
   public
-  integer, save :: i_turn, N_macro_surv, N_for_I, N_spch, i_spch
-  integer, parameter :: N_macro_max=16000
-  double precision, save :: Ex_rms, Ey_rms, sigma_p, sigma_z
-  double precision, save :: Ix_array(N_macro_max), Iy_array(N_macro_max)
-  double precision, save :: dpi_array(N_macro_max), z_part_array(N_macro_max)
-  double precision :: alpha, I_div_E_sum_max
+  integer N_ini,i_turn, N_macro_surv, N_for_I, N_macro_max, N_spch,i_spch,unit_chpt
+  integer, parameter :: lu_max=1000
+  parameter(N_macro_max=100000)
+  double precision Ex_rms, Ey_rms, sigma_p, sigma_z
+  double precision Ix_array(N_macro_max), Iy_array(N_macro_max),    &
+       dpi_array(N_macro_max),                          &
+       z_part_array(N_macro_max)
+  double precision alpha, I_div_E_sum_max
   !  parameter(alpha=0.0, I_div_E_sum_max=7.0)
-
-  double precision, save :: betx_bb(bbd_max), bety_bb(bbd_max), &
-       alfx_bb(bbd_max), alfy_bb(bbd_max), &
-       gamx_bb(bbd_max), gamy_bb(bbd_max), &
-       dx_bb(bbd_max),   dy_bb(bbd_max)
-  double precision,save :: rat_bb_n_ions=1d0
-  double precision, save :: sigma_t=0.d0, mean_t=0.d0  ! calculate and transfer to BB
-  character(len=name_len), save :: spch_bb_name(bbd_max)
+  double precision betx_bb(bbd_max), bety_bb(bbd_max), alfx_bb(bbd_max), &
+       alfy_bb(bbd_max), gamx_bb(bbd_max), gamy_bb(bbd_max), dx_bb(bbd_max), &
+       dy_bb(bbd_max), scsigx(bbd_max), scsigy(bbd_max), scsigz(bbd_max)
+  double precision sc_intstr,sc_charge(bbd_max)
+  double precision :: sc_map(bbd_max,6,6)=0.d0
+  double precision sc_sect_map(bbd_max,6,6), trans_sc_sect_map(bbd_max,6,6)
+  double precision sect_map(bbd_max,6,6), trans_sect_map(bbd_max,6,6)
+  double precision rat_bb_n_ions,R_part
+  double precision ::  sigma_t=0.d0, mean_t=0.d0  ! calculate and transfer to BB
+  character*(name_len) spch_bb_name(bbd_max)
+  save N_ini,i_turn,N_macro_surv,N_for_I,N_spch,i_spch,                                &
+       Ex_rms,Ey_rms,sigma_p,sigma_z,                                           &
+       Ix_array,Iy_array,dpi_array, z_part_array,                               &
+       betx_bb,bety_bb,alfx_bb,alfy_bb,gamx_bb,gamy_bb,dx_bb,dy_bb,             &
+       rat_bb_n_ions,sigma_t, mean_t,spch_bb_name,R_part
+  data rat_bb_n_ions / 1d0 /
+  integer I_NUMBER
+  logical I_OPEN
 end module spch_bbfi
+
+module SCdat
+  ! Yuri Alexahin Oct 2017 Mathematica version
+  ! Frank Schmidt Oct 2017 Fortran90 version
+  ! Copyright Fermilab & CERN
+  implicit none
+  public
+  logical eflag,sc_3d_kick,sc_3d_periodic,sc_3d_beamsize
+  integer, parameter :: idim=6,isigmatfit=50000,nptot=500000
+  integer, parameter :: Nintegrate=1000000
+  integer, parameter :: mmax=77,mmum=15,kmaxo=20;
+  double precision, parameter :: Pi = 4d0 * atan(1d0), EulerGamma =&
+       & 0.57721566490153286060651209008240243104215933593992d0
+  double precision, parameter :: dampf=0.85d0, dampeta=0.25d0, epsz=1d-15 !(* damping factor *)
+  double precision, parameter :: alfa=0.25d0 !(* not optimized yet *)
+  double precision, parameter :: efactor=2d0*alfa/(1d0 + 2d0*alfa)**4
+  double precision, parameter :: dmax=6d0
+  double precision, parameter :: um=.1d0;
+  double precision, parameter :: dres=6.5d0;
+  double precision work_1(idim),work_2(idim),work_3(idim)
+  double precision fcore
+  double precision, dimension(6,6) :: sr
+  double precision, dimension(kmaxo) :: lIntdfact=(/ 3.14159265358979d0,&
+       4.71238898038469d0,15.7079632679490d0,82.4668071567321d0,&
+       593.761011528471d0,5442.80927234432d0,60648.4461775510d0,&
+       796010.856080356d0,12028608.4918809d0,205689205.211164d0,&
+       3926793917.66768d0,82789905097.4935d0,1910536271480.62d0,&
+       47899873663549.8d0,1.296489913826749d15,3.767923812058989d16,&
+       1.170272807510086d18,3.868401780380561d19,1.355976624070239d21,&
+       5.023893392180235d22 /)
+  double precision, dimension(kmaxo) :: eIntdfact=(/ 6.28318530717959d0,&
+       18.8495559215388d0,94.2477796076938d0,659.734457253857d0,&
+       5937.61011528471d0,65313.7112681318d0,849078.246485713d0,&
+       12736173.6972857d0,216514952.853857d0,4113784104.22328d0,&
+       86389466188.6889d0,1986957722339.84d0,49673943058496.1d0,&
+       1.341196462579395d15,3.889469741480246d16,1.205735619858876d18,&
+       3.978927545534292d19,1.392624640937002d21,5.152711171466908d22,&
+       2.009557356872094d24 /)
+  double precision, DIMENSION(2*kmaxo, kmaxo+1) :: scbinom=reshape( (/ &
+                                !1
+       1.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !2
+       -1.d0,3.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !3
+       -1.d0,6.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !4
+       1.d0,-10.d0,5.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !5
+       1.d0,-15.d0,15.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !6
+       -1.d0,21.d0,-35.d0,7.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !7
+       -1.d0,28.d0,-70.d0,28.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !8
+       1.d0,-36.d0,126.d0,-84.d0,9.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !9
+       1.d0,-45.d0,210.d0,-210.d0,45.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !10
+       -1.d0,55.d0,-330.d0,462.d0,-165.d0,11.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !11
+       -1.d0,66.d0,-495.d0,924.d0,-495.d0,66.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !12
+       1.d0,-78.d0,715.d0,-1716.d0,1287.d0,-286.d0,13.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !13
+       1.d0,-91.d0,1001.d0,-3003.d0,3003.d0,-1001.d0,91.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !14
+       -1.d0,105.d0,-1365.d0,5005.d0,-6435.d0,3003.d0,-455.d0,15.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !15
+       -1.d0,120.d0,-1820.d0,8008.d0,-12870.d0,8008.d0,-1820.d0,120.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !16
+       1.d0,-136.d0,2380.d0,-12376.d0,24310.d0,-19448.d0,6188.d0,-680.d0,17.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,0.d0,&
+                                !17
+       1.d0,-153.d0,3060.d0,-18564.d0,43758.d0,-43758.d0,18564.d0,-3060.d0,153.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !18
+       -1.d0,171.d0,-3876.d0,27132.d0,-75582.d0,92378.d0,-50388.d0,11628.d0,-969.d0,19.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !19
+       -1.d0,190.d0,-4845.d0,38760.d0,-125970.d0,184756.d0,-125970.d0,38760.d0,-4845.d0,&
+       190.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !20
+       1.d0,-210.d0,5985.d0,-54264.d0,203490.d0,-352716.d0,293930.d0,-116280.d0,20349.d0,&
+       -1330.d0,21.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !21
+       1.d0,-231.d0,7315.d0,-74613.d0,319770.d0,-646646.d0,646646.d0,-319770.d0,74613.d0,&
+       -7315.d0,231.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !22
+       -1.d0,253.d0,-8855.d0,100947.d0,-490314.d0,1144066.d0,-1352078.d0,817190.d0,-245157.d0,&
+       33649.d0,-1771.d0,23.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !23
+       -1.d0,276.d0,-10626.d0,134596.d0,-735471.d0,1961256.d0,-2704156.d0,1961256.d0,-735471.d0,&
+       134596.d0,-10626.d0,276.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !24
+       1.d0,-300.d0,12650.d0,-177100.d0,1081575.d0,-3268760.d0,5200300.d0,-4457400.d0,2042975.d0,&
+       -480700.d0,53130.d0,-2300.d0,25.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !25
+       1.d0,-325.d0,14950.d0,-230230.d0,1562275.d0,-5311735.d0,9657700.d0,-9657700.d0,5311735.d0,&
+       -1562275.d0,230230.d0,-14950.d0,325.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !26
+       -1.d0,351.d0,-17550.d0,296010.d0,-2220075.d0,8436285.d0,-17383860.d0,20058300.d0,-13037895.d0,&
+       4686825.d0,-888030.d0,80730.d0,-2925.d0,27.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !27
+       -1.d0,378.d0,-20475.d0,376740.d0,-3108105.d0,13123110.d0,-30421755.d0,40116600.d0,-30421755.d0,&
+       13123110.d0,-3108105.d0,376740.d0,-20475.d0,378.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !28
+       1.d0,-406.d0,23751.d0,-475020.d0,4292145.d0,-20030010.d0,51895935.d0,-77558760.d0,67863915.d0,&
+       -34597290.d0,10015005.d0,-1560780.d0,118755.d0,-3654.d0,29.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !29
+       1.d0,-435.d0,27405.d0,-593775.d0,5852925.d0,-30045015.d0,86493225.d0,-145422675.d0,145422675.d0,&
+       -86493225.d0,30045015.d0,-5852925.d0,593775.d0,-27405.d0,435.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !30
+       -1.d0,465.d0,-31465.d0,736281.d0,-7888725.d0,44352165.d0,-141120525.d0,265182525.d0,-300540195.d0,&
+       206253075.d0,-84672315.d0,20160075.d0,-2629575.d0,169911.d0,-4495.d0,31.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !31
+       -1.d0,496.d0,-35960.d0,906192.d0,-10518300.d0,64512240.d0,-225792840.d0,471435600.d0,-601080390.d0,&
+       471435600.d0,-225792840.d0,64512240.d0,-10518300.d0,906192.d0,-35960.d0,496.d0,-1.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !32
+       1.d0,-528.d0,40920.d0,-1107568.d0,13884156.d0,-92561040.d0,354817320.d0,-818809200.d0,1166803110.d0,&
+       -1037158320.d0,573166440.d0,-193536720.d0,38567100.d0,-4272048.d0,237336.d0,-5456.d0,33.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !33
+       1.d0,-561.d0,46376.d0,-1344904.d0,18156204.d0,-131128140.d0,548354040.d0,-1391975640.d0,2203961430.d0,&
+       -2203961430.d0,1391975640.d0,-548354040.d0,131128140.d0,-18156204.d0,1344904.d0,-46376.d0,561.d0,-1.d0,&
+       0.d0,0.d0,0.d0,&
+                                !34
+       -1.d0,595.d0,-52360.d0,1623160.d0,-23535820.d0,183579396.d0,-834451800.d0,2319959400.d0,-4059928950.d0,&
+       4537567650.d0,-3247943160.d0,1476337800.d0,-417225900.d0,70607460.d0,-6724520.d0,324632.d0,-6545.d0,35.d0,&
+       0.d0,0.d0,0.d0,&
+                                !35
+       -1.d0,630.d0,-58905.d0,1947792.d0,-30260340.d0,254186856.d0,-1251677700.d0,3796297200.d0,-7307872110.d0,&
+       9075135300.d0,-7307872110.d0,3796297200.d0,-1251677700.d0,254186856.d0,-30260340.d0,1947792.d0,&
+       -58905.d0,630.d0,-1.d0,0.d0,0.d0,&
+                                !36
+       1.d0,-666.d0,66045.d0,-2324784.d0,38608020.d0,-348330136.d0,1852482996.d0,-6107086800.d0,12875774670.d0,&
+       -17672631900.d0,15905368710.d0,-9364199760.d0,3562467300.d0,-854992152.d0,124403620.d0,-10295472.d0,&
+       435897.d0,-7770.d0,37.d0,0.d0,0.d0,&
+                                !37
+       1.d0,-703.d0,73815.d0,-2760681.d0,48903492.d0,-472733756.d0,2707475148.d0,-9669554100.d0,22239974430.d0,&
+       -33578000610.d0,33578000610.d0,-22239974430.d0,9669554100.d0,-2707475148.d0,472733756.d0,-48903492.d0,&
+       2760681.d0,-73815.d0,703.d0,-1.d0,0.d0,&
+                                !38
+       -1.d0,741.d0,-82251.d0,3262623.d0,-61523748.d0,635745396.d0,-3910797436.d0,15084504396.d0,-37711260990.d0,&
+       62359143990.d0,-68923264410.d0,51021117810.d0,-25140840660.d0,8122425444.d0,-1676056044.d0,211915132.d0,&
+       -15380937.d0,575757.d0,-9139.d0,39.d0,0.d0,&
+                                !39
+       -1.d0,780.d0,-91390.d0,3838380.d0,-76904685.d0,847660528.d0,-5586853480.d0,23206929840.d0,-62852101650.d0,&
+       113380261800.d0,-137846528820.d0,113380261800.d0,-62852101650.d0,23206929840.d0,-5586853480.d0,847660528.d0,&
+       -76904685.d0,3838380.d0,-91390.d0,780.d0,-1.d0,&
+                                !40
+       1.d0,-820.d0,101270.d0,-4496388.d0,95548245.d0,-1121099408.d0,7898654920.d0,-35240152720.d0,103077446706.d0,&
+       -202112640600.d0,269128937220.d0,-244662670200.d0,151584480450.d0,-63432274896.d0,17620076360.d0,-3159461968.d0,&
+       350343565.d0,-22481940d0,749398.d0,-10660.d0,41.d0 /), &
+       shape(scbinom), order=(/2,1/) )
+  save sc_3d_kick,sc_3d_periodic,sc_3d_beamsize
+end module SCdat
 
 module SpaceCharge
 
@@ -42,22 +216,23 @@ module SpaceCharge
 
   logical :: sc_chrom_fix
 
+  double precision sgpr(6,6),npart,sc3d_emit(5)
   double precision :: ex_rms0 = zero, ey_rms0 = zero, sigma_p0 = zero, sigma_z0 = zero
   double precision :: N_ions_in_beam, Npart_gain, N_ions_ini, n_ions_macro, N_ions_for_bb
   double precision :: sigma_z_ini, z_factor, t_rms, pt_rms, z_keep(6,max_part)
-  
+
   double precision, save :: betx_start=1d0, bety_start=1d0
   double precision, save :: alfx_start=0d0, alfy_start=0d0
   double precision, save :: gamx_start=0d0, gamy_start=0d0
   double precision, save :: dx_start=0d0,   dpx_start=0d0
   double precision, save :: dy_start=0d0,   dpy_start=0d0
-  
+
   !VVK 20100321 -------------------------------------------------
   integer :: i_part                     ! local counter
   double precision  :: Summ_t_mean      ! local for mean value
   double precision  :: Summ_t_square    ! local for rms value
-!-------------------------------------------------------------------
-  
+  !-------------------------------------------------------------------
+
   private :: table_input
   private :: ixy_calcs
   private :: ixy_fitting
@@ -68,41 +243,79 @@ contains
 
     use trackfi
     use spch_bbfi
-    
+    use SCdat
+
     logical, intent(IN) :: run, dynap
     integer, intent(IN)  :: turns
     logical, intent(INOUT) :: first
-
+    integer code, j, restart_sequ
+    integer advance_node
+    double precision node_value
     integer, external :: get_option
     double precision, external :: get_value
+    integer, external :: get_file_unit
 
+    !---- get options for space charge variables
     exit_loss_turn = get_option('exit_loss_turn ') .ne. 0
     bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
-    checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. zero
+    sc_3d_kick = get_option('sc_3d_kick ') .ne. 0
+    sc_3d_beamsize = get_option('sc_3d_beamsize ') .ne. 0
+    if(sc_3d_beamsize) then
+       i_spch = 0 !a special spch-update counter
+       j = restart_sequ()
+11     continue
+       code = node_value('mad8_type ')
+       if(code.eq.22) then
+          i_spch = i_spch+1
+          sc_intstr=2d0*0.5d0**1.5d0*arad * get_value('probe ', 'npart ') / get_value('probe ','gamma ')
+          sc_charge(i_spch)=node_value('charge ')
+          do j=1,6
+             sc_map(i_spch,j,j)=1d0
+          enddo
+       endif
+       if (advance_node().ne.0)  then
+          j=j+1
+          go to 11
+       endif
+       i_spch = 0 !a special spch-update counter
+    endif
+    sc_3d_periodic = get_option('sc_3d_periodic ') .ne. 0
+    !  sc_3d_damp = get_option('sc_3d_damp ') .ne. 0 ! replaced by periodic approach
+    !  sc_3d_damp_amp = get_value('run ','sc_3d_damp_amp ') ! replaced by periodic approach
+    checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. 0d0
     emittance_update = get_option('emittance_update ') .ne. 0
-    virgin_state = get_value('run ', 'virgin_state ') .ne. zero
-
-    !! ALSC: I think init should reset to zero these varibles
-    ex_rms0 = zero;
-    ey_rms0 = zero;
-    sigma_p0 = zero;
-    sigma_z0 = zero;
-
-    if (run .and. bb_sxy_update) then
-       open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
-    else if (dynap) then
+    if(sc_3d_kick) emittance_update=.FALSE.
+    virgin_state = get_value('run ', 'virgin_state ') .ne. 0d0
+    if(run) then
+       ! 2015-Feb-23  16:20:19  ghislain: open file only when necessary
+       if (bb_sxy_update) then
+          inquire (file='checkpoint_restart.dat', OPENED=I_OPEN, NUMBER=I_NUMBER)
+          if (I_OPEN) close(I_NUMBER)
+          unit_chpt=get_file_unit(lu_max)
+          if(checkpnt_restart) then
+             open(unit_chpt,file='checkpoint_restart.dat',form='unformat&
+                  &ted',status='old')
+          else
+             open(unit_chpt,file='checkpoint_restart.dat',form='unformatted')
+          endif
+       endif
+    else
        bb_sxy_update = .false.
        checkpnt_restart = .false.
     endif
+    if(bb_sxy_update) then
+       if(virgin_state) first=.true.
 
-    if (bb_sxy_update) then
-       if (virgin_state) first=.true.
-       call table_input( betx_start, bety_start, &
-            alfx_start, alfy_start, &
-            gamx_start, gamy_start, &
-            dx_start,    dpx_start, &
+       call table_input(                                 &
+            betx_start, bety_start,                      &
+            alfx_start, alfy_start,                      &
+            gamx_start, gamy_start,                      &
+            dx_start,    dpx_start,                      &
             dy_start,    dpy_start)
-       if (first) call make_bb6d_ixy(turns)
+
+       if(sc_3d_kick.and.first) call mymap()
+
+       if(first) call make_bb6d_ixy(turns)
     endif
 
   end subroutine SC_Init
@@ -112,42 +325,43 @@ contains
     use spch_bbfi
     use trackfi
     use time_varfi
-    
+
     double precision, intent(IN) :: orbit(6), z(6,N_macro_surv)
 
     !frs on 04.06.2016 - fixing
     !a) bug concerning sigma_p
-    !b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+    !b) Filling data in file bb6d_ixy.txt even for "emittance_update = !.false.",
     !   obviously without update!
-    !c) Fixing checkpnt_restart for "emittance_update = .false." which
+    !c) Fixing checkpnt_restart for "emittance_update = !.false." which
     !   worked for ".true." alright.
     ex_rms0=ex_rms
     ey_rms0=ey_rms
     sigma_z0=sigma_z
     sigma_p0=sigma_p
     if (bb_sxy_update .and. is_lost) then
-       call ixy_calcs(betas, orbit, z,       &
-            betx_start, bety_start, &
-            alfx_start, alfy_start, &
-            gamx_start, gamy_start, &
-            dx_start,    dpx_start, &
+       call ixy_calcs(betas, orbit, z,                  &
+            betx_start, bety_start,                      &
+            alfx_start, alfy_start,                      &
+            gamx_start, gamy_start,                      &
+            dx_start,    dpx_start,                      &
             dy_start,    dpy_start)
        call ixy_fitting()
        is_lost = .false.
     endif
-
     if( .not. emittance_update) then
        ex_rms=ex_rms0
        ey_rms=ey_rms0
-       sigma_z=sigma_z0
-       sigma_p=sigma_p0
+       rat_bb_n_ions=1d0
     endif
+    sigma_z=sigma_z0
+    sigma_p=sigma_p0
     !frs on 04.06.2016 - fixing
     !a) bug concerning sigma_p
-    !b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+    !b) Filling data in file bb6d_ixy.txt even for "emittance_update = !.false.",
     !   obviously without update!
-    !c) Fixing checkpnt_restart for "emittance_update = .false." which
-    !   worked for ".true." alright.    
+    !c) Fixing checkpnt_restart for "emittance_update = !.false." which
+    !   worked for ".true." alright.
+
   end subroutine SC_Update
 
   subroutine BB_Init(first)
@@ -207,125 +421,162 @@ contains
     use spch_bbfi
     use trackfi
     use time_varfi
+    use SCdat
 
     integer, intent(IN) :: turn
-    
-    double precision, intent(IN) :: orbit0(6), z(6,N_macro_surv)
-    
-    if (bb_sxy_update) then
-       trrun_nt = turn
-       time_var_m_lnt = 0 ; time_var_p_lnt = 0 ; time_var_c_lnt = 0
 
-       N_macro_surv = jmax
+    double precision, intent(IN) :: orbit0(6), z(6,N_macro_surv)
+
+    if(bb_sxy_update) then
+       trrun_nt=turn
+       time_var_m_lnt=0
+       time_var_p_lnt=0
+       time_var_c_lnt=0
+
+       N_macro_surv=jmax
        i_spch = 0 !a special spch-update counter
 
-       ex_rms0 = ex_rms
-       ey_rms0 = ey_rms
-       sigma_z0 = sigma_z
+       ex_rms0=ex_rms
+       ey_rms0=ey_rms
+       sigma_z0=sigma_z
        sigma_p0=sigma_p
        !sigma_p0 = sigma_p !CM, 3/11/14
        !fill, table=Ixy_unsorted; column=i_macro_part, Ix, Iy, dpi, z_part;
        !new on 3/31/14:
        !frs on 04.06.2016 - fixing
        !a) bug concerning sigma_p
-       !b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+       !b) Filling data in file bb6d_ixy.txt even for "emittance_update = !.false.",
        !   obviously without update!
-       !c) Fixing checkpnt_restart for "emittance_update = .false." which
+       !c) Fixing checkpnt_restart for "emittance_update = !.false." which
        !   worked for ".true." alright.
        !        if (emittance_update) then
-       call ixy_calcs(betas, orbit0, z, &
-            betx_start, bety_start, &
-            alfx_start, alfy_start, &
-            gamx_start, gamy_start, &
-            dx_start,    dpx_start, &
-            dy_start,    dpy_start)
-       call ixy_fitting()
 
-       call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
-       call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(n_macro_surv))
-       call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(n_for_i))
-       call double_to_table_curr('bb6d_ixy ', 'ex_rms ', ex_rms)
-       call double_to_table_curr('bb6d_ixy ', 'ey_rms ', ey_rms)
-       call double_to_table_curr('bb6d_ixy ', 'sigma_p ', sigma_p)
-       call double_to_table_curr('bb6d_ixy ', 'sigma_z ', sigma_z)
+       if(sc_3d_kick) then
+          call SigmaMatrixFit6Dv7(z,jmax,sgpr,sc3d_emit)
+          if(sc_3d_beamsize) then
+             call SigmaTransport2(sgpr)
+          else
+             call SigmaTransport(sgpr)
+          endif
+          call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
+          call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(N_ini))
+          call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(jmax))
+          call double_to_table_curr('bb6d_ixy ', 'ex_rms ', sc3d_emit(1))
+          call double_to_table_curr('bb6d_ixy ', 'ey_rms ', sc3d_emit(2))
+          call double_to_table_curr('bb6d_ixy ', 'ez_rms ', sc3d_emit(3))
+          call double_to_table_curr('bb6d_ixy ', 'sigma_ct ', sc3d_emit(4))
+          call double_to_table_curr('bb6d_ixy ', 'sigma_pt ', sc3d_emit(5))
+       else
+          call ixy_calcs(betas, orbit0, z,                  &
+               betx_start, bety_start,                      &
+               alfx_start, alfy_start,                      &
+               gamx_start, gamy_start,                      &
+               dx_start,    dpx_start,                      &
+               dy_start,    dpy_start)
+          call ixy_fitting()
+          call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
+          call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(n_macro_surv))
+          call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(n_for_i))
+          call double_to_table_curr('bb6d_ixy ', 'ex_rms ', ex_rms)
+          call double_to_table_curr('bb6d_ixy ', 'ey_rms ', ey_rms)
+          call double_to_table_curr('bb6d_ixy ', 'ez_rms ', 0d0)
+          call double_to_table_curr('bb6d_ixy ', 'sigma_ct ', sigma_z0)
+          call double_to_table_curr('bb6d_ixy ', 'sigma_pt ', sigma_p0)
+       endif
        call augment_count('bb6d_ixy ')
 
-       if (sigma_p0 .eq. zero) sigma_p0 = sigma_p
+       if(sigma_p0.eq.0d0) sigma_p0=sigma_p
        !frs on 04.06.2016 - fixing
        !a) bug concerning sigma_p
-       !b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+       !b) Filling data in file bb6d_ixy.txt even for "emittance_update = !.false.",
        !   obviously without update!
-       !c) Fixing checkpnt_restart for "emittance_update = .false." which
+       !c) Fixing checkpnt_restart for "emittance_update = !.false." which
        !   worked for ".true." alright.
        !new on 3/31/14:
        !        endif
 
-       if (.not.emittance_update) then
-          ex_rms = ex_rms0
-          ey_rms = ey_rms0
-          sigma_z = sigma_z0
-          sigma_p = sigma_p0
-       endif
+       sigma_z=sigma_z0
+       sigma_p=sigma_p0
        !frs on 04.06.2016 - fixing
        !a) bug concerning sigma_p
-       !b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+       !b) Filling data in file bb6d_ixy.txt even for "emittance_update = !.false.",
        !   obviously without update!
-       !c) Fixing checkpnt_restart for "emittance_update = .false." which
+       !c) Fixing checkpnt_restart for "emittance_update = !.false." which
        !   worked for ".true." alright.
        !           sigma_p=sigma_p0
-       z_factor = one
-       if ( sigma_z.gt.zero .and. sigma_z_ini.gt.zero) z_factor = sigma_z_ini/sigma_z
-
-       N_ions_for_bb = n_ions_macro * N_for_I * z_factor
-       if (N_ions_in_beam .le. zero) then
-          rat_bb_n_ions = zero
+       if((sigma_z.GT.0d0).AND.(sigma_z_ini.GT.0d0)) then
+          z_factor=sigma_z_ini/sigma_z
        else
-          rat_bb_n_ions = N_ions_for_bb/N_ions_in_beam
+          z_factor=1D0
        endif
 
-       time_var_m = .false. ; time_var_p = .false. ; time_var_c = .false.
-       if (idnint(time_var_m_nt(time_var_m_cnt+1)) .eq. tot_turn+turn) time_var_m=.true.
-       if (idnint(time_var_p_nt(time_var_p_cnt+1)) .eq. tot_turn+turn) time_var_p=.true.
-       if (idnint(time_var_c_nt(time_var_c_cnt+1)) .eq. tot_turn+turn) time_var_c=.true.
-    endif ! bb_sxy_update
+       N_ions_for_bb=n_ions_macro*N_for_I*z_factor
+       if(N_ions_in_beam.le.0d0) then
+          rat_bb_n_ions=0d0
+       else
+          rat_bb_n_ions=N_ions_for_bb/N_ions_in_beam
+       endif
 
-!!!! ALSC    nlm = 0
-!!!! ALSC    sum = zero
+       if(.not.emittance_update) then
+          ex_rms=ex_rms0
+          ey_rms=ey_rms0
+          rat_bb_n_ions=1d0
+       endif
+
+       if(idnint(time_var_m_nt(time_var_m_cnt+1)).eq.tot_turn+turn) then
+          time_var_m=.true.
+       else
+          time_var_m=.false.
+       endif
+       if(idnint(time_var_p_nt(time_var_p_cnt+1)).eq.tot_turn+turn) then
+          time_var_p=.true.
+       else
+          time_var_p=.false.
+       endif
+       if(idnint(time_var_c_nt(time_var_c_cnt+1)).eq.tot_turn+turn) then
+          time_var_c=.true.
+       else
+          time_var_c=.false.
+       endif
+    endif
+
+    !ALSC     nlm = 0
+    !ALSC     sum=0d0
 
     !frs on 04.06.2016 - fixing
     !a) bug concerning sigma_p
-    !b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+    !b) Filling data in file bb6d_ixy.txt even for "emittance_update = !.false.",
     !   obviously without update!
-    !c) Fixing checkpnt_restart for "emittance_update = .false." which
+    !c) Fixing checkpnt_restart for "emittance_update = !.false." which
     !   worked for ".true." alright.
-    !frs on 07.06.2016 - fixing
-    !  longitudinal plane must be frozen too!
-    if (bb_sxy_update) then
+    if(bb_sxy_update) then
        if(emittance_update.or.(.not.emittance_update.and.mean_t.eq.0d0.and.sigma_t.eq.0d0)) then
+
+          !     if((sigma_t.eq.0d0.or.emittance_update).and.bb_sxy_update) then
           !VVK 20100321 -------- Find RMS-value of t ----------------------
           ! if we do 1-turn tracking, orbit0(5)=0 always
-          Summ_t_mean = zero
-          do i_part = 1, jmax
-             if (abs(z(5,i_part)) .ge. zero) then
-                Summ_t_mean = Summ_t_mean + z(5,i_part)
+          Summ_t_mean=0d0
+          do i_part=1, jmax
+             if (abs(z(5,i_part)) .GE. 0d0) then
+                Summ_t_mean=Summ_t_mean+z(5,i_part)
              else
-                print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
+                Print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
              endif
           enddo
-          mean_t = Summ_t_mean/dble(jmax)
+          mean_t=Summ_t_mean/dble(jmax)
 
-          Summ_t_square = zero
-          do i_part = 1, jmax
-             if (abs(z(5,i_part)) .ge. zero) &
-                  Summ_t_square = Summ_t_square + (z(5,i_part) - mean_t)**2
+          Summ_t_square=0d0
+          do i_part=1, jmax
+             if (abs(z(5,i_part)) .GE. 0d0) &
+                  Summ_t_square=Summ_t_square+(z(5,i_part)-mean_t)**2
           enddo
-          sigma_t = sqrt(Summ_t_square/dble(jmax))
-
-          if (abs(sigma_t) .eq. zero) then
-             sigma_t=t_max/two
+          sigma_t=sqrt(Summ_t_square/dble(jmax))
+          if(abs(sigma_t).eq.0d0) then
+             sigma_t=t_max/2d0
              call fort_warn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
           endif
        endif
+       sigma_t=sigma_z
        !-----------------------------------------------------------------
     endif
 
@@ -781,4 +1032,1113 @@ contains
 
   end subroutine ixy_calcs
 
+  subroutine SigmaMatrixFit6Dv7(z,jmax,sgnw,sc3d_emit)
+    use SCdat
+    use spch_bbfi
+    implicit none
+    ! Yuri Alexahin Oct 2017 Mathematica version
+    !   SigmaMatrixFit6Dv7::usage = "SigmaMatrixFit6D[z,jmax,sgnw,sc3d_emit] makes
+    !   Gaussian fit for jmax vectors z
+    !   fcore::usage = "fraction of particles in the CORE provided by
+    !   the fit to the calling program "(* fcore=1  for now *)
+    ! Frank Schmidt Oct 2017 Fortran90 version
+    ! Copyright Fermilab & CERN
+    integer ip,k,ii,i,i6,j,jmax,nf1
+    integer :: itr=0
+    double precision s3,exf,etaf,etapr,sgnwc!frs 18.04.2019,trpr
+    double precision :: aver(idim),dz(idim),apr(idim),s1(idim),avr(idim),t6(idim),&
+         sgin(idim,idim),t66(idim,idim),sgpr(idim,idim),s2(idim,idim),sgnw(idim,idim),&
+         sgnwa(idim,idim),reeig(idim),aieig(idim),am(idim,idim),sc3d_emit(5)
+    double precision :: z(idim,*),dummy
+    !frs 18.04.2019  double precision, external :: mytrace
+    character*240 ch
+    integer, external :: get_file_unit
+    character(20) text
+    !**********************************************************************************
+    aver= sum(z(1:idim,1:jmax),dim=2)/dble(jmax)
+    sgin=0d0
+    do k=1,jmax
+       t6=z(1:idim,k)-aver
+       sgin=sgin+SPREAD(t6,1,idim)*TRANSPOSE(SPREAD(t6,1,idim))
+    end do
+    sgin=sgin/dble(jmax);!sgnw=sgin;goto 200;
+    apr = aver; sgpr = sgin; etapr=1d0;
+    do ii=1,isigmatfit
+       call symsol(sgin,idim,eflag,work_1,work_2,work_3)
+       !frs 18.04.2019     trpr = mytrace(sgpr)
+       s1 = 0d0; s2 = 0d0; s3 = 0d0;
+       do ip=1,jmax
+          dz=z(1:idim,ip)-apr
+          !        exf = Exp(-dot_product(dz,(MATMUL(sgin,dz)))/2d0); !old
+          exf = Exp(-alfa*dot_product(dz,(MATMUL(sgin,dz)))); !frs 13.06.18
+          s1 = s1 + z(1:idim,ip)*exf;
+          s2 = s2 + SPREAD(dz,1,idim)*TRANSPOSE(SPREAD(dz,1,idim))*exf
+          s3 = s3 + exf
+       enddo
+       !     avr = s1/s3; sgnw = s2/(s3 - etapr*dble(jmax)/16d0); !old
+       avr = s1/s3; sgnw = s2/(s3 - etapr*dble(jmax)*efactor);etaf=1d0; !frs 13.06.18
+       !     etaf = Min(1d0, 8d0*s3/dble(jmax));
+       sgnwc=0d0
+       !frs 18.04.2019
+       do i6=1,idim
+          if(sgpr(i6,i6).eq.0d0) then
+             write(text, '(1p,i8)') i6
+             call fort_fail('TRRUN: ','Fatal: sgpr zero component: ' // text)
+          endif
+          sgnwc=sgnwc+(sgnw(i6,i6)/sgpr(i6,i6)-1d0)**2
+       enddo
+       !frs 18.04.2019     If( Abs(mytrace(sgnw)/trpr - 1d0) + Abs(etaf - etapr) .lt. 2d-6) then
+       If(sgnwc .lt. 4d-12) then!frs 18.04.2019
+          goto 200
+       else
+          apr = (1d0 - dampf)*apr + dampf*avr;
+          sgpr = (1d0 - dampf)*sgpr + dampf*sgnw;
+          !        etapr = (1d0 - dampeta)*etapr + dampeta*etaf !frs 13.06.18
+          sgin=sgpr
+       endif
+    enddo
+200 continue
+    fcore=etaf; print*,"etaf: ",etaf; print*,"Iteration: ",ii-1;
+    sgnwa = matmul(sgnw,sr)
+    reeig=0d0
+    aieig=0d0
+    am=0d0
+    call ladeig(sgnwa,reeig,aieig,am)
+    print*,"beta11:   ",  am(1,1)*am(1,1)+am(1,2)*am(1,2)
+    print*,"beta12:   ",  am(1,3)*am(1,3)+am(1,4)*am(1,4)
+    write(90,'(3(e25.17,1x))') sgnw(1,1),sgnw(3,3),sgnw(5,5)
+    write(91,'(6(e25.17,1x))') ((sgnw(j,i), i=1,6), j=1,6)
+    sc3d_emit(1)=aieig(1)
+    sc3d_emit(2)=aieig(3)
+    sc3d_emit(3)=aieig(5)
+    sc3d_emit(4)=sgnw(5,5)
+    sc3d_emit(5)=sgnw(6,6)
+    if(sc_3d_periodic) then
+       nf1=get_file_unit(lu_max)
+       open(nf1,file="rmatrix.dat",STATUS="OLD",err=1000)
+       goto 2000
+1000   call fort_fail('TRRUN: Fatal: ',                                     &
+            'File: rmatrix.dat non-existing')
+2000   continue
+       do i=1,47
+          read(nf1,*) ch
+       enddo
+       sgnw=0d0
+       read(nf1,*) ch,dummy,(sgnw(i,1:idim),i=1,idim)
+       close(nf1)
+       reeig=0d0
+       aieig=0d0
+       am=0d0
+       call ladeig(sgnw,reeig,aieig,am)
+       am=TRANSPOSE(am)
+       sgnw=0d0
+       do i=1,idim
+          do j=1,idim
+             do k=1,3
+                sgnw(i,j)=sgnw(i,j)+sc3d_emit(k)*(am(2*k-1,i)*am(2*k-1,j)+am(2*k,i)*am(2*k,j))
+             enddo
+          enddo
+       enddo
+    endif
+  end subroutine SigmaMatrixFit6Dv7
+  subroutine SCkick3Dv4(track,ktrack,fk)
+    use SCdat
+    use spch_bbfi
+    implicit none
+    integer ktrack,itrack
+    double precision, external :: eInt
+    double precision, external :: lInt
+    double precision, external :: bips
+    double precision track(6,*),fk
+    double precision h1,h2,h3,h4,hf
+    integer, parameter :: nstt=100
+    integer i,k,l,m,n,ip,mmz,mmzopt,m1,n1,it,kmax,get_option
+    double precision a,sqa,zdig,xory,z1,z2,s2,sm,sn,dpdz1,dpdz11,dpdz2&
+         &,dpdz21,sig1,sig2,zmax,r,u,v,uz1,uz2,aum,sqaum,rad
+    double precision pot,pot1,pot2,pot3,efx,efy,efx1,efy1,efx2,efy2,ir&
+         &,lInts,eInts,st0,weight,at,tst(0:nstt),tfc(0:nstt),sqat,fnx(0:nstt)&
+         &,fny(0:nstt),fnp(0:nstt),exp2,dpdz12,dpdz22
+    double precision x,y,ctm,x2,y2,t
+    double precision :: sigx=0d0,sigy=0d0,sigct=0d0
+    double precision :: iB(0:mmax,0:mmax+1),iBu(0:mmum,0:mmum+1)
+    character(20) text
+    !********************************************************************************
+    kmax = get_option('sc_mult_ord ')
+    if(kmax.gt.kmaxo) then
+       write(text, '(1p,i4)') kmaxo
+       call fort_fail('SCkick:', 'kmax > kmaxo =' // text)
+    endif
+    sigx=scsigx(i_spch); sigy=scsigy(i_spch); sigct=scsigz(i_spch);
+    if(sigx.eq.0d0.or.sigy.eq.0d0.or.sigct.eq.0d0) call fort_fail('SCkick:', 'Some Sigma values = 0 ')
+    if(sigy > sigx) then
+       xory=0d0
+    else
+       xory=1d0
+    endif
+    if(xory==1d0) then
+       sig1=sigx; sig2=sigy;
+    else
+       sig1=sigy; sig2=sigx;
+    endif
+    a=(sig2/sig1)**2-1d0; sqa=Sqrt(1d0+a);
+    !(***** power expansion coefficients for small displacements *****)
+    if(Abs(a)>5d-1) then
+       h1=dble(mmax+1)
+       h2=5d-1
+       h3=dble(mmax+2)
+       h4=-a
+       !       call hygfx(mmax+1,1d0/2d0,mmax+2,-a,hf)
+       call hygfx(h1,h2,h3,h4,hf)
+       iB(mmax,0)=hf/dble(mmax+1)
+    else
+       iB(mmax,0)=bips(a, mmax);
+    endif
+    Do k=1,mmax
+       m=mmax-k;iB(m,0)=(sqa-a*(dble(m)+3d0/2d0)*iB(m+1,0))/dble(m+1);
+       Do l=0,mmax-k+1
+          iB(m,l+1)=(1d0/sqa/(1d0+a)**l-(dble(m-l)+1d0/2d0)*iB(m,l))&
+               &/(dble(l)+1d0/2d0)
+       enddo
+    enddo
+    !(***** expansion coefficients for intermediate displacements *****)
+    aum=a*um;sqaum=Sqrt(1d0+aum);
+    iBu(mmum,0)=bips(aum,mmum);
+    Do k=1,mmum
+       m=mmum-k;
+       iBu(m,0)=(sqaum-aum*(dble(m)+3d0/2d0)*iBu(m+1,0))/(dble(m)+1d0);
+       Do l=0,mmum-k+1
+          iBu(m,l+1)=(1d0/sqaum/(1d0+aum)**l-(dble(m-l)+1d0/2d0)*&
+               &iBu(m,l))/(dble(l)+1d0/2d0)
+       enddo
+    enddo
+!!! new stuff 05.18 for intermediate displacements !!!
+
+    pot3=2d0*log(1d0+sqa)/(1d0+sqaum)+log(um)
+
+    st0 = (1d0 - um)/dble(Nstt);
+    Do it=0,Nstt
+       tst(it) = um + st0*dble(it)
+       at=a*tst(it);
+       tfc(it)=tst(it)/(1d0 + at);
+       if(it.eq.0.or.it.eq.Nstt) then
+          weight=st0/3d0
+       else
+          weight=2d0*(dble(mod(it,2))+1d0)*st0/3d0
+       endif
+       sqat = Sqrt(1d0+at);
+       fnx(it)=weight/sqat;
+       fny(it)=weight/sqat**3;
+       fnp(it)=weight/sqat/tst(it)
+    enddo
+
+!!! end of new stuff 05.18 for intermediate displacements !!!
+
+    !(***** cycle over particles *****)
+    !hrr
+    !$OMP PARALLEL DO PRIVATE(itrack,x,y,ctm,zdig,mmzopt,mmz,z1,z2,m,Sm,Sn), &
+    !$OMP& PRIVATE(n,pot,m1,dpdz1,n1,dpdz2,efx,efy,zmax,r,u,v,lInts,k,iR,it), &
+    !$OMP& PRIVATE(eInts,uz1,uz2,dpdz11,dpdz21,rad,dpdz12,dpdz22,exp2,pot1,pot2)
+    do itrack=1,ktrack
+       x=track(1,itrack); y=track(3,itrack); ctm=track(5,itrack); !(* actually it is T=-ct *)
+       zdig=Sqrt((x/sigx)**2+(y/sigy)**2);
+       If(zdig <= dres) then
+          !(* small displacements *)
+          mmzopt=Ceiling(6.439952123143645d0 +1.9839807379159704d0*zdig+&
+               &1.3522706712502284d0*zdig**2);
+          mmz=Min(mmzopt, mmax);
+          If(xory==1d0) then
+             z1=(x/sig1)**2/2d0; z2=(y/sig1)**2/2d0
+          else
+             z1=(y/sig1)**2/2d0; z2=(x/sig1)**2/2d0;
+          endif
+          If(z1<epsz) z1=epsz;
+          If(z2<epsz) z2=epsz;
+          m=mmz;
+          Sm=0d0;
+          Do While(m>0)
+             n=mmz-m; Sn=0d0;
+             Do While(n>=0)
+                Sn=-Sn*z2/dble(n+1)+iB(m+n-1,n)
+                n = n-1;
+             enddo
+             Sm=-Sm*z1/dble(m+1)+Sn
+             m = m-1
+          enddo
+          n=mmz;Sn=0d0;
+          Do While(n>0)
+             Sn=-Sn*z2/dble(n+1)+iB(n-1,n)
+             n = n-1
+          enddo
+          pot=-Sm*z1-Sn*z2;
+          m1=mmz-1; Sm=0d0;
+          Do While(m1>=0)
+             n=mmz-m1-1; Sn=0d0;
+             Do While(n>=0)
+                Sn=-Sn*z2/dble(n+1)+iB(m1+n,n)
+                n = n-1
+             enddo
+             Sm=-Sm*z1/dble(m1+1)+Sn
+             m1 = m1-1
+          enddo
+          dpdz1=-Sm;
+          m=mmz-1; Sm=0d0;
+          Do While(m>=0)
+             n1=mmz-m-1; Sn=0d0;
+             Do While(n1>=0)
+                Sn=-Sn*z2/dble(n1+1)+iB(m+n1,n1+1)
+                n1 = n1-1
+             enddo
+             Sm=-Sm*z1/(m+1)+Sn
+             m = m-1
+          enddo
+          dpdz2=-Sm;
+          efx=-(xory*dpdz1+(1d0-xory)*dpdz2)*x/sig1**2;
+          efy=-(xory*dpdz2+(1d0-xory)*dpdz1)*y/sig1**2
+       else
+          zmax=Sqrt(x**2+y**2)/sig1;
+          If(zmax>6) then
+             !(* large displacements *)
+             r=sigy/sigx;
+             u=x/sigx;v=y/sigx;iR=1d0/(u**2+v**2);
+             lInts=0d0
+             do k=1,kmax
+                lInts=lInts+lInt(k,r,u,v)*iR**(2*k)
+             enddo
+             pot=Log((1d0+r)**2*iR/2d0)-EulerGamma-lInts/Pi;
+             eInts=0d0
+             do k=1,kmax
+                eInts=eInts+eInt(k,r,u,v)*iR**(2*k+1)
+             enddo
+             efx=(2d0*u*iR+eInts/Pi)/sigx;
+             r=sigx/sigy;
+             u=y/sigy;v=x/sigy;iR=1d0/(u**2+v**2);
+             eInts=0d0
+             do k=1,kmax
+                eInts=eInts+eInt(k,r,u,v)*iR**(2*k+1)
+             enddo
+             efy=(2d0*u*iR+eInts/Pi)/sigy
+          else
+             !(* Intermediate displacements *)
+             mmz=Min(3+NINT(1.65d0*zmax),mmum);
+             If(xory==1d0) then
+                z1=(x/sig1)**2/2d0;z2=(y/sig1)**2/2d0
+             else
+                z1=(y/sig1)**2/2d0;z2=(x/sig1)**2/2d0;
+             endif
+             If(z1<epsz) z1=epsz;If(z2<epsz) z2=epsz;
+             uz1=um*z1; uz2=um*z2;
+             m=mmz; Sm=0d0;
+             Do While(m>0)
+                n=mmz-m; Sn=0d0;
+                Do While(n>=0)
+                   Sn=-Sn*uz2/dble(n+1)+iBu(m+n-1,n);
+                   n = n-1;
+                enddo
+                Sm=-Sm*uz1/dble(m+1)+Sn;
+                m = m-1;
+             enddo
+             n=mmz;Sn=0d0;
+             Do While(n>0)
+                Sn=-Sn*uz2/dble(n+1)+iBu(n-1,n);
+                n = n-1;
+             enddo
+             pot1=-Sm*uz1-Sn*uz2;
+             m1=mmz-1; Sm=0d0;
+             Do While(m1>=0)
+                n=mmz-m1-1; Sn=0d0;
+                Do While(n>=0)
+                   Sn=-Sn*uz2/dble(n+1)+iBu(m1+n,n);
+                   n = n-1;
+                enddo
+                Sm=-Sm*uz1/dble(m1+1)+Sn;
+                m1 = m1-1;
+             enddo
+             dpdz11=-Sm*um;
+             m=mmz-1; Sm=0d0;
+             Do While(m>=0)
+                n1=mmz-m-1; Sn=0d0;
+                Do While(n1>=0)
+                   Sn=-Sn*uz2/dble(n1+1)+iBu(m+n1,n1+1);
+                   n1 = n1-1;
+                enddo
+                Sm=-Sm*uz1/(m+1)+Sn;
+                m = m-1;
+             enddo
+             dpdz21=-Sm*um;
+!!! new stuff 05.2018 for intermediate displacements !!!**)
+
+             pot2 = 0d0; dpdz12 = 0d0; dpdz22 = 0d0;
+             Do it=0,Nstt
+                exp2=1d0/Exp(z1*tst(it)+z2*tfc(it));
+                dpdz12 = dpdz12 - fnx(it)*exp2;
+                dpdz22 = dpdz22 - fny(it)*exp2;
+                pot2 = pot2 + fnp(it)*exp2
+             enddo
+             efx=-(xory*(dpdz11+dpdz12)+(1-xory)*(dpdz21+dpdz22))*&
+                  x/sig1**2;
+             efy=-(xory*(dpdz21+dpdz22)+(1-xory)*(dpdz11+dpdz12))*&
+                  y/sig1**2;
+             pot=pot1+pot2+pot3
+          endif
+       endif
+       rad=fk*Exp(-(ctm/sigct)**2/2d0)
+       track(2,itrack)=track(2,itrack)+rad*efx
+       track(4,itrack)=track(4,itrack)+rad*efy
+       track(6,itrack)=track(6,itrack)+rad*pot*ctm/sigct**2
+    enddo
+    !$OMP END PARALLEL DO
+  end subroutine SCkick3Dv4
+  subroutine mymap()
+    use spch_bbfi
+    implicit none
+    integer i,j,k,m2,nf1
+    double precision s,ree(6,6),ret(6,6),ret_trans(6,6),ret2(6,6),ret2_trans(6,6)
+    character(240) ch
+    character(24) name
+    integer, external :: get_file_unit
+    character(20) text
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    nf1=get_file_unit(lu_max)
+    open(nf1,file="my_sector.tfs",STATUS="OLD",err=1000)
+
+    do i=1,8
+       read(nf1,'(a)') ch
+    enddo
+    ret=0
+    do i=1,6
+       ret(i,i)=1d0
+    enddo
+    ret2=0
+    do i=1,6
+       ret2(i,i)=1d0
+    enddo
+    m2=0
+    do
+       read(nf1,*,end=100) name,s,((ree(j,k),k=1,6),j=1,6)
+       if(name(1:7).eq."SPCH_BB") then
+          m2=m2+1
+          ret_trans=TRANSPOSE(ret)
+          ret2_trans=TRANSPOSE(ret2)
+          sc_sect_map(m2,1:6,1:6)=ret(1:6,1:6)
+          trans_sc_sect_map(m2,1:6,1:6)=ret_trans(1:6,1:6)
+          sect_map(m2,1:6,1:6)=ret2(1:6,1:6)
+          trans_sect_map(m2,1:6,1:6)=ret2_trans(1:6,1:6)
+          ret=ree
+          ret2=0d0
+          do i=1,6
+             ret2(i,i)=1d0
+          enddo
+       else
+          ret=matmul(ree,ret)
+          ret2=matmul(ree,ret2)
+       endif
+    enddo
+100 continue
+    if(N_spch.ne.m2) then
+       write(text, '(1p,a11,i6,1x,i6)') "N_spch m2: ",N_spch, m2
+       call fort_fail('MYMAP: Fatal: ',                                  &
+            'Wrong number of SC kicks: ' // text)
+    endif
+    goto 2000
+1000 continue
+    call fort_fail('TRRUN: Fatal: ',                                     &
+         'File: my_sector.tfs non-existing')
+2000 continue
+  end subroutine mymap
+  subroutine SigmaTransport(sgpr)
+    use spch_bbfi
+    implicit none
+    integer i,j,k
+    double precision sgpr(6,6), sgps(6,6),ret(6,6),ret_trans(6,6)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    do i=1,N_spch
+       ret(1:6,1:6)=sc_sect_map(i,1:6,1:6)
+       ret_trans(1:6,1:6)=trans_sc_sect_map(i,1:6,1:6)
+       sgps=0d0
+       sgps=matmul(sgpr,ret_trans)
+       sgpr=matmul(ret,sgps)
+       scsigx(i)=sqrt(sgpr(1,1))
+       scsigy(i)=sqrt(sgpr(3,3))
+       scsigz(i)=sqrt(sgpr(5,5))
+    enddo
+  end subroutine SigmaTransport
+  subroutine SigmaTransport2(sgpr)
+    use spch_bbfi
+    implicit none
+    integer i,j,k
+    double precision sgpr(6,6), sgps(6,6),ret(6,6),ret_trans(6,6),sigx,sigy
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    do i=1,N_spch
+       ret(1:6,1:6)=sect_map(i,1:6,1:6)
+       ret_trans(1:6,1:6)=trans_sect_map(i,1:6,1:6)
+       sgps=0d0
+       sgps=matmul(sgpr,ret_trans)
+       sgpr=matmul(ret,sgps)
+       sigx=sqrt(sgpr(1,1))
+       sigy=sqrt(sgpr(3,3))
+       sc_map(i,2,1) = sc_intstr*sc_charge(i)/(sigx*(sigx+sigy))
+       sc_map(i,4,3) = sc_intstr*sc_charge(i)/(sigy*(sigx+sigy))
+       ret(1:6,1:6)=sc_map(i,1:6,1:6)
+       ret_trans=TRANSPOSE(ret)
+       sgps=0d0
+       sgps=matmul(sgpr,ret_trans)
+       sgpr=matmul(ret,sgps)
+       scsigx(i)=sqrt(sgpr(1,1))
+       scsigy(i)=sqrt(sgpr(3,3))
+       scsigz(i)=sqrt(sgpr(5,5))
+    enddo
+  end subroutine SigmaTransport2
+
 end module SpaceCharge
+
+subroutine hygfx ( a, b, c, x, hf )
+
+  !*****************************************************************************80
+  !
+  !! HYGFX evaluates the hypergeometric function F(A,B,C,X).
+  !
+  !  Licensing:
+  !
+  !    The original FORTRAN77 version of this routine is copyrighted by
+  !    Shanjie Zhang and Jianming Jin.  However, they give permission to
+  !    incorporate this routine into a user program that the copyright
+  !    is acknowledged.
+  !
+  !  Modified:
+  !
+  !    08 September 2007
+  !
+  !  Author:
+  !
+  !    Original FORTRAN77 version by Shanjie Zhang, Jianming Jin.
+  !    FORTRAN90 version by John Burkardt.
+  !
+  !  Reference:
+  !
+  !    Shanjie Zhang, Jianming Jin,
+  !    Computation of Special Functions,
+  !    Wiley, 1996,
+  !    ISBN: 0-471-11963-6,
+  !    LC: QA351.C45
+  !
+  !  Parameters:
+  !
+  !    Input, real ( kind = 8 ) A, B, C, X, the arguments of the function.
+  !    C must not be equal to a nonpositive integer.
+  !    X < 1.
+  !
+  !    Output, real HF, the value of the function.
+  !
+  implicit none
+
+  double precision a
+  double precision a0
+  double precision aa
+  double precision b
+  double precision bb
+  double precision c
+  double precision c0
+  double precision c1
+  double precision, parameter :: el = 0.5772156649015329D+00
+  double precision eps
+  double precision f0
+  double precision f1
+  double precision g0
+  double precision g1
+  double precision g2
+  double precision g3
+  double precision ga
+  double precision gabc
+  double precision gam
+  double precision gb
+  double precision gbm
+  double precision gc
+  double precision gca
+  double precision gcab
+  double precision gcb
+  double precision gm
+  double precision hf
+  double precision hw
+  integer ( kind = 4 ) j
+  integer ( kind = 4 ) k
+  logical l0
+  logical l1
+  logical l2
+  logical l3
+  logical l4
+  logical l5
+  integer ( kind = 4 ) m
+  integer ( kind = 4 ) nm
+  double precision pa
+  double precision pb
+  double precision, parameter :: pi = 3.141592653589793D+00
+  double precision r
+  double precision r0
+  double precision r1
+  double precision rm
+  double precision rp
+  double precision sm
+  double precision sp
+  double precision sp0
+  double precision x
+  double precision x1
+
+  l0 = ( c == aint ( c ) ) .and. ( c < 0.0D+00 )
+  l1 = ( 1.0D+00 - x < 1.0D-15 ) .and. ( c - a - b <= 0.0D+00 )
+  l2 = ( a == aint ( a ) ) .and. ( a < 0.0D+00 )
+  l3 = ( b == aint ( b ) ) .and. ( b < 0.0D+00 )
+  l4 = ( c - a == aint ( c - a ) ) .and. ( c - a <= 0.0D+00 )
+  l5 = ( c - b == aint ( c - b ) ) .and. ( c - b <= 0.0D+00 )
+
+  if ( l0 .or. l1 ) then
+     write ( *, '(a)' ) ' '
+     write ( *, '(a)' ) 'HYGFX - Fatal error!'
+     write ( *, '(a)' ) '  The hypergeometric series is divergent.'
+     return
+  end if
+
+  if ( 0.95D+00 < x ) then
+     eps = 1.0D-08
+  else
+     eps = 1.0D-15
+  end if
+
+  if ( x == 0.0D+00 .or. a == 0.0D+00 .or. b == 0.0D+00 ) then
+
+     hf = 1.0D+00
+     return
+
+  else if ( 1.0D+00 - x == eps .and. 0.0D+00 < c - a - b ) then
+
+     call gamma ( c, gc )
+     call gamma ( c - a - b, gcab )
+     call gamma ( c - a, gca )
+     call gamma ( c - b, gcb )
+     hf = gc * gcab /( gca *gcb )
+     return
+
+  else if ( 1.0D+00 + x <= eps .and. abs ( c - a + b - 1.0D+00 ) <= eps ) then
+
+     g0 = sqrt ( pi ) * 2.0D+00**( - a )
+     call gamma ( c, g1 )
+     call gamma ( 1.0D+00 + a / 2.0D+00 - b, g2 )
+     call gamma ( 0.5D+00 + 0.5D+00 * a, g3 )
+     hf = g0 * g1 / ( g2 * g3 )
+     return
+
+  else if ( l2 .or. l3 ) then
+
+     if ( l2 ) then
+        nm = int ( abs ( a ) )
+     end if
+
+     if ( l3 ) then
+        nm = int ( abs ( b ) )
+     end if
+
+     hf = 1.0D+00
+     r = 1.0D+00
+
+     do k = 1, nm
+        r = r * ( a + k - 1.0D+00 ) * ( b + k - 1.0D+00 ) &
+             / ( k * ( c + k - 1.0D+00 ) ) * x
+        hf = hf + r
+     end do
+
+     return
+
+  else if ( l4 .or. l5 ) then
+
+     if ( l4 ) then
+        nm = int ( abs ( c - a ) )
+     end if
+
+     if ( l5 ) then
+        nm = int ( abs ( c - b ) )
+     end if
+
+     hf = 1.0D+00
+     r  = 1.0D+00
+     do k = 1, nm
+        r = r * ( c - a + k - 1.0D+00 ) * ( c - b + k - 1.0D+00 ) &
+             / ( k * ( c + k - 1.0D+00 ) ) * x
+        hf = hf + r
+     end do
+     hf = ( 1.0D+00 - x )**( c - a - b ) * hf
+     return
+
+  end if
+
+  aa = a
+  bb = b
+  x1 = x
+  !
+  !  WARNING: ALTERATION OF INPUT ARGUMENTS A AND B, WHICH MIGHT BE CONSTANTS.
+  !
+  if ( x < 0.0D+00 ) then
+     x = x / ( x - 1.0D+00 )
+     if ( a < c .and. b < a .and. 0.0D+00 < b ) then
+        a = bb
+        b = aa
+     end if
+     b = c - b
+  end if
+
+  if ( 0.75D+00 <= x ) then
+
+     gm = 0.0D+00
+
+     if ( abs ( c - a - b - aint ( c - a - b ) ) < 1.0D-15 ) then
+
+        m = int ( c - a - b )
+        call gamma ( a, ga )
+        call gamma ( b, gb )
+        call gamma ( c, gc )
+        call gamma ( a + m, gam )
+        call gamma ( b + m, gbm )
+        call psi ( a, pa )
+        call psi ( b, pb )
+
+        if ( m /= 0 ) then
+           gm = 1.0D+00
+        end if
+
+        do j = 1, abs ( m ) - 1
+           gm = gm * j
+        end do
+
+        rm = 1.0D+00
+        do j = 1, abs ( m )
+           rm = rm * j
+        end do
+
+        f0 = 1.0D+00
+        r0 = 1.0D+00
+        r1 = 1.0D+00
+        sp0 = 0.0D+00
+        sp = 0.0D+00
+
+        if ( 0 <= m ) then
+
+           c0 = gm * gc / ( gam * gbm )
+           c1 = - gc * ( x - 1.0D+00 )**m / ( ga * gb * rm )
+
+           do k = 1, m - 1
+              r0 = r0 * ( a + k - 1.0D+00 ) * ( b + k - 1.0D+00 ) &
+                   / ( k * ( k - m ) ) * ( 1.0D+00 - x )
+              f0 = f0 + r0
+           end do
+
+           do k = 1, m
+              sp0 = sp0 + 1.0D+00 / ( a + k - 1.0D+00 ) &
+                   + 1.0D+00 / ( b + k - 1.0D+00 ) - 1.0D+00 / dble(k)
+           end do
+
+           f1 = pa + pb + sp0 + 2.0D+00 * el + log ( 1.0D+00 - x )
+           hw = f1
+
+           do k = 1, 250
+
+              sp = sp + ( 1.0D+00 - a ) / ( k * ( a + k - 1.0D+00 ) ) &
+                   + ( 1.0D+00 - b ) / ( k * ( b + k - 1.0D+00 ) )
+
+              sm = 0.0D+00
+              do j = 1, m
+                 sm = sm + ( 1.0D+00 - a ) &
+                      / ( ( j + k ) * ( a + j + k - 1.0D+00 ) ) &
+                      + 1.0D+00 / ( b + j + k - 1.0D+00 )
+              end do
+
+              rp = pa + pb + 2.0D+00 * el + sp + sm + log ( 1.0D+00 - x )
+
+              r1 = r1 * ( a + m + k - 1.0D+00 ) * ( b + m + k - 1.0D+00 ) &
+                   / ( k * ( m + k ) ) * ( 1.0D+00 - x )
+
+              f1 = f1 + r1 * rp
+
+              if ( abs ( f1 - hw ) < abs ( f1 ) * eps ) then
+                 exit
+              end if
+
+              hw = f1
+
+           end do
+
+           hf = f0 * c0 + f1 * c1
+
+        else if ( m < 0 ) then
+
+           m = - m
+           c0 = gm * gc / ( ga * gb * ( 1.0D+00 - x )**m )
+           c1 = - ( - 1 )**m * gc / ( gam * gbm * rm )
+
+           do k = 1, m - 1
+              r0 = r0 * ( a - m + k - 1.0D+00 ) * ( b - m + k - 1.0D+00 ) &
+                   / ( k * ( k - m ) ) * ( 1.0D+00 - x )
+              f0 = f0 + r0
+           end do
+
+           do k = 1, m
+              sp0 = sp0 + 1.0D+00 / dble ( k)
+           end do
+
+           f1 = pa + pb - sp0 + 2.0D+00 * el + log ( 1.0D+00 - x )
+
+           do k = 1, 250
+
+              sp = sp + ( 1.0D+00 - a ) &
+                   / ( k * ( a + k - 1.0D+00 ) ) &
+                   + ( 1.0D+00 - b ) / ( k * ( b + k - 1.0D+00 ) )
+
+              sm = 0.0D+00
+              do j = 1, m
+                 sm = sm + 1.0D+00 / dble ( j + k)
+              end do
+
+              rp = pa + pb + 2.0D+00 * el + sp - sm + log ( 1.0D+00 - x )
+
+              r1 = r1 * ( a + k - 1.0D+00 ) * ( b + k - 1.0D+00 ) &
+                   / ( k * ( m + k ) ) * ( 1.0D+00 - x )
+
+              f1 = f1 + r1 * rp
+
+              if ( abs ( f1 - hw ) < abs ( f1 ) * eps ) then
+                 exit
+              end if
+
+              hw = f1
+
+           end do
+
+           hf = f0 * c0 + f1 * c1
+
+        end if
+
+     else
+
+        call gamma ( a, ga )
+        call gamma ( b, gb )
+        call gamma ( c, gc )
+        call gamma ( c - a, gca )
+        call gamma ( c - b, gcb )
+        call gamma ( c - a - b, gcab )
+        call gamma ( a + b - c, gabc )
+        c0 = gc * gcab / ( gca * gcb )
+        c1 = gc * gabc / ( ga * gb ) * ( 1.0D+00 - x )**( c - a - b )
+        hf = 0.0D0
+        r0 = c0
+        r1 = c1
+
+        do k = 1, 250
+
+           r0 = r0 * ( a + k - 1.0D+00 ) * ( b + k - 1.0D+00 ) &
+                / ( k * ( a + b - c + k ) ) * ( 1.0D+00 - x )
+
+           r1 = r1 * ( c - a + k - 1.0D+00 ) * ( c - b + k - 1.0D+00 ) &
+                / ( k * ( c - a - b + k ) ) * ( 1.0D+00 - x )
+
+           hf = hf + r0 + r1
+
+           if ( abs ( hf - hw ) < abs ( hf ) * eps ) then
+              exit
+           end if
+
+           hw = hf
+
+        end do
+
+        hf = hf + c0 + c1
+
+     end if
+
+  else
+
+     a0 = 1.0D+00
+
+     if ( a < c .and. c < 2.0D+00 * a .and. b < c .and. c < 2.0D+00 * b ) then
+
+        a0 = ( 1.0D+00 - x )**( c - a - b )
+        a = c - a
+        b = c - b
+
+     end if
+
+     hf = 1.0D+00
+     r = 1.0D+00
+
+     do k = 1, 250
+
+        r = r * ( a + k - 1.0D+00 ) * ( b + k - 1.0D+00 ) &
+             / ( k * ( c + k - 1.0D+00 ) ) * x
+
+        hf = hf + r
+
+        if ( abs ( hf - hw ) <= abs ( hf ) * eps ) then
+           exit
+        end if
+
+        hw = hf
+
+     end do
+
+     hf = a0 * hf
+
+  end if
+
+  if ( x1 < 0.0D+00 ) then
+     x = x1
+     c0 = 1.0D+00 / ( 1.0D+00 - x )**aa
+     hf = c0 * hf
+  end if
+
+  a = aa
+  b = bb
+
+  if ( 120 < k ) then
+     write ( *, '(a)' ) ' '
+     write ( *, '(a)' ) 'HYGFX - Warning!'
+     write ( *, '(a)' ) '  A large number of iterations were needed.'
+     write ( *, '(a)' ) '  The accuracy of the results should be checked.'
+  end if
+
+  return
+end subroutine hygfx
+
+subroutine gamma ( x, ga )
+
+  !*****************************************************************************80
+  !
+  !! GAMMA evaluates the Gamma function.
+  !
+  !  Licensing:
+  !
+  !    The original FORTRAN77 version of this routine is copyrighted by
+  !    Shanjie Zhang and Jianming Jin.  However, they give permission to
+  !    incorporate this routine into a user program that the copyright
+  !    is acknowledged.
+  !
+  !  Modified:
+  !
+  !    08 September 2007
+  !
+  !  Author:
+  !
+  !    Original FORTRAN77 version by Shanjie Zhang, Jianming Jin.
+  !    FORTRAN90 version by John Burkardt.
+  !
+  !  Reference:
+  !
+  !    Shanjie Zhang, Jianming Jin,
+  !    Computation of Special Functions,
+  !    Wiley, 1996,
+  !    ISBN: 0-471-11963-6,
+  !    LC: QA351.C45
+  !
+  !  Parameters:
+  !
+  !    Input, real ( kind = 8 ) X, the argument.
+  !    X must not be 0, or any negative integer.
+  !
+  !    Output, real ( kind = 8 ) GA, the value of the Gamma function.
+  !
+  implicit none
+
+  double precision, dimension ( 26 ) :: g = (/ &
+       1.0D+00, &
+       0.5772156649015329D+00, &
+       -0.6558780715202538D+00, &
+       -0.420026350340952D-01, &
+       0.1665386113822915D+00, &
+       -0.421977345555443D-01, &
+       -0.96219715278770D-02, &
+       0.72189432466630D-02, &
+       -0.11651675918591D-02, &
+       -0.2152416741149D-03, &
+       0.1280502823882D-03, &
+       -0.201348547807D-04, &
+       -0.12504934821D-05, &
+       0.11330272320D-05, &
+       -0.2056338417D-06, &
+       0.61160950D-08, &
+       0.50020075D-08, &
+       -0.11812746D-08, &
+       0.1043427D-09, &
+       0.77823D-11, &
+       -0.36968D-11, &
+       0.51D-12, &
+       -0.206D-13, &
+       -0.54D-14, &
+       0.14D-14, &
+       0.1D-15 /)
+  double precision ga
+  double precision gr
+  integer ( kind = 4 ) k
+  integer ( kind = 4 ) m
+  integer ( kind = 4 ) m1
+  double precision, parameter :: pi = 3.141592653589793D+00
+  double precision r
+  double precision x
+  double precision z
+
+  if ( x == aint ( x ) ) then
+
+     if ( 0.0D+00 < x ) then
+        ga = 1.0D+00
+        m1 = int ( x ) - 1
+        do k = 2, m1
+           ga = ga * k
+        end do
+     else
+        ga = 1.0D+300
+     end if
+
+  else
+
+     if ( 1.0D+00 < abs ( x ) ) then
+        z = abs ( x )
+        m = int ( z )
+        r = 1.0D+00
+        do k = 1, m
+           r = r * ( z - dble ( k))
+        end do
+        z = z - dble ( m)
+     else
+        z = x
+     end if
+
+     gr = g(26)
+     do k = 25, 1, -1
+        gr = gr * z + g(k)
+     end do
+
+     ga = 1.0D+00 / ( gr * z )
+
+     if ( 1.0D+00 < abs ( x ) ) then
+        ga = ga * r
+        if ( x < 0.0D+00 ) then
+           ga = - pi / ( x* ga * sin ( pi * x ) )
+        end if
+     end if
+
+  end if
+
+  return
+end subroutine gamma
+subroutine psi ( x, ps )
+
+  !*****************************************************************************80
+  !
+  !! PSI computes the PSI function.
+  !
+  !  Licensing:
+  !
+  !    The original FORTRAN77 version of this routine is copyrighted by
+  !    Shanjie Zhang and Jianming Jin.  However, they give permission to
+  !    incorporate this routine into a user program that the copyright
+  !    is acknowledged.
+  !
+  !  Modified:
+  !
+  !    08 September 2007
+  !
+  !  Author:
+  !
+  !    Original FORTRAN77 by Shanjie Zhang, Jianming Jin.
+  !    FORTRAN90 version by John Burkardt.
+  !
+  !  Reference:
+  !
+  !    Shanjie Zhang, Jianming Jin,
+  !    Computation of Special Functions,
+  !    Wiley, 1996,
+  !    ISBN: 0-471-11963-6,
+  !    LC: QA351.C45
+  !
+  !  Parameters:
+  !
+  !    Input, real ( kind = 8 ) X, the argument.
+  !
+  !    Output, real ( kind = 8 ) PS, the value of the PSI function.
+  !
+  implicit none
+
+  double precision, parameter :: a1 = -0.83333333333333333D-01
+  double precision, parameter :: a2 =  0.83333333333333333D-02
+  double precision, parameter :: a3 = -0.39682539682539683D-02
+  double precision, parameter :: a4 =  0.41666666666666667D-02
+  double precision, parameter :: a5 = -0.75757575757575758D-02
+  double precision, parameter :: a6 =  0.21092796092796093D-01
+  double precision, parameter :: a7 = -0.83333333333333333D-01
+  double precision, parameter :: a8 =  0.4432598039215686D+00
+  double precision, parameter :: el = 0.5772156649015329D+00
+  integer ( kind = 4 ) k
+  integer ( kind = 4 ) n
+  double precision, parameter :: pi = 3.141592653589793D+00
+  double precision ps
+  double precision s
+  double precision x
+  double precision x2
+  double precision xa
+
+  xa = abs ( x )
+  s = 0.0D+00
+
+  if ( x == aint ( x ) .and. x <= 0.0D+00 ) then
+
+     ps = 1.0D+300
+     return
+
+  else if ( xa == aint ( xa ) ) then
+
+     n = int ( xa )
+     do k = 1, n - 1
+        s = s + 1.0D+00 / dble ( k)
+     end do
+
+     ps = - el + s
+
+  else if ( xa + 0.5D+00 == aint ( xa + 0.5D+00 ) ) then
+
+     n = int ( xa - 0.5D+00 )
+
+     do k = 1, n
+        s = s + 1.0D+00 / dble ( 2 * k - 1)
+     end do
+
+     ps = - el + 2.0D+00 * s - 1.386294361119891D+00
+
+  else
+
+     if ( xa < 10.0D+00 ) then
+
+        n = 10 - int ( xa )
+        do k = 0, n - 1
+           s = s + 1.0D+00 / ( xa + dble ( k) )
+        end do
+
+        xa = xa + dble ( n)
+
+     end if
+
+     x2 = 1.0D+00 / ( xa * xa )
+
+     ps = log ( xa ) - 0.5D+00 / xa + x2 * ((((((( &
+          a8   &
+          * x2 + a7 ) &
+          * x2 + a6 ) &
+          * x2 + a5 ) &
+          * x2 + a4 ) &
+          * x2 + a3 ) &
+          * x2 + a2 ) &
+          * x2 + a1 )
+
+     ps = ps - s
+
+  end if
+
+  if ( x < 0.0D+00 ) then
+     ps = ps - pi * cos ( pi * x ) / sin ( pi * x ) - 1.0D+00 / x
+  end if
+
+  return
+end subroutine psi
