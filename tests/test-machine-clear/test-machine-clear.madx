@@ -1,0 +1,109 @@
+!
+! Script to rematch beta functions on VESPER
+!
+! Sept 2017 - davide 
+
+! build sequence and load nominal currents
+call, file="../share/CLEAR/clear.seqx";
+
+! reasonable energy (MeV)
+CA.EN = 200;
+
+! nominal initial conditions (measured on 8 Dec 2016 at the entrance of CA.QFD0350)
+CA.IBETX =  14.87; 
+CA.IALFX =  -0.35; 
+CA.IBETY =  14.3; 
+CA.IALFY =   0.09; 
+
+! Some initial settings of the quadrupoles
+ca.iqfd0350 =       47.5 ;
+ca.iqdd0355 =       86.4 ;
+ca.iqfd0360 =       59.0 ;
+ca.iqfd0510 =       44.0 ;
+ca.iqdd0515 =       71.8 ;
+ca.iqfd0520 =       38.8 ;
+ca.iqfd0760 =       61.0 ;
+ca.iqdd0765 =       97.9 ;
+ca.iqfd0770 =       53.0 ;
+
+!!!!
+! beam definition
+!!!!
+beam,particle=electron,energy=CA.EN/1000., EX=NEX/CA.EN/0.511, EY=NEY/CA.EN/0.511, ET=1/1000, SIGT=0, SIGE=sige;
+
+!!!!
+! define the period to use
+!!!!
+use, period=CA.STLINE, range=CA.QFD0350/#E;
+
+
+!!!
+! plot nominal optics
+!!!
+twiss, betx=CA.IBETX, bety=CA.IBETY, alfx=CA.IALFX, ALFY=CA.IALFY, file=twissInit.tfs;
+!plot, noversion=true, table=twiss, haxis=s, vaxis1=betx,bety, interpolate,
+!     title="Initial CLEAR optics", colour=100;
+
+! optimise for low beta at CLIC structure
+! only allow to change the quad strenghts of ~50%
+currentScalingFactorLimit = 0.50;
+
+match, use_macro;
+      ! NOTE: currently magnets can only be powered with positive currents
+      !       but there is no reason not to invert the polarity... 
+      vary, name=CA.IQFD0350, step=1.2, lower= ca.iqfd0350*(1-currentScalingFactorLimit), upper= ca.iqfd0350*(1+currentScalingFactorLimit);
+      vary, name=CA.IQDD0355, step=1.2, lower= ca.iqdd0355*(1-currentScalingFactorLimit), upper= ca.iqdd0355*(1+currentScalingFactorLimit);
+      vary, name=CA.IQFD0360, step=1.2, lower= ca.iqfd0360*(1-currentScalingFactorLimit), upper= ca.iqfd0360*(1+currentScalingFactorLimit);
+      
+      vary, name=CA.IQFD0510, step=1.2, lower= ca.iqfd0510*(1-currentScalingFactorLimit), upper= ca.iqfd0510*(1+currentScalingFactorLimit);
+      vary, name=CA.IQDD0515, step=1.2, lower= ca.iqdd0515*(1-currentScalingFactorLimit), upper= ca.iqdd0515*(1+currentScalingFactorLimit);
+      vary, name=CA.IQFD0520, step=1.2, lower= ca.iqfd0520*(1-currentScalingFactorLimit), upper= ca.iqfd0520*(1+currentScalingFactorLimit);
+
+      m11: macro=
+       {
+         use, period=CA.STLINE, RANGE=CA.QFD0350/#E;
+         twiss, betx=CA.IBETX, bety=CA.IBETY, alfx=CA.IALFX, ALFY=CA.IALFY;
+       };
+
+      !!!!! possible example of constraints
+      !
+      !
+      !! min bet* at ACS0640
+      constraint, weight=10000, expr=table(twiss, CA.WFM0645, betx) < 5; 
+      constraint, weight=10000, expr=table(twiss, CA.WFM0645, bety) < 5; 
+      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfx) < 0.1 ; 
+      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfy) < 0.1 ; 
+      !
+      !! min beta* at CA.MTV0730
+      constraint, weight=1000, expr=table(twiss, CA.BTV0730, betx) < 25; 
+      constraint, weight=1000, expr=table(twiss, CA.BTV0730, bety) < 25; 
+      !
+
+      !!! cosmetics -> not to explode betas
+      ! typical normalised emittance = 10 um.
+      !  -> beam pipe ~ 2.5 cm radius
+      !  -> this correspond to about 25 km beta
+      constraint, weight=100, expr=table(summ,betxmax) < 1000;
+      constraint, weight=100, expr=table(summ,betymax) < 1000;
+
+
+     !!!! minimisation method !!!!!!!!!!!!!!!
+      lmdif,   tolerance:=1e-06, calls:=10000;
+!      simplex,  tolerance:=1e-09, calls:=1000;
+!      lmdif,    tolerance:=1e-09, calls:=1000;
+!      jacobian, tolerance:=1e-09, calls:=1000;
+
+endmatch;
+
+!
+! final settings
+use, period=CA.STLINE, RANGE=CA.QFD0350/#E;
+twiss, betx=CA.IBETX, bety=CA.IBETY, alfx=CA.IALFX, ALFY=CA.IALFY, file=twissFinal.tfs;
+!plot, noversion=true, table=twiss, haxis=s, vaxis1=betx,bety, interpolate,
+!     title="Optimised CLEAR Optics", colour=100;
+
+
+
+
+
+
