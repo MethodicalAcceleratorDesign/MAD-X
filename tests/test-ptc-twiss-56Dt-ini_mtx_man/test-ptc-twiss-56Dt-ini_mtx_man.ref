@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.09 10:20:40      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.12.18 10:55:13      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! reads the user privided one turn matrix via command parameters
 
@@ -934,7 +934,7 @@ Determined SECTOR NMUL MAX :  2
           -1000000      -0.6258930386        2.838575681       0.8200596199 
 
                 q2                dq1                dq2                 qs 
-      0.7198292803       -2.176620083       -4.741107554                  0 
+      0.7198292803       -4.353247388       -9.482230836                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282153606        15.12420824        1.633285386        20.07025827 
@@ -952,10 +952,10 @@ Determined SECTOR NMUL MAX :  2
    2.799154326e-07        129.3455587                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11653       -10.30207056    0.0005935228405 
+                 1        38793.11653        -20.6041753      0.00118704765 
 
           disp2min           disp2max           disp3min           disp3max 
-      -4.543106605        4.543106202                  0                  0 
+      -9.086228281        9.086227476                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 
@@ -964,7 +964,7 @@ Determined SECTOR NMUL MAX :  2
                  0                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    2.512911304e-08                  0    4.205036582e-09 
+                 0    2.512911304e-08                  0    4.205036582e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0    3.754739541e-08                  0    5.077465416e-08 

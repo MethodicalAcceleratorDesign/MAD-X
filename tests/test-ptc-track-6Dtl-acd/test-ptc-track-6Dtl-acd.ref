@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.01  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.07.10               +
-  + Execution date: 2018.08.15 15:00:08      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.12.18 10:57:24      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example of PTC_TRACK command with 6D and totalpath true
 
@@ -106,13 +106,13 @@ Determined SECTOR NMUL MAX :  2
       0.5647686671       0.7168179366    3.828775456e-31    2.016427066e-30 
 
          beta33min          beta33max           disp1min           disp1max 
-       211.9250655        211.9696919       -2.289706197       -1.789238286 
+       211.9250655        211.9696919        -2.35542319        -1.84059132 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.5921219254        0.592113091   -1.251750585e-14    1.440132716e-14 
+     -0.6091164518       0.6091073638   -1.287677153e-14     1.48146605e-14 
 
           disp4min           disp4max             deltap            orbit_x 
-  -5.373130268e-15     5.30444704e-15                  0    5.205943962e-06 
+  -5.527344797e-15    5.456690288e-15                  0    5.205943962e-06 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
    6.465200835e-07                  0                  0    5.501535769e-07 

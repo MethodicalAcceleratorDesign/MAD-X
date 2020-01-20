@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.09 14:25:20      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.12.18 10:56:50      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -851,7 +851,7 @@ Determined SECTOR NMUL MAX :  2
           -1000000      -0.6258930447         2.83857575       0.8215130809 
 
                 q2                dq1                dq2                 qs 
-      0.7214355408       -2.255280125       -4.867432606                  0 
+      0.7214355408       -4.510567731        -9.73488136                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.504898365        15.25837553         1.63488183        21.43991692 
@@ -869,19 +869,19 @@ Determined SECTOR NMUL MAX :  2
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -10.30211155    0.0006326813082 
+                 0                  0       -20.60425727     0.001265364715 
 
           disp2min           disp2max           disp3min           disp3max 
-      -4.543122633        4.543122633   -0.0001805311848    0.0001805311847 
+      -9.086260338        9.086260338   -0.0003610629685    0.0003610629682 
 
           disp4min           disp4max             deltap            orbit_x 
-  -5.941120877e-05    7.741614593e-05                  0    1.068886093e-08 
+  -0.0001188226146    0.0001548325487                  0    1.068886093e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
       2.546155e-09   -5.410652317e-14   -4.158891311e-14                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    1.168576752e-08    2.108087748e-13     3.05960286e-09 
+                 0    1.168576752e-08    2.108087748e-13     3.05960286e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
    7.783652795e-14                  0                  0    2.508655852e-08 
@@ -920,7 +920,7 @@ Determined SECTOR NMUL MAX :  2
 
   ptc_normal,closed_orbit,normal,maptable,icase=5,no=4;
 
- Closed orbit:    1.0688863319111935E-008   2.5461543382882211E-009  -5.3416325507292341E-014  -4.1437484112250240E-014   0.0000000000000000     
+ Closed orbit:    1.0688860934400792E-008   2.5461549996958253E-009  -5.4106523170015830E-014  -4.1588913111425646E-014   0.0000000000000000     
 
 
   write, table=normal_results,file="ptc_normal_results.tfs"; 

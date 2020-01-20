@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.09 10:15:02      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2019.12.18 11:27:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -850,7 +850,7 @@ Determined SECTOR NMUL MAX :  2
        4586.451272      -0.6258930181        2.838575446       0.8200595696 
 
                 q2                dq1                dq2                 qs 
-      0.7198291917       -2.176619695       -4.741106853                  0 
+      0.7198291917       -4.353246611       -9.482229434                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282154172        15.12420643        1.633285488        20.07025728 
@@ -868,10 +868,10 @@ Determined SECTOR NMUL MAX :  2
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -10.30207083    0.0005935095314 
+                 0                  0       -20.60417583     0.001187021032 
 
           disp2min           disp2max           disp3min           disp3max 
-      -4.543107007        4.543107007                  0                  0 
+      -9.086229086        9.086229086                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.662471086e-10 
@@ -880,7 +880,7 @@ Determined SECTOR NMUL MAX :  2
    3.960124073e-11                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    1.817524825e-10                  0    4.758695862e-11 
+                 0    1.817524825e-10                  0    4.758695862e-11 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0    3.018254273e-10                  0    3.901796602e-10 
