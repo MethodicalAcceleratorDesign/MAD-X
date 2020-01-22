@@ -146,7 +146,6 @@ subroutine dynapfill()
   !   lyapunov  (real)    : interpolated Lyapunov exponent               * ghislain
   !----------------------------------------------------------------------*
 
-  call double_to_table_curr('dynap ', 'dynapfrac ', dynapfrac)
   call double_to_table_curr('dynap ', 'dktrturns ', dktrturns)
   call double_to_table_curr('dynap ', 'xend ',      xend )
   call double_to_table_curr('dynap ', 'pxend ',     pxend )
