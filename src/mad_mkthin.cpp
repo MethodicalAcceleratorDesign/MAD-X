@@ -208,7 +208,12 @@ ElmAttr::ElmAttr(const element* el) // constructor
       On.push_back( el_cmd->par_names->inform[i] );
     }
     bool look_at_parent=true;
-    if(look_at_parent && el->parent && el != el->parent && std::string(el->parent->name) != std::string(el->parent->base_type->name) ) TurnOnActive(el->parent);
+    element* el_parent= el->parent;
+    while (look_at_parent && el_parent && el != el_parent && std::string(el_parent->name) != std::string(el_parent->base_type->name) )
+    {
+      TurnOnActive(el_parent);
+      el_parent=el_parent->parent; // check recursively through parents
+    }
   }
 }
 
