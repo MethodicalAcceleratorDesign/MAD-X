@@ -1317,7 +1317,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double haloxadj[MAXARRAY], haloyadj[MAXARRAY];
   double pipex[MAXARRAY], pipey[MAXARRAY];
   double parxd,paryd;
-  double x_intersect, y_intersect, ratio_angle;
+  double x_intersect, y_intersect, ratio_ang;
   char *halofile, *truefile, *offsfile;
   char refnode[NAME_L]="";
   char *cmd_refnode;
@@ -1640,7 +1640,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         }
 
 	if (debug) printf("\n adjustments xeff: %f, yeff: %f\n",xeff,yeff);
-        ratio_angle=9999;
+        ratio_ang = 999999;
         for (angle=0; angle<twopi; angle+=dangle) {
           /* new 27feb08 BJ */
           dispx = bbeat * (fabs(dx)*dp + parxd*(fabs(lim_pt->deltap_twiss)+dp) );
@@ -1666,14 +1666,14 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
           deltay = coyadj + tolyadj + yeff + dispyadj;
 
           /* send beta adjusted halo and its displacement to aperture calculation */
-          aper_calc(deltax, deltay, &ratio_angle, haloxsi, haloysi, halolength, haloxadj, haloyadj,
+          aper_calc(deltax, deltay, &ratio_ang, haloxsi, haloysi, halolength, haloxadj, haloyadj,
                     pipex, pipey, pipelength, notsimple, &x_intersect, &y_intersect);
 
 	  if (debug) printf("\n Angle: %f deltax: %f deltay: %f minratio: %f\n", angle, deltax, deltay, ratio);
-        
-        if(ratio_angle < ratio){ ratio = ratio_angle;}
-        
-
+        }
+    if(ratio_ang < ratio){
+      ratio = ratio_ang;
+    }
         //nr = ratio * halo[1];
         //n1 = nr / (halo[1]/halo[0]); /* ratio r/n = 1.4 */
 	n1 = ratio * halo[0]; // 2015-Jul-30  17:23:26  ghislain: replaced above two lines.
