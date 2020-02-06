@@ -131,13 +131,20 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
      due to tolerance uncertainty for every angle */
   /* NEW VERSION of aper_race, 20feb08 BJ, potential zero-divide issues cleared */
 
-  double angle0, angle1, angle2, alfa, gamma, theta;
+  double angle0, angle1;
+  double tang, at, bt, ct, disc;
   int quadrant;
 
   if (xshift==0 && yshift==0 && r==0) {
     *x=0; *y=0;
     return;
   }
+  if (xshift==0 && yshift==0) {
+    *x=r*cos(angle); 
+    *y=r*sin(angle);
+    return;
+  }
+
 
   quadrant = angle/(pi/2) + 1;
 
@@ -147,13 +154,13 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
     case 2: angle = pi - angle;     break;
     case 3: angle = angle - pi;     break;
     case 4: angle = twopi - angle;  break;
+    case 5: angle = twopi - angle;  break;     /* for angles very slightly larger than twopi */
     }
 
   if (angle == pi/2) {
     *x=0;
     *y=yshift+r;
   }
-
   else {
     /*finding where arc starts and ends*/
     angle0 = atan2( yshift , xshift + r );
@@ -165,35 +172,43 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
       *y = tan(angle) * (xshift+r);
     }
     else if (angle < angle1) {
-      /* if this is a circle, angle2 useless */
+      
+      tang = tan(angle);
+      at = 1 + tang*tang;
+      bt = -2 * (xshift + tang*yshift);
+      ct = xshift*xshift + yshift*yshift - r*r;
+      disc = bt*bt - 4*at*ct;
+      *x = (-bt + sqrt(disc)) / (2 * at);
+      *y = *x * tang;
+    
+    }
+      /* if this is a circle, angle2 useless 
       if (!xshift && !yshift)  angle2 = 0;
       else angle2 = atan2( yshift , xshift );
 
       alfa = fabs(angle-angle2);
       if (alfa < MIN_DOUBLE * 1.e10) {
-	/* alfa==0 is a simpler case */
+	// alfa==0 is a simpler case 
         *x = cos(angle) * (r + sqrt(xshift*xshift + yshift*yshift));
         *y = sin(angle) * (r + sqrt(xshift*xshift + yshift*yshift));
       }
       else {
-	/* solving sine rule w.r.t. gamma */
+	// solving sine rule w.r.t. gamma 
         gamma = asin(sqrt(xshift*xshift + yshift*yshift)/r*sin(alfa));
-	/*theta is the last corner in the triangle*/
+	// theta is the last corner in the triangle
         theta = pi - (alfa+gamma);
         *x = cos(angle) * r * sin(theta)/sin(alfa);
         *y = sin(angle) * r * sin(theta)/sin(alfa);
       }
-    }
+    }  */
     /* upper flat part */
     else {
       *y = r + yshift;
       *x = (r+yshift) * tan(pi/2-angle);
     }
-  }
-
   return;
 }
-
+}
 static void
 aper_adj_quad(double angle, double x, double y, double* xquad, double* yquad)
 {
@@ -1067,7 +1082,7 @@ aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
 static double
 aper_calc(double p, double q, double* minhl,
 	  double halox[], double haloy[], int halolength, double haloxadj[],double haloyadj[],
-	  double pipex[], double pipey[], int pipelength, double notsimple)
+	  double pipex[], double pipey[], int pipelength, double notsimple, double *x_inter, double *y_inter)
 { // 2015-Jul-30  ghislain: partially rewritten from original to limit number of calculations
   // in loop to find ratios.
   int i=0, j=0, c=0;
@@ -1161,7 +1176,13 @@ aper_calc(double p, double q, double* minhl,
 
     h = sqrt((xm-p)*(xm-p) + (ym-q)*(ym-q));
     l = sqrt((haloxadj[j]-p)*(haloxadj[j]-p) + (haloyadj[j]-q)*(haloyadj[j]-q));
-    if (h/l < *minhl) *minhl = h/l;
+    if (h/l < *minhl) {
+     *x_inter = xm; 
+     *y_inter = ym;
+     
+     *minhl = h/l;
+
+    }
   }
 
   return 0;
@@ -1296,6 +1317,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double haloxadj[MAXARRAY], haloyadj[MAXARRAY];
   double pipex[MAXARRAY], pipey[MAXARRAY];
   double parxd,paryd;
+  double x_intersect, y_intersect, ratio_angle;
   char *halofile, *truefile, *offsfile;
   char refnode[NAME_L]="";
   char *cmd_refnode;
@@ -1618,7 +1640,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         }
 
 	if (debug) printf("\n adjustments xeff: %f, yeff: %f\n",xeff,yeff);
-
+        ratio_angle=9999;
         for (angle=0; angle<twopi; angle+=dangle) {
           /* new 27feb08 BJ */
           dispx = bbeat * (fabs(dx)*dp + parxd*(fabs(lim_pt->deltap_twiss)+dp) );
@@ -1644,11 +1666,13 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
           deltay = coyadj + tolyadj + yeff + dispyadj;
 
           /* send beta adjusted halo and its displacement to aperture calculation */
-          aper_calc(deltax, deltay, &ratio, haloxsi, haloysi, halolength, haloxadj, haloyadj,
-                    pipex, pipey, pipelength, notsimple);
+          aper_calc(deltax, deltay, &ratio_angle, haloxsi, haloysi, halolength, haloxadj, haloyadj,
+                    pipex, pipey, pipelength, notsimple, &x_intersect, &y_intersect);
 
 	  if (debug) printf("\n Angle: %f deltax: %f deltay: %f minratio: %f\n", angle, deltax, deltay, ratio);
-        }
+        
+        if(ratio_angle < ratio){ ratio = ratio_angle;}
+        
 
         //nr = ratio * halo[1];
         //n1 = nr / (halo[1]/halo[0]); /* ratio r/n = 1.4 */
