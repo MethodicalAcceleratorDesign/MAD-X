@@ -1310,7 +1310,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double node_s=-1, node_n1=-1;
   double aper_tol[3], ap1, ap2, ap3, ap4;
   double dispx, dispy, tolx, toly;
-  double dispxadj=0, dispyadj=0, coxadj, coyadj, tolxadj=0, tolyadj=0;
+  double dispxadj=0, dispyadj=0, tolxadj=0, tolyadj=0;
   double angle, dangle, deltax, deltay;
   double xshift, yshift, r;
   double halox[MAXARRAY], haloy[MAXARRAY], haloxsi[MAXARRAY], haloysi[MAXARRAY];
@@ -1650,7 +1650,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
           aper_adj_quad(angle, dispx, dispy, &dispxadj, &dispyadj);
 
           /*calculate displacement co+tol for each angle*/
-          coxadj = cor * cos(angle); coyadj = cor * sin(angle);
+         // coxadj = cor * cos(angle); coyadj = cor * sin(angle);
 
           /* Error check added 20feb08 BJ */
           if ( xshift < 0 || yshift < 0 || r < 0 ) {
@@ -1658,12 +1658,12 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
             fatal_error("Illegal negative tolerance",tol_err_mess);
           }
 
-          aper_race(xshift, yshift, r, angle, &tolx, &toly);
+          aper_race(xshift, yshift, cor+r, angle, &tolx, &toly);
           aper_adj_quad(angle, tolx, toly, &tolxadj, &tolyadj);
 
           /* add all displacements */
-          deltax = coxadj + tolxadj + xeff + dispxadj;
-          deltay = coyadj + tolyadj + yeff + dispyadj;
+          deltax =  tolxadj + xeff + dispxadj;
+          deltay =  tolyadj + yeff + dispyadj;
 
           /* send beta adjusted halo and its displacement to aperture calculation */
           aper_calc(deltax, deltay, &ratio_ang, haloxsi, haloysi, halolength, haloxadj, haloyadj,
@@ -1671,9 +1671,11 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
 	  if (debug) printf("\n Angle: %f deltax: %f deltay: %f minratio: %f\n", angle, deltax, deltay, ratio);
         }
+
     if(ratio_ang < ratio){
       ratio = ratio_ang;
     }
+
         //nr = ratio * halo[1];
         //n1 = nr / (halo[1]/halo[0]); /* ratio r/n = 1.4 */
 	n1 = ratio * halo[0]; // 2015-Jul-30  17:23:26  ghislain: replaced above two lines.
