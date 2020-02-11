@@ -135,10 +135,7 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
   double tang, at, bt, ct, disc;
   int quadrant;
 
-  if (xshift==0 && yshift==0 && r==0) {
-    *x=0; *y=0;
-    return;
-  }
+
   if (xshift==0 && yshift==0) {
     *x=r*cos(angle); 
     *y=r*sin(angle);
@@ -156,6 +153,10 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
     case 4: angle = twopi - angle;  break;
     case 5: angle = twopi - angle;  break;     /* for angles very slightly larger than twopi */
     }
+  if (xshift==0 && yshift==0 && r==0) {
+    *x=0; *y=0;
+    return;
+  }
 
   if (angle == pi/2) {
     *x=0;
@@ -1587,7 +1588,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
       /* Treat each slice, for all angles */
       for (jslice=0; jslice <= nint; jslice++) {
-        ratio=999999;
+        ratio=x_intersect=y_intersect=999999;
 
         if (jslice == 0) {
           // parameters from previous node will be used
@@ -1668,13 +1669,15 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
           /* send beta adjusted halo and its displacement to aperture calculation */
           aper_calc(deltax, deltay, &ratio_ang, haloxsi, haloysi, halolength, haloxadj, haloyadj,
                     pipex, pipey, pipelength, notsimple, &x_intersect, &y_intersect);
-
-	  if (debug) printf("\n Angle: %f deltax: %f deltay: %f minratio: %f\n", angle, deltax, deltay, ratio);
+          
+          if(ratio_ang < ratio){
+            ratio = ratio_ang;
+          }
+    if (debug) printf("\n Angle: %e deltax: %e deltay: %e minratio: %e, ratioang: %e, interx: %e, intery: %e \n", 
+      angle, deltax, deltay, ratio, ratio_ang, x_intersect, y_intersect );
         }
 
-    if(ratio_ang < ratio){
-      ratio = ratio_ang;
-    }
+
 
         //nr = ratio * halo[1];
         //n1 = nr / (halo[1]/halo[0]); /* ratio r/n = 1.4 */
