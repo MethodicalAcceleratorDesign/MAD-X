@@ -1641,8 +1641,9 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         }
 
 	if (debug) printf("\n adjustments xeff: %f, yeff: %f\n",xeff,yeff);
-        ratio_ang = 999999;
+
         for (angle=0; angle<twopi; angle+=dangle) {
+            ratio_ang = 999999;
           /* new 27feb08 BJ */
           dispx = bbeat * (fabs(dx)*dp + parxd*(fabs(lim_pt->deltap_twiss)+dp) );
           dispy = bbeat * (fabs(dy)*dp + paryd*(fabs(lim_pt->deltap_twiss)+dp) );
