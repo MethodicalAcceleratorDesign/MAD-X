@@ -135,13 +135,12 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
   double tang, at, bt, ct, disc;
   int quadrant;
 
-
-  if (xshift==0 && yshift==0) {
-    *x=r*cos(angle); 
-    *y=r*sin(angle);
+  if (xshift==0 && yshift==0 && r==0) {
+    *x=0; *y=0;
     return;
   }
 
+  
 
   quadrant = angle/(pi/2) + 1;
 
@@ -153,10 +152,14 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
     case 4: angle = twopi - angle;  break;
     case 5: angle = twopi - angle;  break;     /* for angles very slightly larger than twopi */
     }
-  if (xshift==0 && yshift==0 && r==0) {
-    *x=0; *y=0;
+
+
+  if (xshift==0 && yshift==0) {
+    *x=r*cos(angle); 
+    *y=r*sin(angle);
     return;
   }
+
 
   if (angle == pi/2) {
     *x=0;
