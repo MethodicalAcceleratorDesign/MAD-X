@@ -428,21 +428,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   enddo
   turn = min(turn, turns)
 
-  if (bb_sxy_update) then
-     tot_turn = tot_turn + turn
-!$OMP PARALLEL PRIVATE(i,j)
-!$OMP DO
-     do i = 1, jmax
-        part_id_keep(i) = part_id(i)
-        last_turn_keep(i) = last_turn(i)
-        do j=1,6
-           z_keep(j,i) = z(j,i)
-        enddo
-     enddo
-!$OMP END DO
-!$OMP END PARALLEL
-  endif
-
+  call BB_Update2(jmax, orbit0, z, part_id, last_turn);
+  
   !--- enter last turn in tables if not done already
   if (run .and. .not.last_out)  then
      if (onetable)  then
@@ -458,22 +445,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   endif
 
   !--- Write checkpoint_restart data
-  if (bb_sxy_update) then
-     rewind 90
-     write(90) jmax
-     write(90) Ex_rms
-     write(90) Ey_rms
-     do i = 1, jmax
-        do j = 1, 6
-           write(90) z(j,i)
-        enddo
-     enddo
-!frs on 07.06.2016 - fixing
-!  longitudinal plane must be frozen too!
-     write(90) sigma_t
-     write(90) mean_t
-  endif
-
+  call BB_Write(jmax, orbit0, z);
+  
   !--- enter last turn in summary table
   do  i = 1, j_tot
      call double_to_table_curr('tracksumm ', 'number ', dble(i))

@@ -171,7 +171,7 @@ trrun.o:                    $(FC_DIR_MAD)/trrun.f90                   util.o mad
 twiss.o:                    $(FC_DIR_MAD)/twiss.f90                   util.o madx_space_charge.o madx_beam_beam.o
 madx_space_charge.o:	    $(FC_DIR_MAD)/madx_space_charge.f90
 madx_beam_beam.o:	    $(FC_DIR_MAD)/madx_beam_beam.f90          util.o madx_space_charge.o
-util.o:                     $(FC_DIR_MAD)/util.f90 madx_space_charge.o
+util.o:                     $(FC_DIR_MAD)/util.f90
 
 endif
 

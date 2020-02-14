@@ -578,9 +578,67 @@ contains
        endif
        sigma_t=sigma_z
        !-----------------------------------------------------------------
+
     endif
 
   end subroutine BB_Update
+
+  subroutine BB_Update2(turn, orbit0, z, part_id, last_turn)
+
+    use spch_bbfi
+    use trackfi
+    use time_varfi
+    use SCdat
+
+    integer, intent(IN) :: turn
+    integer :: i, j, part_id(*), last_turn(*)
+
+    double precision, intent(IN) :: orbit0(6), z(6,N_macro_surv)
+
+    if(bb_sxy_update) then
+       tot_turn=tot_turn+turn
+       !$OMP PARALLEL PRIVATE(i,j)
+       !$OMP DO
+       do i = 1, jmax
+          part_id_keep(i)=part_id(i)
+          last_turn_keep(i)=last_turn(i)
+          do j=1,6
+             z_keep(j,i)=z(j,i)
+          enddo
+       enddo
+       !$OMP END DO
+       !$OMP END PARALLEL
+    endif
+
+  end subroutine BB_Update2
+
+  subroutine BB_Write(turn, orbit0, z)
+
+    use spch_bbfi
+    use trackfi
+    use time_varfi
+    use SCdat
+
+    integer, intent(IN) :: turn
+    integer :: i, j
+
+    double precision, intent(IN) :: orbit0(6), z(6,N_macro_surv)
+
+    if (bb_sxy_update) then
+       rewind unit_chpt
+       write(unit_chpt) jmax
+       write(unit_chpt) Ex_rms
+       write(unit_chpt) Ey_rms
+       do i = 1, jmax
+          do j=1,6
+             write(unit_chpt) z(j,i)
+          enddo
+       enddo
+       write(unit_chpt) sigma_t
+       write(unit_chpt) mean_t
+       write(unit_chpt) N_ini
+    endif
+  end subroutine BB_Write
 
   subroutine table_input(betx_start, bety_start, &
        alfx_start, alfy_start, &
