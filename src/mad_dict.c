@@ -301,8 +301,13 @@ const char *const_command_def =
 "emittance_update = [l, true,  true], " /* frs */
 "fast_error_func  = [l, false, true], " /* frs */
 "exit_loss_turn   = [l, false, true], " /* frs */
-"bucket_swap      = [l, false, true], " // frs add-on
-"sc_chrom_fix     = [l, false, true]; " // frs add-on
+"bucket_swap      = [l, false, true], " /* frs Sep. 2017 */
+"sc_chrom_fix     = [l, true],        " /* frs Sep. 2017 */
+"sc_3d_kick       = [l, false, true], " /* frs June 2018 */
+"sc_3d_beamsize   = [l, false, true], " /* frs May 2019 */
+"sc_3d_periodic   = [l, false, true], " /* frs June 2018 */
+"sc_mult_ord      = [i, 10, 20], "      /* frs May 2019 */
+"sc_3d_kick_long  = [l, false, true]; " /* frs June 2018 */
 " "
 "plot: control none 0 0 "
 "vaxis    = [s, {none}], "
@@ -2376,6 +2381,7 @@ const char *const_element_def =
 "mech_sep = [r, 0], "
 "v_pos = [r, 0], "
 "bbdir = [i, -1], "
+"bb_sc   = [l, false, true], " /* frs 08.09.18 - BB element NOT a SC */
 "long_coup_off   = [l, false, true], " // frs add-on
 "model           = [i, -1], "
 "method          = [i, -1], "
