@@ -1647,8 +1647,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 	if (debug) printf("\n adjustments xeff: %f, yeff: %f\n",xeff,yeff);
 
 
-        dispdesx = bbeat * fabs(dx)*dp; //Design dispersion   
-        dispdesy = bbeat * fabs(dy)*dp; 
+        dispdesx = bbeat * dx*dp; //Design dispersion   
+        dispdesy = bbeat * dy*dp; 
 
         dispparax = bbeat*parxd*(fabs(lim_pt->deltap_twiss + pt_ele)+dp); //Parasitic disperison 
         dispparay = bbeat*paryd*(fabs(lim_pt->deltap_twiss + pt_ele)+dp);
@@ -1658,13 +1658,15 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         }
         else if(fabs(dx) > 0 && fabs(dy) > 0){
             nchecks = 1;
+            dispdesx = fabs(dispdesx);
+            dispdesy = fabs(dispdesy);
         }
         else{
             nchecks = 0;
         }
     
         for(int dispc=0; dispc<=nchecks; dispc++){
-          ratio_ang = 999999; x_intersect_ang=999999; y_intersect_ang=999999;
+
 
           if(dispc == 0){
             dispxadj = -dispdesx;
@@ -1680,7 +1682,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
           }
 
           for (angle=0; angle<twopi; angle+=dangle) {
-              
+            ratio_ang = 999999; x_intersect_ang=999999; y_intersect_ang=999999;
             /* new 27feb08 BJ */
 
             /*adjust dispersion to worst-case for quadrant, now only done when there is only dispersion in one plane*/
@@ -1713,8 +1715,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
               y_intersect = y_intersect_ang;
             }
 
-      if (debug) printf("\n Angle: %e deltax: %e deltay: %e minratio: %e, ratioang: %e, interx: %e, intery: %e \n", 
-        angle, deltax, deltay, ratio, ratio_ang, x_intersect_ang, y_intersect_ang );
+      if (debug) printf("\n Angle: %e deltax: %e deltay: %e minratio: %e, ratioang: %e, interx: %e, intery: %e, dispyadj: %e, dispxadjy: %e \n", 
+        angle, deltax, deltay, ratio, ratio_ang, x_intersect_ang, y_intersect_ang, dispxadj, dispyadj );
           }
     }
 
