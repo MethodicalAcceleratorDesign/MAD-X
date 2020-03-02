@@ -380,8 +380,7 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
 
 static void
 aper_read_twiss(const char* table, int* jslice, double* s, double* x, double* y,
-		double* px, double* py,
-                double* betx, double* bety, double* dx, double* dy)
+		double* px, double* py, double* betx, double* bety, double* dx, double* dy, double* pt)
 {
   double_from_table_row(table, "s", jslice, s);
   double_from_table_row(table, "x", jslice, x);
@@ -392,6 +391,7 @@ aper_read_twiss(const char* table, int* jslice, double* s, double* x, double* y,
   double_from_table_row(table, "bety", jslice, bety);
   double_from_table_row(table, "dx", jslice, dx);
   double_from_table_row(table, "dy", jslice, dy);
+  double_from_table_row(table, "pt", jslice, pt);
 
   return;
 }
@@ -1307,13 +1307,13 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double ex, ey;
   double dqf, betaqfx, dp, dparx, dpary;
   double cor, bbeat, nco, halo[4], interval, spec, notsimple;
-  double s=0, x=0, y=0, px=0, py=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, length; // nr not used
+  double s=0, x=0, y=0, px=0, py=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, length, pt_ele; // nr not used
   double xeff=0,yeff=0;
   double n1x_m, n1y_m;
   double s_start, s_curr, s_end;
   double node_s=-1, node_n1=-1;
   double aper_tol[3], ap1, ap2, ap3, ap4;
-  double dispx, dispy, tolx, toly;
+  double dispdesx, dispdesy, tolx, toly, dispparax, dispparay;
   double dispxadj=0, dispyadj=0, tolxadj=0, tolyadj=0;
   double angle, dangle, deltax, deltay;
   double xshift, yshift, r;
@@ -1321,7 +1321,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double haloxadj[MAXARRAY], haloyadj[MAXARRAY];
   double pipex[MAXARRAY], pipey[MAXARRAY];
   double parxd,paryd;
-  double x_intersect, y_intersect, ratio_ang;
+  double x_intersect, y_intersect, ratio_ang, nchecks;
   char *halofile, *truefile, *offsfile;
   char refnode[NAME_L]="";
   char *cmd_refnode;
@@ -1426,7 +1426,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       if ( pipelength > -1) ext_pipe=1; */
 
   /* get initial twiss parameters, from start of first element in range */
-  aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy);
+  aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, &pt_ele);
   
   // LD: shift further results by one step (?) and finish outside the table
   //  (*tw_cnt)++;
@@ -1506,7 +1506,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       /* if no pipe can be built, the n1 is set to inf and Twiss parms read for reference*/
       n1=999999; n1x_m=999999; n1y_m=999999; on_ap=-999999; nint=1;
 
-      aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy);
+      aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, &pt_ele);
       aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
 		       apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec,
                        &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, table);
@@ -1600,7 +1600,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         }
 	else {
           aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y, &px, &py,
-			  &betx, &bety, &dx, &dy);
+			  &betx, &bety, &dx, &dy,  &pt_ele);
 
 	  if(debug) printf("embedded twiss for slice %d: s= %f betx= %f bety= %f dx= %f dy= %f\n",
 			   jslice, s, betx, bety, dx, dy);
@@ -1645,41 +1645,75 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
 	if (debug) printf("\n adjustments xeff: %f, yeff: %f\n",xeff,yeff);
 
-        for (angle=0; angle<twopi; angle+=dangle) {
-            ratio_ang = 999999;
-          /* new 27feb08 BJ */
-          dispx = bbeat * (fabs(dx)*dp + parxd*(fabs(lim_pt->deltap_twiss)+dp) );
-          dispy = bbeat * (fabs(dy)*dp + paryd*(fabs(lim_pt->deltap_twiss)+dp) );
 
-          /*adjust dispersion to worst-case for quadrant*/
-          aper_adj_quad(angle, dispx, dispy, &dispxadj, &dispyadj);
+        dispdesx = bbeat * fabs(dx)*dp; //Design dispersion   
+        dispdesy = bbeat * fabs(dy)*dp; 
 
-          /*calculate displacement co+tol for each angle*/
-         // coxadj = cor * cos(angle); coyadj = cor * sin(angle);
+        dispparax = bbeat*parxd*(fabs(lim_pt->deltap_twiss + pt_ele)+dp); //Parasitic disperison 
+        dispparay = bbeat*paryd*(fabs(lim_pt->deltap_twiss + pt_ele)+dp);
 
-          /* Error check added 20feb08 BJ */
-          if ( xshift < 0 || yshift < 0 || r < 0 ) {
-            sprintf(tol_err_mess,"In element : %s\n",name);
-            fatal_error("Illegal negative tolerance",tol_err_mess);
-          }
-
-          aper_race(xshift, yshift, cor+r, angle, &tolx, &toly);
-          aper_adj_quad(angle, tolx, toly, &tolxadj, &tolyadj);
-
-          /* add all displacements */
-          deltax =  tolxadj + xeff + dispxadj;
-          deltay =  tolyadj + yeff + dispyadj;
-
-          /* send beta adjusted halo and its displacement to aperture calculation */
-          aper_calc(deltax, deltay, &ratio_ang, haloxsi, haloysi, halolength, haloxadj, haloyadj,
-                    pipex, pipey, pipelength, notsimple, &x_intersect, &y_intersect);
-          
-          if(ratio_ang < ratio){
-            ratio = ratio_ang;
-          }
-    if (debug) printf("\n Angle: %e deltax: %e deltay: %e minratio: %e, ratioang: %e, interx: %e, intery: %e \n", 
-      angle, deltax, deltay, ratio, ratio_ang, x_intersect, y_intersect );
+        if(notsimple){
+          nchecks = 10;
         }
+        else if(fabs(dx) > 0 && fabs(dy) > 0){
+            nchecks = 1;
+        }
+        else{
+            nchecks = 0;
+        }
+    
+        for(int dispc=0; dispc<=nchecks; dispc++){
+          ratio_ang = 999999;
+
+          if(dispc == 0){
+            dispxadj = -dispdesx;
+            dispyadj = -dispdesy;
+          }
+          else if(dispc == 1){
+            dispxadj = dispdesx;
+            dispyadj = dispdesy;
+          }
+
+          else{
+            dispxadj = -dispdesx + 2*dispdesx*dispc/(nchecks-1);
+            dispyadj = -dispdesy + 2*dispdesx*dispc/(nchecks-1);
+          }
+
+          for (angle=0; angle<twopi; angle+=dangle) {
+              
+            /* new 27feb08 BJ */
+
+            /*adjust dispersion to worst-case for quadrant, now only done when there is only dispersion in one plane*/
+            if(nchecks==0)
+              aper_adj_quad(angle, dispdesx, dispdesy, &dispxadj, &dispyadj);
+
+            /*calculate displacement co+tol for each angle*/
+           // coxadj = cor * cos(angle); coyadj = cor * sin(angle);
+
+            /* Error check added 20feb08 BJ */
+            if ( xshift < 0 || yshift < 0 || r < 0 ) {
+              sprintf(tol_err_mess,"In element : %s\n",name);
+              fatal_error("Illegal negative tolerance",tol_err_mess);
+            }
+
+            aper_race(xshift+dispparax, yshift+dispparay, cor+r, angle, &tolx, &toly);
+            aper_adj_quad(angle, tolx, toly, &tolxadj, &tolyadj);
+
+            /* add all displacements */
+            deltax =  tolxadj + xeff + dispxadj;
+            deltay =  tolyadj + yeff + dispyadj;
+
+            /* send beta adjusted halo and its displacement to aperture calculation */
+            aper_calc(deltax, deltay, &ratio_ang, haloxsi, haloysi, halolength, haloxadj, haloyadj,
+                      pipex, pipey, pipelength, notsimple, &x_intersect, &y_intersect);
+            
+            if(ratio_ang < ratio){
+              ratio = ratio_ang;
+            }
+      if (debug) printf("\n Angle: %e deltax: %e deltay: %e minratio: %e, ratioang: %e, interx: %e, intery: %e \n", 
+        angle, deltax, deltay, ratio, ratio_ang, x_intersect, y_intersect );
+          }
+    }
 
 
 
