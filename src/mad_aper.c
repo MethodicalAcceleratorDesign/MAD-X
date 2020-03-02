@@ -1050,7 +1050,7 @@ aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
 		 char* apertype,double* ap1,double* ap2,double* ap3,double* ap4,
 		 double* on_ap, double* on_elem, double* spec,double* s,
 		 double* x, double* y, double* px, double* py,
-		 double* betx, double* bety,double* dx, double* dy, char *table)
+		 double* betx, double* bety,double* dx, double* dy, double* x_intersect, double* y_intersect, char *table)
 {
   string_to_table_curr(table, "name", name);
   double_to_table_curr(table, "n1", n1);
@@ -1078,7 +1078,8 @@ aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
   double_to_table_curr(table, "bety", bety);
   double_to_table_curr(table, "dx", dx);
   double_to_table_curr(table, "dy", dy);
-
+  double_to_table_curr(table, "x_pos_hit", x_intersect);
+  double_to_table_curr(table, "y_pos_hit", y_intersect);
   augment_count(table);
 }
 
@@ -1183,7 +1184,6 @@ aper_calc(double p, double q, double* minhl,
     if (h/l < *minhl) {
      *x_inter = xm; 
      *y_inter = ym;
-     
      *minhl = h/l;
 
     }
@@ -1321,7 +1321,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double haloxadj[MAXARRAY], haloyadj[MAXARRAY];
   double pipex[MAXARRAY], pipey[MAXARRAY];
   double parxd,paryd;
-  double x_intersect, y_intersect, ratio_ang, nchecks;
+  double x_intersect, y_intersect,x_intersect_ang, y_intersect_ang, ratio_ang, nchecks;
   char *halofile, *truefile, *offsfile;
   char refnode[NAME_L]="";
   char *cmd_refnode;
@@ -1505,11 +1505,12 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     if (ap == 0 || first == 1) {
       /* if no pipe can be built, the n1 is set to inf and Twiss parms read for reference*/
       n1=999999; n1x_m=999999; n1y_m=999999; on_ap=-999999; nint=1;
+      x_intersect = 999999; y_intersect = 999999;
 
       aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, &pt_ele);
       aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
 		       apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec,
-                       &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, table);
+                       &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, &x_intersect, &y_intersect, table);
       on_ap=1;
 
       double_to_table_row(tw_cp->name, "n1", tw_cnt, &n1);
@@ -1663,7 +1664,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         }
     
         for(int dispc=0; dispc<=nchecks; dispc++){
-          ratio_ang = 999999;
+          ratio_ang = 999999; x_intersect_ang=999999; y_intersect_ang=999999;
 
           if(dispc == 0){
             dispxadj = -dispdesx;
@@ -1673,10 +1674,9 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
             dispxadj = dispdesx;
             dispyadj = dispdesy;
           }
-
           else{
-            dispxadj = -dispdesx + 2*dispdesx*dispc/(nchecks-1);
-            dispyadj = -dispdesy + 2*dispdesx*dispc/(nchecks-1);
+            dispxadj = -dispdesx + 2*dispdesx*(dispc-1)/nchecks; //-1 becuase end point is already checked
+            dispyadj = -dispdesy + 2*dispdesx*(dispc-1)/nchecks;
           }
 
           for (angle=0; angle<twopi; angle+=dangle) {
@@ -1705,13 +1705,16 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
             /* send beta adjusted halo and its displacement to aperture calculation */
             aper_calc(deltax, deltay, &ratio_ang, haloxsi, haloysi, halolength, haloxadj, haloyadj,
-                      pipex, pipey, pipelength, notsimple, &x_intersect, &y_intersect);
+                      pipex, pipey, pipelength, notsimple, &x_intersect_ang, &y_intersect_ang);
             
             if(ratio_ang < ratio){
               ratio = ratio_ang;
+              x_intersect = x_intersect_ang;
+              y_intersect = y_intersect_ang;
             }
+
       if (debug) printf("\n Angle: %e deltax: %e deltay: %e minratio: %e, ratioang: %e, interx: %e, intery: %e \n", 
-        angle, deltax, deltay, ratio, ratio_ang, x_intersect, y_intersect );
+        angle, deltax, deltay, ratio, ratio_ang, x_intersect_ang, y_intersect_ang );
           }
     }
 
@@ -1733,7 +1736,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         if (is_zero_len == 0 || jslice == 1) {
           aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
 			   apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
-                           &xeff, &yeff, &px, &py, &betx, &bety, &dx, &dy, table);
+                           &xeff, &yeff, &px, &py, &betx, &bety, &dx, &dy, &x_intersect, &y_intersect, table);
 
 	  /* save node minimum n1 */
           if (n1 < node_n1) {
