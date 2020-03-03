@@ -1149,7 +1149,7 @@ aper_calc(double p, double q, double* minhl,
       if ( // not parallel lines
 	  0 != aper_intersect(a1, b1, c1, a2, b2, c2, &xm, &ym)
 	  // intersection point is inside the bounding box
-	  &&  ( xm < bbxmax && xm > bbxmin && ym < bbymax && ym > bbymin)
+	  &&  ( xm <= bbxmax && xm >= bbxmin && ym <= bbymax && ym >= bbymin)
 	  // intersection point is inside pipe line segment
 	  && 0 != aper_on_line(xm, ym, pipex[i], pipey[i], pipex[i+1], pipey[i+1], dist_limit)
 	  // halo center is not inside segement defined by halo apex and intersection point
