@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.13 23:13:12      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.02.03 09:23:58      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "test-c6t-4 conversion of thick elements with apertures";
 
