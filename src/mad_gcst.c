@@ -101,7 +101,7 @@ const char* const ap_table_cols[] =
 const int survey_table_types[] =
 {
   3, 3, 2, 2, 2, 2,
-  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2, 2,
   1, 1, 2,
   /*== dealt with the new property v_pos as for mech_sep */
   2,3
@@ -111,7 +111,7 @@ const int survey_table_types[] =
 const char* const survey_table_cols[] =
 {
   "name", "keyword", "s", "l", "angle", "x",
-  "y", "z", "theta", "phi", "psi", "globaltilt",
+  "y", "z", "theta", "phi", "psi", "globaltilt", "tilt",
   "slot_id", "assembly_id", "mech_sep",
   /*== dealt with the new property v_pos as for mech_sep */
   "v_pos", "comments",
