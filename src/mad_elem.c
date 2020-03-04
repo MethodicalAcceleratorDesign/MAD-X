@@ -326,7 +326,7 @@ void set_aperture_element(struct element *el, struct command* def){
     el->aper->length = i; // this minus 1 has to be there because of how the algorithm is done.  
     el->aper->xlist[i]=el->aper->xlist[0];
     el->aper->ylist[i]=el->aper->ylist[0];   
-    
+    fclose(fp);
     }
   }
 
