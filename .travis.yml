@@ -10,9 +10,9 @@ env:
   - MADXDIR="$HOME/.local"
 
 install:
- # - pip install --user cpp-coveralls
- # - make madx-linux64-gnu COVERAGE=yes
- # - make numdiff-linux64-gnu
+  - pip install --user cpp-coveralls
+  - make madx-linux64-gnu COVERAGE=yes
+  - make numdiff-linux64-gnu
   - pip install cython
   - git clone https://github.com/hibtc/cpymad.git
   - ./buildcpymad.sh
@@ -27,19 +27,17 @@ script:
 
   -  python test_madx.py
   -  cd ../../
-  -  pwd
 
+  - make tests &&
+    NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
+    [[ $NUM_FAILED -eq 0 ]]
 
-  #- make tests &&
-  #  NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
-  #  [[ $NUM_FAILED -eq 0 ]]
-
-#  - (cd doc/latexuguide && ./makelatexdoc) ||
-#    (cat doc/latexuguide/makelatexdoc.log && false)
+  - (cd doc/latexuguide && ./makelatexdoc) ||
+    (cat doc/latexuguide/makelatexdoc.log && false)
 
 
 after_success:
- # - coveralls --include src -x .c -x .cpp
+  - coveralls --include src -x .c -x .cpp
 
 
 addons:
@@ -48,11 +46,11 @@ addons:
     - libblas-dev 
     - liblapack-dev
     - gfortran
-#    - gnuplot
-#    - texlive-latex-base
-#    - texlive-latex-extra
-#    - texlive-fonts-recommended
-#    - latex-xcolor
+    - gnuplot
+    - texlive-latex-base
+    - texlive-latex-extra
+    - texlive-fonts-recommended
+    - latex-xcolor
 
 git:
   # Limit cloning depth to reduce download bandwidth:
