@@ -3,6 +3,7 @@ compiler:
   - gcc
 
 install:
+  - git clone git@github.com:hibtc/cpymad.git
   - pip install --user cpp-coveralls
   - make madx-linux64-gnu COVERAGE=yes
   - make numdiff-linux64-gnu
@@ -23,6 +24,8 @@ after_success:
 addons:
   apt:
     packages:
+    - libblas-dev 
+    - liblapack-dev
     - gfortran
     - gnuplot
     - texlive-latex-base
