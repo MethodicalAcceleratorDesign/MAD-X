@@ -2,13 +2,17 @@ language: cpp
 compiler:
   - gcc
 
+language: python
+dist: xenial
+  - "3.6"
+
 install:
-  - pypy3 --version
+  - python --version
   - git clone https://github.com/hibtc/cpymad.git
   - ./buildcpymad.sh
-  - cd cpymad && pypy3 setup.py build_ext --no-X11 --blas --lapack --madxdir=$MADXDIR
+  - cd cpymad && python setup.py build_ext --no-X11 --blas --lapack --madxdir=$MADXDIR
   - pip install -e .
-  - cd test && pypy3 test_madx.py
+  - cd test && python test_madx.py
 
 
  # - pip install --user cpp-coveralls
