@@ -1,4 +1,3 @@
-export MADXDIR="$HOME/.local"
 mkdir build
 cd build
 cmake \
