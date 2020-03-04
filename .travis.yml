@@ -3,18 +3,18 @@ compiler:
   - gcc
 
 install:
-  - git clone git@github.com:hibtc/cpymad.git
-  - pip install --user cpp-coveralls
-  - make madx-linux64-gnu COVERAGE=yes
-  - make numdiff-linux64-gnu
+  - git clone https://github.com/hibtc/cpymad.git
+ # - pip install --user cpp-coveralls
+ # - make madx-linux64-gnu COVERAGE=yes
+ # - make numdiff-linux64-gnu
 
 script:
   - make tests &&
     NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
     [[ $NUM_FAILED -eq 0 ]]
 
-  - (cd doc/latexuguide && ./makelatexdoc) ||
-    (cat doc/latexuguide/makelatexdoc.log && false)
+#  - (cd doc/latexuguide && ./makelatexdoc) ||
+#    (cat doc/latexuguide/makelatexdoc.log && false)
 
 
 after_success:
@@ -26,12 +26,13 @@ addons:
     packages:
     - libblas-dev 
     - liblapack-dev
+    - cython
     - gfortran
-    - gnuplot
-    - texlive-latex-base
-    - texlive-latex-extra
-    - texlive-fonts-recommended
-    - latex-xcolor
+#    - gnuplot
+#    - texlive-latex-base
+#    - texlive-latex-extra
+#    - texlive-fonts-recommended
+#    - latex-xcolor
 
 git:
   # Limit cloning depth to reduce download bandwidth:
