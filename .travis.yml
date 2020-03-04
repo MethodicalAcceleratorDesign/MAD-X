@@ -8,9 +8,12 @@ dist: xenial
 
 env:
   - MADXDIR="$HOME/.local"
+
 install:
+ # - pip install --user cpp-coveralls
+ # - make madx-linux64-gnu COVERAGE=yes
+ # - make numdiff-linux64-gnu
   - pip install cython
-#  - export MADXDIR="$HOME/.local"
   - git clone https://github.com/hibtc/cpymad.git
   - ./buildcpymad.sh
   - cd cpymad && python setup.py build_ext --no-X11 --blas --lapack --madxdir=$MADXDIR
@@ -18,13 +21,15 @@ install:
   - cd test && python test_madx.py
 
 
- # - pip install --user cpp-coveralls
- # - make madx-linux64-gnu COVERAGE=yes
- # - make numdiff-linux64-gnu
+
 
 script:
+
+  -  python test_madx.py
+  -  cd ../../
   -  pwd
-  - cd cpymad/test && python test_madx.py
+
+
   #- make tests &&
   #  NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
   #  [[ $NUM_FAILED -eq 0 ]]
