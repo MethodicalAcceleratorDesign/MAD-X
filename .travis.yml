@@ -5,10 +5,10 @@ compiler:
 install:
   - git clone https://github.com/hibtc/cpymad.git
   - ./buildcpymad.sh
-  - python --version
-  - cd cpymad && python setup.py build_ext --no-X11 --blas --lapack --madxdir=$MADXDIR
+  - python3.6 --version
+  - cd cpymad && python3.6 setup.py build_ext --no-X11 --blas --lapack --madxdir=$MADXDIR
   - pip install -e .
-  - cd test && python test_madx.py
+  - cd test && python3.6 test_madx.py
 
 
  # - pip install --user cpp-coveralls
