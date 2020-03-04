@@ -3,12 +3,12 @@ compiler:
   - gcc
 
 install:
+  - pypy3 --version
   - git clone https://github.com/hibtc/cpymad.git
   - ./buildcpymad.sh
-  - python3.6 --version
-  - cd cpymad && python3.6 setup.py build_ext --no-X11 --blas --lapack --madxdir=$MADXDIR
+  - cd cpymad && pypy3 setup.py build_ext --no-X11 --blas --lapack --madxdir=$MADXDIR
   - pip install -e .
-  - cd test && python3.6 test_madx.py
+  - cd test && pypy3 test_madx.py
 
 
  # - pip install --user cpp-coveralls
