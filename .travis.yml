@@ -10,7 +10,7 @@ env:
   - MADXDIR="$HOME/.local"
 
 install:
-  - pip install --user cpp-coveralls
+  - pip install cpp-coveralls
   - make madx-linux64-gnu COVERAGE=yes
   - make numdiff-linux64-gnu
   - pip install cython
