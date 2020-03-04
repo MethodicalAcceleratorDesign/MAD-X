@@ -23,7 +23,8 @@ install:
  # - make numdiff-linux64-gnu
 
 script:
-- cd ~cpymad/test && python test_madx.py
+  -  pwd
+  - cd cpymad/test && python test_madx.py
   #- make tests &&
   #  NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
   #  [[ $NUM_FAILED -eq 0 ]]
