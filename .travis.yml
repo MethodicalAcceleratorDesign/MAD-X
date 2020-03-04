@@ -8,6 +8,7 @@ dist: xenial
 
 install:
   - python --version
+  - pip install cython
   - git clone https://github.com/hibtc/cpymad.git
   - ./buildcpymad.sh
   - cd cpymad && python setup.py build_ext --no-X11 --blas --lapack --madxdir=$MADXDIR
