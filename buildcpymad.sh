@@ -11,5 +11,5 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DMADX_INSTALL_DOC=OFF \
     ..
-make -j install
+make install
 echo $MADXDIR
