@@ -12,3 +12,4 @@ cmake \
     -DMADX_INSTALL_DOC=OFF \
     ..
 make -j install
+echo $MADXDIR
