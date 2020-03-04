@@ -4,11 +4,16 @@ compiler:
 
 install:
   - git clone https://github.com/hibtc/cpymad.git
+  - pwd
+  - ./buildcpymad.sh
+
+
  # - pip install --user cpp-coveralls
  # - make madx-linux64-gnu COVERAGE=yes
  # - make numdiff-linux64-gnu
 
 script:
+
   - make tests &&
     NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
     [[ $NUM_FAILED -eq 0 ]]
