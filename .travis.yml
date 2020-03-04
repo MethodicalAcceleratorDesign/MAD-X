@@ -23,17 +23,17 @@ install:
  # - make numdiff-linux64-gnu
 
 script:
-
-  - make tests &&
-    NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
-    [[ $NUM_FAILED -eq 0 ]]
+- cd ~cpymad/test && python test_madx.py
+  #- make tests &&
+  #  NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
+  #  [[ $NUM_FAILED -eq 0 ]]
 
 #  - (cd doc/latexuguide && ./makelatexdoc) ||
 #    (cat doc/latexuguide/makelatexdoc.log && false)
 
 
 after_success:
-  - coveralls --include src -x .c -x .cpp
+ # - coveralls --include src -x .c -x .cpp
 
 
 addons:
