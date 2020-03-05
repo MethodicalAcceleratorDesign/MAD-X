@@ -27,6 +27,7 @@ install:
 script:
 
   -  python test_madx.py > /dev/null 2>&1
+  -  python test_util.py > /dev/null 2>&1
   -  cd ../../
 
   - make tests &&
