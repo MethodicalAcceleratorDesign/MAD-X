@@ -655,22 +655,22 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision :: rt(6,6), tt(6,6,6)
   integer :: eflag, kobs, save, thr_on
 
-  logical :: fmap
+  logical :: fmap, istaper
   character(len=28) :: tmptxt1, tmptxt2, tmptxt3
   character(len=150) :: warnstr
   character(len=name_len) :: c_name(2), p_name, el_name
   character(len=2) :: ptxt(2)=(/'x-','y-'/)
   integer :: j, code, n_align, nobs, node, old, poc_cnt, debug
   integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
-  double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: al_errors(align_max)
-  double precision :: el, cick, err, nrm, nrm0
+  double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6), orbitori(6)
+  double precision :: al_errors(align_max), pttemp
+  double precision :: el, cick, err, nrm, nrm0, anglet, newk0
   double precision :: parvec(26),  vector(10), reforb(6)
   double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
 
   integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
-  double precision, external :: node_value
+  double precision, external :: node_value, get_value
   double precision, parameter :: orb_limit=1d1
   integer, parameter :: max_rep=100
 
@@ -690,7 +690,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      j = get_vector('threader ', 'vector ', vector)
      if (j .lt. 3) thr_on = 0
   endif
-
+  istaper = get_value('twiss ','tapering ').ne.zero
+  !istaper = .true.
   TT = zero
   RT = EYE
 
@@ -771,6 +772,63 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   endif
 
   !---- Element matrix
+  if (istaper) then
+    orbitori = orbit
+
+    select case (code)
+
+     case (code_rbend, code_sbend)
+      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
+      
+      anglet = node_value('angle ')
+
+      newk0 = (1+pttemp)*anglet/el
+
+      print *, "bbbbbbb1", newk0, orbit(6), el, anglet, orbit(1)
+      !newk0 = newk0+orbit(1)/(2*el)
+      call store_node_value('k0 ',newk0 )
+      orbit = orbitori
+      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
+      pttemp = (orbit(6)+orbitori(6))/2
+      newk0 = (1+pttemp)*(anglet)/el
+      call store_node_value('k0 ',newk0 )
+      print *, "bbbbbbb2", newk0, orbit(6), el, anglet, orbit(1)
+
+      orbit = orbitori
+      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
+      pttemp = (orbit(6)+orbitori(6))/2
+      newk0 = (1+pttemp)*(anglet)/el
+      call store_node_value('k0 ',newk0 )
+      print *, "bbbbbbb2", newk0, orbit(6), el, anglet, orbit(1)
+
+      orbit = orbitori
+      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
+      pttemp = (orbit(6)+orbitori(6))/2
+      newk0 = (1+pttemp)*(anglet)/el
+      call store_node_value('k0 ',newk0 )
+      print *, "bbbbbbb2", newk0, orbit(6), el, anglet, orbit(1)
+
+     case (code_quadrupole)
+      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
+      pttemp = (orbit(6)+orbitori(6))/2
+      print *, "eeeee", (orbit(6)+orbitori(6))/2
+      anglet = node_value('k1 ')
+      newk0 = (1+pttemp)*anglet
+      call store_node_value('k1 ',newk0 )
+      !print *, "quadrupoleeee", newk0
+
+     case (code_sextupole)
+      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
+      pttemp = (orbit(6)+orbitori(6))/2
+      anglet = node_value('k2 ')
+      newk0 = (1+pttemp)*anglet
+      !print *, "bbbbbbb", newk0, orbit(6), el, anglet
+      call store_node_value('k2 ',newk0 )  
+    end select
+    orbit = orbitori
+
+  endif
+
   call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
 
   !--- if element has a map, concatenate
@@ -3564,6 +3622,8 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
      n_ferr = node_fd_errors(f_errors)
      if (sk0 .ne. 0) f_errors(0) = f_errors(0) + sk0*el - g_elpar(b_angle)
 
+
+     
 !!     if (sk0*el .ne. g_elpar(b_angle)) then
 !!        call element_name(name,len(name))
 !!        print *, name, ': k0l ~= angle, delta= ', sk0*el - g_elpar(b_angle), g_elpar(b_angle)
