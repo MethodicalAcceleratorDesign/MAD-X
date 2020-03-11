@@ -625,13 +625,14 @@ end SUBROUTINE tmclor
 SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use bbfi
   use twiss0fi
-  use twissbeamfi, only : beta, gamma, arad, charge, npart
+  use twissbeamfi, only : beta, gamma, arad, charge, npart, pc, energy
   use name_lenfi
   use twisscfi
   use spch_bbfi
   use matrices, only : EYE, symp_thrd  ! , symp_thrd_orbit
   use math_constfi, only : zero
   use code_constfi
+  use twtapering
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -674,6 +675,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision, parameter :: orb_limit=1d1
   integer, parameter :: max_rep=100
 
+  111 continue
   debug = get_option('debug ')
 
   !---- Initialize
@@ -974,7 +976,13 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      node=node+1
      goto 10 ! loop over nodes
   endif
+  endpt = orbit(6) !*pc+energy
+  if(endpt .gt. 1e-6) then
 
+    orderrun = orderrun+1
+    print *, "kkkkk",endpt
+    goto 111
+  endif
   bbd_flag=0
 
 end SUBROUTINE tmfrst
@@ -6385,8 +6393,9 @@ end SUBROUTINE tmdrf
 
 SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   use twisslfi
+  use twtapering
   use twiss_elpfi
-  use twissbeamfi, only : deltap, pc
+  use twissbeamfi, only : deltap, pc, radiate
   use matrices, only : EYE
   use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi
   use phys_constfi, only : clight
@@ -6408,16 +6417,16 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap, fcentre
+  logical :: fsec, ftrk, fmap, fcentre, istaper
   double precision :: el, ds
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   integer :: elpar_vl
   double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, bvk
   double precision :: ek0(6), rw(6,6), tw(6,6,6)
-  double precision :: c0, c1, c2
+  double precision :: c0, c1, c2, tmpphase
 
-  double precision, external :: node_value
+  double precision, external :: node_value, get_value
   integer, external :: el_par_vector
 
   !-- get element parameters
@@ -6453,12 +6462,28 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   omega = rff * ten6p * twopi / clight
   vrf   = rfv * ten3m / (pc * (one + deltap))
   phirf = rfl * twopi - omega * orbit(5)
+  istaper = get_value('twiss ','tapering ').ne.zero
+  if(istaper .and. ftrk) then
+    phirf = pi*half
+    tmpphase = phirf-node_value('taplag ')
+
+    
+    print *, "ffff", sin(tmpphase)
+    endpt =0.01065! 9.92886902955846840924e-03
+    phirf = asin((sin(phirf)*vrf - endpt/80)/vrf)
+    print * , "pppppp", phirf
+    call store_node_value('taplag ', phirf)
+  !  vrf = vrf-1.338e-4
+  
+
+  endif
   c0 =   vrf * sin(phirf)
   c1 = - vrf * cos(phirf) * omega
   c2 = - vrf * sin(phirf) * omega**2 * half
 
   !---- Transfer map.
   fmap = .true.
+  print *, "rrrrrrrf", vrf, c0, orbit(6), rfv, totrfcav
   if (ftrk) then
     orbit(6) = orbit(6) + c0
     ek(6) = c0

@@ -451,6 +451,14 @@ module twtrrfi
   integer, parameter :: maxmul=20, maxferr=50, maxnaper=100
 end module twtrrfi
 
+module twtapering
+  implicit none
+  public
+  !---- for tapering
+  integer :: totrfcav =0, orderrun=0
+  double precision ::  endpt=0
+end module twtapering
+
 module ibsdbfi
   implicit none
   public
