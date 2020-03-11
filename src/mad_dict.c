@@ -1897,7 +1897,7 @@ const char *const_element_def =
 "aper_tilt  = [r, 0], "
 "no_cavity_totalpath = [l, false, true], "
 "time_var        = [l, false, true], "
-"taplag   = [r, 3.1415],  "
+"taplag   = [r, 0],  "
 "comments = [s, none, none]; "
 " "
 "elseparator: element none 0 11 "

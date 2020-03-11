@@ -484,6 +484,7 @@ store_node_value(const char* par, double* value)
   else if (strcmp(lpar, "k1") == 0) store_comm_par_value("k1",*value,el->def);
   else if (strcmp(lpar, "k2") == 0) store_comm_par_value("k2",*value,el->def);
   else if (strcmp(lpar, "taplag") == 0) store_comm_par_value("taplag",*value,el->def);
+  else if (strcmp(lpar, "lag") == 0) store_comm_par_value("lag",*value,el->def);
 
   /* added by E. T. d'Amico 27 feb 2004 */
 

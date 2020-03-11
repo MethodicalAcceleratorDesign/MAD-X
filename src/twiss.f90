@@ -976,12 +976,13 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      node=node+1
      goto 10 ! loop over nodes
   endif
-  endpt = orbit(6) !*pc+energy
-  if(endpt .gt. 1e-6) then
-
+  !endpt = orbit(6) !*pc+energy
+  print *, "kkkkka", orbit(6)
+  if(orbit(6) .gt. 1e-10) then
+    endpt=endpt+orbit(6)
     orderrun = orderrun+1
     print *, "kkkkk",endpt
-    goto 111
+   ! goto 111
   endif
   bbd_flag=0
 
@@ -6462,17 +6463,17 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   omega = rff * ten6p * twopi / clight
   vrf   = rfv * ten3m / (pc * (one + deltap))
   phirf = rfl * twopi - omega * orbit(5)
-  istaper = get_value('twiss ','tapering ').ne.zero
-  if(istaper .and. ftrk) then
-    phirf = pi*half
-    tmpphase = phirf-node_value('taplag ')
 
+  istaper = get_value('twiss ','tapering ').ne.zero
+  
+  if(istaper .and. ftrk) then
+ !   phirf = pi*half
     
-    print *, "ffff", sin(tmpphase)
-    endpt =0.01065! 9.92886902955846840924e-03
-    phirf = asin((sin(phirf)*vrf - endpt/80)/vrf)
-    print * , "pppppp", phirf
-    call store_node_value('taplag ', phirf)
+ !   phirf = asin((sin(phirf)*vrf - endpt/80)/vrf)
+ !   tmpphase = (phirf+omega*orbit(5))/twopi
+ !   call store_node_value('taplag ', tmpphase)
+    print *, "ppppp", phirf, rfl
+
   !  vrf = vrf-1.338e-4
   
 
