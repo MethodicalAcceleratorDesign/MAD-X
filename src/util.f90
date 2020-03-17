@@ -417,9 +417,9 @@ module twiss_elpfi
   integer, parameter :: b_k2s=16, b_h1=17, b_h2=18, b_hgap=19
   integer, parameter :: b_fint=20, b_fintx=21, b_k3=22, b_k3s=23
   !-quad
-  integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9
+  integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9, q_k1t=10
   !-sext
-  integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9
+  integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9, s_k2t=10
   !-oct
   integer, parameter :: o_tilt=7, o_k3=8, o_k3s=9
   !-mult

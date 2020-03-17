@@ -794,7 +794,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
       pttemp = (orbit(6)+orbitori(6))/2
       newk0 = (1+pttemp)*(anglet)/el
       call store_node_value('k0 ',newk0 )
-      print *, "bbbbbbb2", newk0, orbit(6), el, anglet, orbit(1)
+
 
       orbit = orbitori
       call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
@@ -815,17 +815,17 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
       pttemp = (orbit(6)+orbitori(6))/2
       print *, "eeeee", (orbit(6)+orbitori(6))/2
       anglet = node_value('k1 ')
-      newk0 = (1+pttemp)*anglet
-      call store_node_value('k1 ',newk0 )
+      newk0 = (1+pttemp)*anglet-anglet
+      call store_node_value('k1tap ',newk0 )
       !print *, "quadrupoleeee", newk0
 
      case (code_sextupole)
       call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
       pttemp = (orbit(6)+orbitori(6))/2
       anglet = node_value('k2 ')
-      newk0 = (1+pttemp)*anglet
+      newk0 = (1+pttemp)*anglet - anglet
       !print *, "bbbbbbb", newk0, orbit(6), el, anglet
-      call store_node_value('k2 ',newk0 )  
+      call store_node_value('k2tap ',newk0 )  
     end select
     orbit = orbitori
 
@@ -977,12 +977,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      goto 10 ! loop over nodes
   endif
   !endpt = orbit(6) !*pc+energy
-  print *, "kkkkka", orbit(6)
-  if(orbit(6) .gt. 1e-10) then
+
+  if(orbit(6) .gt. 1e-10 .and. istaper) then
     endpt=endpt+orbit(6)
     orderrun = orderrun+1
     print *, "kkkkk",endpt
-   ! goto 111
+    goto 111
   endif
   bbd_flag=0
 
@@ -5366,9 +5366,13 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   n_ferr = node_fd_errors(f_errors)
 
   !-- element paramters
-  elpar_vl = el_par_vector(q_k1s, g_elpar)
+  elpar_vl = el_par_vector(q_k1t, g_elpar)
   bvk = node_value('other_bv ')
-  sk1  = bvk * ( g_elpar(q_k1)  + f_errors(2)/el)
+  sk1  = bvk * ( g_elpar(q_k1)  + g_elpar(q_k1t) + f_errors(2)/el)
+  print *, "vvv", g_elpar(q_k1t)
+	 if(sk1 .gt. 10) then
+	  print *, "tteest", sk1
+	 endif
   sk1s = bvk * ( g_elpar(q_k1s) + f_errors(3)/el)
   tilt = g_elpar(q_tilt)
   if (sk1s .ne. zero) then
@@ -5780,9 +5784,9 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   n_ferr = node_fd_errors(f_errors)
 
   !-- get element parameters
-  elpar_vl = el_par_vector(s_k2s, g_elpar)
+  elpar_vl = el_par_vector(s_k2t, g_elpar)
   bvk = node_value('other_bv ')
-  sk2  = bvk * ( g_elpar(s_k2)  + f_errors(4)/el )
+  sk2  = bvk * ( g_elpar(s_k2)  + g_elpar(s_k2t) +  f_errors(4)/el )
   sk2s = bvk * ( g_elpar(s_k2s) + f_errors(5)/el )
   tilt = node_value('tilt ')
   if (sk2s .ne. zero) then
@@ -6422,13 +6426,13 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   double precision :: el, ds
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  integer :: elpar_vl
+  integer :: elpar_vl, ncav
   double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, bvk
   double precision :: ek0(6), rw(6,6), tw(6,6,6)
   double precision :: c0, c1, c2, tmpphase
 
   double precision, external :: node_value, get_value
-  integer, external :: el_par_vector
+  integer, external :: el_par_vector, get_ncavities
 
   !-- get element parameters
   elpar_vl = el_par_vector(r_freq, g_elpar)
@@ -6467,24 +6471,19 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   istaper = get_value('twiss ','tapering ').ne.zero
   
   if(istaper .and. ftrk) then
- !   phirf = pi*half
-    
- !   phirf = asin((sin(phirf)*vrf - endpt/80)/vrf)
- !   tmpphase = (phirf+omega*orbit(5))/twopi
- !   call store_node_value('taplag ', tmpphase)
-    print *, "ppppp", phirf, rfl
-
-  !  vrf = vrf-1.338e-4
-  
-
+    ncav = get_ncavities()   
+    phirf = asin((sin(pi*half)*vrf - endpt/ncav)/vrf)
+    tmpphase = (phirf+omega*orbit(5))/twopi
+    call store_node_value('lag ', tmpphase)
   endif
+  
   c0 =   vrf * sin(phirf)
   c1 = - vrf * cos(phirf) * omega
   c2 = - vrf * sin(phirf) * omega**2 * half
 
   !---- Transfer map.
   fmap = .true.
-  print *, "rrrrrrrf", vrf, c0, orbit(6), rfv, totrfcav
+!  print *, "rrrrrrrf", vrf, c0, orbit(6), rfv, totrfcav
   if (ftrk) then
     orbit(6) = orbit(6) + c0
     ek(6) = c0
