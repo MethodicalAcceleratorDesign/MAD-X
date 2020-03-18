@@ -942,7 +942,6 @@ update_element(struct element* el, struct command* update)
   {
     if (update->par_names->inform[pos])  /* parameter has been read */
     {
-      printf("uppdatting %d %d \n", update->par_names->inform[pos], pos );
       el->def->par_names->inform[pos]=update->par_names->inform[pos]; /*hbu activate this parameter in the element */
       e_par = e_pl->parameters[pos];
       par = pl->parameters[pos];

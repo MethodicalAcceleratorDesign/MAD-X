@@ -654,7 +654,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision :: orbit0(6), orbit(6)
   logical :: fsec, ftrk
   double precision :: rt(6,6), tt(6,6,6)
-  integer :: eflag, kobs, save, thr_on
+  integer :: eflag, kobs, save, thr_on, i
 
   logical :: fmap, istaper
   character(len=28) :: tmptxt1, tmptxt2, tmptxt3
@@ -780,55 +780,30 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     select case (code)
 
      case (code_rbend, code_sbend)
-      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-      
       anglet = node_value('angle ')
-
-      newk0 = (1+pttemp)*anglet/el
-
-      print *, "bbbbbbb1", newk0, orbit(6), el, anglet, orbit(1)
-      !newk0 = newk0+orbit(1)/(2*el)
-      call store_node_value('k0 ',newk0 )
-      orbit = orbitori
-      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-      pttemp = (orbit(6)+orbitori(6))/2
-      newk0 = (1+pttemp)*(anglet)/el
-      call store_node_value('k0 ',newk0 )
-
-
-      orbit = orbitori
-      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-      pttemp = (orbit(6)+orbitori(6))/2
-      newk0 = (1+pttemp)*(anglet)/el
-      call store_node_value('k0 ',newk0 )
-      print *, "bbbbbbb2", newk0, orbit(6), el, anglet, orbit(1)
-
-      orbit = orbitori
-      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-      pttemp = (orbit(6)+orbitori(6))/2
-      newk0 = (1+pttemp)*(anglet)/el
-      call store_node_value('k0 ',newk0 )
-      print *, "bbbbbbb2", newk0, orbit(6), el, anglet, orbit(1)
-
+      do i=1,3
+        call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
+        pttemp = (orbit(6)+orbitori(6))/2
+        newk0 = (1+pttemp)*anglet/el
+        call store_node_value('k0 ',newk0 )
+        orbit = orbitori
+  	  enddo
+      
      case (code_quadrupole)
       call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
       pttemp = (orbit(6)+orbitori(6))/2
-      print *, "eeeee", (orbit(6)+orbitori(6))/2
       anglet = node_value('k1 ')
-      newk0 = (1+pttemp)*anglet-anglet
+      newk0 = anglet/(1-pttemp)-anglet
       call store_node_value('k1tap ',newk0 )
-      !print *, "quadrupoleeee", newk0
 
      case (code_sextupole)
       call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
       pttemp = (orbit(6)+orbitori(6))/2
       anglet = node_value('k2 ')
-      newk0 = (1+pttemp)*anglet - anglet
-      !print *, "bbbbbbb", newk0, orbit(6), el, anglet
+      newk0 = anglet/(1-pttemp) - anglet
       call store_node_value('k2tap ',newk0 )  
     end select
     orbit = orbitori
-
   endif
 
   call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
@@ -976,12 +951,11 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      node=node+1
      goto 10 ! loop over nodes
   endif
-  !endpt = orbit(6) !*pc+energy
+
 
   if(orbit(6) .gt. 1e-10 .and. istaper) then
     endpt=endpt+orbit(6)
     orderrun = orderrun+1
-    print *, "kkkkk",endpt
     goto 111
   endif
   bbd_flag=0
@@ -5369,10 +5343,6 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   elpar_vl = el_par_vector(q_k1t, g_elpar)
   bvk = node_value('other_bv ')
   sk1  = bvk * ( g_elpar(q_k1)  + g_elpar(q_k1t) + f_errors(2)/el)
-  print *, "vvv", g_elpar(q_k1t)
-	 if(sk1 .gt. 10) then
-	  print *, "tteest", sk1
-	 endif
   sk1s = bvk * ( g_elpar(q_k1s) + f_errors(3)/el)
   tilt = g_elpar(q_tilt)
   if (sk1s .ne. zero) then
@@ -6435,7 +6405,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   integer, external :: el_par_vector, get_ncavities
 
   !-- get element parameters
-  elpar_vl = el_par_vector(r_freq, g_elpar)
+  elpar_vl = el_par_vector(r_lagt, g_elpar)
 
   !---- Fetch voltage.
   rfv = g_elpar(r_volt)
@@ -6455,7 +6425,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
   !---- BV flag
   rff = g_elpar(r_freq)
-  rfl = g_elpar(r_lag)
+  rfl = g_elpar(r_lag) +  g_elpar(r_lagt)
   bvk = node_value('other_bv ')
 
   !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
@@ -6473,8 +6443,8 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   if(istaper .and. ftrk) then
     ncav = get_ncavities()   
     phirf = asin((sin(pi*half)*vrf - endpt/ncav)/vrf)
-    tmpphase = (phirf+omega*orbit(5))/twopi
-    call store_node_value('lag ', tmpphase)
+    tmpphase = (phirf+omega*orbit(5))/twopi-g_elpar(r_lag)
+    call store_node_value('lagtap ', tmpphase)
   endif
   
   c0 =   vrf * sin(phirf)

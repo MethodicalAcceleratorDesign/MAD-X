@@ -427,7 +427,7 @@ module twiss_elpfi
   !-sol
   integer, parameter :: so_lrad=7, so_ks=8, so_ksi=9
   !-rfc
-  integer, parameter :: r_volt=7, r_lag=8, r_freq=9
+  integer, parameter :: r_volt=7, r_lag=8, r_freq=9, r_lagt=10
   !-elsep
   integer, parameter :: e_tilt=7, e_ex=8, e_ey=9
   !-hkick
