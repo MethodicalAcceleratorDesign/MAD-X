@@ -100,6 +100,9 @@ extern const char* const ptcnodetrack_table_cols[];
 extern const int         trackloss_table_types[];
 extern const char* const trackloss_table_cols[];
 
+extern const char* const dist_table_cols[];
+extern const int         dist_table_types[];
+
 extern const int         dynap_table_types[];
 extern const char* const dynap_table_cols[];
 extern const int         dynaptune_table_types[];
