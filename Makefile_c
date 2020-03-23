@@ -16,15 +16,18 @@
 # | $Id$
 # |
 
-vpath %.h src
-vpath %.c src
+vpath %.h src libs/DISTlib/source
+vpath %.c src libs/DISTlib/source
 vpath %.d $(OBJDIR)
 
-CC_HDR := $(notdir $(wildcard src/mad_*.h))
-CC_SRC := $(notdir $(wildcard src/mad_*.c))
+CC_HDR :=$(notdir $(wildcard libs/DISTlib/source/*.h src/mad_*.h)) 
+CC_SRC :=$(notdir $(wildcard libs/DISTlib/source/*.c src/mad_*.c)) 
+
 
 CC_HDR += madx.h SDDS.h
 CC_SRC +=
+
+
 
 # files specific dependency flags
 $(OBJDIR)/mad_gxx11c.d: CPPFLAGS += $(call incdir,/usr/X11/include /opt/X11/include)
