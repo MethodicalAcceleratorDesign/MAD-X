@@ -6,7 +6,6 @@
 #include "distinterface.h"
 #include "distgeneration.h"
 #include "outputdist.h"
-#include "file_reader.h"
 
 
 /*
@@ -241,7 +240,7 @@ void get6trackcoord(double *x, double *xp, double *y, double *yp, double *sigma,
         nparticles = *totparticles;
 
     for(int i=0; i < nparticles; i++){
-        canonical2six(dist->outcoord[i]->coord, dist->ref->beta0, dist->ref->pc0, dist->ref->mass0, dist->incoord[i]->mass, tmp);
+        canonical2six(dist->outcoord[i]->coord, dist->ref->beta0, dist->ref->pc0, dist->incoord[i]->mass, tmp);
         x[i]  = tmp[0];
         xp[i] = tmp[1];
         y[i]  = tmp[2];
@@ -253,7 +252,6 @@ void get6trackcoord(double *x, double *xp, double *y, double *yp, double *sigma,
 }
 
 void getunconvertedcoord(double *x, double *xp, double *y, double *yp, double *sigma, double *deltap, int *totparticles){
-    double tmp[6];
     int nparticles;
     if(dist->isDistrcalculated ==0){
         gensixcanonical();
@@ -296,19 +294,20 @@ void readtasmatrixfile(const char*  filename_in){
 
 
 void getrefpara(double *energy0, double *mass0, int *a0, int *z0){
-    *energy0=dist->ref->e0;
-    *mass0=dist->ref->mass0;
-    *a0=dist->ref->a0;
-    *z0=dist->ref->z0;
+    *energy0= dist->ref->e0;
+    *mass0  = dist->ref->mass0;
+    *a0     = dist->ref->a0;
+    *z0     = dist->ref->z0;
 }
-int readfile_f(const char*  filename_in, int strlen){
+/*
+void readfile_f(const char*  filename_in, int strlen){
     char filename [strlen];
     strncpy(filename, filename_in, strlen);
     filename[strlen] = '\0';
     readfile(filename);
-}
+}*/
 
-int writefile_f(const char*  filename_in, int strlen){
+void writefile_f(const char*  filename_in, int strlen){
     char filename [strlen];
     strncpy(filename, filename_in, strlen);
     filename[strlen] = '\0';

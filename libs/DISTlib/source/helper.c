@@ -9,7 +9,7 @@
 #include "outputdist.h"
 
 /*This function converts from canoncial to sixtrack tracking variables*/
-void canonical2six(double *canonical, double beta0, double pc0, double mass0, double mass, double *coord){
+void canonical2six(double *canonical, double beta0, double pc0,  double mass, double *coord){
     double deltap = canonical[5];
     double beta = (pc0+deltap)/momentum2energy((pc0+deltap), mass);
     double rv = beta0/beta;
@@ -126,8 +126,7 @@ void solve2by2eq(double a1, double b1, double c1, double a2, double b2, double c
 void mtrx_vector_mult_pointer(int mp, int np,  double **mtrx_a, double mtrx_b[6], double result[6])
 {
 
-    int m = mp;
-    int n = np;
+
     result[0]=0;
     result[1]=0;
     result[2]=0;
@@ -135,7 +134,7 @@ void mtrx_vector_mult_pointer(int mp, int np,  double **mtrx_a, double mtrx_b[6]
     result[4]=0;
     result[5]=0;
 
-    register int i=0, j=0, k=0;
+    register int i=0, k=0;
     for (i = 0; i < mp; i++)
     {
             for (k = 0; k < np; k++)
