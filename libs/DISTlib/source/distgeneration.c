@@ -176,7 +176,6 @@ int particle_within_limits_physical(double *physical){
 int particle_with_limits_action(int i, double value){
     
     if(dist->cuts2apply->action[i]->isset==1){
-    printf("iiiiiii %d \n", dist->cuts2apply->action[i]->isset);
         if(value > pow(dist->cuts2apply->action[i]->min,2) && value < pow(dist->cuts2apply->action[i]->max,2)) return 1;
         else return 0;
     }
@@ -205,7 +204,6 @@ void createcoordinates(int index,  double start, double stop, int length, int ty
     	for(int i=0;i <length; i++){
         	dist->incoord[i]->coord[index] = start;
     	}
-        printf("tttttttttttttttt %d %f \n", index, start);
     return;
     }
    
@@ -234,7 +232,6 @@ void createcoordinates(int index,  double start, double stop, int length, int ty
     else if(type==4){ // uniform random 
         for(int i=0;i <length; i++){
             dist->incoord[i]->coord[index] = rand_uni(start, stop);
-            //printf("%f \n", dist->coord[index-1]->values[i] );
         }
     }
 
@@ -253,7 +250,7 @@ void createcoordinates(int index,  double start, double stop, int length, int ty
                 tmp = randray(start, stop);
 
             dist->incoord[i]->coord[index] = tmp;
-            printf("%f \n", sqrt(tmp/2));
+            //printf("%f \n", sqrt(tmp/2));
         }
     }
     else
