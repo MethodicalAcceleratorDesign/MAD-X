@@ -1,0 +1,1371 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.03.03 16:43:22      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+!
+
+! Script to rematch beta functions on VESPER
+
+!
+
+! Sept 2017 - davide 
+
+
+
+! build sequence and load nominal currents
+
+call, file="../share/CLEAR/clear.seqx";
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! MAD SEQUENCE OF CLEAR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!
+
+! V0 - Sept 2016:
+
+!      First version based on Matlab model of Wilfrid (Davide Gamba)
+
+!
+
+! V1 - 09/02/2017:
+
+!      by Sumaira Zeeshan (CERN) and Davide Gamba (CERN)
+
+!
+
+! V2 - 20/02/2017:
+
+!      Addition of Corrector Calibration factors and adjustment of
+
+!      correctors lengths
+
+!
+
+! V3 - 20/04/2017 (DG):
+
+!      New redefinition adding Califes injector from old files.
+
+!      Dropping previous definition based on drifts and lines.
+
+!
+
+! V4 - 21/04/2017 (SZ):
+
+!      Minor adjustmens according to old geode.
+
+!      DG: changed a few names, added a few elements.
+
+!
+
+! V5 - 12/05/2017 (DG):
+
+!      Adding a BPM and a corrector after the plasma cell experiment.
+
+!
+
+! V6 - 10/11/2017 (DG)
+
+!      Adding some more parameters. Adding calibration of correctors.
+
+!      Moved some scripts.
+
+!      Still need to verify positioning of devices according to GEODE
+
+!
+
+! V7 - 19/01/2018 (DG)
+
+!      Added new doublet at the end of the line.
+
+!      Adjusted average position according to GEODE
+
+!       =>added +4 mm on the reference point in survey file.
+
+!
+
+! V8 - May 2019 (KNS)
+
+!      Updated section between 5xx triplet and CLIC ACS,
+
+!      based on measurements by Antonio Gilardi, Wilfrid Farabolini, and Kyrre Sjobak.
+
+!      Also reformatted the seqx file for readability.
+
+!      Some elements were renamed:
+
+!      - CLIC structures are now ACX instead of ACS and have a length
+
+!      - CA.BPM0560 -> CA.BPM0595 (element moved)
+
+!      - CA.BPC0565 -> CA.BPC0610 (element moved)
+
+!      - CA.WCM0550 -> CA.WCM0555 (number used twice for elements not in same location)
+
+!      The camera CA.BTV0620 was added
+
+!      All ICTs are now included
+
+!      CA.DHJ0590 was moved upstream to have the BPMs after the bump, not inside it.
+
+
+
+!      
+
+
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Calibration constants !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+! -- Quadrupoles (from?) ----------------------------------------------
+
+
+
+ECQD    = 0.056;            ! excitation constant dB/dx/I = 0.056 T/Am
+
+FQD     = CLIGHT*1E-6*ECQD; ! for new QL3 type, QXD, water cooled
+
+
+
+! -- Correctors -------------------------------------------------------
+
+
+
+! Caluculation:
+
+!    From rigidity: kick = l_mag[m] * B[T] / (3.3356 p [GeV/c])
+
+!    So our CORRCALIB = l_mag[m] * (dB/dI) [T/A] / (3.3356/1000). ! /1000 because we use MeV.
+
+
+
+! On CALIFES we have two types of correctors, one with 40 and one with 120 windings
+
+!  120 windings:
+
+!    l_mag = 164 mm
+
+!    B(I) = 13.3 Gauss/A
+
+KG.CORRCALIB = 0.164 * 0.00133/(3.3356/1000); ! 0.06539
+
+
+
+!  40 windings:
+
+!    l_mag = 160 mm
+
+!    B(I) = 4.4 Gauss/A
+
+KGS.CORRCALIB = 0.160 * 0.00044/(3.3356/1000); ! 0.02111
+
+
+
+! On the LIL structures there are dipolar corrector windings,
+
+! but only on the first structure they are powered.
+
+! No information found about their strenght. Assuming here a "random" number.
+
+KB.CORRCALIB = 0.1;
+
+
+
+! On CLEAR we have J type correctors
+
+! Values from http://ctf3-tbts.web.cern.ch/ctf3-tbts/beams/Rapport_correcteur_DJ.pdf
+
+!    l_mag = 0.248 m
+
+!    B(I) = 0.0018 T/A
+
+KJ.CORRCALIB = 0.248 * 0.0018/(3.3356/1000); ! 0.13383
+
+
+
+! S-BAND transverse deflector
+
+CA.GSDH0340 = 0.0; ! Gradient -- no info found so far (Davide Nov2017)
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Elements !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+! -- LIL accelerating structures -----------------------------------------------
+
+L_ACS_LIL = 4.572;
+
+CA.ACS0230 : DRIFT,      L=L_ACS_LIL;
+
+CA.ACS0250 : DRIFT,      L=L_ACS_LIL;
+
+CA.ACS0270 : DRIFT,      L=L_ACS_LIL;
+
+CA.ACS0230E: marker;
+
+CA.ACS0230S: marker;
+
+CA.ACS0250E: marker;
+
+CA.ACS0250S: marker;
+
+CA.ACS0270E: marker;
+
+CA.ACS0270S: marker;
+
+
+
+! -- CLIC accelerating structures
+
+!TODO: 645 is the WFM; 640 and 650 are the accelerating structures,
+
+! which have a length...
+
+!CA.ACS0645: monitor, L=0;
+
+L_ACX = 0.234;        ! Length of the CLIC structures,       1/10-18
+
+L_ACX_module = 0.479; ! Length of the  CLIC superstructure, 30/ 4-19
+
+CA.ACX0640: DRIFT, L=L_ACX;
+
+CA.ACX0650: DRIFT, L=L_ACX;
+
+CA.WFM0645: monitor, L=0;
+
+CA.RMN0700: monitor, L=0; !Radiation monitor
+
+
+
+! -- Dipole bending magnets ----------------------------------------------------
+
+
+
+! 20.04.2017:
+
+!   magnetic lenght to 0.4713 instead of 0.471 from old Frank's MADX
+
+!   addeded positioning correction
+
+! 29.03.2018:
+
+!   CA.BHB0400 is installed @17.5deg   with respect to the straight line
+
+!      This means it is not a real RBEND, but an SBAND with tilted entrance..
+
+!      This should be corrected in the model!
+
+!   CA.BHB0900 is installed @11.355deg with respect to the straight line
+
+!   The current calibration for the magnet should be:
+
+!      dB/dI = 0.008583  T/I and for magnetic length Lm = 0.4712 m
+
+!      According to EDMS #1133503
+
+CA.ANG0400 = -17.5  * twopi/360;
+
+CA.ANG0900 = -22.75 * twopi/360;
+
+CA.LBHB = 0.4713;
+
+
+
+CA.BHB0400: RBEND, L= CA.LBHB, ANGLE = CA.ANG0400;
+
+CA.BHB0900: RBEND, L= CA.LBHB, ANGLE = CA.ANG0900;
+
+
+
+! Positioning correction (Frank 2008):
+
+CA.LCOR0400 = CA.LBHB/2 * ( 1/cos(CA.ANG0400/2) - CA.ANG0400/2/sin(CA.ANG0400/2) );
+
+
+
+! -- Quadrupoles ---------------------------------------------------------------
+
+! note: currently all limited 0-200A current
+
+! 20.04.2017: in old MAD they where L=0.220
+
+L_Q = 0.226; !Magnetic length of QUAD
+
+CA.QUAD: QUADRUPOLE, L=L_Q;
+
+
+
+CA.QFD0350: CA.QUAD, k1 := CA.KQFD0350;
+
+CA.QDD0355: CA.QUAD, k1 := CA.KQDD0355;
+
+CA.QFD0360: CA.QUAD, k1 := CA.KQFD0360;
+
+CA.QFD0510: CA.QUAD, k1 := CA.KQFD0510;
+
+CA.QDD0515: CA.QUAD, k1 := CA.KQDD0515;
+
+CA.QFD0520: CA.QUAD, k1 := CA.KQFD0520;
+
+CA.QFD0760: CA.QUAD, k1 := CA.KQFD0760;
+
+CA.QDD0765: CA.QUAD, k1 := CA.KQDD0765;
+
+CA.QFD0770: CA.QUAD, k1 := CA.KQFD0770;
+
+CA.QDD0870: CA.QUAD, k1 := CA.KQDD0870;
+
+CA.QFD0880: CA.QUAD, k1 := CA.KQFD0880;
+
+!
+
+CA.KQFD0350 := CA.IQFD0350 * (FQD / CA.EN);
+
+CA.KQDD0355 :=-CA.IQDD0355 * (FQD / CA.EN);
+
+CA.KQFD0360 := CA.IQFD0360 * (FQD / CA.EN);
+
+CA.KQFD0510 := CA.IQFD0510 * (FQD / CA.EN);
+
+CA.KQDD0515 :=-CA.IQDD0515 * (FQD / CA.EN);
+
+CA.KQFD0520 := CA.IQFD0520 * (FQD / CA.EN);
+
+CA.KQFD0760 := CA.IQFD0760 * (FQD / CA.EN);
+
+CA.KQDD0765 :=-CA.IQDD0765 * (FQD / CA.EN);
+
+CA.KQFD0770 := CA.IQFD0770 * (FQD / CA.EN);
+
+CA.KQDD0870 :=-CA.IQDD0870 * (FQD / CA.EN);
+
+CA.KQFD0880 := CA.IQFD0880 * (FQD / CA.EN);
+
+
+
+! -- Plasma lens ---------------------------------------------------------------
+
+CA.ECPLC    = 1.1;                  ! excitation constant dB/dx/I = 1.1 T/Am
+
+CA.FPLC     = CLIGHT*1E-6*CA.ECPLC; ! conversion to k1 for plasma lens cell
+
+CA.LPLC     = 0.03;                 ! Length plasma lens cell
+
+CA.PLC0800A: QUADRUPOLE, L = CA.LPLC/2, k1 := CA.KPLC0800;
+
+CA.PLC0800B: QUADRUPOLE, L = CA.LPLC/2, k1 := CA.KPLC0800;
+
+CA.KPLC0800 := CA.IPLC0800 * (CA.FPLC / CA.EN);
+
+CA.KPLC0800 := CA.IPLC0800 * (CA.FPLC / CA.EN);
+
+++++++ info: ca.kplc0800 redefined
+
+
+! Plasma lens Start & Middle & End:
+
+CA.PLC0800S: MARKER;
+
+CA.PLC0800M: MARKER;
+
+CA.PLC0800E: MARKER;
+
+
+
+! -- S-BAND transverse deflector -----------------------------------------------
+
+CA.SDH0340: HKICKER, hkick:=CA.KSDH0340, L=0.116;
+
+CA.KSDH0340 := 0.116*CA.GSDH0340 / CA.EN;
+
+
+
+! -- Correctors ----------------------------------------------------------------
+
+! note: currently all limited -10A - +10A current
+
+
+
+! Horizontal and vertical kickers
+
+L_KJ = 0.1;
+
+L_KG = 0.145;
+
+CA.DHG0130: KICKER, L=L_KG,  hkick:=CA.KDHG0130, vkick:=CA.KDVG0130;
+
+CA.DHG0225: KICKER, L=L_KG,  hkick:=CA.KDHG0225, vkick:=CA.KDVG0225;
+
+CA.DHB0230: KICKER, L=0.000, hkick:=CA.KDHB0230, vkick:=CA.KDVB0230; ! winding along buncher structure
+
+CA.DHG0245: KICKER, L=L_KG,  hkick:=CA.KDHG0245, vkick:=CA.KDVG0245;
+
+CA.DHG0265: KICKER, L=L_KG,  hkick:=CA.KDHG0265, vkick:=CA.KDVG0265;
+
+CA.DHG0320: KICKER, L=L_KG,  hkick:=CA.KDHG0320, vkick:=CA.KDVG0320;
+
+CA.DHG0385: kicker, L=L_KG,  hkick:=CA.KDHG0385, vkick:=CA.KDVG0385;
+
+
+
+CA.DHJ0540: kicker, L=L_KJ,  hkick:=CA.KDHJ0540, vkick:=CA.KDVJ0540;
+
+CA.DHJ0590: kicker, L=L_KJ,  hkick:=CA.KDHJ0590, vkick:=CA.KDVJ0590;
+
+CA.DHJ0710: kicker, L=L_KJ,  hkick:=CA.KDHJ0710, vkick:=CA.KDVJ0710;
+
+CA.DHJ0780: kicker, L=L_KJ,  hkick:=CA.KDHJ0780, vkick:=CA.KDVJ0780;
+
+CA.DHJ0840: kicker, L=L_KJ,  hkick:=CA.KDHJ0840, vkick:=CA.KDVJ0840;
+
+
+
+!Horizontal kick strengths
+
+CA.KDHG0130 := CA.IDHG0130 * KGS.CORRCALIB / CA.EN;
+
+CA.KDHG0225 := CA.IDHG0225 * KGS.CORRCALIB / CA.EN;
+
+CA.KDHB0230 := CA.IDHB0230 * KB.CORRCALIB / CA.EN;
+
+CA.KDHG0245 := CA.IDHG0245 * KG.CORRCALIB / CA.EN;
+
+CA.KDHG0265 := CA.IDHG0265 * KG.CORRCALIB / CA.EN;
+
+CA.KDHG0320 := CA.IDHG0320 * KG.CORRCALIB / CA.EN;
+
+CA.KDHG0385 := CA.IDHG0385 * KG.CORRCALIB / CA.EN;
+
+
+
+CA.KDHJ0540 := CA.IDHJ0540 * KJ.CORRCALIB / CA.EN;
+
+CA.KDHJ0590 := CA.IDHJ0590 * KJ.CORRCALIB / CA.EN;
+
+CA.KDHJ0710 := CA.IDHJ0710 * KJ.CORRCALIB / CA.EN;
+
+CA.KDHJ0780 := CA.IDHJ0780 * KJ.CORRCALIB / CA.EN;
+
+CA.KDHJ0840 := CA.IDHJ0840 * KJ.CORRCALIB / CA.EN;
+
+
+
+! Vertical kick strenghts
+
+CA.KDVG0130 := CA.IDVG0130 * KGS.CORRCALIB / CA.EN;
+
+CA.KDVG0225 := CA.IDVG0225 * KGS.CORRCALIB / CA.EN;
+
+CA.KDVB0230 := CA.IDVB0230 * KB.CORRCALIB / CA.EN;
+
+CA.KDVG0245 := CA.IDVG0245 * KG.CORRCALIB / CA.EN;
+
+CA.KDVG0265 := CA.IDVG0265 * KG.CORRCALIB / CA.EN;
+
+CA.KDVG0320 := CA.IDVG0320 * KG.CORRCALIB / CA.EN;
+
+CA.KDVG0385 := CA.IDVG0385 * KG.CORRCALIB / CA.EN;
+
+
+
+CA.KDVJ0540 := CA.IDVJ0540 * KJ.CORRCALIB / CA.EN;
+
+CA.KDVJ0590 := CA.IDVJ0590 * KJ.CORRCALIB / CA.EN;
+
+CA.KDVJ0710 := CA.IDVJ0710 * KJ.CORRCALIB / CA.EN;
+
+CA.KDVJ0780 := CA.IDVJ0780 * KJ.CORRCALIB / CA.EN;
+
+CA.KDVJ0840 := CA.IDVJ0840 * KJ.CORRCALIB / CA.EN;
+
+
+
+! -- BPMs ----------------------------------------------------------------------
+
+! Type BPM = inductive BPM; BPC = cavity BPM (CALIFES or CLIC)
+
+CA.BPC0220 : MONITOR, L=0;
+
+CA.BPC0240 : MONITOR, L=0;
+
+CA.BPC0260 : MONITOR, L=0;
+
+CA.BPC0310 : MONITOR, L=0;
+
+
+
+CA.BPC0348 : MONITOR, L=0;
+
+CA.BPC0380 : MONITOR, L=0;
+
+CAS.BPM0410: MONITOR, L=0; ! not installed
+
+CA.BPM0530 : MONITOR, L=0;
+
+CA.BPM0595 : MONITOR, L=0; ! Was: CA.BPM0560
+
+CA.BPC0610 : MONITOR, L=0; ! Was: CA.BPC0565
+
+CA.BPC0720 : MONITOR, L=0;
+
+CA.BPC0790 : MONITOR, L=0;
+
+CA.BPM0820 : MONITOR, L=0;
+
+CAS.BPM0920: MONITOR, L=0;
+
+! CLIC cavity BPMs:
+
+CA.BPC0660 : MONITOR, L=0; ! ref cavity
+
+CA.BPC0670 : MONITOR, L=0; ! actual BPM
+
+CA.BPC0680 : MONITOR, L=0; ! actual BPM
+
+CA.BPC0690 : MONITOR, L=0; ! actual BPM
+
+
+
+! -- screens -------------------------------------------------------------------
+
+CA.BTVEOS:  monitor, L=0;
+
+CA.BTV0215:  monitor, L=0;
+
+CA.BTV0390:  monitor, L=0;
+
+CA.BTV0545:  monitor, L=0;
+
+CA.BTV0620:  monitor, L=0;
+
+CA.BTV0730:  monitor, L=0;
+
+CA.BTV0800:  monitor, L=0;
+
+CA.BTV0810:  monitor, L=0;
+
+CA.BTV0910:  monitor, L=0;
+
+CAS.BTV0420: monitor, L=0;
+
+CAS.BTV0930: monitor, L=0;
+
+
+
+! -- Other instrumentation -----------------------------------------------------
+
+CA.ICT0210  : MONITOR, L=0; ! Inductive current transformer
+
+CAS.ICT0430 : MONITOR, L=0; ! Inductive current transformer
+
+CA.ICT0915  : MONITOR, L=0; ! Inductive current transformer
+
+
+
+CA.WCM0555  : MONITOR, L=0; ! Wall current monitor,
+
+                            ! formerly known as 550, however that name is
+
+                            ! also used for a pile of vacuum equipment.
+
+CA.BPR0600  : MONITOR, L=0; ! BPR
+
+CA.WFM0645  : MONITOR, L=0; ! Wake Field Monitor in CLIC structure
+
+++++++ info: element redefined: ca.wfm0645
+
+
+! -- Other useful markers ------------------------------------------------------
+
+CA.QS0350: marker; ! quadscan location triplet 350-360
+
+CA.QS0510: marker; ! quadscan location triplet 510-520
+
+CA.QS0760: marker; ! quadscan location triplet 760-770
+
+CA.QS0870: marker; ! quadscan location doublet 870-880
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! SEQUENCES section (used to build up the full line in various variations) !!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Remember that MAD-X "SEQUENCE" has as default reference point the centre of the element.
+
+
+
+! -- CA.CALIFES ----------------------------------------------------------------
+
+! from RFgun to CA.BTV0390 included.
+
+!
+
+! Based on: Survey file for the CALIFES line in CTF3 - CLEX
+
+!
+
+! F. Tecker
+
+! 25 Jan 2008
+
+!
+
+! Based on an initial MAD-X sequence generated by Michel Fontaine
+
+!
+
+! Verified with the plan 71 E022 DM- 0080 000 RG
+
+! that shows the whole CALIFES line (provided by N.Chritin)
+
+!
+
+! The bending magnet placement is designed such that the
+
+! following elements do not move their position if the length
+
+! of the bend is changed in the file.
+
+! The placement in a MAD-X sequence uses the path length for
+
+! the positioning.
+
+! As I have given the crossing point of the tangents for the
+
+! spectrometer line (at 21.2454m from the cathode), the position
+
+! in the sequence has to be corrected by the straight length
+
+! that is in the bend (L/[2cos(a/2)]),
+
+! i.e. 1/2 the arc length s = L*a/2/sin(a/2)
+
+!
+
+! The same offset has to be applied for the elements following
+
+! the bend with relative placement.
+
+!
+
+! The positioning was verified for the coordinates of CAS.MTV0420
+
+! (for almost 0 and real length of the bend)
+
+!
+
+! Modified 25.03.2008 (FT):
+
+!    Quad length changed to 0.220 m (as in linac and TBTS files)
+
+! Modified 20.04.2017 (DG):
+
+!    The elements are defined above and I finish with last MTV.
+
+!    An additional spectro line is defined for that: CA.CADUMP
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+S_QFD0350_M = 18.454;  ! Taken as Ref for measurements in the machine (DG 20.04.2017)
+
+L_CALIFES   = 20.5920; ! Length of Califes, from the cathode to BTV0390
+
+
+
+CA.CALIFES : SEQUENCE, L=L_CALIFES;
+
+CA.DHG0130,  AT=  0.317  ;
+
+CA.ICT0210,  AT=  1.4996 ;
+
+CA.BTV0215,  AT=  1.8095 ; ! value changed according to GEODE file, previosly written as 1.4996
+
+CA.BPC0220,  AT=  2.057  ;
+
+CA.DHG0225,  AT=  2.1765 ;
+
+CA.ACS0230E, AT=  4.6364 - L_ACS_LIL/2 ;
+
+CA.DHB0230,  AT=  4.6364 - L_ACS_LIL/2 ; ! winding
+
+CA.ACS0230,  AT=  4.6364 ;
+
+CA.ACS0230S, AT=  4.6364 + L_ACS_LIL/2 ;
+
+CA.BPC0240,  AT=  7.2156 ;
+
+CA.DHG0245,  AT=  7.3321 ;
+
+CA.ACS0250E, AT=  9.7951 - L_ACS_LIL/2 ;
+
+CA.ACS0250,  AT=  9.7951 ;
+
+CA.ACS0250S, AT=  9.7951 + L_ACS_LIL/2 ;
+
+CA.BPC0260,  AT= 12.3744 ;
+
+CA.DHG0265,  AT= 12.4909 ;
+
+CA.ACS0270E, AT= 14.9539 - L_ACS_LIL/2 ;
+
+CA.ACS0270,  AT= 14.9539 ;
+
+CA.ACS0270S, AT= 14.9539 + L_ACS_LIL/2 ;
+
+CA.BPC0310,  AT= 17.5882 ;
+
+CA.DHG0320,  AT= 17.7047 ;
+
+CA.SDH0340,  AT= 17.923  ;
+
+CA.QS0350,   AT= S_QFD0350_M - L_Q/2 ;
+
+CA.QFD0350,  AT= S_QFD0350_M  ;
+
+CA.QDD0355,  AT= 18.904  ;
+
+CA.QFD0360,  AT= 19.354  ;
+
+CA.BTVEOS,   AT= S_QFD0350_M - L_Q/2 + 1.276;
+
+CA.BPC0380,  AT= S_QFD0350_M - L_Q/2 + 1.515;
+
+CA.DHG0385,  AT= S_QFD0350_M - L_Q/2 + 1.622;
+
+CA.BTV0390,  AT= S_QFD0350_M - L_Q/2 + 2.251;
+
+ENDSEQUENCE;
+
+
+
+! -- dump sequence to be added to CA.CALIFES -----------------------------------
+
+L_CALIFESDUMP = 22.5 - L_CALIFES;
+
+CA.CADUMP : SEQUENCE, l=L_CALIFESDUMP;
+
+CA.BHB0400, AT=(21.2454 - L_CALIFES) - CA.LCOR0400;
+
+!CA.TEST    : MONITOR, L=0, AT=1-CA.LCOR0400, FROM=CA.BHB0400;
+
+CAS.BPM0410, AT= 0.5034 -CA.LCOR0400, FROM=CA.BHB0400 ;
+
+CAS.BTV0420, AT= 0.74765-CA.LCOR0400, FROM=CA.BHB0400 ;
+
+CAS.ICT0430, AT= 0.8-CA.LCOR0400, FROM=CA.BHB0400 ; ! random position (Nov2017)
+
+ENDSEQUENCE;
+
+
+
+! -- CLEAR main sequence. -----------------------------------------------------
+
+! To be added to CA.CALIFES to go straight.
+
+! From  CA.BTV0390 (excluded) (2.251 from CA.QFD0350_Entre)
+
+! Up to end of CA.QFD0880 (included)
+
+
+
+!Mechanical thickness of elements
+
+L_Q_mech  = 0.2;     !Quadrupole
+
+L_KJ_mech = 0.101;   !J-type corrector "frame"
+
+L_iBPM_mech = 0.120; !Inductive BPM
+
+L_cBPM_CLIC_mech = 0.047; !CLIC cavity BPM
+
+
+
+L_350E  = 2.251;                 !Distance from CA.QFD0350_Entre to start of CA.CLEAR
+
+L_350S  = L_350E-L_Q_mech+0.187; !Distance from CA.QFD0350_Sortie to start of CA.CLEAR;
+
+                                 ! TODO: 0.187 is a "correction factor" to make the measurements the same as what was given from the Wilfrid survey...
+
+L_CLEAR = 13.894;
+
+
+
+CA.CLEAR : SEQUENCE, L=L_CLEAR;
+
+CA.QS0510,   AT=  4.020 - L_350E - L_Q/2 ;
+
+CA.QFD0510,  AT=  4.020 - L_350E;
+
+CA.QDD0515,  AT=  4.520 - L_350E;
+
+CA.QFD0520,  AT=  5.020 - L_350E;
+
+CA.BPM0530,  AT=  0.253+L_Q_mech/2+L_iBPM_mech/2,            FROM=CA.QFD0520;   !Measurement 30/4-2019
+
+CA.DHJ0540,  AT=  0.569+L_Q_mech/2-L_KJ_mech/2,              FROM=CA.QFD0520;   !Measurement 30/4-2019
+
+CA.BTV0545,  AT=  0.796+L_Q_mech/2-0.065/2,                  FROM=CA.QFD0520;   !Measurement 30/4-2019
+
+CA.WCM0555,  AT=  1.7965+L_Q_mech/2-L_KJ_mech - 0.2,         FROM=CA.QDD0515;   !Measurement 30/4-2019,
+
+                                                                                ! reference was DHJ550 entry
+
+CA.DHJ0590,  AT=  1.7965+L_Q_mech/2-L_KJ_mech/2,             FROM=CA.QFD0520;   !Measurement 30/4-2019
+
+CA.BPM0595,  AT=  0.132+L_KJ_mech/2+L_iBPM_mech/2,           FROM=CA.DHJ0590;   !Measurement 30/4-2019
+
+CA.BPR0600,  AT=  0.140-0.080/2,                             FROM=CA.BPM0595;   !Measurement 30/4-2019
+
+CA.BPC0610,  AT=  0.246+L_iBPM_mech/2,                       FROM=CA.BPM0595;   !Measurement 30/4-2019, +/- ca 1 mm
+
+CA.BTV0620,  AT=  2.618-0.070/2+L_Q_mech/2,                  FROM=CA.QFD0520;   !Measurement 30/4-2019
+
+CA.ACX0640,  AT=  2.905+L_Q_mech/2+L_ACX/2,                  FROM=CA.QFD0520;   !Measurement 30/4-2019
+
+CA.WFM0645,  AT=  0.001+L_ACX/2,                             FROM=CA.ACX0640;   !Stick it somehwere
+
+                                                                                ! in the middle of the two ACX'es
+
+CA.ACX0650,  AT=  3.383+L_Q_mech/2-L_ACX/2,                  FROM=CA.QFD0520;   !Measurement 30/4-2019
+
+CA.BPC0660,  AT=  0.142+L_ACX/2+L_cBPM_CLIC_mech/2,          FROM=CA.ACX0650;   !Measurement 30/4-2019
+
+CA.BPC0670,  AT=  0.303+L_ACX/2+L_cBPM_CLIC_mech/2,          FROM=CA.ACX0650;   !Measurement 30/4-2019
+
+CA.BPC0680,  AT=  0.502+L_ACX/2+L_cBPM_CLIC_mech/2,          FROM=CA.ACX0650;   !Measurement 30/4-2019
+
+CA.BPC0690,  AT=  0.714+L_ACX/2+L_cBPM_CLIC_mech/2,          FROM=CA.ACX0650;   !Measurement 30/4-2019
+
+CA.RMN0700,  AT=  1.305+L_ACX/2,                             FROM=CA.ACX0650;   !Measurement 30/4-2019
+
+CA.DHJ0710,  AT=  2.999-L_KJ_mech/2-L_ACX/2,                 FROM=CA.ACX0640;   !Measurement 30/4-2019
+
+CA.BPC0720,  AT=  3.440-0.122-L_ACX/2-0.225,                 FROM=CA.ACX0640;   !Measurement 30/4-2019,
+
+                                                                                ! reference was BTV730 entry
+
+CA.BTV0730,  AT=  3.440-0.122/2-L_ACX/2,                     FROM=CA.ACX0640;   !Measurement 30/4-2019
+
+CA.QS0760,   AT= 11.827 - L_350E - L_Q/2;                                       !Set to be at beginning of quadrupole;
+
+                                                                                ! quad scan measurement point.
+
+CA.QFD0760,  AT= 11.827 - L_350E;
+
+CA.QDD0765,  AT= 12.277 - L_350E;
+
+CA.QFD0770,  AT= 12.727 - L_350E;
+
+CA.DHJ0780,  AT=  0.595,                                     FROM=CA.QFD0770;   ! Measured from magnetic centre of Q770 on 19/01/2018
+
+CA.BPC0790,  AT=  0.755,                                     FROM=CA.QFD0770;   ! Measured on 19/01/2018
+
+CA.PLC0800S, AT=  1.175,                                     FROM=CA.QFD0770;   ! Measured on 19/01/2018
+
+CA.PLC0800A, AT= CA.LPLC / 4,                                FROM=CA.PLC0800S;
+
+CA.PLC0800M, AT= CA.LPLC / 2,                                FROM=CA.PLC0800S;
+
+CA.BTV0800,  AT= 0,                                          FROM=CA.PLC0800M;
+
+CA.PLC0800B, AT= CA.LPLC * 3/4,                              FROM=CA.PLC0800S;
+
+CA.PLC0800E, AT= CA.LPLC,                                    FROM=CA.PLC0800S;
+
+CA.BTV0810,  AT= 1.460,                                      FROM=CA.QFD0770;   ! Measured on 19/01/2018
+
+CA.BPM0820,  AT= 0.30,                                       FROM=CA.BTV0810;   ! Measured on 11/05/2017; confirmed on 19/01/2018
+
+CA.DHJ0840,  AT= 2.315,                                      FROM=CA.QFD0770;   ! Measured on 19/01/2018
+
+CA.QS0760,   AT= 2.855 - L_Q/2,                            FROM=CA.QFD0770;
+
+CA.QDD0870,  AT= 2.855,                                      FROM=CA.QFD0770;   ! Measured on 19/01/2018
+
+CA.QFD0880,  AT= 0.450,                                      FROM=CA.QDD0870;   ! Measured on 19/01/2018
+
+ENDSEQUENCE;
+
+
+
+! -- CLEAR spectrometer sequence -----------------------------------------------
+
+! To be added to CA.CLEAR to go into spectrometer
+
+! From  CA.QFD0880  (excluded)
+
+! Up to CAS.BTV0830 (included)
+
+L_CLSPEC = 1.7954;
+
+CA.CLSPEC: SEQUENCE, L = L_CLSPEC;
+
+CA.BHB0900,  AT = 0.5478; 		   ! according to July 18th 2017 measurements from Tobias
+
+CAS.BPM0920, AT = 0.7436, FROM=CA.BHB0900; ! according to July 18th 2017 measurements from Tobias
+
+CAS.BTV0930, AT = 1.2476, FROM=CA.BHB0900; ! according to July 18th 2017 measurements from Tobias
+
+ENDSEQUENCE;
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!! CLEAR straight dump sequence
+
+!! to be added to CA.CLEAR to go straight into the dump
+
+! From  CA.QFD0880 (excluded)
+
+! Up to the dump
+
+L_CLEARDUMP = 2.260 - L_Q/2.0;                                                  ! Dump position roughly measured 30/4-2019
+
+CA.CLDUMP: SEQUENCE, L = L_CLEARDUMP;
+
+CA.BTV0910, AT = 1.120 - L_Q/2;                                                 ! Measured in April 2018, during PLE run
+
+CA.ICT0915, AT = 0.150-0.07/2, FROM=CA.BTV0910;                                 ! Roughly measured 30/04-2019
+
+ENDSEQUENCE;
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! The complete sequences normally used !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+CA.VESPER : SEQUENCE, L = L_CALIFES + L_CALIFESDUMP, REFER=entry;
+
+CA.CALIFES, AT = 0;
+
+CA.CADUMP,  AT = L_CALIFES;
+
+ENDSEQUENCE;
+
+
+
+CA.LINE   : SEQUENCE, L = L_CALIFES + L_CLEAR + L_CLSPEC, REFER=entry;
+
+CA.CALIFES, AT = 0;
+
+CA.CLEAR,   AT = L_CALIFES;
+
+CA.CLSPEC,  AT = L_CALIFES + L_CLEAR;
+
+ENDSEQUENCE;
+
+
+
+CA.STLINE : SEQUENCE, L = L_CALIFES + L_CLEAR + L_CLEARDUMP, REFER=entry;
+
+CA.CALIFES, AT = 0;
+
+CA.CLEAR,   AT = L_CALIFES;
+
+CA.CLDUMP,  AT = L_CALIFES + L_CLEAR;
+
+ENDSEQUENCE;
+
+
+
+! reasonable energy (MeV)
+
+CA.EN = 200;
+
+
+
+! nominal initial conditions (measured on 8 Dec 2016 at the entrance of CA.QFD0350)
+
+CA.IBETX =  14.87; 
+
+CA.IALFX =  -0.35; 
+
+CA.IBETY =  14.3; 
+
+CA.IALFY =   0.09; 
+
+
+
+! Some initial settings of the quadrupoles
+
+ca.iqfd0350 =       47.5 ;
+
+ca.iqdd0355 =       86.4 ;
+
+ca.iqfd0360 =       59.0 ;
+
+ca.iqfd0510 =       44.0 ;
+
+ca.iqdd0515 =       71.8 ;
+
+ca.iqfd0520 =       38.8 ;
+
+ca.iqfd0760 =       61.0 ;
+
+ca.iqdd0765 =       97.9 ;
+
+ca.iqfd0770 =       53.0 ;
+
+
+
+!!!!
+
+! beam definition
+
+!!!!
+
+beam,particle=electron,energy=CA.EN/1000., EX=NEX/CA.EN/0.511, EY=NEY/CA.EN/0.511, ET=1/1000, SIGT=0, SIGE=sige;
+
+
+
+!!!!
+
+! define the period to use
+
+!!!!
+
+use, period=CA.STLINE, range=CA.QFD0350/#E;
+
+
+
+
+
+!!!
+
+! plot nominal optics
+
+!!!
+
+twiss, betx=CA.IBETX, bety=CA.IBETY, alfx=CA.IALFX, ALFY=CA.IALFY, file=twissInit.tfs;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+            18.292                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.009935988                  0        230.5623024                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  0                  0       0.9713261399 
+
+               dq2            betymax              dymax              dyrms 
+                 0        102.0324032                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+!plot, noversion=true, table=twiss, haxis=s, vaxis1=betx,bety, interpolate,
+
+!     title="Initial CLEAR optics", colour=100;
+
+
+
+! optimise for low beta at CLIC structure
+
+! only allow to change the quad strenghts of ~50%
+
+currentScalingFactorLimit = 0.50;
+
+
+
+match, use_macro;
+
+      ! NOTE: currently magnets can only be powered with positive currents
+
+      !       but there is no reason not to invert the polarity... 
+
+      vary, name=CA.IQFD0350, step=1.2, lower= ca.iqfd0350*(1-currentScalingFactorLimit), upper= ca.iqfd0350*(1+currentScalingFactorLimit);
+
+      vary, name=CA.IQDD0355, step=1.2, lower= ca.iqdd0355*(1-currentScalingFactorLimit), upper= ca.iqdd0355*(1+currentScalingFactorLimit);
+
+      vary, name=CA.IQFD0360, step=1.2, lower= ca.iqfd0360*(1-currentScalingFactorLimit), upper= ca.iqfd0360*(1+currentScalingFactorLimit);
+
+      
+
+      vary, name=CA.IQFD0510, step=1.2, lower= ca.iqfd0510*(1-currentScalingFactorLimit), upper= ca.iqfd0510*(1+currentScalingFactorLimit);
+
+      vary, name=CA.IQDD0515, step=1.2, lower= ca.iqdd0515*(1-currentScalingFactorLimit), upper= ca.iqdd0515*(1+currentScalingFactorLimit);
+
+      vary, name=CA.IQFD0520, step=1.2, lower= ca.iqfd0520*(1-currentScalingFactorLimit), upper= ca.iqfd0520*(1+currentScalingFactorLimit);
+
+
+
+      m11: macro=
+
+       {
+
+         use, period=CA.STLINE, RANGE=CA.QFD0350/#E;
+
+         twiss, betx=CA.IBETX, bety=CA.IBETY, alfx=CA.IALFX, ALFY=CA.IALFY;
+
+       };
+
+
+
+      !!!!! possible example of constraints
+
+      !
+
+      !
+
+      !! min bet* at ACS0640
+
+      constraint, weight=10000, expr=table(twiss, CA.WFM0645, betx) = 5; 
+
+      constraint, weight=10000, expr=table(twiss, CA.WFM0645, bety) = 5; 
+
+      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfx) = 0.1 ; 
+
+      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfy) = 0.1 ; 
+
+      !
+
+
+
+
+
+      !! min beta* at CA.MTV0730
+
+      constraint, weight=1000, expr=table(twiss, CA.BTV0730, betx) < 25; 
+
+      constraint, weight=1000, expr=table(twiss, CA.BTV0730, bety) < 25; 
+
+      !
+
+
+
+      !!! cosmetics -> not to explode betas
+
+      ! typical normalised emittance = 10 um.
+
+      !  -> beam pipe ~ 2.5 cm radius
+
+      !  -> this correspond to about 25 km beta
+
+      constraint, weight=100, expr=table(summ,betxmax) < 1000;
+
+      constraint, weight=100, expr=table(summ,betymax) < 1000;
+
+
+
+
+
+     !!!! minimisation method !!!!!!!!!!!!!!!
+
+      lmdif,   tolerance:=1e-12, calls:=10000;
+
+number of variables:    6
+user given constraints: 0
+total constraints:      8
+
+START LMDIF:
+
+Initial Penalty Function =   0.74647346E+11
+
+
+reset parameter: ca.iqfd0350             from  0.13330380E+03  to  0.68850000E+02
+reset parameter: ca.iqfd0360             from -0.10415497E+02  to  0.31900000E+02
+reset parameter: ca.iqfd0510             from  0.12701299E+03  to  0.63600000E+02
+reset parameter: ca.iqdd0515             from  0.19274024E+03  to  0.10530000E+03
+call:       9   Penalty function =   0.95303482E+10
+call:      18   Penalty function =   0.12849795E+10
+call:      27   Penalty function =   0.96789431E+09
+call:      34   Penalty function =   0.83848429E+09
+call:      41   Penalty function =   0.60742909E+09
+call:      48   Penalty function =   0.32879545E+09
+call:      55   Penalty function =   0.13954742E+09
+call:      63   Penalty function =   0.98437188E+08
+call:      70   Penalty function =   0.68116912E+08
+call:      77   Penalty function =   0.28006775E+08
+call:      84   Penalty function =   0.67503311E+07
+call:      91   Penalty function =   0.41050627E+06
+call:      99   Penalty function =   0.17410363E+06
+call:     106   Penalty function =   0.13371850E+06
+call:     113   Penalty function =   0.10220391E+06
+call:     120   Penalty function =   0.98959183E+05
+call:     127   Penalty function =   0.15445109E+03
+call:     134   Penalty function =   0.13847118E-02
+call:     141   Penalty function =   0.55268827E-08
+call:     148   Penalty function =   0.15200396E-13
+ ++++++++++ LMDIF ended: converged successfully
+call:     148   Penalty function =   0.15200396E-13
+!      simplex,  tolerance:=1e-09, calls:=1000;
+
+!      lmdif,    tolerance:=1e-09, calls:=1000;
+
+!      jacobian, tolerance:=1e-09, calls:=1000;
+
+
+
+endmatch;
+
+
+MATCH SUMMARY
+
+--------------------------------------------------------------------
+macro: m11                 
+  constraint: table(twiss,ca.wfm0645,betx)=5          
+  values:     +5.00000e+00=+5.00000e+00
+  weight:     +1.00000e+04
+  penalty:    -3.12728e-08
+
+  constraint: table(twiss,ca.wfm0645,bety)=5          
+  values:     +5.00000e+00=+5.00000e+00
+  weight:     +1.00000e+04
+  penalty:    -1.19211e-07
+
+  constraint: table(twiss,ca.wfm0645,alfx)=0.1        
+  values:     +1.00000e-01=+1.00000e-01
+  weight:     +1.00000e+03
+  penalty:    +8.66099e-10
+
+  constraint: table(twiss,ca.wfm0645,alfy)=0.1        
+  values:     +1.00000e-01=+1.00000e-01
+  weight:     +1.00000e+03
+  penalty:    +3.21318e-09
+
+  constraint: table(twiss,ca.btv0730,betx)<25         
+  values:     +6.36792e+00<+2.50000e+01
+  weight:     +1.00000e+03
+  penalty:    +0.00000e+00
+
+  constraint: table(twiss,ca.btv0730,bety)<25         
+  values:     +6.36792e+00<+2.50000e+01
+  weight:     +1.00000e+03
+  penalty:    +0.00000e+00
+
+  constraint: table(summ,betxmax)<1000                
+  values:     +3.51831e+01<+1.00000e+03
+  weight:     +1.00000e+02
+  penalty:    +0.00000e+00
+
+  constraint: table(summ,betymax)<1000                
+  values:     +2.39925e+01<+1.00000e+03
+  weight:     +1.00000e+02
+  penalty:    +0.00000e+00
+
+
+
+Final Penalty Function =   1.52003961e-14
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+ca.iqfd0350               4.53587e+01  4.75000e+01  2.37500e+01  7.12500e+01
+ca.iqdd0355               7.31250e+01  8.64000e+01  4.32000e+01  1.29600e+02
+ca.iqfd0360               4.44673e+01  5.90000e+01  2.95000e+01  8.85000e+01
+ca.iqfd0510               6.28497e+01  4.40000e+01  2.20000e+01  6.60000e+01
+ca.iqdd0515               7.24666e+01  7.18000e+01  3.59000e+01  1.07700e+02
+ca.iqfd0520               3.69979e+01  3.88000e+01  1.94000e+01  5.82000e+01
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.52003961e-14
+
+
+!
+
+! final settings
+
+use, period=CA.STLINE, RANGE=CA.QFD0350/#E;
+
+twiss, betx=CA.IBETX, bety=CA.IBETY, alfx=CA.IALFX, ALFY=CA.IALFY, file=twissFinal.tfs;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+            18.292                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.120066197                  0        35.18313468                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  0                  0       0.7037091564 
+
+               dq2            betymax              dymax              dyrms 
+                 0        23.99246062                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+!plot, noversion=true, table=twiss, haxis=s, vaxis1=betx,bety, interpolate,
+
+!     title="Optimised CLEAR Optics", colour=100;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

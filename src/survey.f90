@@ -396,6 +396,10 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   tmp = node_value('v_pos ')
   call double_to_table_curr('survey ', 'v_pos ',tmp)
 
+  tmp = node_value('tilt ')
+  call double_to_table_curr('survey ', 'tilt ',tmp)
+
+
   call augment_count('survey ')
 end subroutine sufill
 
