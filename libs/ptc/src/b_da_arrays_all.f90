@@ -35,7 +35,8 @@ module da_arrays
   integer nst0,nomax,nvmax,nmmax,nocut,lfi
   real(dp) facint(0:lno)
   integer nhole
-  integer,TARGET :: lda_used =15000
+   !integer,TARGET :: lda_used =150 
+ integer,TARGET :: lda_used =15000
 
 contains
 

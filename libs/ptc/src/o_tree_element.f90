@@ -30,8 +30,7 @@ module tree_element_MODULE
 
 
   private scdaddo,daddsco
-  private real_8REAL6,REAL6real_8
-  public real_8REAL_8
+  private real_8REAL6,REAL6real_8,real_8REAL_8
   private probe_quaternion_to_matrixr,probe_quaternion_to_matrixp
 
 
@@ -675,29 +674,6 @@ CONTAINS
 
   END SUBROUTINE dainput_SPECIAL6
 
-  ! SYMPLECTIFY A MAP NEAR THE IDENTITY
-  SUBROUTINE symplectic(m,eps,nst)
-    IMPLICIT NONE
-    type(damap), INTENT(INOUT) :: m
-    type(onelieexponent) uno
-    type(damap) id
-    real(dp), optional :: eps
-    integer nst
-
-    call alloc(uno); call alloc(id);
-
-    if(present(eps))then
-       if(eps>0.0_dp) uno%eps=eps
-    endif
-    uno=m
-    id=1
-    uno%pb%h=uno%pb%h/nst
-    m=texp(uno%pb,id)
-
-    call kill(uno); call kill(id);
-
-
-  end SUBROUTINE symplectic
 
   !  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
   !  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -710,14 +686,6 @@ CONTAINS
   !  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
   !  SPIN STUFF IS HERE
 
-
-
-
-
- 
-
- 
- 
 
 
   subroutine EQUAL_IDENTITY_SPINOR_8(S,R)
@@ -836,6 +804,15 @@ CONTAINS
     P%AC%X(2)=0.0_dp
     P%AC%t=0.0_dp
     p%e_ij=0.0_dp
+    p%damps=0.0_dp
+    p%t_bks=0
+    p%t_bks0=0
+
+    p%b_kin=0.0_dp
+    p%d_spin=0.0_dp
+    p%t_bks=0.0_dp
+    p%t_bks0=0.0_dp
+
   END    subroutine EQUAL_PROBE8_REAL6
 
   subroutine EQUAL_PROBE8_PROBE8(P8,P)
@@ -868,7 +845,11 @@ CONTAINS
     p8%use_q=P%use_q
     P8%e=P%e
     P8%x0=P%x0
-
+    P8%damps=P%damps
+    P8%b_kin=P%b_kin
+    p8%d_spin=p%d_spin
+    p8%t_bks=p%t_bks
+    p8%t_bks0=p%t_bks0
 
   END subroutine EQUAL_PROBE8_PROBE8
 
@@ -1069,6 +1050,12 @@ CONTAINS
     r%use_q=use_quaternion
     r%e=0
     r%x0=0
+    r%damps=0
+    r%t_bks=0
+    r%t_bks0=0
+
+    r%b_kin=0
+    r%d_spin=0
   END    subroutine EQUAL_IDENTITY_probe_8
 
 
@@ -1160,7 +1147,7 @@ CONTAINS
      s%x(i)=1.0_dp
      sf=p%q*s*p%q**(-1)
      do j=1,3
-       p%s(i)%x(j)=sf%x(j+1)
+       p%s(i)%x(j)=sf%x(j)
      enddo
     enddo
      call kill(s)
@@ -1401,6 +1388,12 @@ CONTAINS
     r%use_q=use_quaternion
     r%e=0
     r%x0=0
+    r%damps=0
+    r%t_bks=0
+    r%t_bks0=0
+
+    r%b_kin=0
+    r%d_spin=0
   END    subroutine ALLOC_probe_8
 
   subroutine ALLOC_rf_phasor_8(R)
@@ -1445,6 +1438,13 @@ CONTAINS
     r%e_ij=0.0_dp
     r%u=.false.
     r%e=0
+    r%x0=0
+    r%damps=0
+    r%t_bks=0
+    r%t_bks0=0
+
+    r%b_kin=0
+    r%d_spin=0
   END    subroutine KILL_probe_8
 
   subroutine kill_rf_phasor_8(R)
