@@ -52,7 +52,7 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
 
 logical:: switch_bessel=.true.
 private norm_bessel_Ir,nbit,nbittr,nbitrt,etienne_bessel_Ir,etienne_bessel_It,etienne_bessel_Itr,etienne_bessel_Irt
-private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
+private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr,CFU000_new
   type(dalevel) scratchda(ndumt)   !scratch levels of DA using linked list
   real(dp), pointer :: tn0(:)=>null()
 
@@ -394,9 +394,9 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
   !     MODULE PROCEDURE var001  ! not private
   !  END INTERFACE
 
-!  INTERFACE cfu
-!     MODULE PROCEDURE cfu000  ! not private
-!  END INTERFACE
+  INTERFACE cfu
+     MODULE PROCEDURE CFU000_new  ! not private
+  END INTERFACE
 
   INTERFACE full_abs
      MODULE PROCEDURE full_absT
@@ -3416,7 +3416,7 @@ if(check_gtpsa(j=j)) then
     call kill(junk)
   END SUBROUTINE DACFU_GTPSA
 
-  SUBROUTINE  CFU (S2,FUN,S1)
+  SUBROUTINE  CFU000_new (S2,FUN,S1)
     implicit none
     type (taylor),INTENT(INOUT)::S1
     type (taylor),INTENT(IN)::S2
@@ -3430,7 +3430,7 @@ if(check_gtpsa(j=j)) then
             call DACFU_GTPSA(S2,FUN,S1)
          endif
 
-  END SUBROUTINE CFU
+  END SUBROUTINE CFU000_new
 
 ! obsolete
 !  SUBROUTINE  CFUR(S2,FUN,S1)
