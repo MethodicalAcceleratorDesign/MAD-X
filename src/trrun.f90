@@ -1830,8 +1830,6 @@ subroutine ttrf(track,ktrack)
 
     TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
 
-    print *, "aaaa", TRACK(1,1:ktrack), TRACK(3,1:ktrack)
-
 
   call ttdrf(el/2,track,ktrack)
 
@@ -1842,14 +1840,9 @@ subroutine ttrf(track,ktrack)
     c1=cos(phirf - (omega)*(TRACK(5,1:ktrack)-tcorr))
 
 
-    print *, "ttttssss1", s1, c1, omega, tcorr
-    print *, "ttttxxx1", TRACK(:,1:ktrack)
     TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
     TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
     TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.2500*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
-    print *, "ttttxxx2", TRACK(:,1:ktrack)
-    call ttdrf(el/2,track,ktrack)
-    print *, "ffff", V, c1, omega
 
 
   !*---- If there were wakefields, track the wakes and then the 2nd half
