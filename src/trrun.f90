@@ -489,7 +489,6 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            if ((code.eq.code_sextupole .or. &
               code.eq.code_octupole .or. &
               code.eq.code_elseparator .or. &
-              code.eq.code_rfcavity .or. &
               code.eq.code_crabcavity) .and. el.ne.zero) then
               !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
               call element_name(el_name,len(el_name))
@@ -1698,7 +1697,7 @@ subroutine ttrf(track,ktrack)
   use name_lenfi
   use time_varfi
   use trackfi
-  use math_constfi, only : zero, one, two, ten3m, ten6p, twopi
+  use math_constfi, only : zero, one, two, ten3m, ten6p, twopi, half,pi
   use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
@@ -1721,7 +1720,8 @@ subroutine ttrf(track,ktrack)
   logical :: time_var
   integer :: i, mylen
   double precision :: omega, phirf, pt, rff, rfl, rfv, vrf, pc0, bvk
-  double precision :: bucket_half_length, dummy
+  double precision :: bucket_half_length, dummy, tcorr
+  double precision :: el, V, c1(ktrack), s1(ktrack), jc
   !      double precision px,py,ttt,beti,el1
   character(len=name_len) :: name
 
@@ -1729,6 +1729,16 @@ subroutine ttrf(track,ktrack)
 
   !---- BV flag
   bvk = node_value('other_bv ')
+
+
+!do ko=1,el%nf    ! over modes
+!s1=cos(kbmad*ko*O*z)*sin(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%phase0+EL%PH(KO))
+!c1=cos(kbmad*ko*O*z)*cos(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%phase0+EL%PH(KO))
+!     X(2)=X(2)+V*S1*X(1)*0.5_dp
+!     X(4)=X(4)+V*S1*X(3)*0.5_dp
+!     x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
+!  enddo
+
 
   !---- Fetch data.
   !      el = node_value('l ')
@@ -1758,7 +1768,8 @@ subroutine ttrf(track,ktrack)
   !      deltas = get_variable('track_deltap ')
   !      pc = get_value('probe ','pc ')
   pc0 = get_value('beam ','pc ')
-  !      betas = get_value('probe ','beta ')
+  !betas = get_value('probe ','beta ')
+  print *, "bbbb", betas, el/(2*betas)
   !      gammas= get_value('probe ','gamma ')
   !      dtbyds = get_value('probe ','dtbyds ')
 
@@ -1796,8 +1807,50 @@ subroutine ttrf(track,ktrack)
   phirf = rfl * twopi
   ! dl    = el / two
   ! bi2gi2 = one / (betas * gammas) ** 2
+    
 
-  TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
+
+    el  = node_value('l ')
+    tcorr = el/(2*betas)
+    jc = 1
+    V = jc*vrf/(pc0*el)
+    s1=sin(phirf - (omega)*(TRACK(5,1:ktrack)+tcorr))
+    c1=cos(phirf - (omega)*(TRACK(5,1:ktrack)+tcorr))
+
+
+    print *, "ttttssss1", s1, c1, omega, tcorr
+    print *, "ttttxxx1", TRACK(:,1:ktrack)
+    TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
+    TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
+    TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.2500*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
+    print *, "ttttxxx2", TRACK(:,1:ktrack)
+    call ttdrf(el/2,track,ktrack)
+    print *, "ffff", V, c1, omega
+
+
+    TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
+
+    print *, "aaaa", TRACK(1,1:ktrack), TRACK(3,1:ktrack)
+
+
+  call ttdrf(el/2,track,ktrack)
+
+
+    jc = -1
+    V = jc*vrf/(pc0*el)
+    s1=sin(phirf - (omega)*(TRACK(5,1:ktrack)-tcorr))
+    c1=cos(phirf - (omega)*(TRACK(5,1:ktrack)-tcorr))
+
+
+    print *, "ttttssss1", s1, c1, omega, tcorr
+    print *, "ttttxxx1", TRACK(:,1:ktrack)
+    TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
+    TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
+    TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.2500*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
+    print *, "ttttxxx2", TRACK(:,1:ktrack)
+    call ttdrf(el/2,track,ktrack)
+    print *, "ffff", V, c1, omega
+
 
   !*---- If there were wakefields, track the wakes and then the 2nd half
   !*     of the cavity.
@@ -3992,7 +4045,6 @@ subroutine trclor(switch,orbit0)
             (code.eq.code_sextupole .or. &
             code.eq.code_octupole .or. &
             code.eq.code_elseparator .or. &
-            code.eq.code_rfcavity .or. &
             code.eq.code_crabcavity) .and. el.ne.zero) then
            !  .not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
            print *,"\ncode: ",code," el: ",el,"   THICK ELEMENT FOUND\n"

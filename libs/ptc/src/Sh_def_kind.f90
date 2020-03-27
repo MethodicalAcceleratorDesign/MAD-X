@@ -1575,7 +1575,7 @@ CONTAINS !----------------------------------------------------------------------
     k%TOTALPATH=el%CAVITY_TOTALPATH
 
 
-
+    print *, "innntercav44"
     SELECT CASE(EL%P%METHOD)
     CASE(2)
        DH=EL%L/2.0_dp/EL%P%NST
@@ -1585,6 +1585,7 @@ CONTAINS !----------------------------------------------------------------------
        !       DO I=1,B%N
 
        !        X=BEAM_IN_X(B,I)
+       print *, "nnn method 2"
        CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
        CALL KICKCAV (EL,D,X,k)
        CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
@@ -3503,7 +3504,8 @@ CALL FRINGECAV(EL,X,k,2)
     REAL(DP) C1,S1,V,O,z
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     REAL(DP) KBMAD
-
+    !print *, "ssss heere", jC,k%FRINGE,EL%P%permfringe, el%N_BESSEL, EL%P%permfringe/=0
+    !print *, "ssss lll", (k%FRINGE.or.EL%P%permfringe/=0.or.el%N_BESSEL==-1)
     !return
     !  As of June 2007, Etienne believes that the fringe approximately cancels
     ! it is a mystery perhaps due to the use of canonical variables.
@@ -3547,11 +3549,14 @@ CALL FRINGECAV(EL,X,k,2)
     s1=cos(kbmad*ko*O*z)*sin(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%phase0+EL%PH(KO))
     c1=cos(kbmad*ko*O*z)*cos(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%phase0+EL%PH(KO))
 
-
+    print *, "xxxx1", x 
     X(2)=X(2)+V*S1*X(1)*0.5_dp
     X(4)=X(4)+V*S1*X(3)*0.5_dp
     x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
-
+    print *, "fffprint", V, c1, O, ko
+    print *, "sss1, ccc1", ko, jc, s1, c1, V, O, cos(kbmad*ko*O*z), EL%t*it, EL%PHAS, EL%phase0+EL%PH(KO)
+    print *, "phasses", x(6), EL%t*it,EL%PHAS+EL%phase0,EL%PH(KO)
+    print *, "xxxx2", x 
    enddo
 
    call PRTR("FRNG_CAV4:1", X)
@@ -3647,13 +3652,14 @@ CALL FRINGECAV(EL,X,k,2)
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
     call PRTR("KICKCAV:0", X)
-
+    print *, "nnn KICKCAVR"
     DIR=EL%P%DIR*EL%P%CHARGE
 
        if(freq_redefine) then
         O=EL%freq
          else
         O=twopi*EL%freq/CLIGHT
+        print *, "oooo"
        endif
 
     if(.not.k%TIME.and.piotr_freq) then
@@ -3662,7 +3668,7 @@ CALL FRINGECAV(EL,X,k,2)
 
     VL=dir*YL*EL%volt*volt_c/EL%P%P0C
      
-    !print*,"skowron: ph:",EL%PHAS," ph0=",EL%phase0, EL%t," volt omega",VL,O
+    print*,"skowron: ph:",EL%PHAS," ph0=",EL%phase0, EL%t," volt omega",VL,O
     
     do ko=1,el%nf    ! over modes
 
@@ -3689,8 +3695,11 @@ CALL FRINGECAV(EL,X,k,2)
 !!!!!   indeed EL%PH(KO) should be used to shape the harmonic profile of the cavity only
 !!!!!   if tot_t=1 (default)  then it=1 if totalpath=1 other zero
 !!!!!   if tot_t=0 it=1 always
+       print *, "nnnx", x(5)
+       print *, "nnnbessel", EL%N_BESSEL
        x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0)
-
+	   print *, "nnnx", x(5)
+	   print *, "phasses middle..", x(6), EL%t*it,EL%PHAS+EL%phase0,EL%PH(KO)
        ! doing crabola
 
 
@@ -3827,7 +3836,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ENDIF
 
        ! multipole * cos(omega t+ phi)/p0c
-
+       print *, X(2)
        X(2)=X(2)-el%f(ko)*YL*DIR*BBYTW/EL%P%P0C*(EL%A+EL%R*cos(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0))
        X(4)=X(4)+el%f(ko)*YL*DIR*BBXTW/EL%P%P0C*(EL%A+EL%R*cos(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0))
 
