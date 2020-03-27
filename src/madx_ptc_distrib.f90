@@ -257,7 +257,7 @@ contains
     logical              :: set
     integer              :: i,j,k,e(6)
     integer              :: debug
-    external             :: cfu
+    
     !    integer              :: last
     !    integer              :: index !standarf function
 
