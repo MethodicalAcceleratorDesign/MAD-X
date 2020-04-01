@@ -1769,7 +1769,7 @@ subroutine ttrf(track,ktrack)
   !      pc = get_value('probe ','pc ')
   pc0 = get_value('beam ','pc ')
   !betas = get_value('probe ','beta ')
-  print *, "bbbb", betas, el/(2*betas)
+  print *, "bbbbrff", rff
   !      gammas= get_value('probe ','gamma ')
   !      dtbyds = get_value('probe ','dtbyds ')
 
@@ -1802,6 +1802,7 @@ subroutine ttrf(track,ktrack)
   !      endif
   !---- Set up.
   omega = rff * (ten6p * twopi / clight)
+
   ! vrf   = rfv * ten3m / (pc * (one + deltas))
   vrf   = rfv * ten3m
   phirf = rfl * twopi
@@ -1810,40 +1811,41 @@ subroutine ttrf(track,ktrack)
     
 
 
-    el  = node_value('l ')
+  el  = node_value('l ')
+  
+  if(el .gt. zero) then
     tcorr = el/(2*betas)
     jc = 1
     V = jc*vrf/(pc0*el)
-    s1=sin(phirf - (omega)*(TRACK(5,1:ktrack)+tcorr))
-    c1=cos(phirf - (omega)*(TRACK(5,1:ktrack)+tcorr))
+    s1=sin(phirf - omega*(TRACK(5,1:ktrack)+tcorr))
+    c1=cos(phirf - omega*(TRACK(5,1:ktrack)+tcorr))
+    !print *, "ooooooomega", omega
+    !print *, "iiiiitrat", phirf, omega, TRACK(5,1:ktrack), tcorr
 
-
-    print *, "ttttssss1", s1, c1, omega, tcorr
-    print *, "ttttxxx1", TRACK(:,1:ktrack)
     TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
     TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
-    TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.2500*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
-    print *, "ttttxxx2", TRACK(:,1:ktrack)
+    TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.25d0*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
+    print *, "kkkktrack", jc, track(2,1:ktrack),track(4,1:ktrack),track(6,1:ktrack)
     call ttdrf(el/2,track,ktrack)
-    print *, "ffff", V, c1, omega
+  endif
 
+  TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
 
-    TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
+  if(el .gt. zero) then
 
-
-  call ttdrf(el/2,track,ktrack)
-
-
+    call ttdrf(el/2,track,ktrack)
+    print *, "kkkktrack", -9, track(1,1:ktrack),track(3,1:ktrack),track(5,1:ktrack)
     jc = -1
+    
     V = jc*vrf/(pc0*el)
     s1=sin(phirf - (omega)*(TRACK(5,1:ktrack)-tcorr))
     c1=cos(phirf - (omega)*(TRACK(5,1:ktrack)-tcorr))
 
-
     TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
     TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
-    TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.2500*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
-
+    TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.25d0*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
+    print *, "kkkktrack", jc, track(2,1:ktrack),track(4,1:ktrack),track(6,1:ktrack)
+  endif
 
   !*---- If there were wakefields, track the wakes and then the 2nd half
   !*     of the cavity.

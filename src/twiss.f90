@@ -6351,6 +6351,8 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   logical :: fsec, ftrk, fmap, fcentre
   double precision :: el, ds
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: ek_f(6), re_f(6,6), te_f(6,6,6)
+  double precision :: ek_tmp(6), re_tmp(6,6), te_tmp(6,6,6)
 
   integer :: elpar_vl
   double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, bvk
@@ -6379,6 +6381,10 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   RW = EYE
   TW = zero
 
+  ek_f = zero
+  re_f = EYE
+  te_f = zero
+
   !---- BV flag
   rff = g_elpar(r_freq)
   rfl = g_elpar(r_lag)
@@ -6399,6 +6405,19 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
   !---- Transfer map.
   fmap = .true.
+
+
+  !---- Sandwich cavity between two drifts.
+  if (el .ne. zero) then
+    ! TODO: generalize for ds!=0.5
+    dl = el / two
+    print *, "ooootwiss", orbit
+    call tmrffringe(fsec,ftrk,orbit, fmap, el, one, ek, re_f, te_f) 
+    print *, "ooootwiss2", orbit
+
+    call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+    call tmcat(fsec,rw,tw,re_f,te_f,rw,tw)
+
   if (ftrk) then
     orbit(6) = orbit(6) + c0
     ek(6) = c0
@@ -6410,18 +6429,124 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
     if (fsec) te(6,5,5) = c2
   endif
 
-  !---- Sandwich cavity between two drifts.
-  if (el .ne. zero) then
-    ! TODO: generalize for ds!=0.5
-    dl = el / two
-    call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,re,te,rw,tw,re,te)
     if (fcentre) return
     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,rw,tw,re,te,re,te)
+
+    call tmrffringe(fsec,ftrk,orbit, fmap, el, -one, ek, re_f, te_f) 
+         print *, "kkkktwis" , -9, orbit(1),orbit(3) ,orbit(5)
+    call tmcat(fsec,re_f,te_f,re,te,re,te)
+
   endif
 
 end SUBROUTINE tmrf
+
+SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te) 
+  use twisslfi
+  use twiss_elpfi
+  use twissbeamfi, only : deltap, pc, beta
+  use matrices, only : EYE
+  use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi
+  use phys_constfi, only : clight
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for RF cavity.                                     *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     el        (double)  element length.                              *
+  !     ds        (double)  slice length.                                *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical :: fsec, ftrk, fmap
+  double precision :: el,  V, dpx,dpy,dpt, s1, c1, tcorr
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  integer :: elpar_vl
+  double precision :: rff, rfl, dl, omega, vrf, phirf, bvk, jc
+  double precision :: ek0(6), rw(6,6), tw(6,6,6)
+  double precision :: rfv, x, px, y, py, t, pt
+
+  double precision, external :: node_value
+  integer, external :: el_par_vector
+
+  !-- get element parameters
+  elpar_vl = el_par_vector(r_freq, g_elpar)
+
+  !---- Fetch voltage.
+  rfv = g_elpar(r_volt)
+  rff = g_elpar(r_freq)
+  rfl = g_elpar(r_lag)
+
+  omega = rff * (ten6p * twopi / clight)
+  ! vrf   = rfv * ten3m / (pc * (one + deltas))
+  vrf   = rfv * ten3m
+  phirf = rfl * twopi
+  ! dl    = el / two
+  ! bi2gi2 = one / (betas * gammas) ** 2
+
+  if (ftrk) then
+    ! if bvk = -1 apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
+    x  = orbit(1);
+    px = orbit(2);
+    y  = orbit(3);
+    py = orbit(4);
+    t  = orbit(5);
+    pt = orbit(6);
+  else
+    x  = zero;
+    px = zero;
+    y  = zero;
+    py = zero;
+    t  = zero;
+    pt = zero;
+  endif
+
+  
+ ! if(el .gt. zero) then
+
+    tcorr = jc*el/(2*beta)
+ !   jc = 1 
+    V = jc*vrf/(pc*el)
+    s1=sin(phirf - omega*(t+tcorr))
+    c1=cos(phirf - omega*(t+tcorr))
+
+    print *, "iiiiitra", phirf, omega, t, tcorr
+    print *, "aaaa", V, s1, c1, tcorr
+    print *, "iiiiitwi", jc, V, vrf, omega, tcorr, t, s1, c1, phirf, t 
+     dpx = -V*s1*x*half
+     dpy = -V*s1*y*half
+     dpt =  0.25d0*(x**2+y**2)*V*c1*omega;
+  !if (ftrk) then
+
+    orbit(2) = px + dpx;
+    orbit(4) = py + dpy;
+    orbit(6) = pt + dpt;
+    print *, "kkkktwis" , jc, orbit(2),orbit(4) ,orbit(6)
+ ! endif
+
+!  ek(2) = ek(2) + dpx
+!  ek(4) = ek(4) + dpy
+!  ek(6) = ek(6) + dpt
+ ! re(2,1) = -V*s1*half
+ ! re(4,3) = -V*s1*half
+ ! el  = node_value('l ')
+
+  !  TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
+  !  TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
+  !  TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.25d0*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
+
+
+end SUBROUTINE tmrffringe
 
 SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
   use math_constfi, only : zero
