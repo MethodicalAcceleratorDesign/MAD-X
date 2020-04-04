@@ -10,14 +10,15 @@ module lielib_yang_berz
   implicit none
   public
   !  private
-  PUBLIC XGAM,XGBM  !,FILTRES
+  private XGAM,XGBM,COMCFU  !,FILTRES
   PUBLIC LIEPEEK,INITPERT,HYPER,MAPFLOL
-  PUBLIC ETALL1,TAKE,ETALL,DAPEK0,ETINI,DACLRD,DACOPD,DIFD
+  PUBLIC ETALL1,TAKE,ETALL,ETINI,DACLRD,DACOPD,DIFD
   PUBLIC INTD,ETCCT,TRXFLO,TRX,FACFLOD,EXPFLO,DALIND,ETINV
   PUBLIC INPUTRES,MAPNORMF,DHDJFLO,GETTURA   !,SETIDPRIDPRSET,
-  PUBLIC FLOFACG,FLOFAC,DACMUD,CTORFLO,RTOCFLO,CTOR,RTOC,ETPIN
-  PUBLIC LIEINIT,PERTPEEK,FLOWPARA,COMCFU
-  PUBLIC DAPOK0,FACFLO,EXPFLOD,gofix
+  PUBLIC FLOFACG,FLOFAC,DACMUD,ETPIN
+  PUBLIC CTORFLO,RTOCFLO,CTOR,RTOC
+  PUBLIC LIEINIT,PERTPEEK,FLOWPARA
+  PUBLIC FACFLO,EXPFLOD,gofix
   public getcct,GETINV,gtrx,eig6
   private DFILT,DLIE,FILT,REXT,respoke
   private etallnom,simil
@@ -594,40 +595,41 @@ contains
     return
   end subroutine getinv
 
-  subroutine dapek0(v,x,jj)
-    implicit none
+!  subroutine dapek0(v,x,jj)
+!    implicit none
 
-    integer i,jj
-    integer,dimension(ntt)::jd
-    integer,dimension(:)::v
-    real(dp),dimension(:)::x
-    if(.not.c_%stable_da) return
+!    integer i,jj
+!    integer,dimension(ntt)::jd
+!    integer,dimension(:)::v
+!    real(dp),dimension(:)::x
+!    if(.not.c_%stable_da) return
 
-    do i=1,ntt
-       jd(i)=0
-    enddo
-    do i=1,jj
-       call dapek(v(i),jd,x(i))
-    enddo
-    return
-  end subroutine dapek0
+!    do i=1,ntt
+!       jd(i)=0
+!    enddo
+!    do i=1,jj
+!       call dapek(v(i),jd,x(i))
+!    enddo
+!    return
+!  end subroutine dapek0
 
-  subroutine dapok0(v,x,jj)
-    implicit none
-    integer i,jj
-    integer,dimension(ntt)::jd
-    integer,dimension(:)::v
-    real(dp),dimension(:)::x
-    if(.not.c_%stable_da) return
+! obsolete
+!  subroutine dapok0(v,x,jj)
+!    implicit none
+!    integer i,jj
+!    integer,dimension(ntt)::jd
+!    integer,dimension(:)::v
+!    real(dp),dimension(:)::x
+!    if(.not.c_%stable_da) return
 
-    do i=1,ntt
-       jd(i)=0
-    enddo
-    do i=1,jj
-       call dapok(v(i),jd,x(i))
-    enddo
-    return
-  end subroutine dapok0
+!    do i=1,ntt
+!       jd(i)=0
+!    enddo
+!    do i=1,jj
+!       call dapok(v(i),jd,x(i))
+!    enddo
+!    return
+!  end subroutine dapok0
 
   subroutine dapokzer(v,jj)
     implicit none
@@ -744,7 +746,7 @@ contains
     !  \VEC{HT}= \VEC{H_M}  (TAKES M^th DEGREE PIECE ALL VARIABLES INCLUDED)
     integer i,m,b1,b2
     integer,dimension(:)::h,ht
-    integer,dimension(ntt)::j
+!    integer,dimension(ntt)::j
     integer,dimension(ndim2)::x
     if(.not.c_%stable_da) return
 
@@ -753,9 +755,9 @@ contains
     call etallnom(x,nd2) !  ,'X         ')
 
 
-    do i=1,ntt
-       j(i)=0
-    enddo
+ !   do i=1,ntt
+ !      j(i)=0
+  !  enddo
 
     do   i=1,nd2
        call take(h(i),m,ht(i))
@@ -2143,8 +2145,6 @@ contains
     return
   end subroutine dhdjflo
 
-
-
   subroutine h2pluflo(h,ang,ra)
     implicit none
     ! POKES IN \VEC{H}  ANGLES AND DAMPING COEFFFICIENTS
@@ -2364,6 +2364,7 @@ contains
 
     return
   end subroutine rtoc
+
   subroutine ctorflo(c,dr,di)
     implicit none
     ! FLOW CTOR
@@ -2375,6 +2376,7 @@ contains
 
     return
   end subroutine ctorflo
+
   subroutine rtocflo(dr,di,c)
     implicit none
     ! FLOW RTOC
@@ -2393,6 +2395,7 @@ contains
 
     return
   end subroutine rtocflo
+
   subroutine ctord(c,cr,ci)
     implicit none
     ! ROUTINES USED IN THE INTERMEDIATE STEPS OF CTORFLO AND RTOCFLO

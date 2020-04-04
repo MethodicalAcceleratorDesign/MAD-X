@@ -34,6 +34,11 @@ module madx_ptc_eplacement_module
   !    routines
   private                                     :: rot
   private                                     :: printfframes
+  
+  
+  external :: fort_warn, read_ptc_command77, gino_ptc_command77, gettrack
+  
+  
   !============================================================================================
 
 contains

@@ -2060,19 +2060,8 @@ CONTAINS
           do n=1,EL%P%NMUL
              EL%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
              EL%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
-             
-             print*,"skowron anbn twiss "
-             call print(DVp, 6)
-             call print(ELP%BN(N), 6)
-             call print(ELP%AN(N), 6)
-             
              ELP%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
              ELP%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
-             print*,"skowron - - - - - -  "
-             call print(ELP%BN(N), 6)
-             call print(ELP%AN(N), 6)
-             print*,"skowron anbn twiss end"
-             
           enddo
        endif
        
@@ -2087,10 +2076,8 @@ CONTAINS
              ELP%volt= vp*EL%D0_Volt+DVp*EL%D_Volt
         endif
       endif
-      
       if(associated(el%phas)) then
         if(present(VR))then
-             print*, "Doing phase modulation DVR=",DVR," d_phas=",EL%D_phas
              EL%phas=  vR*EL%D0_phas+DVR*EL%D_phas
              ELP%phas= vR*EL%D0_phas+DVR*EL%D_phas
         else

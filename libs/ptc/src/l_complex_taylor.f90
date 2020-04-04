@@ -20,7 +20,8 @@ module complex_taylor
   private set_in_complex   !, assc  !check,
   private dimagt,drealt,dcmplxt,CEQUAL,DEQUAL,REQUAL,CONJGT
   private GETCHARnd2,GETintnd2,GETint,getcharnd2s,GETintnd2s,GETintk
-  private CFUC,CFURES,varco,varco1
+!  private CFUC,CFURES
+  private varco,varco1
   !  completing tpsa.f90
   private datantt,dasintt,dacostt,full_abstpsat
   integer,private::NO,ND,ND2,NP,NDPT,NV           !,lastmaster 2002.12.13
@@ -985,10 +986,11 @@ module complex_taylor
      MODULE PROCEDURE pekc
   END INTERFACE
 
-  INTERFACE CFU
-     MODULE PROCEDURE CFUC
-     MODULE PROCEDURE CFURES
-  END INTERFACE
+! obsolete
+!  INTERFACE CFU
+!     MODULE PROCEDURE CFUC
+!     MODULE PROCEDURE CFURES
+!  END INTERFACE
 
   INTERFACE full_abs
      MODULE PROCEDURE full_abstpsat
@@ -3151,56 +3153,57 @@ contains
     call pok000(s1%i,J,aimag(r1))
   END SUBROUTINE pokc
 
-  SUBROUTINE  CFUC(S2,FUN,S1)!
-    implicit none
-    type (complextaylor),INTENT(INOUT)::S1
-    type (complextaylor),INTENT(IN)::S2
-    type (complextaylor) T
-    type (taylor) W
-    complex(dp) FUN
-    EXTERNAL FUN
-    CALL ALLOC(T)
-    CALL ALLOC(W)
+! obsolete
+!  SUBROUTINE  CFUC(S2,FUN,S1)!
+!    implicit none
+!    type (complextaylor),INTENT(INOUT)::S1
+!    type (complextaylor),INTENT(IN)::S2
+!    type (complextaylor) T
+!    type (taylor) W
+!    complex(dp) FUN
+!    EXTERNAL FUN
+!    CALL ALLOC(T)
+!    CALL ALLOC(W)
+!
+!    CALL CFUR(S2%R,FUN,W)
+!    T%R=W
+!    CALL CFUI(S2%I,FUN,W)
+!    T%R=T%R-W
+!    CALL CFUR(S2%I,FUN,W)
+!    T%I=W
+!    CALL CFUI(S2%R,FUN,W)
+!    T%I=T%I+W
+!    S1=T
+!    CALL KILL(T)
+!    CALL KILL(W)
+!
+!  END SUBROUTINE CFUC
 
-    CALL CFUR(S2%R,FUN,W)
-    T%R=W
-    CALL CFUI(S2%I,FUN,W)
-    T%R=T%R-W
-    CALL CFUR(S2%I,FUN,W)
-    T%I=W
-    CALL CFUI(S2%R,FUN,W)
-    T%I=T%I+W
-    S1=T
-    CALL KILL(T)
-    CALL KILL(W)
-
-  END SUBROUTINE CFUC
-
-  SUBROUTINE  CFURES(S2,FUN,S1)!
-    implicit none
-    type (pbresonance),INTENT(INOUT)::S1
-    type (pbresonance),INTENT(IN)::S2
-    type (complextaylor) T
-    type (taylor) W
-    complex(dp) FUN
-    EXTERNAL FUN
-    CALL ALLOC(T)
-    CALL ALLOC(W)
-
-    CALL CFUR(S2%COS%H,FUN,W)
-    T%R=W
-    CALL CFUI(S2%SIN%H,FUN,W)
-    T%R=T%R-W
-    CALL CFUR(S2%SIN%H,FUN,W)
-    T%I=W
-    CALL CFUI(S2%COS%H,FUN,W)
-    T%I=T%I+W
-    S1%COS%H=T%R
-    S1%SIN%H=T%I
-    CALL KILL(T)
-    CALL KILL(W)
-
-  END SUBROUTINE CFURES
+!  SUBROUTINE  CFURES(S2,FUN,S1)!
+!    implicit none
+!    type (pbresonance),INTENT(INOUT)::S1
+!    type (pbresonance),INTENT(IN)::S2
+!    type (complextaylor) T
+!    type (taylor) W
+!    complex(dp) FUN
+!    EXTERNAL FUN
+!    CALL ALLOC(T)
+!    CALL ALLOC(W)
+!
+!    CALL CFUR(S2%COS%H,FUN,W)
+!    T%R=W
+!    CALL CFUI(S2%SIN%H,FUN,W)
+!    T%R=T%R-W
+!    CALL CFUR(S2%SIN%H,FUN,W)
+!    T%I=W
+!    CALL CFUI(S2%COS%H,FUN,W)
+!    T%I=T%I+W
+!    S1%COS%H=T%R
+!    S1%SIN%H=T%I
+!    CALL KILL(T)
+!    CALL KILL(W)
+!
+!  END SUBROUTINE CFURES
 
 
 end module  complex_taylor
