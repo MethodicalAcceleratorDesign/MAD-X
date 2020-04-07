@@ -4729,7 +4729,7 @@ subroutine ttrfmult(track, ktrack, turn)
       field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord))
       field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z))
     enddo
-
+    print *, "zzzz", z, krf, krf * z
     Cm2 = zero; Sm2 = zero; Cm1 = zero; Sm1 = zero;
     Cp0 = zero; Sp0 = zero; Cp1 = zero; Sp1 = zero;
 

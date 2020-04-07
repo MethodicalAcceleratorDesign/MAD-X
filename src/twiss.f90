@@ -6424,6 +6424,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
     re(6,5) = c1
     if (fsec) te(6,5,5) = c2
   else
+    print *, "hhhhhhor", orbit(5)
     ek(6) = c0 - c1 * orbit(5) + c2 * orbit(5)**2
     re(6,5) = c1 - two * c2 * orbit(5)
     if (fsec) te(6,5,5) = c2
@@ -6494,7 +6495,7 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
   ! dl    = el / two
   ! bi2gi2 = one / (betas * gammas) ** 2
 
-  if (ftrk) then
+ ! if (ftrk) then
     ! if bvk = -1 apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
     x  = orbit(1);
     px = orbit(2);
@@ -6502,14 +6503,14 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
     py = orbit(4);
     t  = orbit(5);
     pt = orbit(6);
-  else
-    x  = zero;
-    px = zero;
-    y  = zero;
-    py = zero;
-    t  = zero;
-    pt = zero;
-  endif
+  !else
+   ! x  = zero;
+   ! px = zero;
+   ! y  = zero;
+   ! py = zero;
+   ! t  = zero;
+   ! pt = zero;
+  !endif
 
   
  ! if(el .gt. zero) then
@@ -6517,8 +6518,8 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
     tcorr = jc*el/(2*beta)
  !   jc = 1 
     V = jc*vrf/(pc*el)
-    s1=sin(phirf - omega*(t+tcorr))
-    c1=cos(phirf - omega*(t+tcorr))
+    s1 = sin(phirf - omega*(t+tcorr))
+    c1 = cos(phirf - omega*(t+tcorr))
 
     print *, "iiiiitra", phirf, omega, t, tcorr
     print *, "aaaa", V, s1, c1, tcorr
@@ -6526,25 +6527,24 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
      dpx = -V*s1*x*half
      dpy = -V*s1*y*half
      dpt =  0.25d0*(x**2+y**2)*V*c1*omega;
-  !if (ftrk) then
-
+  if (ftrk) then
+ print *, "reeal kick", cm1, z, ftrk
     orbit(2) = px + dpx;
     orbit(4) = py + dpy;
     orbit(6) = pt + dpt;
     print *, "kkkktwis" , jc, orbit(2),orbit(4) ,orbit(6)
- ! endif
-
-!  ek(2) = ek(2) + dpx
-!  ek(4) = ek(4) + dpy
-!  ek(6) = ek(6) + dpt
- ! re(2,1) = -V*s1*half
- ! re(4,3) = -V*s1*half
+  endif
+    print *, "hhhh", ftrk, orbit
+  
+  ek(2) = ek(2) + dpx
+  ek(4) = ek(4) + dpy
+  ek(6) = ek(6) + dpt
+   print *, "reeal fringe", V*s1*half
+  re(2,1) = -V*s1*half
+  re(4,3) = -V*s1*half
+  te(6,1,1) = half*V*c1*omega
+  te(6,2,2) = half*V*c1*omega
  ! el  = node_value('l ')
-
-  !  TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
-  !  TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
-  !  TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.25d0*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
-
 
 end SUBROUTINE tmrffringe
 
@@ -8393,13 +8393,15 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   endif
 
   !---- Element Kick
-  ek(2) = -REAL(Cp0);
-  ek(4) = AIMAG(Cp0);
-  ek(6) =  vrf * sin(lag * twopi - krf * z) - krf * REAL(Sp1);
+  !ek(2) = -REAL(Cp0);
+  !ek(4) = AIMAG(Cp0);
+  !ek(6) =  vrf * sin(lag * twopi - krf * z) - krf * REAL(Sp1);
 
   !---- First-order terms
+  print *, "reeal kick", cm1, z, ftrk
   re(2,1) = -REAL(Cm1);
   re(2,3) =  AIMAG(Cm1);
+  
   re(2,5) = -krf * REAL(Sp0);
   re(4,1) =  re(2,3);
   re(4,3) = -re(2,1);
