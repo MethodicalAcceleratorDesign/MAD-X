@@ -4588,8 +4588,8 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
      !---- Add the missing focussing component of thin dipoles for co
      if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
-        orbit(2) = orbit(2) - dipr*dipr/elrad * x
-        orbit(4) = orbit(4) - dipi*dipi/elrad * y
+        orbit(2) = orbit(2) - (one+deltap)*dipr*dipr/elrad * x
+        orbit(4) = orbit(4) - (one+deltap)*dipi*dipi/elrad * y
      endif
 
      !---- Radiation effects at exit.
@@ -4622,8 +4622,8 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   !---- Add the missing focussing component of thin dipoles
   if (elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
-     re(2,1) = re(2,1) - dipr*dipr/elrad
-     re(4,3) = re(4,3) - dipi*dipi/elrad
+     re(2,1) = re(2,1) - (one+deltap)*dipr*dipr/elrad
+     re(4,3) = re(4,3) - (one+deltap)*dipi*dipi/elrad
   endif
   re(2,6) = + dipr * bi
   re(4,6) = - dipi * bi
