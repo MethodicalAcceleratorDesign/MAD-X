@@ -334,10 +334,6 @@ CONTAINS
       if (modulationtype == 1) then
         V=zero
         DV=el%D_ac*XS%AC(n)%X(2)
-        
-        print*,"skowron: ac modp ",el%name," clock no ",n
-        call print(DV,6)
-        
       else
         DV=(XS%AC(n)%X(1)*COS(ELP%theta_ac)-XS%AC(n)%X(2)*SIN(ELP%theta_ac))
         V=ELP%DC_ac+ELP%A_ac*DV
@@ -348,8 +344,7 @@ CONTAINS
       V=0.0_dp
       DV=0.0_dp
     endif
-    
-    
+ 
     CALL transfer_ANBN(EL,ELP,VP=V,DVP=DV)
 
     CALL KILL(V)
@@ -1115,7 +1110,10 @@ endif
        if(associated(t%bb).and.dobb.and.do_beam_beam) then
 
           if(t%bb%patch) call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_true)
+ 
           call BBKICK(t%bb,X)
+ 
+
           if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
 
        endif

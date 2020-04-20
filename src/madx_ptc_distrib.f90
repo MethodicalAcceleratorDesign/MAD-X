@@ -121,7 +121,8 @@ contains
     integer              :: n
     character(20)        :: tabn
     character(17)        :: coln
-
+    external             :: fort_warn
+    
     if ( (n < 1) .and. (n > nmoments ) ) then
 
        tabn(1:1) = achar(0)
@@ -169,7 +170,8 @@ contains
     integer       :: i,ii,iii
     type(real_8)  :: y(6)
     integer       :: restart_sequ,advance_node
-
+    external      :: fort_warn, fort_info, seterrorflag, makemomentstables
+    
     if (nmoments < 1) then
        call fort_info("ptc_moments","No moments specified for calculation.")
        return
@@ -255,6 +257,7 @@ contains
     logical              :: set
     integer              :: i,j,k,e(6)
     integer              :: debug
+    
     !    integer              :: last
     !    integer              :: index !standarf function
 
@@ -474,6 +477,7 @@ contains
     integer, dimension(3)           :: stringlength
     character(48)                   :: tmpstring
     integer                         :: getcurrentcmdname
+    external             :: fort_warn
     ! This routine must be called before any init in ptc_twiss is performed
     ! since it initialize Bertz for its purpose
     !

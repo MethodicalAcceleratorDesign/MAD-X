@@ -4608,7 +4608,7 @@ contains
     if(iout.eq.0) iout=1
 if(longprint) write(iunit,502) -iout,zero,(j(i),i=1,inva)
 if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero "
-if(.not.longprint) write(6,*) " "
+!if(.not.longprint) write(iunit,*) " "
     !
     return
       end subroutine dapri77

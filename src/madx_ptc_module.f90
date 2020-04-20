@@ -71,7 +71,10 @@ MODULE madx_ptc_module
   real(dp) :: my_ring_length
   
   character(1000), private  :: whymsg
-
+  external :: aafail, dcopy, get_node_vector, fort_warn
+  external :: element_name, node_name, node_string
+  external :: augment_count, string_to_table_curr, vector_to_table_curr
+  external :: make_map_table, seterrorflag, comm_para, double_to_table_curr
 CONTAINS
 
   subroutine resetclocks()

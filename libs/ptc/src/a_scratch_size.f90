@@ -19,7 +19,7 @@
 ! FITNESS FOR A PARTICULAR PURPOSE.
 
 
-module precision_constants
+module precision_constants 
   implicit none
   public
   integer,parameter  :: newscheme_max =200 
@@ -204,6 +204,16 @@ module precision_constants
   logical :: use_quaternion = .false.
   logical :: use_tpsa = .false.
   logical :: conversion_xprime_in_abell=.true.
+  character(18) ::         format1="(1(1x,g23.16,1x))"
+  character(18) ::         format2="(2(1x,g23.16,1x))"
+  character(18) ::         format3="(3(1x,g23.16,1x))"
+  character(18) ::         format4="(4(1x,g23.16,1x))"
+  character(18) ::         format5="(5(1x,g23.16,1x))"
+  character(18) ::         format6="(6(1x,g23.16,1x))"
+  character(18) ::         format7="(7(1x,g23.16,1x))"
+  character(18) ::         format8="(8(1x,g23.16,1x))"
+  character(18) ::         format9="(9(1x,g23.16,1x))"
+  character(19) ::         format10="(10(1x,g23.16,1x))"
   !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence

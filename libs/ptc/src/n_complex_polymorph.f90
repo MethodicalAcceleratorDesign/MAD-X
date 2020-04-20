@@ -1003,6 +1003,7 @@ contains
 
   end subroutine set_da_pointers
 
+
   subroutine init_map_cp(NO1,ND1,NP1,NDPT1,PACKAGE)
     implicit none
     integer NO1,ND1,NP1
