@@ -1493,7 +1493,6 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     if (noffset == 2) {
       xoffset = aper_offset[0];
       yoffset = aper_offset[1];
-      printf("aaabbb %f \n", xoffset);
     }
     else xoffset=yoffset=0;
     if (debug) printf("name: %s, x-offset: %f, y-offset: %f\n", name, xoffset, yoffset);
@@ -1740,7 +1739,6 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   x_intersect -=xoffset;
   y_intersect -=yoffset;
-  printf("offsettt %f %f \n",xoffset, yoffset);
   if (is_zero_len == 0 || jslice == 1) {
     aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
       apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
