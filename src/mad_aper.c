@@ -1134,24 +1134,24 @@ aper_calc(double p, double q, double* minhl,
 	/* Find general line equation for line joining halo centre to pipe apex point*/
        aper_linepar(p, q, pipex[i], pipey[i], &a1, &b1, &c1);
 
-	/* find intersection coordinates; cycle if lines are parallel */
-	if (0 == aper_intersect(a1, b1, c1, a2, b2, c2, &xm, &ym)) continue; // parallel lines
-	/* intersection point must be on halo line segment */
-	if (0 == aper_on_line(xm, ym, haloxadj[j], haloyadj[j], haloxadj[j+1], haloyadj[j+1], dist_limit)) continue;
-	/* pipe apex must be between halo center and intersection point */
-	if (0 == aper_on_line(pipex[i], pipey[i], p, q, xm, ym, dist_limit)) continue;
+      	/* find intersection coordinates; cycle if lines are parallel */
+      	if (0 == aper_intersect(a1, b1, c1, a2, b2, c2, &xm, &ym)) continue; // parallel lines
+      	/* intersection point must be on halo line segment */
+      	if (0 == aper_on_line(xm, ym, haloxadj[j], haloyadj[j], haloxadj[j+1], haloyadj[j+1], dist_limit)) continue;
+      	/* pipe apex must be between halo center and intersection point */
+      	if (0 == aper_on_line(pipex[i], pipey[i], p, q, xm, ym, dist_limit)) continue;
 
-	tmphalox[c] = xm;
-	tmphaloy[c] = ym;
-	c++;
-}
-}
+      	tmphalox[c] = xm;
+      	tmphaloy[c] = ym;
+      	c++;
+      }
+    }
 
-halolength = c - 1;
-for (j=0; j <= halolength; j++) {
-  haloxadj[j] = tmphalox[j];
-  haloyadj[j] = tmphaloy[j];
-}
+    halolength = c - 1;
+    for (j=0; j <= halolength; j++) {
+      haloxadj[j] = tmphalox[j];
+      haloyadj[j] = tmphaloy[j];
+    }
   } // notsimple
 
   /*Calculate smallest ratio:*/
@@ -1169,7 +1169,7 @@ for (j=0; j <= halolength; j++) {
       if ( // not parallel lines
        0 != aper_intersect(a1, b1, c1, a2, b2, c2, &xm, &ym)
 	  // intersection point is inside the bounding box
-	  &&  ( xm <= bbxmax && xm >= bbxmin && ym <= bbymax && ym >= bbymin)
+       &&  ( xm <= bbxmax && xm >= bbxmin && ym <= bbymax && ym >= bbymin)
 
 	  // intersection point is inside pipe line segment
        && 0 != aper_on_line(xm, ym, pipex[i], pipey[i], pipex[i+1], pipey[i+1], dist_limit)
@@ -1538,10 +1538,10 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       }
     }    /* end loop 'if no pipe ' */
 
-      else {
-        node_n1   = 999999;
-        true_node = 0;
-        offs_node = 0;
+    else {
+      node_n1   = 999999;
+      true_node = 0;
+      offs_node = 0;
 
 
       /* calculate the number of slices per node */
@@ -1682,7 +1682,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
             dispxadj = -dispdesx + 2*dispdesx*(dispc-1)/nchecks; //-1 becuase end point is already checked
             dispyadj = -dispdesy + 2*dispdesx*(dispc-1)/nchecks;
           }
-         
+
           for (angle=0; angle<twopi; angle+=dangle) {
 
             /* new 27feb08 BJ */
@@ -1720,46 +1720,43 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
             if (debug) printf("\n Angle: %e deltax: %e deltay: %e minratio: %e, ratioang: %e, interx: %e, intery: %e, dispyadj: %e, dispxadjy: %e \n", 
               angle, deltax, deltay, ratio, ratio_ang, x_intersect_ang, y_intersect_ang, dispxadj, dispyadj );
           }
-
-      }
-
-
+        }
 
         //nr = ratio * halo[1];
         //n1 = nr / (halo[1]/halo[0]); /* ratio r/n = 1.4 */
-	n1 = ratio * halo[0]; // 2015-Jul-30  17:23:26  ghislain: replaced above two lines.
+      	n1 = ratio * halo[0]; // 2015-Jul-30  17:23:26  ghislain: replaced above two lines.
 
 
-	if (debug) printf("\n Found ratio: %f n1: %f \n",ratio,n1);
+      	if (debug) printf("\n Found ratio: %f n1: %f \n",ratio,n1);
 
-  n1x_m = n1 * bbeat * sqrt(betx*ex);
-  n1y_m = n1 * bbeat * sqrt(bety*ey);
+        n1x_m = n1 * bbeat * sqrt(betx*ex);
+        n1y_m = n1 * bbeat * sqrt(bety*ey);
 
-	/* Change below, BJ 23oct2008                              */
-	/* test block 'if (n1 < node_n1)' included in test block   */
+      	/* Change below, BJ 23oct2008                              */
+      	/* test block 'if (n1 < node_n1)' included in test block   */
 
-  x_intersect -=xoffset;
-  y_intersect -=yoffset;
-  if (is_zero_len == 0 || jslice == 1) {
-    aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
-      apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
-      &xeff, &yeff, &px, &py, &betx, &bety, &dx, &dy, &x_intersect, &y_intersect, table);
+        x_intersect -=xoffset;
+        y_intersect -=yoffset;
+        if (is_zero_len == 0 || jslice == 1) {
+          aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
+            apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
+            &xeff, &yeff, &px, &py, &betx, &bety, &dx, &dy, &x_intersect, &y_intersect, table);
 
-	  /* save node minimum n1 */
-    if (n1 < node_n1) {
-      node_n1 = n1;
-      node_s = s_curr;
-    }
-	} // if is_zero_len
-} // for jslice
+      	  /* save node minimum n1 */
+          if (n1 < node_n1) {
+            node_n1 = n1;
+            node_s = s_curr;
+          }
+      	} // if is_zero_len
+      } // for jslice
 
       reset_interpolation();
 
-      /* insert minimum node value into Twiss table */
+            /* insert minimum node value into Twiss table */
       double_to_table_row(tw_cp->name, "n1", tw_cnt, &node_n1);
       (*tw_cnt)++;
 
-      /* save range minimum n1 */
+            /* save range minimum n1 */
       if (node_n1 < lim_pt->n1) {
         strcpy(lim_pt->name,name);
         lim_pt->n1 = node_n1;
