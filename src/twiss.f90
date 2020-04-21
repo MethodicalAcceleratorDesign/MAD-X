@@ -4519,11 +4519,11 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      dbi = dtmp * sin(angle)
   endif
 
-  dbr = bvk * dbr
-  dbi = bvk * dbi
+  dbr  = bvk * dbr
+  dbi  = bvk * dbi
   dipr = bvk * dipr
   dipi = bvk * dipi
-
+  an   = bvk * an
   !---- Other components and errors.
   nord = 0
   ! that loop should start at one since nominal dipole strength already taken into account above
