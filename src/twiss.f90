@@ -4590,7 +4590,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
         if (an .ne. 0) then
           orbit(2) = orbit(2) - an*dipr/elrad * x ! 
-          orbit(4) = orbit(4) - an*dipi/elrad * y
+          orbit(4) = orbit(4) - (one+deltap)*dipi/elrad * y
         else
           orbit(2) = orbit(2) - (one+deltap)*dipr*dipr/elrad * x ! 
           orbit(4) = orbit(4) - (one+deltap)*dipi*dipi/elrad * y
@@ -4629,7 +4629,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   if (elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
     if (an .ne. 0) then
       re(2,1) = re(2,1) - an*dipr/elrad
-      re(4,3) = re(4,3) - an*dipi/elrad
+      re(4,3) = re(4,3) - (one+deltap)*dipi/elrad
     else
       re(2,1) = re(2,1) - (one+deltap)*dipr*dipr/elrad
       re(4,3) = re(4,3) - (one+deltap)*dipi*dipi/elrad
