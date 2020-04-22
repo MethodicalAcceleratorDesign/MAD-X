@@ -4634,8 +4634,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   !---- The (1+deltap) is from that the term is h*k0 (so one geometrical and one is bending strength)
   if (elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
     if (an .ne. 0) then
-      print *, "kkk", anr, dipr, elrad
-      print *, "kki", ani, dipi, elrad
       re(2,1) = re(2,1) - anr*dipr/elrad
       re(4,3) = re(4,3) - ani*dipi/elrad
     else
