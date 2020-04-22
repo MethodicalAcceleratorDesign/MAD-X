@@ -142,8 +142,6 @@ module S_status
   logical(lp) :: automatic_complex = my_true
   integer :: aperture_pos_default=0
   private track_TREE_G_complexr,track_TREE_G_complexp,track_TREE_probe_complexr,track_TREE_probe_complexp_new
-  integer :: size_tree=15
-  integer :: ind_spin(3,3),k1_spin(9),k2_spin(9)
   real(dp),TARGET ::INITIAL_CHARGE=1
   logical :: mcmillan=.false.
   real(dp) :: radfac=1   ! to fudge radiation (lower it)
@@ -677,40 +675,6 @@ CONTAINS
     CALL CHECK_APERTURE(E,Y)
 
   END SUBROUTINE  CHECK_APERTURE_P
-
-
-
-
-!int
-!aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipelength )
-!{
-!// winding number test for a point in a polygon
-!// Input:   p,q = a point,
-!//          pipex[], pipey[] = vertex points of the polygon with pipe[len]=pipe[0]
-!// Return:  wn = the winding number (=0 only when point is outside polygon)
-!// source : wn_PnInPoly() at http://geomalgorithms.com/a03-_inclusion.html
-! int    wn = 0;    // the  winding number counter
-! // loop through all edges of the polygon
-! for (int i=0; i<=pipelength; i++) { // edge from V[i] to  V[i+1]
-!   if (pipey[i] <= q  &&  pipey[i+1]  > q) {
-!     // first vertex is below point; second vertex is above; upward crossing
-!     if ( (pipex[i+1] - pipex[i]) * (q - pipey[i]) - (p - pipex[i]) * (pipey[i+1] - pipey[i])  > 0 ) {
-!       // Point left of  edge
-!       ++wn;
-!       continue;
-!     }
-!   }
-!   if (pipey[i] > q  &&  pipey[i+1]  <= q) {
-!     // first vertex is above point; second vertex is below; downward crossing
-!     if ( (pipex[i+1] - pipex[i]) * (q - pipey[i]) - (p - pipex[i]) * (pipey[i+1] - pipey[i])  < 0) {
-!       // Point right of  edge
-!       --wn;
-!       continue;
-!     }
-!   }
-! }
-! return wn;
-!}
 
   
   ! checks aperture of aribtrary polygon
@@ -1562,7 +1526,7 @@ CONTAINS
     n_rf=0
 !    call dd_p !valishev
     doing_ac_modulation_in_ptc=.false.
-    package=my_true
+    package=old_package
     if(present(pack))     package=my_true
     only2d=0
     n_acc=0
@@ -10376,74 +10340,7 @@ endif
 
   END SUBROUTINE SET_TREE_G_complex
 
-subroutine print_tree_element(t,mf)
-implicit none
-type(tree_element) t
- 
-integer i,mf
-!   write(mf,'(a204)') t%file
-write(mf,'(3(1X,i8))') t%N,t%NP,t%no 
-do i=1,t%n
- write(mf,'(1X,G20.13,1x,i8,1x,i8)')  t%cc(i),t%jl(i),t%jv(i)
-enddo
-write(mf,'(2(1X,L1))') t%symptrack,t%usenonsymp,t%factored
-write(mf,'(18(1X,G20.13))') t%fix0,t%fix,t%fixr
-do i=1,6
- write(mf,'(6(1X,G20.13))') t%e_ij(i,1:6)
-enddo
-do i=1,6
- write(mf,'(6(1X,G20.13))') t%rad(i,1:6)
-enddo
- write(mf,'(3(1X,G20.13))') t%ds,t%beta0,t%eps
 
-end subroutine print_tree_element
-
-subroutine print_tree_elements(t,mf)
-implicit none
-type(tree_element) t(:)
- 
-integer i,mf
-
- do i=1,size(t)
-  call print_tree_element(t(i),mf)
- enddo
-
-end subroutine print_tree_elements
- 
-subroutine read_tree_element(t,mf)
-implicit none
-type(tree_element) t
- 
-integer i,mf
- 
- ! read(mf,'(a204)') t%file
-!read(mf,*) t%N,t%NP,t%no
-do i=1,t%n
- read(mf,*)  t%cc(i),t%jl(i),t%jv(i)
-enddo
-read(mf,*) t%symptrack,t%usenonsymp,t%factored
-read(mf,'(18(1X,G20.13))') t%fix0,t%fix,t%fixr
-do i=1,6
- read(mf,*) t%e_ij(i,1:6)
-enddo
-do i=1,6
- read(mf,*) t%rad(i,1:6)
-enddo
- read(mf,*) t%ds,t%beta0,t%eps
-
-end subroutine read_tree_element
-
-subroutine read_tree_elements(t,mf)
-implicit none
-type(tree_element) t(:)
- 
-integer i,mf
-
- do i=1,size(t)
-  call read_tree_element(t(i),mf)
- enddo
-
-end subroutine read_tree_elements
 
   SUBROUTINE track_TREE_probe_complexr(T,xs,dofix0,dofix,sta,jump,all_map)
     use da_arrays
