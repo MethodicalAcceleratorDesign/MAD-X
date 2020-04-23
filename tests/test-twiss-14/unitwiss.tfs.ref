@@ -22,8 +22,8 @@
 @ GAMMATR          %le         41.44984628
 @ Q1               %le        0.3162594615
 @ Q2               %le        0.3680673109
-@ DQ1              %le       -0.6032990119
-@ DQ2              %le        -0.425053144
+@ DQ1              %le       -0.6032990215
+@ DQ2              %le       -0.4250531508
 @ DXMAX            %le       0.07371094893
 @ DYMAX            %le                  -0
 @ XCOMAX           %le                   0
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le     2.243130388e-05
 @ SYNCH_5          %le     8.091411766e-07
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.04.02 Darwin 64"
-@ DATE             %08s "22/03/19"
-@ TIME             %08s "10.22.31"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "23/04/20"
+@ TIME             %08s "10.22.54"
 * NAME               KEYWORD                             S                  L              ANGLE                K1L               BETX               ALFX                MUX               BETY               ALFY                MUY                 DX                DPX                 DY                DPY 
 $ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TME$START"         "MARKER"                             0                  0                  0                  0       0.6790421976   -1.517389453e-16                  0        2.156479968                  0                  0       0.0204938901                 -0                 -0                 -0

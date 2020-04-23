@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.09.27 13:36:38      +
+  + Execution date: 2020.04.23 10:25:42      +
   ++++++++++++++++++++++++++++++++++++++++++++
 SET, FORMAT="12d", "-18.5e", "25s";
 
@@ -97,7 +97,7 @@ enter Twiss module
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   5.000000E-03  0.000000E+00  7.000000E-03  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     2.000000E-01  3.900000E-01  1.050000E-02  7.000000E-03 -4.303726E-02  0.000000E+00
+final orbit vector:     1.995000E-01  3.890000E-01  1.050000E-02  7.000000E-03 -4.284251E-02  0.000000E+00
 
 ++++++ table: summ
 
@@ -105,10 +105,10 @@ length             orbit5             alfa               gammatr
 1.00000e+00        -0.00000e+00       0.00000e+00        0.00000e+00        
 
 q1                 dq1                betxmax            dxmax              
-2.50000e-01        0.00000e+00        1.25000e+00        3.05000e-01        
+2.84802e-01        0.00000e+00        1.25000e+00        3.05500e-01        
 
 dxrms              xcomax             xcorms             q2                 
-1.99669e-01        2.00000e-01        1.30985e-01        1.10571e-01        
+1.99997e-01        1.99500e-01        1.30658e-01        1.10571e-01        
 
 dq2                betymax            dymax              dyrms              
 0.00000e+00        3.81250e+00        3.50000e-03        2.29129e-03        
