@@ -47,7 +47,7 @@ constraint,sequence=lhcb1,range=ip8,dx=0.0,dpx=0.0;
 
 constraint,sequence=lhcb1,range=e.DS.R8.B1,
                             alfx=eir8b1->alfx,alfy=eir8b1->alfy,
-                            betx=eir8b1->betx,bety=eir8b1->bety; 
+                            betx=eir8b1->betx,bety=eir8b1->bety;
 constraint,sequence=lhcb1,range=e.DS.R8.B1,dx=eir8b1->dx,dpx=eir8b1->dpx;
 constraint,sequence=lhcb1,range=e.DS.R8.B1,mux=muxip8,muy=muyip8;
 
@@ -72,7 +72,7 @@ vary,name=KQ10.R8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
 vary,name=KQTL11.R8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
 vary,name=KQT12.R8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
 vary,name=KQT13.R8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
-jacobian,calls=30,tolerance=1.e-24;
+jacobian,calls=30,tolerance=1.e-24,bisec=1;
 endmatch;
 fill,table=str.ip8.b1;
 };
