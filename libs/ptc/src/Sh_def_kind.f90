@@ -1265,14 +1265,12 @@ CONTAINS !----------------------------------------------------------------------
        if(J==1) then
           if(EL5%P%DIR==1) THEN
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,1,X,k)
-             IF(k%FRINGE.or.el5%p%permfringe==1.or.el5%p%permfringe==3) &
-                CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,1,X,k)
+             IF(k%FRINGE.or.el5%p%permfringe==1.or.el5%p%permfringe==3) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,1,X,k)
              IF(el5%p%permfringe==2.or.el5%p%permfringe==3) &
                CALL FRINGE2QUAD(EL5%P,EL5%bn(2),EL5%an(2),EL5%VA,EL5%VS,1,X,k)
           ELSE
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,2,X,k)
-              IF(k%FRINGE.or.el5%p%permfringe==1.or.el5%p%permfringe==3) &
-                 CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,2,X,k)
+              IF(k%FRINGE.or.el5%p%permfringe==1.or.el5%p%permfringe==3) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,2,X,k)
              IF(el5%p%permfringe==2.or.el5%p%permfringe==3) &
              CALL FRINGE2QUAD(EL5%P,EL5%bn(2),EL5%an(2),EL5%VA,EL5%VS,2,X,k)
           ENDIF
@@ -1280,14 +1278,12 @@ CONTAINS !----------------------------------------------------------------------
           if(EL5%P%DIR==1) THEN
              IF(el5%p%permfringe==2.or.el5%p%permfringe==3) &
              CALL FRINGE2QUAD(EL5%P,EL5%bn(2),EL5%an(2),EL5%VA,EL5%VS,2,X,k)
-              IF(k%FRINGE.or.el5%p%permfringe==1.or.el5%p%permfringe==3) &
-                       CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,2,X,k)
+              IF(k%FRINGE.or.el5%p%permfringe==1.or.el5%p%permfringe==3) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,2,X,k)
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,2,X,k)
           ELSE
              IF(el5%p%permfringe==2.or.el5%p%permfringe==3) &
              CALL FRINGE2QUAD(EL5%P,EL5%bn(2),EL5%an(2),EL5%VA,EL5%VS,1,X,k)
-              IF(k%FRINGE.or.el5%p%permfringe==1.or.el5%p%permfringe==3) &
-                        CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,1,X,k)
+              IF(k%FRINGE.or.el5%p%permfringe==1.or.el5%p%permfringe==3) CALL MULTIPOLE_FRINGE(EL5%P,EL5%AN,EL5%BN,1,X,k)
              CALL EDGE(EL5%P,EL5%BN,EL5%H1,EL5%H2,EL5%FINT,EL5%HGAP,1,X,k)
           ENDIF
        ENDIF
@@ -3661,9 +3657,9 @@ CALL FRINGECAV(EL,X,k,2)
     endif
 
     VL=dir*YL*EL%volt*volt_c/EL%P%P0C
-     
+
     !print*,"skowron: ph:",EL%PHAS," ph0=",EL%phase0, EL%t," volt omega",VL,O
-    
+
     do ko=1,el%nf    ! over modes
 
        DF=0.0_dp
