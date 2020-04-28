@@ -117,6 +117,10 @@
       double precision WORK(1000*(N+M)),SV(N+M),COND
       integer IWORK(30*(N+M)),RANK
       integer effcon, effvar,coninfo(M),varinfo(N)
+      integer debug
+      integer, external :: get_option
+
+      debug = get_option('debug ')
 
       ireset = 0
       izero = 0
@@ -198,6 +202,13 @@
         goto 300
       endif
 
+      if (debug .ne. 0) then
+        write(*,*) "Jacobian: "
+        do i=1,M
+          write(*,*) fjac(i,:)
+        enddo
+      endif
+
 !---- Reset solution vector
       do i=1,N+M
         effsol(i)=0
@@ -253,6 +264,14 @@
 !---- CALL DGELS(TRANSA, M, N, NRHS, DA, LDA, DB, LDB, DWORK,
 !---- LDWORK,INFO)
       write(*,*) "Solve system with ",effcon,"con,",effvar,"var"
+
+      if (debug .ne. 0) then
+        write(*,*) "Effective Jacobian: "
+        do i=1,effcon
+          write(*,*) effjac(i,:)
+        enddo
+      endif
+
 !      call DGELS ('N',effcon,effvar,1,effjac,M,effsol,N+M,              &
 !     &WORK,2*(N+M),INFO)
 !      DGELSD( M, N, NRHS, A, LDA, B, LDB, S,  RCOND,
