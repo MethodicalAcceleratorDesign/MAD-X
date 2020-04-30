@@ -205,7 +205,7 @@
       if (debug .ne. 0) then
         write(*,*) "Jacobian: "
         do i=1,M
-          write(*,*) fjac(i,:)
+          write(*,'(100e20.12)') (fjac(i,j),j=1,N)
         enddo
       endif
 
@@ -268,7 +268,7 @@
       if (debug .ne. 0) then
         write(*,*) "Effective Jacobian: "
         do i=1,effcon
-          write(*,*) effjac(i,:)
+          write(*,'(100e20.12)') (effjac(i,j),j=1,effvar)
         enddo
       endif
 
