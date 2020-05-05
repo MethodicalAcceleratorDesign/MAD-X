@@ -122,25 +122,25 @@ END TYPE S_APERTURE
 
 
 TYPE MAGNET_CHART
-   type(magnet_frame), pointer:: f  => null()
-   type(MADX_APERTURE), pointer:: APERTURE  => null()
-   type(S_APERTURE), pointer:: A(:)  => null()
+   type(magnet_frame), pointer:: f  => null()  ! position magnets within the fibre (same as fibre if not misaligned)
+   type(MADX_APERTURE), pointer:: APERTURE  => null()  ! apertures in Magnets
+   type(S_APERTURE), pointer:: A(:)  => null()  !  never used : different aperture at every node
    real(dp),pointer :: charge  => null() ! propagator
    integer,pointer :: dir  => null()   ! propagator
    real(dp), POINTER :: BETA0 => null(),GAMMA0I => null(),GAMBET => null(),MASS => null(),ag => null()
    real(dp), POINTER :: P0C => null()
-   real(dp), POINTER :: LD => null(),B0 => null(),LC => null()         !
-   real(dp), POINTER :: TILTD  => null()     ! INTERNAL FRAME
-   real(dp),  DIMENSION(:), POINTER :: EDGE  => null()        ! INTERNAL FRAME
+   real(dp), POINTER :: LD => null(),B0 => null(),LC => null()         ! arc length  and cord length
+   real(dp), POINTER :: TILTD  => null()     ! INTERNAL FRAME design tilt
+   real(dp),  DIMENSION(:), POINTER :: EDGE  => null()        ! INTERNAL FRAME  design entrance and exit angle
 
    !
-   LOGICAL(lp), POINTER :: EXACT  => null()
+   LOGICAL(lp), POINTER :: EXACT  => null()  ! small angle or not
    LOGICAL(lp), POINTER :: KILL_ENT_FRINGE => null(),KILL_EXI_FRINGE => null(), bend_fringe => null()
    LOGICAL(lp), POINTER :: KILL_ENT_SPIN => null(),KILL_EXI_SPIN => null() 
-   integer, pointer :: permFRINGE => null(),highest_fringe => null()                 !
+   integer, pointer :: permFRINGE => null(),highest_fringe => null()     ! highest_fringe = 2 by default            !
    !
-   INTEGER, POINTER :: METHOD => null(),NST => null()                   ! METHOD OF INTEGRATION 2,4,OR 6 YOSHIDA
-   INTEGER, POINTER :: NMUL => null()                         ! NUMBER OF MULTIPOLE
+   INTEGER, POINTER :: METHOD => null(),NST => null()                   ! METHOD OF INTEGRATION 2,4,OR 6 YOSHIDA ! nst= number of steps
+   INTEGER, POINTER :: NMUL => null()                         ! NUMBER OF MULTIPOLE   ! nmul maximum multipole
 
 END TYPE MAGNET_CHART
 
@@ -170,8 +170,8 @@ TYPE ELEMENT
    INTEGER, POINTER :: KIND => null()
    logical(lp), POINTER :: recut,even => null()
    LOGICAL(LP), POINTER :: PLOT => null()
-   LOGICAL(LP), POINTER :: electric => null()
-   character(120), pointer :: filef
+   LOGICAL(LP), POINTER :: electric => null()  !  type teapot can be electric
+   character(120), pointer :: filef   ! maps replacing ptc
    character(120), pointer ::  fileb
    ! common stuff to all element
    type(MAGNET_CHART), pointer :: P => null()
@@ -194,10 +194,10 @@ TYPE ELEMENT
    real(dp), POINTER:: D_Volt=> null(),D0_Volt=> null();
    real(dp), POINTER:: D_phas=> null(),D0_phas=> null();
    logical(lp), POINTER :: THIN => null()
-   integer(2), pointer :: slow_ac => null()
+   integer(2), pointer :: slow_ac => null()  ! magnet modulation
    real(dp), POINTER ::  B_SOL  => null()
    !  misalignements and rotation
-   logical(lp), POINTER ::  MIS => null()
+   logical(lp), POINTER ::  MIS => null()   ! migalignment on or off
    !   real(dp),  DIMENSION(:), POINTER ::d => null(),r => null()                             !  Misalignements
    !storage  space
    !integer  twiss                                                            !
@@ -209,31 +209,31 @@ TYPE ELEMENT
    TYPE(SOL5), POINTER :: S5    => null()            ! solenoid
    TYPE(KTK), POINTER :: T6     => null()           ! INTEGRATOR   thick slow
    TYPE(TKTF), POINTER :: T7    => null()            ! INTEGRATOR   thick fast
-   TYPE(NSMI), POINTER :: S8    => null()            ! NORMAL SMI
-   TYPE(SSMI), POINTER :: S9    => null()            ! SKEW SMI
-   TYPE(TEAPOT), POINTER :: TP10 => null()                ! sector teapot
+   TYPE(NSMI), POINTER :: S8    => null()            ! NORMAL SMI Sixtrack shit
+   TYPE(SSMI), POINTER :: S9    => null()            ! SKEW SMI Sixtrack shit
+   TYPE(TEAPOT), POINTER :: TP10 => null()                ! sector teapot exact sector bend electric or magnetic
    TYPE(MON), POINTER :: MON14   => null()            ! MONITOR OR INSTRUMENT
-   TYPE(ESEPTUM), POINTER :: SEP15 => null()              ! MONITOR OR INSTRUMENT
+   TYPE(ESEPTUM), POINTER :: SEP15 => null()              ! MONITOR OR INSTRUMENT electric kicker
    TYPE(STREX), POINTER :: K16   => null()             ! EXACT STRAIGHT INTEGRATOR
-   TYPE(ENGE), POINTER :: ENGE17 => null()               ! SOLENOID SIXTRACK STYLE
+   TYPE(ENGE), POINTER :: ENGE17 => null()               !  not implemented
    TYPE(RCOL), POINTER :: RCOL18 => null()             ! RCOLLIMATOR
    TYPE(ECOL), POINTER :: ECOL19 => null()             ! ECOLLIMATOR
-   TYPE(CAV_TRAV), POINTER :: CAV21 => null()            ! CAVITY TRAVELLING WAVE
-   TYPE(SAGAN), POINTER :: WI   => null()              ! USER DEFINED
-   TYPE(PANCAKE), POINTER :: PA => null()          ! GENERAL B
+   TYPE(CAV_TRAV), POINTER :: CAV21 => null()            ! CAVITY TRAVELLING WAVE  (not symplectic)
+   TYPE(SAGAN), POINTER :: WI   => null()              ! USER DEFINED  undulator exact =.false.
+   TYPE(PANCAKE), POINTER :: PA => null()          ! GENERAL B represented as Taylor
    TYPE(ABELL), POINTER :: AB    => null()            ! TYPE ABELL 
-   TYPE(HELICAL_DIPOLE), POINTER :: HE22  => null()         !  
+   TYPE(HELICAL_DIPOLE), POINTER :: HE22  => null()         !  exact =false otherwise not correct
    TYPE(SUPERDRIFT), POINTER :: SDR      => null()     ! GENERAL DRIFT
-   TYPE(FIBRE), POINTER :: PARENT_FIBRE => null()
-   TYPE(fibre_appearance), POINTER :: doko => null()
-   type(element), pointer :: siamese => null()
-   type(element), pointer :: girders => null()
+   TYPE(FIBRE), POINTER :: PARENT_FIBRE => null()   ! in the database universe
+   TYPE(fibre_appearance), POINTER :: doko => null()  ! all appearances 
+   type(element), pointer :: siamese => null()    !   magnets somewhat glued together
+   type(element), pointer :: girders => null()    !    mangets on a girder
    TYPE(AFFINE_FRAME), POINTER :: SIAMESE_FRAME => null()
    TYPE(AFFINE_FRAME), POINTER :: girder_FRAME => null()
    !   integer, POINTER ::girder_index => null()
-   type(girder),pointer :: assembly => null()
+   type(girder),pointer :: assembly => null()   ! actual girders
    type(ramping), pointer :: ramp => null()
-   type(tree_element), pointer :: forward(:)=> null(),backward(:)=> null()
+   type(tree_element), pointer :: forward(:)=> null(),backward(:)=> null()  ! Taylor tracking on a fibre
    logical, pointer :: usef=> null(),useb=> null()
    integer, pointer :: skip_ptc_f=> null(),skip_ptc_b=> null()
    logical, pointer :: do1mapf=> null(),do1mapb=> null()
@@ -361,7 +361,7 @@ TYPE FIBRE
    real(dp), POINTER :: CHARGE => null()
    real(dp), POINTER :: AG  => null()! spin g-2
    ! TO TIE LAYOUTS
-   TYPE (FIBRE),POINTER :: P => null()
+   TYPE (FIBRE),POINTER :: P => null()   ! tying them in the so-called database universe M_u
    TYPE (FIBRE),POINTER :: N => null()
    INTEGER,POINTER :: loc => null()
 

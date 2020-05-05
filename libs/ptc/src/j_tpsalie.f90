@@ -2,7 +2,7 @@
 !Copyright (C) Etienne Forest
 
 module tpsalie
-  use tpsa
+  use tpsa,  difd_lielib => difd, intd_lielib=> intd !
   implicit none
   public
   private  ASSVEC,ASSMAP,ASSPB,asstaylor,explieflo,expliepb,expflot,exppb
@@ -18,8 +18,8 @@ module tpsalie
   private ADDMAP   !,VECMAP,MAPVEC,VECPB,PBVEC
   private SUBMAP,POWMAP,POWMAP_INV,DAREADTAYLORS,DAREADMAP,DAREADVEC,DAREApb,DAREADTAYLOR
   PRIVATE DAPRINTTAYLORS,DAPRINTMAP
-  private DAPRINTVEC,DAPRINTTAYLOR,DAPRINTpb,allocmap,allocvec,allocpb,alloctree,allocrad,allocrads
-  private KILLmap,KILLvec,KILLpb,KILLtree,killrad,killrads
+  private DAPRINTVEC,DAPRINTTAYLOR,DAPRINTpb,allocmap,allocvec,allocpb,alloctree !,allocrad,allocrads
+  private KILLmap,KILLvec,KILLpb,KILLtree  !,killrad,killrads
   private A_OPT_damap,k_OPT_damap,A_OPT_vecfield,K_OPT_vecfield,A_OPT_pbfield,K_OPT_pbfield
   private A_OPT_tree,K_OPT_tree
   !private push1pol,allocTAYLORS,KILLTAYLORS
@@ -32,12 +32,13 @@ module tpsalie
 
   private A_OPT_gmap,k_OPT_gmap,allocgmap,KILLgmap,EQUALgMAP,IdentityEQUALgMAP,DAPRINTgMAP,concatorg
   private assgmap,concatg,DPEKgMAP,DPOKgMAP,gPOWMAP,trxgtaylorc,trxgtaylor,gPOWMAPtpsa,GETORDERgMAP,CUTORDERg
-  private matrixtMAPr,EQUALgMAPdamap,PRINT_for_bmad_parsem
+  private matrixtMAPr,EQUALgMAPdamap,PRINT_for_bmad_parsem,EQUALdamapgmap
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUALMAP
      MODULE PROCEDURE EQUALgMAP
      MODULE PROCEDURE EQUALgMAPdamap
+     MODULE PROCEDURE EQUALdamapgmap
      MODULE PROCEDURE MAPTAYLORS
      MODULE PROCEDURE TAYLORSMAP
      MODULE PROCEDURE IdentityEQUALMAP
@@ -60,8 +61,8 @@ module tpsalie
      MODULE PROCEDURE EQUALpbvec
      MODULE PROCEDURE TREEMAP
      !radiation
-     MODULE PROCEDURE radEQUAL
-     MODULE PROCEDURE EQUALrad
+!     MODULE PROCEDURE radEQUAL
+!     MODULE PROCEDURE EQUALrad
   end  INTERFACE
 
   INTERFACE OPERATOR (*)
@@ -129,6 +130,8 @@ module tpsalie
      MODULE PROCEDURE concatorg
      MODULE PROCEDURE trxtaylorc
      MODULE PROCEDURE trxgtaylorc
+     MODULE PROCEDURE push1polslow
+
      !     MODULE PROCEDURE trxpbc
      !     MODULE PROCEDURE trxflowc
   end  INTERFACE
@@ -215,8 +218,8 @@ module tpsalie
      MODULE PROCEDURE allocpb
      MODULE PROCEDURE alloctree
      !radiation
-     MODULE PROCEDURE allocrad
-     MODULE PROCEDURE allocrads
+!     MODULE PROCEDURE allocrad
+!     MODULE PROCEDURE allocrads
   END INTERFACE
 
   INTERFACE allocTPSA
@@ -225,8 +228,8 @@ module tpsalie
      MODULE PROCEDURE allocpb
      MODULE PROCEDURE alloctree
      !radiation
-     MODULE PROCEDURE allocrad
-     MODULE PROCEDURE allocrads
+ !    MODULE PROCEDURE allocrad
+ !    MODULE PROCEDURE allocrads
   END INTERFACE
 
   INTERFACE KILL
@@ -241,8 +244,8 @@ module tpsalie
      MODULE PROCEDURE KILLpb
      MODULE PROCEDURE KILLtree
      !radiation
-     MODULE PROCEDURE KILLrad
-     MODULE PROCEDURE KILLrads
+   !  MODULE PROCEDURE KILLrad
+   !  MODULE PROCEDURE KILLrads
   END INTERFACE
 
   INTERFACE KILLTPSA
@@ -251,8 +254,8 @@ module tpsalie
      MODULE PROCEDURE KILLpb
      MODULE PROCEDURE KILLtree
      !radiation
-     MODULE PROCEDURE KILLrad
-     MODULE PROCEDURE KILLrads
+   !  MODULE PROCEDURE KILLrad
+   !  MODULE PROCEDURE KILLrads
   END INTERFACE
 
   ! Management routines
@@ -387,12 +390,11 @@ contains
   SUBROUTINE  alloctree(S1)
     implicit none
     type (tree),INTENT(INOUT)::S1
+     integer i
+   do i=1,nd2
+    call alloc(s1%branch(i))
+   enddo
 
-    ! if(old) then
-    call etall(s1%branch%i,nd2)
-    !    else
-    !       call NEWetall(s1%branch%j,nd2)
-    !    endif
   END SUBROUTINE alloctree
 
  ! SUBROUTINE  damap_clean(S1,value)
@@ -427,14 +429,16 @@ contains
     implicit none
     type (gmap),INTENT(INOUT)::S1
     integer, optional :: n
-    integer m
+    integer m,i
 
     m=nv
     if(present(n)) m=n
     s1%n=m
 
     ! if(old) then
-    call etall(s1%v%i,s1%n)
+    do i=1,s1%n
+     call alloc(s1%v(i))
+    enddo
     !    else
     !       call NEWetall(s1%v%j,s1%n)
     !    endif
@@ -445,10 +449,12 @@ contains
   SUBROUTINE  allocvec(S1)
     implicit none
     type (vecfield),INTENT(INOUT)::S1
-
+    integer i
     s1%ifac=0
     ! if(old) then
-    call etall(s1%v%i,nd2)
+    do i=1,nd2
+     call alloc(s1%v(i))
+    enddo
     !    else
     !       call NEWetall(s1%v%j,nd2)
     !    endif
@@ -460,7 +466,7 @@ contains
     !     call alloc(s1%h)
     s1%ifac=0
     ! if(old) then
-    call etall1(s1%h%i)
+    call alloc(s1%h)
     !    else
     !       call NEWetall(s1%h%j,1)
     !    endif
@@ -470,8 +476,11 @@ contains
   SUBROUTINE  KILLtree(S1)
     implicit none
     type (tree),INTENT(INOUT)::S1
+    integer i
     ! if(old) then
-    call DADAL(s1%branch%i,nd2)
+     do i=1,nd2
+    call kill(s1%branch(i))
+    enddo
     !    else
     !       call newDADAL(s1%branch%j,nd2)
     !    endif
@@ -495,8 +504,11 @@ contains
   SUBROUTINE  KILLgmap(S1)
     implicit none
     type (gmap),INTENT(INOUT)::S1
+    integer i
     ! if(old) then
-    call DADAL(s1%v%i,s1%n)
+    do i=1,s1%n
+     call kill(s1%v(i))
+    enddo
     !    else
     !       call newDADAL(s1%v%j,s1%n)
     !    endif
@@ -505,9 +517,13 @@ contains
   SUBROUTINE  KILLvec(S1)
     implicit none
     type (vecfield),INTENT(INOUT)::S1
+     integer i
     s1%ifac=0
     ! if(old) then
-    call DADAL(s1%v%i,nd2)
+    do i=1,nd2
+     call kill(s1%v(i))
+    enddo
+
     !    else
     !       call newDADAL(s1%v%j,nd2)
     !    endif
@@ -518,7 +534,7 @@ contains
     type (pbfield),INTENT(INOUT)::S1
     s1%ifac=0
     ! if(old) then
-    call DADAL1(s1%h%i)
+    call kill(s1%h)
     !    else
     !       call newDADAL(s1%h%j,1)
     !    endif
@@ -756,7 +772,7 @@ contains
     type (damap),INTENT(IN)::S1
     REAL(DP),OPTIONAL,INTENT(IN)::PREC
     INTEGER I
-    
+
     DO I=1,ND2
        CALL PRI(s1%V(I),MFILE,PREC,ind=i)
     ENDDO
@@ -773,7 +789,7 @@ contains
     character(255) line
      mfi=6
      if(present(mfile)) mfi=mfile
-   
+
     call alloc(t,idf)
      t=s1
      if(present(ref0)) then
@@ -781,11 +797,11 @@ contains
        do i=1,nd2
         idf%v(i)=(1.d0.mono.i)-ref0(i)
        enddo
-       do i=1,nd2 
+       do i=1,nd2
         t%v(i)=t%v(i)-(t%v(i).sub.'0')
        enddo
-       t=t.o.idf 
-       do i=1,nd2 
+       t=t.o.idf
+       do i=1,nd2
         t%v(i)=t%v(i)+ref1(i)
        enddo
        write(line,*) "ref_orbit=(",ref0(1),",",ref0(2),",",ref0(3),",",ref0(4),",",ref0(5),",",ref0(6),"),"
@@ -883,7 +899,7 @@ contains
     DABSMAP=0.0_dp
     R1=0.0_dp
     ! if(old) then
-    if(s1%V(1)%i==0) call crap1("DABSMAP 1")  !call etall(s1%V%i,ND2)
+  !  if(s1%V(1)%i==0) call crap1("DABSMAP 1")  !call etall(s1%V%i,ND2)
 
     DO i=1,ND2
        !          R1=s1%V(I) !2002.10.17
@@ -907,10 +923,14 @@ contains
     implicit none
     real(dp),INTENT(inOUT),dimension(:)::S2
     type (damap),INTENT(IN)::S1
+    integer i
     IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     ! if(old) then
-    CALL DAPEK0(S1%V%I,S2,nd2)
+
+
+     call PEK0(S1%V,S2,nd2)
+
     !    else
     !       CALL newDAPEK0(S1%V%J,S2,nd2)
     !    endif
@@ -923,8 +943,9 @@ contains
     IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     ! if(old) then
-    CALL DAPEK0(S1%V%I,S2,s1%n)
-    !    else
+     call PEK0(S1%V,S2,s1%n)
+
+     !    else
     !       CALL newDAPEK0(S1%V%J,S2,s1%n)
     !    endif
   END SUBROUTINE DPEKgMAP
@@ -933,10 +954,13 @@ contains
     implicit none
     real(dp),INTENT(IN),dimension(:)::S2
     type (damap),INTENT(inOUT)::S1
+    integer i
     IF(.NOT.C_%STABLE_DA) RETURN
     ! if(old) then
-    if(s1%V(1)%i==0) call crap1("DPOKMAP 1") !call allocw_old(s1%V(1))   !call etall(s1%V%i,ND2)
-    CALL DAPOK0(S1%V%I,S2,nd2)
+ !   if(s1%V(1)%i==0) call crap1("DPOKMAP 1") !call allocw_old(s1%V(1))   !call etall(s1%V%i,ND2)
+!
+    call pok0(s1%v,S2,nd2)
+  !  CALL DAPOK0(S1%V%I,S2,nd2)
     !    else
     !       if(.NOT. ASSOCIATED(s1%V(1)%j%r))  call crap1("DPOKMAP 2") !  !call allocw_old(s1%V(1))  !call newetall(s1%V%j,ND2)
     !       CALL NEWDAPOK0(S1%V%J,S2,nd2)
@@ -949,8 +973,8 @@ contains
     type (gmap),INTENT(inOUT)::S1
     IF(.NOT.C_%STABLE_DA) RETURN
     ! if(old) then
-    if(s1%V(1)%i==0) call crap1("DPOKMAP 1") !call allocw_old(s1%V(1))   !call etall(s1%V%i,ND2)
-    CALL DAPOK0(S1%V%I,S2,s1%n)
+ !   if(s1%V(1)%i==0) call crap1("DPOKMAP 1") !call allocw_old(s1%V(1))   !call etall(s1%V%i,ND2)
+    CALL POK0(S1%V,S2,s1%n)
     !    else
     !       if(.NOT. ASSOCIATED(s1%V(1)%j%r))  call crap1("DPOKMAP 2") !  !call allocw_old(s1%V(1))  !call newetall(s1%V%j,ND2)
     !       CALL NEWDAPOK0(S1%V%J,S2,s1%n)
@@ -1031,7 +1055,7 @@ contains
     do i=1,nd2
        do j=1,nd2
           JL(j)=1
-          call dapek(S1%v(i)%i,JL,m(i,j))
+          call pek(S1%v(i),JL,m(i,j))
           JL(j)=0
        enddo
     enddo
@@ -1040,7 +1064,7 @@ contains
           s2(i,j)=m(i,j)
        enddo
     enddo
- 
+
   END SUBROUTINE matrixMAPr
 
   SUBROUTINE  MAPmatrixr(S1,S2)
@@ -1059,7 +1083,7 @@ contains
     do i=1,nd2
        do j=1,nd2
           JL(j)=1
-          call dapok(S1%v(i)%i,JL,s2(i,j))
+          call pok(S1%v(i),JL,s2(i,j))
           JL(j)=0
        enddo
     enddo
@@ -1075,7 +1099,7 @@ contains
     type (TAYLOR),INTENT(IN),dimension(:)::S1
     IF(.NOT.C_%STABLE_DA) RETURN
     ! if(old) then
-    if(s2%V(1)%i==0) call crap1("MAPTAYLORS 1")  !call etall(s2%V%i,ND2)
+   ! if(s2%V(1)%i==0) call crap1("MAPTAYLORS 1")  !call etall(s2%V%i,ND2)
     ! CALL DACOPD(S1%I,S2%v%I)
     !    else
     !       if(.NOT. ASSOCIATED(s2%V(1)%j%r)) call crap1("MAPTAYLORS 2")  !call newetall(s2%V%j,ND2)
@@ -1097,7 +1121,7 @@ contains
 
 
     ! if(old) then
-    if(s1(1)%i==0) call crap1("TAYLORSMAP 1")  !call allocw_old(s1(1))
+   ! if(s1(1)%i==0) call crap1("TAYLORSMAP 1")  !call allocw_old(s1(1))
     ! CALL DACOPD(S2%v%I,S1%I)
     !    else
     !       if(.NOT. ASSOCIATED(s1(1)%j%r)) call crap1("TAYLORSMAP 2")  !call allocw_old(s1(1))
@@ -1119,7 +1143,7 @@ contains
     call check_snake
 
     ! if(old) then
-    if(s2%V(1)%i==0) call crap1("EQUALMAP 1")  !call etall(s2%V%i,ND2)
+   ! if(s2%V(1)%i==0) call crap1("EQUALMAP 1")  !call etall(s2%V%i,ND2)
     ! CALL DACOPD(S1%V%I,S2%v%I)
     !    else
     !       if(.NOT. ASSOCIATED(s2%V(1)%J%r)) call crap1("EQUALMAP 2")  !call newetall(s2%V%j,ND2)
@@ -1155,18 +1179,42 @@ contains
     enddo
   END SUBROUTINE EQUALgMAPdamap
 
+  SUBROUTINE  EQUALdamapgmap(S2,S1)
+    implicit none
+    type (damap),INTENT(inOUT)::S2
+    type (gmap),INTENT(IN)::S1
+    integer i
+    IF(.NOT.C_%STABLE_DA) RETURN
+    call check_snake
+
+    do i=1,c_%nd2
+       s2%v(i)=s1%v(i)
+    enddo
+  END SUBROUTINE EQUALdamapgmap
+
 
 
   SUBROUTINE  IdentityEQUALMAP(S2,S1)
     implicit none
     type (damap),INTENT(inOUT)::S2
     integer,INTENT(IN)::S1
+     integer i
     IF(.NOT.C_%STABLE_DA) RETURN
 
     ! if(old) then
-    if(s2%V(1)%i==0) call crap1("IdentityEQUALMAP 1") !call etall(s2%V%i,ND2)
-    IF(S1.EQ.1) CALL etini(S2%V%I)
-    IF(S1.EQ.0) CALL DACLRD(S2%V%I)
+   ! if(s2%V(1)%i==0) call crap1("IdentityEQUALMAP 1") !call etall(s2%V%i,ND2)
+    IF(S1.EQ.1) then
+    ! CALL etini(S2%V%I)
+     do i=1,nd2
+     s2%v(i)=1.0_dp.mono.i
+     enddo
+    endif
+    IF(S1.EQ.0) then
+!     CALL DACLRD(S2%V%I)
+     do i=1,nd2
+     s2%v(i)=0.0_dp
+     enddo
+endif
     !    else
     !       if(.NOT. ASSOCIATED(s2%V(1)%J%r))call crap1("IdentityEQUALMAP 2") ! call newetall(s2%V%j,ND2)
     !
@@ -1205,7 +1253,7 @@ contains
        zero_(i)=0.0_dp
     enddo
     ! if(old) then
-    if(s2%V(1)%i==0) call crap1("zeroEQUALMAP 1") !call etall(s2%V%i,ND2)
+   ! if(s2%V(1)%i==0) call crap1("zeroEQUALMAP 1") !call etall(s2%V%i,ND2)
     !    else
     !       if(.NOT. ASSOCIATED(s2%V(1)%J%r)) call crap1("zeroEQUALMAP 2") !call newetall(s2%V%j,ND2)
     !    endif
@@ -1217,11 +1265,15 @@ contains
     implicit none
     type (vecfield),INTENT(inOUT)::S2
     type (vecfield),INTENT(IN)::S1
+    integer i
     IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     ! if(old) then
-    if(s2%V(1)%i==0) call crap1("EQUALVEC 1") !call etall(s2%V%i,ND2)
-    CALL DACOPD(S1%V%I,S2%v%I)
+  !  if(s2%V(1)%i==0) call crap1("EQUALVEC 1") !call etall(s2%V%i,ND2)
+    do i=1,nd2
+!     CALL DACOPD(S1%V%I,S2%v%I)
+      s2%v(i)=s1%v(i)
+    enddo
     !    else
     !       if(.NOT. ASSOCIATED(s2%V(1)%J%r)) call crap1("EQUALVEC 2") !call newetall(s2%V%j,ND2)
     !       CALL NEWDACOPD(S1%V%J,S2%v%J)
@@ -1238,8 +1290,8 @@ contains
     call check_snake
 
     ! if(old) then
-    if(s2%V(1)%i==0) call crap1("EQUALvecpb 1")  !call etall(s2%V%i,ND2)
-    CALL DIFD(S1%h%i,S2%v%i,-1.0_dp)
+!    if(s2%V(1)%i==0) call crap1("EQUALvecpb 1")  !call etall(s2%V%i,ND2)
+    CALL DIFD(S1%h,S2%v,-1.0_dp)
     !    else
     !       if(.NOT. ASSOCIATED(s2%V(1)%J%r)) call crap1("EQUALvecpb 2")  !call newetall(s2%V%j,ND2)
     !       CALL NEWDIFD(S1%h%J,S2%v%J,-one)
@@ -1247,6 +1299,34 @@ contains
     s2%ifac=s1%ifac
 
   END SUBROUTINE EQUALvecpb
+
+  subroutine difd(h1,v,sca)
+    implicit none
+    ! INVERSE OF INTD ROUTINE
+    type(taylor) , intent(in):: h1
+    type(taylor) h,b1
+    integer i
+    type(taylor) , intent(inout):: v(:)
+
+    real(dp),intent (in) :: sca
+    if(.not.c_%stable_da) return
+
+    call alloc(b1)
+    call alloc(h)
+    h=h1
+
+    do i=1,nd
+        v(2*i)=h.d.(2*i-1)
+        b1=h.d.(2*i)
+        v(2*i-1)=sca*b1
+!      call dader(2*i,h,b1)
+!      call   dacmu(b1,sca,v(2*i-1))
+    enddo
+
+    call kill(h)
+    call kill(b1)
+    return
+  end subroutine difd
 
   SUBROUTINE  EQUALpbvec(S2,S1)
     implicit none
@@ -1257,14 +1337,77 @@ contains
     call check_snake
 
     ! if(old) then
-    if(s2%h%i==0) call crap1("EQUALpbvec 1")  !call etall1(s2%h%i)
-    CALL intd(S1%v%i,s2%h%i,-1.0_dp)
+  !  if(s2%h%i==0) call crap1("EQUALpbvec 1")  !call etall1(s2%h%i)
+    CALL intd(S1%v,s2%h,-1.0_dp)
     !    else
     !       if(.NOT. ASSOCIATED(s2%h%J%r)) call crap1("EQUALpbvec 2")  !call newetall(s2%h%J,1)
     !       CALL NEWintd(S1%v%J,s2%h%J,-one)
     !    endif
     s2%ifac=s1%ifac
   END SUBROUTINE EQUALpbvec
+
+  real(dp) function dliet(j)
+    implicit none
+    integer i
+    !      INTEGER J(NTT)
+    integer,dimension(:)::j
+    if(.not.c_%stable_da) return
+
+    dliet=0.0_dp
+    do i=1,nd
+       dliet=REAL(j(2*i-1)+j(2*i),kind=DP)+dliet
+    enddo
+    dliet=dliet+1.0_dp
+    dliet=1.0_dp/dliet
+    return
+  end function dliet
+
+  subroutine intd(v,h,sca)
+    implicit none
+    ! IF SCA=-one
+    !     \VEC{V}.GRAD   = J GRAD H . GRAD = :H:
+    !
+    ! IF SCA=one
+    !     \VEC{V}.GRAD  = GRAD H . GRAD
+    integer i
+    type(taylor), intent(inout) :: h
+    type(taylor),intent(in) ::v(ndim2)
+    type(taylor) x(ndim2)
+
+    type(taylor) b1,b2,b3,b4
+    real(dp) sca
+
+
+    if(.not.c_%stable_da) return
+
+    call alloc(b1)
+    call alloc(b2)
+    call alloc(b3)
+    call alloc(b4)
+    call alloc(x,nd2)
+
+    do i=1,nd2
+      x(i)=1.0_dp.mono.i
+    enddo
+
+    do i=1,nd
+       call cfu(v(2*i-1),dliet,b3)
+       call cfu(v(2*i),dliet,b1)
+       b2=b1*x(2*i-1)
+       b1=b3*x(2*i)
+       b3=b2+sca*b1
+       b4=b3+b4
+    enddo
+    h=b4
+
+    call kill(x,nd2)
+    call kill(b4)
+    call kill(b3)
+    call kill(b2)
+    call kill(b1)
+
+    return
+  end subroutine intd
 
 
   SUBROUTINE  EQUALpbpb(S2,S1)
@@ -1274,8 +1417,9 @@ contains
     IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     ! if(old) then
-    if(s2%h%i==0) call crap1("EQUALpbpb 1")  ! call etall1(s2%h%i)
-    CALL dacop(S1%h%i,S2%h%i)
+ !   if(s2%h%i==0) call crap1("EQUALpbpb 1")  ! call etall1(s2%h%i)
+!    CALL dacop(S1%h%i,S2%h%i)
+      s2%h=s1%h
     !    else
     !       if(.NOT. ASSOCIATED(s2%h%J%r)) call crap1("EQUALpbpb 2")  !call newetall(s2%h%J,1)
     !       CALL NEWdacop(S1%h%J,S2%h%J)
@@ -1292,7 +1436,7 @@ contains
     call check_snake
 
     ! if(old) then
-    if(s2%h%i==0)  call crap1("EQUALpbda 1")  !call allocw_old(s2%h )
+!    if(s2%h%i==0)  call crap1("EQUALpbda 1")  !call allocw_old(s2%h )
     !    else
     !       if(.NOT. ASSOCIATED(s2%h%J%r))  call crap1("EQUALpbda 2")  !call allocw_old(s2%h )
     !    endif
@@ -1308,7 +1452,7 @@ contains
     call check_snake
 
     ! if(old) then
-    if(s2%i==0) call crap1("EQUALdapb 1")  ! call allocw_old(s2)
+!    if(s2%i==0) call crap1("EQUALdapb 1")  ! call allocw_old(s2)
     !      CALL dacop(S1%h%i,S2%i)
     !    else
     !       if(.NOT. ASSOCIATED(s2%J%r)) call crap1("EQUALdapb 2")  ! call allocw_old(s2)
@@ -1488,7 +1632,6 @@ contains
 
   END FUNCTION GETORDERPB
 
-
   FUNCTION pushtree( S1, S2 )
     implicit none
     TYPE (tree), INTENT (IN) :: S1
@@ -1557,13 +1700,21 @@ contains
     implicit none
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), intent(in),dimension(:)::s2
-    real(dp) push1pol
-
-    ! if(old) then
-    call ppush1(S1%i,s2,push1pol)
-    !    else
-    !       call newppush1(S1%j,s2,push1pol)
-    !    endif
+    real(dp) push1pol,push1polt(1)
+    real(dp) s2t(lnv)
+    integer si
+    type(taylor) s1t(1)
+     if(old_package) then
+        call ppush1(S1%i,s2,push1pol)
+    else
+        call alloc(s1t(1))
+        s1t(1)=s1
+        s2t=0
+        s2t(1:size(s2))=s2
+! GTPSA REMOVED !           call mad_tpsa_eval(1,S1t%j,nv,s2t,push1polt)
+        call kill(s1t(1))
+        push1pol=push1polt(1)
+    endif
 
 
   END FUNCTION push1pol
@@ -1572,17 +1723,28 @@ contains
     implicit none
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), intent(in),dimension(:)::s2
-    real(dp) push1polslow
+    real(dp) push1polslow,push1polt(1)
     TYPE (taylor) t
+    real(dp) s2t(lnv)
+    integer si
+    type(taylor) s1t(1)
+     if(old_package) then
 
     call alloc(t)
 
     call maketree(s1,t)
-    ! if(old) then
+
     call ppush1(t%i,s2,push1polslow)
-    !    else
-    !       call newppush1(t%j,s2,push1polslow)
-    !    endif
+    else
+        call alloc(s1t(1))
+        s1t(1)=s1
+        s2t=0
+        s2t(1:size(s2))=s2
+! GTPSA REMOVED !           call mad_tpsa_eval(1,S1t%j,nv,s2t,push1polt)
+        call kill(s1t(1))
+        push1polslow=push1polt(1)
+    endif
+
 
     call kill(t)
 
@@ -1616,13 +1778,15 @@ contains
     t1=s1;t2=s2;
     v1=s1     ! change oct 2004.10
     t1=zero_;t2=zero_;
-    ! if(old) then
+     if(old_package) then
     call etcct(t1%v%i,t2%v%i,tempnew%v%i)
     call dacopd(tempnew%v%i,concat%v%i)
-    !    else
+        else
+! GTPSA REMOVED !        call fpp_mad_tpsa_compose(nd2,t1%v,nd2,t2%v,t2%v)
+concat=t2
     !       call NEWetcct(t1%v%J,t2%v%J,tempnew%v%j)
     !       call NEWdacopd(tempnew%v%j,concat%v%J)
-    !    endif
+        endif
     concat=v1
 
     call kill(t1);call kill(t2);call kill(tempnew);
@@ -1651,23 +1815,42 @@ contains
     t1=s1;t2=s2;
     v1=s2
     t1=zero_;t2=zero_;
-    ! if(old) then
+     if(old_package) then
     call getcct(t1%v%i,t2%v%i,tempnew%v%i,s1%n)
     do i=1,s1%n
        call dacop(tempnew%v(i)%i,concatg%v(i)%i)
     enddo
-    !    else
-    !       call NEWgetcct(t1%v%J,t2%v%J,tempnew%v%j,s1%n)
-    !       do i=1,s1%n
-    !          call newdacop(tempnew%v(i)%j,concatg%v(i)%j)
-    !       enddo
-    !    endif
+        else
+! GTPSA REMOVED !        call fpp_mad_tpsa_compose(s1%n,t1%v,s2%n,t2%v,concatg%v)
+        endif
     concatg=v1
 
     call kill(t1);call kill(t2);call kill(tempnew);
     master=localmaster
 
   END FUNCTION concatg
+
+    subroutine fpp_mad_tpsa_compose(n1,t1,n2,t2,t3)
+    implicit none
+    type(taylor), intent(in) :: t1(:),t2(:)
+    type(taylor), intent(inout) :: t3(:)
+    type(taylor) t2t(lnv)
+    integer i,n1,n2
+
+    call alloc(t2t(1:nv),nv)
+
+     do i=1,min(size(t2),nv)
+       t2t(i)=t2(i)
+     enddo
+
+     do i=min(size(t2),nv)+1,nv
+       t2t(i)=1.0_dp.mono.i
+     enddo
+! GTPSA REMOVED !     call   mad_tpsa_compose(n1,t1(1:n1)%j,nv,t2t(1:nv)%j,t3(1:n1)%j)
+
+    call KILL(t2t(1:nv),nv)
+
+    end subroutine fpp_mad_tpsa_compose
 
   FUNCTION concator( S1, S2 )
     implicit none
@@ -1683,13 +1866,12 @@ contains
     call checkdamap(s2)
     call assdamap(concator)
 
-    ! if(old) then
+     if(old_package) then
     call etcct(s1%v%i,s2%v%i,tempnew%v%i)
     call dacopd(tempnew%v%i,concator%v%i)
-    !    else
-    !       call NEWetcct(s1%v%J,s2%v%J,tempnew%v%j)
-    !       call NEWdacopd(tempnew%v%j,concator%v%J)
-    !    endif
+        else
+! GTPSA REMOVED !        call fpp_mad_tpsa_compose(nd2,s1%v,nd2,s2%v,concator%v)
+        endif
 
     master=localmaster
     call kill(tempnew)
@@ -1709,17 +1891,19 @@ contains
     concatorg%n=s1%n
     call assdamap(concatorg)
 
-    ! if(old) then
+   if(old_package) then
     call getcct(s1%v%i,s2%v%i,tempnew%v%i,s1%n)
     do i=1,s1%n
        call dacop(tempnew%v(i)%i,concatorg%v(i)%i)
     enddo
-    !    else
+        else
     !       call NEWgetcct(s1%v%J,s2%v%J,tempnew%v%j,s1%n)
+! GTPSA REMOVED ! !       call mad_tpsa_compose(s1%n,s1%v%j,s1%n,s2%v%j,concatorg%v%j)
+! GTPSA REMOVED !        call fpp_mad_tpsa_compose(s1%n,s1%v,s2%n,s2%v,concatorg%v)
     !       do i=1,s1%n
     !          call newdacop(tempnew%v(i)%j,concatorg%v(i)%j)
     !       enddo
-    !    endif
+        endif
 
     master=localmaster
     call kill(tempnew)
@@ -1750,19 +1934,68 @@ contains
     enddo
     s22=s2
     s22=zero_
-    ! if(old) then
+     if(old_package) then
     call trxflo(s1%v%i,tempnew%v%i,s22%v%i)
     call dacopd(tempnew%v%i,trxflow%v%i)
-    !    else
-    !       call NEWtrxflo(s1%v%J,tempnew%v%J,s22%v%J)
-    !       call NEWdacopd(tempnew%v%J,trxflow%v%J)
-    !    endif
+        else
+    call trxflo_g(s1%v,tempnew%v,s22%v)
+    call dacopd_g(tempnew%v,trxflow%v)
+        endif
 
     call kill(s22,tempnew)
     master=localmaster
     trxflow%IFAC=S1%IFAC
   END FUNCTION trxflow
 
+  subroutine trxflo_g(h,rh,y)
+    implicit none
+    !  *RH* = Y *H* Y^-1  CHANGE OF A VECTOR FLOW OPERATOR
+    integer j,k
+    type(taylor) b1,b2
+    type(taylor),dimension(:)::h,rh,y
+    type(taylor),dimension(ndim2)::yi,ht
+    type(taylor) s22g(2)
+    if(.not.c_%stable_da) return
+
+    call alloc(yi,nd2)  !  ,'YI        ')
+    call alloc(ht,nd2)  !  ,'HT        ')
+    call alloc(b1 )
+    call alloc(b2 )
+    call alloc(s22g,2 )
+
+    !call etinv(y,yi)
+! GTPSA REMOVED !       call fpp_mad_tpsa_minv(nd2,y,yi)
+    !----- HT= H o Y
+ !   call etcct(h,y,ht)
+! GTPSA REMOVED !    call fpp_mad_tpsa_compose(nd2,h,nd2,y,ht)
+    !----
+    do j=1,nd2
+    rh(j)=0.0_dp
+    enddo
+ !   call daclrd(rh)
+    do j=1,nd2
+       do k=1,nd2
+        b1=yi(j).d.k
+       !   call dader(k,yi(j),b1)
+       s22g(1:1)=b1
+! GTPSA REMOVED !        call fpp_mad_tpsa_compose(1,s22g(1:1),nd2,y,s22g(2:2))
+         ! call trx(b1,b2,y)
+            b1=b2*ht(k)
+       !   call damul(b2,ht(k),b1)
+            b2=b1+rh(j)
+      !    call daadd(b1,rh(j),b2)
+            rh(j)=b2
+      !    call dacop(b2,rh(j))
+       enddo
+    enddo
+
+    call kill(s22g,2 )
+    call kill(b2)
+    call kill(b1)
+    call kill(ht,nd2)
+    call kill(yi,nd2)
+    return
+  end subroutine trxflo_g
 
   FUNCTION trxpb( S2, S1 )
     implicit none
@@ -1796,7 +2029,7 @@ contains
     TYPE (taylor) trxtaylor
     TYPE (taylor), INTENT (IN) :: S1
     TYPE (damap), INTENT (IN) ::  S2
-    TYPE (damap)  S22
+    TYPE (damap)  S22,s22g
     real(dp) zero_(ndim2)
     integer i
     integer localmaster
@@ -1813,19 +2046,20 @@ contains
     call checkdamap(s2)
     call assdamap(trxtaylor)
 
-    call alloc(s22)
+    call alloc(s22,s22g)
 
     s22=s2
     s22=zero_
-    ! if(old) then
-    call trx(s1%i,temp%i,s22%v%i)
-    call dacop(temp%i,trxtaylor%i)
-    !    else
-    !       call NEWtrx(s1%J,tempL,s22%v%J)
-    !       call NEWdacop(tempL,trxtaylor%J)
-    !   endif
+     if(old) then
+        call trx(s1%i,temp%i,s22%v%i)
+        call dacop(temp%i,trxtaylor%i)
+    else
+        s22g%v(1)=s1
+! GTPSA REMOVED !        call fpp_mad_tpsa_compose(1,s22g%v(1:1),nd2,s22%v,s22g%v(2:2))
+        trxtaylor=s22g%v(2)
+    endif
 
-    call kill(s22)
+    call kill(s22,s22g)
     master=localmaster
 
   END FUNCTION trxtaylor
@@ -1835,7 +2069,7 @@ contains
     TYPE (taylor) trxgtaylor
     TYPE (taylor), INTENT (IN) :: S1
     TYPE (gmap), INTENT (IN) ::  S2
-    TYPE (gmap)  S22
+    TYPE (gmap)  S22,s22g
     real(dp),allocatable:: zero_(:)
     integer i
     integer localmaster
@@ -1857,14 +2091,16 @@ contains
 
     s22=s2
     s22=zero_
-    ! if(old) then
+    if(old_package) then
     call gtrx(s1%i,temp%i,s22%v%i,s2%n)
     call dacop(temp%i,trxgtaylor%i)
-    !    else
-    !       call NEWgtrx(s1%J,tempL,s22%v%J,s2%n)
-    !       call NEWdacop(tempL,trxgtaylor%J)
-    !   endif
-
+     else
+        call alloc(s22g,s2%n)
+        s22g%v(1)=s1
+! GTPSA REMOVED !        call fpp_mad_tpsa_compose(1,s22g%v(1:1),s2%n,s22%v,s22g%v(2:2))
+        trxgtaylor=s22g%v(2)
+        call kill(s22g)
+    endif
     call kill(s22)
     deallocate(zero_)
     master=localmaster
@@ -1876,6 +2112,7 @@ contains
     TYPE (taylor) trxtaylorc
     TYPE (taylor), INTENT (IN) :: S1
     TYPE (damap), INTENT (IN) ::  S2
+    TYPE (damap) s22
     integer localmaster
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
@@ -1885,13 +2122,16 @@ contains
     call checkdamap(s2)
     call assdamap(trxtaylorc)
 
-    ! if(old) then
+    if(old_package) then
     call trx(s1%i,temp%i,s2%v%i)
     call dacop(temp%i,trxtaylorc%i)
-    !    else
-    !       call NEWtrx(s1%J,temp%iL,s2%v%J)
-    !       call NEWdacop(temp%iL,trxtaylorc%J)
-    !   endif
+        else
+        call alloc(s22)
+        s22%v(1)=s1
+! GTPSA REMOVED !        call fpp_mad_tpsa_compose(1,s22%v(1:1),nd2,s2%v,s22%v(2:2))
+        trxtaylorc=s22%v(2)
+        call kill(s22)
+       endif
 
     master=localmaster
 
@@ -1902,6 +2142,7 @@ contains
     TYPE (taylor) trxgtaylorc
     TYPE (taylor), INTENT (IN) :: S1
     TYPE (gmap), INTENT (IN) ::  S2
+    TYPE (damap) s22
     integer localmaster
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
@@ -1909,13 +2150,16 @@ contains
 
     call assdamap(trxgtaylorc)
 
-    ! if(old) then
-    call gtrx(s1%i,temp%i,s2%v%i,s2%n)
-    call dacop(temp%i,trxgtaylorc%i)
-    !    else
-    !       call NEWgtrx(s1%J,temp%iL,s2%v%J,s2%n)
-    !       call NEWdacop(temp%iL,trxgtaylorc%J)
-    !   endif
+    if(old_package) then
+     call gtrx(s1%i,temp%i,s2%v%i,s2%n)
+     call dacop(temp%i,trxgtaylorc%i)
+    else
+        call alloc(s22)
+        s22%v(1)=s1
+! GTPSA REMOVED !        call fpp_mad_tpsa_compose(1,s22%v(1:1),s2%n,s2%v,s22%v(2:2))
+        trxgtaylorc=s22%v(2)
+        call kill(s22)
+    endif
 
     master=localmaster
 
@@ -1941,14 +2185,13 @@ contains
     call assdamap(texpdf)
     call alloc(tempnew)
 
-    ! if(old) then
+     if(old_package) then
     !write(6,*) NRMIN,NRMAX,SCA,IFAC
     call  FACFLOD(s1%v%i,s2%v%i,tempnew%v%i,NRMIN,NRMAX,SCA,IFAC )
     call dacopd(tempnew%v%i,texpdf%v%i)
-    !    else
-    !       call newFACFLOD(s1%v%j,s2%v%j,tempnew%v%j,NRMIN,NRMAX,SCA,IFAC )
-    !       call NEWdacopd(tempnew%v%j,texpdf%v%J)
-    !   endif
+        else
+         call  FACFLOD_g(s1%v,s2%v,texpdf%v,NRMIN,NRMAX,SCA,IFAC )
+       endif
     master=localmaster
     call kill(tempnew)
 
@@ -1970,14 +2213,13 @@ contains
     call checkdamap(s2)
     call assdamap(texpdft)
 
-    ! if(old) then
+     if(old_package) then
     !write(6,*) NRMIN,NRMAX,SCA,IFAC
     call  FACFLO(s1%v%i,s2%i,temp%i,NRMIN,NRMAX,SCA,IFAC )
     call dacop(temp%i,texpdft%i)
-    !    else
-    !       call newFACFLO(s1%v%j,s2%j,temp%iL,NRMIN,NRMAX,SCA,IFAC )
-    !       call NEWdacop(temp%iL,texpdft%J)
-    !   endif
+         else
+     call  FACFLO_g(s1%v ,s2 ,texpdft ,NRMIN,NRMAX,SCA,IFAC )
+        endif
     master=localmaster
 
   END FUNCTION texpdft
@@ -2001,20 +2243,25 @@ contains
     call checkdamap(s2)
     call assdamap(explieflo)
     call alloc(tempnew)
-    if(s1%ifac/=0) then
-       explieflo=texpdf( S1, S2,2,no1,1.0_dp,s1%ifac )
-       !         write(6,*) "Improper usage: map is factorized "
-       !     write(6,*) "Sorry, we will implement in later version "
-       !     write(6,*) "Use a Dragt-Finn or Reverse-Dragt-Finn scratch variable "
+    if(old_package) then
+      if(s1%ifac/=0) then
+         explieflo=texpdf( S1, S2,2,no1,1.0_dp,s1%ifac )
+      else
+         call EXPFLOD(s1%v%i,s2%v%i,tempnew%v%i,eps_tpsalie,nrmax)
+         call dacopd(tempnew%v%i,explieflo%v%i)
+
+      endif
     else
-       ! if(old) then
-       call EXPFLOD(s1%v%i,s2%v%i,tempnew%v%i,eps_tpsalie,nrmax)
-       call dacopd(tempnew%v%i,explieflo%v%i)
-       !       else
-       !          call NEWEXPFLOD(s1%v%J,s2%v%J,tempnew%v%J,eps_tpsalie,nrmax)
-       !          call NEWdacopd(tempnew%v%J,explieflo%v%J)
-       !      endif
+      if(s1%ifac/=0) then
+         explieflo=texpdf( S1, S2,2,no1,1.0_dp,s1%ifac )
+      else
+
+         call EXPFLOD_g(s1%v,s2%v,tempnew%v,eps_tpsalie,nrmax)
+         call dacopd_g(tempnew%v,explieflo%v)
+
+      endif
     endif
+
     master=localmaster
     call kill(tempnew)
 
@@ -2036,19 +2283,22 @@ contains
     call checkdamap(s2)
     call assdamap(expflot)
 
-    if(s1%ifac/=0) then
-       expflot=texpdft( S1, S2,2,no1,1.0_dp,s1%ifac )
-       !         write(6,*) "Improper usage: map is factorized "
-       !    write(6,*) "Sorry, we will implement in later version "
-       !     write(6,*) "Use a Dragt-Finn or Reverse-Dragt-Finn scratch variable "
+    if(old_package) then
+      if(s1%ifac/=0) then
+         expflot=texpdft( S1, S2,2,no1,1.0_dp,s1%ifac )
+      else
+         ! if(old) then
+         call EXPFLO(s1%v%i,s2%i,temp%i,eps_tpsalie,nrmax)
+         call dacop(temp%i,expflot%i)
+      endif
     else
-       ! if(old) then
-       call EXPFLO(s1%v%i,s2%i,temp%i,eps_tpsalie,nrmax)
-       call dacop(temp%i,expflot%i)
-       !      else
-       !         call NEWEXPFLO(s1%v%J,s2%J,tempL,eps_tpsalie,nrmax)
-       !         call NEWdacop(tempL,expflot%J)
-       !      endif
+      if(s1%ifac/=0) then
+         expflot=texpdft( S1, S2,2,no1,1.0_dp,s1%ifac )
+      else
+         ! if(old) then
+         call EXPFLO_g(s1%v,s2,temp,eps_tpsalie,nrmax)
+         expflot=temp
+      endif
     endif
     master=localmaster
 
@@ -2107,7 +2357,7 @@ contains
     implicit none
     TYPE (damap) ADDMAP
     TYPE (damap), INTENT (IN) :: S1, S2
-    integer localmaster
+    integer localmaster,i
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
@@ -2116,11 +2366,12 @@ contains
     call checkdamap(s2)
     call assdamap(ADDMAP)
 
-    ! if(old) then
-    call DALIND(s1%v%i,1.0_dp,s2%v%i,1.0_dp,ADDMAP%v%i)
-    !   else
-    !      call newDALIND(s1%v%j,one,s2%v%j,one,ADDMAP%v%j)
-    !   endif
+
+       do i=1,nd2
+         ADDMAP%v(i)=s1%v(i)+s2%v(i)
+       enddo
+
+
 
     master=localmaster
 
@@ -2130,7 +2381,7 @@ contains
     implicit none
     TYPE (damap) SUBMAP
     TYPE (damap), INTENT (IN) :: S1, S2
-    integer localmaster
+    integer localmaster,i
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
@@ -2139,11 +2390,13 @@ contains
     call checkdamap(s2)
     call assdamap(SUBMAP)
 
-    ! if(old) then
-    call DALIND(s1%v%i,1.0_dp,s2%v%i,-1.0_dp,SUBMAP%v%i)
-    !   else
-    !      call newDALIND(s1%v%j,one,s2%v%j,-one,SUBMAP%v%j)
-    !   endif
+
+
+       do i=1,nd2
+         SUBMAP%v(i)=s1%v(i)-s2%v(i)
+       enddo
+
+
 
     master=localmaster
 
@@ -2156,29 +2409,22 @@ contains
     real(dp), INTENT (IN) :: SC
     INTEGER I
     integer localmaster
-    TYPE (damap)  tempnew
+
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
 
     call checkdamap(s1)
     call assdamap(DMULMAPsc)
-    call alloc(tempnew)
 
-    ! if(old) then
-    DO I=1,ND2
-       CALL DACMU(s1%v(I)%i,SC,tempnew%v(I)%i)
-    ENDDO
-    call dacopd(tempnew%v%i,DMULMAPsc%v%i)
-    !    else
-    !       DO I=1,ND2
-    !          CALL NEWDACMU(s1%v(I)%J,SC,tempnew%v(I)%J)
-    !       ENDDO
-    !       call NEWdacopd(tempnew%v%J,DMULMAPsc%v%J)
-    !    endif
+
+       do i=1,nd2
+         DMULMAPsc%v(i)=sc*s1%v(i)
+       enddo
+
 
     master=localmaster
-    call kill(tempnew)
+
 
   END FUNCTION DMULMAPsc
 
@@ -2188,7 +2434,7 @@ contains
     TYPE (damap), INTENT (IN) :: S1
     REAL(SP), INTENT (IN) :: SC
     INTEGER I
-    TYPE (damap)  tempnew
+
     integer localmaster
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
@@ -2196,21 +2442,15 @@ contains
 
     call checkdamap(s1)
     call assdamap(MULMAPsc)
-    call alloc(tempnew)
 
-    ! if(old) then
-    DO I=1,ND2
-       CALL DACMU(s1%v(I)%i,REAL(SC,kind=DP),tempnew%v(I)%i)
-    ENDDO
-    call dacopd(tempnew%v%i,MULMAPsc%v%i)
-    !    else
-    !       DO I=1,ND2
-    !          CALL NEWDACMU(s1%v(I)%J,REAL(SC,kind=DP),tempnew%v(I)%j)
-    !       ENDDO
-    !       call NEWdacopd(tempnew%v%j,MULMAPsc%v%J)
-    !    endif
+
+
+       do i=1,nd2
+         MULMAPsc%v(i)=sc*s1%v(i)
+       enddo
+
     master=localmaster
-    call kill(tempnew)
+
 
   END FUNCTION MULMAPsc
 
@@ -2220,7 +2460,6 @@ contains
     TYPE (damap), INTENT (IN) :: S1
     INTEGER, INTENT (IN) :: SC
     INTEGER I
-    TYPE (damap)  tempnew
     integer localmaster
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
@@ -2228,20 +2467,15 @@ contains
 
     call checkdamap(s1)
     call assdamap(IMULMAPsc)
-    call alloc(tempnew)
-    ! if(old) then
-    DO I=1,ND2
-       CALL DACMU(s1%v(I)%i,REAL(SC,kind=DP),tempnew%v(I)%i)
-    ENDDO
-    call dacopd(tempnew%v%i,IMULMAPsc%v%i)
-    !    else
-    !       DO I=1,ND2
-    !          CALL NEWDACMU(s1%v(I)%J,REAL(SC,kind=DP),tempnew%v(I)%j)
-    !       ENDDO
-    !       call NEWdacopd(tempnew%v%j,IMULMAPsc%v%J)
-    !    endif
+
+
+
+       do i=1,nd2
+         IMULMAPsc%v(i)=sc*s1%v(i)
+       enddo
+
     master=localmaster
-    call kill(tempnew)
+
 
   END FUNCTION IMULMAPsc
 
@@ -2251,7 +2485,7 @@ contains
     TYPE (damap), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: SC
     INTEGER I
-    TYPE (damap)  tempnew
+
     integer localmaster
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
@@ -2259,20 +2493,15 @@ contains
     call checkdamap(s1)
     call assdamap(scDMULMAP)
 
-    call alloc(tempnew)
-    ! if(old) then
-    DO I=1,ND2
-       CALL DACMU(s1%v(I)%i,SC,tempnew%v(I)%i)
-    ENDDO
-    call dacopd(tempnew%v%i,scDMULMAP%v%i)
-    !    else
-    !       DO I=1,ND2
-    !          CALL NEWDACMU(s1%v(I)%J,SC,tempnew%v(i)%j)
-    !       ENDDO
-    !       call NEWdacopd(tempnew%v%j,scDMULMAP%v%J)
-    !    endif
+
+
+
+       do i=1,nd2
+         scDMULMAP%v(i)=sc*s1%v(i)
+       enddo
+
     master=localmaster
-    call kill(tempnew)
+
 
   END FUNCTION scDMULMAP
 
@@ -2283,28 +2512,22 @@ contains
     REAL(SP), INTENT (IN) :: SC
     INTEGER I
     integer localmaster
-    TYPE (damap)  tempnew
+
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
 
     call checkdamap(s1)
     call assdamap(scMULMAP)
-    call alloc(tempnew)
 
-    ! if(old) then
-    DO I=1,ND2
-       CALL DACMU(s1%v(I)%i,REAL(SC,kind=DP),tempnew%v(I)%i)
-    ENDDO
-    call dacopd(tempnew%v%i,scMULMAP%v%i)
-    !    else
-    !       DO I=1,ND2
-    !          CALL NEWDACMU(s1%v(I)%J,REAL(SC,kind=DP),tempnew%v(I)%j)
-    !       ENDDO
-    !       call NEWdacopd(tempnew%v%j,scMULMAP%v%J)
-    !    endif
+
+
+        do i=1,nd2
+         scMULMAP%v(i)=sc*s1%v(i)
+       enddo
+
     master=localmaster
-    call kill(tempnew)
+
 
   END FUNCTION scMULMAP
 
@@ -2315,32 +2538,75 @@ contains
     INTEGER, INTENT (IN) :: SC
     INTEGER I
     integer localmaster
-    TYPE (damap)  tempnew
+
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
 
     call checkdamap(s1)
     call assdamap(scIMULMAP)
-    call alloc(tempnew)
 
-    ! if(old) then
-    DO I=1,ND2
-       CALL DACMU(s1%v(I)%i,REAL(SC,kind=DP),tempnew%v(I)%i)
-    ENDDO
-    call dacopd(tempnew%v%i,scIMULMAP%v%i)
-    !    else
-    !       DO I=1,ND2
-    !          CALL NEWDACMU(s1%v(I)%J,REAL(SC,kind=DP),tempnew%v(I)%j)
-    !       ENDDO
-    !       call NEWdacopd(tempnew%v%j,scIMULMAP%v%J)
-    !    endif
+
+        do i=1,nd2
+         scIMULMAP%v(i)=sc*s1%v(i)
+       enddo
+
     master=localmaster
-    call kill(tempnew)
+
 
   END FUNCTION scIMULMAP
 
+    subroutine fpp_mad_tpsa_minv(ns,tpsa_a,tpsa_r)
+    implicit none
+    type(taylor) :: tpsa_a(:),tpsa_r(:)
+    type(taylor)  a(lnv),b(lnv)
+    integer i,n,ns
 
+    call alloc(a,nv)
+    call alloc(b,nv)
+
+    do i=1,ns
+     a(i)=tpsa_a(i)
+    enddo
+    do i=ns+1,nv
+        a(i)=1.0_dp.mono.i
+    enddo
+
+! GTPSA REMOVED !    call mad_tpsa_minv(nv,a(1:nv)%j,b(1:nv)%j)
+    do i=1,ns
+     tpsa_r(i)=b(i)
+    enddo
+    call kill(a,nv)
+    call kill(b,nv)
+
+    end subroutine fpp_mad_tpsa_minv
+
+    subroutine fpp_mad_tpsa_pminv(ns,tpsa_a,tpsa_r,select)
+    implicit none
+    type(taylor) :: tpsa_a(:),tpsa_r(:)
+    type(taylor)  a(lnv),b(lnv)
+    integer :: select(:)
+    integer i,n,ns,j(lnv)
+
+    call alloc(a,nv)
+    call alloc(b,nv)
+
+    do i=1,ns
+     a(i)=tpsa_a(i)
+    enddo
+    do i=ns+1,nv
+        a(i)=1.0_dp.mono.i
+    enddo
+    j(1:size(select))=select
+
+! GTPSA REMOVED !    call mad_tpsa_pminv(nv,a(1:nv)%j,b(1:nv)%j,j(1:nv))
+    do i=1,ns
+     tpsa_r(i)=b(i)
+    enddo
+    call kill(a,nv)
+    call kill(b,nv)
+
+    end subroutine fpp_mad_tpsa_pminv
 
   FUNCTION POWMAP( S1, R2 )
     implicit none
@@ -2369,11 +2635,12 @@ contains
     ENDDO
 
     IF(R2.LT.0) THEN
-       ! if(old) then
+        if(old_package) then
        CALL etinv(S11%v%i,S11%v%i)
-       !       else
-       !          CALL newetinv(S11%v%j,S11%v%j)
-       !       endif
+
+               else
+! GTPSA REMOVED !       call fpp_mad_tpsa_minv(nd2,S11%v,S11%v)
+               endif
     ENDIF
 
     powmap=s11
@@ -2412,11 +2679,11 @@ contains
     ENDDO
 
     IF(R2.LT.0) THEN
-       ! if(old) then
+        if(old_package) then
        CALL getinv(S11%v%i,S11%v%i,s11%n)
-       !       else
-       !          CALL newgetinv(S11%v%j,S11%v%j,s11%n)
-       !       endif
+              else
+! GTPSA REMOVED !              call fpp_mad_tpsa_minv(s11%n,S11%v,S11%v)
+              endif
     ENDIF
 
     gpowmap=s11
@@ -2464,11 +2731,11 @@ contains
 
 
     IF(R2.LT.0) THEN
-       ! if(old) then
+        if(old_package) then
        CALL getinv(S11%v%i,S11%v%i,s11%n)
-       !       else
-       !          CALL newgetinv(S11%v%j,S11%v%j,s11%n)
-       !       endif
+              else
+! GTPSA REMOVED !              call fpp_mad_tpsa_minv(s11%n,S11%v,S11%v)
+              endif
     ENDIF
 
     do i=1,s1%n
@@ -2520,13 +2787,12 @@ contains
 
     call alloc(s11)
 
-    ! if(old) then
+     if(old_package) then
     if(s1%v(1)%i==0) call crap1("POWMAP_INV 2")  !call etall(s2%m%v%i,nd2)
     call etpin(S1%V%i,S11%v%i,jn)
-    !    else
-    !       if(.NOT. ASSOCIATED(s1%v(1)%J%r)) call crap1("POWMAP_INV 4")  !call newetall(s2%m%v%J,nd2)
-    !       call newetpin(S1%v%j,s11%v%j,jn)
-    !   endif
+        else
+! GTPSA REMOVED !       call fpp_mad_tpsa_pminv(nd2,S1%V,S11%V,jn)
+       endif
 
     POWMAP_INV=s11
 
@@ -2590,28 +2856,19 @@ contains
     implicit none
     TYPE (damap) s1
     integer i
-    ! if(old) then
+     if(old_package) then
     do i=1,nd2
        if(s1%v(i)%i==0) then
- 
-            write(6,*) "Should not be here: checkmap" 
- 
+
+            write(6,*) "Should not be here: checkmap"
+
           ! call !write_e(200)
           !             s1%v(i)%i=dummymap(i)
        endif
     enddo
-    !    else
-    !       do i=1,nd2
-    !          if(.NOT. ASSOCIATED(s1%v(i)%J%r)) then
-    !             !             s1%v(i)%j=dummymapl(i)
-    !             w_p=0
-    !             w_p%nc=1
-    !             w_p=(/"Should not be here: Assign variables"/)
-    !             w_p%fc='(1((1X,A72),/))'
-    !             ! call !write_e(201)
-    !         endif
-    !      enddo
-    !   endif
+         else
+
+       endif
 
   end subroutine checkmap
 
@@ -2620,15 +2877,15 @@ contains
     TYPE (vecfield) s1
     integer i
 
-    ! if(old) then
+     if(old_package) then
     do i=1,nd2
        if(s1%v(i)%i==0) then
- 
-            write(6,*)  "Should not be here: checkvec" 
- 
+
+            write(6,*)  "Should not be here: checkvec"
+
        endif
     enddo
-    !    else
+        else
     !       do i=1,nd2
     !          if(.NOT. ASSOCIATED(s1%v(i)%J%r)) then
     !             w_p=0
@@ -2639,7 +2896,7 @@ contains
     !             !             s1%v(i)%j=dummymapl(i)
     !          endif
     !       enddo
-    !    endif
+        endif
 
   end subroutine checkvec
 
@@ -2647,13 +2904,13 @@ contains
     implicit none
     TYPE (pbfield) s1
 
-    ! if(old) then
+     if(old_package) then
     if(s1%h%i==0) then
- 
-         write(6,*) "Should not be here: Assign variables checkbp" 
- 
+
+         write(6,*) "Should not be here: Assign variables checkbp"
+
     endif
-    !    else
+       else
     !       if(.NOT. ASSOCIATED(s1%h%J%r)) then
     !          !          s1%h%j=dummyl
     !          w_p=0
@@ -2662,28 +2919,22 @@ contains
     !          w_p%fc='(1((1X,A72),/))'
     !          ! call !write_e(205)
     !       endif
-    !   endif
+       endif
   end subroutine checkpb
 
   subroutine checktaylor(s1)
     implicit none
     TYPE (taylor) s1
     ! if(old) then
-    if(s1%i==0) then
- 
-        write(6,*) "Should not be here: Assign variables checktaylor "
- 
-    endif
-    !    else
-    !       if(.NOT. ASSOCIATED(s1%J%r)) then
-    !          w_p=0
-    !          w_p%nc=1
-    !          w_p=(/"Should not be here: Assign variables"/)
-    !          w_p%fc='(1((1X,A72),/))'
-    !          ! call !write_e(207)
-    !          !          s1%j=dummyl
-    !       endif
-    !   endif
+    if(old_package) then
+         if(s1%i==0) then
+
+            write(6,*) "Should not be here: Assign variables checktaylor "
+
+         endif
+        else
+
+      endif
   end subroutine checktaylor
 
 
@@ -2696,9 +2947,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
- 
-         write(6,*) " cannot indent anymore " 
- 
+
+         write(6,*) " cannot indent anymore "
+
     end select
 
     call ass0(s1%h)
@@ -2714,9 +2965,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
- 
-         write(6,*) "cannot indent anymore : asstaylor" 
- 
+
+         write(6,*) "cannot indent anymore : asstaylor"
+
        ! call !write_e(100)
     end select
 
@@ -2733,9 +2984,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
- 
-         write(6,*) " cannot indent anymore assvec" 
- 
+
+         write(6,*) " cannot indent anymore assvec"
+
        ! call !write_e(100)
     end select
 
@@ -2754,9 +3005,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
- 
-         write(6,*) " cannot indent anymore assmap " 
- 
+
+         write(6,*) " cannot indent anymore assmap "
+
        ! call !write_e(100)
     end select
 
@@ -2775,9 +3026,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
- 
-         write(6,*) " cannot indent anymore assgmap" 
- 
+
+         write(6,*) " cannot indent anymore assgmap"
+
        ! call !write_e(100)
     end select
 
@@ -2788,119 +3039,354 @@ contains
   end subroutine assgmap
 
   !Radiation
-  SUBROUTINE  allocrad(S1)
-    implicit none
-    type (radtaylor),INTENT(INOUT)::S1
-    ! if(old) then
-    call etall1(s1%v%i)
-    call etall(s1%e%i,nd2)
-    !    else
-    !       call newetall(s1%v%j,1)
-    !       call newetall(s1%e%j,nd2)
-    !   endif
-  END SUBROUTINE allocrad
+!  SUBROUTINE  allocrad(S1)
+!    implicit none
+!    type (radtaylor),INTENT(INOUT)::S1
+!    ! if(old) then
+!    call etall1(s1%v%i)
+!    call etall(s1%e%i,nd2)
+!    !    else
+!    !       call newetall(s1%v%j,1)
+!    !       call newetall(s1%e%j,nd2)
+!    !   endif
+!  END SUBROUTINE allocrad
+!
+!  SUBROUTINE  KILLrad(S1)
+!    implicit none
+!    type (radtaylor),INTENT(INOUT)::S1
+!    ! if(old) then
+!    call dadal1(s1%v%i)
+!    call dadal(s1%e%i,nd2)
+!    !    else
+!    !       call newdadal(s1%v%j,1)
+!    !       call newdadal(s1%e%j,nd2)
+!    !   endif
+!
+!  END SUBROUTINE KILLrad
 
-  SUBROUTINE  KILLrad(S1)
-    implicit none
-    type (radtaylor),INTENT(INOUT)::S1
-    ! if(old) then
-    call dadal1(s1%v%i)
-    call dadal(s1%e%i,nd2)
-    !    else
-    !       call newdadal(s1%v%j,1)
-    !       call newdadal(s1%e%j,nd2)
-    !   endif
+!  SUBROUTINE  allocrads(S1,n)
+!    implicit none
+!    type (radtaylor),INTENT(INOUT),dimension(:)::S1
+!    integer i ,n
+!    do i=1,n
+!       call allocrad(s1(i))
+!    enddo
+!
+!  END SUBROUTINE allocrads
+!
+!  SUBROUTINE  KILLrads(S1,n)
+!    implicit none
+!    type (radtaylor),INTENT(INOUT),dimension(:)::s1
+!    integer i,n
+!    do i=1,n
+!       call killrad(s1(i))
+!    enddo
+!
+!
+!  END SUBROUTINE KILLrads
 
-  END SUBROUTINE KILLrad
 
-  SUBROUTINE  allocrads(S1,n)
+
+!  SUBROUTINE  EQUALrad(S2,S1)
+!    implicit none
+!    type (TAYLOR),INTENT(inOUT)::S2
+!    type (radTAYLOR),INTENT(IN)::S1
+!    !     if(iass0>ndum) then
+!    !     call ndum_warning
+!    !     endif
+!    !      iass0=0
+!    ! if(old) then
+!    if(s2%i==0) call crap1("EQUALrad 1")  ! call allocw_old(s2)
+!    CALL DACOP(S1%v%I,S2%I)
+!    !    else
+!    !       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("EQUALrad 2")  !call allocw_old(s2)
+!    !       call newdacop(S1%v%j,S2%j)
+!    !   endif
+!  END SUBROUTINE EQUALrad
+
+
+!  SUBROUTINE  radEQUAL(S2,S1)
+!    implicit none
+!    type (radTAYLOR),INTENT(inOUT)::S2
+!    type (TAYLOR),INTENT(IN)::S1
+!    call check_snake
+!
+!    !     if(iass0>ndum) then
+!    !     call ndum_warning
+!    !     endif
+!    !      iass0=0
+!    ! if(old) then
+!    if(s2%v%i==0) call crap1("radEQUAL 1")  ! call allocw_old(s2%v)
+!    CALL DACOP(S1%I,S2%v%I)
+!    !    else
+!    !       IF (.NOT. ASSOCIATED(s2%v%j%r)) call crap1("radEQUAL 2")  !call allocw_old(s2%v)
+!    !       call newdacop(S1%j,S2%v%j)
+!    !   endif
+!  END SUBROUTINE radEQUAL
+!
+!  ! remove small numbers
+
+
+!!!!! Laurent GTPSA various 'FLO' routines
+
+  subroutine daflo_g(h,x,y)
     implicit none
-    type (radtaylor),INTENT(INOUT),dimension(:)::S1
-    integer i ,n
-    do i=1,n
-       call allocrad(s1(i))
+    ! LIE EXPONENT ROUTINES WITH FLOW OPERATORS
+    !
+    !     \VEC{H}.GRAD X =Y
+    integer i
+    type(taylor) x,y,b1,b2,b3
+    type(taylor),dimension(:)::h
+    if(.not.c_%stable_da) return
+
+    call alloc(b1)
+    call alloc(b2)
+    call alloc(b3)
+
+
+    do i=1,nd2
+        b2=x.d.i
+        b3=b2*h(i)
+        b2=b3+b1
+        b1=b2
     enddo
 
-  END SUBROUTINE allocrads
+    y=b1
+    call kill(b3)
+    call kill(b2)
+    call kill(b1)
+    return
+  end subroutine daflo_g
 
-  SUBROUTINE  KILLrads(S1,n)
+  subroutine daflod_g(h,x,y)
     implicit none
-    type (radtaylor),INTENT(INOUT),dimension(:)::s1
-    integer i,n
-    do i=1,n
-       call killrad(s1(i))
+    integer i
+    type(taylor),dimension(:)::h,x,y
+    type(taylor),dimension(ndim2)::b1,b2
+    if(.not.c_%stable_da) return
+
+    call alloc(b1,nd2)
+    call alloc(b2,nd2)
+    b1=h
+    b2=x
+
+
+    do i=1,nd2
+       call daflo_g(b1,b2(i),y(i))
     enddo
 
+    call kill(b1,nd2)
+    call kill(b2,nd2)
+    return
+  end subroutine daflod_g
 
-  END SUBROUTINE KILLrads
-
-
-
-  SUBROUTINE  EQUALrad(S2,S1)
+  subroutine expflo_g(h,x,y,eps,nrmax)
     implicit none
-    type (TAYLOR),INTENT(inOUT)::S2
-    type (radTAYLOR),INTENT(IN)::S1
-    !     if(iass0>ndum) then
-    !     call ndum_warning
-    !     endif
-    !      iass0=0
-    ! if(old) then
-    if(s2%i==0) call crap1("EQUALrad 1")  ! call allocw_old(s2)
-    CALL DACOP(S1%v%I,S2%I)
-    !    else
-    !       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("EQUALrad 2")  !call allocw_old(s2)
-    !       call newdacop(S1%v%j,S2%j)
-    !   endif
-  END SUBROUTINE EQUALrad
+    ! DOES EXP( \VEC{H} ) X = Y
+    logical(lp) more
+    integer i,nrmax
+     type(taylor) x,y,b1,b2,b3,b4
+    type(taylor) ,dimension(:)::h
+    real(dp) coe,eps,r,rbefore
+    if(.not.c_%stable_da) return
 
+    call alloc(b1)
+    call alloc(b2)
+    call alloc(b3)
+    call alloc(b4)
+    b4=x
+    b1=x
 
-  SUBROUTINE  radEQUAL(S2,S1)
+    more=.true.
+    rbefore=1e30_dp
+    do i=1,nrmax
+       coe=1.0_dp/REAL(i,kind=DP)
+        b2=b1*coe
+       call daflo_g(h,b2,b1)
+        b3=b1+b4
+        r=full_abs(b1)
+
+       if(more) then
+          if(r.gt.eps) then
+             rbefore=r
+             goto 100
+          else
+             rbefore=r
+             more=.false.
+          endif
+       else
+          if(r.ge.rbefore) then
+            y=b3
+
+             call kill(b4)
+             call kill(b3)
+             call kill(b2)
+             call kill(b1)
+             return
+          endif
+          rbefore=r
+       endif
+100    continue
+        b4=b3
+
+    enddo
+    if(lielib_print(2)==1) then
+       write(6,'(a6,1x,G21.14,1x,a25)') ' NORM ',eps,' NEVER REACHED IN EXPFLO '
+    endif
+     y=b3
+    call kill(b4)
+    call kill(b3)
+    call kill(b2)
+    call kill(b1)
+    return
+  end subroutine expflo_g
+
+  subroutine facflod_g(h,x,w,nrmin,nrmax,sca,ifac)
     implicit none
-    type (radTAYLOR),INTENT(inOUT)::S2
-    type (TAYLOR),INTENT(IN)::S1
-    call check_snake
+    ! IFAC=1
+    ! DOES EXP(SCA \VEC{H}_MRMIN ) ... EXP(SCA \VEC{H}_NRMAX )  \VEC{X}= \VEC{Y}
+    ! IFAC=-1
+    ! DOES EXP(SCA \VEC{H}_NRMAX ) ... EXP(SCA \VEC{H}_MRMIN ) \VEC{X}= \VEC{Y}
+    integer i,ifac,nrmax,nrmin
+    type(taylor),dimension(:)::x,w,h
+    real(dp) sca
+    if(.not.c_%stable_da) return
 
-    !     if(iass0>ndum) then
-    !     call ndum_warning
-    !     endif
-    !      iass0=0
-    ! if(old) then
-    if(s2%v%i==0) call crap1("radEQUAL 1")  ! call allocw_old(s2%v)
-    CALL DACOP(S1%I,S2%v%I)
-    !    else
-    !       IF (.NOT. ASSOCIATED(s2%v%j%r)) call crap1("radEQUAL 2")  !call allocw_old(s2%v)
-    !       call newdacop(S1%j,S2%v%j)
-    !   endif
-  END SUBROUTINE radEQUAL
+    do i=1,nd2
+       call facflo_g(h,x(i),w(i),nrmin,nrmax,sca,ifac)
+    enddo
 
-  ! remove small numbers
+    return
+  end subroutine facflod_g
 
-
-  SUBROUTINE  flip_damap(S1,S2)
+  subroutine facflo_g(h,x,w,nrmin,nrmax,sca,ifac)
     implicit none
-    type (damap),INTENT(INOUT)::S2
-    type (damap), intent(INOUT):: s1
+    ! IFAC=1
+    ! DOES EXP(SCA \VEC{H}_MRMIN ) ... EXP(SCA \VEC{H}_NRMAX ) X= Y
+    ! IFAC=-1
+    ! DOES EXP(SCA \VEC{H}_NRMAX ) ... EXP(SCA \VEC{H}_MRMIN ) X= Y
+    integer i,ifac,nmax,nrmax,nrmin
+    type(taylor) x,w,v
+    type(taylor) ,dimension(:)::h
+    type(taylor) ,dimension(ndim2)::bm,b0
+    real(dp) eps,sca
+    if(.not.c_%stable_da) return
 
-    call flip(S1%v%i,S2%v%i)
+    call alloc(bm,nd2) !  ,'BM        ')
+    call alloc(b0,nd2) !  ,'B0        ')
+    call alloc(v)
+    v=x
+   ! call dacop(x,v)
 
-  end SUBROUTINE  flip_damap
+    !    eps=-one
+    !    call daeps(eps)
+    eps=epsflo
+    nmax=100
+    !
+    ! IFAC =1 ---> V = EXP(:SCA*H(NRMAX):)...EXP(:SCA*H(NRMIN):)X
+    if(ifac.eq.1) then
+       do i=nrmax,nrmin,-1
+          call taked_g(h,i,b0)
 
-  SUBROUTINE  flip_taylor(S1,S2,i)
+          call dacmud_g(b0,sca,bm)
+
+          call expflo_g(bm,v,b0(1),eps,nmax)
+        v=b0(1)
+!          call dacop(b0(1),v)
+       enddo
+    else
+       ! IFAC =-1 ---> V = EXP(:SCA*H(NRMIN):)...EXP(:SCA*H(NRMAX):)X
+       do i=nrmin,nrmax
+          call taked_g(h,i,b0)
+          call dacmud_g(b0,sca,bm)
+
+          call expflo_g(bm,v,b0(1),eps,nmax)
+            v=b0(1)
+!          call dacop(b0(1),v)
+       enddo
+    endif
+!    call dacop(v,w)
+        w=v
+    call kill(v)
+    call kill(b0,nd2)
+    call kill(bm,nd2)
+    return
+  end subroutine facflo_g
+
+  subroutine taked_g(h,m,ht)
     implicit none
-    type (taylor),INTENT(INOUT)::S2
-    type (taylor), intent(INOUT):: s1
+    !  \VEC{HT}= \VEC{H_M}  (TAKES M^th DEGREE PIECE ALL VARIABLES INCLUDED)
+    integer i,m
+    type(taylor) b1,b2
+    type(taylor),dimension(:)::h,ht
+    type(taylor),dimension(ndim2)::x
+    if(.not.c_%stable_da) return
+
+    call alloc(b1)
+    call alloc(b2)
+    call alloc(x,nd2) !  ,'X         ')
+
+
+
+    do   i=1,nd2
+       ht(i)=h(i).sub.m
+ !      call take(h(i),m,ht(i))
+    enddo
+    call kill(x,nd2)
+    call kill(b2)
+    call kill(b1)
+    return
+  end subroutine taked_g
+
+  subroutine dacmud_g(h,sca,ht)
+    implicit none
     integer i
-    call flip_i(S1%i,S2%i,i)
+    type(taylor),dimension(:)::h,ht
+    real(dp) sca
+    if(.not.c_%stable_da) return
 
-  end SUBROUTINE  flip_taylor
+    do i=1,nd2
+       ht(i)=sca*h(i)  ! call dacmu(h(i),sca,ht(i))
+    enddo
+    return
+  end subroutine dacmud_g
 
-  SUBROUTINE  flip_vecfield(S1,S2,i)
+  subroutine expflod_g(h,x,w,eps,nrmax)
     implicit none
-    type (vecfield),INTENT(INOUT)::S2
-    type (vecfield), intent(INOUT):: s1
+    ! DOES EXP( \VEC{H} ) \VEC{X} = \VEC{Y}
+    integer j,nrmax
+    type(taylor) b0
+    type(taylor),dimension(:)::x,w,h
+    type(taylor),dimension(ndim2)::v
+    real(dp) eps
+    if(.not.c_%stable_da) return
+
+    call alloc(b0 )
+    call alloc(v,nd2) !  ,'V         ')
+    v=x
+  !  call dacopd(x,v)
+    do j=1,nd2
+       call expflo_g(h,v(j),b0,eps,nrmax)
+        v(j)=b0
+ !      call dacop(b0,v(j))
+    enddo
+    call dacopd_g(v,w)
+    call kill(v,nd2)
+    call kill(b0)
+    return
+  end subroutine expflod_g
+
+
+  subroutine dacopd_g(h,ht)
+    implicit none
+    !    H goes into HT  (nd2 array)
     integer i
-    call flipflo(S1%v%i,S2%v%i,i)
+    type(taylor),dimension(:)::h,ht
+    if(.not.c_%stable_da) return
 
-  end SUBROUTINE  flip_vecfield
-
+    do i=1,nd2
+       ht(i)=h(i)
+    enddo
+    return
+  end subroutine dacopd_g
 end module tpsalie

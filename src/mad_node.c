@@ -725,13 +725,22 @@ line_nodes(struct char_p_array* flat)
   int i, j, k;
   double pos = zero, val;
   struct element* el;
+  
   for (j = 0; j < flat->curr; j++)
-  {
+   {
     if ((el = find_element(flat->p[j], element_list)) == NULL)
+     {
+      
       fatal_error("line contains unknown element:", flat->p[j]);
+     }
+     
     if (strcmp(el->base_type->name, "rfcavity") == 0 &&
         find_element(el->name, current_sequ->cavities) == NULL)
+     {   
       add_to_el_list(&el, 0, current_sequ->cavities, 0);
+     }
+     
+     
     val = el_par_value("l", el);
     pos += val / 2;
     k = 1;

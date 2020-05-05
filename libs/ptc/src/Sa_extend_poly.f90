@@ -67,29 +67,6 @@ CONTAINS
       , X(5).sub.'100000', X(5).sub.'010000', X(5).sub.'001000', X(5).sub.'000100',-X(5).sub.'000001', X(5).sub.'000010'
   END SUBROUTINE PRTP
 
-  ! LD: 21.11.2019
-  SUBROUTINE PRTR(S, X)
-    IMPLICIT NONE
-    CHARACTER(*), INTENT(IN):: S
-    REAL(DP), OPTIONAL, INTENT(IN):: X(6)
-
-    ! cancel all PRTP
-    if (MAPDUMP .eq. 0) return
-
-    ! special case: display only string without X
-    if (.not. PRESENT(X)) then
-      WRITE(*, '(a,a)') '@@ ', S
-      return
-    endif
-
-    ! @@ + elem + func + 6 columns
-    if (MAPDUMP .eq. 1) then
-      WRITE(*, '(a,a15,a,a15,6E25.16)') '@@ ', ELEM_NAME, ' ', S &
-        , X(1), X(2), X(3), X(4),-X(6), X(5)
-      return
-    endif
-  END SUBROUTINE PRTR
-
   SUBROUTINE ANALYSE_APERTURE_FLAG(I,R)
     IMPLICIT NONE
     INTEGER I,B,K

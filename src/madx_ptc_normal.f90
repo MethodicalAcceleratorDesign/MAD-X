@@ -20,7 +20,7 @@ module madx_ptc_normal_module
   private display_table_results
 
   character(1000), private  :: whymsg
-
+  
 contains
   !____________________________________________________________________________________________
 
