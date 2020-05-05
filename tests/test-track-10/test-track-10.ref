@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2019.04.30 14:58:10      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.05.05 16:54:11      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! based on examples/emit/LEP/
 
@@ -11,35 +11,35 @@ option, -echo,-warn,-info;
 
 enter Twiss module
   
-iteration:   1 error:   5.293620E-02 deltap:   0.000000E+00
-orbit:  -3.739151E-03  1.105827E-04  0.000000E+00  0.000000E+00  1.255156E-01  4.669275E-04
+iteration:   1 error:   5.293621E-02 deltap:   0.000000E+00
+orbit:  -3.726483E-03  1.100746E-04  0.000000E+00  0.000000E+00  1.255157E-01  4.669720E-04
   
-iteration:   2 error:   1.177482E-02 deltap:   0.000000E+00
-orbit:   3.155094E-04  2.049378E-07  0.000000E+00  0.000000E+00  1.530803E-01  7.049757E-04
+iteration:   2 error:   1.174362E-02 deltap:   0.000000E+00
+orbit:   3.148314E-04  1.818041E-07  0.000000E+00  0.000000E+00  1.530461E-01  7.050191E-04
   
-iteration:   3 error:   2.984777E-04 deltap:   0.000000E+00
-orbit:   5.108716E-05 -4.033873E-07  0.000000E+00  0.000000E+00  1.525259E-01  7.213358E-04
+iteration:   3 error:   3.014432E-04 deltap:   0.000000E+00
+orbit:   5.111450E-05 -3.967647E-07  0.000000E+00  0.000000E+00  1.525256E-01  7.213445E-04
   
-iteration:   4 error:   1.313217E-06 deltap:   0.000000E+00
-orbit:   4.965214E-05 -4.284574E-07  0.000000E+00  0.000000E+00  1.525165E-01  7.214353E-04
+iteration:   4 error:   1.302086E-06 deltap:   0.000000E+00
+orbit:   4.965542E-05 -4.217450E-07  0.000000E+00  0.000000E+00  1.525165E-01  7.214353E-04
   
-iteration:   5 error:   1.853161E-08 deltap:   0.000000E+00
-orbit:   4.965188E-05 -4.287247E-07  0.000000E+00  0.000000E+00  1.525164E-01  7.214376E-04
+iteration:   5 error:   1.822851E-08 deltap:   0.000000E+00
+orbit:   4.965488E-05 -4.220133E-07  0.000000E+00  0.000000E+00  1.525164E-01  7.214376E-04
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       26658.87208      -0.1525163926    0.0001453605831        82.94241411 
+       26658.87208      -0.1525163888    0.0001453605802        82.94241494 
 
                 q1                dq1            betxmax              dxmax 
-       98.27686301        1.178496691        408.8527192        1.033800733 
+       98.27799441        1.159263004        409.3247352        1.033687025 
 
              dxrms             xcomax             xcorms                 q2 
-      0.6196816374      0.00408335567     0.001276704911         96.1860528 
+      0.6196808501     0.004082953071     0.001276693395        96.18712261 
 
                dq2            betymax              dymax              dyrms 
-      0.8217413734        216.0318443                  0                  0 
+      0.8083622563        215.9865525                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
