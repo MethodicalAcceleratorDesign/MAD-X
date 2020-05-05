@@ -6412,17 +6412,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
     fringe = node_value('fringe ') .gt. zero
     ! TODO: generalize for ds!=0.5
     dl = el / two
-    
-    if (fringe) then
-      call tmrffringe(fsec,ftrk,orbit, fmap, el, one, ek, re_f, te_f)
-      call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
-      call tmcat(fsec,rw,tw,re_f,te_f,rw,tw)
-    else
-      call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
-    endif
-
-
-  if (ftrk) then
+      if (ftrk) then
     orbit(6) = orbit(6) + c0
     ek(6) = c0
     re(6,5) = c1
@@ -6432,6 +6422,16 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
     re(6,5) = c1 - two * c2 * orbit(5)
     if (fsec) te(6,5,5) = c2
   endif
+    if (fringe) then
+      call tmrffringe(fsec,ftrk,orbit, fmap, el, one, ek, re_f, te_f)
+      call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+      call tmcat(fsec,rw,tw,re_f,te_f,rw,tw)
+    else
+      call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+    endif
+
+
+
 
     call tmcat(fsec,re,te,rw,tw,re,te)
     if (fcentre) return
