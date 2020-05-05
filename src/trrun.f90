@@ -1819,32 +1819,38 @@ subroutine ttrf(track,ktrack)
     V = jc*vrf/(pc0*el)
     s1=sin(phirf - omega*(TRACK(5,1:ktrack)+tcorr))
     c1=cos(phirf - omega*(TRACK(5,1:ktrack)+tcorr))
-    !print *, "ooooooomega", omega
+    !print *, "ooooooomega", om1ega
     !print *, "iiiiitrat", phirf, omega, TRACK(5,1:ktrack), tcorr
 
     TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
     TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
     TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.25d0*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
-    print *, "kkkktrack", jc, track(2,1:ktrack),track(4,1:ktrack),track(6,1:ktrack)
+     print *, "iiiiitru", jc, s1, c1, V
+            print *, "ttttrunssang", jc, track(1,1:ktrack),track(3,1:ktrack),track(6,1:ktrack)
+        print *, "ttttrunxyzzt", jc, track(2,1:ktrack),track(4,1:ktrack),track(5,1:ktrack)
+    print *, "qqqqru1", TRACK(:,1:ktrack)
     call ttdrf(el/2,track,ktrack)
+print *, "qqqqru2", TRACK(:,1:ktrack)
   endif
 
   TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
-
+  print *, "qqqqru3", TRACK(:,1:ktrack)
   if(el .gt. zero) then
 
     call ttdrf(el/2,track,ktrack)
-    print *, "kkkktrack", -9, track(1,1:ktrack),track(3,1:ktrack),track(5,1:ktrack)
-    jc = -1
+  print *, "qqqqru4", TRACK(:,1:ktrack)
+    print *, "kkkktracke", track(1,1:ktrack),track(3,1:ktrack),track(5,1:ktrack)
+    jc = -one
     
     V = jc*vrf/(pc0*el)
-    s1=sin(phirf - (omega)*(TRACK(5,1:ktrack)-tcorr))
-    c1=cos(phirf - (omega)*(TRACK(5,1:ktrack)-tcorr))
+    s1=sin(phirf - (omega)*(TRACK(5,1:ktrack)+jc*tcorr))
+    c1=cos(phirf - (omega)*(TRACK(5,1:ktrack)+jc*tcorr))
 
     TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
     TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
     TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.25d0*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
-    print *, "kkkktrack", jc, track(2,1:ktrack),track(4,1:ktrack),track(6,1:ktrack)
+      print *, "qqqqru5", TRACK(:,1:ktrack)
+    print *, "iiiiitru", jc, s1, c1,  V
   endif
 
   !*---- If there were wakefields, track the wakes and then the 2nd half

@@ -6411,10 +6411,8 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   if (el .ne. zero) then
     ! TODO: generalize for ds!=0.5
     dl = el / two
-    print *, "ooootwiss", orbit
-    call tmrffringe(fsec,ftrk,orbit, fmap, el, one, ek, re_f, te_f) 
-    print *, "ooootwiss2", orbit
 
+    call tmrffringe(fsec,ftrk,orbit, fmap, el, one, ek, re_f, te_f) 
     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,rw,tw,re_f,te_f,rw,tw)
 
@@ -6424,7 +6422,6 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
     re(6,5) = c1
     if (fsec) te(6,5,5) = c2
   else
-    print *, "hhhhhhor", orbit(5)
     ek(6) = c0 - c1 * orbit(5) + c2 * orbit(5)**2
     re(6,5) = c1 - two * c2 * orbit(5)
     if (fsec) te(6,5,5) = c2
@@ -6432,11 +6429,11 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
     call tmcat(fsec,re,te,rw,tw,re,te)
     if (fcentre) return
+
     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,rw,tw,re,te,re,te)
 
     call tmrffringe(fsec,ftrk,orbit, fmap, el, -one, ek, re_f, te_f) 
-         print *, "kkkktwis" , -9, orbit(1),orbit(3) ,orbit(5)
     call tmcat(fsec,re_f,te_f,re,te,re,te)
 
   endif
@@ -6469,7 +6466,7 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk, fmap
-  double precision :: el,  V, dpx,dpy,dpt, s1, c1, tcorr
+  double precision :: el,  V, dpxy, dptxy, s1, c1, tcorr
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   integer :: elpar_vl
@@ -6479,6 +6476,9 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
 
   double precision, external :: node_value
   integer, external :: el_par_vector
+  ek = zero
+  te = zero
+  re = EYE
 
   !-- get element parameters
   elpar_vl = el_par_vector(r_freq, g_elpar)
@@ -6497,23 +6497,7 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
 
  ! if (ftrk) then
     ! if bvk = -1 apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
-    x  = orbit(1);
-    px = orbit(2);
-    y  = orbit(3);
-    py = orbit(4);
     t  = orbit(5);
-    pt = orbit(6);
-  !else
-   ! x  = zero;
-   ! px = zero;
-   ! y  = zero;
-   ! py = zero;
-   ! t  = zero;
-   ! pt = zero;
-  !endif
-
-  
- ! if(el .gt. zero) then
 
     tcorr = jc*el/(2*beta)
  !   jc = 1 
@@ -6521,29 +6505,20 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
     s1 = sin(phirf - omega*(t+tcorr))
     c1 = cos(phirf - omega*(t+tcorr))
 
-    print *, "iiiiitra", phirf, omega, t, tcorr
     print *, "aaaa", V, s1, c1, tcorr
-    print *, "iiiiitwi", jc, V, vrf, omega, tcorr, t, s1, c1, phirf, t 
-     dpx = -V*s1*x*half
-     dpy = -V*s1*y*half
-     dpt =  0.25d0*(x**2+y**2)*V*c1*omega;
-  if (ftrk) then
- print *, "reeal kick", cm1, z, ftrk
-    orbit(2) = px + dpx;
-    orbit(4) = py + dpy;
-    orbit(6) = pt + dpt;
-    print *, "kkkktwis" , jc, orbit(2),orbit(4) ,orbit(6)
-  endif
-    print *, "hhhh", ftrk, orbit
-  
-  ek(2) = ek(2) + dpx
-  ek(4) = ek(4) + dpy
-  ek(6) = ek(6) + dpt
-   print *, "reeal fringe", V*s1*half
-  re(2,1) = -V*s1*half
-  re(4,3) = -V*s1*half
-  te(6,1,1) = half*V*c1*omega
-  te(6,2,2) = half*V*c1*omega
+    print *, "iiiiitwi", jc, s1, c1, V
+     dpxy = -V*s1*half
+     !dpy = -V*s1*y*half
+     !dptxy =  0.25d0*(x**2+y**2)*V*c1*omega;
+
+  re(2,1)   = dpxy
+  re(4,3)   = dpxy
+  te(6,1,1) = 0.25d0*V*c1*omega
+  te(6,3,3) = 0.25d0*V*c1*omega
+
+  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  print *, "ttttwisssang", jc, orbit(1), orbit(3), orbit(6), c1
+  print *, "tttttiwssxyz", jc, orbit(2), orbit(4), orbit(5), c1
  ! el  = node_value('l ')
 
 end SUBROUTINE tmrffringe
