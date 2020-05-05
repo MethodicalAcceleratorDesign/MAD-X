@@ -6348,7 +6348,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap, fcentre
+  logical :: fsec, ftrk, fmap, fcentre, fringe
   double precision :: el, ds
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
   double precision :: ek_f(6), re_f(6,6), te_f(6,6,6)
@@ -6409,12 +6409,18 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
   !---- Sandwich cavity between two drifts.
   if (el .ne. zero) then
+    fringe = node_value('fringe ') .gt. zero
     ! TODO: generalize for ds!=0.5
     dl = el / two
+    
+    if (fringe) then
+      call tmrffringe(fsec,ftrk,orbit, fmap, el, one, ek, re_f, te_f)
+      call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+      call tmcat(fsec,rw,tw,re_f,te_f,rw,tw)
+    else
+      call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+    endif
 
-    call tmrffringe(fsec,ftrk,orbit, fmap, el, one, ek, re_f, te_f) 
-    call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
-    call tmcat(fsec,rw,tw,re_f,te_f,rw,tw)
 
   if (ftrk) then
     orbit(6) = orbit(6) + c0
@@ -6432,10 +6438,23 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,rw,tw,re,te,re,te)
+    if (fringe) then
+      call tmrffringe(fsec,ftrk,orbit, fmap, el, -one, ek, re_f, te_f) 
+      call tmcat(fsec,re_f,te_f,re,te,re,te)
+    endif
 
-    call tmrffringe(fsec,ftrk,orbit, fmap, el, -one, ek, re_f, te_f) 
-    call tmcat(fsec,re_f,te_f,re,te,re,te)
-
+  
+  else
+    if (ftrk) then
+      orbit(6) = orbit(6) + c0
+      ek(6) = c0
+      re(6,5) = c1
+      if (fsec) te(6,5,5) = c2
+    else
+      ek(6) = c0 - c1 * orbit(5) + c2 * orbit(5)**2
+      re(6,5) = c1 - two * c2 * orbit(5)
+      if (fsec) te(6,5,5) = c2
+   endif
   endif
 
 end SUBROUTINE tmrf
@@ -6450,7 +6469,7 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
-  !     TRANSPORT map for RF cavity.                                     *
+  !     TRANSPORT map for RF cavity fringe.                                     *
   !     Input:                                                           *
   !     fsec      (logical) if true, return second order terms.          *
   !     ftrk      (logical) if true, track orbit.                        *
@@ -6492,24 +6511,15 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
   ! vrf   = rfv * ten3m / (pc * (one + deltas))
   vrf   = rfv * ten3m
   phirf = rfl * twopi
-  ! dl    = el / two
-  ! bi2gi2 = one / (betas * gammas) ** 2
+  t  = orbit(5);
 
- ! if (ftrk) then
-    ! if bvk = -1 apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
-    t  = orbit(5);
+  tcorr = jc*el/(2*beta)
+  V = jc*vrf/(pc*el* (one + deltap))
+  s1 = sin(phirf - omega*(t+tcorr))
+  c1 = cos(phirf - omega*(t+tcorr))
 
-    tcorr = jc*el/(2*beta)
- !   jc = 1 
-    V = jc*vrf/(pc*el)
-    s1 = sin(phirf - omega*(t+tcorr))
-    c1 = cos(phirf - omega*(t+tcorr))
+  dpxy = -V*s1*half
 
-    print *, "aaaa", V, s1, c1, tcorr
-    print *, "iiiiitwi", jc, s1, c1, V
-     dpxy = -V*s1*half
-     !dpy = -V*s1*y*half
-     !dptxy =  0.25d0*(x**2+y**2)*V*c1*omega;
 
   re(2,1)   = dpxy
   re(4,3)   = dpxy
@@ -6517,9 +6527,7 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
   te(6,3,3) = 0.25d0*V*c1*omega
 
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-  print *, "ttttwisssang", jc, orbit(1), orbit(3), orbit(6), c1
-  print *, "tttttiwssxyz", jc, orbit(2), orbit(4), orbit(5), c1
- ! el  = node_value('l ')
+
 
 end SUBROUTINE tmrffringe
 
@@ -8373,7 +8381,6 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   !ek(6) =  vrf * sin(lag * twopi - krf * z) - krf * REAL(Sp1);
 
   !---- First-order terms
-  print *, "reeal kick", cm1, z, ftrk
   re(2,1) = -REAL(Cm1);
   re(2,3) =  AIMAG(Cm1);
   
