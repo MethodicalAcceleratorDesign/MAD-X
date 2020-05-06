@@ -6469,13 +6469,12 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
-  !     TRANSPORT map for RF cavity fringe.                                     *
+  !     TRANSPORT map for RF cavity fringe.                              *
   !     Input:                                                           *
   !     fsec      (logical) if true, return second order terms.          *
   !     ftrk      (logical) if true, track orbit.                        *
   !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
   !     el        (double)  element length.                              *
-  !     ds        (double)  slice length.                                *
   !     Input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     Output:                                                          *
@@ -6520,14 +6519,12 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
 
   dpxy = -V*s1*half
 
-
   re(2,1)   = dpxy
   re(4,3)   = dpxy
   te(6,1,1) = 0.25d0*V*c1*omega
   te(6,3,3) = 0.25d0*V*c1*omega
 
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-
 
 end SUBROUTINE tmrffringe
 
