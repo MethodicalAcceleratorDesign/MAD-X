@@ -4308,10 +4308,10 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   !Done with all the setting up...
 
   if (elrad.gt.zero) then
-    lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad/Factorial(k)
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad
      do k = 1, nord
         ! The factor (one + deltap) below is taken from the original MAD-X routine.
-        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/(one + deltap)/elrad/Factorial(k)
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)
      enddo
   else
      lambda = zero
