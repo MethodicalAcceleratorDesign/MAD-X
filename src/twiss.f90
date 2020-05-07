@@ -6348,9 +6348,11 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap, fcentre
+  logical :: fsec, ftrk, fmap, fcentre, fringe
   double precision :: el, ds
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: ek_f(6), re_f(6,6), te_f(6,6,6)
+  double precision :: ek_tmp(6), re_tmp(6,6), te_tmp(6,6,6)
 
   integer :: elpar_vl
   double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, bvk
@@ -6379,6 +6381,10 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   RW = EYE
   TW = zero
 
+  ek_f = zero
+  re_f = EYE
+  te_f = zero
+
   !---- BV flag
   rff = g_elpar(r_freq)
   rfl = g_elpar(r_lag)
@@ -6399,6 +6405,23 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
   !---- Transfer map.
   fmap = .true.
+
+
+  !---- Sandwich cavity between two drifts.
+  if (el .ne. zero) then
+    fringe = node_value('fringe ') .gt. zero
+    ! TODO: generalize for ds!=0.5
+    dl = el / two
+    
+    if (fringe) then
+      call tmrffringe(fsec,ftrk,orbit, fmap, el, one, ek, re_f, te_f)
+      call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+      call tmcat(fsec,rw,tw,re_f,te_f,rw,tw)
+    else
+      call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+    endif
+
+
   if (ftrk) then
     orbit(6) = orbit(6) + c0
     ek(6) = c0
@@ -6410,18 +6433,100 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
     if (fsec) te(6,5,5) = c2
   endif
 
-  !---- Sandwich cavity between two drifts.
-  if (el .ne. zero) then
-    ! TODO: generalize for ds!=0.5
-    dl = el / two
-    call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,re,te,rw,tw,re,te)
     if (fcentre) return
+
     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,rw,tw,re,te,re,te)
+    if (fringe) then
+      call tmrffringe(fsec,ftrk,orbit, fmap, el, -one, ek, re_f, te_f) 
+      call tmcat(fsec,re_f,te_f,re,te,re,te)
+    endif
+
+  
+  else
+    if (ftrk) then
+      orbit(6) = orbit(6) + c0
+      ek(6) = c0
+      re(6,5) = c1
+      if (fsec) te(6,5,5) = c2
+    else
+      ek(6) = c0 - c1 * orbit(5) + c2 * orbit(5)**2
+      re(6,5) = c1 - two * c2 * orbit(5)
+      if (fsec) te(6,5,5) = c2
+   endif
   endif
 
 end SUBROUTINE tmrf
+
+SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te) 
+  use twisslfi
+  use twiss_elpfi
+  use twissbeamfi, only : deltap, pc, beta
+  use matrices, only : EYE
+  use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi
+  use phys_constfi, only : clight
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for RF cavity fringe.                              *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     el        (double)  element length.                              *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical :: fsec, ftrk, fmap
+  double precision :: el,  V, dpxy, dptxy, s1, c1, tcorr
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  integer :: elpar_vl
+  double precision :: rff, rfl, dl, omega, vrf, phirf, bvk, jc
+  double precision :: ek0(6), rw(6,6), tw(6,6,6)
+  double precision :: rfv, x, px, y, py, t, pt
+
+  double precision, external :: node_value
+  integer, external :: el_par_vector
+  ek = zero
+  te = zero
+  re = EYE
+
+  !-- get element parameters
+  elpar_vl = el_par_vector(r_freq, g_elpar)
+
+  !---- Fetch voltage.
+  rfv = g_elpar(r_volt)
+  rff = g_elpar(r_freq)
+  rfl = g_elpar(r_lag)
+
+  omega = rff * (ten6p * twopi / clight)
+  ! vrf   = rfv * ten3m / (pc * (one + deltas))
+  vrf   = rfv * ten3m
+  phirf = rfl * twopi
+  t  = orbit(5);
+
+  tcorr = jc*el/(2*beta)
+  V = jc*vrf/(pc*el* (one + deltap))
+  s1 = sin(phirf - omega*(t+tcorr))
+  c1 = cos(phirf - omega*(t+tcorr))
+
+  dpxy = -V*s1*half
+
+  re(2,1)   = dpxy
+  re(4,3)   = dpxy
+  te(6,1,1) = 0.25d0*V*c1*omega
+  te(6,3,3) = 0.25d0*V*c1*omega
+
+  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
+end SUBROUTINE tmrffringe
 
 SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
   use math_constfi, only : zero
@@ -8268,13 +8373,14 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   endif
 
   !---- Element Kick
-  ek(2) = -REAL(Cp0);
-  ek(4) = AIMAG(Cp0);
-  ek(6) =  vrf * sin(lag * twopi - krf * z) - krf * REAL(Sp1);
+  !ek(2) = -REAL(Cp0);
+  !ek(4) = AIMAG(Cp0);
+  !ek(6) =  vrf * sin(lag * twopi - krf * z) - krf * REAL(Sp1);
 
   !---- First-order terms
   re(2,1) = -REAL(Cm1);
   re(2,3) =  AIMAG(Cm1);
+  
   re(2,5) = -krf * REAL(Sp0);
   re(4,1) =  re(2,3);
   re(4,3) = -re(2,1);

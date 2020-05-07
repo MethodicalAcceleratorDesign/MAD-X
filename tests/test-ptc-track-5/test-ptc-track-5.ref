@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:57:22      +
+  + Execution date: 2020.05.06 08:40:48      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !MADX test for rf lag handling in PTC
 
@@ -13,22 +13,22 @@ option,-echo,-info;
 
 enter Twiss module
   
-iteration:   1 error:   4.021246E-07 deltap:   0.000000E+00
-orbit:   1.839784E-06  5.524609E-13  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.021252E-07 deltap:   0.000000E+00
+orbit:   1.839782E-06  5.524594E-13  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-               6.5                 -0    0.0006278008505         39.9106729 
+               6.5                 -0    0.0006277993121         39.9107218 
 
                 q1                dq1            betxmax              dxmax 
-      0.1072458631      -0.1135571289        13.83023176        0.299880421 
+      0.1072460238      -0.1135571418        13.83023881       0.2998799811 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2679119522    1.839784269e-06    1.643654689e-06       0.1058719085 
+      0.2679115172     1.83978157e-06     1.64365202e-06       0.1058720683 
 
                dq2            betymax              dymax              dyrms 
-     -0.1107430802        13.59506758                  0                  0 
+     -0.1107430995        13.59507428                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
