@@ -489,7 +489,6 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            if ((code.eq.code_sextupole .or. &
               code.eq.code_octupole .or. &
               code.eq.code_elseparator .or. &
-              code.eq.code_rfcavity .or. &
               code.eq.code_crabcavity) .and. el.ne.zero) then
               !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
               call element_name(el_name,len(el_name))
@@ -1698,7 +1697,7 @@ subroutine ttrf(track,ktrack)
   use name_lenfi
   use time_varfi
   use trackfi
-  use math_constfi, only : zero, one, two, ten3m, ten6p, twopi
+  use math_constfi, only : zero, one, two, ten3m, ten6p, twopi, half,pi
   use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
@@ -1718,10 +1717,11 @@ subroutine ttrf(track,ktrack)
   !----------------------------------------------------------------------*
   double precision :: track(6,*)
   integer :: ktrack, itrack, get_option
-  logical :: time_var
+  logical :: time_var, Fringe
   integer :: i, mylen
   double precision :: omega, phirf, pt, rff, rfl, rfv, vrf, pc0, bvk
-  double precision :: bucket_half_length, dummy
+  double precision :: bucket_half_length, dummy, tcorr
+  double precision :: el, V, c1(ktrack), s1(ktrack), jc
   !      double precision px,py,ttt,beti,el1
   character(len=name_len) :: name
 
@@ -1730,9 +1730,7 @@ subroutine ttrf(track,ktrack)
   !---- BV flag
   bvk = node_value('other_bv ')
 
-  !---- Fetch data.
-  !      el = node_value('l ')
-  !      el1 = node_value('l ')
+
   rfv = bvk * node_value('volt ')
 
   !---- Time Variation
@@ -1754,85 +1752,48 @@ subroutine ttrf(track,ktrack)
 
   rff = node_value('freq ')
   rfl = node_value('lag ')
-  !      deltap = get_value('probe ','deltap ')
-  !      deltas = get_variable('track_deltap ')
-  !      pc = get_value('probe ','pc ')
   pc0 = get_value('beam ','pc ')
-  !      betas = get_value('probe ','beta ')
-  !      gammas= get_value('probe ','gamma ')
-  !      dtbyds = get_value('probe ','dtbyds ')
-
-  !      print *,"RF cav.  volt=",rfv, "  freq.",rff
-
-  !*---- Get the longitudinal wakefield filename (parameter #17).
-  !      if (iq(lcelm+melen+15*mcsiz-2) .eq. 61) then
-  !        lstr = iq(lcelm+melen+15*mcsiz)
-  !        call uhtoc(iq(lq(lcelm-17)+1), mcwrd, lfile, 80)
-  !      else
-  !        lfile = ' '
-  !      endif
-
-  !*---- Get the transverse wakefield filename (parameter #18).
-  !      if (iq(lcelm+melen+16*mcsiz-2) .eq. 61) then
-  !        lstr = iq(lcelm+melen+16*mcsiz)
-  !        call uhtoc(iq(lq(lcelm-18)+1), mcwrd, tfile, 80)
-  !      else
-  !        tfile = ' '
-  !      endif
-
-  !*---- If there are wakefields split the cavity.
-  !      if (lfile .ne. ' ' .or. tfile .ne. ' ') then
-  !        el1 = el / two
-  !        rfv = rfv / two
-  !        lwake = .true.
-  !      else
-  !        el1 = el
-  !        lwake = .false.
-  !      endif
-  !---- Set up.
   omega = rff * (ten6p * twopi / clight)
+
   ! vrf   = rfv * ten3m / (pc * (one + deltas))
   vrf   = rfv * ten3m
   phirf = rfl * twopi
   ! dl    = el / two
   ! bi2gi2 = one / (betas * gammas) ** 2
+  el  = node_value('l ')
+  fringe = node_value('fringe ') .gt. zero
+  if(el .gt. zero) then
+    if(fringe) then
+      tcorr = el/(2*betas)
+      jc = one
+      V = jc*vrf/(pc0*el)
+      s1=sin(phirf - omega*(TRACK(5,1:ktrack)+tcorr))
+      c1=cos(phirf - omega*(TRACK(5,1:ktrack)+tcorr))
+
+      TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
+      TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
+      TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.25d0*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
+    endif
+    call ttdrf(el/2,track,ktrack)
+  endif
 
   TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
 
-  !*---- If there were wakefields, track the wakes and then the 2nd half
-  !*     of the cavity.
-  !      if (lwake) then
-  !        call ttwake(two*el1, nbin, binmax, lfile, tfile, ener1, track,
-  !     +              ktrack)
-  !
-  !*---- Track 2nd half of cavity -- loop for all particles.
-  !      do 20 i = 1, ktrack
-  !
-  !*---- Drift to centre.
-  !         px = track(2,i)
-  !         py = track(4,i)
-  !         pt = track(6,i)
-  !         ttt = one/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
-  !         track(1,i) = track(1,i) + dl*ttt*px
-  !         track(3,i) = track(3,i) + dl*ttt*py
-  !         track(5,i) = track(5,i)
-  !     +        + dl*(beti - (beti+pt)*ttt) + dl*pt*dtbyds
-  !
-  !*---- Acceleration.
-  !         pt = pt + vrf * sin(phirf - omega * track(5,i))
-  !         track(6,i) = pt
-  !
-  !*---- Drift to end.
-  !         ttt = one/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
-  !         track(1,i) = track(1,i) + dl*ttt*px
-  !         track(3,i) = track(3,i) + dl*ttt*py
-  !         track(5,i) = track(5,i)
-  !     +        + dl*(beti - (beti+pt)*ttt) + dl*pt*dtbyds
-  ! 20   continue
-  !      endif
+  if(el .gt. zero) then
+    call ttdrf(el/2,track,ktrack)
+    if(fringe) then
+      jc = -one
+      V = jc*vrf/(pc0*el)
+      s1=sin(phirf - (omega)*(TRACK(5,1:ktrack)+jc*tcorr))
+      c1=cos(phirf - (omega)*(TRACK(5,1:ktrack)+jc*tcorr))
 
-  !! frs add-on (bring lost particules back to the bucket long-term studies)
-  if(get_option('bucket_swap ').eq.1) then
+      TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
+      TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
+      TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.25d0*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
+    endif
+  endif
+
+   if(get_option('bucket_swap ').eq.1) then
     bucket_half_length = &
       get_value('probe ','circ ') / (two * get_value('probe ', 'beta ') &
                                      * node_value('harmon '));
@@ -3992,7 +3953,6 @@ subroutine trclor(switch,orbit0)
             (code.eq.code_sextupole .or. &
             code.eq.code_octupole .or. &
             code.eq.code_elseparator .or. &
-            code.eq.code_rfcavity .or. &
             code.eq.code_crabcavity) .and. el.ne.zero) then
            !  .not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
            print *,"\ncode: ",code," el: ",el,"   THICK ELEMENT FOUND\n"
@@ -4682,7 +4642,6 @@ subroutine ttrfmult(track, ktrack, turn)
       field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord))
       field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z))
     enddo
-
     Cm2 = zero; Sm2 = zero; Cm1 = zero; Sm1 = zero;
     Cp0 = zero; Sp0 = zero; Cp1 = zero; Sp1 = zero;
 
