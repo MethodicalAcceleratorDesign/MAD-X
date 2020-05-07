@@ -22,8 +22,8 @@
 @ GAMMATR          %le                   0
 @ Q1               %le         1.531423661
 @ Q2               %le         1.060565274
-@ DQ1              %le         1.187955434
-@ DQ2              %le        -0.545673954
+@ DQ1              %le         1.936237007
+@ DQ2              %le       -0.8893886702
 @ DXMAX            %le         3.523221083
 @ DYMAX            %le                   0
 @ XCOMAX           %le                   0
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le         3.049096885
 @ SYNCH_5          %le         10.03783676
 @ TITLE            %18s "TRANSLINE_2+4 type"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.53.23"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "23/04/20"
+@ TIME             %08s "10.26.51"
 * NAME                                S               BETX               ALFX                MUX                 DX                DPX               BETY               ALFY              MVAR1              MVAR2 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TRANS$START"                        0                  6                  0                  0                  0                  0                  3                  0              0.003              0.003

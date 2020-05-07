@@ -4308,10 +4308,10 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   !Done with all the setting up...
 
   if (elrad.gt.zero) then
-    lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad/Factorial(k)
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad
      do k = 1, nord
         ! The factor (one + deltap) below is taken from the original MAD-X routine.
-        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/(one + deltap)/elrad/Factorial(k)
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)
      enddo
   else
      lambda = zero
@@ -4464,7 +4464,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   integer :: n_ferr, nord, iord, j, nd, nn, ns
   double precision :: f_errors(0:maxferr)
   double precision :: normal(0:maxmul), skew(0:maxmul)
-  double precision :: bi, pt, rfac, bvk, elrad, tilt, angle, an
+  double precision :: bi, pt, rfac, bvk, elrad, tilt, angle, an, anr, ani
   double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp
 
   integer, external :: get_option, node_fd_errors
@@ -4495,8 +4495,10 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   !---- Angle (bvk applied later)
   an = node_value('angle ')
-  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
-
+  if (an .ne. 0) then 
+    anr = an
+    f_errors(0) = f_errors(0) + normal(0) - an
+  endif
   !---- Dipole error.
   dbr = f_errors(0) / (one + deltap)
   dbi = f_errors(1) / (one + deltap)
@@ -4517,13 +4519,17 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      dtmp = sqrt(dbi**2 + dbr**2)
      dbr = dtmp * cos(angle)
      dbi = dtmp * sin(angle)
+     anr = an * cos(angle)
+     ani = an * sin(angle)
+     anr   = bvk * anr
+     ani   = bvk * ani
   endif
 
-  dbr = bvk * dbr
-  dbi = bvk * dbi
+
+  dbr  = bvk * dbr
+  dbi  = bvk * dbi
   dipr = bvk * dipr
   dipi = bvk * dipi
-
   !---- Other components and errors.
   nord = 0
   ! that loop should start at one since nominal dipole strength already taken into account above
@@ -4588,10 +4594,14 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
      !---- Add the missing focussing component of thin dipoles for co
      if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
-        orbit(2) = orbit(2) - dipr*dipr/elrad * x
-        orbit(4) = orbit(4) - dipi*dipi/elrad * y
+        if (an .ne. 0) then
+          orbit(2) = orbit(2) - anr*dipr/elrad * x ! 
+          orbit(4) = orbit(4) - ani*dipi/elrad * y
+        else
+          orbit(2) = orbit(2) - (one+deltap)*dipr*dipr/elrad * x ! 
+          orbit(4) = orbit(4) - (one+deltap)*dipi*dipi/elrad * y
+        endif
      endif
-
      !---- Radiation effects at exit.
      if (radiate  .and.  elrad.ne.zero) then
         orbit(2) = orbit(2) * f_damp_t;
@@ -4621,9 +4631,16 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   endif
 
   !---- Add the missing focussing component of thin dipoles
+  !---- The (1+deltap) is from that the term is h*k0 (so one geometrical and one is bending strength)
   if (elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
-     re(2,1) = re(2,1) - dipr*dipr/elrad
-     re(4,3) = re(4,3) - dipi*dipi/elrad
+    if (an .ne. 0) then
+      re(2,1) = re(2,1) - anr*dipr/elrad
+      re(4,3) = re(4,3) - ani*dipi/elrad
+    else
+      re(2,1) = re(2,1) - (one+deltap)*dipr*dipr/elrad
+      re(4,3) = re(4,3) - (one+deltap)*dipi*dipi/elrad
+    endif
+
   endif
   re(2,6) = + dipr * bi
   re(4,6) = - dipi * bi

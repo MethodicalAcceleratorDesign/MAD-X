@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.01  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.06.07               +
-  + Execution date: 2019.06.27 12:00:27      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.04.23 10:33:07      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !identical to test-ptc-normal-5D so beam-beam effect can be compared directly
 
@@ -848,13 +848,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        78.54370266                 -0       0.1182846613        2.907607528 
 
                 q1                dq1            betxmax              dxmax 
-       1.822284779         160.466757        15.17476941        20.95013299 
+       1.822284779        320.9340463        15.17476941        20.95013299 
 
              dxrms             xcomax             xcorms                 q2 
        9.843308374                  0                  0         2.71778368 
 
                dq2            betymax              dymax              dyrms 
-      -203.8329924        20.33402761        5.142031503        2.210404629 
+       -407.666661        20.33402761        5.142031503        2.210404629 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        9.290535008 
