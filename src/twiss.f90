@@ -3439,9 +3439,11 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmbb(fsec,ftrk,orbit,fmap,re,te)
 
      case (code_marker)
+
         ! nothing on purpose!
 
      case (code_wire)
+        call tmchenergy(ftrk,orbit,fmap,ek,re, te)
         ! nothing for now...
 
      case (code_dipedge)
@@ -3464,7 +3466,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
      case (code_rfmultipole)
         call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
-
+     case (code_changerefpc)
+        call tmchenergy(ftrk,orbit,fmap,ek,re, te)
      case default !--- anything else:
         ! nil (23, 28, 34)
 
@@ -4624,10 +4627,10 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
         di  = (dr * y + di * x) / (iord) + f_errors(2*iord+1)
         dr  = drt
      enddo
-     re(2,1) = - dr
+    ! re(2,1) = - dr
      re(2,3) = + di
      re(4,1) = + di
-     re(4,3) = + dr
+    ! re(4,3) = + dr
   endif
 
   !---- Add the missing focussing component of thin dipoles
@@ -4648,6 +4651,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   re(5,3) = - re(4,6)
 
   !---- Second-order terms (use X,Y from orbit tracking).
+
   if (fsec) then
      if (nord .ge. 2) then
         dr = zero
@@ -4669,7 +4673,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
         te(4,3,3) = - di
      endif
   endif
-
+te = zero
 end SUBROUTINE tmmult
 
 SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
@@ -6318,6 +6322,7 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   fmap = dl .ne. zero
 
   !---- First-order terms.
+
   re(1,2) = dl
   re(3,4) = dl
   re(5,6) = dl/(beta*gamma)**2
@@ -6334,11 +6339,65 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
      te(5,4,4) = te(5,2,2)
      te(5,6,6) = te(1,2,6) * three / (beta * gamma) ** 2
   endif
-
+  
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmdrf
+
+SUBROUTINE tmchenergy(ftrk,orbit,fmap,ek,re, te)
+  use twisslfi
+  use twiss_elpfi
+  use twissbeamfi, only : deltap, pc, gamma, energy, beta
+  use matrices, only : EYE
+  use math_constfi, only : zero, one
+  use phys_constfi, only : clight
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for change of reference Energy                     *
+  !     Input:                                                           *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !----------------------------------------------------------------------*
+  logical :: fsec, ftrk, fmap, fcentre, fringe
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+
+  double precision :: energy1, pc1, gamma1, pt, mass, beta1i
+  double precision, external :: node_value, get_value
+  integer, external :: el_par_vector
+
+  mass     = get_value('probe ','mass ')
+  re = EYE
+  ek = zero
+  te = zero
+  pt = orbit(6) 
+
+  !---- Transfer map.
+  fmap = .true.
+  
+  energy1 = pt*pc+energy
+  pc1 = sqrt(energy1**2-mass**2)
+  gamma1 = energy1/mass
+  beta1i = energy1/pc1
+
+  re(2,2) = pc/pc1
+  re(4,4) = pc/pc1
+  re(6,6) = pc/pc1
+
+  ek(6) = beta1i*(gamma/gamma1-one)
+
+  if(ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
+
+end SUBROUTINE tmchenergy
+
 
 SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   use twisslfi
@@ -6370,6 +6429,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
   double precision :: ek_f(6), re_f(6,6), te_f(6,6,6)
   double precision :: ek_tmp(6), re_tmp(6,6), te_tmp(6,6,6)
+  double precision :: ek_ch(6), re_ch(6,6), te_ch(6,6,6)
 
   integer :: elpar_vl
   double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, bvk
@@ -6406,6 +6466,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   rff = g_elpar(r_freq)
   rfl = g_elpar(r_lag)
   bvk = node_value('other_bv ')
+  
 
   !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
   if (bvk .eq. -one) then
@@ -6451,6 +6512,12 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   endif
 
     call tmcat(fsec,re,te,rw,tw,re,te)
+
+    if (changeref_p0) then
+      call tmchenergy(ftrk,orbit,fmap,ek_ch,re_ch, te_ch)
+      call tmcat(fsec,re_ch,te_ch,re,te,re,te)
+    endif
+
     if (fcentre) return
 
     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
