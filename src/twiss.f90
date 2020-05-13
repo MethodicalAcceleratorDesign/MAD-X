@@ -6513,10 +6513,10 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
     call tmcat(fsec,re,te,rw,tw,re,te)
 
-    if (changeref_p0) then
+    
       call tmchenergy(ftrk,orbit,fmap,ek_ch,re_ch, te_ch)
       call tmcat(fsec,re_ch,te_ch,re,te,re,te)
-    endif
+    
 
     if (fcentre) return
 
