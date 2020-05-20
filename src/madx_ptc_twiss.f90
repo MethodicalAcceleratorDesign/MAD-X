@@ -636,6 +636,11 @@ contains
       rmatrix = .true. ! for the time being force if ptc_select or ptc_knob was defined
     endif
 
+    maptable = get_value('ptc_twiss ','maptable ') .ne. 0
+    if (maptable) then
+      rmatrix = .true. 
+    endif
+    
     isTMsave = .false.
 
     no = get_value('ptc_twiss ','no ')
@@ -1384,7 +1389,6 @@ contains
     endif
 
 
-    maptable = get_value('ptc_twiss ','maptable ') .ne. 0
     if(maptable) then
        call makemaptable(theTransferMap%x,no)
     endif
