@@ -660,7 +660,7 @@ run_ptccalculation(int setknobs, char* readstartval)
 {
   int i,n;
   char buff[500];
-  char comd[500];
+  char comd[600];
   char* iniparname;
 
   char **toks=madx_mpk_comm_calculate->tok_list->p;
@@ -916,7 +916,7 @@ madx_mpk_run(struct in_cmd* cmd)
   double* function_vector1 = 0x0;
   double* function_vector2 = 0x0;
   char    ptcend[20];
-  char    callmatchfile[200];
+  char    callmatchfile[400];
   char    matchfilename[300];
   char    matchactioncommand[400];
   char    maxNCallsExceeded = 0;
