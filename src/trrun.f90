@@ -1061,11 +1061,10 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   dipr = bvk * normal(0) !vals(1,0)
   dipi = bvk * skew(0)  
 
-  !!print *, "ggggg_old", gstr, sstr
      ! cf magnet with quadrupole & sextupole
      gstr = normal(1)/elrad
      sstr = normal(2)/elrad
-     !print *, "uuuu", gstr, sstr, dipr, dipi
+
     do jtrk = 1,ktrack
        x = track(1,jtrk)
        px0 = track(2,jtrk)
@@ -1079,7 +1078,6 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
        ! particle
        deltapp = bet0i*sqrt((1d0 + bet0*orb60)**2 - 1 + bet0**2)
        
-       !deltapp = 0 !HASSSSSSSSSSSSSSSST TOB CHANGE 
        ! orbit transformation:
        ! attention: The following formulas constitute only the kick part
        ! of the CF in a drift-kick-drift decomposition.
@@ -1138,9 +1136,8 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
   integer, external :: Factorial
   double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
-  double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle, tilt2
+  double precision :: dtmp, an, angle, tilt2
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
-  !double precision :: orbit(6),
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
                     dxx, dxy, dyy, rp, rm
   double complex :: lambda(0:maxmul)
@@ -1161,7 +1158,6 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   an = get_tt_attrib(enum_angle)
   time_var = get_tt_attrib(enum_time_var) .ne. 0  
 
-  
   !---- Multipole components.
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
@@ -1171,31 +1167,14 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   !---- Angle (no bvk in track)
   if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
 
-
-
   !-----added FrankS, 10-12-2008
-  !nd = 2 * max(nn, ns, n_ferr/2-1)
-
-  !---- Dipole error.
-  !      dbr = bvk * field(1,0) / (one + deltas)
-  !      dbi = bvk * field(2,0) / (one + deltas)
-  dbr = bvk * f_errors(0) !field(1,0)
-  dbi = bvk * f_errors(1) !field(2,0)
-
-  !---- Nominal dipole strength.
-  !      dipr = bvk * vals(1,0) / (one + deltas)
-  !      dipi = bvk * vals(2,0) / (one + deltas)
-  dipr = bvk * normal(0) !vals(1,0)
-  dipi = bvk * skew(0)   !vals(2,0)
-
+  nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !Below here should not be commented output
   !---- Other components and errors.
   ! that loop should start at one since nominal dipole strength already taken into account above
   !needs to be here though
   nord = 0
-  nd = 2 * max(nn, ns, n_ferr/2-1)
-
   do iord = 1, nd/2
      f_errors(2*iord)   = bvk * (f_errors(2*iord) + normal(iord))
      f_errors(2*iord+1) = bvk * (f_errors(2*iord+1) + skew(iord))
@@ -1206,10 +1185,9 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   lambda(0:maxmul) = 0
 
   if (elrad.gt.zero) then
-    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad/(one + deltap)
      do k = 1, nord
-        ! The factor (one + deltap) below is taken from the original MAD-X routine.
-        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)/(one + deltap)
      enddo
   else
      lambda = zero
@@ -1258,12 +1236,11 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
         del_p_g = del_p_g + sum0
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
-     !pkick = elrad*(barkappa*(one + deltap) + del_p_g)
-    pkick = elrad*(barkappa+ del_p_g)
+     pkick = elrad*(barkappa*(one + deltap) + del_p_g)
      dpx = real(pkick)
      dpy = - aimag(pkick)
-     track(2,jtrk) = track(2,jtrk) + dpx! - dbr
-     track(4,jtrk) = track(4,jtrk) + dpy! + dbi
+     track(2,jtrk) = track(2,jtrk) + dpx
+     track(4,jtrk) = track(4,jtrk) + dpy
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      track(5,jtrk) = track(5,jtrk) - elrad*(kx*track(1,jtrk) + ky*track(3,jtrk)) &
                 *(one + beta*track(6,jtrk))/(one + deltap)/beta
