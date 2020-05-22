@@ -4224,7 +4224,8 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   F_ERRORS(0:maxferr) = zero
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
-  tilt2 = 0 !This is a dumy parameter now that can be changed to have a relative tilt of the different orders
+  tilt2 = 0 ! A parameter describing the relative tilt between
+            ! the dipole component and the higher-order components of the CFM
 
   !####SETTING UP THE MULTIPLES
   an = node_value('angle ')

@@ -1138,7 +1138,6 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
   double precision :: dtmp, an, angle, tilt2
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
-  !double precision :: orbit(6),
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
                     dxx, dxy, dyy, rp, rm
   double complex :: lambda(0:maxmul)
