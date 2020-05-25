@@ -4201,7 +4201,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr
   integer, external :: Factorial
   double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1
-  double precision :: an, angle, dtmp, h0, etahat, ux, uy, xi, eta
+  double precision :: an, angle, dtmp, h0, etahat
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double precision :: orbit(6), re(6,6), te(6,6,6), tilt2
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -4224,7 +4224,8 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   F_ERRORS(0:maxferr) = zero
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
-  tilt2 = 0 !This is a dumy parameter now that can be changed to have a relative tilt of the different orders
+  tilt2 = 0 ! A parameter describing the relative tilt between
+            ! the dipole component and the higher-order components of the CFM
 
   !####SETTING UP THE MULTIPLES
   an = node_value('angle ')
@@ -4236,9 +4237,9 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   ! that loop should start at one since nominal dipole strength already taken into account above
   !needs to be here though
   do iord = 0, max(nn, ns, n_ferr/2-1)
- !    get the maximum effective order; loop runs over maximum of user given values
+  !    get the maximum effective order; loop runs over maximum of user given values
      if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
-          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
+          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord + 1 !  why  +1
   enddo
 
   do iord = 1, nord
@@ -4336,9 +4337,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
         del_p_g = del_p_g + sum0
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
-
-     !pkick = elrad*(barkappa*(one + deltap) + del_p_g) ! original version
-     pkick = elrad*(barkappa*h0 + del_p_g) ! new version
+     pkick = elrad*(barkappa*h0 + del_p_g)
 
      dpx = real(pkick)
      dpy = - aimag(pkick)
@@ -4349,7 +4348,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      orbit(4) = orbit(4) + dpy
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
-                *(one + beta*orbit(6))/beta/(one + etahat) ! 1/(one + deltap)  original version
+                *(one + beta*orbit(6))/beta/(one + etahat)
   endif
   ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! re(6,6) is assumed to be a unit matrix as input
