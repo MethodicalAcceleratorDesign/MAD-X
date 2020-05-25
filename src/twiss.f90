@@ -4201,7 +4201,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr
   integer, external :: Factorial
   double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1
-  double precision :: an, angle, dtmp
+  double precision :: an, angle, dtmp, etahat, h0
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double precision :: orbit(6), re(6,6), te(6,6,6), tilt2
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -4318,6 +4318,11 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      g(k + 1, k + 1) = conjg(g(k + 1, 0))
   enddo
 
+  etahat = sqrt(two*orbit(6)/beta + orbit(6)**2 + one) - one ! etahat = deltap of individual particle
+  etahat = etahat + deltap ! take derivative with respect to a point having a deltap-offset, approximately maintaining
+                           ! the fixed reference orbit in MAD-X.
+  h0 = sqrt((one + etahat)**2 - orbit(2)**2 - orbit(4)**2)
+
   if (ftrk) then
      rp = (orbit(1) + (0, 1)*orbit(3))/two
      rm = conjg(rp)
@@ -4333,16 +4338,19 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
 
-     pkick = elrad*(barkappa*(one + deltap) + del_p_g)
+     !pkick = elrad*(barkappa*(one + deltap) + del_p_g) ! original version
+     pkick = elrad*(barkappa*h0 + del_p_g) ! new version
 
      dpx = real(pkick)
      dpy = - aimag(pkick)
 
+     orbit(1) = orbit(1) + elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)/h0
      orbit(2) = orbit(2) + dpx
+     orbit(3) = orbit(3) + elrad*(kx*orbit(1) + ky*orbit(3))*orbit(4)/h0
      orbit(4) = orbit(4) + dpy
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
-                *(one + beta*orbit(6))/beta/(one + deltap)
+                *(one + beta*orbit(6))/beta/(one + etahat)
   endif
   ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! re(6,6) is assumed to be a unit matrix as input
