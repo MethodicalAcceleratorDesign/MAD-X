@@ -4390,10 +4390,8 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
 
      bp1 = one - one/beta**2
 
-     !te(1, 1, 2) = elrad*kx/(one + deltap)/two ! factor 1/two: see comment above
      te(1, 1, 2) = elrad*kx*(one/h0 + orbit(2)**2/h0**3)/two
      te(1, 2, 1) = te(1, 1, 2)
-     !te(1, 2, 3) = elrad*ky/(one + deltap)/two ! factor 1/two: see comment above
      te(1, 2, 3) = elrad*ky*(one/h0 + orbit(2)**2/h0**3)/two
      te(1, 3, 2) = te(1, 2, 3)
 
