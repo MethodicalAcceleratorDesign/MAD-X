@@ -1106,7 +1106,7 @@ end SUBROUTINE ttmult_cf_mini
 
 SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   use twtrrfi
-  use twissbeamfi, only : deltap, beta
+  use twissbeamfi, only : beta
   use math_constfi, only : zero, one, two, three
   use time_varfi
   use trackfi
@@ -1185,9 +1185,9 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   lambda(0:maxmul) = 0
 
   if (elrad.gt.zero) then
-    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad/(one + deltap)
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad
      do k = 1, nord
-        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)/(one + deltap)
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)
      enddo
   else
      lambda = zero
@@ -1224,8 +1224,6 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
 
   do jtrk = 1, ktrack
      etahat = sqrt(two*track(6,jtrk)/beta + track(6,jtrk)**2 + one) - one ! etahat = deltap of individual particle
-     etahat = etahat + deltap ! take derivative with respect to a point having a deltap-offset, approximately maintaining
-                              ! the fixed reference orbit in MAD-X.
      h0 = sqrt((one + etahat)**2 - track(2,jtrk)**2 - track(4,jtrk)**2)
 
      rp = (track(1,jtrk) + (0, 1)*track(3,jtrk))/two
