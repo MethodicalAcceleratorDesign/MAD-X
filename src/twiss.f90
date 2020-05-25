@@ -4201,7 +4201,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr
   integer, external :: Factorial
   double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1
-  double precision :: an, angle, dtmp, etahat, h0
+  double precision :: an, angle, dtmp, h0, etahat, ux, uy, xi, eta
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double precision :: orbit(6), re(6,6), te(6,6,6), tilt2
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -4224,8 +4224,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   F_ERRORS(0:maxferr) = zero
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
-  tilt2 = 0 ! A parameter describing the relative tilt between
-            ! the dipole component and the higher-order components of the CFM
+  tilt2 = 0 !This is a dumy parameter now that can be changed to have a relative tilt of the different orders
 
   !####SETTING UP THE MULTIPLES
   an = node_value('angle ')
@@ -4350,7 +4349,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      orbit(4) = orbit(4) + dpy
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
-                *(one + beta*orbit(6))/beta/(one + etahat)
+                *(one + beta*orbit(6))/beta/(one + etahat) ! 1/(one + deltap)  original version
   endif
   ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! re(6,6) is assumed to be a unit matrix as input
@@ -4368,14 +4367,14 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
 
      re(2, 1) = real(dxdpg)
      re(2, 3) = real(dydpg)
-     re(2, 6) = elrad*kx/beta/(one + deltap)  ! Eq. (2.48), thesis
+     re(2, 6) = elrad*kx/beta*(one + beta*orbit(6))/h0
 
      re(4, 1) = - aimag(dxdpg)
      re(4, 3) = - aimag(dydpg)
-     re(4, 6) = elrad*ky/beta/(one + deltap) ! Eq. (2.48), thesis
+     re(4, 6) = elrad*ky/beta*(one + beta*orbit(6))/h0
 
-     re(5, 1) = - elrad*kx/beta/(one + deltap) ! Eq. (2.38e), thesis (and (2.37e))
-     re(5, 3) = - elrad*ky/beta/(one + deltap) ! Eq. (2.38e), thesis (and (2.37e))
+     re(5, 1) = - elrad*kx/beta*(one + beta*orbit(6))/h0
+     re(5, 3) = - elrad*ky/beta*(one + beta*orbit(6))/h0
   endif
 
   ! Second-order terms by derivation of Eqs. (39) in Ref. above, at zero
@@ -4392,9 +4391,11 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
 
      bp1 = one - one/beta**2
 
-     te(1, 1, 2) = elrad*kx/(one + deltap)/two ! factor 1/two: see comment above
+     !te(1, 1, 2) = elrad*kx/(one + deltap)/two ! factor 1/two: see comment above
+     te(1, 1, 2) = elrad*kx*(one/h0 + orbit(2)**2/h0**3)/two
      te(1, 2, 1) = te(1, 1, 2)
-     te(1, 2, 3) = elrad*ky/(one + deltap)/two ! factor 1/two: see comment above
+     !te(1, 2, 3) = elrad*ky/(one + deltap)/two ! factor 1/two: see comment above
+     te(1, 2, 3) = elrad*ky*(one/h0 + orbit(2)**2/h0**3)/two
      te(1, 3, 2) = te(1, 2, 3)
 
      te(2, 1, 1) = real(dxx)   ! cf
@@ -4423,6 +4424,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      te(5, 6, 1) = - te(1, 1, 2)*bp1
      te(5, 6, 3) = - te(1, 2, 3)*bp1
   endif
+
 end SUBROUTINE tmmult_cf
 
 SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
