@@ -4200,8 +4200,8 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   logical :: fsec, ftrk, fmap
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr
   integer, external :: Factorial
-  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1
-  double precision :: an, angle, dtmp, h0, etahat
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, etahat, h0
+  double precision :: an, angle, dtmp
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double precision :: orbit(6), re(6,6), te(6,6,6), tilt2
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -4237,9 +4237,9 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   ! that loop should start at one since nominal dipole strength already taken into account above
   !needs to be here though
   do iord = 0, max(nn, ns, n_ferr/2-1)
-  !    get the maximum effective order; loop runs over maximum of user given values
+ !    get the maximum effective order; loop runs over maximum of user given values
      if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
-          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord + 1 !  why  +1
+          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
   enddo
 
   do iord = 1, nord
@@ -4289,9 +4289,9 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      lambda = zero
   endif
 
-  kx = real(lambda(0))    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
-  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
-                          ! Phys. Rev. AccelBeams 19.054002
+  kx = real(lambda(0))*(one + deltap)    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
+  ky = - aimag(lambda(0))*(one + deltap) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
+                                         ! Phys. Rev. AccelBeams 19.054002
 
   kappa = kx + (0, 1)*ky
   barkappa = conjg(kappa)
@@ -4319,14 +4319,11 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   enddo
 
   etahat = sqrt(two*orbit(6)/beta + orbit(6)**2 + one) - one ! etahat = deltap of individual particle
-  etahat = etahat + deltap ! take derivative with respect to a point having a deltap-offset, approximately maintaining
-                           ! the fixed reference orbit in MAD-X.
   h0 = sqrt((one + etahat)**2 - orbit(2)**2 - orbit(4)**2)
 
   if (ftrk) then
      rp = (orbit(1) + (0, 1)*orbit(3))/two
      rm = conjg(rp)
-
      ! Compute \partial_+ G using Eq. (7) in Ref. above
      del_p_g = 0
      do k = 1, nord
@@ -4338,10 +4335,8 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
      pkick = elrad*(barkappa*h0 + del_p_g)
-
      dpx = real(pkick)
      dpy = - aimag(pkick)
-
      orbit(1) = orbit(1) + elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)/h0
      orbit(2) = orbit(2) + dpx
      orbit(3) = orbit(3) + elrad*(kx*orbit(1) + ky*orbit(3))*orbit(4)/h0
@@ -4352,30 +4347,23 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   endif
   ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! re(6,6) is assumed to be a unit matrix as input
-
   ! Eq. (2.38) are required to obtain agreement to the thick sectormap.
-
   if (nord .ge. 1) then
      ! The next two expressions emerge by the first
      ! derivative of \partial_+ G wrt. x and y, see documentation.
-
      ! the factors (one + deltap) means that we take the derivative with respect to a given
      ! energy-offset, so that if deltap != 0, the derivative is evaluated at a larger radius.
      dxdpg = elrad/two*(two*g(2, 0) + g(2, 1))
      dydpg = elrad/two*(0, 1)*(two*g(2, 0) - g(2, 1))
-
      re(2, 1) = real(dxdpg)
      re(2, 3) = real(dydpg)
      re(2, 6) = elrad*kx/beta*(one + beta*orbit(6))/h0
-
      re(4, 1) = - aimag(dxdpg)
      re(4, 3) = - aimag(dydpg)
      re(4, 6) = elrad*ky/beta*(one + beta*orbit(6))/h0
-
      re(5, 1) = - elrad*kx/beta*(one + beta*orbit(6))/h0
      re(5, 3) = - elrad*ky/beta*(one + beta*orbit(6))/h0
   endif
-
   ! Second-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! te(6,6,6) is assumed to be a zero tensor as input
   if ((fsec) .and. (nord .ge. 2)) then
@@ -4387,14 +4375,11 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      dxx = elrad/two*(three*g(3, 0) + two*g(3, 1) + g(3, 2))/two
      dxy = elrad/two*(0, 1)*(three*g(3, 0) - g(3, 2))/two
      dyy = -elrad/two*(three*g(3, 0) - two*g(3, 1) + g(3, 2))/two
-
      bp1 = one - one/beta**2
-
      te(1, 1, 2) = elrad*kx*(one/h0 + orbit(2)**2/h0**3)/two
      te(1, 2, 1) = te(1, 1, 2)
      te(1, 2, 3) = elrad*ky*(one/h0 + orbit(2)**2/h0**3)/two
      te(1, 3, 2) = te(1, 2, 3)
-
      te(2, 1, 1) = real(dxx)   ! cf
      te(2, 1, 3) = real(dxy)   ! cf
      te(2, 3, 1) = te(2, 1, 3) ! cf
@@ -4402,12 +4387,10 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      te(2, 2, 2) = - te(1, 1, 2)
      te(2, 4, 4) = - te(1, 1, 2)
      te(2, 6, 6) = te(1, 1, 2)*bp1
-
      te(3, 1, 4) = te(1, 1, 2)
      te(3, 3, 4) = te(1, 2, 3)
      te(3, 4, 1) = te(1, 1, 2)
      te(3, 4, 3) = te(1, 2, 3)
-
      te(4, 1, 1) = - aimag(dxx)  ! cf
      te(4, 1, 3) = - aimag(dxy)  ! cf
      te(4, 3, 1) = te(4, 1, 3)   ! cf
@@ -4415,13 +4398,11 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      te(4, 2, 2) = - te(1, 2, 3)
      te(4, 4, 4) = - te(1, 2, 3)
      te(4, 6, 6) = te(1, 2, 3)*bp1
-
      te(5, 1, 6) = - te(1, 1, 2)*bp1
      te(5, 3, 6) = - te(1, 2, 3)*bp1
      te(5, 6, 1) = - te(1, 1, 2)*bp1
      te(5, 6, 3) = - te(1, 2, 3)*bp1
   endif
-
 end SUBROUTINE tmmult_cf
 
 SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
