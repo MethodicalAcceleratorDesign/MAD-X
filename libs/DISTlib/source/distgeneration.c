@@ -199,7 +199,9 @@ int particle_within_limits_normalized(double *normalized){
 }
 
 void createcoordinates(int index,  double start, double stop, int length, int type){
-	double temp [length];
+	double *temp;
+    temp = (double*)malloc(length*sizeof(double));
+    
     if(type ==0){ //Constant value
     	for(int i=0;i <length; i++){
         	dist->incoord[i]->coord[index] = start;
@@ -255,6 +257,8 @@ void createcoordinates(int index,  double start, double stop, int length, int ty
     }
     else
     	issue_error("Unknown type of spacing");
+
+    free(temp);
 }
 
 
@@ -309,6 +313,7 @@ double randray(double mu, double sigma){
 
 
 void allocateincoord(int linecount){
+  printf("allllocating \n");
   dist->incoord = (struct coordinates**)malloc(linecount*sizeof(struct coordinates*));
   dist->outcoord = (struct coordinates**)malloc(linecount*sizeof(struct coordinates*));
   dist->totincoord = linecount;
@@ -330,6 +335,7 @@ void allocateincoord(int linecount){
 
   }
   dist->isallocated =1;
+  printf("allllocating2 \n");
 }
 void deallocateincoord(void){
 

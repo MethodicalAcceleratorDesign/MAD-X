@@ -126,7 +126,7 @@ void settasmatrix_element(double value, int row, int column){
 void settwisstas(double betax, double alfax, double betay, double alfay){
 
     dist->tas[0][0] = sqrt(betax);
-    dist->tas[1][0] =-(alfax)/sqrt(betax);
+    dist->tas[1][0] =-alfax/sqrt(betax);
     dist->tas[1][1] =-1/sqrt(betax);
 
     
@@ -167,6 +167,7 @@ void setcoords(double *xn, double *xpn, double *yn, double *ypn, double *zn, dou
 
 void settotalsteps(int totgenerate){
     dist->totincoord = totgenerate;
+    printf("setttttinglllll \n");
 }
 
 void setscan_para_diagonal(int variable, int variable_type, int type, double start, double stop){
@@ -178,7 +179,7 @@ void setscan_para_diagonal(int variable, int variable_type, int type, double sta
     }
     dist->ref->typeused[variable] =  variable_type;
     dist->incoordtype=variable_type; // this is wrong
-
+    
     createcoordinates(variable, start, stop, dist->totincoord,type);
 }
 
