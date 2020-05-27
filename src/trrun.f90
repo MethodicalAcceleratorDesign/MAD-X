@@ -1844,7 +1844,36 @@ subroutine ttrf(track,ktrack)
     enddo
   endif
   !! frs add-on end
+  !call ttchangep0(track,ktrack)
 end subroutine ttrf
+
+subroutine ttchangep0(track,ktrack)
+  use math_constfi, only : zero, two, one
+  use phys_constfi, only : clight
+  implicit none
+  double precision :: track(6,*) 
+  double precision :: get_value, bet0
+  double precision :: pc0, px_, py_, pt_, onedp
+  integer :: i, ktrack
+
+  pc0 = get_value('beam ','pc ')
+  bet0 = get_value('beam ','beta ')
+
+  do i =1, ktrack
+    px_ = track(1,i)
+    py_ = track(3,i)
+    pt_ = track(6,i) 
+    
+    onedp   = sqrt( one + two*pt_/bet0 + (pt_**2))
+
+    TRACK(2,i) = TRACK(2,i)/onedp
+    TRACK(4,i) = TRACK(4,i)/onedp
+    TRACK(6,i) = zero
+  end do
+
+end subroutine ttchangep0
+
+
 
 subroutine ttcrabrf(track,ktrack,turn)
   use math_constfi, only : zero, ten3m, ten6p, twopi
@@ -1919,7 +1948,8 @@ subroutine ttcrabrf(track,ktrack,turn)
 
   TRACK(6,1:ktrack) = TRACK(6,1:ktrack) - &
        omega * vrf * TRACK(1,1:ktrack) * cos(phirf - bvk*omega*TRACK(5,1:ktrack))
-
+  
+ 
 end subroutine ttcrabrf
 
 subroutine tthacdip(track,ktrack,turn)
