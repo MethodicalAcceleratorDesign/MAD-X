@@ -27,7 +27,7 @@ module ptc_spin
   PRIVATE TRACK_SPIN_FRONTR,TRACK_SPIN_FRONTP,TRACK_SPIN_FRONT
   PRIVATE TRACK_SPIN_BACKR,TRACK_SPIN_BACKP,TRACK_SPIN_BACK
   !  private PUSH_SPIN_RAY8
-  private radiate_2p,radiate_2r,radiate_2
+  private radiate_2p,radiate_2r,radiate_2,crossp
   private TRACK_NODE_FLAG_probe_R,TRACK_NODE_FLAG_probe_p,TRACK_NODE_LAYOUT_FLAG_spinr_x
 
   PRIVATE get_Bfield_fringeR,get_Bfield_fringeP,get_Bfield_fringe,TRACK_NODE_LAYOUT_FLAG_spinp_x
@@ -44,7 +44,7 @@ module ptc_spin
   REAL(DP) :: bran_init=pi  
   logical :: locate_with_no_cavity = .false.,full_way=.true.
   integer  :: item_min=3,mfdebug
- 
+  private quaternion_8_to_matrix
   !  INTEGER, PRIVATE :: ISPIN0P=0,ISPIN1P=3
 
 
@@ -55,6 +55,10 @@ module ptc_spin
   INTERFACE alloc
      MODULE PROCEDURE alloc_temporal_probe
      MODULE PROCEDURE alloc_temporal_beam
+  END INTERFACE
+
+  INTERFACE makeso3
+     MODULE PROCEDURE quaternion_8_to_matrix
   END INTERFACE
 
   INTERFACE TRACK_PROBE2     ! semi private routine
@@ -434,21 +438,22 @@ contains
     endif
   END subroutine rot_spin_zp
 
-  subroutine radiate_2r(c,DS,FAC,X,b2,dlds,before,k,POS)
+  subroutine radiate_2r(c,DS,FAC,p,b2,dlds,before,k,POS)
     use gauss_dis
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENT), POINTER::EL
     INTEGER,OPTIONAL,INTENT(IN) ::POS
-    real(dp),INTENT(INOUT) :: X(6)  !,XP(2)
+    type(probe),INTENT(INOUT) :: p !,XP(2)
     real(dp), INTENT(IN) :: DS
     REAL(DP), INTENT(IN) :: FAC
     real(dp), intent(in):: B2,dlds
     LOGICAL(LP),intent(in) :: BEFORE
-    real(dp)  st,z,av(3),t
+    real(dp)  st,z,av(3),t,x(6)
     type(internal_state) k
 
     IF(.NOT.CHECK_STABLE) return
+    x=p%x
     el=>c%parent_fibre%mag
 
     if(k%TIME) then
@@ -526,28 +531,58 @@ contains
     !       X(2)=X_MEC(2)*(one+X(5))/(one+X5)-EL%B_SOL*EL%P%CHARGE*X(3)/two
     !       X(4)=X_MEC(4)*(one+X(5))/(one+X5)+EL%B_SOL*EL%P%CHARGE*X(1)/two
 
-
+   p%x=x
   end subroutine radiate_2r
 
 
-  subroutine radiate_2p(c,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
+  subroutine  quaternion_8_to_matrix(q,s)
+    implicit none
+    TYPE(quaternion), INTENT(INOUT) :: q
+    real(dp) s(3,3)
+    integer i,j
+    type(quaternion) sq,sf
+    
+
+
+    do i=1,3
+     s=0.0_dp
+     sq%x(i)=1.0_dp
+     sf=q*sq*q**(-1)
+     do j=1,3
+       s(j,i)=sf%x(j)
+     enddo
+    enddo
+
+
+    end subroutine  quaternion_8_to_matrix
+
+  subroutine radiate_2p(c,DS,FAC,p,b2,dlds,XP,before,k,POS,E,B)
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENTP), POINTER::EL
     INTEGER,OPTIONAL,INTENT(IN) ::POS
-    TYPE(REAL_8),INTENT(INOUT) :: X(6),XP(2)
-    real(dp),INTENT(INOUT) :: E_IJ(6,6)
+    TYPE(REAL_8),INTENT(INOUT) ::XP(2),E(3),B(3)
+    TYPE(probe_8),INTENT(INOUT) :: p
     TYPE(REAL_8), INTENT(IN) :: DS
     REAL(DP), INTENT(IN) :: FAC
     TYPE(REAL_8), intent(in):: B2,dlds
     LOGICAL(LP),intent(in) :: BEFORE
-    TYPE(REAL_8) st,av(3),z
-    real(dp) b30,x1,x3,denf
+    TYPE(REAL_8) st,av(3),z,x(6)
+    type(quaternion) q
+    real(dp) b30,x1,x3,denf,a(3),dspin(3),bs(3),ee(3),bb(3),lambda,s(3,3),theta
     type(damap) xpmap
-    integer i,j
+    integer i,j,ja,ia
     type(internal_state) k
 
     IF(.NOT.CHECK_STABLE) return
+        do i=1,3
+         ee(i)=e(i)
+         bb(i)=b(i)
+        enddo
+
+    call alloc(x)
+    x=p%x
+
     el=>c%parent_fibre%magp
     if(.not.before.and.k%envelope) then
 
@@ -572,11 +607,79 @@ contains
           do j=1,6
              X1=(xpmap%v(i)).sub.'000010'   ! Still works if BMAD units are used because xpmax**(-1) is needed!!!
              X3=(xpmap%v(j)).sub.'000010'
-             E_IJ(i,j)=E_IJ(i,j)+denf*x1*x3 ! In a code internally using BMAD units '000001' is needed!!!
+             P%E_IJ(i,j)=p%E_IJ(i,j)+denf*x1*x3 ! In a code internally using BMAD units '000001' is needed!!!
           enddo
-       enddo
-       if(compute_stoch_kick) c%delta_rad_out=root(denf)
+       enddo    
        call kill(xpmap)
+! new eq 15
+       if(k%spin.and.k%envelope) then
+       if(p%use_q) then
+         q=p%q   
+         call makeso3(q,s)
+       else
+        DO I=1,3
+           DO J=1,3
+              s(i,j)=p%S(J)%X(I)
+           ENDDO
+        ENDDO         
+       endif
+ !!  lambda
+        lambda=denf*24.0_dp*sqrt(3.0_dp)/(1.0_dp+x(5))**2/55.0_dp
+
+        x1=5.0_dp*sqrt(3.0_dp)/8.0_dp*lambda
+ 
+        do i=1,3
+         p%damps(i,i)=p%damps(i,i)-x1
+        enddo
+        do i=1,3
+         do j=1,3
+             p%damps(i,j)= x1*2.0_dp/9.0_dp*ee(i)*ee(j)   + p%damps(i,j)
+         enddo
+        enddo
+
+!! equation 15 of Barber in Chao's handbook
+
+        theta=(denf/2.0_dp/11.0_dp)*18.0_dp !  comparing to tau_dep
+! if(c%parent_fibre%mag%p%b0/=0)         then
+p%t_bks0=p%t_bks0+theta  
+!write(6,*) c%parent_fibre%mag%p%b0**2,b30t,denf
+!endif 
+
+        do j=1,3 
+          do i=1,3
+            do ja=1,3 
+             do ia=1,3
+
+            p%t_bks(j,ja)=p%t_bks(j,ja) - theta*2.0_dp* ee(i)*s(i,j) *ee(ia)*s(ia,ja) /9.0_dp
+             enddo
+           enddo
+         enddo
+       enddo
+
+        call crossp(ee,bb,a)
+        call crossp(ee,a,dspin)
+        x3=sqrt(a(1)**2+a(2)**2+a(3)**2)
+        
+       if(x3>1.d-38) then
+          x1=24.0_dp*sqrt(3.0_dp)/55.0_dp*lambda
+          do i=1,3
+          do j=1,3
+           p%b_kin(i,j)=x1*dspin(i)*dspin(j)/x3**2 + p%b_kin(i,j)
+          enddo
+          enddo
+            do i=1,3
+               dspin(i)=dspin(i)*lambda/x3
+            enddo
+           do i=1,3
+            p%d_spin(i)=p%d_spin(i)+dspin(i)
+           enddo
+
+
+        endif
+ 
+       endif
+
+       if(compute_stoch_kick) c%delta_rad_out=root(denf)
     endif
 
 
@@ -666,17 +769,153 @@ contains
           do j=1,6
              X1=(xpmap%v(i)).sub.'000010'
              X3=(xpmap%v(j)).sub.'000010'
-             E_IJ(i,j)=E_IJ(i,j)+denf*x1*x3
+             p%E_IJ(i,j)=p%E_IJ(i,j)+denf*x1*x3
           enddo
        enddo
-       if(compute_stoch_kick) c%delta_rad_in=root(denf)
        call kill(xpmap)
-    endif
+       if(k%spin.and.k%envelope) then
+        if(p%use_q) then
+         q=p%q   
+         call makeso3(q,s)
+       else
+        DO I=1,3
+           DO J=1,3
+              s(i,j)=p%S(J)%X(I)
+           ENDDO
+        ENDDO         
+       endif
 
+        x1=denf*9.0_dp/((1.0_dp+x(5))**2 *11.0_dp)
+        do i=1,3
+         p%damps(i,i)=p%damps(i,i)-x1
+        enddo
+        do i=1,3
+         do j=1,3
+             p%damps(i,j)= x1*2.0_dp/9.0_dp*ee(i)*ee(j)   + p%damps(i,j)
+         enddo
+        enddo
+!!  lambda
+        lambda=denf*24.0_dp*sqrt(3.0_dp)/(1.0_dp+x(5))**2/55.0_dp
+!! equation 15 of Barber in Chao's handbook
+ 
+        theta=(denf/2.0_dp/11.0_dp)*18.0_dp !  comparing to tau_dep
+        
+! if(c%parent_fibre%mag%p%b0/=0)         then
+p%t_bks0=p%t_bks0+theta  
+!write(6,*) c%parent_fibre%mag%p%b0**2,b30t,denf
+!endif 
+
+        do j=1,3 
+          do i=1,3
+            do ja=1,3 
+             do ia=1,3
+
+            p%t_bks(j,ja)=p%t_bks(j,ja) - theta*2.0_dp* ee(i)*s(i,j) *ee(ia)*s(ia,ja) /9.0_dp
+             enddo
+           enddo
+         enddo
+       enddo
+
+        call crossp(ee,bb,a)
+        call crossp(ee,a,dspin)
+        x3=sqrt(a(1)**2+a(2)**2+a(3)**2)
+        
+       if(x3>1.d-38) then
+          x1=24.0_dp*sqrt(3.0_dp)/55.0_dp*lambda
+          do i=1,3
+          do j=1,3
+           p%b_kin(i,j)=x1*dspin(i)*dspin(j)/x3**2 + p%b_kin(i,j)
+          enddo
+          enddo
+            do i=1,3
+               dspin(i)=dspin(i)*lambda/x3
+            enddo
+           do i=1,3
+            p%d_spin(i)=p%d_spin(i)+dspin(i)
+           enddo
+
+        endif
+ 
+       endif
+       if(compute_stoch_kick) c%delta_rad_in=root(denf)
+    endif
+    p%x=x
+    call kill(x)
+ 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
   end subroutine radiate_2p
+
+  subroutine fluc_spin(p,De_ij)
+  implicit none
+   TYPE(probe_8),target,INTENT(INOUT) :: p    
+   real(dp) De_ij(6,6),ds(3,3,0:6),v(9),s(3,3),t(9,9)
+   integer je(6),i1,i2,i3,j1,j2,j3
+   type(c_damap) m
+   call alloc(m)
+   m=p
+   call makeso3(m)
+   ds=0
+   do i1=1,3
+   do i2=1,3
+   s(i1,i2)=m%s%s(i1,i2)
+   do j1=1,6
+   je=0
+   je(j1)=1
+    ds(i1,i2,j1)= m%s%s(i1,i2).sub.je
+   enddo
+   enddo
+   enddo
+
+   do i1=1,3
+   do i2=1,3
+   do i3=1,3
+   do j1=1,6
+   do j2=1,6
+    ds(i1,i3,0)= ds(i1,i3,0) + ds(i1,i2,j1)*ds(i2,i3,j2)*De_ij(j1,j2)
+   enddo
+   enddo
+   enddo
+   enddo
+   enddo
+
+   do i1=1,9
+    v(i1) = ds(k1_spin(i1),k2_spin(i1),0)
+   enddo
+   
+   t=0
+
+  do i1=1,3
+  do i2=1,3
+  do i3=1,3
+     t(ind_spin0(i1,i3),ind_spin0(i3,i2))=  t(ind_spin0(i1,i3),ind_spin0(i3,i2)) - s(i1,i2)
+      t(ind_spin0(i1,i3),ind_spin0(i1,i2))=  t(ind_spin0(i1,i3),ind_spin0(i1,i2)) - s(i3,i2)
+  enddo
+  enddo
+  enddo
+
+   
+  call kill(m)
+  end subroutine fluc_spin 
+
+
+  subroutine crossp(a,b,c)
+  implicit none
+    real(dp),INTENT(INOUT) ::a(3),b(3),c(3)
+    real(dp) t(3)
+
+ 
+
+     t(1)=a(2)*b(3)-a(3)*b(2)
+     t(2)=a(3)*b(1)-a(1)*b(3)
+     t(3)=a(1)*b(2)-a(2)*b(1)
+     c(1)=t(1)
+     c(2)=t(2)
+     c(3)=t(3)
+  
+
+  end subroutine crossp 
+
 
   !  subroutine PUSH_SPIN_fake_fringer(c,p,before,k,POS)
   subroutine PUSH_SPIN_fake_fringer(c,p,k,POS)
@@ -687,7 +926,7 @@ contains
     !    real(dp),INTENT(INOUT) :: X(6),S(3)
     type(probe),INTENT(INOUT) :: p
 
-    real(dp) OM(3),CO(3),SI(3),B2,XP(2)
+    real(dp) OM(3),CO(3),SI(3),B2,XP(2),E(3),B(3)
     real(dp) ST,dlds,norm,stheta
     !    LOGICAL(LP),intent(in) :: BEFORE
     type(internal_state) k
@@ -703,7 +942,7 @@ contains
 
 
 
-    CALL get_omega_spin(c,OM,B2,dlds,XP,p%X,POS,k)
+    CALL get_omega_spin(c,OM,B2,dlds,XP,p%X,POS,k,E,B)
     !if(k%radiation.AND.BEFORE) then
     !if(el%p%radiation.AND.BEFORE) then
     ! call radiate_2(EL,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
@@ -766,7 +1005,7 @@ endif
     TYPE(probe_8),INTENT(INOUT) :: p
     !    TYPE(REAL_8),INTENT(INOUT) :: X(6),S(3)
 
-    TYPE(REAL_8) OM(3),CO(3),SI(3),B2,XP(2)
+    TYPE(REAL_8) OM(3),CO(3),SI(3),B2,XP(2),E(3),B(3)
     TYPE(REAL_8) ST,dlds,norm,stheta
     !    LOGICAL(LP),intent(in) :: BEFORE
     type(internal_state) k
@@ -783,12 +1022,14 @@ endif
 
 
     CALL ALLOC(OM,3)
+    CALL ALLOC(E,3)
+    CALL ALLOC(B,3)
     CALL ALLOC(CO,3)
     CALL ALLOC(SI,3)
     CALL ALLOC(XP,2)
     CALL ALLOC(ST,B2,dlds)
 
-    CALL get_omega_spin(c,OM,B2,dlds,XP,p%X,POS,k)
+    CALL get_omega_spin(c,OM,B2,dlds,XP,p%X,POS,k,E,B)
     !if(k%radiation.AND.BEFORE) then
     !if(el%p%radiation.AND.BEFORE) then
     ! call radiate_2(EL,DS,FAC,X,E_IJ,b2,dlds,XP,before,k,POS)
@@ -862,6 +1103,8 @@ endif
     !endif
 
     CALL KILL(OM,3)
+    CALL KILL(E,3)
+    CALL KILL(B,3)
     CALL KILL(CO,3)
     CALL KILL(SI,3)
     CALL KILL(XP,2)
@@ -878,7 +1121,7 @@ endif
     TYPE(PROBE), INTENT(INOUT) :: P
     !    REAL(DP),INTENT(INOUT) :: X(6),S(3)
     REAL(DP), INTENT(IN) :: DS,FAC
-    REAL(DP) OM(3),CO(3),SI(3),B2,XP(2)
+    REAL(DP) OM(3),CO(3),SI(3),B2,XP(2),E(3),B(3)
     REAL(DP) ST,dlds,norm,stheta
     type(quaternion) dq,mulq
     LOGICAL(LP),intent(in) :: BEFORE
@@ -893,11 +1136,11 @@ endif
     !    if(EL%kind>=kind11.and.EL%kind<=kind14) return    ! should I prevent monitor here??? instead of xp=Px,y in get_omega_spin
     !    if(EL%kind>=kind18.and.EL%kind<=kind19) return    ! should I prevent monitor here??? instead of xp=Px,y in get_omega_spin
 
-    CALL get_omega_spin(c,OM,B2,dlds,XP,P%X,POS,k)
+    CALL get_omega_spin(c,OM,B2,dlds,XP,P%X,POS,k,E,B)
     if((k%radiation.or.k%envelope).AND.BEFORE) then
        !if(el%p%radiation.AND.BEFORE) then
        !       call radiate_2(c,DS,FAC,P%X,b2,dlds,XP,before,k,POS)
-       call radiate_2(c,DS,FAC,P%X,b2,dlds,before,k,POS)
+       call radiate_2(c,DS,FAC,P,b2,dlds,before,k,POS)
     endif
    if(k%spin) then
     if(p%use_q) then
@@ -965,7 +1208,7 @@ endif
     !if(el%p%radiation.AND.(.NOT.BEFORE)) then
     if((k%radiation.or.k%envelope).AND.(.NOT.BEFORE)) then
        !       call radiate_2(c,DS,FAC,P%X,b2,dlds,XP,before,k,POS)
-       call radiate_2(c,DS,FAC,P%X,b2,dlds,before,k,POS)
+       call radiate_2(c,DS,FAC,P,b2,dlds,before,k,POS)
     endif
 
   END subroutine PUSH_SPINR
@@ -980,9 +1223,10 @@ endif
     !    real(dp),INTENT(INOUT) :: E_IJ(6,6)
     TYPE(REAL_8), INTENT(INout) :: DS
     REAL(DP), INTENT(IN) :: FAC
-    TYPE(REAL_8) OM(3),CO(3),SI(3),B2,XP(2)
+    TYPE(REAL_8) OM(3),CO(3),SI(3),B2,XP(2),E(3),B(3)
     TYPE(REAL_8) ST,dlds,norm,stheta
     type(quaternion_8) dq
+    type(quaternion) dq0
     LOGICAL(LP),intent(in) :: BEFORE
     type(internal_state) k
     INTEGER I
@@ -995,6 +1239,8 @@ endif
     !    if(EL%kind>=kind18.and.EL%kind<=kind19) return    ! should I prevent monitor here??? instead of xp=Px,y in get_omega_spin
 
     CALL ALLOC(OM,3)
+    CALL ALLOC(E,3)
+    CALL ALLOC(B,3)
     CALL ALLOC(CO,3)
     CALL ALLOC(SI,3)
     CALL ALLOC(XP,2)
@@ -1002,10 +1248,10 @@ endif
 
 
     IF(K%PARA_IN ) KNOB=.TRUE.
-    CALL get_omega_spin(c,OM,B2,dlds,XP,P%X,POS,k)
+    CALL get_omega_spin(c,OM,B2,dlds,XP,P%X,POS,k,E,B)
     if((k%radiation.or.k%envelope).AND.BEFORE) then
        !if(el%p%radiation.AND.BEFORE) then
-       call radiate_2(c,DS,FAC,P%X,P%E_IJ,b2,dlds,XP,before,k,POS)
+       call radiate_2(c,DS,FAC,P,b2,dlds,XP,before,k,POS,E,B)
        !       call radiate_2(c,DS,FAC,P%X,E_IJ,b2,dlds,XP,before,k,POS)
 
     endif
@@ -1031,7 +1277,10 @@ endif
         dq%x(2)=stheta*om(2)
         dq%x(3)=stheta*om(3)
         p%q=dq*p%q
-
+      if(k%envelope.and.k%radiation) then
+         dq0=dq
+       call quaternion_to_damps (dq0,p)
+      endif
        call kill(norm,stheta)
        call kill(dq)
 
@@ -1073,11 +1322,13 @@ endif
     endif
     if((k%radiation.or.k%envelope).AND.(.NOT.BEFORE)) then
        !if(el%p%radiation.AND.(.NOT.BEFORE)) then
-       call radiate_2(c,DS,FAC,P%X,P%E_IJ,b2,dlds,XP,before,k,POS)
+       call radiate_2(c,DS,FAC,P,b2,dlds,XP,before,k,POS,E,B)
        !       call radiate_2(c,DS,FAC,P%X,E_IJ,b2,dlds,XP,before,k,POS)
     endif
 
     CALL KILL(OM,3)
+    CALL KILL(E,3)
+    CALL KILL(B,3)
     CALL KILL(CO,3)
     CALL KILL(SI,3)
     CALL KILL(XP,2)
@@ -1085,14 +1336,37 @@ endif
     knob=.false.
   END subroutine PUSH_SPINP
 
-  subroutine get_omega_spinr(c,OM,B2,dlds,XP,X,POS,k)
+  subroutine  quaternion_to_damps (q_lin,p)
+    implicit none
+    real(dp) m(3,3) 
+    TYPE(quaternion), INTENT(IN) :: q_lin
+    type(probe_8), intent(inout) :: p
+    type(quaternion) s,sf
+    integer i,j
+
+    do i=1,3
+     s=0.0_dp
+     s%x(i)=1.0_dp
+     sf=q_lin*s*q_lin**(-1) 
+     do j=1,3
+      m(j,i)=sf%x(j)
+     enddo
+    enddo
+    p%damps=matmul(m,p%damps)
+    p%b_kin=matmul(m,p%b_kin)
+    p%b_kin=matmul(p%b_kin,transpose(m))
+    p%d_spin=matmul(m,p%d_spin)
+
+    end subroutine  quaternion_to_damps 
+
+  subroutine get_omega_spinr(c,OM,B2,dlds,XP,X,POS,k,ED,B)
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENT), POINTER::EL
     TYPE(MAGNET_CHART), POINTER::P
     INTEGER,OPTIONAL,INTENT(IN) ::POS
-    REAL(DP),INTENT(INOUT) :: X(6),OM(3),B2,XP(2),DLDS
-    REAL(DP)  B(3),E(3),BPA(3),BPE(3),D1,D2,GAMMA,EB(3),EFD(3),beta,ed(3)
+    REAL(DP),INTENT(INOUT) :: X(6),OM(3),B2,XP(2),DLDS,B(3),ED(3)
+    REAL(DP)  BPA(3),BPE(3),D1,D2,GAMMA,EB(3),EFD(3),beta,e(3)
     REAL(DP) BETA0,GAMMA0I,XPA(2),phi,del,z
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -1114,6 +1388,7 @@ endif
     BPE=0.0_dp
     B=0.0_dp
     E=0.0_dp
+    ED=0.0_dp
     EFD=0.0_dp
     phi=0.0_dp
 
@@ -1244,14 +1519,14 @@ endif
 
   end subroutine get_omega_spinr
 
-  subroutine get_omega_spinp(c,OM,B2,dlds,XP,X,POS,k)
+  subroutine get_omega_spinp(c,OM,B2,dlds,XP,X,POS,k,ED,B)
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENTp), POINTER::EL
     TYPE(MAGNET_CHART), POINTER::P
     INTEGER,OPTIONAL,INTENT(IN) ::POS
-    TYPE(REAL_8), INTENT(INOUT) :: X(6),OM(3),B2,XP(2)
-    TYPE(REAL_8)  B(3),E(3),BPA(3),BPE(3),DLDS,D1,D2,GAMMA,EB(3),efd(3),XPA(2),ed(3),beta,phi,del,z
+    TYPE(REAL_8), INTENT(INOUT) :: X(6),OM(3),B2,XP(2),B(3),ED(3)
+    TYPE(REAL_8)  BPA(3),BPE(3),DLDS,D1,D2,GAMMA,EB(3),efd(3),XPA(2),e(3),beta,phi,del,z
     REAL(DP) BETA0,GAMMA0I
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -1270,9 +1545,9 @@ endif
 
     IF(.NOT.CHECK_STABLE) return
 
-    CALL ALLOC(B,3)
+  !  CALL ALLOC(B,3)
+    !CALL ALLOC(ED,3)
     CALL ALLOC(E,3)
-    CALL ALLOC(Ed,3)
     CALL ALLOC(efd,3)
     CALL ALLOC(beta,del,z)
     CALL ALLOC(EB,3)
@@ -1419,17 +1694,18 @@ endif
     ENDIF
 
 
-    CALL KILL(B,3)
+ !   CALL KILL(B,3)
+  !  CALL KILL(ED,3)
+ 
+
     CALL KILL(E,3)
+    CALL KILL(efd,3)
+    CALL KILL(beta,del,z)
     CALL KILL(EB,3)
     CALL KILL(BPA,3)
     CALL KILL(BPE,3)
-    CALL KILL(D1,D2,GAMMA,phi,z)
     CALL KILL(XPA,2)
-    CALL KILL(Ed,3)
-    CALL KILL(efd,3)
-    CALL KILL(beta,del)
-
+    CALL KILL(D1,D2,GAMMA,phi)
     !  TESTBUG SATEESH
     !    CALL KILL(XS)
     !     CALL KILL(ID)
@@ -2765,7 +3041,7 @@ call kill(vm,phi,z)
         elem_name = C%PARENT_FIBRE%MAGP%name  ! LD: 22.03.2019
         CALL TRACK_NODE_PROBE(C,XS,K)  !,R%charge)
         if(.not.check_stable) exit
-
+ 
        C=>C%NEXT
        J=J+1
     ENDDO
@@ -3286,7 +3562,7 @@ call kill(vm,phi,z)
           CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
           if(k%spin) then
             CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
-            if(xs%use_q) xs%q%x=xs%q%x/sqrt(xs%q%x(1)**2+xs%q%x(2)**2+xs%q%x(3)**2+xs%q%x(0)**2)
+   if(xs%use_q.and.assume_c_quaternion_normalised) xs%q%x=xs%q%x/sqrt(xs%q%x(1)**2+xs%q%x(2)**2+xs%q%x(3)**2+xs%q%x(0)**2)
 
           endif
        
@@ -3294,7 +3570,7 @@ call kill(vm,phi,z)
           if(k%spin) then
 
                  CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
-             if(xs%use_q) xs%q%x=xs%q%x/sqrt(xs%q%x(1)**2+xs%q%x(2)**2+xs%q%x(3)**2+xs%q%x(0)**2)
+   if(xs%use_q.and.assume_c_quaternion_normalised) xs%q%x=xs%q%x/sqrt(xs%q%x(1)**2+xs%q%x(2)**2+xs%q%x(3)**2+xs%q%x(0)**2)
 
            endif
           CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
@@ -3459,7 +3735,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           if(k%spin) then
 
                  CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
-       if(xs%use_q) then
+   if(xs%use_q.and.assume_c_quaternion_normalised) then
            ds=1.0_dp/sqrt(xs%q%x(1)**2+xs%q%x(2)**2+xs%q%x(3)**2+xs%q%x(0)**2)
            xs%q%x(0)=xs%q%x(0)*ds
            xs%q%x(1)=xs%q%x(1)*ds
@@ -3472,7 +3748,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           if(k%spin) then
 
                  CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
-        if(xs%use_q) then
+   if(xs%use_q.and.assume_c_quaternion_normalised) then
            ds=1.0_dp/sqrt(xs%q%x(1)**2+xs%q%x(2)**2+xs%q%x(3)**2+xs%q%x(0)**2)
            xs%q%x(0)=xs%q%x(0)*ds
            xs%q%x(1)=xs%q%x(1)*ds
@@ -5874,7 +6150,137 @@ call kill(xs);call kill(m);call kill(mr)
  
 end subroutine fill_tree_element_line_zhe0
 
-subroutine fill_tree_element_line_zhe(state,f1,f2,no,fix0,filef,stochprec,sagan_tree)   ! fix0 is the initial condition for the maps
+subroutine fill_tree_element_line_zhe0_node(state_0,state,t1,t2,no,fix0_0,fix0,filef,stochprec,sagan_tree)   ! fix0 is the initial condition for the maps
+implicit none
+TYPE(INTEGRATION_NODE), target :: t1,t2 
+type(layout), pointer :: r
+TYPE(INTEGRATION_NODE),POINTER:: t1c,t2c
+TYPE (NODE_LAYOUT), POINTER :: t
+type(internal_state), intent(in):: state,state_0
+real(dp) fixr(6),fixs(6),fix(6),fix0(6),fix0_0(6),mat(6,6),xn,stoch,fix_0(6)
+real(dp), optional :: stochprec
+ 
+type(probe) xs0,xs0_0
+type(probe_8) xs,xs_0
+type(c_damap) m,mr,m_0
+integer no,i,inf
+type(fibre), pointer :: p
+type(tree_element), pointer :: forward(:) =>null()
+character(*),optional :: filef
+type(tree_element),optional, target :: sagan_tree(3)
+
+ 
+
+if(present(sagan_tree)) then
+ forward=>sagan_tree
+else
+  allocate(forward(3))
+endif
+if(.not.associated(t1%parent_fibre%parent_layout)) then
+ write(6,*) " parent layout not associated "
+ stop
+else
+ r=>t1%parent_fibre%parent_layout
+endif
+
+ t=>t1%parent_fibre%parent_layout%t
+ t1c=>t1 !%next
+ t2c=>t2
+
+
+mat=0
+do i=1,size(mat,1)
+mat(i,i)=1
+enddo
+
+ 
+call init_all(state,no,0)
+call alloc(xs);call alloc(m,m_0);call alloc(mr)
+ call alloc(xs_0);
+
+
+xs0=fix0
+m=1
+xs=xs0+m
+if(associated(t1c,t2c)) then
+ call propagate(xs,state,node1=t1c)
+else
+ call propagate(xs,state,node1=t1c,node2=t2c)
+endif
+ 
+
+
+xs0_0=fix0_0
+m=1
+xs_0=xs0_0+m
+if(associated(t1c,t2c)) then
+ call propagate(xs_0,state_0,node1=t1c)
+else
+ call propagate(xs_0,state_0,node1=t1c,node2=t2c)
+endif
+ 
+! For David
+!!  The full nonlinear map m is computed and the final orbit
+!!  
+fix=xs%x  ! <---   
+m=xs  ! <---   
+ 
+do i=1,6
+ m%v(i)=m%v(i)-(m%v(i).sub.0)
+enddo 
+
+fix_0=xs_0%x  ! <---   
+m_0=xs_0 ! <---   
+ 
+do i=1,6
+ m_0%v(i)=m_0%v(i)-(m_0%v(i).sub.0)
+enddo 
+
+ 
+
+ 
+call SET_TREE_G_complex_zhe0(forward,m,m_0)
+
+  stoch=-1.0_dp
+if(present(stochprec)) stoch=stochprec
+
+if(stoch>=0) then
+  call c_stochastic_kick(m,forward(2)%rad,forward(2)%fix0,stoch)  
+endif
+
+ 
+forward(1)%rad=mat
+forward(1)%fix0(1:6)=fix0
+forward(1)%fixr(1:6)=fix
+forward(1)%fix(1:6)=fix    ! always same fixed point
+ 
+ 
+forward(3)%fix0(1:6)=fix0_0
+forward(3)%fixr(1:6)=fix_0
+forward(3)%fix(1:6)=fix_0    ! always same fixed point
+
+
+ forward(1)%ds=0.0_dp
+ p=>t1%parent_fibre
+ do while(.not.associated(p,t2%parent_fibre))
+  forward(1)%ds=p%mag%p%ld +forward(1)%ds
+  p=>p%next
+ enddo
+forward(1)%beta0=t1%parent_fibre%beta0
+
+ if(present(filef)) then
+  call kanalnummer(inf,filef)
+    call print_tree_elements(forward,inf)
+   close(inf)
+  call KILL(forward)
+  deallocate(forward)
+endif
+
+call kill(xs);call kill(m);call kill(mr)
+ 
+end subroutine fill_tree_element_line_zhe0_node
+
+subroutine fill_tree_element_line_zhe(state,f1,f2,no,fix0,filef,stochprec,as_is,sagan_tree)   ! fix0 is the initial condition for the maps
 implicit none
 type(fibre), target :: f1,f2
 type(layout), pointer :: r
@@ -5882,7 +6288,9 @@ TYPE(INTEGRATION_NODE),POINTER:: t1c,t2c
 TYPE (NODE_LAYOUT), POINTER :: t
 type(internal_state), intent(in):: state
 real(dp) fixr(6),fixs(6),fix(6),fix0(6),mat(6,6),xn,stoch
-real(dp), optional :: stochprec
+real(dp), optional :: stochprec 
+logical, optional :: as_is
+logical  as_is0
  
 type(probe) xs0
 type(probe_8) xs
@@ -5893,7 +6301,9 @@ type(tree_element), pointer :: forward(:) =>null()
 character(*),optional :: filef
 type(tree_element),optional, target :: sagan_tree(3)
 
- 
+ as_is0=.false.
+
+ if(present(as_is)) as_is0=as_is
 
 if(present(sagan_tree)) then
  forward=>sagan_tree
@@ -5945,8 +6355,11 @@ enddo
 
  
 
-
-call SET_TREE_G_complex_zhe(forward,m)
+if( as_is0)  then
+ call SET_TREE_G_complex_zhe_as_is(forward,m)
+else
+ call SET_TREE_G_complex_zhe(forward,m)
+endif
 
   stoch=-1.0_dp
 if(present(stochprec)) stoch=stochprec
@@ -5981,142 +6394,539 @@ call kill(xs);call kill(m);call kill(mr)
 
 end subroutine fill_tree_element_line_zhe
 
-!!!!!!!!!!!!!!!!!!!!   tree tracking  for Zhe  : independent program
 
-  SUBROUTINE SET_TREE_G_complex_zhe(T,Ma)
+
+subroutine fill_tree_element_line_zhe_outside_map_ji(minput,minput0 ,filef,fix0, fs)   ! fix0 is the initial condition for the maps
+implicit none
+real(dp), optional :: fix0(6),fs(6)
+
+ 
+real(dp)  fix(6),mat(6,6) ,f0(6),stoch,fsi(6)
+ 
+type(c_damap) m,m0,minput,minput0
+integer  i,inf
+ 
+type(tree_element), pointer :: forward =>null()
+character(*),optional :: filef
+ 
+ 
+ 
+  allocate(forward)
+ 
+
+mat=0
+do i=1,size(mat,1)
+mat(i,i)=1
+enddo
+
+
+!call init_all(state,no,0)
+ call alloc(m,m0); 
+
+
+
+fix=minput 
+f0=fix  
+if(present(fix0)) f0=fix0
+fsi=0.0_dp  
+if(present(fs)) fsi=fs
+
+ 
+m=minput  
+m0=minput0
+
+do i=1,6
+ m%v(i)=m%v(i)-(m%v(i).sub.0)
+enddo
+
+do i=1,6
+ m0%v(i)=minput0%v(i)-(minput0%v(i).sub.0)
+enddo
+
+ 
+call SET_TREE_G_complex_zhe_as_is_ji(forward,M,minput0,fsi)
+
+
+
+ 
+
+forward%rad=mat
+forward%fix0(1:6)=f0 ! entrance
+forward%fixr(1:6)=fsi
+forward%fix(1:6)=fix    ! exit
+
+
+ forward%ds=0.0_dp
+ 
+ 
+  forward%ds=0.0d0
+ 
+forward%beta0=1.d0
+
+ if(present(filef)) then
+  call kanalnummer(inf,filef)
+  call print_tree_element(forward,inf)
+   close(inf)
+  call KILL(forward)
+  deallocate(forward)
+endif
+
+ call kill(m,m0) 
+
+end subroutine fill_tree_element_line_zhe_outside_map_ji
+
+subroutine fill_tree_element_line_zhe_outside_map_ji_vec(minput,minput0 ,filef,fix0, fs)   ! fix0 is the initial condition for the maps
+implicit none
+real(dp), optional :: fix0(6),fs(6)
+
+ 
+real(dp)  fix(6),mat(6,6) ,f0(6),stoch,fsi(6)
+ 
+type(c_damap) m,m0,minput,minput0
+integer  i,inf
+ 
+type(tree_element), pointer :: forward(:) =>null()
+character(*),optional :: filef
+ 
+ 
+ 
+  allocate(forward(2))
+ 
+
+mat=0
+do i=1,size(mat,1)
+mat(i,i)=1
+enddo
+
+
+!call init_all(state,no,0)
+ call alloc(m,m0); 
+
+
+
+fix=minput 
+f0=fix  
+if(present(fix0)) f0=fix0
+fsi=0.0_dp  
+if(present(fs)) fsi=fs
+
+ 
+m=minput  
+m0=minput0
+
+do i=1,6
+ m%v(i)=m%v(i)-(m%v(i).sub.0)
+enddo
+
+do i=1,6
+ m0%v(i)=minput0%v(i)-(minput0%v(i).sub.0)
+enddo
+
+  
+call SET_TREE_G_complex_zhe_ji_vec(forward,M,minput0,fsi)
+
+
+ 
+forward(1)%fixr=0
+forward(1)%fix0(1:6)=f0 ! entrance
+forward(1)%fixr(1:6)=fsi
+forward(1)%fix(1:6)=fix    ! exit
+
+forward(2)%fixr=0
+forward(2)%fix0(1:6)=f0 ! entrance
+forward(2)%fixr(1:6)=fsi
+forward(2)%fix(1:6)=fix    ! exit
+
+
+! forward(1)%ds=0.0_dp
+ 
+ 
+  !forward(2)%ds=0.0d0
+ 
+!forward%beta0=1.d0
+!forward%beta0=1.d0
+
+ if(present(filef)) then
+  call kanalnummer(inf,filef)
+  call print_tree_elements(forward,inf)
+   close(inf)
+  call KILL(forward)
+  deallocate(forward)
+endif
+
+ call kill(m,m0) 
+
+end subroutine fill_tree_element_line_zhe_outside_map_ji_vec
+
+subroutine fill_tree_element_line_zhe_outside_map_ji_symp(minput,minput0 ,filef,fix0, fs)   ! fix0 is the initial condition for the maps
+implicit none
+real(dp), optional :: fix0(6),fs(3)
+
+ 
+real(dp)  fix(6),mat(6,6) ,f0(6),stoch,fsi(3)
+ 
+type(c_damap) m,m0,minput,minput0
+integer  i,inf
+ 
+type(tree_element), pointer :: forward =>null()
+character(*),optional :: filef
+ 
+ 
+ 
+  allocate(forward)
+ 
+
+mat=0
+do i=1,size(mat,1)
+mat(i,i)=1
+enddo
+
+
+!call init_all(state,no,0)
+ call alloc(m,m0); 
+
+
+
+fix=minput 
+f0=fix  
+if(present(fix0)) f0=fix0
+fsi=0.0_dp  
+if(present(fs)) fsi=fs
+
+ 
+m=minput  
+m0=minput0
+
+do i=1,6
+ m%v(i)=m%v(i)-(m%v(i).sub.0)
+enddo
+
+do i=1,6
+ m0%v(i)=minput0%v(i)-(minput0%v(i).sub.0)
+enddo
+
+ 
+!call SET_TREE_G_complex_zhe_as_is_ji(forward,M,minput0,fsi)
+call SET_TREE_G_complex_zhe_ji(forward,M,minput0,fsi)
+
+
+ 
+forward%fixr=0
+forward%fix0(1:6)=f0 ! entrance
+forward%fixr(1:3)=fsi
+forward%fix(1:6)=fix    ! exit
+
+
+ forward%ds=0.0_dp
+ 
+ 
+  forward%ds=0.0d0
+ 
+forward%beta0=1.d0
+
+ if(present(filef)) then
+  call kanalnummer(inf,filef)
+  call print_tree_element(forward,inf)
+   close(inf)
+  call KILL(forward)
+  deallocate(forward)
+endif
+
+ call kill(m,m0) 
+
+end subroutine fill_tree_element_line_zhe_outside_map_ji_symp
+
+
+
+  SUBROUTINE SET_TREE_G_complex_zhe_as_is_ji(T,Ma,M_0,f)
     IMPLICIT NONE
-    TYPE(TREE_ELEMENT), INTENT(INOUT) :: T(:)
-    TYPE(c_damap), INTENT(INOUT) :: Ma
+    TYPE(TREE_ELEMENT), INTENT(INOUT) :: T 
+    TYPE(c_damap), INTENT(INOUT) :: Ma,M_0
+    INTEGER N,NP,i,k,j,kq
+    real(dp) :: f(:) 
+    real(dp) norm,mat(6,6)
+    TYPE(taylor), ALLOCATABLE :: M(:), MG(:)
+    type(c_damap) M_sc, sca
+   TYPE(c_taylor) ef
+
+     
+    call alloc(ef)
+    call alloc(M_sc,sca)
+
+  !  call symplectify_for_zhe(ma,L_ns , N_pure_ns, L_s , N_s )
+
+ 
+    np=12   !size_tree
+     
+     sca=1
+    ef=1
+     do i=1,C_%nd2
+      ef= ef*exp( f(i)*dz_c(i)**2 ) 
+     enddo
+
+     M_sc=(Ma-M_0)
+     do i=1,c_%nd2
+      sca%v(i)=sca%v(i)*ef
+    enddo
+    sca=sca**(-1)
+ 
+    M_sc=M_sc*sca
+
+    sca=m_0*sca
+    ALLOCATE(M(NP))
+    CALL ALLOC(M,NP)
+
+
+
+ 
+   do i=1,c_%nd2
+    m(i)=m_sc%v(i)
+   enddo
+   do i=c_%nd2+1,6
+    m(i)=0.0_dp
+   enddo
+   do i=1,c_%nd2
+    m(i+6)=sca%v(i)
+   enddo
+   do i=c_%nd2+1,6
+    m(i+6)=0.0_dp
+   enddo
+
+     call SET_TREE_g(T,m(1:12))
+
+ 
+    call kill(m);  
+    deallocate(M);    
+    call kill(M_sc,sca)
+    call kill(ef)
+
+  END SUBROUTINE SET_TREE_G_complex_zhe_as_is_ji
+
+   SUBROUTINE SET_TREE_G_complex_zhe_ji(T,Ma,M_0,f)
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
+    TYPE(c_damap), INTENT(INOUT) :: Ma,M_0
     INTEGER N,NP,i,k,j,kq
  
     real(dp) norm,mat(6,6)
-    TYPE(taylor), ALLOCATABLE :: M(:), MG(:)
-    TYPE(damap) ms
+    TYPE(taylor), ALLOCATABLE ::  MG(:)
+    TYPE(damap) ms,mpi
     integer js(6)
     type(c_damap) L_ns , N_pure_ns , N_s , L_s
-
-
+    TYPE(taylor) gen
+    TYPE(taylor) g,h,ef
+    real(dp) :: f(:) 
  
 
     call alloc(L_ns , N_pure_ns , N_s , L_s)
+    call alloc(ms,mpi)
+    call alloc( g,h,gen,ef)
     
+    call symplectify_for_zhe(m_0,L_ns , N_pure_ns, L_s , N_s )
+    mpi = L_s*N_s
     call symplectify_for_zhe(ma,L_ns , N_pure_ns, L_s , N_s )
+    ms = L_s*N_s
 
 !    np=ma%n+18
     if(ma%n/=6) then
      write(6,*) " you need a 6-d map in SET_TREE_G_complex for PTC "
      stop
     endif
-    np=size_tree
-! initialized in ptc ini
- !   ind_spin(1,1)=1+ma%n;ind_spin(1,2)=2+ma%n;ind_spin(1,3)=3+ma%n;
- !   ind_spin(2,1)=4+ma%n;ind_spin(2,2)=5+ma%n;ind_spin(2,3)=6+ma%n;
- !   ind_spin(3,1)=7+ma%n;ind_spin(3,2)=8+ma%n;ind_spin(3,3)=9+ma%n;
- !   k1_spin(1)=1;k2_spin(1)=1;
- !   k1_spin(2)=1;k2_spin(2)=2;
- !   k1_spin(3)=1;k2_spin(3)=3;
- !   k1_spin(4)=2;k2_spin(4)=1;
- !   k1_spin(5)=2;k2_spin(5)=2;
- !   k1_spin(6)=2;k2_spin(6)=3;
- !   k1_spin(7)=3;k2_spin(7)=1;
- !   k1_spin(8)=3;k2_spin(8)=2;
- !   k1_spin(9)=3;k2_spin(9)=3;
-
-
-    ALLOCATE(M(NP))
-    CALL ALLOC(M,NP)
+    np=6+6+9+9+1
+ 
     ALLOCATE(Mg(NP))
     CALL ALLOC(mg,NP)
     do i=1,np
-     m(i)=0.e0_dp
-     mg(i)=0.e0_dp
+     mg(i)=0.0_dp
     enddo
 
-      L_ns = L_ns*N_pure_ns
-
-     do i=1,L_ns%n
-      m(i)=L_ns%v(i)   ! orbital part
-     enddo
-
-    call c_full_norm_spin(Ma%s,k,norm)
-
-
-if(use_quaternion) then
-    call c_full_norm_quaternion(Ma%q,kq,norm)
-    if(kq==-1) then
-      do i=0,3
-        m(ind_spin(1,1)+i)=ma%q%x(i)
-      enddo
-    elseif(kq/=-1) then
-      m(ind_spin(1,1))=1.0_dp
-      do i=ind_spin(1,1)+1,size_tree
-        m(i)=0.0_dp
-      enddo
-    endif
-else
-    if(k==-1) then
-      do i=1,3
-      do j=1,3
-        m(ind_spin(i,j))=ma%s%s(i,j)
-      enddo
-      enddo
-    else
-      do i=1,3
-        m(ind_spin(i,i))=1.0e0_dp
-      enddo
-    endif
-endif
+ 
       js=0
-     js(1)=1;js(3)=1;js(5)=1; ! q_i(q_f,p_i) and p_f(q_f,p_i)
-     call alloc(ms)
+     js(1)=1;js(3)=1;js(5)=1;  
 
 
-       ms=n_s
+     ms  = ms**js
+     mpi = mpi**js
+     call intd_lielib(ms%v%i,gen%i,1.0_dp)
+     call intd_lielib(mpi%v%i,h%i,1.0_dp)
+ 
+     ef=1.0_dp
+    do i=1,3
+     ef=ef*exp(-f(i)*(1.0_dp.mono.(2*i-1))**2 )
+    enddo
+
+     g=(gen-h)/ef
+ 
 
 
+do i=1,3
+ ms%v(2*i-1)  = (g.d.(2*i))
+ ms%v(2*i)    = (g.d.(2*i-1))
+ mpi%v(2*i-1) = (h.d.(2*i))
+ mpi%v(2*i)   = (h.d.(2*i-1))
+enddo
 
-     ms=ms**js
-!     do i=1,3
-!      mg(i)=ms%v(2*i-1)   !  q_i(q_f,p_i)
-!      mg(3+i)=ms%v(2*i)   !  p_f(q_f,p_i)
-!     enddo
+ 
+ 
      do i=1,6
       mg(i)=ms%v(i)
      enddo
+     do i=1,6
+      mg(6+i)=mpi%v(i)
+     enddo
+
+     k=12
      do i=1,3
      do j=1,3
-       mg(ind_spin(i,j))=ms%v(2*i-1).d.(2*j-1)  !   Jacobian for Newton search
+       k=k+1
+       mg(k)=ms%v(2*i-1).d.(2*j-1)  !   Jacobian for Newton search
      enddo
      enddo
-     call kill(ms)  
 
-     call SET_TREE_g(T(1),m(1:6))
- !    do i=1,ma%n
- !     m(i)=1.0_dp.cmono.i
- !    enddo 
- !    do i=ma%n+1,6
- !     m(i)=0.0_dp
- !    enddo
-     call SET_TREE_g(T(2),m(7:15))
+     do i=1,3
+     do j=1,3
+       k=k+1
+       mg(k)=mpi%v(2*i-1).d.(2*j-1)  !   Jacobian for Newton search
+     enddo
+     enddo
+     mg(np)=g
+     call SET_TREE_g(T,mg(1:np))
  
- !    call SET_TREE_g(T(2),m(1:size_tree))
-     call SET_TREE_g(T(3),mg(1:size_tree))
-
-!T(3)%ng=mul
-!     write(6,*) " mul ",mul
-      t(3)%rad=L_s
+ 
+      t%rad=L_s
 
 
-       mat=ma**(-1)
-       t(1)%e_ij=ma%e_ij     !matmul(matmul(mat,ma%e_ij),transpose(mat))  not necessary I think
+  !     mat=ma**(-1)
+  !     t(1)%e_ij=ma%e_ij     !matmul(matmul(mat,ma%e_ij),transpose(mat))  not necessary I think
 
   
 
-    call kill(m); call kill(mg);
-    deallocate(M);    deallocate(Mg);
+    call kill(mg);
+    deallocate(Mg);
+    call kill( g,h,gen,ef)
+     call kill(ms,mpi)  
+
     call kill(L_ns , N_pure_ns , N_s , L_s)
 
-  END SUBROUTINE SET_TREE_G_complex_zhe
+  END SUBROUTINE SET_TREE_G_complex_zhe_ji
+
+   SUBROUTINE SET_TREE_G_complex_zhe_ji_vec(T,Ma,M_0,e)
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(INOUT) :: T(2)
+    TYPE(c_damap), INTENT(INOUT) :: Ma,M_0
+    type(c_taylor) ft,f,g
+    INTEGER N,NP,i,k,j,kq
+    real(dp) e(6)
+    TYPE(taylor)  MG(13)
+    TYPE(taylor)  Mk(13)
+
+    type(c_damap) L_ns , N_pure_ns , N_s , L_s
+    type(c_vector_field) fv ,fv2
+    type(c_normal_form) cn
+    type(c_taylor)  phase, phase2
+    if(ma%n/=6) then
+     write(6,*) " you need a 6-d map in SET_TREE_G_complex for PTC "
+     stop
+    endif
+    np=13
+    call alloc(L_ns , N_pure_ns , N_s , L_s)
+    call alloc(fv)
+    call alloc(fv2)
+ 
+    call alloc(cn)
+    call alloc(phase,ft,f,phase2,g)
+    call alloc(mk)
+    call alloc(mg)
+
+    call symplectify_for_zhe(m_0,L_ns , N_pure_ns, L_s , N_s )
+ 
+    call c_normal(l_s,cn)
+   
+     phase=cn%tune(1)*((1.0_dp.cmono.'2')+(1.0_dp.cmono.'02'))
+    phase=phase+cn%tune(2)*((1.0_dp.cmono.'002')+(1.0_dp.cmono.'0002'))
+    phase=-pi*phase
+    phase=phase*cn%a_t**(-1)
+
+ 
+
+     ft=1.d0
+     do i=1,6
+     ft=ft*exp(-e(i)*(1.0_dp.cmono.i)**2)
+    enddo
+
+    
+     fv=log(n_s)
+
+
+
+    call symplectify_for_zhe(ma,L_ns , N_pure_ns, L_s , N_s )
+    call c_normal(l_s,cn)
+
+ 
+    phase2=cn%tune(1)*((1.0_dp.cmono.'2')+(1.0_dp.cmono.'02'))
+    phase2=phase2+cn%tune(2)*((1.0_dp.cmono.'002')+(1.0_dp.cmono.'0002'))
+    phase2=-pi*phase2
+    phase2=phase2*cn%a_t**(-1)   
+ 
+
+     fv2=log(n_s)
+
+     g=phase
+     f= (phase2-g)/ft
+
+
+
+       do i=1,3
+        mg(2*i-1)=-f.d.(2*i)
+        mg(2*i)=f.d.(2*i-1)
+       enddo
+
+       do i=1,3
+        mg(2*i-1+6)=-g.d.(2*i)
+        mg(2*i+6)=g.d.(2*i-1)
+       enddo
+       mg(13)=f
+
+      g=getpb(fv)
+      f=getpb(fv2)
+
+
+     f= (f-g)/ft
+       do i=1,3
+        mk(2*i-1)=-f.d.(2*i)
+        mk(2*i)=f.d.(2*i-1)
+       enddo
+
+       do i=1,3
+        mk(2*i-1+6)=-g.d.(2*i)
+        mk(2*i+6)=g.d.(2*i-1)
+       enddo
+       mk(13)=f
+!call print(g)
+!call print(f)
+!call print(ft)
+!pause 777
+
+!    np=ma%n+18
+
+
+
+
+     call SET_TREE_g(T(1),mg(1:np))
+ 
+     call SET_TREE_g(T(2),mk(1:np))
+
+    call kill(mg);
+    call kill(mk);
+ 
+    call kill(fv)
+    call kill(fv2)
+ 
+    call kill(cn)
+    call kill(L_ns , N_pure_ns , N_s , L_s)
+    call kill(phase,ft,f,phase2,g)
+
+  END SUBROUTINE SET_TREE_G_complex_zhe_ji_vec
 
   SUBROUTINE SET_TREE_G_complex_zhe0(T,Ma,ma_0)
     IMPLICIT NONE
@@ -6129,7 +6939,7 @@ endif
     TYPE(damap) ms
     integer js(6)
     type(c_damap) L_ns , N_pure_ns , N_s , L_s
-
+    logical :: nothing
 
  
 
@@ -6173,8 +6983,9 @@ endif
       m(i)=L_ns%v(i)   ! orbital part
      enddo
 
-    call c_full_norm_spin(Ma%s,k,norm)
 
+nothing=.true.
+    call c_full_norm_spin(Ma%s,k,norm)
 
 if(use_quaternion) then
     call c_full_norm_quaternion(Ma%q,kq,norm)
@@ -6182,6 +6993,7 @@ if(use_quaternion) then
       do i=0,3
         m(ind_spin(1,1)+i)=ma%q%x(i)
       enddo
+    nothing=.false.
     elseif(kq/=-1) then
       m(ind_spin(1,1))=1.0_dp
       do i=ind_spin(1,1)+1,size_tree
@@ -6195,12 +7007,45 @@ else
         m(ind_spin(i,j))=ma%s%s(i,j)
       enddo
       enddo
+    nothing=.false.
     else
       do i=1,3
         m(ind_spin(i,i))=1.0e0_dp
       enddo
     endif
 endif
+ if(nothing) then
+    call c_full_norm_spin(Ma_0%s,k,norm)
+
+if(use_quaternion) then
+    call c_full_norm_quaternion(Ma_0%q,kq,norm)
+    if(kq==-1) then
+      do i=0,3
+        m(ind_spin(1,1)+i)=Ma_0%q%x(i)
+      enddo
+    nothing=.false.
+    elseif(kq/=-1) then
+      m(ind_spin(1,1))=1.0_dp
+      do i=ind_spin(1,1)+1,size_tree
+        m(i)=0.0_dp
+      enddo
+    endif
+else
+    if(k==-1) then
+      do i=1,3
+      do j=1,3
+        m(ind_spin(i,j))=Ma_0%s%s(i,j)
+      enddo
+      enddo
+    nothing=.false.
+    else
+      do i=1,3
+        m(ind_spin(i,i))=1.0e0_dp
+      enddo
+    endif
+endif
+
+ endif
       js=0
      js(1)=1;js(3)=1;js(5)=1; ! q_i(q_f,p_i) and p_f(q_f,p_i)
      call alloc(ms)
@@ -6255,115 +7100,7 @@ endif
 
 
 
-subroutine symplectify_for_zhe(m,L_ns , N_pure_ns , L_s, N_s )
-implicit none
-TYPE(c_damap),intent(inout):: m ,L_ns , N_pure_ns , N_s , L_s
-type(c_vector_field) f,fs
-complex(dp) v
-type(c_taylor) t,dt
-real(dp),allocatable::  mat(:,:)
-integer i,j,k,n(11),nv,nd2,al,ii,a,mul
-integer, allocatable :: je(:)
-real(dp) dm,norm,normb,norma
-TYPE(c_damap) mt
-real(dp),allocatable::   S(:,:),id(:,:)
 
-! m = L_ns o N_pure_ns o L_s o N_s
-! d= = L_ns o N_pure_ns
-! ms= L_s o N_s
-
-allocate(S(m%n,m%n),id(m%n,m%n))
-
-call c_get_indices(n,0)
-nv=n(4)
-nd2=n(3)
-
-S=0
-id=0
-do i=1,nd2/2
- S(2*I-1,2*I)=1 ; S(2*I,2*I-1)=-1;
- Id(2*I-1,2*I-1)=1 ; id(2*I,2*I)=1;
-enddo
-
-
-
-
- call alloc(f);call alloc(fs);
-call alloc(t,dt);call alloc(mt);
-
-allocate(mat(m%n,m%n))
-
-mat=0
-
-
-
-if(nv-nd2==0) then
-mat=m.sub.1
-else
-write(6,*) " this map should not have parameters or modulated magnets "
-stop 444
-endif
-
-
-! constructing Furman's contracting matrix from my review sec.3.8.2
-
-call furman_symp(mat)
-L_s=mat
-
-mt=m*L_s**(-1)
-L_ns=mt.sub.1
-
-mt=L_ns**(-1)*mt
-
-f=log(mt)
-
-fs=0
-
-! Integrating a symplectic operator using the hypercube's diagonal
-
-allocate(je(nv))
-je=0
-do i=1,f%n
-
-       j=1
-
-        do while(.true.)
-
-          call  c_cycle(f%v(i),j,v ,je); if(j==0) exit;
-         dm=1
-         do ii=1,nd2
-          dm=dm+je(ii)
-         enddo
-        t=v.cmono.je
-        do a=1,nd2
-         dt=t.d.a
-        do al=1,nd2
-        do k=1,nd2
-          fs%v(al)=fs%v(al)+s(a,al)*s(k,i)*(id(k,a)*t+(1.0_dp.cmono.k)*dt)/dm
-        enddo ! k
-        enddo ! al
-        enddo ! a
-        enddo
-
-enddo
- 
-
-
-N_s=exp(fs)
-N_pure_ns= mt*N_s**(-1)
-
-N_s= L_s**(-1)*N_s*L_s 
-
-!norma=1.d0/mul
-!fs=norma*log(n_s)
-!N_s=exp(fs)
-
-
-deallocate(je);deallocate(s,id);
- call kill(f);call kill(fs);
-call kill(t,dt);call kill(mt);
-deallocate(mat)
-end subroutine symplectify_for_zhe
 
 subroutine symplectify_for_zhe0(m,m0,L_ns , N_pure_ns , L_s, N_s )
 implicit none
@@ -6482,79 +7219,6 @@ end subroutine symplectify_for_zhe0
 
 
 
-  SUBROUTINE furman_symp(r)
-   implicit none
-   real(dp)  r(:,:)
-    real(dp), allocatable::rt(:,:)
-    real(dp) eps,a,ab
-   integer nmax,i,j,k,n
-! Furmanizing the rotation
-    n=size(r,1)
-    allocate(rt(n,n))
-
-    rt=0
-    eps=1.d-8
-    nmax=1000
-
-    ab=1.d8
-    do i=1,nmax
-    ! rt=matmul(r,transpose(r))
-    ! r= matmul((id-0.5e0_dp*rt),r)
-
-      call furman_step(r,r,rt)
-
-     a=-n
-     do j=1,n
-     do k=1,n
-      a=a+abs(rt(j,k))
-     enddo
-     enddo
-     a=abs(a)
-     if(a<eps) then
-      if(a>=ab) exit
-      ab=a
-     endif
-    enddo
-    if(i>nrmax-10) then
-     write(6,*) i, a, "did not converge in orthonormalisep"
-     ! stop
-    endif
-    deallocate(rt)
-  end SUBROUTINE furman_symp
-
-  SUBROUTINE furman_step(r,s,rt)
-   implicit none
-   real(dp)  r(:,:),s(:,:),rt(:,:)
-   real(dp), allocatable :: id(:,:),ik(:,:), j(:,:),ji(:,:)
-   integer i,n
-
-    n=size(r,1)
-
-allocate(id(n,n),ik(n,n), j(n,n),ji(n,n))
-    id=0
-    ik=0
-     j=0
-      ji=0
-      do i=1,n/2
-       j(2*i-1,2*i)=1
-       j(2*i,2*i-1)=-1
-      enddo
-      ji=-j
-      do i=1,n
-       ik(i,i)=1.5e0_dp
-      enddo
-
-
-       id=matmul(ik-0.5_dp*  matmul( matmul(r,j),matmul(transpose(r),ji) )  , r)
-
-
-
-
-        s=id
-
-      rt=matmul(r,matmul(j,transpose(r)) )
-deallocate(id,ik, j,ji)
-end   SUBROUTINE furman_step
 
 !!!!!!!!!!!!!!!!!!!!   stuff for Zhe  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -111,6 +111,7 @@ module code_constfi
   integer, parameter :: code_nllens = 42
   integer, parameter :: code_rfmultipole = 43
   integer, parameter :: code_collimator = 44
+  integer, parameter :: code_changerefpc = 45
 end module code_constfi
 
 module aperture_enums
