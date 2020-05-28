@@ -4227,9 +4227,9 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   tilt2 = 0 ! A parameter describing the relative tilt between
             ! the dipole component and the higher-order components of the CFM
 
-  !####SETTING UP THE MULTIPLES
+  !####SETTING UP THE MULTIPOLES
   an = node_value('angle ')
-  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
+  f_errors(0) = f_errors(0) + normal(0) ! The zero-component of the B-field
 
   !Below here should not be commented output
   !---- Other components and errors.
@@ -4237,7 +4237,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   ! that loop should start at one since nominal dipole strength already taken into account above
   !needs to be here though
   do iord = 0, max(nn, ns, n_ferr/2-1)
- !    get the maximum effective order; loop runs over maximum of user given values
+  !   get the maximum effective order; loop runs over maximum of user given values
      if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
           normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
   enddo
@@ -4279,19 +4279,21 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   !
   ! play the role as the k'th skew- and normal field component.
 
-  if (elrad.gt.zero) then
-    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad/(one + deltap)
-     do k = 1, nord
-        ! The factor (one + deltap) below is taken from the original MAD-X routine.
-        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)/(one + deltap)
-     enddo
-  else
-     lambda = zero
-  endif
+  do k = 0, nord
+     ! The factor (one + deltap) below is taken from the original MAD-X routine.
+     lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)/(one + deltap)
+  enddo
 
-  kx = real(lambda(0))*(one + deltap)    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
-  ky = - aimag(lambda(0))*(one + deltap) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
-                                         ! Phys. Rev. AccelBeams 19.054002
+  ! Set the curvature of the MAD-X reference trajectory; Due to MAD-X standards,
+  ! this trajectory should be independent on deltap
+  if (an .eq. 0) then
+     ! The special case an == 0 is also treated differently for backward compatibility
+     kx = real(lambda(0))*(one + deltap)
+     ky = -aimag(lambda(0))*(one + deltap)
+  else
+     kx = an/elrad*cos(tilt) !  N.B. B_y |_{\varphi = tilt, r = 0} = kx
+     ky = an/elrad*sin(tilt) !       B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
+  endif                      ! Phys. Rev. AccelBeams 19.054002
 
   kappa = kx + (0, 1)*ky
   barkappa = conjg(kappa)
