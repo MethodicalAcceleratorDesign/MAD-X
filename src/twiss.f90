@@ -6387,6 +6387,7 @@ SUBROUTINE tmchenergy(ftrk,orbit,fmap,ek,re, te)
   gamma1 = energy1/mass
   beta1i = energy1/pc1
 
+  print *, "kkkk", pc1/pc
   re(2,2) = pc/pc1
   re(4,4) = pc/pc1
   re(6,6) = pc/pc1

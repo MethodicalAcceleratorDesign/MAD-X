@@ -1805,7 +1805,7 @@ subroutine ttrf(track,ktrack)
     enddo
   endif
   !! frs add-on end
-  !call ttchangep0(track,ktrack)
+  call ttchangep0(track,ktrack)
 end subroutine ttrf
 
 subroutine ttchangep0(track,ktrack)
