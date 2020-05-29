@@ -1846,10 +1846,9 @@ contains
 
       !deltap = A_script_probe%x(5).sub.'0'
       !deltae = deltae * (1.0 + deltap)
-      print *, "deltaeeeee1", deltae, deltap, beta0
       pt_ = A_script_probe%x(5).sub.'0'
       onedp   = sqrt( one + two*pt_/relativisticBeta + (pt_**2))
-      print *, "deltaeeeee", deltae, deltap, relativisticBeta, onedp
+      
 
 
       opt_fun(beta11)= tw%beta(1,1) * onedp ! beta11=1
@@ -1862,25 +1861,25 @@ contains
       opt_fun(beta32)= tw%beta(3,2) * onedp
       opt_fun(beta33)= tw%beta(3,3) * onedp
 
-      opt_fun(alfa11)= tw%alfa(1,1) * onedp
-      opt_fun(alfa12)= tw%alfa(1,2) * onedp
-      opt_fun(alfa13)= tw%alfa(1,3) * onedp
-      opt_fun(alfa21)= tw%alfa(2,1) * onedp
-      opt_fun(alfa22)= tw%alfa(2,2) * onedp
-      opt_fun(alfa23)= tw%alfa(2,3) * onedp
-      opt_fun(alfa31)= tw%alfa(3,1) * onedp
-      opt_fun(alfa32)= tw%alfa(3,2) * onedp
-      opt_fun(alfa33)= tw%alfa(3,3) * onedp
+      opt_fun(alfa11)= tw%alfa(1,1) 
+      opt_fun(alfa12)= tw%alfa(1,2) 
+      opt_fun(alfa13)= tw%alfa(1,3) 
+      opt_fun(alfa21)= tw%alfa(2,1) 
+      opt_fun(alfa22)= tw%alfa(2,2) 
+      opt_fun(alfa23)= tw%alfa(2,3) 
+      opt_fun(alfa31)= tw%alfa(3,1) 
+      opt_fun(alfa32)= tw%alfa(3,2) 
+      opt_fun(alfa33)= tw%alfa(3,3) 
 
-      opt_fun(gama11)= tw%gama(1,1) * onedp
-      opt_fun(gama12)= tw%gama(1,2) * onedp
-      opt_fun(gama13)= tw%gama(1,3) * onedp
-      opt_fun(gama21)= tw%gama(2,1) * onedp
-      opt_fun(gama22)= tw%gama(2,2) * onedp
-      opt_fun(gama23)= tw%gama(2,3) * onedp
-      opt_fun(gama31)= tw%gama(3,1) * onedp
-      opt_fun(gama32)= tw%gama(3,2) * onedp
-      opt_fun(gama33)= tw%gama(3,3) * onedp
+      opt_fun(gama11)= tw%gama(1,1) / onedp
+      opt_fun(gama12)= tw%gama(1,2) / onedp
+      opt_fun(gama13)= tw%gama(1,3) / onedp
+      opt_fun(gama21)= tw%gama(2,1) / onedp
+      opt_fun(gama22)= tw%gama(2,2) / onedp
+      opt_fun(gama23)= tw%gama(2,3) / onedp
+      opt_fun(gama31)= tw%gama(3,1) / onedp
+      opt_fun(gama32)= tw%gama(3,2) / onedp
+      opt_fun(gama33)= tw%gama(3,3) / onedp
 
 
       ! --- derivatives of Twiss paramters w.r.t delta_p
@@ -1895,25 +1894,25 @@ contains
          opt_fun(beta32p)= tw%beta_p(3,2) * onedp
          opt_fun(beta33p)= tw%beta_p(3,3) * onedp
 
-         opt_fun(alfa11p)= tw%alfa_p(1,1) * onedp
-         opt_fun(alfa12p)= tw%alfa_p(1,2) * onedp
-         opt_fun(alfa13p)= tw%alfa_p(1,3) * onedp
-         opt_fun(alfa21p)= tw%alfa_p(2,1) * onedp
-         opt_fun(alfa22p)= tw%alfa_p(2,2) * onedp
-         opt_fun(alfa23p)= tw%alfa_p(2,3) * onedp
-         opt_fun(alfa31p)= tw%alfa_p(3,1) * onedp
-         opt_fun(alfa32p)= tw%alfa_p(3,2) * onedp
-         opt_fun(alfa33p)= tw%alfa_p(3,3) * onedp
+         opt_fun(alfa11p)= tw%alfa_p(1,1) 
+         opt_fun(alfa12p)= tw%alfa_p(1,2) 
+         opt_fun(alfa13p)= tw%alfa_p(1,3) 
+         opt_fun(alfa21p)= tw%alfa_p(2,1) 
+         opt_fun(alfa22p)= tw%alfa_p(2,2) 
+         opt_fun(alfa23p)= tw%alfa_p(2,3) 
+         opt_fun(alfa31p)= tw%alfa_p(3,1) 
+         opt_fun(alfa32p)= tw%alfa_p(3,2) 
+         opt_fun(alfa33p)= tw%alfa_p(3,3) 
 
-         opt_fun(gama11p)= tw%gama_p(1,1) * onedp
-         opt_fun(gama12p)= tw%gama_p(1,2) * onedp
-         opt_fun(gama13p)= tw%gama_p(1,3) * onedp
-         opt_fun(gama21p)= tw%gama_p(2,1) * onedp
-         opt_fun(gama22p)= tw%gama_p(2,2) * onedp
-         opt_fun(gama23p)= tw%gama_p(2,3) * onedp
-         opt_fun(gama31p)= tw%gama_p(3,1) * onedp
-         opt_fun(gama32p)= tw%gama_p(3,2) * onedp
-         opt_fun(gama33p)= tw%gama_p(3,3) * onedp
+         opt_fun(gama11p)= tw%gama_p(1,1) / onedp
+         opt_fun(gama12p)= tw%gama_p(1,2) / onedp
+         opt_fun(gama13p)= tw%gama_p(1,3) / onedp
+         opt_fun(gama21p)= tw%gama_p(2,1) / onedp
+         opt_fun(gama22p)= tw%gama_p(2,2) / onedp
+         opt_fun(gama23p)= tw%gama_p(2,3) / onedp
+         opt_fun(gama31p)= tw%gama_p(3,1) / onedp
+         opt_fun(gama32p)= tw%gama_p(3,2) / onedp
+         opt_fun(gama33p)= tw%gama_p(3,3) / onedp
       endif
       ! --- end
 
@@ -2040,8 +2039,8 @@ contains
          ! hence we reflect this in the formula from Lebedev
          betx = tw%beta(1,1) * onedp
          bety = tw%beta(2,2) * onedp
-         alfx = tw%alfa(1,1) * onedp
-         alfy = tw%alfa(2,2) * onedp
+         alfx = tw%alfa(1,1)
+         alfy = tw%alfa(2,2)
 
       else
 
@@ -2077,8 +2076,8 @@ contains
 
             betx = (tw%beta(1,1)/kappa) * onedp
             bety = (tw%beta(2,2)/kappa) * onedp
-            alfx = (tw%alfa(1,1)/kappa) * onedp
-            alfy = (tw%alfa(2,2)/kappa) * onedp
+            alfx = (tw%alfa(1,1)/kappa) 
+            alfy = (tw%alfa(2,2)/kappa) 
 
             bx = kx*kappa+u/kx
             by = ky*kappa-u/ky
@@ -2112,8 +2111,8 @@ contains
 
             betx = tw%beta(1,1) * onedp
             bety = tw%beta(2,2) * onedp
-            alfx = tw%alfa(1,1) * onedp
-            alfy = tw%alfa(2,2) * onedp
+            alfx = tw%alfa(1,1)
+            alfy = tw%alfa(2,2)
          endif
 
       endif
