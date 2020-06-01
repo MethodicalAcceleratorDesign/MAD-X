@@ -118,6 +118,7 @@ update_beam(struct command* comm)
     npart = 0, mass = 0, pc = 0, circ = 0, arad = 0,
     ex, exn, ey, eyn, alfa;
 
+  npart = get_value("beam", "npart");
   pos = name_list_pos("particle", nlc);
   if (nlc->inform[pos]) { /* parameter has been read */
     pl->parameters[pos]->string = name = plc->parameters[pos]->string;
