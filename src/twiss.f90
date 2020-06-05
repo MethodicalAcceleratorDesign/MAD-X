@@ -4202,8 +4202,8 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   logical :: fsec, ftrk, fmap
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr
   integer, external :: Factorial
-  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
-  double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1
+  double precision :: an, angle, dtmp
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double precision :: orbit(6), re(6,6), te(6,6,6), tilt2
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -4226,8 +4226,42 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   F_ERRORS(0:maxferr) = zero
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
-  tilt2 = 0 !This is a dumy parameter now that can be changed to have a relative tilf of the different orders
+  tilt2 = 0 ! A parameter describing the relative tilt between
+            ! the dipole component and the higher-order components of the CFM
 
+  !####SETTING UP THE MULTIPLES
+  an = node_value('angle ')
+  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
+
+  !Below here should not be commented output
+  !---- Other components and errors.
+  nord = 0
+  ! that loop should start at one since nominal dipole strength already taken into account above
+  !needs to be here though
+  do iord = 0, max(nn, ns, n_ferr/2-1)
+ !    get the maximum effective order; loop runs over maximum of user given values
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
+          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
+  enddo
+
+  do iord = 1, nord
+     f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))
+     f_errors(2*iord+1) = (skew(iord)   + f_errors(2*iord+1))
+     if (tilt .ne. zero) then
+        if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) then
+           angle = atan2(f_errors(2*iord+1), f_errors(2*iord)) / (iord+1) - tilt
+        else
+           angle = -tilt
+        endif
+        angle = (iord+1) * angle
+        dtmp = sqrt(f_errors(2*iord)**2 + f_errors(2*iord+1)**2)
+        f_errors(2*iord)   = dtmp * cos(angle)
+        f_errors(2*iord+1) = dtmp * sin(angle)
+     endif
+     f_errors(2*iord)   = bvk * f_errors(2*iord)
+     f_errors(2*iord+1) = bvk * f_errors(2*iord + 1)
+  enddo
+  !Done with all the setting up...
 
   ! The "normal" components are considered here as the expansion coefficients of
   ! B_y wrt. the reference plane, while the "skew" components are considered as the
@@ -4247,73 +4281,11 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   !
   ! play the role as the k'th skew- and normal field component.
 
-
-    !---- Nominal dipole strength.
-  dipr = normal(0) / (one + deltap)
-  dipi = skew(0)   / (one + deltap)
-
-  !####SETTING UP THE MULTIPLES
-  an = node_value('angle ')
-  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
-
-  !---- Dipole error.
-  dbr = f_errors(0) / (one + deltap)
-  dbi = f_errors(1) / (one + deltap)
-
-
-  if (tilt .ne. zero)  then
-     if (dipi.ne.zero .or. dipr.ne.zero) then
-        angle = atan2(dipi, dipr) - tilt
-     else
-        angle = -tilt
-     endif
-     dtmp = sqrt(dipi**2 + dipr**2)
-     dipr = dtmp * cos(angle)
-     dipi = dtmp * sin(angle)
-     dtmp = sqrt(dbi**2 + dbr**2)
-     dbr = dtmp * cos(angle)
-     dbi = dtmp * sin(angle)
-  endif
-
-  dbr = bvk * dbr
-  dbi = bvk * dbi
-  dipr = bvk * dipr
-  dipi = bvk * dipi
-  !Below here should not be commented output
-  !---- Other components and errors.
-  nord = 0
-  ! that loop should start at one since nominal dipole strength already taken into account above
-  !needs to be here though
-  do iord = 0, max(nn, ns, n_ferr/2-1)
- !    get the maximum effective order; loop runs over maximum of user given values
-     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
-          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
-  enddo
-
-  do iord = 1, nord
-     f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))   / (one + deltap)
-     f_errors(2*iord+1) = (skew(iord)   + f_errors(2*iord+1)) / (one + deltap)
-     if (tilt .ne. zero) then
-        if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) then
-           angle = atan2(f_errors(2*iord+1), f_errors(2*iord)) / (iord+1) - tilt
-        else
-           angle = -tilt
-        endif
-        angle = (iord+1) * angle
-        dtmp = sqrt(f_errors(2*iord)**2 + f_errors(2*iord+1)**2)
-        f_errors(2*iord)   = dtmp * cos(angle)
-        f_errors(2*iord+1) = dtmp * sin(angle)
-     endif
-     f_errors(2*iord)   = bvk * f_errors(2*iord)
-     f_errors(2*iord+1) = bvk * f_errors(2*iord+1)
-  enddo
-  !Done with all the setting up...
-
   if (elrad.gt.zero) then
-    lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad/(one + deltap)
      do k = 1, nord
         ! The factor (one + deltap) below is taken from the original MAD-X routine.
-        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)/(one + deltap)
      enddo
   else
      lambda = zero
@@ -4362,35 +4334,42 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
         del_p_g = del_p_g + sum0
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
+
      pkick = elrad*(barkappa*(one + deltap) + del_p_g)
 
      dpx = real(pkick)
      dpy = - aimag(pkick)
 
-     orbit(2) = orbit(2) + dpx - dbr
-     orbit(4) = orbit(4) + dpy + dbi
+     orbit(2) = orbit(2) + dpx
+     orbit(4) = orbit(4) + dpy
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
-                *(one + beta*orbit(6))/(one + deltap)/beta
+                *(one + beta*orbit(6))/beta/(one + deltap)
   endif
   ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! re(6,6) is assumed to be a unit matrix as input
+
+  ! Eq. (2.38) are required to obtain agreement to the thick sectormap.
+
   if (nord .ge. 1) then
      ! The next two expressions emerge by the first
-     ! derivative of \partial_+ G wrt. x and y at zero, see documentation.
+     ! derivative of \partial_+ G wrt. x and y, see documentation.
+
+     ! the factors (one + deltap) means that we take the derivative with respect to a given
+     ! energy-offset, so that if deltap != 0, the derivative is evaluated at a larger radius.
      dxdpg = elrad/two*(two*g(2, 0) + g(2, 1))
      dydpg = elrad/two*(0, 1)*(two*g(2, 0) - g(2, 1))
 
      re(2, 1) = real(dxdpg)
      re(2, 3) = real(dydpg)
-     re(2, 6) = elrad*kx/beta
+     re(2, 6) = elrad*kx/beta/(one + deltap)  ! Eq. (2.48), thesis
 
      re(4, 1) = - aimag(dxdpg)
      re(4, 3) = - aimag(dydpg)
-     re(4, 6) = elrad*ky/beta
+     re(4, 6) = elrad*ky/beta/(one + deltap) ! Eq. (2.48), thesis
 
-     re(5, 1) = - elrad*kx/beta
-     re(5, 3) = - elrad*ky/beta
+     re(5, 1) = - elrad*kx/beta/(one + deltap) ! Eq. (2.38e), thesis (and (2.37e))
+     re(5, 3) = - elrad*ky/beta/(one + deltap) ! Eq. (2.38e), thesis (and (2.37e))
   endif
 
   ! Second-order terms by derivation of Eqs. (39) in Ref. above, at zero
@@ -4407,9 +4386,9 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
 
      bp1 = one - one/beta**2
 
-     te(1, 1, 2) = 0.5*elrad*kx
+     te(1, 1, 2) = elrad*kx/(one + deltap)/two ! factor 1/two: see comment above
      te(1, 2, 1) = te(1, 1, 2)
-     te(1, 2, 3) = 0.5*elrad*ky
+     te(1, 2, 3) = elrad*ky/(one + deltap)/two ! factor 1/two: see comment above
      te(1, 3, 2) = te(1, 2, 3)
 
      te(2, 1, 1) = real(dxx)   ! cf
@@ -4439,7 +4418,6 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      te(5, 6, 3) = - te(1, 2, 3)*bp1
   endif
 end SUBROUTINE tmmult_cf
-
 
 SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   use twtrrfi
