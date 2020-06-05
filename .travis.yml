@@ -15,7 +15,10 @@ install:
   - make numdiff-linux64-gnu
 
   - pip install cython
-  - git clone https://github.com/hibtc/cpymad.git
+  - git clone https://github.com/tpersson/cpymad.git
+  - cd cpymad
+  - git checkout addingDistribution
+  - cd ..
   - ./buildcpymad.sh
   - cd cpymad && python setup.py build_ext --no-X11 --blas --lapack --madxdir=$MADXDIR
   - pip install -e .
