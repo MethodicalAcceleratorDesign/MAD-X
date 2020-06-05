@@ -3443,7 +3443,6 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         ! nothing on purpose!
 
      case (code_wire)
-        call tmchenergy(ftrk,orbit,fmap,ek,re, te)
         ! nothing for now...
 
      case (code_dipedge)
@@ -4627,10 +4626,10 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
         di  = (dr * y + di * x) / (iord) + f_errors(2*iord+1)
         dr  = drt
      enddo
-    ! re(2,1) = - dr
+     re(2,1) = - dr
      re(2,3) = + di
      re(4,1) = + di
-    ! re(4,3) = + dr
+     re(4,3) = + dr
   endif
 
   !---- Add the missing focussing component of thin dipoles
@@ -4673,7 +4672,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
         te(4,3,3) = - di
      endif
   endif
-te = zero
 end SUBROUTINE tmmult
 
 SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
@@ -6387,7 +6385,6 @@ SUBROUTINE tmchenergy(ftrk,orbit,fmap,ek,re, te)
   gamma1 = energy1/mass
   beta1i = energy1/pc1
 
-  print *, "kkkk", pc1/pc
   re(2,2) = pc/pc1
   re(4,4) = pc/pc1
   re(6,6) = pc/pc1

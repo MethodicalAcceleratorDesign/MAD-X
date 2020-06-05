@@ -84,9 +84,7 @@ void pro_distribution(struct in_cmd* p){
 	setemitt12(get_value("beam", "ex"), get_value("beam", "ey"));
 	setemitt3(get_value("beam", "et"));
 	sete0andmass0(get_value("beam", "energy"),get_value("beam", "mass") );
-	printf("innnlllll2 \n");
 	settotalsteps(npart);
-	printf("innnlllll3 \n");
 	if(command_par_value("use_intial", p->clone)!=0){
 
 		double betx = command_par_value("betx", p->clone);
@@ -95,14 +93,13 @@ void pro_distribution(struct in_cmd* p){
 		double alfy = command_par_value("alfy", p->clone);
 		settwisstas(betx, alfx, bety, alfy);
 
-		printf("ssssss %f %f %f %f \n", betx, alfx, bety, alfy);
 	}
 	else{
 		trbegn_(oneturnmat,eigen);
 		settasmatrixtranspose(eigen);
 		
 	}
-	printf("innnlllll4 \n");
+
 	type = command_par_string("horizontal", p->clone);
 	cut_l = command_par_vector("cutsig_h", p->clone, cuts);
 	setdistparameters(type, cut_l, cuts, C_HOR, dist_type, start_v,stop_v, coord_t);
@@ -114,13 +111,13 @@ void pro_distribution(struct in_cmd* p){
 	type = command_par_string("longitudinal", p->clone);
 	cut_l = command_par_vector("cutsig_l", p->clone, cuts);
 	setdistparameters(type, cut_l, cuts, C_LON, dist_type, start_v,stop_v, coord_t);
-	printf("innnlllll5 \n");
+
 
 	for(int i=0; i<6; i++){
 		setscan_para_diagonal(i,coord_t[i],dist_type[i],start_v[i],stop_v[i]);
 	}
 	
-	printf("innnlllll6 \n");
+
 	getunconvertedcoord(xd,pxd,yd,pyd,td,ptd, &npart);
 
 

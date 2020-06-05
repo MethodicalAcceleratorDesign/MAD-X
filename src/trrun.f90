@@ -1061,7 +1061,7 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   dipr = bvk * normal(0) !vals(1,0)
   dipi = bvk * skew(0)  
 
-  !!print *, "ggggg_old", gstr, sstr
+
      ! cf magnet with quadrupole & sextupole
      gstr = normal(1)/elrad
      sstr = normal(2)/elrad
@@ -1805,7 +1805,7 @@ subroutine ttrf(track,ktrack)
     enddo
   endif
   !! frs add-on end
-  call ttchangep0(track,ktrack)
+ 
 end subroutine ttrf
 
 subroutine ttchangep0(track,ktrack)

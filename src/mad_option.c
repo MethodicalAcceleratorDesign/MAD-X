@@ -1,6 +1,6 @@
 #include "madx.h"
 
-int
+ int
 get_option(const char* str)
 {
 /* This function is called by fortran to get option of a command */
@@ -40,7 +40,7 @@ set_defaults(const char* str) /* reset options, beam etc. to defaults */
   if ((pos = name_list_pos(str, defined_commands->list)) > -1)
   {
     if (strcmp(str, "option") == 0)
-    {
+    {  
       if (options != NULL) delete_command(options);
       options = clone_command(defined_commands->commands[pos]);
     }
