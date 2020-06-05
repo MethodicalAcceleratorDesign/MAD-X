@@ -39,17 +39,13 @@ rflag:= 1/2;
 rflag:=3/8;
 
 tr$macro(turn): macro = {
-value, rfvolt;
 }
 
 track, onepass, update, dump;
 start, x=1e-6, px=0, y=1e-6, py=0, t=-0.25;
 start, x=1e-6, px=0, y=1e-6, py=0, t=-1.0;
 start, x=1e-6, px=0, y=1e-6, py=0, t=-1.75;
-start, x=1e-6, px=0, y=1e-6, py=0, t=-0.25;
-start, x=1e-6, px=0, y=1e-6, py=0, t=-1.0;
-start, x=1e-6, px=0, y=1e-6, py=0, t=-1.75;
-run, turns=150, ffile=1;
+run, turns=50, ffile=1;
 endtrack;
 stop;
 
