@@ -180,7 +180,7 @@ exec_command(void)
       scan_in_cmd(p); /* match input command with clone + fill */
       current_command = p->clone;
 
-      // main commands
+      // main command_par_string_user
       if      (strcmp(p->cmd_def->module, "control") == 0)   control(p);
       else if (strcmp(p->cmd_def->module, "c6t") == 0)       conv_sixtrack(p);
       else if (strcmp(p->cmd_def->module, "edit") == 0)      seq_edit_main(p);
@@ -196,6 +196,7 @@ exec_command(void)
       else if (strcmp(p->cmd_def->module, "survey") == 0)    { current_survey = p->clone; pro_survey(p); }
       else if (strcmp(p->cmd_def->module, "track") == 0)     pro_track(p);
       else if (strcmp(p->cmd_def->module, "twiss") == 0)     { current_twiss = p->clone; pro_twiss(); }
+      else if (strcmp(p->cmd_def->module, "distribution") == 0)       pro_distribution(p); 
 
       else if (strcmp(p->cmd_def->module, "sdds") == 0) {
 #ifdef _ONLINE

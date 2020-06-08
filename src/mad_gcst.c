@@ -113,11 +113,13 @@ const char* const survey_table_cols[] =
   "name", "keyword", "s", "l", "angle", "x",
   "y", "z", "theta", "phi", "psi", "globaltilt", "tilt",
   "slot_id", "assembly_id", "mech_sep",
-  /*== dealt with the new property v_pos as for mech_sep */
+  /*== dealt with the new property v_pos asc for mech_sep */
   "v_pos", "comments",
   /*==*/
   " "  /* blank terminates */
 };
+
+
 
 const int efield_table_types[] =
 {
@@ -690,6 +692,18 @@ const char* const track_table_cols[] =
   "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
   " "  /* blank terminates */
 };
+
+const char* const dist_table_cols[] =
+{
+  "number", "x", "px", "y", "py", "t", "pt",
+  " "  /* blank terminates */
+};
+
+const int dist_table_types[] =
+{
+  1, 2, 2, 2, 2, 2, 2
+};
+
 
 const int track_table_cols_len = sizeof track_table_cols / sizeof track_table_cols[0];
 
