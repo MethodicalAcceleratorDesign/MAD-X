@@ -85,7 +85,7 @@ const int ap_table_types[] =
   2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2, 2, 2, 2,
-  2, 2, 2
+  2, 2, 2, 2, 2
 };
 
 const char* const ap_table_cols[] =
@@ -94,7 +94,7 @@ const char* const ap_table_cols[] =
   "aper_1", "aper_2", "aper_3", "aper_4",
   "rtol", "xtol", "ytol", "xoffset", "yoffset",
   "s", "betx", "bety", "dx", "dy", "x", "y", "px", "py",
-  "on_ap", "on_elem", "spec",
+  "on_ap", "on_elem", "spec", "x_pos_hit", "y_pos_hit",
   " "  /* blank terminates */
 };
 
