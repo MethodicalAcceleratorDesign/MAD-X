@@ -3465,8 +3465,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
      case (code_rfmultipole)
         call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
-     case (code_changerefpc)
-        call tmchenergy(ftrk,orbit,fmap,ek,re, te)
+     case (code_changerefp0)
+        call tmchp0(ftrk,orbit,fmap,ek,re, te)
      case default !--- anything else:
         ! nil (23, 28, 34)
 
@@ -6321,7 +6321,7 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
 end SUBROUTINE tmdrf
 
-SUBROUTINE tmchenergy(ftrk,orbit,fmap,ek,re, te)
+SUBROUTINE tmchp0(ftrk,orbit,fmap,ek,re, te)
   use twisslfi
   use twiss_elpfi
   use twissbeamfi, only : deltap, pc, gamma, energy, beta
@@ -6372,7 +6372,7 @@ SUBROUTINE tmchenergy(ftrk,orbit,fmap,ek,re, te)
   if(ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 
-end SUBROUTINE tmchenergy
+end SUBROUTINE tmchp0
 
 
 SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
@@ -6490,7 +6490,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
     call tmcat(fsec,re,te,rw,tw,re,te)
 
     
-     ! call tmchenergy(ftrk,orbit,fmap,ek_ch,re_ch, te_ch)
+     ! call tmchp0(ftrk,orbit,fmap,ek_ch,re_ch, te_ch)
       !call tmcat(fsec,re_ch,te_ch,re,te,re,te)
     
 

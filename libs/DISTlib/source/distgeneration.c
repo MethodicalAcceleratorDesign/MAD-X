@@ -252,7 +252,6 @@ void createcoordinates(int index,  double start, double stop, int length, int ty
                 tmp = randray(start, stop);
 
             dist->incoord[i]->coord[index] = tmp;
-            //printf("%f \n", sqrt(tmp/2));
         }
     }
     else
@@ -313,7 +312,6 @@ double randray(double mu, double sigma){
 
 
 void allocateincoord(int linecount){
-  printf("allllocating \n");
   dist->incoord = (struct coordinates**)malloc(linecount*sizeof(struct coordinates*));
   dist->outcoord = (struct coordinates**)malloc(linecount*sizeof(struct coordinates*));
   dist->totincoord = linecount;
@@ -335,7 +333,6 @@ void allocateincoord(int linecount){
 
   }
   dist->isallocated =1;
-  printf("allllocating2 \n");
 }
 void deallocateincoord(void){
 
@@ -343,6 +340,6 @@ void deallocateincoord(void){
   free(dist->incoord); 
   free(dist->outcoord); 
   //dist->ref->typeused = (int*)malloc(dim*sizeof(int));
-  dist->isallocated =0;
+  dist->isallocated = 0;
   dist->totincoord = -1;
 }
