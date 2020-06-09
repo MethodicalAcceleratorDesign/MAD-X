@@ -3480,6 +3480,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmbb(fsec,ftrk,orbit,fmap,re,te)
 
      case (code_marker)
+
         ! nothing on purpose!
 
      case (code_wire)
@@ -3505,7 +3506,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
      case (code_rfmultipole)
         call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
-
+     case (code_changerefp0)
+        call tmchp0(ftrk,orbit,fmap,ek,re, te)
      case default !--- anything else:
         ! nil (23, 28, 34)
 
@@ -4243,8 +4245,8 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   logical :: fsec, ftrk, fmap
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr
   integer, external :: Factorial
-  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
-  double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1
+  double precision :: an, angle, dtmp
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double precision :: orbit(6), re(6,6), te(6,6,6), tilt2
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -4267,8 +4269,42 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   F_ERRORS(0:maxferr) = zero
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
-  tilt2 = 0 !This is a dumy parameter now that can be changed to have a relative tilf of the different orders
+  tilt2 = 0 ! A parameter describing the relative tilt between
+            ! the dipole component and the higher-order components of the CFM
 
+  !####SETTING UP THE MULTIPLES
+  an = node_value('angle ')
+  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
+
+  !Below here should not be commented output
+  !---- Other components and errors.
+  nord = 0
+  ! that loop should start at one since nominal dipole strength already taken into account above
+  !needs to be here though
+  do iord = 0, max(nn, ns, n_ferr/2-1)
+ !    get the maximum effective order; loop runs over maximum of user given values
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
+          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
+  enddo
+
+  do iord = 1, nord
+     f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))
+     f_errors(2*iord+1) = (skew(iord)   + f_errors(2*iord+1))
+     if (tilt .ne. zero) then
+        if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) then
+           angle = atan2(f_errors(2*iord+1), f_errors(2*iord)) / (iord+1) - tilt
+        else
+           angle = -tilt
+        endif
+        angle = (iord+1) * angle
+        dtmp = sqrt(f_errors(2*iord)**2 + f_errors(2*iord+1)**2)
+        f_errors(2*iord)   = dtmp * cos(angle)
+        f_errors(2*iord+1) = dtmp * sin(angle)
+     endif
+     f_errors(2*iord)   = bvk * f_errors(2*iord)
+     f_errors(2*iord+1) = bvk * f_errors(2*iord + 1)
+  enddo
+  !Done with all the setting up...
 
   ! The "normal" components are considered here as the expansion coefficients of
   ! B_y wrt. the reference plane, while the "skew" components are considered as the
@@ -4288,73 +4324,11 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   !
   ! play the role as the k'th skew- and normal field component.
 
-
-    !---- Nominal dipole strength.
-  dipr = normal(0) / (one + deltap)
-  dipi = skew(0)   / (one + deltap)
-
-  !####SETTING UP THE MULTIPLES
-  an = node_value('angle ')
-  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
-
-  !---- Dipole error.
-  dbr = f_errors(0) / (one + deltap)
-  dbi = f_errors(1) / (one + deltap)
-
-
-  if (tilt .ne. zero)  then
-     if (dipi.ne.zero .or. dipr.ne.zero) then
-        angle = atan2(dipi, dipr) - tilt
-     else
-        angle = -tilt
-     endif
-     dtmp = sqrt(dipi**2 + dipr**2)
-     dipr = dtmp * cos(angle)
-     dipi = dtmp * sin(angle)
-     dtmp = sqrt(dbi**2 + dbr**2)
-     dbr = dtmp * cos(angle)
-     dbi = dtmp * sin(angle)
-  endif
-
-  dbr = bvk * dbr
-  dbi = bvk * dbi
-  dipr = bvk * dipr
-  dipi = bvk * dipi
-  !Below here should not be commented output
-  !---- Other components and errors.
-  nord = 0
-  ! that loop should start at one since nominal dipole strength already taken into account above
-  !needs to be here though
-  do iord = 0, max(nn, ns, n_ferr/2-1)
- !    get the maximum effective order; loop runs over maximum of user given values
-     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
-          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
-  enddo
-
-  do iord = 1, nord
-     f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))   / (one + deltap)
-     f_errors(2*iord+1) = (skew(iord)   + f_errors(2*iord+1)) / (one + deltap)
-     if (tilt .ne. zero) then
-        if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) then
-           angle = atan2(f_errors(2*iord+1), f_errors(2*iord)) / (iord+1) - tilt
-        else
-           angle = -tilt
-        endif
-        angle = (iord+1) * angle
-        dtmp = sqrt(f_errors(2*iord)**2 + f_errors(2*iord+1)**2)
-        f_errors(2*iord)   = dtmp * cos(angle)
-        f_errors(2*iord+1) = dtmp * sin(angle)
-     endif
-     f_errors(2*iord)   = bvk * f_errors(2*iord)
-     f_errors(2*iord+1) = bvk * f_errors(2*iord+1)
-  enddo
-  !Done with all the setting up...
-
   if (elrad.gt.zero) then
-    lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad/Factorial(k)
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad/(one + deltap)
      do k = 1, nord
         ! The factor (one + deltap) below is taken from the original MAD-X routine.
-        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/(one + deltap)/elrad/Factorial(k)
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)/(one + deltap)
      enddo
   else
      lambda = zero
@@ -4403,35 +4377,42 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
         del_p_g = del_p_g + sum0
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
+
      pkick = elrad*(barkappa*(one + deltap) + del_p_g)
 
      dpx = real(pkick)
      dpy = - aimag(pkick)
 
-     orbit(2) = orbit(2) + dpx - dbr
-     orbit(4) = orbit(4) + dpy + dbi
+     orbit(2) = orbit(2) + dpx
+     orbit(4) = orbit(4) + dpy
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
-                *(one + beta*orbit(6))/(one + deltap)/beta
+                *(one + beta*orbit(6))/beta/(one + deltap)
   endif
   ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! re(6,6) is assumed to be a unit matrix as input
+
+  ! Eq. (2.38) are required to obtain agreement to the thick sectormap.
+
   if (nord .ge. 1) then
      ! The next two expressions emerge by the first
-     ! derivative of \partial_+ G wrt. x and y at zero, see documentation.
+     ! derivative of \partial_+ G wrt. x and y, see documentation.
+
+     ! the factors (one + deltap) means that we take the derivative with respect to a given
+     ! energy-offset, so that if deltap != 0, the derivative is evaluated at a larger radius.
      dxdpg = elrad/two*(two*g(2, 0) + g(2, 1))
      dydpg = elrad/two*(0, 1)*(two*g(2, 0) - g(2, 1))
 
      re(2, 1) = real(dxdpg)
      re(2, 3) = real(dydpg)
-     re(2, 6) = elrad*kx/beta
+     re(2, 6) = elrad*kx/beta/(one + deltap)  ! Eq. (2.48), thesis
 
      re(4, 1) = - aimag(dxdpg)
      re(4, 3) = - aimag(dydpg)
-     re(4, 6) = elrad*ky/beta
+     re(4, 6) = elrad*ky/beta/(one + deltap) ! Eq. (2.48), thesis
 
-     re(5, 1) = - elrad*kx/beta
-     re(5, 3) = - elrad*ky/beta
+     re(5, 1) = - elrad*kx/beta/(one + deltap) ! Eq. (2.38e), thesis (and (2.37e))
+     re(5, 3) = - elrad*ky/beta/(one + deltap) ! Eq. (2.38e), thesis (and (2.37e))
   endif
 
   ! Second-order terms by derivation of Eqs. (39) in Ref. above, at zero
@@ -4448,9 +4429,9 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
 
      bp1 = one - one/beta**2
 
-     te(1, 1, 2) = 0.5*elrad*kx
+     te(1, 1, 2) = elrad*kx/(one + deltap)/two ! factor 1/two: see comment above
      te(1, 2, 1) = te(1, 1, 2)
-     te(1, 2, 3) = 0.5*elrad*ky
+     te(1, 2, 3) = elrad*ky/(one + deltap)/two ! factor 1/two: see comment above
      te(1, 3, 2) = te(1, 2, 3)
 
      te(2, 1, 1) = real(dxx)   ! cf
@@ -4481,7 +4462,6 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   endif
 end SUBROUTINE tmmult_cf
 
-
 SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   use twtrrfi
   use twisslfi
@@ -4507,7 +4487,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   integer :: n_ferr, nord, iord, j, nd, nn, ns
   double precision :: f_errors(0:maxferr)
   double precision :: normal(0:maxmul), skew(0:maxmul)
-  double precision :: bi, pt, rfac, bvk, elrad, tilt, angle, an
+  double precision :: bi, pt, rfac, bvk, elrad, tilt, angle, an, anr, ani
   double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp
 
   integer, external :: get_option, node_fd_errors
@@ -4538,8 +4518,10 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   !---- Angle (bvk applied later)
   an = node_value('angle ')
-  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
-
+  if (an .ne. 0) then 
+    anr = an
+    f_errors(0) = f_errors(0) + normal(0) - an
+  endif
   !---- Dipole error.
   dbr = f_errors(0) / (one + deltap)
   dbi = f_errors(1) / (one + deltap)
@@ -4560,13 +4542,17 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      dtmp = sqrt(dbi**2 + dbr**2)
      dbr = dtmp * cos(angle)
      dbi = dtmp * sin(angle)
+     anr = an * cos(angle)
+     ani = an * sin(angle)
+     anr   = bvk * anr
+     ani   = bvk * ani
   endif
 
-  dbr = bvk * dbr
-  dbi = bvk * dbi
+
+  dbr  = bvk * dbr
+  dbi  = bvk * dbi
   dipr = bvk * dipr
   dipi = bvk * dipi
-
   !---- Other components and errors.
   nord = 0
   ! that loop should start at one since nominal dipole strength already taken into account above
@@ -4631,10 +4617,14 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
      !---- Add the missing focussing component of thin dipoles for co
      if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
-        orbit(2) = orbit(2) - dipr*dipr/elrad * x
-        orbit(4) = orbit(4) - dipi*dipi/elrad * y
+        if (an .ne. 0) then
+          orbit(2) = orbit(2) - anr*dipr/elrad * x ! 
+          orbit(4) = orbit(4) - ani*dipi/elrad * y
+        else
+          orbit(2) = orbit(2) - (one+deltap)*dipr*dipr/elrad * x ! 
+          orbit(4) = orbit(4) - (one+deltap)*dipi*dipi/elrad * y
+        endif
      endif
-
      !---- Radiation effects at exit.
      if (radiate  .and.  elrad.ne.zero) then
         orbit(2) = orbit(2) * f_damp_t;
@@ -4664,9 +4654,16 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   endif
 
   !---- Add the missing focussing component of thin dipoles
+  !---- The (1+deltap) is from that the term is h*k0 (so one geometrical and one is bending strength)
   if (elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
-     re(2,1) = re(2,1) - dipr*dipr/elrad
-     re(4,3) = re(4,3) - dipi*dipi/elrad
+    if (an .ne. 0) then
+      re(2,1) = re(2,1) - anr*dipr/elrad
+      re(4,3) = re(4,3) - ani*dipi/elrad
+    else
+      re(2,1) = re(2,1) - (one+deltap)*dipr*dipr/elrad
+      re(4,3) = re(4,3) - (one+deltap)*dipi*dipi/elrad
+    endif
+
   endif
   re(2,6) = + dipr * bi
   re(4,6) = - dipi * bi
@@ -4674,6 +4671,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   re(5,3) = - re(4,6)
 
   !---- Second-order terms (use X,Y from orbit tracking).
+
   if (fsec) then
      if (nord .ge. 2) then
         dr = zero
@@ -4695,7 +4693,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
         te(4,3,3) = - di
      endif
   endif
-
 end SUBROUTINE tmmult
 
 SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
@@ -6344,6 +6341,7 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   fmap = dl .ne. zero
 
   !---- First-order terms.
+
   re(1,2) = dl
   re(3,4) = dl
   re(5,6) = dl/(beta*gamma)**2
@@ -6360,11 +6358,65 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
      te(5,4,4) = te(5,2,2)
      te(5,6,6) = te(1,2,6) * three / (beta * gamma) ** 2
   endif
-
+  
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmdrf
+
+SUBROUTINE tmchp0(ftrk,orbit,fmap,ek,re, te)
+  use twisslfi
+  use twiss_elpfi
+  use twissbeamfi, only : deltap, pc, gamma, energy, beta
+  use matrices, only : EYE
+  use math_constfi, only : zero, one
+  use phys_constfi, only : clight
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for change of reference Energy                     *
+  !     Input:                                                           *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !----------------------------------------------------------------------*
+  logical :: fsec, ftrk, fmap, fcentre, fringe
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+
+  double precision :: energy1, pc1, gamma1, pt, mass, beta1i
+  double precision, external :: node_value, get_value
+  integer, external :: el_par_vector
+
+  mass     = get_value('probe ','mass ')
+  re = EYE
+  ek = zero
+  te = zero
+  pt = orbit(6) 
+
+  !---- Transfer map.
+  fmap = .true.
+  
+  energy1 = pt*pc+energy
+  pc1 = sqrt(energy1**2-mass**2)
+  gamma1 = energy1/mass
+  beta1i = energy1/pc1
+
+  re(2,2) = pc/pc1
+  re(4,4) = pc/pc1
+  re(6,6) = pc/pc1
+
+  ek(6) = beta1i*(gamma/gamma1-one)
+
+  if(ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
+
+end SUBROUTINE tmchp0
+
 
 SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   use twisslfi
@@ -6392,9 +6444,13 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap, fcentre, istaper
+
+  logical :: fsec, ftrk, fmap, fcentre, istaper, fringe
   double precision :: el, ds
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: ek_f(6), re_f(6,6), te_f(6,6,6)
+  double precision :: ek_tmp(6), re_tmp(6,6), te_tmp(6,6,6)
+  double precision :: ek_ch(6), re_ch(6,6), te_ch(6,6,6)
 
   integer :: elpar_vl, ncav
   double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, bvk
@@ -6423,10 +6479,15 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   RW = EYE
   TW = zero
 
+  ek_f = zero
+  re_f = EYE
+  te_f = zero
+
   !---- BV flag
   rff = g_elpar(r_freq)
   rfl = g_elpar(r_lag) +  g_elpar(r_lagt)
   bvk = node_value('other_bv ')
+  
 
   !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
   if (bvk .eq. -one) then
@@ -6453,7 +6514,22 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
   !---- Transfer map.
   fmap = .true.
-!  print *, "rrrrrrrf", vrf, c0, orbit(6), rfv, totrfcav
+
+  !---- Sandwich cavity between two drifts.
+  if (el .ne. zero) then
+    fringe = node_value('fringe ') .gt. zero
+    ! TODO: generalize for ds!=0.5
+    dl = el / two
+    
+    if (fringe) then
+      call tmrffringe(fsec,ftrk,orbit, fmap, el, one, ek, re_f, te_f)
+      call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+      call tmcat(fsec,rw,tw,re_f,te_f,rw,tw)
+    else
+      call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+    endif
+
+
   if (ftrk) then
     orbit(6) = orbit(6) + c0
     ek(6) = c0
@@ -6465,18 +6541,105 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
     if (fsec) te(6,5,5) = c2
   endif
 
-  !---- Sandwich cavity between two drifts.
-  if (el .ne. zero) then
-    ! TODO: generalize for ds!=0.5
-    dl = el / two
-    call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,re,te,rw,tw,re,te)
+
+    
+     ! call tmchp0(ftrk,orbit,fmap,ek_ch,re_ch, te_ch)
+      !call tmcat(fsec,re_ch,te_ch,re,te,re,te)
+    
+
     if (fcentre) return
+
     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,rw,tw,re,te,re,te)
+    if (fringe) then
+      call tmrffringe(fsec,ftrk,orbit, fmap, el, -one, ek, re_f, te_f) 
+      call tmcat(fsec,re_f,te_f,re,te,re,te)
+    endif
+
+  else
+    if (ftrk) then
+      orbit(6) = orbit(6) + c0
+      ek(6) = c0
+      re(6,5) = c1
+      if (fsec) te(6,5,5) = c2
+    else
+      ek(6) = c0 - c1 * orbit(5) + c2 * orbit(5)**2
+      re(6,5) = c1 - two * c2 * orbit(5)
+      if (fsec) te(6,5,5) = c2
+   endif
   endif
 
 end SUBROUTINE tmrf
+
+SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te) 
+  use twisslfi
+  use twiss_elpfi
+  use twissbeamfi, only : deltap, pc, beta
+  use matrices, only : EYE
+  use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi
+  use phys_constfi, only : clight
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for RF cavity fringe.                              *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     el        (double)  element length.                              *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical :: fsec, ftrk, fmap
+  double precision :: el,  V, dpxy, dptxy, s1, c1, tcorr
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  integer :: elpar_vl
+  double precision :: rff, rfl, dl, omega, vrf, phirf, bvk, jc
+  double precision :: ek0(6), rw(6,6), tw(6,6,6)
+  double precision :: rfv, x, px, y, py, t, pt
+
+  double precision, external :: node_value
+  integer, external :: el_par_vector
+  ek = zero
+  te = zero
+  re = EYE
+
+  !-- get element parameters
+  elpar_vl = el_par_vector(r_freq, g_elpar)
+
+  !---- Fetch voltage.
+  rfv = g_elpar(r_volt)
+  rff = g_elpar(r_freq)
+  rfl = g_elpar(r_lag)
+
+  omega = rff * (ten6p * twopi / clight)
+  ! vrf   = rfv * ten3m / (pc * (one + deltas))
+  vrf   = rfv * ten3m
+  phirf = rfl * twopi
+  t  = orbit(5);
+
+  tcorr = jc*el/(2*beta)
+  V = jc*vrf/(pc*el* (one + deltap))
+  s1 = sin(phirf - omega*(t+tcorr))
+  c1 = cos(phirf - omega*(t+tcorr))
+
+  dpxy = -V*s1*half
+
+  re(2,1)   = dpxy
+  re(4,3)   = dpxy
+  te(6,1,1) = 0.25d0*V*c1*omega
+  te(6,3,3) = 0.25d0*V*c1*omega
+
+  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
+end SUBROUTINE tmrffringe
 
 SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
   use math_constfi, only : zero
@@ -8323,13 +8486,14 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   endif
 
   !---- Element Kick
-  ek(2) = -REAL(Cp0);
-  ek(4) = AIMAG(Cp0);
-  ek(6) =  vrf * sin(lag * twopi - krf * z) - krf * REAL(Sp1);
+  !ek(2) = -REAL(Cp0);
+  !ek(4) = AIMAG(Cp0);
+  !ek(6) =  vrf * sin(lag * twopi - krf * z) - krf * REAL(Sp1);
 
   !---- First-order terms
   re(2,1) = -REAL(Cm1);
   re(2,3) =  AIMAG(Cm1);
+  
   re(2,5) = -krf * REAL(Sp0);
   re(4,1) =  re(2,3);
   re(4,3) = -re(2,1);

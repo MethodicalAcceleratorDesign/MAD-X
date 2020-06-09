@@ -2491,6 +2491,11 @@ void SeqElList::slice_node() // main steering, decides how to split an individua
       if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " zero length place directly copy of element " << work_node->name << '\n';
       add_node_at_end_of_sequence( copy_thin(work_node),sliced_seq );
     }
+    else if( nslices==0)
+    {
+      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " number of slices is 0, place as is " << work_node->name << '\n';
+      add_node_at_end_of_sequence( work_node,sliced_seq );
+    }
     else if ( strcmp(work_node->base_name,"matrix") == 0 ) add_node_at_end_of_sequence(work_node,sliced_seq); // Take matrix as it is, including any length
     else if ( strcmp(work_node->base_name,"drift")  == 0 ) ; // do nothing for drift
     // now the element types that can be sliced

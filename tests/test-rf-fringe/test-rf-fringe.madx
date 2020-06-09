@@ -1,0 +1,43 @@
+circum=1.5;
+rfcav: RFCAVITY, VOLT=1000, LAG=0.0 , L = 0.2, Freq=4, fringe=1;
+ip5: marker;
+
+seq: sequence, refer=center, l=circum;
+rfcav, at = 1;
+endsequence;
+
+beam, energy=10, particle=positron;
+use, sequence=seq;
+
+select, flag=twiss, column=name, s, x,px, y,py, pt,t, betx, bety;
+
+xin = 0.01;
+yin = 0.02;
+pxin = 0.000;
+pyin = 0.000;
+tin = 0.00;
+twiss, file="fodo.twiss", betx=1, bety=2, t=tin, x=xin, y=yin, px=pxin, py=pyin;
+
+
+use, sequence=seq;
+
+TRACK,FILE=thick.dat,ONEPASS=true;
+START, X=xin, Y=yin, t=tin;
+RUN, TURNS=1;
+ENDTRACK;
+
+
+!select, flag=ptc_twiss, column=name, s, x,px, y,py,pt,t, betx, bety;
+ptc_create_universe;
+ptc_create_layout,model=1, method=2, nst=1, exact=true;
+
+ptc_setswitch, debuglevel=0,  time=true, totalpath=false;
+PTC_TWISS, table=twiss, icase=6, no=5, betx=1, bety=2, betz=10, x=xin, y=yin, t=tin, pt=0.0,px=pxin, py=pyin ;
+write, table=twiss, file="twiss.ptc.tfs";
+
+!ptc_start, x=xin, y=yin, t=tin,px=pxin, py=pyin;
+
+!ptc_track, icase=6, element_by_element,  dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6}, turns=1, ffile=1, 
+!             radiation=false,CLOSED_ORBIT=false;
+
+ptc_end;

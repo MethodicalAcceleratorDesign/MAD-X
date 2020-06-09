@@ -923,8 +923,9 @@ pro_twiss(void)
       pos = name_list_pos("q2", summ_table->columns);
       q2_val = summ_table->d_cols[pos][i];
 
-      dq1 = (q1_val_p - q1_val) / DQ_DELTAP;
-      dq2 = (q2_val_p - q2_val) / DQ_DELTAP;
+      double beta0   = get_value("probe","beta");
+      dq1 = (q1_val_p - q1_val) / (beta0*DQ_DELTAP);
+      dq2 = (q2_val_p - q2_val) / (beta0*DQ_DELTAP);
 
       pos = name_list_pos("dq1", summ_table->columns);
       summ_table->d_cols[pos][i] = dq1;

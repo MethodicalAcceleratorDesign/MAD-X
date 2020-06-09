@@ -1,0 +1,41 @@
+! Aperture calculation test
+! saved on 28/11/2019 12:18:19 by T.Risselada
+
+mk:       marker;
+myseq:    sequence, l=1;
+mk,       at=0.000;
+endsequence;
+option, debug;
+mk,       apertype=RECTANGLE, aperture={1, 0.4};
+
+!option, debug;
+beam,     particle=electron, energy=3 ,ex=3e-4, ey=1e-4;
+use,      sequence=myseq;
+ 
+select, flag=twiss, column = s, betx, dx;
+twiss,    betx=1, bety=1 , y=0.2, x=0.02,  file=mytwiss.dat;
+
+select,   flag=aperture, pattern=mk, column=name,n1,x_pos_hit, y_pos_hit;
+ 
+
+
+!case 1:  no rtol,  cor=2 mm (bad)
+mk,       aper_tol = {0.0, 0.0, 0.0};
+aperture, halo={5,5,5,5}, cor=0.00, dp=1, BETAQFX = 1, DQF =1, DPARX =0.2, DPARY=0.4, bbeat=1, nco=20, file='apert1.tfs';
+
+! case 2:  rtol=2 mm, no cor  (OK)
+mk,       aper_tol = {0.0, 0.2, 0.4};
+aperture, halo={5,5,5,5}, cor=0.00, dp=0, BETAQFX = 1, DQF =0, DPARX =0.0, DPARY=0.0, bbeat=1, nco=20, file='apert2.tfs';
+
+
+mk,       aper_tol = {0.0, 0.0, 0.0};
+
+aperture, halo={5,5,5,5}, cor=0.00, dp=0, BETAQFX = 1, DQF =1, DPARX =0.0, DPARY=0.0, bbeat=1, nco=20, file='apert3.tfs';
+
+twiss,    betx=1, bety=1 , dy=0.2, dx=0.02,  file=mytwiss2.dat;
+
+aperture, halo={5,5,5,5}, cor=0.00, dp=1, BETAQFX = 1, DQF =1, DPARX =0.0, DPARY=0.0, bbeat=1, nco=20, file='apert4.tfs';
+
+
+
+stop;
