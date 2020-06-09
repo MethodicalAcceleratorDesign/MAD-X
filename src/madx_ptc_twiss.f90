@@ -1846,8 +1846,14 @@ contains
 
       !deltap = A_script_probe%x(5).sub.'0'
       !deltae = deltae * (1.0 + deltap)
-      pt_ = A_script_probe%x(5).sub.'0'
-      onedp   = sqrt( one + two*pt_/relativisticBeta + (pt_**2))
+      if(default%time) then
+        pt_ = A_script_probe%x(5).sub.'0'
+        onedp   = sqrt( one + two*pt_/relativisticBeta + (pt_**2))
+        print *, "trueeeee,", onedp
+      else
+        onedp = one + A_script_probe%x(5).sub.'0'
+        print *, "falsseee,", onedp
+      endif
       
 
 
