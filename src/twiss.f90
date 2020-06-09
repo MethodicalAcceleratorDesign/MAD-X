@@ -4286,8 +4286,6 @@ SUBROUTINE tmmult_cf_short(fsec, ftrk, orbit, fmap, re, te)
   !
   ! play the role as the k'th skew- and normal field component.
 
-  deltap = deltap/beta ! get the MAD-X definition of chromaticity
-
   do k = 0, nord
      ! The factor (one + deltap) below is taken from the original MAD-X routine.
      lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)/(one + deltap)
@@ -4530,8 +4528,6 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   ! Re[\lambda_k] = 1/k! \partial^k B_y / \partial_r^k |_{\varphi = tilt} .
   !
   ! play the role as the k'th skew- and normal field component.
-
-  deltap = deltap/beta ! get the MAD-X definition of chromaticity
 
   do k = 0, nord
      ! The factor (one + deltap) below is taken from the original MAD-X routine.
