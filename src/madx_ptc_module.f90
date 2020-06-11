@@ -1888,10 +1888,10 @@ CONTAINS
           endif                                                !
        enddo                                                   !
     endif !====================================================!
-    if (key%magnet == 'sbend' .or. key%magnet == 'rbend') then 
-      bk0 = node_value('k0 ')
-      if(bk0 .ne. 0) key%list%k(1) = key%list%k(1) + bk0 - node_value('angle ')/l
-    endif
+ !   if (key%magnet == 'sbend' .or. key%magnet == 'rbend') then 
+ !     bk0 = node_value('k0 ')
+ !     if(bk0 .ne. 0) key%list%k(1) = key%list%k(1) + bk0 - node_value('angle ')/l
+ !   endif
 
     ord_max=max(ord_max,n_max)
 
