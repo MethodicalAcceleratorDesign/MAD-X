@@ -484,9 +484,27 @@ store_node_value(const char* par, double* value)
   
   else if (strcmp(lpar, "k1") == 0) store_comm_par_value("k1",*value,el->def);
   else if (strcmp(lpar, "k2") == 0) store_comm_par_value("k2",*value,el->def);
-  else if (strcmp(lpar, "k1tap") == 0) store_comm_par_value("k1tap",*value,el->def);
-  else if (strcmp(lpar, "k2tap") == 0) store_comm_par_value("k2tap",*value,el->def);
-  else if (strcmp(lpar, "lagtap") == 0) store_comm_par_value("lagtap",*value,el->def);
+  // The inform is to make sure they are written out to a new sequence. 
+  else if (strcmp(lpar, "k1tap") == 0) {
+    store_comm_par_value("k1tap",*value,el->def);
+    el->def->par_names->inform[9] = 1;
+  }
+  else if (strcmp(lpar, "k1stap") == 0) {
+    store_comm_par_value("k1stap",*value,el->def);
+    el->def->par_names->inform[10] = 1;
+  }
+  else if (strcmp(lpar, "k2tap") == 0){
+    store_comm_par_value("k2tap",*value,el->def);
+    el->def->par_names->inform[9] = 1;
+  }
+  else if (strcmp(lpar, "k2stap") == 0){
+    store_comm_par_value("k2stap",*value,el->def);
+    el->def->par_names->inform[10] = 1;
+  }
+  else if (strcmp(lpar, "lagtap") == 0) {
+    store_comm_par_value("lagtap",*value,el->def);
+    el->def->par_names->inform[9] = 1;
+  }
   else if (strcmp(lpar, "lag") == 0) store_comm_par_value("lag",*value,el->def);
 
   /* added by E. T. d'Amico 27 feb 2004 */
@@ -550,9 +568,9 @@ store_node_value(const char* par, double* value)
   else if (strcmp(lpar, "rm65") == 0) store_comm_par_value("rm65",*value,el->def);
   else if (strcmp(lpar, "rm66") == 0) store_comm_par_value("rm66",*value,el->def);
   // This needs to be cleaned up.
-  el->def->par_names->inform[9] = 1;
-  el->def->par_names->inform[8] = 1;
-  el->def->par_names->inform[7] = 1;
+  
+  
+
   /* end of additions */
 }
 
