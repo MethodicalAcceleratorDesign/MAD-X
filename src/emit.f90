@@ -286,7 +286,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         edg1 = bvk * node_value('e1 ')
         edg2 = bvk * node_value('e2 ')
         sk1 = bvk * (node_value('k1 ') + node_value('k1tap ')) 
-        sk2 = bvk * (node_value('k2 ') + node_value('ktap '))
+        sk2 = bvk * (node_value('k2 ') + node_value('k2tap '))
         hgap = node_value('hgap ')
         fint = node_value('fint ')
         sks = zero
@@ -473,12 +473,12 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         sksol = zero
         select case (code)
         case (code_quadrupole)  !---- Quadrupole
-           sk1 = bvk * (node_value('k1 ') + node_value('k1 ')) 
+           sk1 = bvk * (node_value('k1 ') + node_value('k1t ')) 
            str  = sk1
            n    = 1
            twon = two
         case (code_sextupole)   !---- Sextupole
-           sk2 = bvk * node_value('k2 ')
+           sk2 = bvk * (node_value('k2 ') + node_value('k2t '))
            str  = sk2 / two
            n    = 2
            twon = four
