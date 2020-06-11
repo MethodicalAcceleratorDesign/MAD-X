@@ -4895,8 +4895,8 @@ subroutine tttquad(track, ktrack)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = g_elpar(q_k1)
-  k1s = g_elpar(q_k1s)
+  k1  = g_elpar(q_k1)  + g_elpar(q_k1t)
+  k1s = g_elpar(q_k1s) + g_elpar(q_k1ts)
   
   !k1  = node_value('k1 ')
   !k1s = node_value('k1s ')

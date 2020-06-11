@@ -664,8 +664,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   integer :: j, code, n_align, nobs, node, old, poc_cnt, debug
   integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
   double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6), orbitori(6)
-  double precision :: al_errors(align_max), pttemp
-  double precision :: el, cick, err, nrm, nrm0, anglet, newk0
+  double precision :: al_errors(align_max), dptemp
+  double precision :: el, cick, err, nrm, nrm0, anglet, newk0, tempk
   double precision :: parvec(26),  vector(10), reforb(6)
   double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
@@ -779,29 +779,38 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
     select case (code)
 
-     case (code_rbend, code_sbend)
+    case (code_rbend, code_sbend)
       anglet = node_value('angle ')
       do i=1,3
         call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-        pttemp = (orbit(6)+orbitori(6))/2
-        newk0 = (1+pttemp)*anglet/el
+        dptemp = (orbit(6)+orbitori(6))/(2*beta)
+        newk0 = (1+dptemp)*anglet/el
         call store_node_value('k0 ',newk0 )
         orbit = orbitori
   	  enddo
       
-     case (code_quadrupole)
+    case (code_quadrupole)
       call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-      pttemp = (orbit(6)+orbitori(6))/2
-      anglet = node_value('k1 ')
-      newk0 = anglet/(1-pttemp)-anglet
+      dptemp = (orbit(6)+orbitori(6))/(2*beta)
+      tempk = node_value('k1 ')
+      newk0 = tempk/(1-dptemp)-tempk
       call store_node_value('k1tap ',newk0 )
 
-     case (code_sextupole)
+      tempk = node_value('k1s ')
+      newk0 = tempk/(1-dptemp)-tempk
+      call store_node_value('k1stap ',newk0 )
+
+    case (code_sextupole)
       call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-      pttemp = (orbit(6)+orbitori(6))/2
-      anglet = node_value('k2 ')
-      newk0 = anglet/(1-pttemp) - anglet
+      dptemp = (orbit(6)+orbitori(6))/(2*beta)
+      tempk = node_value('k2 ')
+      newk0 = tempk/(1-dptemp) - tempk
       call store_node_value('k2tap ',newk0 )  
+
+      tempk = node_value('k2s ')
+      newk0 = tempk/(1-dptemp) - tempk
+      call store_node_value('k2stap ',newk0 )
+
     end select
     orbit = orbitori
   endif
@@ -5337,10 +5346,10 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   n_ferr = node_fd_errors(f_errors)
 
   !-- element paramters
-  elpar_vl = el_par_vector(q_k1t, g_elpar)
+  elpar_vl = el_par_vector(q_k1st, g_elpar)
   bvk = node_value('other_bv ')
-  sk1  = bvk * ( g_elpar(q_k1)  + g_elpar(q_k1t) + f_errors(2)/el)
-  sk1s = bvk * ( g_elpar(q_k1s) + f_errors(3)/el)
+  sk1  = bvk * ( g_elpar(q_k1)  + g_elpar(q_k1t)  + f_errors(2)/el)
+  sk1s = bvk * ( g_elpar(q_k1s) + g_elpar(q_k1st) + f_errors(3)/el)
   tilt = g_elpar(q_tilt)
   if (sk1s .ne. zero) then
      tilt = -atan2(sk1s, sk1)/two + tilt
@@ -5751,10 +5760,10 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   n_ferr = node_fd_errors(f_errors)
 
   !-- get element parameters
-  elpar_vl = el_par_vector(s_k2t, g_elpar)
+  elpar_vl = el_par_vector(s_k2st, g_elpar)
   bvk = node_value('other_bv ')
-  sk2  = bvk * ( g_elpar(s_k2)  + g_elpar(s_k2t) +  f_errors(4)/el )
-  sk2s = bvk * ( g_elpar(s_k2s) + f_errors(5)/el )
+  sk2  = bvk * ( g_elpar(s_k2)  + g_elpar(s_k2t)  +  f_errors(4)/el )
+  sk2s = bvk * ( g_elpar(s_k2s) + g_elpar(s_k2st) +  f_errors(5)/el )
   tilt = node_value('tilt ')
   if (sk2s .ne. zero) then
      tilt = -atan2(sk2s, sk2)/three + tilt
