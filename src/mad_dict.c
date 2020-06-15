@@ -961,7 +961,7 @@ const char *const_command_def =
 "file = [s, errfil, errfil]; "
 " "
 "efcomp: error none 0 0 "
-"order    = [i, -1], "
+"order    = [i, 0], "
 "hyster   = [i, 0], "
 "radius   = [r, 0], "
 "hcoeffn  = [r, {0}], "
