@@ -133,6 +133,7 @@
 // from mad_seq.c
 #define restart_sequ restart_sequ_
 #define get_nnodes get_nnodes_
+#define get_ncavities get_ncavities_
 
 // from mad_table.c
 // warning:augment_counts is provided by madx_ptc_knobs.f90
