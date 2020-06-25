@@ -174,6 +174,8 @@ private:
   node* copy_thin(node* thick_node);
   node* thick_node;  // current node, that is considered for slicing
   node*  work_node;  // clone of thick_node for non-destructive rbend->sbend translation
+  const element* thick_elem_sliced; // last thick_elem sliced
+  command_parameter *knl_param, *kns_param;
   SequenceList* theSequenceList;
   sequence *sliced_seq;
   std::string seqname; // name of the sequence
@@ -599,7 +601,7 @@ static std::string my_dump_command(const command* cmd)
     ostr << "within command par:";       if(cmd->par)       ostr << '\n' << my_dump_command_parameter_list(cmd->par); else ostr << " NULL" << '\n';
   }
   ostr << '\n';
-  ostr << "my_dump_command command end" << '\n';
+  ostr << "my_dump_command command end" << std::endl;
   return ostr.str();
 }
 
@@ -660,7 +662,7 @@ static std::string my_dump_node(const node* node)
     if(node->p_elem) ostr << my_dump_element(node->p_elem);
     if(node->cl) { for(int i=0; i< node->cl->curr; ++i) dump_constraint(node->cl->constraints[i]); }
   }
-  ostr << '\n';
+  ostr << std::endl;
   return ostr.str();
 }
 
@@ -711,7 +713,7 @@ static std::string my_dump_sequence(const sequence* c_sequ,const int level)
       c_node = c_node->next;
     }
     ostr << "===== sum of node length=" << std::setw(8) << suml << '\n';
-    ostr << '\n';
+    ostr << std::endl;
   }
   return ostr.str();
 }
@@ -719,7 +721,6 @@ static std::string my_dump_sequence(const sequence* c_sequ,const int level)
 static std::string my_get_cmd_expr_str(const command_parameter* cmd) // return the expression as string, if there is only a value, return the value as string
 {
   std::string result="";
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << my_dump_command_parameter(cmd);
   if(cmd)
   {
     if(cmd->expr && cmd->expr->string) result=cmd->expr->string; // the expression is define as string, use this
@@ -804,7 +805,6 @@ static command_parameter* par_scaled(const command_parameter* par_inp, const com
 
   if( par_inp && length_param )
   {
-    if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " par_inp: " << my_dump_command_parameter(par_inp);
     par_out=clone_command_parameter(par_inp); // start from clone of input parameter
     strcpy(par_out->name,new_par_name.c_str());
     if (length_param->expr ) // first * l, expression or value
@@ -828,8 +828,7 @@ static command_parameter* par_scaled(const command_parameter* par_inp, const com
       par_out->double_value=my_get_expression_value(par_out->expr);
       par_out->expr=nullptr;
     }
-    if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " par_out: " << my_dump_command_parameter(par_out) << '\n';
-  }
+   }
   return par_out;
 }
 
@@ -1089,7 +1088,6 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const std::
       to_param->double_value=my_get_expression_value(to_param->expr);
       to_param->expr=nullptr;
     }
-    if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " to_parm_name=" << to_parm_name << "        now  to_param " << my_dump_command_parameter(to_param);
   }
 }
 
@@ -1583,7 +1581,7 @@ void ElementListWithSlices::Print(std::ostream &StrOut) const
 
 //--------  SeqElList
 SeqElList::SeqElList(const std::string seqname,const std::string slice_style,/* sequence* thick_sequ,*/sequence* sliced_seq,node* thick_node,SequenceList* theSequenceList)
-: thick_node(thick_node), work_node(thick_node), theSequenceList(theSequenceList), sliced_seq(sliced_seq), seqname(seqname), slice_style(slice_style), verbose(MaTh::Verbose), eps(1.e-15), MakeDipedge(MaTh::iMakeDipedge) // SeqElList constructor, eps used to check if values are is compatible with zero
+: thick_node(thick_node), work_node(thick_node), thick_elem_sliced(nullptr), knl_param(nullptr), kns_param(nullptr), theSequenceList(theSequenceList), sliced_seq(sliced_seq), seqname(seqname), slice_style(slice_style), verbose(MaTh::Verbose), eps(1.e-15), MakeDipedge(MaTh::iMakeDipedge) // SeqElList constructor, eps used to check if values are is compatible with zero
 {
 }
 
@@ -1651,7 +1649,6 @@ element* SeqElList::new_marker_element(const std::string el_name, const element*
 {
   command* cmd = new_cmdptr( find_element("marker", base_type_list) );
   copy_params_from_elem(cmd,el_inp,MaTh::DoNotCopy);
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " el_out_cmd " << my_dump_command(cmd) << std::endl;
   return my_El_List->my_make_element(el_name,"marker",cmd,-1); // makes new marker
 }
 
@@ -1700,8 +1697,8 @@ void SeqElList::add_ktap_i(const int i,command_parameter* k_param,const std::str
   if( command_parameter *p     = return_param_recurse(k_name.c_str(), thick_elem) )  // has k1n, or k1s, k2n, k2s
     if( command_parameter *p_tap = return_param_recurse(ktap_name.c_str(), thick_elem) )// has corresponding tap
     {
-      if(!p->expr) p->expr=expr_from_value(p->double_value); // make sure to always have an expression, to make addition of tap visible in output
-      k_param->expr_list->list[i] = p->expr = compound_expr(p->expr, p->double_value, "+", p_tap->expr, p_tap->double_value, 0); // add tap and store in k_param
+      if(p->expr) k_param->expr_list->list[i] = compound_expr(p->expr,                          p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
+      else        k_param->expr_list->list[i] = compound_expr(expr_from_value(p->double_value), p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
     }
 }
 
@@ -1995,7 +1992,6 @@ element* SeqElList::create_thick_slice(const element* thick_elem,const int slice
     }
     else Remove_All_Fringe_Field_Parameters(sliced_elem); // thick magnet body, remove fringe fields
   }
-  if (verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ <<  my_dump_element(sliced_elem) << '\n';
   theSliceList->put_slice(thick_elem,sliced_elem); //-- store what is done in theSliceList
   return sliced_elem;
 } // create_thick_slice
@@ -2075,16 +2071,18 @@ element* SeqElList::create_thin_slices(const element* thick_elem, int slice_no) 
     if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " has angle_param,  kn_pars[0] " << my_dump_command_parameter(kn_pars[0]) << std::endl;
   }
 
-  command_parameter *knl_param=make_k_list("knl",kn_pars); // make new knl 0,1,2,3 expr_list based on kn_pars from thick
-  command_parameter *kns_param=make_k_list("ksl",ks_pars); // make new ksl 0,1,2,3 expr_list based on ks_pars from thick
+  if(thick_elem != thick_elem_sliced)
+  {
+    knl_param=make_k_list("knl",kn_pars); // make new knl 0,1,2,3 expr_list based on kn_pars from thick
+    kns_param=make_k_list("ksl",ks_pars); // make new ksl 0,1,2,3 expr_list based on ks_pars from thick
 
-  if(slice_no==1) add_ktap(knl_param,thick_elem);
-  if(slice_no==1) add_ktap(kns_param,thick_elem);
+    add_ktap(knl_param,thick_elem);
+    add_ktap(kns_param,thick_elem);
 
-  // multiply the k by length and divide by slice
-  knl_param = scale_and_slice(knl_param,length_param,nslices,mult_with_length);
-  kns_param = scale_and_slice(kns_param,length_param,nslices,mult_with_length);
-
+    // multiply the k by length and divide by slice
+    knl_param = scale_and_slice(knl_param,length_param,nslices,mult_with_length);
+    kns_param = scale_and_slice(kns_param,length_param,nslices,mult_with_length);
+  }
 
   if(multipole_angle_param && nslices>1) // case of angle different from k0l
   {
@@ -2100,6 +2098,7 @@ element* SeqElList::create_thin_slices(const element* thick_elem, int slice_no) 
   set_lrad(cmd,length_param,nslices); // keep l  as lrad
   finish_make_sliced_elem(sliced_elem, thick_elem, cmd, parent_or_base, slice_no);
   ParameterRemove("l",sliced_elem);
+  thick_elem_sliced=thick_elem;
   return sliced_elem;
 }
 
@@ -2269,7 +2268,6 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       {
         ExitDipedge=create_bend_dipedge_element(thick_elem,false); // make new ExitDipedge element and remove e2 from thick_elem
         theBendEdgeList->put_slice(thick_elem,ExitDipedge);        // to remember this has been translated
-        if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << " thick node " << work_node->name << " " << thick_elem->name << " now has ExitDipedge=" << EntryDipedge << " " << my_dump_element(ExitDipedge) << '\n';
       }
     } // new ExitDipedge
     if(!already_translated_rbend) Remove_All_Fringe_Field_Parameters(thick_elem); // remove what is taken care of by dipedges
@@ -2734,8 +2732,6 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
 
   const std::string name = thick_sequ->name;
   std::cout << "makethin: slicing sequence : " << name << '\n';
-
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " my_dump_sequence thick_sequ " << my_dump_sequence(thick_sequ,2) << '\n'; // dump level 2, without nodes/elements
 
   sliced_seq = new_sequence(name.c_str(), thick_sequ->ref_flag);
   sliced_seq->start = nullptr;
