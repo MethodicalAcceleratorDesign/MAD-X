@@ -5,6 +5,10 @@
 
 struct in_cmd;
 
+// constants
+
+enum Match_Mode{ kMatch_NoMatch = 0, kMatch_Std, kMatch_UseMacro, kMatch_PTCknobs };
+
 // interface
 
 void pro_match(struct in_cmd* cmd);

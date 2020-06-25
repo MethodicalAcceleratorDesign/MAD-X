@@ -8564,6 +8564,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
 end SUBROUTINE tmrfmult
 
 SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
+  use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -8612,6 +8613,7 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   double complex :: k2, k, kl
 
   integer, external :: get_option
+  character(len=name_len) :: name
 
   betx = betxi
   dx = dxi
@@ -8651,15 +8653,17 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   I(5) = curlyhaverage * abs(rhoinv)**3 * blen
 
   if (get_option('debug ') .ne. 0) then
-     print *, ' '
-     print *, 'Input:  rhoinv = ', rhoinv, 'k1 = ', k1, 'e1 =', e1, 'e2 = ', e2, 'blen = ', blen
-     print *, '        betxi = ', betxi, 'alfxi = ', alfxi, 'dxi = ', dxi, 'dpxi = ', dpxi
-     print *, ' --> '
-     print *, '        k2 = ', k2, '  k = ', k, 'k*l = ', kl
-     print *, '        alfx = ', alfx, 'dpx = ', dpx, 'gamx = ', gamx, 'dx2 = ', dx2
-     print *, '        dispaverage = ', dispaverage, 'curlyhaverage = ', curlyhaverage
-     print *, 'Contributions to Radiation Integrals:', I(1), I(2), I(3), I(4), I(5)
-     print *, ' '
+    !LD: 22.12.2019
+    call element_name(name,len(name))
+    print *, 'Synchrotron integrals at exit of element ', name
+    print *, 'Input:  rhoinv = ', rhoinv, 'k1 = ', k1, 'e1 =', e1, 'e2 = ', e2, 'blen = ', blen
+    print *, '        betxi = ', betxi, 'alfxi = ', alfxi, 'dxi = ', dxi, 'dpxi = ', dpxi
+    print *, ' --> '
+    print *, '        k2 = ', k2, '  k = ', k, 'k*l = ', kl
+    print *, '        alfx = ', alfx, 'dpx = ', dpx, 'gamx = ', gamx, 'dx2 = ', dx2
+    print *, '        dispaverage = ', dispaverage, 'curlyhaverage = ', curlyhaverage
+    print *, 'Contributions to Radiation Integrals:', I(1), I(2), I(3), I(4), I(5)
+    print *, ' '
   endif
 
 END SUBROUTINE calcsyncint
