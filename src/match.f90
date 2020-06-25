@@ -69,13 +69,8 @@
       use name_lenfi
       implicit none
 
-
       integer j,next_vary,ireset,slope
-      double precision vect(*),c_min,c_max,step,                        &
-     &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin, opt
-      parameter(s_fact=5d-1)
-      parameter(eps = 1.0d-10,eps2 = 1.0d-1,stplim = 2.0d-1)
-      parameter(vmax=1.e+20,vmin=-1.e+20)
+      double precision vect(*),c_min,c_max,step,dval,val,valold,opt
       character*(name_len) name
 
  1    continue
@@ -84,13 +79,13 @@
         val = vect(j)
         if (val .ge. c_max) then
           valold = val
-          dval = min(step, (val - c_max)*s_fact)
+          dval = min(step, (val - c_max)*0.5)
           val = c_max - 2*dval
           write(*,831) "reset parameter:",name,"from",valold,"to",val
           ireset = ireset + 1
         elseif (val .le. c_min) then
           valold = val
-          dval = min(step, (c_min - val)*s_fact)
+          dval = min(step, (c_min - val)*0.5)
           val = c_min + 2*dval
           write(*,831) "reset parameter:",name,"from",valold,"to",val
           ireset = ireset + 1
