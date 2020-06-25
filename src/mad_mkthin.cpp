@@ -2732,6 +2732,12 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
 
   const std::string name = thick_sequ->name;
   std::cout << "makethin: slicing sequence : " << name << '\n';
+  if(MaTh::Verbose>1)
+  {
+    int level=1;
+    if(MaTh::Verbose>2) level=2;
+    std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " my_dump_sequence thick_sequ " << my_dump_sequence(thick_sequ,level) << std::endl; // dump level 2, without nodes/elements
+  }
 
   sliced_seq = new_sequence(name.c_str(), thick_sequ->ref_flag);
   sliced_seq->start = nullptr;
