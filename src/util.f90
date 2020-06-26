@@ -112,6 +112,7 @@ module code_constfi
   integer, parameter :: code_rfmultipole = 43
   integer, parameter :: code_collimator = 44
   integer, parameter :: code_changerefp0 = 45
+  integer, parameter :: code_sixmarker = 46
 end module code_constfi
 
 module aperture_enums

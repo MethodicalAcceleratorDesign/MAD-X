@@ -303,6 +303,7 @@ static void att_rfmultipole(struct c6t_element*);
 static void att_xrotation(struct c6t_element*);
 static void att_yrotation(struct c6t_element*);
 static void att_srotation(struct c6t_element*);
+static void att_sixmarker(struct c6t_element* el);
 static void att_undefined(struct c6t_element*);
 static void clean_c6t_element(struct c6t_element*);
 static struct c6t_element* create_aperture(const char* ,const char* ,double, double, double, double, double, double, double,
@@ -445,7 +446,8 @@ static char el_info[][60] = /* see type_info definition */
  "rfoctupole   2       0       2       0       0       2",
  "xrotation    2       2       2       0       0       0",
  "yrotation    2       2       2       0       0       0",
- "srotation    2       2       2       0       0       0"
+ "srotation    2       2       2       0       0       0",
+ "sixmarker    2       2       2       0       0       2"
 };
 
 /* no. of valid element types */
@@ -632,6 +634,7 @@ assign_att(void)
     for (j = 0; j < types.member[i]->curr; j++) /* loop over el. in type */
     {
       el = types.member[i]->elem[j];
+      printf("ffff %s \n", el->base_name);
       if (el->flag > 0 && el->equiv == el)  /* all others ignored */
       {
         if      (strcmp(el->base_name, "aperture") == 0) att_aperture(el);
@@ -664,6 +667,7 @@ assign_att(void)
         else if (strcmp(el->base_name, "xrotation") == 0) att_xrotation(el);
         else if (strcmp(el->base_name, "yrotation") == 0) att_yrotation(el);
         else if (strcmp(el->base_name, "srotation") == 0) att_srotation(el);
+        else if (strcmp(el->base_name, "sixmarker") == 0) att_sixmarker(el);
         else att_undefined(el);
       }
     }
@@ -927,6 +931,20 @@ att_srotation(struct c6t_element* el)
 }
 
 static void
+att_sixmarker(struct c6t_element* el)
+{
+  printf("iiisixmarker \n");
+  el->out_1 = el->value[1];
+  el->out_2 = el->value[2];
+  el->out_3 = el->value[3];
+  el->out_4 = el->value[4];
+  el->out_5 = el->value[5];
+  el->out_6 = el->value[6];
+  el->out_7 = el->value[7];
+
+}
+
+static void
 att_solenoid(struct c6t_element* el)
 {
   el->out_1 = 25;
@@ -999,6 +1017,7 @@ att_vkicker(struct c6t_element* el)
 static void
 att_undefined(struct c6t_element* el)
 {
+    printf("iiisixmarker \n");
   el->out_4 = el->value[0];
 }
 
@@ -1460,6 +1479,21 @@ convert_madx_to_c6t(struct node* p)
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
     c6t_elem->value[1] = el_par_value_recurse("angle",p->p_elem);
+  }
+  else if(strcmp(p->base_name,"sixmarker") == 0){
+    c6t_elem = new_c6t_element(20,t_name,p->base_name);
+
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+    c6t_elem->value[1] = el_par_value_recurse("eltype",p->p_elem);
+    int nl;
+    double attrtemp [20];
+    nl = element_vector(p->p_elem, "attr", attrtemp);
+    for(int i=0; i< nl; i++){
+        c6t_elem->value[i+2] = attrtemp[i];
+        printf("isssss %f \n" ,attrtemp[i]);
+    }
+
   }
   else if (strcmp(p->base_name,"drift") == 0)
   {
