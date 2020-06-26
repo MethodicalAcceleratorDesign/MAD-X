@@ -1897,7 +1897,6 @@ const char *const_element_def =
 "harmon   = [i, 0],  "
 "nbin     = [i, 0],  "
 "magnet   = [i, 0],  "
-"slice    = [i, 1],  "
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "
 "model           = [i, -1], "
