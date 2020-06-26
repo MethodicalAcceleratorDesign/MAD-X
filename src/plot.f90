@@ -2359,7 +2359,7 @@ subroutine plginit
   integer :: ipseps, iset=0, nint, ndble, k, int_arr(100), char_l(100)
   double precision :: d_arr(100)
   real :: tmpval
-  character(len=40) :: char_a
+  character(len=120) :: char_a !hbu increased from len=40 to 120 as required below
 
   !--- definitions of function primitives
   double precision, external :: plot_option
