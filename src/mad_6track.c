@@ -383,7 +383,7 @@ static void write_struct(void);
 static void setup_output_string(void);
 static void write_f3_rfmultipoles(struct c6t_element*);
 static int my_table_row(struct table*, char*);
-
+static void write_f3_sixmarker(struct element* el);
 /* routines used from makethin.c */
 static struct li_list types;
 
@@ -933,7 +933,6 @@ att_srotation(struct c6t_element* el)
 static void
 att_sixmarker(struct c6t_element* el)
 {
-  printf("iiisixmarker \n");
   el->out_1 = el->value[1];
   el->out_2 = el->value[2];
   el->out_3 = el->value[3];
@@ -1017,7 +1016,6 @@ att_vkicker(struct c6t_element* el)
 static void
 att_undefined(struct c6t_element* el)
 {
-    printf("iiisixmarker \n");
   el->out_4 = el->value[0];
 }
 
@@ -1489,6 +1487,7 @@ convert_madx_to_c6t(struct node* p)
     int nl;
     double attrtemp [20];
     nl = element_vector(p->p_elem, "attr", attrtemp);
+    write_f3_sixmarker(p->p_elem);
     for(int i=0; i< nl; i++){
         c6t_elem->value[i+2] = attrtemp[i];
         printf("isssss %f \n" ,attrtemp[i]);
@@ -3238,6 +3237,54 @@ write_f3_aux(void)
     fprintf(f3aux, "SXD%23.15f\n", aux_val[3]);
     fprintf(f3aux, "NEXT\n");
   }
+}
+
+static void
+write_f3_sixmarker(struct element* el){
+  int nl;
+  char* tmp;
+  char tmp3[160]; 
+  double attrtemp [20] ;
+  
+  tmp = mymalloc("sixmarker", 500*sizeof *tmp);
+  char  tmp2 [500];
+
+  if (!f3) f3 = fopen("fc.3", "w");
+  printf("aaaa %s \n", tmpbuff(command_par_string("f3string",el->def)));   
+  tmp = tmpbuff(command_par_string("f3string",el->def));
+  printf("%s", tmp);
+  nl = element_vector(el, "attr", attrtemp);
+  for(int i=0; i<nl; i++){
+    char nstr [50], nstr2[50];
+    sprintf(tmp3, "%12.8e", attrtemp[i]);
+    
+    strcpy(nstr2,"{");
+
+    sprintf(nstr, "%d", i);
+    strcat(nstr2,nstr);
+
+    strcat(nstr2,"}");
+    printf("attrtemp %s %s \n", tmp3, nstr2);
+    
+    myrepl(nstr2, tmp3, tmp, tmp2);
+    strcpy(tmp, tmp2);
+    
+  }
+    int string_len;
+
+    string_len = strlen(tmp);
+
+  
+
+    for(int i = 0; i < string_len; i++) {
+        printf("%c",tmp2[i]);
+    }
+    printf("aaaa \n");
+  
+  myrepl("\newline", "\n", tmp, tmp2);
+  //strcpy(tmp, tmp2);
+  strcat(tmp, "\n a");
+  fprintf(f3, "%s", tmp);
 }
 
 static void

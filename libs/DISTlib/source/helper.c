@@ -7,6 +7,8 @@
 #include "distinterface.h"
 #include "distgeneration.h"
 #include "outputdist.h"
+#include "distdata.h"
+
 
 /*This function converts from canoncial to sixtrack tracking variables*/
 void canonical2six(double *canonical, double beta0, double pc0,  double mass, double *coord){
