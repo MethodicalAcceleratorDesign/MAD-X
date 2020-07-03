@@ -634,7 +634,6 @@ assign_att(void)
     for (j = 0; j < types.member[i]->curr; j++) /* loop over el. in type */
     {
       el = types.member[i]->elem[j];
-      printf("ffff %s \n", el->base_name);
       if (el->flag > 0 && el->equiv == el)  /* all others ignored */
       {
         if      (strcmp(el->base_name, "aperture") == 0) att_aperture(el);
@@ -1488,9 +1487,9 @@ convert_madx_to_c6t(struct node* p)
     double attrtemp [20];
     nl = element_vector(p->p_elem, "attr", attrtemp);
     write_f3_sixmarker(p->p_elem);
+
     for(int i=0; i< nl; i++){
         c6t_elem->value[i+2] = attrtemp[i];
-        printf("isssss %f \n" ,attrtemp[i]);
     }
 
   }
@@ -3243,48 +3242,35 @@ static void
 write_f3_sixmarker(struct element* el){
   int nl;
   char* tmp;
-  char tmp3[160]; 
+  char tmp2 [500], str_att_value[50]; 
   double attrtemp [20] ;
-  
+  char nstr [5], nstr2[5];
   tmp = mymalloc("sixmarker", 500*sizeof *tmp);
-  char  tmp2 [500];
+
 
   if (!f3) f3 = fopen("fc.3", "w");
-  printf("aaaa %s \n", tmpbuff(command_par_string("f3string",el->def)));   
-  tmp = tmpbuff(command_par_string("f3string",el->def));
-  printf("%s", tmp);
+    
+  tmp =command_par_string("f3string",el->def);
   nl = element_vector(el, "attr", attrtemp);
+  
   for(int i=0; i<nl; i++){
-    char nstr [50], nstr2[50];
-    sprintf(tmp3, "%12.8e", attrtemp[i]);
+    
+    sprintf(str_att_value, "%12.8e", attrtemp[i]);
     
     strcpy(nstr2,"{");
-
     sprintf(nstr, "%d", i);
     strcat(nstr2,nstr);
 
     strcat(nstr2,"}");
-    printf("attrtemp %s %s \n", tmp3, nstr2);
-    
-    myrepl(nstr2, tmp3, tmp, tmp2);
+    myrepl(nstr2, str_att_value, tmp, tmp2);
     strcpy(tmp, tmp2);
     
   }
-    int string_len;
 
-    string_len = strlen(tmp);
-
-  
-
-    for(int i = 0; i < string_len; i++) {
-        printf("%c",tmp2[i]);
-    }
-    printf("aaaa \n");
-  
-  myrepl("\newline", "\n", tmp, tmp2);
-  //strcpy(tmp, tmp2);
-  strcat(tmp, "\n a");
+  myrepl("{newline}", "\n", tmp2, tmp);
   fprintf(f3, "%s", tmp);
+  fprintf(f3, "%s", "\n");
+
 }
 
 static void
