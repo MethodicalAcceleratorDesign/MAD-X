@@ -2571,6 +2571,7 @@ const char *const_element_def =
 "aper_vy  = [r, {-1}],  "
 "magnet   = [i, 0],  "
 "lrad = [r, 0], "
+"slice    = [i, 1],  "
 "current = [r, 0], "
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "

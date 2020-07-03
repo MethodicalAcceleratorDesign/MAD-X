@@ -157,7 +157,7 @@ private:
   void add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem);
   command_parameter* make_k_list(const std::string parnam,command_parameter* k_pars[4]) const; // from k values 0-3 to  expr lists
   element*   new_marker_element(const std::string el_name, const element* el_inp);
-  element* new_thinwire_element(const element* thick_elem);
+  element*  create_wire_element(const element* thick_elem, int slice_no);
   element*        sbend_from_rbend(element* rbend_el);
   element*      create_thick_slice(const element* thick_elem,const int slice_type);
   element*      create_thin_slices(const element* thick_elem, int slice_no);
@@ -444,8 +444,10 @@ static std::string my_dump_command_parameter(const command_parameter* cp) // dum
               {
                 ostr << std::right << std::setw(3) << ei << " :" << std::left << my_dump_expression(cp->expr_list->list[ei]) << std::right; // show expression and value
               }
-              else ostr << std::right << std::setw(3) << ei << " is nullptr";
+              else ostr << std::right << std::setw(3) << ei << " is nullptr ";
             }
+            ostr << "double array:";
+            for (int ei = 0; ei < cp->double_array->curr; ++ei) ostr << cp->double_array->a[ei] << " ";
           }
         }
         ostr << std::endl;
@@ -1652,21 +1654,24 @@ element* SeqElList::new_marker_element(const std::string el_name, const element*
   return my_El_List->my_make_element(el_name,"marker",cmd,-1); // makes new marker
 }
 
-element* SeqElList::new_thinwire_element(const element* thick_elem) // central thin wire when slicing wire collimator
+element* SeqElList::create_wire_element(const element* thick_elem,int slice_no) // for slicing wire collimators, wire(s) with zero length
 {
-  element* middle_thinwire=nullptr;
+  element* newwire=nullptr;
   command_parameter* ilnorm_param = return_param_recurse("ilnorm",thick_elem);
   if(ilnorm_param)
   {
-    command* cmd = new_cmdptr( find_element("thinwire", base_type_list) );
+    command* cmd = new_cmdptr( find_element("wire", base_type_list) );
     for(unsigned i=0;i<MaTh::WireCollimatorParmList.size();++i)
     {
       command_parameter* cp=return_param_recurse(MaTh::WireCollimatorParmList[i].c_str(),thick_elem); // copy wire parameters from collimator wire
       SetParameter_in_cmd(cmd,cp,MaTh::WireCollimatorParmList[i],1);
     }
-    middle_thinwire= my_El_List->my_make_element(std::string(thick_elem->name)+"_wire","thinwire",cmd,-1); // makes new thinwire
+    slice_attributes_to_slice(cmd,thick_elem); // scale ilnorm with nslices
+    std::string WireName=std::string(thick_elem->name)+"_wire";
+    if(nslices>1) WireName=WireName+".."+std::to_string(slice_no);
+    newwire= my_El_List->my_make_element(WireName,"wire",cmd,-1);
   }
-  return middle_thinwire;
+  return newwire;
 }
 
 void SeqElList::kn_ks_from_thick_elem(const element* thick_elem,command_parameter* kn_pars[4],command_parameter* ks_pars[4]) const
@@ -2374,12 +2379,7 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
 
   expression* at_expr = work_node->at_expr;
   double at = work_node->at_value;
-  if(at_expr==nullptr)
-  {
-    at_expr=expr_from_value_2(at); // make a new expression from the value
-    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " at_expr=" << my_dump_expression(at_expr) << std::endl;
-  }
-  std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " at_expr=" << my_dump_expression(at_expr) << std::endl;
+  if(at_expr==nullptr)  at_expr=expr_from_value_2(at); // make a new expression from the value
 
   double length = work_node->length;
 
@@ -2391,13 +2391,13 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
 
   std::string local_slice_style="collim"; // for passive elements use slice_style "collim"   with slice at start and end
 
-  element* middle_thinwire=nullptr;
-  if(std::string(thick_elem->base_type->name)=="collimator") middle_thinwire=new_thinwire_element(thick_elem); // special case wire collimator
-
   for (int i=1; i<=nslices; ++i) // loop to place the nslices in the sequence
   {
+    element* wirecoll=nullptr;
+    if(std::string(thick_elem->base_type->name)=="collimator") wirecoll=create_wire_element(thick_elem,i); // special case wire collimator
+
     element* slice_i = create_sliced_element(thick_elem,i); // same type, l set to 0 and kept in lrad   (if existing)
-    if(middle_thinwire) for(unsigned int i=0;i<MaTh::WireCollimatorParmList.size();++i) ParameterRemove(MaTh::WireCollimatorParmList[i], slice_i);  // remove wire parameter provided by the middle_thinwire
+    if(wirecoll) for(unsigned int i=0;i<MaTh::WireCollimatorParmList.size();++i) ParameterRemove(MaTh::WireCollimatorParmList[i], slice_i);  // remove wire parameter provided by the wirecoll
 
     expression* thin_at_expr=nullptr;
     if (fabs(at_shift(nslices,i,local_slice_style))>0.0)
@@ -2410,23 +2410,20 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
       if (at_expr) thin_at_expr = clone_expression(at_expr);
     }
 
-    if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " work_node->base_name=" << " el->name=" << std::left << std::setw(MaTh::el_type_maxlen) << work_node->base_name << " i=" << i << " middle=" << middle << " nslices=" << nslices << " slice_i->name=" << slice_i->name << " at_expr " << my_dump_expression(at_expr) << " l_expr " << my_dump_expression(l_expr) << '\n';
 
     if (i==middle) // create and place new marker with name of thick_elem  in the middle = poition of thick_elem
     {
       element* middle_marker=new_marker_element(thick_elem->name,thick_elem);
       place_node_at(work_node, sliced_seq, middle_marker,at_expr);
-      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " work_node " << work_node->name << " nslices=" << nslices << " i=" << i << " middle=" << middle << " place middle marker at=" << work_node->at_value << " at_expr=" << at_expr
-        << " thin_at_value=" << my_get_expression_value(thin_at_expr) << '\n';
-      if(middle_thinwire) place_node_at(work_node, sliced_seq, middle_thinwire,at_expr);
     }
     if(slice_i) place_node_at(work_node, sliced_seq, slice_i,thin_at_expr);
+    if(wirecoll) place_node_at(work_node, sliced_seq, wirecoll,thin_at_expr);
   }
 } // SeqElList::slice_node_default()
 
 void SeqElList::slice_attributes_to_slice(command* cmd,const element* thick_elem)
 { // looks for attributes like kick that need slicing, modify them in cmd used to construct the sliced element
-  const std::vector<std::string> attributes_to_slice = { "kick", "hkick", "vkick", "chkick", "cvkick"};
+  const std::vector<std::string> attributes_to_slice = { "kick", "hkick", "vkick", "chkick", "cvkick", "ilnorm"};
   ElmAttr theElmAttr(thick_elem);
   std::vector<std::string> active_par_to_be_used=theElmAttr.get_list_of_active_attributes();
   for(unsigned i=0;i<active_par_to_be_used.size();++i)
@@ -2447,9 +2444,29 @@ void SeqElList::slice_attributes_to_slice(command* cmd,const element* thick_elem
       const int ei=name_list_pos(attribute_name.c_str(),nl);
       if(ei>-1)
       {
-        command_parameter* the_param=cmd->par->parameters[ei];
-        if(the_param->expr) the_param->expr = compound_expr(the_param->expr,0.,"/",nullptr,nslices,1);
-        else the_param->double_value /= nslices;
+        command_parameter* cp=cmd->par->parameters[ei];
+        if (cp->type==k_double_array) // double array,  expr_list as used for ilnorm; scale every value, or expression
+        {
+          if (cp->double_array)
+          {
+            if (cp->expr_list) // calculate the values
+            {
+              for (int ei = 0; ei < cp->double_array->curr; ++ei)
+              {
+                if (ei < cp->expr_list->curr && cp->expr_list->list[ei] != nullptr)
+                {
+                  cp->expr_list->list[ei] = compound_expr(cp->expr_list->list[ei],0.,"/",nullptr,nslices,1); // scale expression in list
+                }
+              }
+              for (int ei = 0; ei < cp->double_array->curr; ++ei) cp->double_array->a[ei]/=nslices; // scale value in array
+            }
+          }
+        }
+        else // single expression/value
+        {
+          if(cp->expr) cp->expr = compound_expr(cp->expr,0.,"/",nullptr,nslices,1);
+          else cp->double_value /= nslices;
+        }
       }
     }
   }
@@ -2524,6 +2541,7 @@ void SeqElList::slice_node() // main steering, decides how to split an individua
   {
     if(verbose>1) std::cout << " now see what to do with work_node=" << std::left << std::setw(MaTh::par_name_maxlen) << work_node->name <<  " depending on its base=" << std::setw(MaTh::par_name_maxlen) << work_node->base_name << std::right << '\n';
     const double eps=1.e-15; // used to check if a value is compatible with zero
+    bool IsWireCollimator = ( strcmp(work_node->base_name,"collimator") == 0 && return_param_recurse("ilnorm",thick_elem) );
     if ( fabs(el_par_value("l",thick_elem)) <eps ) // if the length is compatible with zero copy it directly
     {
       if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " zero length place directly copy of element " << work_node->name << '\n';
@@ -2541,11 +2559,11 @@ void SeqElList::slice_node() // main steering, decides how to split an individua
     {
       slice_node_translate(); // slice/translate and add slices to sliced sequence
     }
-    else if(nslices>1)
+    else if(nslices>1 || IsWireCollimator) // in case of wire collimator translate also single slice
     {
       slice_node_default(); // and add slices to sliced sequence
     }
-    else
+    else // single slice
     {
       node* thin_node;
       if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " nslices=" << nslices << " place copy of work_node " << work_node->name << '\n';
