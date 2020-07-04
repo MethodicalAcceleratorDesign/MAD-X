@@ -5,10 +5,6 @@ struct cut{
 };
 
 
-struct distparam* dist;
-struct distparam* diststart;
-int dim;
-int distn;
 void writefile_f(const char*  filename_in, int strlen);
 void readfile_f(const char*  filename_in, int strlen);
 void readtasmatrixfile(const char*  filename_in);

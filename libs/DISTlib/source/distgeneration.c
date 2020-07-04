@@ -7,6 +7,13 @@
 #include "distinterface.h"
 #include "outputdist.h"
 
+
+struct distparam* dist;
+struct distparam* diststart;
+int dim;
+int distn;
+
+
 void gensixcanonical(){
 
 	int counter = 0;

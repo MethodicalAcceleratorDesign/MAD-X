@@ -7,6 +7,8 @@
 #include "distgeneration.h"
 #include "outputdist.h"
 
+#include "distdata.h"
+
 
 void print2file(const char* nameoffile){
 
