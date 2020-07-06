@@ -584,7 +584,7 @@ module plotfi
   !--- parameters used in the routine peschm in file plot.F
 
   integer, parameter :: mobj = 14, msize = 88
-  integer, parameter :: mtitl  = 128, mxlabl = 160
+  integer, parameter :: mtitl  = 128, mxlabl = 300 !hbu mxlabl = 160 increased to 300 as required by plot.f90
   integer, parameter :: mnvar = 74, mxdep = 2
   integer, parameter :: mqadd = 100000
   integer, parameter :: mntmax = 20, mksmax = 10
