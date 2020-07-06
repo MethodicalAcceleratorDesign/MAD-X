@@ -66,6 +66,6 @@ int     make_line(char* statement);
 int     get_stmt(FILE* file, int supp_flag);
 void    get_defined_commands(char *);
 void    remove_from_command_list(char* label, struct command_list*);
-void exec_add_expression(struct in_cmd* cmd);
+void    exec_add_expression(struct in_cmd* cmd);
 
 #endif // MAD_CMD_H
