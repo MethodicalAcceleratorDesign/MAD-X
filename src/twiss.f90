@@ -8784,9 +8784,9 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   elrad = node_value('lrad ')
   tilt = node_value('tilt ')
 
-  rfv = bvk * node_value('volt ')
+  rfv  = node_value('volt ')
   freq = node_value('freq ')
-  rfl = node_value('lag ')
+  rfl  = node_value('lag ')
 
   kn0l = rfv / pc / ten3p; ! MeV / 1d3 / GeV = rad
   pn0  = quarter + rfl; ! 2pi/4 + rfl
