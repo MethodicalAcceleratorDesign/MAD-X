@@ -3,7 +3,7 @@
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "20/07/20"
-@ TIME             %08s "12.11.19"
+@ TIME             %08s "14.39.09"
 * NAME               KEYWORD                             S                  L              ANGLE                  X                  Y                  Z              THETA                PHI                PSI         GLOBALTILT               TILT    SLOT_ID ASSEMBLY_ID           MECH_SEP              V_POS COMMENTS           
 $ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le         %d         %d                %le                %le %s                 
  "SEQ$START"         "MARKER"                             0                  0                  0                  0                  0                  0                  0                  0                  0                  0                  0          0          0                  0                  0 ""                 
