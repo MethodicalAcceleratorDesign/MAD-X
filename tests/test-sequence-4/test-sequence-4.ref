@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.13 23:30:27      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.20 12:15:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -2641,22 +2641,22 @@ enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
  Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
 Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=   -2.42421657971287408
+  parameters: freq0=   0.078897080842682682, alfa=0.000642332758968173589
+              beta=   0.999997826292276182, gamma=     479.60606218519689, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.42421658e+00 (fix point)
 updating probe_beam for deltap=0 => ds=   -2.42421657971287319
   parameters: freq0=   0.078897080842682682, alfa=0.000642332758968173372
               beta=   0.999997826292276182, gamma=     479.60606218519689, dtbyds=                      0
-Twiss pre-init: iteration 1, delta ds = -2.42421658e+00 (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421657971287274
-  parameters: freq0=   0.078897080842682682, alfa=0.000642332758968173264
-              beta=   0.999997826292276182, gamma=     479.60606218519689, dtbyds=                      0
-Twiss pre-init: iteration 2, delta ds = 4.44089210e-16 (fix point)
+Twiss pre-init: iteration 2, delta ds = 8.88178420e-16 (fix point)
  
  Global parameters for protons, radiate = F:
 
  C                3799.783251 m          f0             0.07889708084 MHz
  T0               12.67474017 musecs     alfa          0.000642332759 
  eta          0.0006379853482            gamma(tr)        39.45662772 
- Bcurrent                   0 A/bunch    Kbunch             1 
- Npart                      0 /bunch     Energy           450.0009782 GeV 
+ Bcurrent      6.94954952e-15 A/bunch    Kbunch             1 
+ Npart           0.5497766276 /bunch     Energy           450.0009782 GeV 
  gamma            479.6060622            beta            0.9999978263
  dtbyds                     0
   

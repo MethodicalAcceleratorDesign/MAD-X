@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:54:06      +
+  + Execution date: 2020.07.20 12:13:25      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title " Diamond Light Source Lattice 8.1.1";
 
@@ -79,8 +79,8 @@ enter EMIT module
  C                      561.6 m          f0              0.5338184716 MHz
  T0               1.873295986 musecs     alfa         0.0001708141631 
  eta          0.0001707851498            gamma(tr)         76.5134987 
- Bcurrent                   0 A/bunch    Kbunch             1 
- Npart                      0 /bunch     Energy                     3 GeV 
+ Bcurrent     8.552714625e-14 A/bunch    Kbunch             1 
+ Npart                      1 /bunch     Energy                     3 GeV 
  gamma            5870.853595            beta            0.9999999855
  dtbyds                     0
  
