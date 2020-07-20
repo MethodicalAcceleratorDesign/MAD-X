@@ -31,7 +31,7 @@ TWISS, \=SEQUENCE=seqname, LINE=linename, RANGE=range,  \\
        \>EIGENVECTOR=tabname, EIGENFILE=filename,\\
        \>KEEPORBIT=name, USEORBIT=name,\\
        \>COUPLE=logical,\\
-       \>RIPKEN=logical;
+       \>RIPKEN=logical, TAPERING=logical \\;
 }
 
 The  attributes of the \texttt{TWISS} command are: 
@@ -188,7 +188,12 @@ The  attributes of the \texttt{TWISS} command are:
   parameters (\texttt{beta11, beta12, beta21, beta22, alfa11, alfa12,
   alfa21, alfa22, gamma11, gamma12, gamma21} and \texttt{gamma22}) using
   the parameters \texttt{betx, bety, alfx, alfy, \\ gamax, gamay, R11, R12,
-    R21} and \texttt{R22} as input.  
+    R21} and \texttt{R22} as input.
+
+  \ttitem{TAPERING} Adjust the strength of the quadrupoles and sextupoles
+  in order to compensate for the offset in energy. The phase of the RF is
+  also adjusted in order to find a closed 6D orbit. The change of the 
+  attributes are stored in k1tap, k2tap etc.  
 
 \end{madlist}
 

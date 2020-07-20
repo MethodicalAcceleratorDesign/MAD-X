@@ -18,7 +18,7 @@ constraint,sequence=fivecell,range=#e,mux=1.27,muy=1.77, betx=205.9;
 vary,name=mq->l, lower=0.1, upper=2.95, step=1.e-6;
 vary,name=kqf,step=1.0e-6;
 vary,name=kqd,step=1.0e-6;
-jacobian,calls=20,tolerance=1.e-21;
+jacobian,calls=20,tolerance=1.e-21,bisec=1;
 endmatch;
 
 stop;

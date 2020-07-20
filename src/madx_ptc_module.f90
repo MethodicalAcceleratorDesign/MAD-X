@@ -977,7 +977,7 @@ CONTAINS
        sk0=node_value('k0 ')
 
        ! quadrupole components
-       sk1= node_value('k1 ')
+       sk1= node_value('k1 ')+node_value('k1tap ')
        sk1s=node_value('k1s ')
        tilt=node_value('tilt ')
        dum1=key%list%k(2)-normal_0123(1)
@@ -1024,7 +1024,7 @@ CONTAINS
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        ! sextupole components
-       sk2= node_value('k2 ')
+       sk2= node_value('k2 ') + node_value('k2tap ')
        sk2s=node_value('k2s ')
        tilt=node_value('tilt ')
        dum1=key%list%k(3)-normal_0123(2)
@@ -1205,7 +1205,7 @@ CONTAINS
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
 
-       key%list%lag = -node_value('lag ')*twopi
+       key%list%lag = -(node_value('lag ')+node_value('lagtap ') )*twopi
 
 
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
@@ -1773,13 +1773,14 @@ CONTAINS
     type(keywords), INTENT(INOUT) ::  key
     REAL(dp), INTENT(OUT) :: normal_0123(0:3), skew_0123(0:3) ! n/l;
     REAL(dp) :: normal(0:maxmul), skew  (0:maxmul), &
-         f_errors(0:maxferr), field(2,0:maxmul)
+         f_errors(0:maxferr), field(2,0:maxmul), bk0
     INTEGER :: n_norm, n_skew, n_ferr ! number of terms in command line
     INTEGER :: n_max
     INTEGER :: node_fd_errors ! function
     integer :: i, i_count, n_dim_mult_err, ord_max
 
     double precision, parameter :: zero=0.d0
+    real(kind(1d0))   ::  node_value
 
     !initialization
     normal_0123(:)=zero
@@ -1887,7 +1888,10 @@ CONTAINS
           endif                                                !
        enddo                                                   !
     endif !====================================================!
-
+    if (key%magnet == 'sbend' .or. key%magnet == 'rbend') then 
+      bk0 = node_value('k0 ')
+      if(bk0 .ne. 0) key%list%k(1) = key%list%k(1) + bk0 - node_value('angle ')/l
+    endif
 
     ord_max=max(ord_max,n_max)
 
@@ -3400,7 +3404,7 @@ CONTAINS
     elseif(code.eq.6) then
        ! sextupole components code = 6
        k=3
-       sk= node_value('k2 ')
+       sk= node_value('k2 ')+node_value('k2tap ')
        sks=node_value('k2s ')
        tilt=node_value('tilt ')
        b(k)=sk

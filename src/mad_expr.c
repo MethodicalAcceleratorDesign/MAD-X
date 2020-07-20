@@ -443,12 +443,11 @@ compound_expr(struct expression* e1, double v1, const char* oper, struct express
   char tmp[30], op[30];
   int n;
   strcpy(op, oper);
-  if(parentheses== 0) { //In this way if no parenthesis are chosen they 
+  if(parentheses== 0) { //In this way if no parenthesis are chosen they
     lb[0] =  (char) 0;
     rb[0] =  (char) 0;
-    if(e2->string[0]=='-') op[0] =' ';
+    if(e2 && e2->string[0]=='-') op[0] =' ';
   }
-  
   if (e1 != NULL || e2 != NULL)
   {
     if (e1 != NULL)

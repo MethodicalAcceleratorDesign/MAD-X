@@ -500,7 +500,7 @@ ESAVE, FILE = err.file;
 \textbf{Please note: in case of field errors, the absolute errors are
   saved and not relative errors. } 
 
-\section{ETABLE: Saving the}
+\section{ETABLE: Saving the errors to a table}
 \label{sec:esave}
 
 \madbox{
@@ -514,7 +514,7 @@ USE command.
 
 Example: 
 \madxmp{
-SELECT, FLAG=myerrortable, RANGE=range, CLASS=name, PATTERN=string;
+SELECT, FLAG=myerrortable, RANGE=range, CLASS=name, PATTERN=string; \\
 ETABLE, TABLE=myerrortable;
 }
 and elements selected by the  \hyperref[sec:select]{\texttt{SELECT}}

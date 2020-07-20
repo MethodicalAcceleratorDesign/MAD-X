@@ -319,7 +319,7 @@ extern char
            tag_type[MAX_TAG][16],
            tag_code[MAX_TAG][16];
 
-time_t     last_time,
+extern time_t     last_time,
            start_time;
 
 extern char filenames[100][500];

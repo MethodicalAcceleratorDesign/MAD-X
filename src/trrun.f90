@@ -1061,6 +1061,7 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   dipr = bvk * normal(0) !vals(1,0)
   dipi = bvk * skew(0)  
 
+
      ! cf magnet with quadrupole & sextupole
      gstr = normal(1)/elrad
      sstr = normal(2)/elrad
@@ -1782,7 +1783,36 @@ subroutine ttrf(track,ktrack)
     enddo
   endif
   !! frs add-on end
+ 
 end subroutine ttrf
+
+subroutine ttchangep0(track,ktrack)
+  use math_constfi, only : zero, two, one
+  use phys_constfi, only : clight
+  implicit none
+  double precision :: track(6,*) 
+  double precision :: get_value, bet0
+  double precision :: pc0, px_, py_, pt_, onedp
+  integer :: i, ktrack
+
+  pc0 = get_value('beam ','pc ')
+  bet0 = get_value('beam ','beta ')
+
+  do i =1, ktrack
+    px_ = track(1,i)
+    py_ = track(3,i)
+    pt_ = track(6,i) 
+    
+    onedp   = sqrt( one + two*pt_/bet0 + (pt_**2))
+
+    TRACK(2,i) = TRACK(2,i)/onedp
+    TRACK(4,i) = TRACK(4,i)/onedp
+    TRACK(6,i) = zero
+  end do
+
+end subroutine ttchangep0
+
+
 
 subroutine ttcrabrf(track,ktrack,turn)
   use math_constfi, only : zero, ten3m, ten6p, twopi
@@ -1857,7 +1887,8 @@ subroutine ttcrabrf(track,ktrack,turn)
 
   TRACK(6,1:ktrack) = TRACK(6,1:ktrack) - &
        omega * vrf * TRACK(1,1:ktrack) * cos(phirf - bvk*omega*TRACK(5,1:ktrack))
-
+  
+ 
 end subroutine ttcrabrf
 
 subroutine tthacdip(track,ktrack,turn)
@@ -4864,8 +4895,8 @@ subroutine tttquad(track, ktrack)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = g_elpar(q_k1)
-  k1s = g_elpar(q_k1s)
+  k1  = g_elpar(q_k1)  + g_elpar(q_k1t)
+  k1s = g_elpar(q_k1s) + g_elpar(q_k1st)
   
   !k1  = node_value('k1 ')
   !k1s = node_value('k1s ')

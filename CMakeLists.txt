@@ -30,6 +30,7 @@ include(setupCompilerSpecifics)
 include(setupArchSpecifics)
 
 add_subdirectory(libs/ptc)
+add_subdirectory(libs/DISTlib)
 add_subdirectory(src)
 add_subdirectory(tools)
 add_subdirectory(syntax)

@@ -13,6 +13,8 @@ make_sequ_node(struct sequence* sequ, int occ_cnt)
   current_node->next = NULL;
 }
 
+
+
 static struct sequence_list*
 delete_sequence_list(struct sequence_list* sql)
 {
@@ -1716,6 +1718,10 @@ int
 sequ_check_valid_twiss(struct sequence * sequ)
 {
   return sequ->tw_table != NULL && sequ->tw_valid;
+}
+
+int get_ncavities(void){
+  return current_sequ->cavities->curr;
 }
 
 int

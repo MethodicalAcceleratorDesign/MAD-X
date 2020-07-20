@@ -1,0 +1,29 @@
+!--------------------------------------------------------------
+! title,"FCC-ee";
+! 		  
+!--------------------------------------------------------------
+
+	pbeam :=   182.5;
+	Ebeam := sqrt( pbeam^2 + emass^2 );
+
+	call, file="FCCee_t_213_nosol_13.seq";
+
+	SET, FORMAT="25.20e";
+
+!--------------------------------------------------------------
+! FCC-ee Optics: prepare bare twiss contents
+!--------------------------------------------------------------
+   
+    beam, particle = electron, energy=Ebeam, radiate=true;
+    
+    use, sequence=L000013;
+	
+    select, flag=twiss, clear;
+    select,flag=twiss,column=name,s,betx,bety,ALFX,ALFY,MUX,MUY,dx,dy,x,px,y,py,t,pt;
+	
+	
+	
+    twiss, file = "fcc_radiate.twiss", tapering;
+    save, sequence=L000013, file="taper2.seq";
+    stop;
+	

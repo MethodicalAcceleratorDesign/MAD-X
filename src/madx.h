@@ -86,7 +86,8 @@
 //#include "mad_elemrfc.h"
 
 // physics modules
-
+#include "../libs/DISTlib/source/distinterface.h"
+#include "mad_dist.h"
 #include "mad_aper.h"
 #include "mad_dynap.h"
 #include "mad_emit.h"

@@ -111,6 +111,8 @@ module code_constfi
   integer, parameter :: code_nllens = 42
   integer, parameter :: code_rfmultipole = 43
   integer, parameter :: code_collimator = 44
+  integer, parameter :: code_changerefp0 = 45
+  integer, parameter :: code_sixmarker = 46
 end module code_constfi
 
 module aperture_enums
@@ -417,9 +419,9 @@ module twiss_elpfi
   integer, parameter :: b_k2s=16, b_h1=17, b_h2=18, b_hgap=19
   integer, parameter :: b_fint=20, b_fintx=21, b_k3=22, b_k3s=23
   !-quad
-  integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9
+  integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9, q_k1t=10, q_k1st=11
   !-sext
-  integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9
+  integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9, s_k2t=10, s_k2st=11
   !-oct
   integer, parameter :: o_tilt=7, o_k3=8, o_k3s=9
   !-mult
@@ -427,7 +429,7 @@ module twiss_elpfi
   !-sol
   integer, parameter :: so_lrad=7, so_ks=8, so_ksi=9
   !-rfc
-  integer, parameter :: r_volt=7, r_lag=8, r_freq=9
+  integer, parameter :: r_volt=7, r_lag=8, r_freq=9, r_lagt=10
   !-elsep
   integer, parameter :: e_tilt=7, e_ex=8, e_ey=9
   !-hkick
@@ -450,6 +452,14 @@ module twtrrfi
   !---- maxmul is the maximum multipole order both in twiss and trrun
   integer, parameter :: maxmul=20, maxferr=50, maxnaper=100
 end module twtrrfi
+
+module twtapering
+  implicit none
+  public
+  !---- for tapering
+  integer :: totrfcav =0, orderrun=0
+  double precision ::  endpt=0
+end module twtapering
 
 module ibsdbfi
   implicit none
@@ -574,7 +584,7 @@ module plotfi
   !--- parameters used in the routine peschm in file plot.F
 
   integer, parameter :: mobj = 14, msize = 88
-  integer, parameter :: mtitl  = 128, mxlabl = 160
+  integer, parameter :: mtitl  = 128, mxlabl = 300 !hbu mxlabl = 160 increased to 300 as required by plot.f90
   integer, parameter :: mnvar = 74, mxdep = 2
   integer, parameter :: mqadd = 100000
   integer, parameter :: mntmax = 20, mksmax = 10
