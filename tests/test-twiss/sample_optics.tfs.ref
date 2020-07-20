@@ -8,10 +8,10 @@
 @ PC               %le                 450
 @ GAMMA            %le         479.6060622
 @ KBUNCH           %le                   1
-@ BCURRENT         %le                   0
+@ BCURRENT         %le     1.801719808e-15
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
-@ NPART            %le                   0
+@ NPART            %le                   1
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %30s "LHC Version 6.503 -  July 2009"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.33.42"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "12.11.10"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "IP1"                                0        11.00000336        11.00000569

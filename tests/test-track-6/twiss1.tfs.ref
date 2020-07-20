@@ -8,10 +8,10 @@
 @ PC               %le         449.9990218
 @ GAMMA            %le         479.6050197
 @ KBUNCH           %le                   1
-@ BCURRENT         %le                   0
+@ BCURRENT         %le     9.606367583e-13
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
-@ NPART            %le                   0
+@ NPART            %le                   1
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.34.40"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "12.10.45"
 * NAME                                S                  X                 PX                  Y                 PY                  T                 PT                  L 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le 
  "ENDMK"                             50     0.000956993052    3.268034491e-06                  0                  0   -0.0004821455786                  0                  0

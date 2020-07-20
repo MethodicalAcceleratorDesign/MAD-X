@@ -8,10 +8,10 @@
 @ PC               %le         2.859999954
 @ GAMMA            %le         5596.880428
 @ KBUNCH           %le                   1
-@ BCURRENT         %le                   0
+@ BCURRENT         %le     1.805715985e-11
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
-@ NPART            %le                   0
+@ NPART            %le                   1
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
@@ -42,8 +42,8 @@
 @ SYNCH_5          %le     8.091411766e-07
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "23/04/20"
-@ TIME             %08s "10.22.54"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "12.11.19"
 * NAME               KEYWORD                             S                  L              ANGLE                K1L               BETX               ALFX                MUX               BETY               ALFY                MUY                 DX                DPX                 DY                DPY 
 $ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TME$START"         "MARKER"                             0                  0                  0                  0       0.6790421976   -1.517389453e-16                  0        2.156479968                  0                  0       0.0204938901                 -0                 -0                 -0

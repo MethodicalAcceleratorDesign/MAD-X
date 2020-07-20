@@ -8,10 +8,10 @@
 @ PC               %le        0.9999998694
 @ GAMMA            %le         1956.951198
 @ KBUNCH           %le                   1
-@ BCURRENT         %le                   0
+@ BCURRENT         %le     9.606406838e-13
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
-@ NPART            %le                   0
+@ NPART            %le                   1
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.17.44"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "12.16.00"
 *                  S NAME               KEYWORD                          BETX               BETY 
 $                %le %s                 %s                                %le                %le 
                   0 "MYSEQ$START"       "MARKER"                             1                  1
