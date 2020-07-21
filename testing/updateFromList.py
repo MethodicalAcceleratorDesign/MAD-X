@@ -31,7 +31,7 @@ from shutil import copyfile
 
 #copyfile(src, dst)
 mypath_orig = '../tests/'
-file1 = open('../failedTests.txt', 'r') 
+file1 = open('failedTests.txt', 'r') 
 Lines = file1.readlines() 
 loc = os.getcwd()
 count = 0

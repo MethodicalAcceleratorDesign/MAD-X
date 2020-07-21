@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.01  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.06.07               +
-  + Execution date: 2019.06.25 13:11:59      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.20 21:50:42      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2009
 
@@ -503,9 +503,9 @@ nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "25/06/19"
-@ TIME             %08s "13.12.11"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "21.51.01"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.5684327563 6.00000857580693 6.00000000016412 4.71839927843178e-06 1.18943709464912e-11 2.51017670501167e-07 5.87323275056339e-08 15.0983408225299 14.5331268901972
@@ -583,9 +583,9 @@ nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "25/06/19"
-@ TIME             %08s "13.12.13"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "21.51.02"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.8731672437 5.99997370066488 5.99999999981848 -3.57164062478269e-06 -4.98715163136442e-12 1.84951004452163e-07 -1.16397076916794e-08 15.1373644428132 14.5337976415106
@@ -663,9 +663,9 @@ nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "25/06/19"
-@ TIME             %08s "13.12.14"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "21.51.03"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.5684327563 6.8940544701245e-08 0.0019999810501769 0.000295003163426264 -3.67961959238216e-09
@@ -746,9 +746,9 @@ nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "25/06/19"
-@ TIME             %08s "13.12.15"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "21.51.05"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.8731672437 1.20764185699033e-07 -0.00200462302084927 -0.000294999055610351 -1.95142007206673e-07
@@ -1095,9 +1095,9 @@ nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "25/06/19"
-@ TIME             %08s "13.12.26"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "21.51.18"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6589.76797484384 "BBMK_PAR.L5B1_20"  232.152821909535 444.40605255872 0.119855803302649 -3.37079020790944 14.8578859657367 14.2797662852504 -0.00847570838825121 -2.11125877351268e-05 -0.000102596725854685 -2.6179531131159e-07
@@ -1253,9 +1253,9 @@ nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "25/06/19"
-@ TIME             %08s "13.12.27"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "21.51.19"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6590.07270933124 "BBMK_PAR.L5B2_20"  444.408065834104 232.153020272438 -3.37080209513399 0.119860761280512 14.8840032844189 14.2933420228492 0.0128526464399329 -0.00109523043599441 0.000159367975721061 -1.32579168031851e-05
@@ -1411,9 +1411,9 @@ nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.01 Linux 64"
-@ DATE             %08s "25/06/19"
-@ TIME             %08s "13.12.29"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "21.51.20"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6664.4514327563 "BB_HO.L5B1_5"      6.00229117764788 6.00228150046523 0.0195046905373777 0.0194999999099732 15.0952376991283 14.5300237620878 -3.45149998584371e-05 0.00199999999990648 0.000295000000018246 2.44750267517919e-14
@@ -3157,31 +3157,29 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.61958744E+03
+Initial Penalty Function =   0.61904729E+03
 
 
-call:       4   Penalty function =   0.58030481E+03
-call:       7   Penalty function =   0.50987659E+03
-call:      10   Penalty function =   0.38279635E+03
-call:      13   Penalty function =   0.18322350E+03
-call:      16   Penalty function =   0.21845867E+01
-call:      19   Penalty function =   0.13355184E-06
-call:      22   Penalty function =   0.64837959E-12
-call:      25   Penalty function =   0.81397948E-13
-call:      28   Penalty function =   0.34074138E-13
-call:      31   Penalty function =   0.12219024E-13
+call:       4   Penalty function =   0.57978138E+03
+call:       7   Penalty function =   0.50978922E+03
+call:      10   Penalty function =   0.38335156E+03
+call:      13   Penalty function =   0.18445807E+03
+call:      16   Penalty function =   0.25183697E+01
+call:      19   Penalty function =   0.16951877E-06
+call:      22   Penalty function =   0.13847523E-12
+call:      25   Penalty function =   0.50940453E-14
  ++++++++++ LMDIF ended: converged without success
-call:      34   Penalty function =   0.12219024E-13
+call:      28   Penalty function =   0.50940453E-14
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         dq1          4     2.00000000E+01     2.00000001E+01     5.99115422E-15
-Global constraint:         dq2          4     2.00000000E+01     1.99999999E+01     6.22787005E-15
+Global constraint:         dq1          4     2.00000000E+01     2.00000000E+01     6.67706629E-16
+Global constraint:         dq2          4     2.00000000E+01     2.00000001E+01     4.42633866E-15
 
 
-Final Penalty Function =   1.22190243e-14
+Final Penalty Function =   5.09404529e-15
 
 
 
@@ -3189,12 +3187,12 @@ Final Penalty Function =   1.22190243e-14
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-ksf                       2.46821e-02  0.00000e+00 -1.00000e+20  1.00000e+20
-ksd                      -4.22266e-02  0.00000e+00 -1.00000e+20  1.00000e+20
+ksf                       2.46634e-02  0.00000e+00 -1.00000e+20  1.00000e+20
+ksd                      -4.22207e-02  0.00000e+00 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.22190243e-14
+VARIABLE "TAR" SET TO   5.09404529e-15
 START MATCHING
 
 number of variables:    4
@@ -3203,25 +3201,25 @@ total constraints:      4
 
 START LMDIF:
 
-Initial Penalty Function =   0.20304252E-12
+Initial Penalty Function =   0.19574549E-12
 
 
-call:       6   Penalty function =   0.85645488E-13
-call:      11   Penalty function =   0.52021416E-14
+call:       6   Penalty function =   0.12006029E-12
+call:      11   Penalty function =   0.36666022E-14
  ++++++++++ LMDIF ended: converged without success
-call:      16   Penalty function =   0.52021416E-14
+call:      16   Penalty function =   0.36666022E-14
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         dq1          4     2.00000000E+01     2.00000000E+01     1.20895168E-15
-Global constraint:         dq2          4     2.00000000E+01     2.00000001E+01     3.99318992E-15
-Global constraint:         q1           4     6.22950000E+01     6.22950000E+01     2.90805684E-24
-Global constraint:         q2           4     6.02700000E+01     6.02700000E+01     4.08945493E-25
+Global constraint:         dq1          4     2.00000000E+01     2.00000001E+01     3.53136546E-15
+Global constraint:         dq2          4     2.00000000E+01     2.00000000E+01     1.35236739E-16
+Global constraint:         q1           4     6.22950000E+01     6.22950000E+01     2.47386780E-25
+Global constraint:         q2           4     6.02700000E+01     6.02700000E+01     0.00000000E+00
 
 
-Final Penalty Function =   5.20214161e-15
+Final Penalty Function =   3.66660220e-15
 
 
 
@@ -3229,14 +3227,14 @@ Final Penalty Function =   5.20214161e-15
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-ksf                       2.46821e-02  2.46821e-02 -1.00000e+20  1.00000e+20
-ksd                      -4.22266e-02 -4.22266e-02 -1.00000e+20  1.00000e+20
+ksf                       2.46634e-02  2.46634e-02 -1.00000e+20  1.00000e+20
+ksd                      -4.22207e-02 -4.22207e-02 -1.00000e+20  1.00000e+20
 kqtf                     -1.24647e-04 -1.24648e-04 -1.00000e+20  1.00000e+20
 kqtd                      3.16620e-04  3.16620e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   5.20214161e-15
+VARIABLE "TAR" SET TO   3.66660220e-15
 nrj                = 450 ;
 ************************************
 ********Triplet correctors**********
@@ -3306,18 +3304,18 @@ kctsx3.r5/kmctsxmax1*100 = 0 ;
 ************************************
 kqtf.a12b1/kmqtmax*100 = 0 ;
 kqtd.a12b1/kmqtmax*100 = 0 ;
-kqtf.a23b1/kmqtmax*100 = -0.349174602742762 ;
-kqtd.a23b1/kmqtmax*100 = 0.433005878630223 ;
-kqtf.a34b1/kmqtmax*100 = -0.534013484992762 ;
-kqtd.a34b1/kmqtmax*100 = 0.468020921430224 ;
+kqtf.a23b1/kmqtmax*100 = -0.349174602906413 ;
+kqtd.a23b1/kmqtmax*100 = 0.433005878587735 ;
+kqtf.a34b1/kmqtmax*100 = -0.534013485156413 ;
+kqtd.a34b1/kmqtmax*100 = 0.468020921387735 ;
 kqtf.a45b1/kmqtmax*100 = 0 ;
 kqtd.a45b1/kmqtmax*100 = 0 ;
 kqtf.a56b1/kmqtmax*100 = 0 ;
 kqtd.a56b1/kmqtmax*100 = 0 ;
-kqtf.a67b1/kmqtmax*100 = 0.173175169257238 ;
-kqtd.a67b1/kmqtmax*100 = -0.0112936261697765 ;
-kqtf.a78b1/kmqtmax*100 = 0.512540815132237 ;
-kqtd.a78b1/kmqtmax*100 = 0.619015422455223 ;
+kqtf.a67b1/kmqtmax*100 = 0.173175169093587 ;
+kqtd.a67b1/kmqtmax*100 = -0.0112936262122653 ;
+kqtf.a78b1/kmqtmax*100 = 0.512540814968587 ;
+kqtd.a78b1/kmqtmax*100 = 0.619015422412735 ;
 kqtf.a81b1/kmqtmax*100 = 0 ;
 kqtd.a81b1/kmqtmax*100 = 0 ;
 kqs.r1b1/kmqsmax*100 = 0 ;
@@ -3334,34 +3332,34 @@ kqs.l8b1/kmqsmax*100 = 0.0174635844206725 ;
 kqs.a81b1/kmqsmax*100 = 0 ;
 ksf1.a12b1/kmsmax*100 = 0.956037362816597 ;
 ksf2.a12b1/kmsmax*100 = 1.016015625 ;
-ksf1.a23b1/kmsmax*100 = 1.37910472383438 ;
-ksf2.a23b1/kmsmax*100 = 1.37910472383438 ;
-ksf1.a34b1/kmsmax*100 = 1.37910472383438 ;
-ksf2.a34b1/kmsmax*100 = 1.37910472383438 ;
+ksf1.a23b1/kmsmax*100 = 1.37878756911195 ;
+ksf2.a23b1/kmsmax*100 = 1.37878756911195 ;
+ksf1.a34b1/kmsmax*100 = 1.37878756911195 ;
+ksf2.a34b1/kmsmax*100 = 1.37878756911195 ;
 ksf1.a45b1/kmsmax*100 = 1.18908498810831 ;
 ksf2.a45b1/kmsmax*100 = 1.016015625 ;
 ksf1.a56b1/kmsmax*100 = 1.58857867161877 ;
 ksf2.a56b1/kmsmax*100 = 1.016015625 ;
-ksf1.a67b1/kmsmax*100 = 1.37910472383438 ;
-ksf2.a67b1/kmsmax*100 = 1.37910472383438 ;
-ksf1.a78b1/kmsmax*100 = 1.37910472383438 ;
-ksf2.a78b1/kmsmax*100 = 1.37910472383438 ;
+ksf1.a67b1/kmsmax*100 = 1.37878756911195 ;
+ksf2.a67b1/kmsmax*100 = 1.37878756911195 ;
+ksf1.a78b1/kmsmax*100 = 1.37878756911195 ;
+ksf2.a78b1/kmsmax*100 = 1.37878756911195 ;
 ksf1.a81b1/kmsmax*100 = 1.17114660543381 ;
 ksf2.a81b1/kmsmax*100 = 1.016015625 ;
 ksd1.a12b1/kmsmax*100 = -1.67642578125 ;
 ksd2.a12b1/kmsmax*100 = -2.12524071978853 ;
-ksd1.a23b1/kmsmax*100 = -2.3603332311525 ;
-ksd2.a23b1/kmsmax*100 = -2.3603332311525 ;
-ksd1.a34b1/kmsmax*100 = -2.3603332311525 ;
-ksd2.a34b1/kmsmax*100 = -2.3603332311525 ;
+ksd1.a23b1/kmsmax*100 = -2.36023323467793 ;
+ksd2.a23b1/kmsmax*100 = -2.36023323467793 ;
+ksd1.a34b1/kmsmax*100 = -2.36023323467793 ;
+ksd2.a34b1/kmsmax*100 = -2.36023323467793 ;
 ksd1.a45b1/kmsmax*100 = -1.67642578125 ;
 ksd2.a45b1/kmsmax*100 = -2.00254099127159 ;
 ksd1.a56b1/kmsmax*100 = -1.67642578125 ;
 ksd2.a56b1/kmsmax*100 = -2.01136113924176 ;
-ksd1.a67b1/kmsmax*100 = -2.3603332311525 ;
-ksd2.a67b1/kmsmax*100 = -2.3603332311525 ;
-ksd1.a78b1/kmsmax*100 = -2.3603332311525 ;
-ksd2.a78b1/kmsmax*100 = -2.3603332311525 ;
+ksd1.a67b1/kmsmax*100 = -2.36023323467793 ;
+ksd2.a67b1/kmsmax*100 = -2.36023323467793 ;
+ksd1.a78b1/kmsmax*100 = -2.36023323467793 ;
+ksd2.a78b1/kmsmax*100 = -2.36023323467793 ;
 ksd1.a81b1/kmsmax*100 = -1.67642578125 ;
 ksd2.a81b1/kmsmax*100 = -1.64793140049919 ;
 kss.a12b1/kmssmax*100 = 0 ;
@@ -3466,19 +3464,19 @@ orbit:  -9.205359E-08  2.248447E-09  8.119708E-10  8.584208E-12  0.000000E+00  0
 ++++++ table: summ
 
 length orbit5 alfa gammatr 
-26658.883199996 -0 0.000347646528599278 53.6328717169955 
+26658.883199996 -0 0.000347646528599578 53.6328717169724 
 
 q1 dq1 betxmax dxmax 
-62.2949999999998 20.1033649595077 620.964642813926 2.67491755498258 
+62.295 20.0877306193111 620.964642806347 2.67491755676796 
 
 dxrms xcomax xcorms q2 
-1.4267757915836 0.0164767495227694 0.00241775115521684 60.2699999999999 
+1.42677579156057 0.0164767495227694 0.00241775115521685 60.27 
 
 dq2 betymax dymax dyrms 
-19.9208406132664 678.478463036152 0.233873308038859 0.0727765116259127 
+19.9208111815848 678.478463034925 0.233873308104895 0.0727765116354934 
 
 ycomax ycorms deltap synch_1 
-0.0164768818811137 0.00256673786457338 0 0 
+0.0164768818811136 0.00256673786457338 0 0 
 
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
@@ -3499,40 +3497,40 @@ xnom8=table(twiss,IP8,x);pxnom8=table(twiss,IP8,px);ynom8=table(twiss,IP8,y);pyn
 
 value,xnom1,xnom2,xnom5,xnom8;
 
-xnom1              = -0.00200000766102691 ;
-xnom2              = -0.00349998659974414 ;
-xnom5              = -1.95147794151113e-08 ;
-xnom8              = -1.63933058217449e-09 ;
+xnom1              = -0.00200000766102692 ;
+xnom2              = -0.00349998659974417 ;
+xnom5              = -1.95147793944801e-08 ;
+xnom8              = -1.63933060097831e-09 ;
 value,ynom1,ynom2,ynom5,ynom8;
 
-ynom1              = 5.69769966147346e-11 ;
-ynom2              = -9.50323682420537e-11 ;
+ynom1              = 5.69770056830694e-11 ;
+ynom2              = -9.50323766840075e-11 ;
 ynom5              = 0.00199999986402777 ;
 ynom8              = -0.00350000012265858 ;
 value,pxnom1,pxnom2,pxnom5,pxnom8;
 
-pxnom1             = 3.98795810202726e-09 ;
-pxnom2             = 2.94880307522509e-07 ;
-pxnom5             = 0.000294997325277891 ;
-pxnom8             = -3.50088871240621e-05 ;
+pxnom1             = 3.98795809718478e-09 ;
+pxnom2             = 2.9488030752073e-07 ;
+pxnom5             = 0.000294997325277893 ;
+pxnom8             = -3.50088871240655e-05 ;
 value,pynom1,pynom2,pynom5,pynom8;
 
-pynom1             = 0.000295000010778508 ;
-pynom2             = 0.00023999939386026 ;
+pynom1             = 0.000295000010778507 ;
+pynom2             = 0.000239999393860262 ;
 pynom5             = 1.30348629385906e-11 ;
-pynom8             = 1.80975466038905e-06 ;
+pynom8             = 1.8097546603891e-06 ;
 value, table(summ,q1);
 
-table( summ q1 )   = 62.2949999999998 ;
+table( summ q1 )   = 62.295 ;
 value, table(summ,q2);
 
-table( summ q2 )   = 60.2699999999999 ;
+table( summ q2 )   = 60.27 ;
 value, table(summ,dq1);
 
-table( summ dq1 )  = 20.1033649595077 ;
+table( summ dq1 )  = 20.0877306193111 ;
 value, table(summ,dq2);
 
-table( summ dq2 )  = 19.9208406132664 ;
+table( summ dq2 )  = 19.9208111815848 ;
 !sixtrack,cavall, mult_auto_off,radius=0.017;
 
 sixtrack,cavall, radius=0.017;
@@ -3575,19 +3573,19 @@ orbit:  -9.205359E-08  2.248447E-09  8.119708E-10  8.584208E-12  0.000000E+00  0
 ++++++ table: summ
 
 length orbit5 alfa gammatr 
-26658.883199996 -0 0.000347646528599278 53.6328717169955 
+26658.883199996 -0 0.000347646528599578 53.6328717169724 
 
 q1 dq1 betxmax dxmax 
-62.2949999999998 20.1033649595077 620.964642813926 2.67491755498258 
+62.295 20.0877306193111 620.964642806347 2.67491755676796 
 
 dxrms xcomax xcorms q2 
-1.4267757915836 0.0164767495227694 0.00241775115521684 60.2699999999999 
+1.42677579156057 0.0164767495227694 0.00241775115521685 60.27 
 
 dq2 betymax dymax dyrms 
-19.9208406132664 678.478463036152 0.233873308038859 0.0727765116259127 
+19.9208111815848 678.478463034925 0.233873308104895 0.0727765116354934 
 
 ycomax ycorms deltap synch_1 
-0.0164768818811137 0.00256673786457338 0 0 
+0.0164768818811136 0.00256673786457338 0 0 
 
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
