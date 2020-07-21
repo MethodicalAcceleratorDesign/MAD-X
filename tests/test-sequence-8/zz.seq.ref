@@ -13,7 +13,7 @@ mq1: mq,k1:=kq1 ;
 mq2: mq,k1:=kq2 ;
 mq3: mq,k1:=kq3 ;
 myseq: sequence, l = 100.000000;
-mq4, at = ( 2.000000 ) + ( g ) ;
+mq4, at = ( 2.0000000000000000 ) + ( g ) ;
 mq1, at = ( 10 * a ) + ( g ) ;
 mq2, at = ( 42 + a ) + ( g ) ;
 mq3, at = ( ( b ) + ( a ) ) + ( f ) , from = mq2;

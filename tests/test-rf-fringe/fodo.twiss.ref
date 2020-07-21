@@ -8,10 +8,10 @@
 @ PC               %le         9.999999987
 @ GAMMA            %le         19569.51198
 @ KBUNCH           %le                   1
-@ BCURRENT         %le                   0
+@ BCURRENT         %le      3.20213644e-11
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
-@ NPART            %le                   0
+@ NPART            %le                   1
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "06/05/20"
-@ TIME             %08s "09.20.27"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "12.11.20"
 * NAME                                S                  X                 PX                  Y                 PY                 PT                  T               BETX               BETY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "SEQ$START"                          0               0.01                  0               0.02                  0                  0                  0                  1                  2

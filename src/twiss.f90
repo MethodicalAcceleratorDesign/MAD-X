@@ -625,13 +625,14 @@ end SUBROUTINE tmclor
 SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use bbfi
   use twiss0fi
-  use twissbeamfi, only : beta, gamma, arad, charge, npart
+  use twissbeamfi, only : beta, gamma, arad, charge, npart, pc, energy
   use name_lenfi
   use twisscfi
   use spch_bbfi
   use matrices, only : EYE, symp_thrd  ! , symp_thrd_orbit
   use math_constfi, only : zero
   use code_constfi
+  use twtapering
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -653,27 +654,28 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision :: orbit0(6), orbit(6)
   logical :: fsec, ftrk
   double precision :: rt(6,6), tt(6,6,6)
-  integer :: eflag, kobs, save, thr_on
+  integer :: eflag, kobs, save, thr_on, i
 
-  logical :: fmap
+  logical :: fmap, istaper
   character(len=28) :: tmptxt1, tmptxt2, tmptxt3
   character(len=150) :: warnstr
   character(len=name_len) :: c_name(2), p_name, el_name
   character(len=2) :: ptxt(2)=(/'x-','y-'/)
   integer :: j, code, n_align, nobs, node, old, poc_cnt, debug
   integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
-  double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: al_errors(align_max)
-  double precision :: el, cick, err, nrm, nrm0
+  double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6), orbitori(6)
+  double precision :: al_errors(align_max), dptemp
+  double precision :: el, cick, err, nrm, nrm0, anglet, newk0, tempk
   double precision :: parvec(26),  vector(10), reforb(6)
   double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
 
   integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
-  double precision, external :: node_value
+  double precision, external :: node_value, get_value
   double precision, parameter :: orb_limit=1d1
   integer, parameter :: max_rep=100
 
+  111 continue
   debug = get_option('debug ')
 
   !---- Initialize
@@ -690,7 +692,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      j = get_vector('threader ', 'vector ', vector)
      if (j .lt. 3) thr_on = 0
   endif
-
+  istaper = get_value('twiss ','tapering ').ne.zero
+  !istaper = .true.
   TT = zero
   RT = EYE
 
@@ -771,6 +774,47 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   endif
 
   !---- Element matrix
+  if (istaper) then
+    orbitori = orbit
+
+    select case (code)
+
+    case (code_rbend, code_sbend)
+      anglet = node_value('angle ')
+      do i=1,3
+        call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
+        dptemp = (orbit(6)+orbitori(6))/(2*beta)
+        newk0 = (1+dptemp)*anglet/el
+        call store_node_value('k0 ',newk0 )
+        orbit = orbitori
+  	  enddo
+      
+    case (code_quadrupole)
+      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
+      dptemp = (orbit(6)+orbitori(6))/(2*beta)
+      tempk = node_value('k1 ')
+      newk0 = tempk/(1-dptemp)-tempk
+      call store_node_value('k1tap ',newk0 )
+
+      tempk = node_value('k1s ')
+      newk0 = tempk/(1-dptemp)-tempk
+      call store_node_value('k1stap ',newk0 )
+
+    case (code_sextupole)
+      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
+      dptemp = (orbit(6)+orbitori(6))/(2*beta)
+      tempk = node_value('k2 ')
+      newk0 = tempk/(1-dptemp) - tempk
+      call store_node_value('k2tap ',newk0 )  
+
+      tempk = node_value('k2s ')
+      newk0 = tempk/(1-dptemp) - tempk
+      call store_node_value('k2stap ',newk0 )
+
+    end select
+    orbit = orbitori
+  endif
+
   call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
 
   !--- if element has a map, concatenate
@@ -917,6 +961,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      goto 10 ! loop over nodes
   endif
 
+
+  if(orbit(6) .gt. 1e-10 .and. istaper) then
+    endpt=endpt+orbit(6)
+    orderrun = orderrun+1
+    goto 111
+  endif
   bbd_flag=0
 
 end SUBROUTINE tmfrst
@@ -3409,6 +3459,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
      case (code_multipole)
         if(get_option('thin_cf ').ne.zero .and. node_value('lrad ') .gt. zero) then
+          !call tmmult_cf_short(fsec,ftrk,orbit,fmap,re,te)
           call tmmult_cf(fsec,ftrk,orbit,fmap,re,te)
         else
           call tmmult(fsec,ftrk,orbit,fmap,re,te)
@@ -3439,6 +3490,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmbb(fsec,ftrk,orbit,fmap,re,te)
 
      case (code_marker)
+
         ! nothing on purpose!
 
      case (code_wire)
@@ -3464,7 +3516,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
      case (code_rfmultipole)
         call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
-
+     case (code_changerefp0)
+        call tmchp0(ftrk,orbit,fmap,ek,re, te)
      case default !--- anything else:
         ! nil (23, 28, 34)
 
@@ -3564,6 +3617,8 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
      n_ferr = node_fd_errors(f_errors)
      if (sk0 .ne. 0) f_errors(0) = f_errors(0) + sk0*el - g_elpar(b_angle)
 
+
+     
 !!     if (sk0*el .ne. g_elpar(b_angle)) then
 !!        call element_name(name,len(name))
 !!        print *, name, ': k0l ~= angle, delta= ', sk0*el - g_elpar(b_angle), g_elpar(b_angle)
@@ -4177,7 +4232,7 @@ INTEGER FUNCTION Factorial(n)
   Factorial = Ans
 END FUNCTION Factorial
 
-SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
+SUBROUTINE tmmult_cf_short(fsec, ftrk, orbit, fmap, re, te)
   use twtrrfi, only : maxmul, maxferr
   use twissbeamfi, only : deltap, beta
   use math_constfi, only : zero, one, two, three
@@ -4196,12 +4251,18 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   !     te(6,6,6) (double)  second-order terms.                          *
   !     Detailed description:                                            *
   !     See Phys. Rev. AccelBeams 19.054002 by M.Titze                   *
+  !                                                                      *
+  !     Note:                                                            *
+  !     This 'short' version yields the correct chromaticity of a        *
+  !     sliced sector CFM only if TWISS is used without the 'chrom'      *
+  !     option. For a correct treatment of the chrom option,             * 
+  !     tmmult_cf must be used.                                     *
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk, fmap
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr
   integer, external :: Factorial
-  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
-  double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, etahat, h0
+  double precision :: an, angle, dtmp
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double precision :: orbit(6), re(6,6), te(6,6,6), tilt2
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -4224,8 +4285,42 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   F_ERRORS(0:maxferr) = zero
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
-  tilt2 = 0 !This is a dumy parameter now that can be changed to have a relative tilf of the different orders
+  tilt2 = 0 ! A parameter describing the relative tilt between
+            ! the dipole component and the higher-order components of the CFM
 
+  !####SETTING UP THE MULTIPOLES
+  an = node_value('angle ')
+  f_errors(0) = f_errors(0) + normal(0) ! The zero-component of the B-field
+
+  !Below here should not be commented output
+  !---- Other components and errors.
+  nord = 0
+  ! that loop should start at one since nominal dipole strength already taken into account above
+  !needs to be here though
+  do iord = 0, max(nn, ns, n_ferr/2-1)
+  !   get the maximum effective order; loop runs over maximum of user given values
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
+          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
+  enddo
+
+  do iord = 1, nord
+     f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))
+     f_errors(2*iord+1) = (skew(iord)   + f_errors(2*iord+1))
+     if (tilt .ne. zero) then
+        if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) then
+           angle = atan2(f_errors(2*iord+1), f_errors(2*iord)) / (iord+1) - tilt
+        else
+           angle = -tilt
+        endif
+        angle = (iord+1) * angle
+        dtmp = sqrt(f_errors(2*iord)**2 + f_errors(2*iord+1)**2)
+        f_errors(2*iord)   = dtmp * cos(angle)
+        f_errors(2*iord+1) = dtmp * sin(angle)
+     endif
+     f_errors(2*iord)   = bvk * f_errors(2*iord)
+     f_errors(2*iord+1) = bvk * f_errors(2*iord + 1)
+  enddo
+  !Done with all the setting up...
 
   ! The "normal" components are considered here as the expansion coefficients of
   ! B_y wrt. the reference plane, while the "skew" components are considered as the
@@ -4245,81 +4340,25 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
   !
   ! play the role as the k'th skew- and normal field component.
 
-
-    !---- Nominal dipole strength.
-  dipr = normal(0) / (one + deltap)
-  dipi = skew(0)   / (one + deltap)
-
-  !####SETTING UP THE MULTIPLES
-  an = node_value('angle ')
-  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
-
-  !---- Dipole error.
-  dbr = f_errors(0) / (one + deltap)
-  dbi = f_errors(1) / (one + deltap)
-
-
-  if (tilt .ne. zero)  then
-     if (dipi.ne.zero .or. dipr.ne.zero) then
-        angle = atan2(dipi, dipr) - tilt
-     else
-        angle = -tilt
-     endif
-     dtmp = sqrt(dipi**2 + dipr**2)
-     dipr = dtmp * cos(angle)
-     dipi = dtmp * sin(angle)
-     dtmp = sqrt(dbi**2 + dbr**2)
-     dbr = dtmp * cos(angle)
-     dbi = dtmp * sin(angle)
-  endif
-
-  dbr = bvk * dbr
-  dbi = bvk * dbi
-  dipr = bvk * dipr
-  dipi = bvk * dipi
-  !Below here should not be commented output
-  !---- Other components and errors.
-  nord = 0
-  ! that loop should start at one since nominal dipole strength already taken into account above
-  !needs to be here though
-  do iord = 0, max(nn, ns, n_ferr/2-1)
- !    get the maximum effective order; loop runs over maximum of user given values
-     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
-          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
+  do k = 0, nord
+     ! The factor (one + deltap) below is taken from the original MAD-X routine.
+     lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)/(one + deltap)
   enddo
 
-  do iord = 1, nord
-     f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))   / (one + deltap)
-     f_errors(2*iord+1) = (skew(iord)   + f_errors(2*iord+1)) / (one + deltap)
-     if (tilt .ne. zero) then
-        if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) then
-           angle = atan2(f_errors(2*iord+1), f_errors(2*iord)) / (iord+1) - tilt
-        else
-           angle = -tilt
-        endif
-        angle = (iord+1) * angle
-        dtmp = sqrt(f_errors(2*iord)**2 + f_errors(2*iord+1)**2)
-        f_errors(2*iord)   = dtmp * cos(angle)
-        f_errors(2*iord+1) = dtmp * sin(angle)
-     endif
-     f_errors(2*iord)   = bvk * f_errors(2*iord)
-     f_errors(2*iord+1) = bvk * f_errors(2*iord+1)
-  enddo
-  !Done with all the setting up...
-
-  if (elrad.gt.zero) then
-    lambda(0) = (normal(0) + (0, 1)*skew(0))/(one + deltap)/elrad
-     do k = 1, nord
-        ! The factor (one + deltap) below is taken from the original MAD-X routine.
-        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)
-     enddo
+  ! Set the curvature of the MAD-X reference trajectory; Due to MAD-X standards,
+  ! this trajectory should be independent on deltap
+  if (an .eq. 0) then
+     ! The special case an == 0 is treated differently for the purpose of backwards compatibility
+     kx = real(lambda(0))*(one + deltap)
+     ky = -aimag(lambda(0))*(one + deltap)
   else
-     lambda = zero
+     kx = an/elrad*cos(tilt)
+     ky = an/elrad*sin(tilt)
   endif
 
-  kx = real(lambda(0))    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
-  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
-                          ! Phys. Rev. AccelBeams 19.054002
+  !  N.B. B_y |_{\varphi = tilt, r = 0} = kx
+  !       B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
+  ! Phys. Rev. AccelBeams 19.054002
 
   kappa = kx + (0, 1)*ky
   barkappa = conjg(kappa)
@@ -4346,10 +4385,12 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      g(k + 1, k + 1) = conjg(g(k + 1, 0))
   enddo
 
+  etahat = sqrt(two*orbit(6)/beta + orbit(6)**2 + one) - one ! etahat = deltap of individual particle
+  h0 = sqrt((one + etahat)**2 - orbit(2)**2 - orbit(4)**2)
+
   if (ftrk) then
      rp = (orbit(1) + (0, 1)*orbit(3))/two
      rm = conjg(rp)
-
      ! Compute \partial_+ G using Eq. (7) in Ref. above
      del_p_g = 0
      do k = 1, nord
@@ -4360,37 +4401,37 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
         del_p_g = del_p_g + sum0
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
-     pkick = elrad*(barkappa*(one + deltap) + del_p_g)
-
+     pkick = elrad*(barkappa*h0 + del_p_g)
      dpx = real(pkick)
      dpy = - aimag(pkick)
-
-     orbit(2) = orbit(2) + dpx - dbr
-     orbit(4) = orbit(4) + dpy + dbi
+     orbit(1) = orbit(1) + elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)/h0
+     orbit(2) = orbit(2) + dpx
+     orbit(3) = orbit(3) + elrad*(kx*orbit(1) + ky*orbit(3))*orbit(4)/h0
+     orbit(4) = orbit(4) + dpy
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
-                *(one + beta*orbit(6))/(one + deltap)/beta
+                *(one + beta*orbit(6))/beta/h0
   endif
   ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! re(6,6) is assumed to be a unit matrix as input
+  ! Eqs. (39) are required to obtain agreement to the thick sectormap.
+
   if (nord .ge. 1) then
      ! The next two expressions emerge by the first
-     ! derivative of \partial_+ G wrt. x and y at zero, see documentation.
+     ! derivative of \partial_+ G wrt. x and y, see documentation.
+     ! the factors (one + deltap) means that we take the derivative with respect to a given
+     ! energy-offset, so that if deltap != 0, the derivative is evaluated at a larger radius.
      dxdpg = elrad/two*(two*g(2, 0) + g(2, 1))
      dydpg = elrad/two*(0, 1)*(two*g(2, 0) - g(2, 1))
-
      re(2, 1) = real(dxdpg)
      re(2, 3) = real(dydpg)
-     re(2, 6) = elrad*kx/beta
-
+     re(2, 6) = elrad*kx/beta*(one + beta*orbit(6))/h0
      re(4, 1) = - aimag(dxdpg)
      re(4, 3) = - aimag(dydpg)
-     re(4, 6) = elrad*ky/beta
-
-     re(5, 1) = - elrad*kx/beta
-     re(5, 3) = - elrad*ky/beta
+     re(4, 6) = elrad*ky/beta*(one + beta*orbit(6))/h0
+     re(5, 1) = - elrad*kx/beta*(one + beta*orbit(6))/h0
+     re(5, 3) = - elrad*ky/beta*(one + beta*orbit(6))/h0
   endif
-
   ! Second-order terms by derivation of Eqs. (39) in Ref. above, at zero
   ! te(6,6,6) is assumed to be a zero tensor as input
   if ((fsec) .and. (nord .ge. 2)) then
@@ -4402,14 +4443,11 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      dxx = elrad/two*(three*g(3, 0) + two*g(3, 1) + g(3, 2))/two
      dxy = elrad/two*(0, 1)*(three*g(3, 0) - g(3, 2))/two
      dyy = -elrad/two*(three*g(3, 0) - two*g(3, 1) + g(3, 2))/two
-
      bp1 = one - one/beta**2
-
-     te(1, 1, 2) = 0.5*elrad*kx
+     te(1, 1, 2) = elrad*kx*(one/h0 + orbit(2)**2/h0**3)/two
      te(1, 2, 1) = te(1, 1, 2)
-     te(1, 2, 3) = 0.5*elrad*ky
+     te(1, 2, 3) = elrad*ky*(one/h0 + orbit(2)**2/h0**3)/two
      te(1, 3, 2) = te(1, 2, 3)
-
      te(2, 1, 1) = real(dxx)   ! cf
      te(2, 1, 3) = real(dxy)   ! cf
      te(2, 3, 1) = te(2, 1, 3) ! cf
@@ -4417,12 +4455,10 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      te(2, 2, 2) = - te(1, 1, 2)
      te(2, 4, 4) = - te(1, 1, 2)
      te(2, 6, 6) = te(1, 1, 2)*bp1
-
      te(3, 1, 4) = te(1, 1, 2)
      te(3, 3, 4) = te(1, 2, 3)
      te(3, 4, 1) = te(1, 1, 2)
      te(3, 4, 3) = te(1, 2, 3)
-
      te(4, 1, 1) = - aimag(dxx)  ! cf
      te(4, 1, 3) = - aimag(dxy)  ! cf
      te(4, 3, 1) = te(4, 1, 3)   ! cf
@@ -4430,14 +4466,422 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      te(4, 2, 2) = - te(1, 2, 3)
      te(4, 4, 4) = - te(1, 2, 3)
      te(4, 6, 6) = te(1, 2, 3)*bp1
-
      te(5, 1, 6) = - te(1, 1, 2)*bp1
      te(5, 3, 6) = - te(1, 2, 3)*bp1
      te(5, 6, 1) = - te(1, 1, 2)*bp1
      te(5, 6, 3) = - te(1, 2, 3)*bp1
   endif
-end SUBROUTINE tmmult_cf
+end SUBROUTINE tmmult_cf_short
 
+SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
+  use twtrrfi, only : maxmul, maxferr
+  use twissbeamfi, only : deltap, beta
+  use math_constfi, only : zero, one, two, three
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Computes thin-lens kick through combined-function magnet.        *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !     Detailed description:                                            *
+  !     See Phys. Rev. AccelBeams 19.054002 by M.Titze                   *
+  !     Implementation of full map (Eq. (2.38))                          *
+  !----------------------------------------------------------------------*
+  logical :: fsec, ftrk, fmap
+  integer :: nord, k, j, nn, ns, bvk, iord, n_ferr
+  integer, external :: Factorial
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, etahat, h0
+  double precision :: an, angle, dtmp
+  double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
+  double precision :: orbit(6), re(6,6), te(6,6,6), tilt2
+  double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
+                    dxx, dxy, dyy, rp, rm
+  double complex :: lambda(0:maxmul)
+  double complex :: g(0:maxmul, 0:maxmul)
+
+  double complex :: sigma(0:maxmul, 0:maxmul), &
+                    dxsigma(0:maxmul, 0:maxmul), &
+                    dysigma(0:maxmul, 0:maxmul), &
+                    dxxsigma(0:maxmul, 0:maxmul), &
+                    dxysigma(0:maxmul, 0:maxmul), &
+                    dyysigma(0:maxmul, 0:maxmul)
+
+  double precision, external :: node_value
+  integer, external :: node_fd_errors
+  fmap = .true.
+
+  ! Read magnetic field components & fill lambda's according to field
+  ! components relative to given plane
+  normal = zero ; call get_node_vector('knl ', nn, normal)
+  skew   = zero ; call get_node_vector('ksl ', ns, skew)
+  nord = max(nn, ns)
+  tilt = node_value('tilt ')
+  elrad = node_value('lrad ')
+
+  F_ERRORS(0:maxferr) = zero
+  n_ferr = node_fd_errors(f_errors)
+  bvk = node_value('other_bv ')
+  tilt2 = 0 ! A parameter describing the relative tilt between
+            ! the dipole component and the higher-order components of the CFM
+
+  !####SETTING UP THE MULTIPOLES
+  an = node_value('angle ')
+  f_errors(0) = f_errors(0) + normal(0) ! The zero-component of the B-field
+
+  !Below here should not be commented output
+  !---- Other components and errors.
+  nord = 0
+  ! that loop should start at one since nominal dipole strength already taken into account above
+  !needs to be here though
+  do iord = 0, max(nn, ns, n_ferr/2-1)
+  !   get the maximum effective order; loop runs over maximum of user given values
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. &
+          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord+1 !  why  +1
+  enddo
+
+  do iord = 1, nord
+     f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))
+     f_errors(2*iord+1) = (skew(iord)   + f_errors(2*iord+1))
+     if (tilt .ne. zero) then
+        if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) then
+           angle = atan2(f_errors(2*iord+1), f_errors(2*iord)) / (iord+1) - tilt
+        else
+           angle = -tilt
+        endif
+        angle = (iord+1) * angle
+        dtmp = sqrt(f_errors(2*iord)**2 + f_errors(2*iord+1)**2)
+        f_errors(2*iord)   = dtmp * cos(angle)
+        f_errors(2*iord+1) = dtmp * sin(angle)
+     endif
+     f_errors(2*iord)   = bvk * f_errors(2*iord)
+     f_errors(2*iord+1) = bvk * f_errors(2*iord + 1)
+  enddo
+  !Done with all the setting up...
+
+  ! The "normal" components are considered here as the expansion coefficients of
+  ! B_y wrt. the reference plane, while the "skew" components are considered as the
+  ! corresponding expansion coefficients of B_x, see documentation. This can
+  ! be modified in the future, in particular to use tilted components,
+  ! but bare in mind that the bending curvature (the
+  ! lambda(0) terms) should be unchanged.
+  !
+  ! The above means precisely, that we currently implemented the following scheme:
+  !
+  ! B_y |_{\varphi = tilt} + i B_x |_{\varphi = tilt} = \sum_{k = 0}^nord \lambda_k r^k
+  !
+  ! with complex coefficients \lambda_k and in which
+  !
+  ! Im[\lambda_k] = 1/k! \partial^k B_x / \partial_r^k |_{\varphi = tilt} ,
+  ! Re[\lambda_k] = 1/k! \partial^k B_y / \partial_r^k |_{\varphi = tilt} .
+  !
+  ! play the role as the k'th skew- and normal field component.
+
+  do k = 0, nord
+     ! The factor (one + deltap) below is taken from the original MAD-X routine.
+     lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)/(one + deltap)
+  enddo
+
+  ! Set the curvature of the MAD-X reference trajectory; Due to MAD-X standards,
+  ! this trajectory should be independent on deltap
+  if (an .eq. 0) then
+     ! The special case an == 0 is treated differently for the purpose of backwards compatibility
+     kx = real(lambda(0))*(one + deltap)
+     ky = -aimag(lambda(0))*(one + deltap)
+  else
+     kx = an/elrad*cos(tilt)
+     ky = an/elrad*sin(tilt)
+  endif
+
+  !  N.B. B_y |_{\varphi = tilt, r = 0} = kx
+  !       B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
+  ! Phys. Rev. AccelBeams 19.054002
+
+  kappa = kx + (0, 1)*ky
+  barkappa = conjg(kappa)
+
+  ! Now fill up the g_{ij}'s for j = 0, ..., i and i = 0, ..., nord + 1.
+  g(0, 0) = (0, 0)
+  g(1, 0) = -lambda(0)
+  g(1, 1) = conjg(g(1, 0))
+
+  do k = 1, nord
+     do j = 0, k - 1
+        ! Eq. (6), in Ref. above
+        g(k + 1, j + 1) = (barkappa*g(k, j + 1)*(j + one)*(j - k + three/two) +  &
+             kappa*g(k, j)*(k - j)*(one/two - j))/(k - j)/(j + one)
+     enddo
+     ! Eq. (8) in Ref. above
+     sum0 = 0
+     do j = 1, k
+       sum0 = sum0 - (k + 1 - j)*g(k + 1, j)*exp(-two*(0, 1)*j*tilt2)
+     enddo
+     g(k + 1, 0) = ( sum0 - two**k*exp(-(0, 1)*k*tilt2)*( lambda(k) &
+                    + one/two*(barkappa*exp((0, 1)*tilt2) + kappa*exp(-(0, 1)*tilt2)) &
+                    *lambda(k - 1) ) )/(k + one)
+     g(k + 1, k + 1) = conjg(g(k + 1, 0))
+  enddo
+
+  etahat = sqrt(two*orbit(6)/beta + orbit(6)**2 + one) - one ! etahat = deltap of individual particle
+  h0 = sqrt((one + etahat)**2 - orbit(2)**2 - orbit(4)**2)
+
+  if (ftrk) then
+     rp = (orbit(1) + (0, 1)*orbit(3))/two
+     rm = conjg(rp)
+     ! Compute \partial_+ G using Eq. (7) in Ref. above
+     del_p_g = 0
+     do k = 1, nord
+        sum0 = 0
+        do j = 0, k - 1
+           sum0 = sum0 + (k - j)*g(k, j)*rp**(k - 1 - j)*rm**j
+        enddo
+        del_p_g = del_p_g + sum0
+     enddo
+     ! Now compute kick (Eqs. (38) in Ref. above)
+     pkick = elrad*(barkappa*h0 + del_p_g)
+     dpx = real(pkick)
+     dpy = - aimag(pkick)
+     orbit(1) = orbit(1) + elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)/h0
+     orbit(2) = orbit(2) + dpx
+     orbit(3) = orbit(3) + elrad*(kx*orbit(1) + ky*orbit(3))*orbit(4)/h0
+     orbit(4) = orbit(4) + dpy
+     ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
+     orbit(5) = orbit(5) - elrad*(kx*orbit(1) + ky*orbit(3)) &
+                *(one + beta*orbit(6))/beta/h0
+  endif
+  ! First-order terms by derivation of Eqs. (39) in Ref. above, at zero
+  ! re(6,6) is assumed to be a unit matrix as input
+  ! Eqs. (39) are required to obtain agreement to the thick sectormap.
+
+  if (nord .ge. 1) then
+     ! The next two expressions emerge by the first
+     ! derivative of \partial_+ G wrt. x and y, see documentation.
+     ! the factors (one + deltap) means that we take the derivative with respect to a given
+     ! energy-offset, so that if deltap != 0, the derivative is evaluated at a larger radius.
+
+     do k = 0, nord
+         do j = 0, k
+             ! N.B.: j = k + 1 leads to sigma(k, k + 1) = 0, so the inner loop will go only up to k
+             sigma(k, j) = elrad*(k + one - j)*g(k + 1, j)
+         enddo
+     enddo
+
+     do k = 0, nord - 1
+         do j = 0, k
+             dxsigma(k, j) = ((k + one - j)*sigma(k + 1, j) + (j + one)*sigma(k + 1, j + 1))/two
+             dysigma(k, j) = (0, 1)*((k + one - j)*sigma(k + 1, j) - (j + one)*sigma(k + 1, j + 1))/two
+         enddo
+     enddo
+
+     dxdpg = 0
+     dydpg = 0
+     do k = 0, nord - 1
+         do j = 0, k
+             dxdpg = dxdpg + dxsigma(k, j)*rp**(k - j)*rm**j
+             dydpg = dydpg + dysigma(k, j)*rp**(k - j)*rm**j
+         enddo
+     enddo
+
+     ! if evaluated at zero, one can instead use:
+     !dxdpg = elrad/two*(two*g(2, 0) + g(2, 1))
+     !dydpg = elrad/two*(0, 1)*(two*g(2, 0) - g(2, 1))
+
+     re(1, 1) = one + elrad*kx*orbit(2)/h0
+     re(1, 2) = elrad*(kx*orbit(1) + ky*orbit(3))*(one/h0 + orbit(2)**2/h0**3)
+     re(1, 3) = elrad*ky*orbit(2)/h0
+     re(1, 4) = elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)*orbit(4)/h0**3
+     re(1, 6) = -elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)/h0**3/beta*(one + beta*orbit(6))
+
+     re(2, 1) = real(dxdpg)
+     re(2, 2) = one - elrad*kx*orbit(2)/h0 
+     re(2, 3) = real(dydpg)
+     re(2, 4) = -elrad*kx*orbit(4)/h0 
+     re(2, 6) = elrad*kx/beta*(one + beta*orbit(6))/h0
+
+     re(3, 1) = elrad*kx*orbit(4)/h0
+     re(3, 2) = elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)*orbit(4)/h0**3
+     re(3, 3) = one + elrad*ky*orbit(4)/h0
+     re(3, 4) = elrad*(kx*orbit(1) + ky*orbit(3))*(one/h0 + orbit(4)**2/h0**3)
+     re(3, 6) = -elrad*(kx*orbit(1) + ky*orbit(3))*orbit(4)/h0**3/beta*(one + beta*orbit(6))
+
+     re(4, 1) = - aimag(dxdpg)
+     re(4, 2) = elrad*ky*orbit(2)/h0
+     re(4, 3) = - aimag(dydpg)
+     re(4, 4) = one - elrad*ky*orbit(4)/h0
+     re(4, 6) = elrad*ky/beta*(one + beta*orbit(6))/h0
+
+     re(5, 1) = -elrad*kx/beta*(one + beta*orbit(6))/h0
+     re(5, 2) = -elrad*orbit(2)*(kx*orbit(1) + ky*orbit(3))*(one + beta*orbit(6))/beta/h0**3
+     re(5, 3) = -elrad*ky/beta*(one + beta*orbit(6))/h0
+     re(5, 4) = -elrad*orbit(4)*(kx*orbit(1) + ky*orbit(3))*(one + beta*orbit(6))/beta/h0**3
+     re(5, 5) = one
+     re(5, 6) = -elrad*(kx*orbit(1) + ky*orbit(3))*(beta**2/h0 - (one + beta*orbit(6))**2/h0**3)/beta**2
+
+     re(6, 6) = one
+  endif
+  ! Second-order terms by derivation of Eqs. (39) in Ref. above, at zero
+  ! te(6,6,6) is assumed to be a zero tensor as input
+  if ((fsec) .and. (nord .ge. 2)) then
+     ! The next three expressions emerge by the second
+     ! derivative of \partial_+ G wrt. x and y at zero, see documentation.
+     ! The additional factor two in the end accounts for the fact
+     ! that the te(6,6,6) tensor and the 2nd derivative are related
+     ! by the usual Taylor-expansion factorials.
+     do k = 0, nord - 2
+         do j = 0, k
+             dxxsigma(k, j) = ((k + one - j)*((k + two - j)*sigma(k + 2, j) + two*(j + one)*sigma(k + 2, j + 1)) + &
+                              (j + one)*(j + two)*sigma(k + 2, j + 2))/4
+             dxysigma(k, j) = (0, 1)*((k + one - j)*(k + two - j)*sigma(k + 2, j) &
+                              - (j + one)*(j + two)*sigma(k + 2, j + 2))/4
+             dyysigma(k, j) = -((k + one - j)*((k + two - j)*sigma(k + 2, j) - two*(j + one)*sigma(k + 2, j + 1)) + &
+                              (j + one)*(j + two)*sigma(k + 2, j + 2))/4
+         enddo
+     enddo
+
+     dxx = 0
+     dxy = 0
+     dyy = 0
+     do k = 0, nord - 2
+         do j = 0, k
+             dxx = dxx + dxxsigma(k, j)*rp**(k - j)*rm**j
+             dxy = dxy + dxysigma(k, j)*rp**(k - j)*rm**j
+             dyy = dyy + dyysigma(k, j)*rp**(k - j)*rm**j
+         enddo
+     enddo
+     dxx = dxx/two
+     dxy = dxy/two
+     dyy = dyy/two
+
+     ! if evaluated at zero, one can use instead:
+     !dxx = elrad/two*(three*g(3, 0) + two*g(3, 1) + g(3, 2))/two
+     !dxy = elrad/two*(0, 1)*(three*g(3, 0) - g(3, 2))/two
+     !dyy = -elrad/two*(three*g(3, 0) - two*g(3, 1) + g(3, 2))/two
+
+     te(1, 1, 2) = elrad*kx*(one/h0 + orbit(2)**2/h0**3)/two
+     te(1, 1, 4) = elrad*kx*orbit(2)*orbit(4)/h0**3/two
+     te(1, 1, 6) = -elrad*kx*orbit(2)/h0**3*(one + beta*orbit(6))/beta/two
+
+     te(1, 2, 1) = te(1, 1, 2)
+     te(1, 2, 2) = elrad*(kx*orbit(1) + ky*orbit(3))*3*orbit(2)/h0**3*(one + orbit(2)**2/h0**2)/two
+     te(1, 2, 3) = elrad*ky*(one/h0 + orbit(2)**2/h0**3)/two
+     te(1, 2, 4) = elrad*(kx*orbit(1) + ky*orbit(3))*(orbit(4)/h0**3 + 3*orbit(2)**2*orbit(4)/h0**5)/two
+     te(1, 2, 6) = -elrad*(kx*orbit(1) + ky*orbit(3))*(one/h0**2 + 3*orbit(2)**2/h0**4)/beta/h0*(one + beta*orbit(6))/two
+
+     te(1, 3, 2) = te(1, 2, 3)
+     te(1, 3, 4) = elrad*ky*orbit(2)*orbit(4)/h0**3/two
+     te(1, 3, 6) = elrad*ky*orbit(2)/beta/h0*(one + beta*orbit(6))/two
+
+     te(1, 4, 1) = te(1, 1, 4)
+     te(1, 4, 2) = te(1, 2, 4)
+     te(1, 4, 3) = te(1, 3, 4)
+     te(1, 4, 4) = elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)*(one/h0**3 + 3*orbit(4)**2/h0**5)/two
+     te(1, 4, 6) = -elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)*orbit(4)*3/h0**5/beta*(one + beta*orbit(6))/two
+
+     te(1, 6, 1) = te(1, 1, 6)
+     te(1, 6, 2) = te(1, 2, 6)
+     te(1, 6, 3) = te(1, 3, 6)
+     te(1, 6, 4) = te(1, 4, 6)
+     te(1, 6, 6) = -elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)/beta/h0**3*(beta - 3/h0/beta**2*(one + orbit(6))**2)/two
+
+     te(2, 1, 1) = real(dxx)   ! cf
+     te(2, 1, 3) = real(dxy)   ! cf
+
+     te(2, 2, 2) = - te(1, 1, 2) ! checked
+     te(2, 2, 4) = -elrad*kx*orbit(2)*orbit(4)/h0**3/two
+     te(2, 2, 6) = elrad*kx*orbit(2)/h0**3/beta*(one + beta*orbit(6))/two
+
+     te(2, 3, 1) = te(2, 1, 3) ! cf
+     te(2, 3, 3) = real(dyy)   ! cf
+
+     te(2, 4, 2) = te(2, 2, 4)
+     te(2, 4, 4) = -elrad*kx*(one/h0 + orbit(4)**2/h0**3)/two ! - te(1, 1, 2) old
+     te(2, 4, 6) = elrad*kx*orbit(4)/h0**3/beta*(one + beta*orbit(6))/two
+     
+     te(2, 6, 2) = te(2, 2, 6)
+     te(2, 6, 4) = te(2, 4, 6)
+     te(2, 6, 6) = elrad*kx*(one/h0 - (one + beta*orbit(6))**2/beta**2/h0**3)/two  ! = te(1, 1, 2)*bp1 old
+
+     te(3, 1, 2) = elrad*kx*orbit(2)*orbit(4)/h0**3/two
+     te(3, 1, 4) = elrad*kx*(one/h0 + orbit(4)**2/h0**3)/two
+     te(3, 1, 6) = -elrad*kx*orbit(4)/h0**3/beta*(one + beta*orbit(6))/two
+
+     te(3, 2, 1) = te(3, 1, 2)
+
+     te(3, 2, 2) = elrad*(kx*orbit(1) + ky*orbit(3))*orbit(4)/h0**3*(one + 3*orbit(2)**2/h0**2)/two
+     te(3, 2, 3) = elrad*ky*orbit(2)*orbit(4)/h0**3/two
+     te(3, 2, 4) = elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)/h0**3*(one + 3*orbit(4)**2/h0**2)/two
+     te(3, 2, 6) = -elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)*orbit(4)/h0**5/beta*(one + beta*orbit(6))/two
+
+     te(3, 3, 2) = te(3, 2, 3)
+     te(3, 3, 4) = te(1, 2, 3) ! checked
+     te(3, 3, 6) = -elrad*ky*orbit(4)/h0**3/beta*(one + beta*orbit(6))/two
+
+     te(3, 4, 1) = te(3, 1, 4)
+     te(3, 4, 2) = te(3, 2, 4)
+     te(3, 4, 3) = te(3, 3, 4)
+
+     te(3, 4, 4) = elrad*(kx*orbit(1) + ky*orbit(3))*3*orbit(4)/h0**3*(one + orbit(4)**2/h0**2)/two
+     te(3, 4, 6) = -elrad*(kx*orbit(1) + ky*orbit(3))/beta/h0**3*(one + beta*orbit(6))*(one + 3*orbit(4)**2/h0**2)/two
+
+     te(3, 6, 1) = te(3, 1, 6)
+     te(3, 6, 2) = te(3, 2, 6)
+     te(3, 6, 3) = te(3, 3, 6)
+     te(3, 6, 4) = te(3, 4, 6)
+     te(3, 6, 6) = -elrad*(kx*orbit(1) + ky*orbit(3))*orbit(4)/beta/h0**3*(beta - 3/beta/h0**2*(one + beta*orbit(6)))/two
+
+     te(4, 1, 1) = - aimag(dxx)  ! cf
+     te(4, 1, 3) = - aimag(dxy)  ! cf
+
+     te(4, 2, 2) = elrad*ky/h0*(one + orbit(2)**2/h0**2)/two
+     te(4, 2, 4) = elrad*ky*orbit(2)*orbit(4)/h0**3/two
+     te(4, 2, 6) = -elrad*ky*orbit(2)/beta/h0**3*(one + beta*orbit(6))/two
+
+     te(4, 3, 1) = te(4, 1, 3)   ! cf
+     te(4, 3, 3) = - aimag(dyy)  ! cf
+
+     te(4, 4, 2) = te(4, 2, 4)
+     te(4, 4, 4) = -elrad*ky/h0*(one + orbit(4)**2/h0**2)/two
+     te(4, 4, 6) = elrad*ky*orbit(4)/beta/h0**3*(one + beta*orbit(6))/two
+
+     te(4, 6, 2) = te(4, 2, 6)
+     te(4, 6, 4) = te(4, 4, 6)
+     te(4, 6, 6) = elrad*ky/beta/h0*(beta - one/beta/h0**2*(one + beta*orbit(6)))/two
+
+     te(5, 1, 2) = -elrad*kx/beta*(one + beta*orbit(6))*orbit(2)/h0**3/two
+     te(5, 1, 4) = -elrad*kx/beta*(one + beta*orbit(6))*orbit(4)/h0**3/two
+     te(5, 1, 6) = -elrad*kx/beta/h0*(beta - one/beta/h0**2*(one + beta*orbit(6)))/two
+
+     te(5, 2, 1) = te(5, 1, 2)
+     te(5, 2, 2) = -elrad*(kx*orbit(1) + ky*orbit(3))*(one + beta*orbit(6))/beta/h0**3*(one + 3*orbit(2)**2/h0**2)/two
+     te(5, 2, 3) = -elrad*orbit(2)*ky*(one + beta*orbit(6))/beta/h0**3/two
+     te(5, 2, 4) = -elrad*orbit(2)*(kx*orbit(1) + ky*orbit(3))*(one + beta*orbit(6))/beta*3/h0**5*orbit(4)/two
+     te(5, 2, 6) = -elrad*orbit(2)*(kx*orbit(1) + ky*orbit(3))/beta/h0**3*(beta - 3/beta/h0**2*(one + beta*orbit(6))**2)/two
+
+     ! 5, 3 = ky/kx * 5, 1
+     te(5, 3, 2) = te(5, 2, 3)
+     te(5, 3, 4) = -elrad*ky/beta*(one + beta*orbit(6))*orbit(4)/h0**3/two
+     te(5, 3, 6) = -elrad*ky/beta/h0*(beta - one/beta/h0**2*(one + beta*orbit(6)))/two
+
+     te(5, 4, 1) = te(5, 1, 4)
+     te(5, 4, 2) = te(5, 2, 4)
+     te(5, 4, 3) = te(5, 3, 4)
+     te(5, 4, 4) = -elrad*(kx*orbit(1) + ky*orbit(3))*(one + beta*orbit(6))/beta/h0**3*(one + 3*orbit(4)**2/h0**2)/two
+     te(5, 4, 6) = -elrad*orbit(4)*(kx*orbit(1) + ky*orbit(3))/beta/h0**3*(beta - 3/beta/h0**2*(one + beta*orbit(6))**2)/two
+
+     te(5, 6, 1) = te(5, 1, 6)
+     te(5, 6, 2) = te(5, 2, 6)
+     te(5, 6, 3) = te(5, 3, 6)
+     te(5, 6, 4) = te(5, 4, 6)
+     te(5, 6, 6) = elrad*3*(kx*orbit(1) + ky*orbit(3))/beta**2/h0**3*(one + beta*orbit(6))*&
+                   (beta - one/beta/h0**2*(one + beta*orbit(6))**2)/two
+  endif
+end SUBROUTINE tmmult_cf
 
 SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   use twtrrfi
@@ -4648,6 +5092,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   re(5,3) = - re(4,6)
 
   !---- Second-order terms (use X,Y from orbit tracking).
+
   if (fsec) then
      if (nord .ge. 2) then
         dr = zero
@@ -4669,7 +5114,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
         te(4,3,3) = - di
      endif
   endif
-
 end SUBROUTINE tmmult
 
 SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
@@ -5314,10 +5758,10 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   n_ferr = node_fd_errors(f_errors)
 
   !-- element paramters
-  elpar_vl = el_par_vector(q_k1s, g_elpar)
+  elpar_vl = el_par_vector(q_k1st, g_elpar)
   bvk = node_value('other_bv ')
-  sk1  = bvk * ( g_elpar(q_k1)  + f_errors(2)/el)
-  sk1s = bvk * ( g_elpar(q_k1s) + f_errors(3)/el)
+  sk1  = bvk * ( g_elpar(q_k1)  + g_elpar(q_k1t)  + f_errors(2)/el)
+  sk1s = bvk * ( g_elpar(q_k1s) + g_elpar(q_k1st) + f_errors(3)/el)
   tilt = g_elpar(q_tilt)
   if (sk1s .ne. zero) then
      tilt = -atan2(sk1s, sk1)/two + tilt
@@ -5728,10 +6172,10 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   n_ferr = node_fd_errors(f_errors)
 
   !-- get element parameters
-  elpar_vl = el_par_vector(s_k2s, g_elpar)
+  elpar_vl = el_par_vector(s_k2st, g_elpar)
   bvk = node_value('other_bv ')
-  sk2  = bvk * ( g_elpar(s_k2)  + f_errors(4)/el )
-  sk2s = bvk * ( g_elpar(s_k2s) + f_errors(5)/el )
+  sk2  = bvk * ( g_elpar(s_k2)  + g_elpar(s_k2t)  +  f_errors(4)/el )
+  sk2s = bvk * ( g_elpar(s_k2s) + g_elpar(s_k2st) +  f_errors(5)/el )
   tilt = node_value('tilt ')
   if (sk2s .ne. zero) then
      tilt = -atan2(sk2s, sk2)/three + tilt
@@ -6318,6 +6762,7 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   fmap = dl .ne. zero
 
   !---- First-order terms.
+
   re(1,2) = dl
   re(3,4) = dl
   re(5,6) = dl/(beta*gamma)**2
@@ -6334,16 +6779,71 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
      te(5,4,4) = te(5,2,2)
      te(5,6,6) = te(1,2,6) * three / (beta * gamma) ** 2
   endif
-
+  
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmdrf
 
-SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
+SUBROUTINE tmchp0(ftrk,orbit,fmap,ek,re, te)
   use twisslfi
   use twiss_elpfi
-  use twissbeamfi, only : deltap, pc
+  use twissbeamfi, only : deltap, pc, gamma, energy, beta
+  use matrices, only : EYE
+  use math_constfi, only : zero, one
+  use phys_constfi, only : clight
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for change of reference Energy                     *
+  !     Input:                                                           *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !----------------------------------------------------------------------*
+  logical :: fsec, ftrk, fmap, fcentre, fringe
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+
+  double precision :: energy1, pc1, gamma1, pt, mass, beta1i
+  double precision, external :: node_value, get_value
+  integer, external :: el_par_vector
+
+  mass     = get_value('probe ','mass ')
+  re = EYE
+  ek = zero
+  te = zero
+  pt = orbit(6) 
+
+  !---- Transfer map.
+  fmap = .true.
+  
+  energy1 = pt*pc+energy
+  pc1 = sqrt(energy1**2-mass**2)
+  gamma1 = energy1/mass
+  beta1i = energy1/pc1
+
+  re(2,2) = pc/pc1
+  re(4,4) = pc/pc1
+  re(6,6) = pc/pc1
+
+  ek(6) = beta1i*(gamma/gamma1-one)
+
+  if(ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
+
+end SUBROUTINE tmchp0
+
+
+SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
+  use twisslfi
+  use twtapering
+  use twiss_elpfi
+  use twissbeamfi, only : deltap, pc, radiate
   use matrices, only : EYE
   use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi
   use phys_constfi, only : clight
@@ -6365,22 +6865,24 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap, fcentre, fringe
+
+  logical :: fsec, ftrk, fmap, fcentre, istaper, fringe
   double precision :: el, ds
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
   double precision :: ek_f(6), re_f(6,6), te_f(6,6,6)
   double precision :: ek_tmp(6), re_tmp(6,6), te_tmp(6,6,6)
+  double precision :: ek_ch(6), re_ch(6,6), te_ch(6,6,6)
 
-  integer :: elpar_vl
+  integer :: elpar_vl, ncav
   double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, bvk
   double precision :: ek0(6), rw(6,6), tw(6,6,6)
-  double precision :: c0, c1, c2
+  double precision :: c0, c1, c2, tmpphase
 
-  double precision, external :: node_value
-  integer, external :: el_par_vector
+  double precision, external :: node_value, get_value
+  integer, external :: el_par_vector, get_ncavities
 
   !-- get element parameters
-  elpar_vl = el_par_vector(r_freq, g_elpar)
+  elpar_vl = el_par_vector(r_lagt, g_elpar)
 
   !---- Fetch voltage.
   rfv = g_elpar(r_volt)
@@ -6404,8 +6906,9 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
   !---- BV flag
   rff = g_elpar(r_freq)
-  rfl = g_elpar(r_lag)
+  rfl = g_elpar(r_lag) +  g_elpar(r_lagt)
   bvk = node_value('other_bv ')
+  
 
   !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
   if (bvk .eq. -one) then
@@ -6416,13 +6919,22 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   omega = rff * ten6p * twopi / clight
   vrf   = rfv * ten3m / (pc * (one + deltap))
   phirf = rfl * twopi - omega * orbit(5)
+
+  istaper = get_value('twiss ','tapering ').ne.zero
+  
+  if(istaper .and. ftrk) then
+    ncav = get_ncavities()   
+    phirf = asin((sin(pi*half)*vrf - endpt/ncav)/vrf)
+    tmpphase = (phirf+omega*orbit(5))/twopi-g_elpar(r_lag)
+    call store_node_value('lagtap ', tmpphase)
+  endif
+  
   c0 =   vrf * sin(phirf)
   c1 = - vrf * cos(phirf) * omega
   c2 = - vrf * sin(phirf) * omega**2 * half
 
   !---- Transfer map.
   fmap = .true.
-
 
   !---- Sandwich cavity between two drifts.
   if (el .ne. zero) then
@@ -6451,6 +6963,12 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   endif
 
     call tmcat(fsec,re,te,rw,tw,re,te)
+
+    
+     ! call tmchp0(ftrk,orbit,fmap,ek_ch,re_ch, te_ch)
+      !call tmcat(fsec,re_ch,te_ch,re,te,re,te)
+    
+
     if (fcentre) return
 
     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
@@ -6460,7 +6978,6 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
       call tmcat(fsec,re_f,te_f,re,te,re,te)
     endif
 
-  
   else
     if (ftrk) then
       orbit(6) = orbit(6) + c0
@@ -8459,6 +8976,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
 end SUBROUTINE tmrfmult
 
 SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
+  use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -8507,6 +9025,7 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   double complex :: k2, k, kl
 
   integer, external :: get_option
+  character(len=name_len) :: name
 
   betx = betxi
   dx = dxi
@@ -8546,15 +9065,17 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   I(5) = curlyhaverage * abs(rhoinv)**3 * blen
 
   if (get_option('debug ') .ne. 0) then
-     print *, ' '
-     print *, 'Input:  rhoinv = ', rhoinv, 'k1 = ', k1, 'e1 =', e1, 'e2 = ', e2, 'blen = ', blen
-     print *, '        betxi = ', betxi, 'alfxi = ', alfxi, 'dxi = ', dxi, 'dpxi = ', dpxi
-     print *, ' --> '
-     print *, '        k2 = ', k2, '  k = ', k, 'k*l = ', kl
-     print *, '        alfx = ', alfx, 'dpx = ', dpx, 'gamx = ', gamx, 'dx2 = ', dx2
-     print *, '        dispaverage = ', dispaverage, 'curlyhaverage = ', curlyhaverage
-     print *, 'Contributions to Radiation Integrals:', I(1), I(2), I(3), I(4), I(5)
-     print *, ' '
+    !LD: 22.12.2019
+    call element_name(name,len(name))
+    print *, 'Synchrotron integrals at exit of element ', name
+    print *, 'Input:  rhoinv = ', rhoinv, 'k1 = ', k1, 'e1 =', e1, 'e2 = ', e2, 'blen = ', blen
+    print *, '        betxi = ', betxi, 'alfxi = ', alfxi, 'dxi = ', dxi, 'dpxi = ', dpxi
+    print *, ' --> '
+    print *, '        k2 = ', k2, '  k = ', k, 'k*l = ', kl
+    print *, '        alfx = ', alfx, 'dpx = ', dpx, 'gamx = ', gamx, 'dx2 = ', dx2
+    print *, '        dispaverage = ', dispaverage, 'curlyhaverage = ', curlyhaverage
+    print *, 'Contributions to Radiation Integrals:', I(1), I(2), I(3), I(4), I(5)
+    print *, ' '
   endif
 
 END SUBROUTINE calcsyncint
@@ -8675,9 +9196,9 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   elrad = node_value('lrad ')
   tilt = node_value('tilt ')
 
-  rfv = bvk * node_value('volt ')
+  rfv  = node_value('volt ')
   freq = node_value('freq ')
-  rfl = node_value('lag ')
+  rfl  = node_value('lag ')
 
   kn0l = rfv / pc / ten3p; ! MeV / 1d3 / GeV = rad
   pn0  = quarter + rfl; ! 2pi/4 + rfl

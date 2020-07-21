@@ -313,7 +313,7 @@ vary,name=kqf,step=1.0e-6;
 
 vary,name=kqd,step=1.0e-6;
 
-jacobian,calls=20,tolerance=1.e-21;
+jacobian,calls=20,tolerance=1.e-21,bisec=1;
 
 number of variables:    3
 user given constraints: 3
@@ -321,7 +321,7 @@ total constraints:      3
 
 START JACOBIAN:
 
- reset parameter:mq->l                                           from   3.1000000000000001      to   2.9499980000000003     
+ reset parameter:mq->l                                           from   3.1000000000000001      to   2.9499980000000003
  JACOBIAN Strategy =           3
 Initial Penalty Function =   0.8571976411662916E+02
 
@@ -426,7 +426,7 @@ Final Penalty Function =   4.31799408e+00
 
 
 
-Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit
 --------------------------------------------------------------------------------
 mq->l                     2.95000e+00  3.10000e+00  1.00000e-01  2.95000e+00
 kqf                       9.93185e-03  9.07757e-03 -1.00000e+20  1.00000e+20

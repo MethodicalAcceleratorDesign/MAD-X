@@ -303,6 +303,7 @@ static void att_rfmultipole(struct c6t_element*);
 static void att_xrotation(struct c6t_element*);
 static void att_yrotation(struct c6t_element*);
 static void att_srotation(struct c6t_element*);
+static void att_sixmarker(struct c6t_element* el);
 static void att_undefined(struct c6t_element*);
 static void clean_c6t_element(struct c6t_element*);
 static struct c6t_element* create_aperture(const char* ,const char* ,double, double, double, double, double, double, double,
@@ -382,7 +383,7 @@ static void write_struct(void);
 static void setup_output_string(void);
 static void write_f3_rfmultipoles(struct c6t_element*);
 static int my_table_row(struct table*, char*);
-
+static void write_f3_sixmarker(struct element* el);
 /* routines used from makethin.c */
 static struct li_list types;
 
@@ -445,7 +446,8 @@ static char el_info[][60] = /* see type_info definition */
  "rfoctupole   2       0       2       0       0       2",
  "xrotation    2       2       2       0       0       0",
  "yrotation    2       2       2       0       0       0",
- "srotation    2       2       2       0       0       0"
+ "srotation    2       2       2       0       0       0",
+ "sixmarker    2       2       2       0       0       2"
 };
 
 /* no. of valid element types */
@@ -664,6 +666,7 @@ assign_att(void)
         else if (strcmp(el->base_name, "xrotation") == 0) att_xrotation(el);
         else if (strcmp(el->base_name, "yrotation") == 0) att_yrotation(el);
         else if (strcmp(el->base_name, "srotation") == 0) att_srotation(el);
+        else if (strcmp(el->base_name, "sixmarker") == 0) att_sixmarker(el);
         else att_undefined(el);
       }
     }
@@ -924,6 +927,19 @@ att_srotation(struct c6t_element* el)
 {
   el->out_1 = 45;
   el->out_2 = el->value[1] ;
+}
+
+static void
+att_sixmarker(struct c6t_element* el)
+{
+  el->out_1 = el->value[1];
+  el->out_2 = el->value[2];
+  el->out_3 = el->value[3];
+  el->out_4 = el->value[4];
+  el->out_5 = el->value[5];
+  el->out_6 = el->value[6];
+  el->out_7 = el->value[7];
+
 }
 
 static void
@@ -1460,6 +1476,22 @@ convert_madx_to_c6t(struct node* p)
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
     c6t_elem->value[1] = el_par_value_recurse("angle",p->p_elem);
+  }
+  else if(strcmp(p->base_name,"sixmarker") == 0){
+    c6t_elem = new_c6t_element(20,t_name,p->base_name);
+
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+    c6t_elem->value[1] = el_par_value_recurse("eltype",p->p_elem);
+    int nl;
+    double attrtemp [20];
+    nl = element_vector(p->p_elem, "attr", attrtemp);
+    write_f3_sixmarker(p->p_elem);
+
+    for(int i=0; i< nl; i++){
+        c6t_elem->value[i+2] = attrtemp[i];
+    }
+
   }
   else if (strcmp(p->base_name,"drift") == 0)
   {
@@ -3204,6 +3236,41 @@ write_f3_aux(void)
     fprintf(f3aux, "SXD%23.15f\n", aux_val[3]);
     fprintf(f3aux, "NEXT\n");
   }
+}
+
+static void
+write_f3_sixmarker(struct element* el){
+  int nl;
+  char* tmp;
+  char tmp2 [500], str_att_value[50]; 
+  double attrtemp [20] ;
+  char nstr [5], nstr2[5];
+  tmp = mymalloc("sixmarker", 500*sizeof *tmp);
+
+
+  if (!f3) f3 = fopen("fc.3", "w");
+    
+  tmp =command_par_string("f3string",el->def);
+  nl = element_vector(el, "attr", attrtemp);
+  
+  for(int i=0; i<nl; i++){
+    
+    sprintf(str_att_value, "%12.8e", attrtemp[i]);
+    
+    strcpy(nstr2,"{");
+    sprintf(nstr, "%d", i);
+    strcat(nstr2,nstr);
+
+    strcat(nstr2,"}");
+    myrepl(nstr2, str_att_value, tmp, tmp2);
+    strcpy(tmp, tmp2);
+    
+  }
+
+  myrepl("{newline}", "\n", tmp2, tmp);
+  fprintf(f3, "%s", tmp);
+  fprintf(f3, "%s", "\n");
+
 }
 
 static void

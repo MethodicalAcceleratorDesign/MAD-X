@@ -300,12 +300,12 @@ where the parameters have the following meaning:
 \begin{madlist}
 	\ttitem{RANGE} \hyperref[sec:range]{Range} given by
 	elements. Default = \texttt{\#s/\#e}  
-	\ttitem{DQF} Peak linear dispersion [m]. Default = 2.086 
+	\ttitem{DQF} Peak linear dispersion $(\partial x / \partial p_t)$[m]. Default = 2.086 
 	\ttitem{DPARX} Fractional horizontal parasitic dispersion. Default = 0.273 
 	\ttitem{DPARY} Fractional vertical parasitic dispersion. Default = 0.273 
 	\ttitem{BETAQFX} Beta x in standard qf [m]. Default = 170.25 
-	\ttitem{BBEAT} Beta beating coefficient applying to beam size. Default = 1.1 
-	\ttitem{DP} Bucket edge at the current beam energy. Default = 0.0015 
+	\ttitem{BBEAT} Beam size increase. This can be used to include beta-beat but note that it is a increase of the beamsize.  Default = 1.1 
+	\ttitem{DP} Bucket edge at the current beam energy. Note that this should be given in $p_t$ and not deltap. For high energy machines such as the LHC this makes no difference. Default = 0.0015 
 	\ttitem{COR} Maximum radial closed orbit uncertainty [m]. Default = 0.004 
 	\ttitem{NCO} Number of azimuth per quadrant for halo radial scan. Default = 5 
 	\ttitem{HALO} Halo parameters: \{n, r, h, v\}. n is the radius of the
@@ -392,6 +392,23 @@ halo polygon apexes. The result is that the halo polygon has a few
 expansion will henceforth not miss a dent in the beam pipe. See
 figure \ref{fig:notsimple2}. The use of the
 notsimple option significantly increases computation time. 
+\section{Dispersion}
+The aperture module uses both the parasitic dispersion which is based on inputs from the aperture module as well as the design dispersion which is
+obtained from \texttt{TWISS}. The spurious dispersion is given by:
+\begin{equation}
+D_{spur}(s) =  D_m(s)(\sigma_{increase}-1) +\frac{\sigma_{increase}(\sqrt{\beta _m (s)}  f_{dqf}D_{para}}{\sqrt{\beta _{arc}}}),
+\end{equation}
+where $D_m(s)$, $\beta_m(s) $is the dispersion and $\beta$-function from TWISS at the given location, 
+\texttt{DQF}=$f_{dqf}$ , \texttt{DPARX}=$D_{para}$, \texttt{BETAQFX} = $\beta_{arc}$, \texttt{BBEAT} =$\sigma_{increase}$. 
+
+When the aperture is calculated the two extrem points are checked for the model dispersion, i.e. +\texttt{DP} and -\texttt{DP}. The spurious dispersion is then added to this point in the way that it reduces the aperture the most for the given angle. This is the same method that is used for mechanical tolerances as well. The way the dispersion is added is shown in figure~\ref{fig:aper:dispersion}. In case \texttt{NOTSIMPLE} is chosen 10 points between +\texttt{DP} and -\texttt{DP} is evaluated. This is only needed in case of concave apertures and slows down the calculations significantly. 
+ 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=250bp]{jpg/dispersion_calc.pdf}    
+  \caption{The closed orbit is the black spot and the blue spots are displaced due to the design dispersion. The green rectangles show the spurious dispersion being added. Note that the points in the left corner of the figure has the same parameters but with $p_t$ being negative. }
+  \label{fig:aper:dispersion}
+\end{figure}
 
 \section{Trueprofile file syntax}
 \label{sec:trueprofile}

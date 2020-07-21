@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.05.05 17:13:00      +
+  + Execution date: 2020.07.20 12:11:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
@@ -39,7 +39,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
@@ -94,8 +94,8 @@ enter EMIT module
  C                  67.200074 m          f0               4.461192314 MHz
  T0              0.2241553221 musecs     alfa         0.0008829339203 
  eta           0.000882904907            gamma(tr)        33.65393868 
- Bcurrent                   0 A/bunch    Kbunch             1 
- Npart                      0 /bunch     Energy                     3 GeV 
+ Bcurrent     7.147617923e-13 A/bunch    Kbunch             1 
+ Npart                      1 /bunch     Energy                     3 GeV 
  gamma            5870.853595            beta            0.9999999855
  dtbyds                     0
      U0              0.254202 [MeV/turn]
@@ -152,8 +152,8 @@ parameter: et   double value:    9.569041543e-07
 parameter: sigt   double value:    0.0008578396932
 parameter: sige   double value:     0.001115467778
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
-parameter: bcurrent   double value:                  0
+parameter: npart   double value:                  1
+parameter: bcurrent   double value:    7.147617923e-13
 parameter: freq0   double value:        4.461192314
 parameter: circ   double value:          67.200074
 parameter: dtbyds   double value:                  0
@@ -205,7 +205,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
@@ -260,8 +260,8 @@ enter EMIT module
  C                  67.200074 m          f0               4.461192314 MHz
  T0              0.2241553221 musecs     alfa         0.0008829339203 
  eta           0.000882904907            gamma(tr)        33.65393868 
- Bcurrent                   0 A/bunch    Kbunch             1 
- Npart                      0 /bunch     Energy                     3 GeV 
+ Bcurrent     7.147617923e-13 A/bunch    Kbunch             1 
+ Npart                      1 /bunch     Energy                     3 GeV 
  gamma            5870.853595            beta            0.9999999855
  dtbyds                     0
      U0              0.254202 [MeV/turn]
@@ -324,8 +324,8 @@ parameter: et   double value:    8.450985528e-07
 parameter: sigt   double value:    0.0008061722208
 parameter: sige   double value:     0.001048278042
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
-parameter: bcurrent   double value:                  0
+parameter: npart   double value:                  1
+parameter: bcurrent   double value:    7.147617923e-13
 parameter: freq0   double value:        4.461192314
 parameter: circ   double value:          67.200074
 parameter: dtbyds   double value:                  0

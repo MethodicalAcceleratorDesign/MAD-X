@@ -2,8 +2,8 @@ TITLE,'TRANSLINE_2+4 type';
 OPTION,-ECHO,info,warn;
 OPTION, RBARC=FALSE;
 !---------------------------------------------------------------!
-BEAM, PARTICLE=PROTON, PC=0.729, EX=1.5E-06, EY=3.E-06; 
-DEG:=PI/180.0; 
+BEAM, PARTICLE=PROTON, PC=0.729, EX=1.5E-06, EY=3.E-06;
+DEG:=PI/180.0;
 !---------------------------------------------------------------!
 Q11 : QUADRUPOLE,   L=0.20,   K1:= KQ11;    KQ11=6.23173e+000  ;
 Q12 : QUADRUPOLE,   L=0.20,   K1:= KQ12;    KQ12=-7.35812e+000 ;
@@ -54,20 +54,20 @@ trans:LINE=(D00,D17,Q11,D10,D20,D10,D10,D20,
             D10,Q13,PSTN1,D12,D13,Q14,D17,
             D13,Q15,D12,D13,Q16,PSTN3,M1,D15,
             D10,B21,M2,D1,B22,M3,D1,PSTN,B23,M4,D1,
-            B24,M5,D12,D16,PSTN2,D16,D12); 
+            B24,M5,D12,D16,PSTN2,D16,D12);
 USE,SEQUENCE=trans;
 !---------------------------------------------------------------!
-upp= 15.0; 
-low=-15.0; 
-upp_b= 2.5; 
-low_b=-2.5; 
-bx=6.0; 
-by=3.0; 
+upp= 15.0;
+low=-15.0;
+upp_b= 2.5;
+low_b=-2.5;
+bx=6.0;
+by=3.0;
 ax=0.0;
 ay=0.0;
-DELTAP=0.000; 
+DELTAP=0.000;
 !---------------------------------------------------------------!
-DELTAP:=0.003; 
+DELTAP:=0.003;
 BEAM_EX:=1.5E-06;
 BEAM_EY:=3.0E-06;
 BETX1:=TABLE(TWISS,BETX);
@@ -97,13 +97,13 @@ VARY, NAME=KB22, STEP=1E-6, LOWER=low_b, UPPER=UPP_b;
 VARY, NAME=KB23, STEP=1E-6, LOWER=low_b, UPPER=UPP_b;
 VARY, NAME=KB24, STEP=1E-6, LOWER=low_b, UPPER=UPP_b;
 
-constraint,sequence=trans, range=#S/#E, betx<10.0, bety<10.0;   
+constraint,sequence=trans, range=#S/#E, betx<10.0, bety<10.0;
 CONSTRAINT,sequence=trans,range=PSTN2,MUX=1.50,MUY=1.0 ;
-constraint,sequence=trans,range=PSTN2,BETX=6.0,BETY=3.0,ALFX=0,ALFY=0,dx=0,dpx=0 ; 
+constraint,sequence=trans,range=PSTN2,BETX=6.0,BETY=3.0,ALFX=0,ALFY=0,dx=0,dpx=0 ;
 constraint,sequence=trans, range=M1/M5,mvar1<0.01,mvar2<0.002 ;
 
 lmdif,calls=100000;
-jacobian,calls=100,tolerance=1e-15;
+jacobian,calls=100,tolerance=1e-15,bisec=1;
 endmatch;
 !---------------------------------------------------------------!
 select,flag=twiss,clear;

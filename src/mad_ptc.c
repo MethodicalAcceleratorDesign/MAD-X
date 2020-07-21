@@ -1181,6 +1181,11 @@ pro_ptc_eplacement(struct in_cmd* cmd)
      {
        refframe = 2;
      }
+     
+     if ( strcmp(s_refframe,"gcs") == 0 )
+     {
+       refframe = 0;
+     }
 
     if (refframe < 0)
      {
