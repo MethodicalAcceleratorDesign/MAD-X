@@ -64,6 +64,7 @@ ifneq ($(FCNAME),nagfor)
 Sg_sagan_wiggler.o: FFLAGS += $(if $(call eq,$(FCNAME),lf95),-dollar-ok,-fdollar-ok)
 endif
 
+utils.o: FFLAGS += $(if $(call eq,$(FCNAME),gfortran),-fallow-invalid-boz,)
 
 #######################
 # Fortran dependencies (case not automatic!)
