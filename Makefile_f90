@@ -180,19 +180,19 @@ endif
 
 ifneq ($(filter $(BUILDGOALS),$(MAKECMDGOALS)),)
 ifeq ($(FCNAME),gfortran)
-FCVER  := $(strip $(shell $(FC) -dumpversion))
-ifeq ($(findstring GNU Fortran (GCC),$(FCVER)),GNU Fortran (GCC))
-FCVER  := $(word 4,$(FCVER)) # gfortran -dumpversion bug
-endif
-FCVERL := $(subst ., ,$(FCVER))
-FCVER1 := $(findstring $(word 1,$(FCVERL)),"456789")
-FCVER2 := 0
-  ifeq ($(FCVER1),4)
-  FCVER2 := $(findstring $(word 2,$(FCVERL)),"456789")
+  FCVER  := $(strip $(shell $(FC) -dumpversion))
+  ifeq ($(findstring GNU Fortran (GCC),$(FCVER)),GNU Fortran (GCC))
+    FCVER := $(word 4,$(FCVER)) # gfortran -dumpversion bug
   endif
-ifeq ($(and $(FCVER1),$(FCVER2)),)
-$(error MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
-endif # version
+  FCVERL := $(subst ., ,$(FCVER))
+  FCVER1 := $(findstring $(word 1,$(FCVERL)),4 5 6 7 8 9 10 11 12 13 14 15 16 17)
+  FCVER2 := 0
+  ifeq ($(FCVER1),4)
+    FCVER2 := $(findstring $(word 2,$(FCVERL)),4 5 6 7 8 9)
+  endif
+  ifeq ($(and $(FCVER1),$(FCVER2)),)
+    $(error MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
+  endif # version
 endif # gfortran
 endif # cmdgoal
 
