@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2018.10.31 10:50:57      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.20 12:12:53      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'testing BEAM definitions in MADX';
 
@@ -38,7 +38,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
@@ -114,7 +114,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
@@ -190,7 +190,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
@@ -266,7 +266,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
@@ -342,7 +342,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
@@ -418,7 +418,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
@@ -494,7 +494,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:                400
 parameter: circ   double value:       0.7494795158
@@ -570,7 +570,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:                400
 parameter: circ   double value:       0.7494795158
@@ -654,7 +654,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
@@ -696,7 +696,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
@@ -737,7 +737,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
@@ -777,7 +777,7 @@ parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9

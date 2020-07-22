@@ -2,8 +2,8 @@
 @ TYPE             %07s "MAP_TAB"
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "18/12/19"
-@ TIME             %08s "11.36.40"
+@ DATE             %08s "20/07/20"
+@ TIME             %08s "12.15.23"
 * NAME                             COEF   N_VECTOR         NV      ORDER         NX        NXP         NY        NYP    NDELTAP         NT 
 $ %s                                %le         %d         %d         %d         %d         %d         %d         %d         %d         %d 
  "C1_000000"            9.059199475e-09          1          6          0          0          0          0          0          0          0

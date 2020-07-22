@@ -1107,7 +1107,7 @@ end SUBROUTINE ttmult_cf_mini
 
 SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   use twtrrfi
-  use twissbeamfi, only : deltap, beta
+  use twissbeamfi, only : beta
   use math_constfi, only : zero, one, two, three
   use time_varfi
   use trackfi
@@ -1137,7 +1137,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
   integer, external :: Factorial
   double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
-  double precision :: dtmp, an, angle, tilt2
+  double precision :: dtmp, an, angle, tilt2, etahat
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
                     dxx, dxy, dyy, rp, rm
@@ -1186,9 +1186,9 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   lambda(0:maxmul) = 0
 
   if (elrad.gt.zero) then
-    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad/(one + deltap)
+    lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad
      do k = 1, nord
-        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)/(one + deltap)
+        lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)
      enddo
   else
      lambda = zero
@@ -1223,7 +1223,10 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
      g(k + 1, k + 1) = conjg(g(k + 1, 0))
   enddo
 
-   do jtrk = 1,ktrack
+  do jtrk = 1, ktrack
+     etahat = sqrt(two*track(6,jtrk)/beta + track(6,jtrk)**2 + one) - one ! etahat = deltap of individual particle
+     h0 = sqrt((one + etahat)**2 - track(2,jtrk)**2 - track(4,jtrk)**2)
+
      rp = (track(1,jtrk) + (0, 1)*track(3,jtrk))/two
      rm = conjg(rp)
 
@@ -1237,15 +1240,16 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
         del_p_g = del_p_g + sum0
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
-     pkick = elrad*(barkappa*(one + deltap) + del_p_g)
+     pkick = elrad*(barkappa*h0 + del_p_g)
      dpx = real(pkick)
      dpy = - aimag(pkick)
-     track(2,jtrk) = track(2,jtrk) + dpx
-     track(4,jtrk) = track(4,jtrk) + dpy
+     track(1, jtrk) = track(1, jtrk) + elrad*(kx*track(1, jtrk) + ky*track(3, jtrk))*track(2, jtrk)/h0
+     track(2, jtrk) = track(2, jtrk) + dpx
+     track(3, jtrk) = track(3, jtrk) + elrad*(kx*track(1, jtrk) + ky*track(3, jtrk))*track(4, jtrk)/h0
+     track(4, jtrk) = track(4, jtrk) + dpy
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
-     track(5,jtrk) = track(5,jtrk) - elrad*(kx*track(1,jtrk) + ky*track(3,jtrk)) &
-                *(one + beta*track(6,jtrk))/(one + deltap)/beta
-  
+     track(5, jtrk) = track(5, jtrk) - elrad*(kx*track(1, jtrk) + ky*track(3, jtrk)) &
+                *(one + beta*track(6, jtrk))/beta/(one + etahat)
   enddo
 
 

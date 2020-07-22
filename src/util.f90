@@ -112,6 +112,7 @@ module code_constfi
   integer, parameter :: code_rfmultipole = 43
   integer, parameter :: code_collimator = 44
   integer, parameter :: code_changerefp0 = 45
+  integer, parameter :: code_sixmarker = 46
 end module code_constfi
 
 module aperture_enums
@@ -583,7 +584,7 @@ module plotfi
   !--- parameters used in the routine peschm in file plot.F
 
   integer, parameter :: mobj = 14, msize = 88
-  integer, parameter :: mtitl  = 128, mxlabl = 160
+  integer, parameter :: mtitl  = 128, mxlabl = 300 !hbu mxlabl = 160 increased to 300 as required by plot.f90
   integer, parameter :: mnvar = 74, mxdep = 2
   integer, parameter :: mqadd = 100000
   integer, parameter :: mntmax = 20, mksmax = 10

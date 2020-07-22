@@ -6,6 +6,7 @@
 #include "distinterface.h"
 #include "distgeneration.h"
 #include "outputdist.h"
+#include "distdata.h"
 
 
 /*
@@ -167,7 +168,6 @@ void setcoords(double *xn, double *xpn, double *yn, double *ypn, double *zn, dou
 
 void settotalsteps(int totgenerate){
     dist->totincoord = totgenerate;
-    printf("setttttinglllll \n");
 }
 
 void setscan_para_diagonal(int variable, int variable_type, int type, double start, double stop){
