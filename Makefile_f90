@@ -64,8 +64,6 @@ ifneq ($(FCNAME),nagfor)
 Sg_sagan_wiggler.o: FFLAGS += $(if $(call eq,$(FCNAME),lf95),-dollar-ok,-fdollar-ok)
 endif
 
-util.o: FFLAGS += $(if $(call eq,$(FCNAME),gfortran),-fallow-invalid-boz,)
-
 #######################
 # Fortran dependencies (case not automatic!)
 
@@ -193,6 +191,7 @@ ifeq ($(FCNAME),gfortran)
   ifeq ($(and $(FCVER1),$(FCVER2)),)
     $(error MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
   endif # version
+  util.o: FFLAGS += $(if $(findstring $(FCVER1),10 11 12 13 14 15 16 17),-fallow-invalid-boz,)
 endif # gfortran
 endif # cmdgoal
 
