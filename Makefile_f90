@@ -64,6 +64,9 @@ ifneq ($(FCNAME),nagfor)
 Sg_sagan_wiggler.o: FFLAGS += $(if $(call eq,$(FCNAME),lf95),-dollar-ok,-fdollar-ok)
 endif
 
+# BOZ flag set at the end of this file, i.e. need gfortran version
+# util.o: FFLAGS += $(if $(call search,$(FCVER1),$(FCBOZV)),-fallow-invalid-boz,)
+
 #######################
 # Fortran dependencies (case not automatic!)
 
@@ -183,15 +186,21 @@ ifeq ($(FCNAME),gfortran)
     FCVER := $(word 4,$(FCVER)) # gfortran -dumpversion bug
   endif
   FCVERL := $(subst ., ,$(FCVER))
-  FCVER1 := $(findstring $(word 1,$(FCVERL)),4 5 6 7 8 9 10 11 12 13 14 15 16 17)
-  FCVER2 := 0
-  ifeq ($(FCVER1),4)
-    FCVER2 := $(findstring $(word 2,$(FCVERL)),4 5 6 7 8 9)
+  FCVER1 := $(word 1,$(FCVERL))
+  FCVER2 := $(word 2,$(FCVERL))
+  FCVER3 := $(word 3,$(FCVERL))
+  FCVERS := 4 5 6 7 8 9 10 11 12 13 14 15 16 17 19 20
+  FCISOK := $(call search,$(FCVER1),$(FCVERS))
+  ifeq ($(FCISOK),4)
+    FCISOK := $(call search,$(FCVER2),$(FCVERS))
   endif
-  ifeq ($(and $(FCVER1),$(FCVER2)),)
+  ifeq ($(FCISOK),)
     $(error MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
   endif # version
-  util.o: FFLAGS += $(if $(findstring $(FCVER1),10 11 12 13 14 15 16 17),-fallow-invalid-boz,)
+
+  FCBOZV := 10 11 12 13 14 15 16 17 19 20
+  util.o: FFLAGS += $(if $(call search,$(FCVER1),$(FCBOZV)),-fallow-invalid-boz,)
+
 endif # gfortran
 endif # cmdgoal
 
