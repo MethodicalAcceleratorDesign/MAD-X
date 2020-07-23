@@ -9,7 +9,10 @@ if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     # General:
     set(CMAKE_Fortran_FLAGS " -fno-range-check -fno-f2c -cpp ") # remove -g -O2 from main list
     execute_process(COMMAND ${CMAKE_Fortran_COMPILER} --version OUTPUT_VARIABLE CMAKE_Fortran_COMPILER_VERSION)
-    string(REGEX MATCH "[3-9].[0-9].[0-9]" CMAKE_Fortran_COMPILER_VERSION ${CMAKE_Fortran_COMPILER_VERSION})
+    string(REGEX MATCH "[1-9]?[0-9].[0-9].[0-9]" CMAKE_Fortran_COMPILER_VERSION ${CMAKE_Fortran_COMPILER_VERSION})
+    if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_LESS 3.0.0)
+        message( FATAL_ERROR "Fortran compiler version ${CMAKE_Fortran_COMPILER_VERSION} too old, at least 3.0.0 is required!" )
+    endif()
     if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER 4.3.9)
         add_definitions(-D_GFORTRAN)
     endif()
