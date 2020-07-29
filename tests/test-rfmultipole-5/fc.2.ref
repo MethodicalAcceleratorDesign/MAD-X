@@ -11,5 +11,5 @@ BLOCK DEFINITIONS-------------------------------------------------------
 BLOC1             drift_0           
 NEXT
 STRUCTURE INPUT---------------------------------------------------------
-rfm1q             rfm1s             rfm1qs            rfm1ss            BLOC1             m1                
+rfm1q             rfm1s             rfm1qs            rfm1ss             BLOC1             m1                
 NEXT

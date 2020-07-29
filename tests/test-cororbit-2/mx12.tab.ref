@@ -1,9 +1,9 @@
 @ NAME             %03s "MON"
 @ TYPE             %03s "MON"
 @ TITLE            %62s "LHC 6.503 with errors and two beam orbit correction using MADX"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.34.03"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.38.41"
 * NAME                            X.OLD              Y.OLD                  X                  Y 
 $ %s                                %le                %le                %le                %le 
  "BPMSW.1R1.B1"          0.001817466177                  0   -2.931927014e-05                  0

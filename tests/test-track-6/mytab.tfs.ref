@@ -2,8 +2,8 @@
 @ TYPE             %04s "USER"
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.10.45"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.36.41"
 *             METHOD           PARTICLE                  X                 PX                  Y                 PY                  T                 PT 
 $                %le                %le                %le                %le                %le                %le                %le                %le 
                   1                  1     0.000956993052    3.268034491e-06                  0                  0   -0.0004821455786                  0

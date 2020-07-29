@@ -84,8 +84,8 @@
 @ PTCOMAX          %le    -2.005933626e-13
 @ TITLE            %56s "Carol Johnstone's FFAG ring lattice 6 to 20 GeV - apr07k"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.15.30"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.49.16"
 * NAME                                S             ENERGY                  X                 PX                  Y                 PY                 PT                  T             BETA11             BETA22             BETA33                MU1                MU2                MU3              DISP1              DISP2 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "C314$START"                         0               16.3   -5.771726222e-14   -1.390249328e-19                  0                  0   -2.006478505e-13           -0.40625        13.61401273        6.885900951        8.673544247                  0                  0                  0       0.2876393017   -9.540865796e-15

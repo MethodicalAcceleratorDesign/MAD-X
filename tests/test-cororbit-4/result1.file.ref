@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %51s "LHC 6.5 with errors and orbit correction using MADX"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.47.58"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.38.56"
 * NAME                                S                  X                 PX                  Y                 PY               BETX               BETY               ALFX               ALFY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "LHCB1$START"                        0   -2.464538307e-06   -6.064156789e-06    1.416703348e-06    1.815021095e-06       0.5507483724       0.5494961845   -0.0002191611558    0.0008482071846
