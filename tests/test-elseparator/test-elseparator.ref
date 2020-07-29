@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.20 12:10:42      +
+  + Execution date: 2020.07.29 11:36:37      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "test elseparator";
 
@@ -35,8 +35,8 @@ final orbit vector:     2.557183E-08  7.858251E-09 -1.396904E-08 -3.122029E-09 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 makethin: slicing sequence : testseq
 enter TRACK module
 one pass is on

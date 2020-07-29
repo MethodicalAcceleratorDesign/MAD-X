@@ -84,8 +84,8 @@
 @ PTCOMAX          %le                   0
 @ TITLE            %30s "LHC Version 6.503 -  July 2009"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.13.14"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.43.20"
 * NAME                                S             BETA11             BETA22              DISP1              DISP3                  X                 PX                  Y                 PY                 PT                  T 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "LHCB1$START"                        0         10.9999858        11.00000847     -0.01314887377     0.009206404925    -0.002000001373   -7.053266099e-10   -6.470123592e-10    0.0001700000459                  0                 -0

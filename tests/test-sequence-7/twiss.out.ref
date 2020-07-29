@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.16.00"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "12.28.37"
 *                  S NAME               KEYWORD                          BETX               BETY 
 $                %le %s                 %s                                %le                %le 
                   0 "MYSEQ$START"       "MARKER"                             1                  1

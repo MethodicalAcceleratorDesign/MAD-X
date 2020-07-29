@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:59:52      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 11:40:55      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'Transferline matching with MAD-X';
 
@@ -340,8 +340,8 @@ orbit:  -2.556193E-05 -3.552790E-07  2.948751E-03 -1.098197E-04 -2.419989E-07 -1
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 match,sequence=fivecell,beta0=abc,x=0,px=0,y=0,py=0,t=0,pt=0;
@@ -396,12 +396,12 @@ call:      22   Penalty function =   0.43794196E+02
 call:      25   Penalty function =   0.33085625E+02
 call:      28   Penalty function =   0.12655064E+02
 call:      31   Penalty function =   0.33603728E+00
-call:      34   Penalty function =   0.15458515E-03
-call:      37   Penalty function =   0.16536767E-08
-call:      40   Penalty function =   0.64176410E-14
-call:      43   Penalty function =   0.96757900E-19
+call:      34   Penalty function =   0.15458514E-03
+call:      37   Penalty function =   0.16536766E-08
+call:      40   Penalty function =   0.64176345E-14
+call:      43   Penalty function =   0.96481569E-19
  ++++++++++ LMDIF ended: converged successfully
-call:      43   Penalty function =   0.96757900E-19
+call:      43   Penalty function =   0.96481569E-19
 endmatch;
 
 
@@ -409,11 +409,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-fivecell$end:1             betx         4     1.80000000E+02     1.80000000E+02     9.66266258E-20
-fivecell$end:1             bety         4     3.00000000E+01     3.00000000E+01     1.31274343E-22
+fivecell$end:1             betx         4     1.80000000E+02     1.80000000E+02     9.63441178E-20
+fivecell$end:1             bety         4     3.00000000E+01     3.00000000E+01     1.37451124E-22
 
 
-Final Penalty Function =   9.67579002e-20
+Final Penalty Function =   9.64815689e-20
 
 
 
@@ -426,7 +426,7 @@ kqd                      -9.19086e-03 -9.70000e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   9.67579002e-20
+VARIABLE "TAR" SET TO   9.64815689e-20
 
 
 value, kqf;

@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.20 12:15:59      +
+  + Execution date: 2020.07.29 11:53:42      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -194,8 +194,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 QF.60010.BETA->mux = 0.0;
 
 QF.60010.BETA->muy = 0.0;
@@ -2645,10 +2645,10 @@ updating probe_beam for deltap=0 => ds=   -2.42421657971287408
   parameters: freq0=   0.078897080842682682, alfa=0.000642332758968173589
               beta=   0.999997826292276182, gamma=     479.60606218519689, dtbyds=                      0
 Twiss pre-init: iteration 1, delta ds = -2.42421658e+00 (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421657971287319
-  parameters: freq0=   0.078897080842682682, alfa=0.000642332758968173372
+updating probe_beam for deltap=0 => ds=   -2.42421657971287363
+  parameters: freq0=   0.078897080842682682, alfa=0.000642332758968173481
               beta=   0.999997826292276182, gamma=     479.60606218519689, dtbyds=                      0
-Twiss pre-init: iteration 2, delta ds = 8.88178420e-16 (fix point)
+Twiss pre-init: iteration 2, delta ds = 4.44089210e-16 (fix point)
  
  Global parameters for protons, radiate = F:
 
@@ -2684,8 +2684,8 @@ final orbit vector:    -6.835225E-06  2.632486E-07 -4.259852E-06 -3.205230E-08  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 stop;

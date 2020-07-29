@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:55:06      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 11:36:49      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! YIL13: Taken from tests_old/test_runs/track_example/
 
@@ -12,18 +12,18 @@ option,-echo,-info;
 enter Twiss module
   
 iteration:   1 error:   1.502666E-21 deltap:   0.000000E+00
-orbit:   3.729601E-24  2.713931E-39  0.000000E+00  0.000000E+00 -3.167331E-17  1.243713E-23
+orbit:  -5.743847E-31  2.627631E-39  0.000000E+00  0.000000E+00 -3.167331E-17 -2.960907E-30
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-               6.5     3.16733115e-17    0.0006277815833        39.91128535 
+               6.5    3.167331152e-17    0.0006277815833        39.91128535 
 
                 q1                dq1            betxmax              dxmax 
       0.1072467205      -0.1135571662         13.8302683       0.2998762806 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2679078562     5.29761843e-23    3.061450169e-23       0.1058727477 
+      0.2679078562    4.924658253e-23    2.820016038e-23       0.1058727477 
 
                dq2            betymax              dymax              dyrms 
      -0.1107431782        13.59510076                  0                  0 
@@ -34,8 +34,8 @@ orbit:   3.729601E-24  2.713931E-39  0.000000E+00  0.000000E+00 -3.167331E-17  1
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 makethin: style chosen : hybrid
 ++++++ warning: makethin: no selection list, slicing all to one thin lens.
 makethin: slicing sequence : c314
@@ -64,8 +64,8 @@ orbit:   3.113976E-25  2.096717E-28  0.000000E+00  0.000000E+00 -9.945508E-15  1
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter TRACK module
 one pass is on
 update is on

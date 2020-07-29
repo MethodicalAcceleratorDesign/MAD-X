@@ -84,8 +84,8 @@
 @ PTCOMAX          %le                   0
 @ TITLE            %01s "s"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.13.20"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.43.34"
 * NAME                                S             BETA11             BETA21             BETA12             BETA22              DISP1              DISP3 
 $ %s                                %le                %le                %le                %le                %le                %le                %le 
  "FIVECELL$START"                     0        177.7010914                  0                  0         32.0344759        2.174564191                  0

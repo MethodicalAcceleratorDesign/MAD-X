@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.20 12:12:19      +
+  + Execution date: 2020.07.29 11:40:46      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 
@@ -68,8 +68,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 !show, bini1ir8;
 
 
@@ -105,8 +105,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 !show, bini2ir8;
 
 
@@ -150,8 +150,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 !show, bir8b1;
 
 
@@ -239,8 +239,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 eir8b1->mux = muxip8;
@@ -312,8 +312,8 @@ final orbit vector:    -3.446111E-09  8.180880E-12 -9.779835E-11  6.328584E-13  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 Use, period=lhcb1, RANGE=s.DS.L8.B1/e.DS.R8.B1;
@@ -357,8 +357,8 @@ final orbit vector:    -3.446111E-09  8.180880E-12 -9.779835E-11  6.328584E-13  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 !System,"cat twiss.ir8.b1.data";
 
 return;
@@ -514,7 +514,7 @@ Initial Penalty Function =   0.3549501076742023E+02
  exclude parameter:kq10.l8b1                                       hit minimum
  exclude parameter:kqt12.l8b1                                      hit maximum
  Reset system to           14 con,          16 var
- Too var to exclude, set strategy=1
+ Too many variables to exclude, set strategy=1
  Step length    235.34068574646864     
  Bisec iteration            1
 call:     2 Dx =   0.23534069E+03  Penalty function =  0.3549501076742023E+02
@@ -543,109 +543,94 @@ call:     5 Dx =   0.10034019E+00  Penalty function =  0.2329886637563026E+02
 reset parameter: kqt13.l8b1              from  0.73724319E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57058754E-02  to -0.55657143E-02
  Step length    8.9173246056341984E-002
-call:     6 Dx =   0.89173246E-01  Penalty function =  0.7119378949778969E+01
+call:     6 Dx =   0.89173246E-01  Penalty function =  0.7119378949779072E+01
  Solve system with           14 con,          20 var
- Rank            14   Condition number    3132.4349463737590     
+ Rank            14   Condition number    3132.4349502393952     
 reset parameter: kqt13.l8b1              from  0.71625835E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57706210E-02  to -0.55657143E-02
- Step length    7.1711432349696597E-002
-call:     7 Dx =   0.71711432E-01  Penalty function =  0.6767018372168172E+01
+ Step length    7.1711432438203951E-002
+call:     7 Dx =   0.71711432E-01  Penalty function =  0.6767018433803974E+01
  Solve system with           14 con,          20 var
- Rank            14   Condition number    3074.2084559288396     
+ Rank            14   Condition number    3074.2084489298513     
 reset parameter: kqt13.l8b1              from  0.68666640E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57705176E-02  to -0.55657143E-02
- Step length    5.9932297887149398E-002
-call:     8 Dx =   0.59932298E-01  Penalty function =  0.3701954801379065E+01
+ Step length    5.9932297756453132E-002
+call:     8 Dx =   0.59932298E-01  Penalty function =  0.3701954787701291E+01
  Solve system with           14 con,          20 var
- Rank            14   Condition number    2957.0541446694142     
+ Rank            14   Condition number    2957.0541434360343     
 reset parameter: kqt13.l8b1              from  0.65623959E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57508001E-02  to -0.55657143E-02
- Step length    4.7383605178250111E-002
-call:     9 Dx =   0.47383605E-01  Penalty function =  0.1829020806504851E+01
+ Step length    4.7383605116275068E-002
+call:     9 Dx =   0.47383605E-01  Penalty function =  0.1829020785765619E+01
  Solve system with           14 con,          20 var
- Rank            14   Condition number    2751.4513309016352     
+ Rank            14   Condition number    2751.4513337960138     
 reset parameter: kqt13.l8b1              from  0.62373769E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57068541E-02  to -0.55657143E-02
- Step length    3.3859834815331634E-002
-call:    10 Dx =   0.33859835E-01  Penalty function =  0.6404905601048422E+00
+ Step length    3.3859834809419904E-002
+call:    10 Dx =   0.33859835E-01  Penalty function =  0.6404905586156180E+00
  Solve system with           14 con,          20 var
- Rank            14   Condition number    2411.4522614825883     
+ Rank            14   Condition number    2411.4522580895004     
 reset parameter: kqt13.l8b1              from  0.59063176E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.56393947E-02  to -0.55657143E-02
- Step length    1.9334937138717707E-002
-call:    11 Dx =   0.19334937E-01  Penalty function =  0.1063480773759856E+00
+ Step length    1.9334937036904757E-002
+call:    11 Dx =   0.19334937E-01  Penalty function =  0.1063480758303328E+00
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1992.0519033849409     
+ Rank            14   Condition number    1992.0518971768529     
 reset parameter: kqt13.l8b1              from  0.56708381E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.55842926E-02  to -0.55657143E-02
- Step length    7.2122034750616787E-003
-call:    12 Dx =   0.72122035E-02  Penalty function =  0.1067128335064439E-01
+ Step length    7.2122033921039790E-003
+call:    12 Dx =   0.72122034E-02  Penalty function =  0.1067128291062984E-01
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1755.2773473081293     
+ Rank            14   Condition number    1755.2773453278639     
 reset parameter: kqt13.l8b1              from  0.55890470E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.55678101E-02  to -0.55676184E-02
- Step length    1.8374717179378383E-003
-call:    13 Dx =   0.18374717E-02  Penalty function =  0.1345079971899083E-02
+ Step length    1.8374717035782699E-003
+call:    13 Dx =   0.18374717E-02  Penalty function =  0.1345079883851416E-02
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1704.6394931156640     
+ Rank            14   Condition number    1704.6394935417923     
 reset parameter: kqt13.l8b1              from  0.55712916E-02  to  0.55657143E-02
- Step length    4.5013446288175342E-004
-call:    14 Dx =   0.45013446E-03  Penalty function =  0.8233993736529061E-04
+ Step length    4.5013446138250667E-004
+call:    14 Dx =   0.45013446E-03  Penalty function =  0.8233993690087336E-04
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1697.0453056026520     
- Step length    1.1404097540406877E-004
-call:    15 Dx =   0.11404098E-03  Penalty function =  0.1170709304605034E-08
+ Rank            14   Condition number    1697.0453065131658     
+ Step length    1.1404097499098054E-004
+call:    15 Dx =   0.11404097E-03  Penalty function =  0.1170711833808930E-08
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.3825025829763     
- Step length    1.5199302708825538E-007
-call:    16 Dx =   0.15199303E-06  Penalty function =  0.1667347952237724E-16
+ Rank            14   Condition number    1695.3825032478055     
+ Step length    1.5199313030247115E-007
+call:    16 Dx =   0.15199313E-06  Penalty function =  0.1665218038131468E-16
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.3813754875177     
- Step length    5.5485207870448914E-012
-call:    17 Dx =   0.55485208E-11  Penalty function =  0.1621010347600044E-22
+ Rank            14   Condition number    1695.3813741411122     
+ Step length    5.5488137965051246E-012
+call:    17 Dx =   0.55488138E-11  Penalty function =  0.6056813810332166E-23
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.3813746952296     
- Step length    1.8896454153527919E-015
-call:    18 Dx =   0.18896454E-14  Penalty function =  0.1008973514304333E-23
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.3813757606035     
- Step length    4.1262768860263288E-015
- Bisec iteration            1
-call:    19 Dx =   0.41262769E-14  Penalty function =  0.3839746965814407E-23
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.3813740933392     
- Step length    4.4329392791322987E-015
- Bisec iteration            1
-call:    20 Dx =   0.44329393E-14  Penalty function =  0.1340784139280455E-23
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.3813743835969     
- Step length    2.1636464949354221E-015
- Bisec iteration            1
-call:    21 Dx =   0.21636465E-14  Penalty function =  0.1629717791075522E-24
+ Rank            14   Condition number    1695.3813735054805     
+ Step length    5.0437371617741157E-015
+call:    18 Dx =   0.50437372E-14  Penalty function =  0.1559550638228626E-24
  ++++++++++ JACOBIAN ended: converged successfully
- Final difference norm:   6.5423096858313379E-002
+ Final difference norm:   6.5423096853508209E-002
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-ip8:1                      betx         4     6.00000000E+00     6.00000000E+00     1.26217745E-27
-ip8:1                      bety         4     6.00000000E+00     6.00000000E+00     7.88860905E-29
-ip8:1                      alfx         4     0.00000000E+00     1.04163716E-15     1.08500797E-28
-ip8:1                      alfy         4     0.00000000E+00     2.41221236E-15     5.81876849E-28
-ip8:1                      dx           4     0.00000000E+00     2.70887913E-16     7.33802613E-30
-ip8:1                      dpx          4     0.00000000E+00     3.83790628E-18     1.47295246E-31
-e.ds.r8.b1:1               betx         4     3.14155198E+01     3.14155198E+01     3.03048805E-26
-e.ds.r8.b1:1               alfx         4    -5.15245257E-01    -5.15245257E-01     8.33234331E-28
-e.ds.r8.b1:1               bety         4     1.72206230E+02     1.72206230E+02     9.77430216E-26
-e.ds.r8.b1:1               alfy         4     2.34715937E+00     2.34715937E+00     3.15544362E-26
-e.ds.r8.b1:1               dx           4     9.95758012E-01     9.95758012E-01     9.98402083E-29
-e.ds.r8.b1:1               dpx          4     1.28965195E-02     1.28965195E-02     3.00926554E-30
-e.ds.r8.b1:1               mux          4     3.20400000E+00     3.20400000E+00     7.88860905E-29
-e.ds.r8.b1:1               muy          4     2.80400000E+00     2.80400000E+00     3.15544362E-28
+ip8:1                      betx         4     6.00000000E+00     6.00000000E+00     5.04870979E-29
+ip8:1                      bety         4     6.00000000E+00     6.00000000E+00     2.55590933E-28
+ip8:1                      alfx         4     0.00000000E+00     4.87924774E-15     2.38070585E-27
+ip8:1                      alfy         4     0.00000000E+00    -6.96252205E-15     4.84767133E-27
+ip8:1                      dx           4     0.00000000E+00     2.80591522E-16     7.87316024E-30
+ip8:1                      dpx          4     0.00000000E+00    -6.36858662E-17     4.05588955E-29
+e.ds.r8.b1:1               betx         4     3.14155198E+01     3.14155198E+01     1.37451124E-26
+e.ds.r8.b1:1               alfx         4    -5.15245257E-01    -5.15245257E-01     1.10933565E-29
+e.ds.r8.b1:1               bety         4     1.72206230E+02     1.72206230E+02     1.16322274E-25
+e.ds.r8.b1:1               alfy         4     2.34715937E+00     2.34715937E+00     1.77493704E-26
+e.ds.r8.b1:1               dx           4     9.95758012E-01     9.95758012E-01     1.49144015E-28
+e.ds.r8.b1:1               dpx          4     1.28965195E-02     1.28965195E-02     7.52316385E-31
+e.ds.r8.b1:1               mux          4     3.20400000E+00     3.20400000E+00     3.15544362E-28
+e.ds.r8.b1:1               muy          4     2.80400000E+00     2.80400000E+00     7.88860905E-29
 
 
-Final Penalty Function =   1.62971779e-25
+Final Penalty Function =   1.55955064e-25
 
 
 
@@ -676,7 +661,7 @@ kqt13.r8b1               -1.92425e-03 -3.61438e-03 -5.56771e-03  5.56771e-03
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.62971779e-25
+VARIABLE "TAR" SET TO   1.55955064e-25
 ++++++ info: n redefined
 ++++++ info: beta.ip8 redefined
 START MATCHING
@@ -692,74 +677,70 @@ total constraints:      14
 START JACOBIAN:
 
  JACOBIAN Strategy =           3
-Initial Penalty Function =   0.1151999999999988E+02
+Initial Penalty Function =   0.1151999999999996E+02
 
 
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.3813740934816     
+ Rank            14   Condition number    1695.3813727395209     
  exclude parameter:kqtl11.r8b1                                     hit minimum
  Reset system to           14 con,          19 var
  Solve system with           14 con,          19 var
- Rank            14   Condition number    1725.9839005479964     
- Step length    4.9044925892378230E-002
+ Rank            14   Condition number    1725.9838992918299     
+ Step length    4.9044925919029723E-002
  Bisec iteration            1
-call:     2 Dx =   0.48940749E-01  Penalty function =  0.1206672102093368E+02
+call:     2 Dx =   0.48940749E-01  Penalty function =  0.1206672104782998E+02
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1721.1997852720306     
+ Rank            14   Condition number    1721.1997871609879     
  exclude parameter:kqt13.l8b1                                      hit maximum
  Reset system to           14 con,          19 var
  Solve system with           14 con,          19 var
- Rank            14   Condition number    1800.7685672521170     
- Step length    2.4058748144489685E-002
-call:     3 Dx =   0.24058748E-01  Penalty function =  0.6766371140731993E+01
+ Rank            14   Condition number    1800.7685687556937     
+ Step length    2.4058748171551687E-002
+call:     3 Dx =   0.24058748E-01  Penalty function =  0.6766371145558029E+01
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1763.7510801742615     
- Step length    4.8573674947013272E-003
-call:     4 Dx =   0.48573675E-02  Penalty function =  0.5391162135792110E-01
+ Rank            14   Condition number    1763.7510738720998     
+ Step length    4.8573675090485104E-003
+call:     4 Dx =   0.48573675E-02  Penalty function =  0.5391162117798980E-01
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1791.6651239026019     
- Step length    4.3744353830496249E-004
-call:     5 Dx =   0.43744354E-03  Penalty function =  0.1154656321266778E-05
+ Rank            14   Condition number    1791.6651269535655     
+ Step length    4.3744353771382445E-004
+call:     5 Dx =   0.43744354E-03  Penalty function =  0.1154656273492885E-05
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1789.1150805850905     
- Step length    2.1160503628468827E-006
-call:     6 Dx =   0.21160504E-05  Penalty function =  0.1541474631520179E-13
+ Rank            14   Condition number    1789.1150731093976     
+ Step length    2.1160497502244404E-006
+call:     6 Dx =   0.21160498E-05  Penalty function =  0.1541444130547338E-13
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1789.1216687029887     
- Step length    4.6057955148156851E-010
-call:     7 Dx =   0.46057955E-09  Penalty function =  0.7929180010022915E-20
+ Rank            14   Condition number    1789.1216706894595     
+ Step length    4.6057530161814486E-010
+call:     7 Dx =   0.46057530E-09  Penalty function =  0.7966349763032884E-20
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1789.1216670490865     
- Step length    3.8173804396375720E-014
-call:     8 Dx =   0.38173804E-13  Penalty function =  0.1089034077945831E-23
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1789.1216688179411     
- Step length    1.6993988230739493E-015
-call:     9 Dx =   0.16993988E-14  Penalty function =  0.6348359309291236E-24
+ Rank            14   Condition number    1789.1216684795843     
+ Step length    3.7601765768387872E-014
+call:     8 Dx =   0.37601766E-13  Penalty function =  0.7067403093300141E-24
  ++++++++++ JACOBIAN ended: converged successfully
- Final difference norm:   3.1841196216197611E-002
+ Final difference norm:   3.1841196217634114E-002
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-ip8:1                      betx         4     3.60000000E+00     3.60000000E+00     2.99964359E-28
-ip8:1                      bety         4     3.60000000E+00     3.60000000E+00     4.73513758E-28
-ip8:1                      alfx         4     0.00000000E+00    -1.03819154E-14     1.07784167E-26
-ip8:1                      alfy         4     0.00000000E+00    -2.40785387E-14     5.79776025E-26
-ip8:1                      dx           4     0.00000000E+00    -8.22367348E-17     6.76288055E-31
-ip8:1                      dpx          4     0.00000000E+00    -5.15402608E-17     2.65639848E-29
-e.ds.r8.b1:1               betx         4     3.14155198E+01     3.14155198E+01     9.77430216E-26
-e.ds.r8.b1:1               alfx         4    -5.15245257E-01    -5.15245257E-01     5.04870979E-27
-e.ds.r8.b1:1               bety         4     1.72206230E+02     1.72206230E+02     2.61725116E-25
-e.ds.r8.b1:1               alfy         4     2.34715937E+00     2.34715937E+00     1.97215226E-25
-e.ds.r8.b1:1               dx           4     9.95758012E-01     9.95758012E-01     1.23259516E-28
-e.ds.r8.b1:1               dpx          4     1.28965195E-02     1.28965195E-02     1.20370622E-29
-e.ds.r8.b1:1               mux          4     3.20400000E+00     3.20400000E+00     7.88860905E-29
-e.ds.r8.b1:1               muy          4     2.80400000E+00     2.80400000E+00     3.33293732E-27
+ip8:1                      betx         4     3.60000000E+00     3.60000000E+00     8.69719148E-29
+ip8:1                      bety         4     3.60000000E+00     3.60000000E+00     3.15544362E-30
+ip8:1                      alfx         4     0.00000000E+00    -2.68929133E-15     7.23228787E-28
+ip8:1                      alfy         4     0.00000000E+00    -1.62608313E-15     2.64414635E-28
+ip8:1                      dx           4     0.00000000E+00    -3.42716307E-16     1.17454467E-29
+ip8:1                      dpx          4     0.00000000E+00    -4.87187940E-17     2.37352089E-29
+e.ds.r8.b1:1               betx         4     3.14155198E+01     3.14155198E+01     1.55512883E-25
+e.ds.r8.b1:1               alfx         4    -5.15245257E-01    -5.15245257E-01     3.11612384E-26
+e.ds.r8.b1:1               bety         4     1.72206230E+02     1.72206230E+02     5.04870979E-25
+e.ds.r8.b1:1               alfy         4     2.34715937E+00     2.34715937E+00     1.23259516E-26
+e.ds.r8.b1:1               dx           4     9.95758012E-01     9.95758012E-01     9.98402083E-29
+e.ds.r8.b1:1               dpx          4     1.28965195E-02     1.28965195E-02     3.90000814E-29
+e.ds.r8.b1:1               mux          4     3.20400000E+00     3.20400000E+00     1.59744333E-27
+e.ds.r8.b1:1               muy          4     2.80400000E+00     2.80400000E+00     1.97215226E-29
 
 
-Final Penalty Function =   6.34835931e-25
+Final Penalty Function =   7.06740309e-25
 
 
 
@@ -790,7 +771,7 @@ kqt13.r8b1               -1.92742e-03 -1.92425e-03 -5.56771e-03  5.56771e-03
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   6.34835931e-25
+VARIABLE "TAR" SET TO   7.06740309e-25
 write,table=str.ip8.b1,file="str.ip8.b1.dat";
 
 stop;

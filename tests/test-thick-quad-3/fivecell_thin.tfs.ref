@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %14s "Five cell test"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.12.18"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.40.45"
 * NAME                                S               BETX               ALFX                 DX                DPX               BETY               ALFY                 DY                DPY                MUX                MUY APERTYPE                       APER_1             APER_2 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le %s                                %le                %le 
  "FIVECELL$START"                     0        183.8452652       -2.496624639        2.181087913      0.02970971935        31.01843672       0.4682565895      0.05308752869   -0.0006928197792                  0                  0 "CIRCLE"                             0                  0

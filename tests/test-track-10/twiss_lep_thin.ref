@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %51s "F1020B98v1.lep, 102/90 BT optics for 1998 to 97 GeV"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.10.54"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.37.05"
 *                  S NAME                             BETX               BETY 
 $                %le %s                                %le                %le 
                   0 "IP1"                      70.64182199        37.70809638
