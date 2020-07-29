@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %16s "test elseparator"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.10.42"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.36.37"
 * NAME               KEYWORD                             S                  X                 PX                  Y                 PY               BETX               BETY                MUX                MUY 
 $ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TESTSEQ$START"     "MARKER"                             0                  0                  0                  0                  0                  1                  1                  0                  0

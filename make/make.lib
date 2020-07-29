@@ -18,7 +18,7 @@
 
 # some useful variables
 EMPTY :=
-SPACE := 
+SPACE :=
 SPACE +=
 COMMA := ,
 
@@ -32,14 +32,11 @@ first  = $(word 1,$1)
 last   = $(word $(words $1),$1)
 rest   = $(wordlist 2,$(words $1),$1)
 chop   = $(wordlist 2,$(words $1),_ $1)
-uniq   = $(strip $(if $1,$(call uniq,$(call chop,$1)) \
-            $(if $(filter $(call last,$1),$(call chop,$1)),,$(call last,$1))))
-trans  = $(if $1,$(call trans,$(call rest,$1),$(call rest,$2)\
-                    ,$(patsubst $(firstword $1),$(firstword $2),$3)),$3) 
-find   = $(if $(and $1,$2),$(if $(findstring $1,$(firstword $2)),$2,\
-              $(call find,$1,$(call rest,$2))),)
-trunc  = $(if $(and $1,$2),$(if $(findstring $1,$(lastword $2)),$2,\
-              $(call trunc,$1,$(call chop,$2))),)
+uniq   = $(strip $(if $1,$(call uniq,$(call chop,$1)) $(if $(filter $(call last,$1),$(call chop,$1)),,$(call last,$1))))
+trans  = $(if $1,$(call trans,$(call rest,$1),$(call rest,$2),$(patsubst $(firstword $1),$(firstword $2),$3)),$3)
+find   = $(if $(and $1,$2),$(if $(findstring $1,$(firstword $2)),$2,$(call find,$1,$(call rest,$2))),)
+trunc  = $(if $(and $1,$2),$(if $(findstring $1,$(lastword $2)),$2,$(call trunc,$1,$(call chop,$2))),)
+search = $(if $(and $1,$2),$(if $(call eq,$1,$(firstword $2)),$1,$(call search,$1,$(call rest,$2))),)
 
 assert = $(if $1,,$(error $2))
 exists = $(if $(wildcard $1),,$(error $2))

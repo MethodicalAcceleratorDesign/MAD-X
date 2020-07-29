@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.05.22 16:02:46      +
+  + Execution date: 2020.07.29 11:53:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -echo;
 
@@ -71,8 +71,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
        1.526297364       0.3728165258       0.5042000294        4.147872957 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+       52.84960067        256.7869428                  0 
 
 
 plot, haxis=s, vaxis=betx;
@@ -344,14 +344,14 @@ orbit:  -1.583606E-01 -3.199629E-02  0.000000E+00  0.000000E+00 -2.602349E-02  1
                  0                  0                  0                  0 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
-                 0 
-                 0 
-                 0 
-                 0 
-                 0 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+                 0                  0                  0 
+                 0                  0                  0 
+                 0                  0                  0 
+                 0                  0                  0 
+                 0                  0                  0 
+                 0                  0                  0 
 
 
 plot, table="summ", haxis=deltap,vaxis1=q1,vaxis2=q2,
@@ -406,8 +406,8 @@ orbit:  -1.830396E-07  4.958385E-08 -3.528003E-04 -1.117477E-04 -8.237753E-07  4
            synch_2            synch_3            synch_4            synch_5 
        1.526297364       0.3728165258       0.5042000195        4.147876677 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+       60.59368277        330.6335677                  0 
 
 
 plot, haxis=s, vaxis=y, interpolate, range=QFN12/XFW11, noversion, hmin=10.5,hmax=14.0,

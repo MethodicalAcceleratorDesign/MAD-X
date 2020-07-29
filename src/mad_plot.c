@@ -122,8 +122,8 @@ plot_option(char* name)
 void
 exec_plot(struct in_cmd* cmd)
 {
-  int i, j, k, ierr, notitle = strcmp(title,"no-title") == 0 ? 1 : 0;
-  int nointerp = 0, multiple = 0, noversion = 0, nolegend = 0, s_haxis = 1, track_flag = 0;
+  int i, j, k, ierr, notitle = !strcmp(title,"no-title");
+  int nointerp = 0, multiple = 0, noversion = 0, nolegend = 0, s_haxis = 0, track_flag = 0;
   int tsm1 = TITLE_SIZE - 1, tsm2 = TITLE_SIZE - 2;
   int part_idx[100], curr, track_cols_length, haxis_idx = 0, vaxis_idx = 0;
   int size_plot_title = tsm1, size_version = tsm1;
@@ -162,7 +162,7 @@ exec_plot(struct in_cmd* cmd)
   /* get haxis_name & s_haxis flag */
   haxis_name = command_par_string_user("haxis", this_cmd->clone);
   if (haxis_name) {
-    s_haxis = strcmp(haxis_name,"s");
+    s_haxis = !strcmp(haxis_name,"s");
   }
 
   /* get table_name & track_flag */
@@ -321,7 +321,7 @@ exec_plot(struct in_cmd* cmd)
   else { /* normal plot */
 
     /* if haxis is "s" and no interpolation, check if table name is the same of the last twiss call */
-    if (nointerp == 0 && s_haxis == 0) {
+    if (nointerp == 0 && s_haxis == 1) {
 
       if (!current_sequ->tw_table) {
 	warning("PLOT - no TWISS table present", "PLOT command ignored");

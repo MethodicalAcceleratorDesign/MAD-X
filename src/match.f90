@@ -709,17 +709,23 @@
 !----------------------------------------------------------------------*
       integer i,iflag,j,ldfjac,m,n
       double precision eps,epsfcn,fjac(ldfjac,n),fvec(m),h,temp,wa(m),  &
-     &x(n),zero,epsmch
+     &x(n),zero,epsmch,fdstep
       parameter(zero=0d0,epsmch=1d-16)
       external fcn
+      integer, external :: get_option
 
+      fdstep = get_option('fdstep ')
       eps = sqrt(max(epsfcn,epsmch))
       iflag = 0
 
       do j = 1, n
         temp = x(j)
-        h = eps*abs(temp)
-        if (h .eq. zero) h = eps
+        if (fdstep .ne. zero) then
+          h = fdstep
+        else
+          h = eps*abs(temp)
+          if (h .eq. zero) h = eps
+        endif
         x(j) = temp + h
         call fcn(m,n,x,wa,iflag)
         x(j) = temp

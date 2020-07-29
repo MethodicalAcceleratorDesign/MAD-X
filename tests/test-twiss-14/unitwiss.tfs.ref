@@ -42,8 +42,8 @@
 @ SYNCH_5          %le     8.091411766e-07
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.11.19"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.38.16"
 * NAME               KEYWORD                             S                  L              ANGLE                K1L               BETX               ALFX                MUX               BETY               ALFY                MUY                 DX                DPX                 DY                DPY 
 $ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TME$START"         "MARKER"                             0                  0                  0                  0       0.6790421976   -1.517389453e-16                  0        2.156479968                  0                  0       0.0204938901                 -0                 -0                 -0

@@ -2,8 +2,8 @@
 @ TYPE             %03s "IBS"
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "05/05/20"
-@ TIME             %08s "16.55.33"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.39.06"
 * NAME                                S               DELS                TLI                TXI                TYI               BETX               ALFX                 DX                DPX               BETY               ALFY                 DY                DPY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "QFW1"                            0.05                0.1        1285.752498      0.07323985163   -3.386436039e-05        12.79279963       0.9619499402   -0.0007436264258   -2.485794987e-05        3.130287967      -0.2509896163                  0                  0

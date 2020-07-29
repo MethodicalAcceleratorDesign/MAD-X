@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.13 23:22:59      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 11:40:55      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 
@@ -74,7 +74,7 @@ iteration:   2 error:   2.297742E-05 deltap:   0.000000E+00
 orbit:  -5.000003E-04 -4.472642E-09 -1.671459E-10  1.424984E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   2.548596E-09 deltap:   0.000000E+00
-orbit:  -5.000008E-04 -2.358319E-09  8.002375E-12  1.425000E-04  0.000000E+00  0.000000E+00
+orbit:  -5.000008E-04 -2.358319E-09  8.002373E-12  1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -96,8 +96,8 @@ orbit:  -5.000008E-04 -2.358319E-09  8.002375E-12  1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 ! Select beam2:
@@ -145,8 +145,8 @@ orbit:   5.000020E-04  4.645559E-09  1.227331E-12 -1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 ! Match the chromaticity:
@@ -185,9 +185,9 @@ START LMDIF:
 Initial Penalty Function =   0.37917356E-01
 
 
-call:       6   Penalty function =   0.41672180E-21
+call:       6   Penalty function =   0.26122941E-21
  ++++++++++ LMDIF ended: converged successfully
-call:       6   Penalty function =   0.41672180E-21
+call:       6   Penalty function =   0.26122941E-21
 endmatch;
 
 
@@ -195,13 +195,13 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     1.25677284E-22
-Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     2.18670291E-22
-Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     3.67187191E-23
-Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     3.56555103E-23
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     1.95214960E-22
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     2.99386599E-23
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     3.56502070E-23
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     4.25582767E-25
 
 
-Final Penalty Function =   4.16721804e-22
+Final Penalty Function =   2.61229410e-22
 
 
 
@@ -216,7 +216,7 @@ ksd.b2                   -1.71385e-01 -1.71293e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   4.16721804e-22
+VARIABLE "TAR" SET TO   2.61229410e-22
 
 
 ! Generate a TWISS table:
@@ -236,7 +236,7 @@ iteration:   2 error:   2.299326E-05 deltap:   0.000000E+00
 orbit:  -5.000003E-04 -4.479980E-09 -1.672446E-10  1.424984E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   2.546104E-09 deltap:   0.000000E+00
-orbit:  -5.000008E-04 -2.358319E-09  8.002374E-12  1.425000E-04  0.000000E+00  0.000000E+00
+orbit:  -5.000008E-04 -2.358319E-09  8.002379E-12  1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -258,8 +258,8 @@ orbit:  -5.000008E-04 -2.358319E-09  8.002374E-12  1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 ! Generate a TWISS table:
@@ -279,7 +279,7 @@ iteration:   2 error:   1.449392E-05 deltap:   0.000000E+00
 orbit:   5.000004E-04  4.431490E-09  1.229806E-09 -1.424999E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   2.924088E-09 deltap:   0.000000E+00
-orbit:   5.000020E-04  4.645559E-09  1.227328E-12 -1.425000E-04  0.000000E+00  0.000000E+00
+orbit:   5.000020E-04  4.645559E-09  1.227332E-12 -1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -301,8 +301,8 @@ orbit:   5.000020E-04  4.645559E-09  1.227328E-12 -1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 stop;

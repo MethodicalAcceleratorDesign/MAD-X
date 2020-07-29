@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.20 12:11:19      +
+  + Execution date: 2020.07.29 11:38:16      +
   ++++++++++++++++++++++++++++++++++++++++++++
 filename(nn): macro = {
 
@@ -131,8 +131,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
     0.008403239167     0.001011477181    2.243130388e-05    8.091411766e-07 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+       2021.355733        2.341769225                  0 
 
 
 I1=table(summ,synch_1);

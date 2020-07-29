@@ -2,8 +2,8 @@
 @ TYPE             %04s "CORR"
 @ TITLE            %01s "s"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.11.30"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.38.45"
 * NAME                           PX.OLD             PY.OLD      PX.CORRECTION      PY.CORRECTION 
 $ %s                                %le                %le                %le                %le 
  "CBH.10"                             0                  0   -6.158367366e-06                  0

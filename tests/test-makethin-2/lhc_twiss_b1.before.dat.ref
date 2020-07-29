@@ -42,8 +42,8 @@
 @ SYNCH_5          %le      0.000000
 @ TITLE            %14s "V6.5 Thin Lens"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.10.37"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.36.25"
 * NAME                          S         BETX         BETY         ALFX         ALFY           DX          DPX          MUX          MUY            X           PX            Y           PY 
 $ %s                          %le          %le          %le          %le          %le          %le          %le          %le          %le          %le          %le          %le          %le 
  "IP1"                   0.000000    11.000000    11.000000     0.000000     0.000000     0.000000     0.000000     0.000000     0.000000     0.000000     0.000000     0.000000     0.000000
