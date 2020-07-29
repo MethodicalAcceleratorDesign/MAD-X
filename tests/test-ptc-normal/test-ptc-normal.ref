@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:55:16      +
+  + Execution date: 2020.07.29 16:31:56      +
   ++++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -90,31 +90,31 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
 parameter: energy   double value:               5000
 parameter: pc   double value:        4999.999912
-parameter: gamma   double value:        5328.944663
+parameter: gamma   double value:        5328.944624
 parameter: beta   double value:       0.9999999824
 parameter: brho   double value:        16678.20447
 parameter: ex   double value:                  1
-parameter: exn   double value:        5328.944569
+parameter: exn   double value:         5328.94453
 parameter: ey   double value:                  1
-parameter: eyn   double value:        5328.944569
+parameter: eyn   double value:         5328.94453
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    3.521417994e-08
+parameter: alfa   double value:    3.521418046e-08
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1

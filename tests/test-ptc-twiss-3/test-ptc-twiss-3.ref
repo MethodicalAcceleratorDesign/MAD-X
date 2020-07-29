@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:43:22      +
+  + Execution date: 2020.07.29 16:29:14      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -124,7 +124,7 @@ Determined SECTOR NMUL MAX :  2
              534.6    0.0004431145119           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000     0.000355079062        47.50529435       0.2546195015 
+          -1000000    0.0003550790607        47.50529435       0.2546195015 
 
                 q2                dq1                dq2                 qs 
       0.2546003528        1.051169737        1.046958093                  0 
@@ -175,7 +175,7 @@ Determined SECTOR NMUL MAX :  2
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps     10
- This is a proton
+ This a particle with    1836.1526734253     times the electron mass 
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
        RADIATION   =  FALSE

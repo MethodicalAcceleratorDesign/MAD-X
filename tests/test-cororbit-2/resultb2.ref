@@ -2,13 +2,13 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le        0.9382720813
+@ MASS             %le        0.9382720882
 @ CHARGE           %le                   1
 @ ENERGY           %le                7000
 @ PC               %le         6999.999937
-@ GAMMA            %le         7460.522528
+@ GAMMA            %le         7460.522474
 @ KBUNCH           %le                   1
-@ BCURRENT         %le     0.0001891813989
+@ BCURRENT         %le     0.0001891814004
 @ SIGE             %le             0.00045
 @ SIGT             %le                   1
 @ NPART            %le            1.05e+11
@@ -43,7 +43,7 @@
 @ TITLE            %62s "LHC 6.503 with errors and two beam orbit correction using MADX"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "29/07/20"
-@ TIME             %08s "11.38.44"
+@ TIME             %08s "16.24.44"
 * NAME                                S                  X                 PX                  Y                 PY               BETX               BETY               ALFX               ALFY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "LHCB2$START"                        0    3.932085492e-05   -8.379744547e-07   -5.420823261e-05    2.537128025e-05       0.5500269101       0.5502488679    0.0001853571247    0.0001739722674

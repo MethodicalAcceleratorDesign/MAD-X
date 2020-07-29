@@ -3,7 +3,7 @@
 @ TITLE            %51s "LHC 6.5 with errors and orbit correction using MADX"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "29/07/20"
-@ TIME             %08s "11.38.54"
+@ TIME             %08s "16.24.51"
 * NAME                            X.OLD              Y.OLD                  X                  Y 
 $ %s                                %le                %le                %le                %le 
  "BPMSW.1R1.B1"         -0.001920878229                  0    8.469530854e-12                  0

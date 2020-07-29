@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:40:55      +
+  + Execution date: 2020.07.29 16:26:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 
@@ -185,9 +185,9 @@ START LMDIF:
 Initial Penalty Function =   0.37917356E-01
 
 
-call:       6   Penalty function =   0.26122941E-21
+call:       6   Penalty function =   0.71159192E-22
  ++++++++++ LMDIF ended: converged successfully
-call:       6   Penalty function =   0.26122941E-21
+call:       6   Penalty function =   0.71159192E-22
 endmatch;
 
 
@@ -195,13 +195,13 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     1.95214960E-22
-Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     2.99386599E-23
-Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     3.56502070E-23
-Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     4.25582767E-25
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     1.79263032E-23
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     2.56076132E-23
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     2.70060228E-23
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     6.19252655E-25
 
 
-Final Penalty Function =   2.61229410e-22
+Final Penalty Function =   7.11591918e-23
 
 
 
@@ -216,7 +216,7 @@ ksd.b2                   -1.71385e-01 -1.71293e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   2.61229410e-22
+VARIABLE "TAR" SET TO   7.11591918e-23
 
 
 ! Generate a TWISS table:
@@ -236,7 +236,7 @@ iteration:   2 error:   2.299326E-05 deltap:   0.000000E+00
 orbit:  -5.000003E-04 -4.479980E-09 -1.672446E-10  1.424984E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   2.546104E-09 deltap:   0.000000E+00
-orbit:  -5.000008E-04 -2.358319E-09  8.002379E-12  1.425000E-04  0.000000E+00  0.000000E+00
+orbit:  -5.000008E-04 -2.358319E-09  8.002378E-12  1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -279,7 +279,7 @@ iteration:   2 error:   1.449392E-05 deltap:   0.000000E+00
 orbit:   5.000004E-04  4.431490E-09  1.229806E-09 -1.424999E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   2.924088E-09 deltap:   0.000000E+00
-orbit:   5.000020E-04  4.645559E-09  1.227332E-12 -1.425000E-04  0.000000E+00  0.000000E+00
+orbit:   5.000020E-04  4.645559E-09  1.227333E-12 -1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 

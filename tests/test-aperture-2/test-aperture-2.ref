@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:41:51      +
+  + Execution date: 2020.07.29 16:27:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs" ;
 
@@ -121,7 +121,7 @@ ptc_create_layout, model=2, method=2, nst=2, exact;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.450000E+03
  Setting MADx with 
-     energy           450.00097817060191     
+     energy           450.00097817061624     
      method                   2
      Num. of steps            2
      charge           1.0000000000000000     
@@ -171,7 +171,7 @@ ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
         26658.8832    0.0003216320503           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003172846396        55.75968869        0.280001026 
+          -1000000    0.0003172846395        55.75968869        0.280001026 
 
                 q2                dq1                dq2                 qs 
       0.3100005974                  0                  0                 -0 
@@ -207,16 +207,16 @@ ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
                  0    0.0007074557202     0.000713726789    2.376317578e-05 
 
            pycorms             tcorms            ptcorms             xcomax 
-   2.414012503e-05    6.321244696e-06                  0     0.007390728165 
+   2.414012503e-05    6.321244863e-06                  0     0.007390728165 
 
             ycomax            pxcomax            pycomax             tcomax 
-    0.008056958782    0.0004263337929    0.0004558719032    1.067987893e-05 
+    0.008056958782    0.0004263337929    0.0004558719032    1.067987606e-05 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0    -0.008477871351    -0.008499924562   -0.0004558708109 
 
            pycomin             tcomin            ptcomin 
-  -0.0003912272041   -1.013624735e-05                  0 
+  -0.0003912272041   -1.013624875e-05                  0 
 
 
 ptc_end;
