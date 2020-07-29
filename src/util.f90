@@ -21,20 +21,23 @@ module phys_constfi
   public
   !--- Definition of physical constants
   ! sources  :
-  ! J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012
-  ! K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG 2014
+  ! https://physics.nist.gov/cuu/pdf/wall_2018.pdf
   double precision, parameter :: clight = 299792458d0        ! Speed of light in vacuum [m/s]
-  double precision, parameter :: qelect = 1.6021766208d-19   ! Elementary charge [A*s]
-  double precision, parameter :: hbar   = 6.582119514e-25    ! Reduced Plack's constant [GeV*s]
+  double precision, parameter :: qelect = 1.602176634d-19   ! Elementary charge [A*s]
+
+  double precision, parameter :: hbar   = 6.582119569e-25    ! Reduced Plack's constant [GeV*s]
+
   double precision, parameter :: amu0   = 4d-7 * pi          ! Permeability of vacuum [V*s/A*m]
   ! Rest Mass [GeV]
-  double precision, parameter ::  emass  = 0.5109989461d-3   ! GeV CODATA 2014
-  double precision, parameter ::  pmass  = 0.9382720813      ! GeV CODATA 2014
-  double precision, parameter ::  nmass  = 0.9314940954      ! GeV CODATA 2014
-  double precision, parameter ::  mumass = 0.1056583745      ! GeV CODATA 2014
+  double precision, parameter ::  emass  = 0.51099895000d-3   ! GeV CODATA 2018
+
+  double precision, parameter ::  pmass  = 0.93827208816     ! GeV CODATA 2018
+
+  double precision, parameter ::  nmass  = 0.93956542052      ! GeV CODATA 2018
+  double precision, parameter ::  mumass = 0.1056583755     ! GeV CODATA 2018
 
   ! Classical radius [m]
-  double precision, parameter :: erad   = 2.8179403227d-15
+  double precision, parameter :: erad   = 2.8179403262d-15
   double precision, parameter :: prad   = erad*emass/pmass
 end module phys_constfi
 
