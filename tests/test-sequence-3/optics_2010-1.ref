@@ -42,8 +42,8 @@
 @ SYNCH_5          %le  0.00000000000
 @ TITLE            %44s "AD HE 2010 optics. Anti-Protons - 3.57 GeV/c"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.15.59"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.53.42"
 * NAME                              S             L          ALFX          BETX            DX          ALFY          BETY 
 $ %s                              %le           %le           %le           %le           %le           %le           %le 
  "AD$START"             0.00000000000 0.00000000000 -0.00000200026 3.85095118133 0.11519440181 0.00000000000 1.00000000000

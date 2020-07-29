@@ -1,9 +1,9 @@
 @ NAME             %08s "TOUSCHEK"
 @ TYPE             %08s "TOUSCHEK"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.25.18"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.49.43"
 * NAME                                S                TLI               TLIW             TLITOT 
 $ %s                                %le                %le                %le                %le 
  "RING$START"                         0      0.04157004415                  0                  0

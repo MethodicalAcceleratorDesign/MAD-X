@@ -84,8 +84,8 @@
 @ PTCOMAX          %le     2.852890811e-13
 @ TITLE            %35s " Diamond Light Source Lattice 8.1.1"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.13.28"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.43.54"
 * NAME                                S               BETX               BETY             BETA11             BETA22              DISP1              DISP3                MU1                MU2                  X                  Y 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "DIAMOND$START"                      0        9.978753865        5.831556551        9.978753865        5.831556551      0.07214748637    2.318994656e-16                  0                  0    2.418029085e-14                  0

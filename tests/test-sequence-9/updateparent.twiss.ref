@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "20/07/20"
-@ TIME             %08s "12.16.00"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.53.44"
 * NAME               APERTYPE                       APER_1             APER_2              ANGLE 
 $ %s                 %s                                %le                %le                %le 
  "TESTORDER$START"   "CIRCLE"                             0                  0                  0

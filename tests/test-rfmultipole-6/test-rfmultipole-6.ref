@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:01:19      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 11:42:27      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -43,7 +43,7 @@ twiss, save, centre;
 enter Twiss module
   
 iteration:   1 error:   1.119543E-19 deltap:   0.000000E+00
-orbit:   9.063684E-37  1.269933E-34  0.000000E+00  0.000000E+00 -2.434672E-16 -3.141399E-34
+orbit:  -2.229700E-36  2.640795E-34  0.000000E+00  0.000000E+00 -2.434672E-16 -3.100927E-34
 
 ++++++ table: summ
 
@@ -65,8 +65,8 @@ orbit:   9.063684E-37  1.269933E-34  0.000000E+00  0.000000E+00 -2.434672E-16 -3
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 !!!!! track

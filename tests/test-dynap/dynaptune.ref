@@ -1,9 +1,9 @@
 @ NAME             %09s "DYNAPTUNE"
 @ TYPE             %09s "DYNAPTUNE"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.01 Linux 64"
-@ DATE             %08s "31/08/18"
-@ TIME             %08s "16.43.08"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.39.49"
 *                  X                  Y               TUNX               TUNY              DTUNE 
 $                %le                %le                %le                %le                %le 
     8.306578336e-07    8.221272278e-07       0.3099651518       0.3200187462    3.231732197e-11

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2019.01.14 17:33:39      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 12:17:13      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=120;
 
@@ -154,8 +154,8 @@ orbit:   1.983622E-03  1.377589E-04 -2.259703E-03 -6.536889E-04 -9.552016E-03  2
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 TRACK, ONEPASS=true, FILE="element_testmad";
 
 enter TRACK module

@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.04.23 10:21:50      +
+  + Execution date: 2020.07.29 11:37:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -108,8 +108,8 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 beta.ip1           =                  0 ;
 enter Twiss module
   
@@ -137,8 +137,8 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   1.026361E-07 deltap:   0.000000E+00
@@ -165,8 +165,8 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 on_x1              =                  0 ;
 on_x2              =                  0 ;
 on_x5              =                  0 ;
@@ -513,8 +513,8 @@ orbit:   2.292565E-12  2.911529E-14  9.267977E-14  5.983349E-16  4.824161E-10 -4
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter TRACK module
   
 iteration:   1 error:   4.115632E-11 deltap:   0.000000E+00

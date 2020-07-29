@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.20 12:11:19      +
+  + Execution date: 2020.07.29 12:12:58      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=3;
 
@@ -86,8 +86,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  5.335817E-03  2.520236E-04  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 SURVEY, SEQUENCE=seq, FILE= survey.out, x0=xin;
 
 
@@ -140,8 +140,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  3.357763E-04  2.520924E-04 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 seq_ptc: sequence, refer=center, l=circum;
