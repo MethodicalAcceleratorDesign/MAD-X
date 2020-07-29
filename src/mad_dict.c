@@ -17,7 +17,7 @@ const char *const_constant_def =
 #undef mkstr
 #undef mkstr_
 
-/* constants (pre-defined variables)  PDG 2014
+/* constants (pre-defined variables)  CODATA 2018
    nmass is the unified atomic mass unit [GeV/(c**2)] */
 
 "const pi = 4 * atan(1.); "
@@ -26,14 +26,14 @@ const char *const_constant_def =
 "const raddeg = pi / 180; "
 "const e = exp(1.); "
 "const amu0 = 4.e-7 * pi; "
-"const emass = 0.5109989461e-3; "
-"const mumass = 0.1056583745; "
-"const nmass = 0.9314940954; "
-"const pmass = 0.9382720813; "
+"const emass = 0.51099895000e-3; "
+"const mumass = 0.1056583755; "
+"const nmass = 0.93956542052; "
+"const pmass = 0.93827208816; "
 "const clight = 299792458; "
-"const qelect = 1.6021766208e-19; "
-"const hbar = 6.582119514e-25; " /* GeV*s */
-"const erad = 2.8179403227e-15; "
+"const qelect = 1.602176634e-19; "
+"const hbar = 6.582119569e-25; " /* GeV*s */
+"const erad = 2.8179403262e-15; "
 "const prad = erad*emass/pmass; ";
 
 /* mods HG090508 - speed-up twiss

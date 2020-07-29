@@ -2,10 +2,10 @@
 @ TYPE             %08s "APERTURE"
 @ SEQUENCE         %02s "AD"
 @ PARTICLE         %08s "POSITRON"
-@ MASS             %le     0.0005109989461
+@ MASS             %le       0.00051099895
 @ ENERGY           %le                   1
 @ PC               %le        0.9999998694
-@ GAMMA            %le         1956.951198
+@ GAMMA            %le         1956.951184
 @ BETA             %le        0.9999998694
 @ EXN              %le  1.95695E-05
 @ EYN              %le  1.95695E-05
@@ -27,7 +27,7 @@
 @ TITLE            %44s "AD HE 2010 optics. Anti-Protons - 3.57 GeV/c"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "29/07/20"
-@ TIME             %08s "11.42.26"
+@ TIME             %08s "16.27.59"
 * NAME                                S               BETX               BETY                 DX                  X                  Y                 N1 APERTYPE                       APER_1             APER_2             APER_3             APER_4               XTOL               YTOL               RTOL 
 $ %s                                %le                %le                %le                %le                %le                %le                %le %s                                %le                %le                %le                %le                %le                %le                %le 
  "AD$START"                           0        3.850951181                  1       0.1151944018                  0                  0             999999 "CIRCLE"                             0                  0                  0                  0                  0                  0                  0

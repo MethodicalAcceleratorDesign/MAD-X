@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:37:51      +
+  + Execution date: 2020.07.29 16:24:09      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for MAD-X';
 
@@ -37,8 +37,8 @@ beam, particle = proton, energy =   eg        ,
 
 value,epsx,epsy;
 
-epsx               =    3.518520305e-08 ;
-epsy               =    3.518520305e-08 ;
+epsx               =    3.518520331e-08 ;
+epsy               =    3.518520331e-08 ;
 option,-echo;
 
 

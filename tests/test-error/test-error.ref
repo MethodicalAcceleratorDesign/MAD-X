@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2019.02.20 09:54:45      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:25:02      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option,debug;
 
@@ -69,16 +69,16 @@ parameter: particle   string: electron
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:    0.0005109989461
+parameter: mass   double value:      0.00051099895
 parameter: charge   double value:                 -1
 parameter: energy   double value:                 10
 parameter: pc   double value:        9.999999987
-parameter: gamma   double value:        19569.51198
+parameter: gamma   double value:        19569.51184
 parameter: beta   double value:       0.9999999987
 parameter: brho   double value:        33.35640948
-parameter: ex   double value:    3.515672754e-10
+parameter: ex   double value:    3.515672781e-10
 parameter: exn   double value:           6.88e-06
-parameter: ey   double value:     1.91624605e-10
+parameter: ey   double value:    1.916246065e-10
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
@@ -90,10 +90,10 @@ parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    2.611199229e-09
+parameter: alfa   double value:    2.611199269e-09
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    2.817940323e-15
+parameter: arad   double value:    2.817940325e-15
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1

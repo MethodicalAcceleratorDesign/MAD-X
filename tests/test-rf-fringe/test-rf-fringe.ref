@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:38:18      +
+  + Execution date: 2020.07.29 16:24:26      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=1.5;
 
@@ -184,7 +184,7 @@ PTC_TWISS, table=twiss, icase=6, no=5, betx=1, bety=2, betz=10, x=xin, y=yin, t=
                  0      0.01000922771      0.02001845542      3.2475116e-05 
 
            pycorms             tcorms            ptcorms             xcomax 
-   6.495023201e-05    1.254430624e-09    3.402290031e-09       0.0100209617 
+   6.495023201e-05    1.254430663e-09    3.402290031e-09       0.0100209617 
 
             ycomax            pxcomax            pycomax             tcomax 
      0.02004192339    4.192519448e-05    8.385038897e-05                 -0 
@@ -193,7 +193,7 @@ PTC_TWISS, table=twiss, icase=6, no=5, betx=1, bety=2, betz=10, x=xin, y=yin, t=
                  0               0.01               0.02                  0 
 
            pycomin             tcomin            ptcomin 
-                 0   -1.977340236e-09   -4.392337543e-09 
+                 0   -1.977340292e-09   -4.392337543e-09 
 write, table=twiss, file="twiss.ptc.tfs";
 
 

@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:42:26      +
+  + Execution date: 2020.07.29 16:28:00      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'testing BEAM definitions in MADX';
 
@@ -23,16 +23,16 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
-parameter: gamma   double value:        479.6050197
+parameter: gamma   double value:        479.6050162
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    7.818951007e-09
+parameter: ex   double value:    7.818951064e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    7.818951007e-09
+parameter: ey   double value:    7.818951064e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
@@ -44,10 +44,10 @@ parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    4.347429622e-06
+parameter: alfa   double value:    4.347429686e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -99,17 +99,17 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
-parameter: gamma   double value:        479.6050197
+parameter: gamma   double value:        479.6050162
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
 parameter: ex   double value:    7.818950713e-09
-parameter: exn   double value:    3.749999859e-06
+parameter: exn   double value:    3.749999832e-06
 parameter: ey   double value:    7.818950713e-09
-parameter: eyn   double value:    3.749999859e-06
+parameter: eyn   double value:    3.749999832e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
@@ -120,10 +120,10 @@ parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    4.347429622e-06
+parameter: alfa   double value:    4.347429686e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -175,13 +175,13 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
-parameter: energy   double value:        450.0017777
-parameter: pc   double value:        450.0007995
+parameter: energy   double value:        450.0017809
+parameter: pc   double value:        450.0008028
 parameter: gamma   double value:        479.6069143
 parameter: beta   double value:       0.9999978263
-parameter: brho   double value:        1501.041095
+parameter: brho   double value:        1501.041106
 parameter: ex   double value:    7.818920119e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818920119e-09
@@ -199,7 +199,7 @@ parameter: deltap   double value:                  0
 parameter: alfa   double value:    4.347395275e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -251,16 +251,16 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
-parameter: gamma   double value:        479.6050196
+parameter: gamma   double value:        479.6050161
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035165
-parameter: ex   double value:    7.818951007e-09
+parameter: ex   double value:    7.818951065e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    7.818951007e-09
+parameter: ey   double value:    7.818951065e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
@@ -272,10 +272,10 @@ parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    4.347429623e-06
+parameter: alfa   double value:    4.347429687e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -327,13 +327,13 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
-parameter: energy   double value:        450.0000169
-parameter: pc   double value:        449.9990388
+parameter: energy   double value:        450.0000202
+parameter: pc   double value:         449.999042
 parameter: gamma   double value:        479.6050377
 parameter: beta   double value:       0.9999978263
-parameter: brho   double value:        1501.035222
+parameter: brho   double value:        1501.035233
 parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818950713e-09
@@ -351,7 +351,7 @@ parameter: deltap   double value:                  0
 parameter: alfa   double value:    4.347429295e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -427,7 +427,7 @@ parameter: deltap   double value:                  0
 parameter: alfa   double value:    4.347429295e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698323e-18
+parameter: arad   double value:    1.534698335e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -479,13 +479,13 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
-parameter: energy   double value:        450.0000169
-parameter: pc   double value:        449.9990388
+parameter: energy   double value:        450.0000202
+parameter: pc   double value:         449.999042
 parameter: gamma   double value:        479.6050377
 parameter: beta   double value:       0.9999978263
-parameter: brho   double value:        1501.035222
+parameter: brho   double value:        1501.035233
 parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818950713e-09
@@ -503,7 +503,7 @@ parameter: deltap   double value:                  0
 parameter: alfa   double value:    4.347429295e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -555,16 +555,16 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
 parameter: energy   double value:        450.0000001
 parameter: pc   double value:         449.999022
-parameter: gamma   double value:        479.6050198
+parameter: gamma   double value:        479.6050163
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    7.818951005e-09
+parameter: ex   double value:    7.818951062e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    7.818951005e-09
+parameter: ey   double value:    7.818951062e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
@@ -576,10 +576,10 @@ parameter: freq0   double value:                400
 parameter: circ   double value:       0.7494795158
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:     4.34742962e-06
+parameter: alfa   double value:    4.347429683e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -639,16 +639,16 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
-parameter: gamma   double value:        479.6050197
+parameter: gamma   double value:        479.6050162
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    7.818951005e-09
+parameter: ex   double value:    7.818951062e-09
 parameter: exn   double value:    3.749999999e-06
-parameter: ey   double value:    7.818951005e-09
+parameter: ey   double value:    7.818951062e-09
 parameter: eyn   double value:    3.749999999e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
@@ -660,10 +660,10 @@ parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    4.347429622e-06
+parameter: alfa   double value:    4.347429686e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -681,16 +681,16 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
-parameter: gamma   double value:        479.6050196
+parameter: gamma   double value:        479.6050161
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035165
-parameter: ex   double value:    7.818951005e-09
+parameter: ex   double value:    7.818951062e-09
 parameter: exn   double value:    3.749999999e-06
-parameter: ey   double value:    7.818951005e-09
+parameter: ey   double value:    7.818951062e-09
 parameter: eyn   double value:    3.749999999e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
@@ -702,10 +702,10 @@ parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    4.347429623e-06
+parameter: alfa   double value:    4.347429687e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -722,17 +722,17 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
-parameter: energy   double value:        450.0000169
-parameter: pc   double value:        449.9990388
+parameter: energy   double value:        450.0000202
+parameter: pc   double value:         449.999042
 parameter: gamma   double value:        479.6050377
 parameter: beta   double value:       0.9999978263
-parameter: brho   double value:        1501.035222
-parameter: ex   double value:    7.818951005e-09
-parameter: exn   double value:     3.75000014e-06
-parameter: ey   double value:    7.818951005e-09
-parameter: eyn   double value:     3.75000014e-06
+parameter: brho   double value:        1501.035233
+parameter: ex   double value:    7.818951062e-09
+parameter: exn   double value:    3.750000167e-06
+parameter: ey   double value:    7.818951062e-09
+parameter: eyn   double value:    3.750000167e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
@@ -746,7 +746,7 @@ parameter: deltap   double value:                  0
 parameter: alfa   double value:    4.347429295e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -762,17 +762,17 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:       0.9382720813
+parameter: mass   double value:       0.9382720882
 parameter: charge   double value:                  1
-parameter: energy   double value:        450.0017777
-parameter: pc   double value:        450.0007995
+parameter: energy   double value:        450.0017809
+parameter: pc   double value:        450.0008028
 parameter: gamma   double value:        479.6069143
 parameter: beta   double value:       0.9999978263
-parameter: brho   double value:        1501.041095
-parameter: ex   double value:    7.818951005e-09
-parameter: exn   double value:    3.750014813e-06
-parameter: ey   double value:    7.818951005e-09
-parameter: eyn   double value:    3.750014813e-06
+parameter: brho   double value:        1501.041106
+parameter: ex   double value:    7.818951062e-09
+parameter: exn   double value:     3.75001484e-06
+parameter: ey   double value:    7.818951062e-09
+parameter: eyn   double value:     3.75001484e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
@@ -786,7 +786,7 @@ parameter: deltap   double value:                  0
 parameter: alfa   double value:    4.347395275e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698265e-18
+parameter: arad   double value:    1.534698266e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
