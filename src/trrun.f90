@@ -1733,7 +1733,7 @@ subroutine ttrf(track,ktrack)
   endif
 
   rff = node_value('freq ')
-  rfl = node_value('lag ')
+  rfl = node_value('lag ')+node_value('lagtap ')
   pc0 = get_value('beam ','pc ')
   omega = rff * (ten6p * twopi / clight)
 
