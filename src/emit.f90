@@ -667,7 +667,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
      case (code_rfcavity) !---- RF cavities.
         rfv = node_value('volt ') * ten3m ! MV but u0 is in GeV
         rff = node_value('freq ') * ten6p * two * pi / clight
-        rfl = node_value('lag ')  * two * pi
+        rfl = (node_value('lag ') + node_value('lagtap '))  * two * pi
         time = half * (orb1(5) + orb2(5))
         sumu0 = sumu0 + rfv * sin(rfl - rff * time)
 
