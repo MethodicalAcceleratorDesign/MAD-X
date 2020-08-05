@@ -264,8 +264,14 @@ make_element(const char* name, const char* parent, struct command* def, int flag
     el->base_type = el->parent->base_type;
     if(command_par_value("l",def) !=0 && belongs_to_class(el,"multipole"))
       warning("Multipole defined with non-zero length:", el->name);
+    if(command_par_value("l",def)==0){
+      if(belongs_to_class(el,"octupole") || belongs_to_class(el,"sextupole"))
+        warning("Element defined with zero length will have no impact:", el->name);
+    }
+
     el->length = el_par_value("l", el);
     set_aperture_element(el, def);
+  
   }
   
   add_to_el_list(&el, def->mad8_type, element_list, flag);

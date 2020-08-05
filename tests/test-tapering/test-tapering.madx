@@ -24,6 +24,7 @@
 	
 	
     twiss, file = "fcc_radiate.twiss", tapering;
+    show, B1.15;
     save, sequence=L000013, file="taper2.seq";
     stop;
 	
