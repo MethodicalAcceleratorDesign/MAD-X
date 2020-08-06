@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:38:08      +
+  + Execution date: 2020.08.06 16:02:39      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !--------------------------------------------------------------
 
@@ -3291,7 +3291,7 @@ B1L.6: B1L, at = 2096.6264289492547;
 
 QD3.17: QD3, at = 2111.4426435816295;
 
-B1.15: B1, at = 2125.408858214003;
+B1.15: B1, k0=0, at = 2125.408858214003;
 
 QF4.17: QF4, at = 2139.3750728463774;
 
@@ -20330,22 +20330,22 @@ ENDSEQUENCE;
 enter Twiss module
   
 iteration:   1 error:   8.479677E-11 deltap:   0.000000E+00
-orbit:  -1.763103E-12 -9.095146E-13  0.000000E+00  0.000000E+00 -2.595322E-11 -1.181440E-10
+orbit:  -1.762941E-12 -9.093844E-13  0.000000E+00  0.000000E+00 -2.595368E-11 -1.181441E-10
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
                    length                    orbit5                      alfa                   gammatr 
-9.77560642831906588981e+04 2.59532181150552571148e-11 7.70611712713849219723e-06 3.60231923584710102659e+02 
+9.77560642831906588981e+04 2.59536812948070930740e-11 7.70611713153630420003e-06 3.60231923481919523056e+02 
 
                        q1                       dq1                   betxmax                     dxmax 
-3.89106001718408492707e+02 -9.27385928869937647967e-01 1.57657426553755999521e+03 5.45239145477975806209e-01 
+3.89106002040149348886e+02 -9.27388075570325320918e-01 1.57657404192160811363e+03 5.45239140168843006151e-01 
 
                     dxrms                    xcomax                    xcorms                        q2 
-1.23763253814880069825e-01 8.36695213717229037700e-11 1.18370547754408952065e-11 3.89179746033554863516e+02 
+1.23763253416106291938e-01 8.36769913008151546020e-11 1.18371809951514800577e-11 3.89179745578686038243e+02 
 
                       dq2                   betymax                     dymax                     dyrms 
-3.78293452134217333960e-01 6.97448569587576548656e+03 0.00000000000000000000e+00 0.00000000000000000000e+00 
+3.78303097143315947282e-01 6.97448877298367369804e+03 0.00000000000000000000e+00 0.00000000000000000000e+00 
 
                    ycomax                    ycorms                    deltap                   synch_1 
 0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 
@@ -20355,6 +20355,70 @@ orbit:  -1.763103E-12 -9.095146E-13  0.000000E+00  0.000000E+00 -2.595322E-11 -1
 
                   synch_6                   synch_8                    nflips 
 0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 
+    show, B1.15;
+
++++ dumping element b1.15               parent b1                
+command: b1.15  module: element
+parameter: at   double value: 2.12540885821400297573e+03
+parameter: l   expression: lb1  :: value: 2.44317862893079080777e+01
+double value: 2.44317862893079080777e+01
+parameter: kmax   double value: 0.00000000000000000000e+00
+parameter: kmin   double value: 0.00000000000000000000e+00
+parameter: calib   double value: 0.00000000000000000000e+00
+parameter: polarity   double value: 0.00000000000000000000e+00
+parameter: angle   expression: angleb1  :: value: 2.27067314711202998534e-03
+double value: 2.27067314711202998534e-03
+parameter: tilt   double value: 0.00000000000000000000e+00
+parameter: k0   double value: 9.28394145139555188647e-05
+parameter: k0s   double value: 0.00000000000000000000e+00
+parameter: k1   double value: 0.00000000000000000000e+00
+parameter: k1s   double value: 0.00000000000000000000e+00
+parameter: e1   expression: 0 * angleb1  :: value: 0.00000000000000000000e+00
+double value: 0.00000000000000000000e+00
+parameter: e2   expression: 0 * angleb1  :: value: 0.00000000000000000000e+00
+double value: 0.00000000000000000000e+00
+parameter: k2   double value: 0.00000000000000000000e+00
+parameter: k2s   double value: 0.00000000000000000000e+00
+parameter: h1   double value: 0.00000000000000000000e+00
+parameter: h2   double value: 0.00000000000000000000e+00
+parameter: hgap   double value: 0.00000000000000000000e+00
+parameter: fint   double value: 0.00000000000000000000e+00
+parameter: fintx   double value: -1.00000000000000000000e+00
+parameter: k3   double value: 0.00000000000000000000e+00
+parameter: k3s   double value: 0.00000000000000000000e+00
+parameter: fcsr   double value: 0.00000000000000000000e+00
+parameter: mech_sep   double value: 0.00000000000000000000e+00
+parameter: v_pos   double value: 0.00000000000000000000e+00
+parameter: aperture   double array: 0.000000e+00 
+parameter: aper_offset   double array: 0.000000e+00 
+parameter: aper_tol   double array: 0.000000e+00 0.000000e+00 0.000000e+00 
+parameter: aper_vx   double array: -1.000000e+00 
+parameter: aper_vy   double array: -1.000000e+00 
+parameter: knl   double array: 0.000000e+00 
+parameter: ksl   double array: 0.000000e+00 
+parameter: magnet   integer:          1
+parameter: slot_id   expression: none :: value: 0.00000000000000000000e+00
+integer:          0
+parameter: assembly_id   expression: none :: value: 0.00000000000000000000e+00
+integer:          0
+parameter: slice   integer:          1
+parameter: thick   logical: false
+parameter: model   integer:         -1
+parameter: method   integer:         -1
+parameter: exact   integer:         -1
+parameter: nst   integer:         -1
+parameter: apertype   string: circle
+parameter: from   string: (null)
+parameter: type   string: (null)
+parameter: ptcrbend   logical: false
+parameter: truerbend   logical: true
+parameter: fringe   integer:          0
+parameter: bend_fringe   logical: true
+parameter: kill_ent_fringe   logical: false
+parameter: kill_exi_fringe   logical: false
+parameter: aper_tilt   double value: 0.00000000000000000000e+00
+parameter: add_angle   double array: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 
+parameter: comments   string: (null)
     save, sequence=L000013, file="taper2.seq";
 
 ++++++ warning: SAVE makes all previous USE invalid !  
