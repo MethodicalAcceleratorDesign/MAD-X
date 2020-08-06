@@ -58,7 +58,7 @@ test-emit test-emit-2 \
 test-ibs test-ibs-2 test-ibs-3 test-ibs-4 \
 test-error test-error-2 test-error-3  test-error-4 \
 test-dynap \
-test-c6t test-c6t-2 test-c6t-3 test-c6t-4 test-c6t-5 test-c6t-6 test-c6t-7 \
+test-c6t test-c6t-2 test-c6t-3 test-c6t-4 test-c6t-5 test-c6t-6 test-c6t-7 test-c6t-8 \
 test-thick-quad test-thick-quad-2 test-thick-quad-3 \
 test-thick-dipole test-thick-dipole-2 test-thick-dipole-3 \
 test-thick-rbend test-thick-solenoid \

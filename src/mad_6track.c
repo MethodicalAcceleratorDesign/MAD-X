@@ -1236,7 +1236,6 @@ convert_madx_to_c6t(struct node* p, int ncombined)
   int i,j;
   char* cp;
   int index=-1;
-  printf("nnnnnn %s \n", p->name);
   if (mangle_flag)
     NameMangler_mangle(p->name, t_name);
   else
@@ -1505,30 +1504,34 @@ convert_madx_to_c6t(struct node* p, int ncombined)
   }
   else if(strcmp(p->base_name,"wire") == 0){
     char snum[11];
-    int ill_l, xma_l, yma_l;
+    int ill_l, xma_l, yma_l, l_phy_l, l_int_l;
     strcat(t_name, "w_");
     sprintf(snum, "%d", ncombined);
     strcat(t_name, snum);
     c6t_elem = new_c6t_element(15,t_name,p->base_name);
 
-    double ilnorm [20];
+    double current[20];
     double xma [20];
-    double yma [20];
-    ill_l = element_vector(p->p_elem, "ilnorm", ilnorm);
-    xma_l = element_vector(p->p_elem, "xma", xma);
-    yma_l = element_vector(p->p_elem, "yma", yma);
-    if (ill_l==xma_l && ill_l==yma_l){
+    double yma [20];     
+    double l_int [20];
+    double l_phy [20];
+    ill_l   = element_vector(p->p_elem, "current", current);
+    xma_l   = element_vector(p->p_elem, "xma", xma);
+    yma_l   = element_vector(p->p_elem, "yma", yma);
+    l_int_l = element_vector(p->p_elem, "l_int", l_int);
+    l_phy_l = element_vector(p->p_elem, "l_phy", l_phy);
+    if (ill_l==xma_l && ill_l==yma_l && ill_l==l_int_l && ill_l==l_phy_l){
       c6t_elem->value[1] = el_par_value("closed_orbit", p->p_elem);
-      c6t_elem->value[2] = ilnorm[ncombined];
-      c6t_elem->value[3] = 1;
-      c6t_elem->value[4] = 0;
+      c6t_elem->value[2] = current[ncombined];
+      c6t_elem->value[3] = l_int[ncombined];
+      c6t_elem->value[4] = l_phy[ncombined];
       c6t_elem->value[5] = xma[ncombined]*1000;
       c6t_elem->value[6] = yma[ncombined]*1000;
       c6t_elem->value[7] = 0;
       c6t_elem->value[8] = 0;
-  }
+    }
     else{
-      mad_error("The length of the xma, yma and ilnorm is different for element :",p->base_name);
+      mad_error("The length of the xma, yma and current is different for element :",p->base_name);
     }
   }
 
@@ -3388,7 +3391,6 @@ write_f3_wire(void)
   int isfirst = 0;
   while (current_element != NULL)
   {
-    printf("isssssss  %s \n", current_element->base_name);
     if (strcmp(current_element->base_name, "wire") == 0)
     {
 
@@ -3398,7 +3400,7 @@ write_f3_wire(void)
       }
 
       fprintf(f3,name_format_short,current_element->name);
-      for(int i=1; i < 8; i++) fprintf(f3,name_format_6, current_element->value[i]);
+      for(int i=1; i < 9; i++) fprintf(f3,name_format_6, current_element->value[i]);
       fprintf(f3,"\n"); 
     }
      current_element = current_element->next;

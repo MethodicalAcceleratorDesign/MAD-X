@@ -1,0 +1,115 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.08.06 15:15:42      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+
+
+co  : collimator,    l=1,  xma={0.001,0.002}, yma={0.003,0.004}, current={3,4},l_int={1,2}, l_phy={3,4}, closed_orbit=1, comments="Thick=1,Material=Cu";
+
+wi  : wire,    l=2,  xma={0.007,0.008}, yma={0.009,0.0010}, current={3,4},l_int={8,9}, l_phy={10,11}, closed_orbit=1, comments="Thick=1,Material=Cu";
+
+
+
+testseq: sequence,l=20;
+
+co,  at=1;
+
+wi,  at =5;
+
+endsequence;
+
+
+
+
+
+//-- strength can also be set after sequence definition
+
+beam;
+
+use, sequence=testseq;
+
+
+
+select, flag = makethin, class=collimator,  slice=1	;
+
+select, flag = makethin, class=wire,  slice=2	;
+
+
+
+makethin, sequence=testseq;
+
+makethin: slicing sequence : testseq
+use, sequence=testseq;
+
+
+
+twiss, betx=1, bety=1, file ="thin.twiss";
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                20                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2420488744                  0                401                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  0                  0       0.2420488744 
+
+               dq2            betymax              dymax              dyrms 
+                 0                401                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+
+
+sixtrack;
+
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+Reference radius set to : 1.000000
+nnwires 0 
+nnwires 1 
+nnwires 0 
+nnwires 1 
+nnwires 0 
+nnwires 1 
+++++++ info: MADX sequence converted to c6t internal. 
+
+total block length: 20.000000
+
+c6t terminated - total number of elements: 13
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 0
+                 alignment errors   MAD-X: 6
+                alignment errors SixTrack: 6
+                          sequence length: 20.000000 [m]
+
+
+save sequence=testseq, file="thin.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+  Number of warnings: 1
+1 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
