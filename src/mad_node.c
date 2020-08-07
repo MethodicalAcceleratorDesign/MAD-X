@@ -480,7 +480,10 @@ store_node_value(const char* par, double* value)
   else if (strcmp(lpar, "sel_sector") == 0) current_node->sel_sector = *value;
   else if (strcmp(lpar, "enable") == 0) current_node->enable = *value;
 
-  else if (strcmp(lpar, "k0") == 0) store_comm_par_value("k0",*value,el->def);
+  else if (strcmp(lpar, "k0") == 0) {
+    store_comm_par_value("k0",*value,el->def);
+    el->def->par_names->inform[8] = 1;
+  }
   
   else if (strcmp(lpar, "k1") == 0) store_comm_par_value("k1",*value,el->def);
   else if (strcmp(lpar, "k2") == 0) store_comm_par_value("k2",*value,el->def);
