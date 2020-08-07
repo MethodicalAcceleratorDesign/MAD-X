@@ -3669,7 +3669,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
 
      !---- Get map for entrance fringe field and concatenate
      if (.not.kill_ent_fringe) then
-        corr = (h + h) * hgap * fint
+        corr = (h_k + h_k) * hgap * fint
         call tmfrng(.true.,h_k,sk1,e1,h1,one,corr,rw,tw)
         call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
      endif
@@ -3677,7 +3677,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
    !---- Get map for exit fringe fields and concatenate
      if (.not.kill_exi_fringe) then
         if (fintx .lt. 0) fintx = fint
-        corr = (h + h) * hgap * fintx
+        corr = (h_k + h_k) * hgap * fintx
         call tmfrng(.true.,h_k,sk1,e2,h2,-one,corr,rw,tw)
         call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
      endif
