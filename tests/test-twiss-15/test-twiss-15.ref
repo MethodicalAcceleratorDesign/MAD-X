@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.08.04 13:54:45      +
+  + Execution date: 2020.08.10 13:26:27      +
   ++++++++++++++++++++++++++++++++++++++++++++
 BEAM, PARTICLE=ELECTRON, ENERGY=18.0;
 
@@ -13,7 +13,7 @@ OPTION, DEBUG;
 
 b1: sbend, l=1, angle=0.05, e1=0.1, kill_exi_fringe;;
 
-b2: sbend, l=1, angle=1e-20, k0=0.05, e1=0.1, kill_ent_fringe;
+b2: sbend, l=1, angle=1e-20, k0=0.05, e1=0.1, kill_exi_fringe;
 
 mrk2: marker;
 
@@ -130,20 +130,20 @@ TWISS, SEQUENCE=seq_k0,betx=2,bety=1, FILE='k0.tfs';
 enter Twiss module
  Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
 Twiss pre-init: adjusting probe and oneturnmat (fix point)
-updating probe_beam for deltap=0 => ds= 0.00124948729202129872
-  parameters: freq0=    29.9792457879194778, alfa=-0.000124947923175730178
+updating probe_beam for deltap=0 => ds= 0.00130903683745396747
+  parameters: freq0=    29.9792457879194778, alfa=-0.000130902877714197778
               beta=   0.999999999597037115, gamma=    35225.1213040653092, dtbyds=                     -0
-Twiss pre-init: iteration 1, delta ds = 1.24948729e-03 (fix point)
-updating probe_beam for deltap=0 => ds= 0.00124948729202129893
-  parameters: freq0=    29.9792457879194778, alfa=-0.000124947923175730178
+Twiss pre-init: iteration 1, delta ds = 1.30903684e-03 (fix point)
+updating probe_beam for deltap=0 => ds= 0.00130903683745396747
+  parameters: freq0=    29.9792457879194778, alfa=-0.000130902877714197778
               beta=   0.999999999597037115, gamma=    35225.1213040653092, dtbyds=                     -0
-Twiss pre-init: iteration 2, delta ds = 2.16840434e-19 (fix point)
+Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
  
  Global parameters for electrons, radiate = F:
 
  C                         10 m          f0               29.97924579 MHz
- T0             0.03335640953 musecs     alfa        -0.0001249479232 
- eta         -0.0001249487291            gamma(tr)        89.46135649 
+ T0             0.03335640953 musecs     alfa        -0.0001309028777 
+ eta         -0.0001309036836            gamma(tr)        87.40281152 
  Bcurrent     4.803204709e-12 A/bunch    Kbunch             1 
  Npart                      1 /bunch     Energy                    18 GeV 
  gamma             35225.1213            beta            0.9999999996
@@ -159,13 +159,13 @@ final orbit vector:    -4.500000E-01 -5.000000E-02  0.000000E+00  0.000000E+00 -
                 10                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-      0.2185835209                  0                 52       0.4500000002 
+      0.2172034968                  0         52.4337574       0.4500000002 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2848245075               0.45       0.2848245074       0.2344228297 
+      0.2848245075               0.45       0.2848245074       0.2348527178 
 
                dq2            betymax              dymax              dyrms 
-                 0        100.3214676                  0                  0 
+                 0        100.4309316                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 

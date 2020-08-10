@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "04/08/20"
-@ TIME             %08s "14.25.47"
+@ DATE             %08s "10/08/20"
+@ TIME             %08s "13.26.27"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "SEQ_K0$START"                       0                  2                  1
