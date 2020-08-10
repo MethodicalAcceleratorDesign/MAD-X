@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %74s "Matching chromaticity for beam1 and beam2 of the LHC 6.4 lattice with MADX"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "16.26.45"
+@ DATE             %08s "10/08/20"
+@ TIME             %08s "13.27.38"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "IP1"                                0       0.5500002114       0.5500000458

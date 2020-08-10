@@ -51,8 +51,8 @@ test-track-7 test-track-8 test-track-9 test-track-10 test-track-11 test-track-12
 test-track-acd test-track-rotations \
 test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 \
 test-twiss-6 test-twiss-8 test-twiss-9 test-twiss-10 test-twiss-11 test-tapering \
-test-twiss-12 test-twiss-13 test-twiss-14 test-translation test-xrotation test-yrotation \
-test-interpolate test-rf-fringe \
+test-twiss-12 test-twiss-13 test-twiss-14 test-twiss-15 test-translation \
+test-xrotation test-yrotation test-interpolate test-rf-fringe \
 test-cororbit test-cororbit-2 test-cororbit-3 test-cororbit-4 \
 test-emit test-emit-2 \
 test-ibs test-ibs-2 test-ibs-3 test-ibs-4 \

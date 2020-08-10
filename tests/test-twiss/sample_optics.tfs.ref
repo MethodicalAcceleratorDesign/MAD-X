@@ -27,7 +27,7 @@
 @ DXMAX            %le         2.815212715
 @ DYMAX            %le        0.1894286768
 @ XCOMAX           %le      0.008477874214
-@ YCOMAX           %le      0.008499924148
+@ YCOMAX           %le      0.008499924147
 @ BETXMAX          %le         595.1194704
 @ BETYMAX          %le         609.5259704
 @ XCORMS           %le     0.0007074557983
@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %30s "LHC Version 6.503 -  July 2009"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "16.24.09"
+@ DATE             %08s "10/08/20"
+@ TIME             %08s "13.26.17"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "IP1"                                0        11.00000336        11.00000569

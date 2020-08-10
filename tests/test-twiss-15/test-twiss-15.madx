@@ -1,0 +1,25 @@
+BEAM, PARTICLE=ELECTRON, ENERGY=18.0;
+OPTION, DEBUG;
+
+b1: sbend, l=1, angle=0.05, e1=0.1, kill_exi_fringe;;
+b2: sbend, l=1, angle=1e-20, k0=0.05, e1=0.1, kill_exi_fringe;
+mrk2: marker;
+
+seq_ang: sequence, l=10;
+b1, at = 1;
+endsequence;
+
+seq_k0: sequence, l=10;
+b2, at = 1;
+endsequence;
+
+// -------- Twiss output --------------------
+USE,SEQUENCE=seq_ang;
+select, flag = twiss, column=name,s,betx,bety;
+TWISS, SEQUENCE=seq_ang, betx=2,bety=1, FILE='ang.tfs';
+
+
+USE,SEQUENCE=seq_k0;
+TWISS, SEQUENCE=seq_k0,betx=2,bety=1, FILE='k0.tfs';
+
+STOP;

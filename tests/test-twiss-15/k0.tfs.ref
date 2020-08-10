@@ -1,0 +1,53 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %06s "SEQ_K0"
+@ PARTICLE         %08s "ELECTRON"
+@ MASS             %le       0.00051099895
+@ CHARGE           %le                  -1
+@ ENERGY           %le                  18
+@ PC               %le         17.99999999
+@ GAMMA            %le          35225.1213
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     4.803204709e-12
+@ SIGE             %le               0.001
+@ SIGT             %le                   1
+@ NPART            %le                   1
+@ EX               %le                   1
+@ EY               %le                   1
+@ ET               %le               0.001
+@ BV_FLAG          %le                   1
+@ LENGTH           %le                  10
+@ ALFA             %le                   0
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le                   0
+@ Q1               %le        0.2172034968
+@ Q2               %le        0.2348527178
+@ DQ1              %le                   0
+@ DQ2              %le                   0
+@ DXMAX            %le        0.4500000002
+@ DYMAX            %le                   0
+@ XCOMAX           %le                0.45
+@ YCOMAX           %le                   0
+@ BETXMAX          %le          52.4337574
+@ BETYMAX          %le         100.4309316
+@ XCORMS           %le        0.2848245074
+@ YCORMS           %le                   0
+@ DXRMS            %le        0.2848245075
+@ DYRMS            %le                   0
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "10/08/20"
+@ TIME             %08s "13.26.27"
+* NAME                                S               BETX               BETY 
+$ %s                                %le                %le                %le 
+ "SEQ_K0$START"                       0                  2                  1
+ "DRIFT_0"                          0.5              2.125               1.25
+ "B2"                               1.5        3.148882966        3.232472892
+ "DRIFT_1"                           10         52.4337574        100.4309316
+ "SEQ_K0$END"                        10         52.4337574        100.4309316

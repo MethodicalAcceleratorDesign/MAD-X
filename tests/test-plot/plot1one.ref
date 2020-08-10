@@ -47,8 +47,8 @@
 @ E66              %le                   1
 @ TITLE            %54s "Test for PLOT command on the LHC 6.5 lattice with MADX"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "11.53.51"
+@ DATE             %08s "10/08/20"
+@ TIME             %08s "13.31.12"
 *             NUMBER               TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
 $                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
 #segment       1      11       4       0 start                                                                         

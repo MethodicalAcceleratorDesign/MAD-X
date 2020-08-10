@@ -1,0 +1,188 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.08.10 13:26:27      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+BEAM, PARTICLE=ELECTRON, ENERGY=18.0;
+
+OPTION, DEBUG;
+
+
+
+b1: sbend, l=1, angle=0.05, e1=0.1, kill_exi_fringe;;
+
+b2: sbend, l=1, angle=1e-20, k0=0.05, e1=0.1, kill_exi_fringe;
+
+mrk2: marker;
+
+
+
+seq_ang: sequence, l=10;
+
+b1, at = 1;
+
+endsequence;
+
+
+
+seq_k0: sequence, l=10;
+
+b2, at = 1;
+
+endsequence;
+
+
+
+// -------- Twiss output --------------------
+
+USE,SEQUENCE=seq_ang;
+
+   in get_node_pos: name: seq_ang$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: seq_ang$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: b1, pos: 1.000000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: b1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: seq_ang$end, pos: 1.000000e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: seq_ang$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+
+
+TOP Expand_sequence name seq_ang with length 1.000000e+01, ref_flag 0
+inserting a drift of length 5.000000e-01 at position 2.500000e-01 
+ 
+inserting a drift of length 8.500000e+00 at position 5.750000e+00 
+ 
+select, flag = twiss, column=name,s,betx,bety;
+
+TWISS, SEQUENCE=seq_ang, betx=2,bety=1, FILE='ang.tfs';
+
+enter Twiss module
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+++++++ warning: THREADER-M:  Symplectic deviation:  0.444457E-10 in element b1                                                                                                     
+updating probe_beam for deltap=0 => ds=-0.000416606527512282528
+  parameters: freq0=    29.9792457879194778, alfa=4.16614586433531746e-05
+              beta=   0.999999999597037115, gamma=    35225.1213040653092, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -4.16606528e-04 (fix point)
+++++++ warning: THREADER-M:  Symplectic deviation:  0.444457E-10 in element b1                                                                                                     
+updating probe_beam for deltap=0 => ds=-0.000416606527512282691
+  parameters: freq0=    29.9792457879194778, alfa=4.16614586433531882e-05
+              beta=   0.999999999597037115, gamma=    35225.1213040653092, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -1.62630326e-19 (fix point)
+ 
+ Global parameters for electrons, radiate = F:
+
+ C                         10 m          f0               29.97924579 MHz
+ T0             0.03335640953 musecs     alfa         4.166145864e-05 
+ eta          4.166065272e-05            gamma(tr)        154.9290166 
+ Bcurrent     4.803204709e-12 A/bunch    Kbunch             1 
+ Npart                      1 /bunch     Energy                    18 GeV 
+ gamma             35225.1213            beta            0.9999999996
+ dtbyds                     0
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                10                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2178204006                  0        52.11688274       0.4498177311 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.2847092278                  0                  0       0.2348527178 
+
+               dq2            betymax              dymax              dyrms 
+                 0        100.4309316                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+
+
+
+
+USE,SEQUENCE=seq_k0;
+
+   in get_node_pos: name: seq_k0$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: seq_k0$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: b2, pos: 1.000000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: b2, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: seq_k0$end, pos: 1.000000e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: seq_k0$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+
+
+TOP Expand_sequence name seq_k0 with length 1.000000e+01, ref_flag 0
+inserting a drift of length 5.000000e-01 at position 2.500000e-01 
+ 
+inserting a drift of length 8.500000e+00 at position 5.750000e+00 
+ 
+TWISS, SEQUENCE=seq_k0,betx=2,bety=1, FILE='k0.tfs';
+
+enter Twiss module
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds= 0.00130903683745396747
+  parameters: freq0=    29.9792457879194778, alfa=-0.000130902877714197778
+              beta=   0.999999999597037115, gamma=    35225.1213040653092, dtbyds=                     -0
+Twiss pre-init: iteration 1, delta ds = 1.30903684e-03 (fix point)
+updating probe_beam for deltap=0 => ds= 0.00130903683745396747
+  parameters: freq0=    29.9792457879194778, alfa=-0.000130902877714197778
+              beta=   0.999999999597037115, gamma=    35225.1213040653092, dtbyds=                     -0
+Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
+ 
+ Global parameters for electrons, radiate = F:
+
+ C                         10 m          f0               29.97924579 MHz
+ T0             0.03335640953 musecs     alfa        -0.0001309028777 
+ eta         -0.0001309036836            gamma(tr)        87.40281152 
+ Bcurrent     4.803204709e-12 A/bunch    Kbunch             1 
+ Npart                      1 /bunch     Energy                    18 GeV 
+ gamma             35225.1213            beta            0.9999999996
+ dtbyds                    -0
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:    -4.500000E-01 -5.000000E-02  0.000000E+00  0.000000E+00 -1.104167E-02  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                10                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2172034968                  0         52.4337574       0.4500000002 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.2848245075               0.45       0.2848245074       0.2348527178 
+
+               dq2            betymax              dymax              dyrms 
+                 0        100.4309316                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+
+
+STOP;
+
+
+  Number of warnings: 2
+0 in C and 2 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

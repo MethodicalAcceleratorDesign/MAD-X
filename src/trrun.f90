@@ -5121,7 +5121,7 @@ subroutine tttdipole(track, ktrack, code)
   endif
   !---- Apply entrance dipole edge effect
   if (node_value('kill_ent_fringe ') .eq. zero) &
-       call ttdpdg_map(track, ktrack, e1, h, hgap, fint, zero)
+       call ttdpdg_map(track, ktrack, e1, k0, hgap, fint, zero)
 
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
@@ -5210,7 +5210,7 @@ subroutine tttdipole(track, ktrack, code)
   !---- Apply exit dipole edge effect
   if (node_value('kill_exi_fringe ') .eq. zero) then
      if (fintx .lt. zero) fintx = fint
-     call ttdpdg_map(track, ktrack, e2, h, hgap, fintx, zero)
+     call ttdpdg_map(track, ktrack, e2, k0, hgap, fintx, zero)
   endif
 
 end subroutine tttdipole
