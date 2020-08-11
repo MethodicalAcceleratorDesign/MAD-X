@@ -1,0 +1,35 @@
+circum=15;
+
+var1 = 0X1.999999929999AP-4;
+rfcav: RFCAVITY, VOLT=100, LAG=var1 , L = 0.1, Freq=100, fringe=1	;
+
+ip5: marker ;
+set, format="A";
+
+seq: sequence, refer=center, l=circum;
+rfcavi:rfcav, at = 1;
+endsequence;
+
+beam;
+
+use, sequence=seq;
+
+
+
+select, flag=twiss, column=name, s, x,px, y,py, pt,t, betx, bety;
+
+twiss, betx=1, bety=1, file="twiss_hex.dat",chrom;
+
+save, sequence=seq, file=seq_hex.seq;
+
+call, file="seq_hex.seq";
+
+set, format="22.14e";
+
+save, sequence=seq, file=seq_ascii.seq;
+
+READMYTABLE, FILE="twiss_hex.dat", TABLE=myhex;
+
+WRITE, TABLE=myhex, FILE=fodoloaded.twiss;
+
+stop;
