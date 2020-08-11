@@ -1,0 +1,135 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.08.11 09:09:34      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+circum=15;
+
+
+
+var1 = 0X1.999999929999AP-4;
+
+++++++ warning: illegal expression set to 0 in: var1 = 0 x1.999999929999ap - 4 
+rfcav: RFCAVITY, VOLT=100, LAG=var1 , L = 0.1, Freq=100, fringe=1	;
+
+
+
+ip5: marker ;
+
+set, format="A";
+
+
+
+seq: sequence, refer=center, l=circum;
+
+rfcavi:rfcav, at = 1;
+
+endsequence;
+
+
+
+beam;
+
+
+
+use, sequence=seq;
+
+
+
+
+
+
+
+select, flag=twiss, column=name, s, x,px, y,py, pt,t, betx, bety;
+
+
+
+twiss, betx=1, bety=1, file="twiss_hex.dat",chrom;
+
+enter Twiss module
+  
+open line - error with deltap:   1.000000E-06
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00 -3.916791E-12  5.199021E-14
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                15                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2263217824      0.01182956671        277.2796356                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  0                  0       0.2263217824 
+
+               dq2            betymax              dymax              dyrms 
+     0.01182956671        277.2796356                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+
+
+save, sequence=seq, file=seq_hex.seq;
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+call, file="seq_hex.seq";
+
+none = 0;
+
+rfcav: rfcavity,l:= 0.1,volt:= 100,lag:= 0,freq:= 100,fringe:= 1;
+
+++++++ info: element redefined: rfcav
+rfcavi: rfcav;
+
+++++++ info: element redefined: rfcavi
+seq: sequence, l = 15;
+
+rfcavi: rfcav, at = 1;
+
+++++++ warning: implicit element re-definition ignored: rfcavi
+endsequence;
+
+
+
+set, format="22.14e";
+
+
+
+save, sequence=seq, file=seq_ascii.seq;
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+READMYTABLE, FILE="twiss_hex.dat", TABLE=myhex;
+
+Want to make named table: myhex
+
+
+WRITE, TABLE=myhex, FILE=fodoloaded.twiss;
+
+
+
+stop;
+
+
+  Number of warnings: 4
+4 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
