@@ -12,18 +12,16 @@
 <h1>Changes</h1>
 <hr class="h1">
 <!-- -------- -->
-<h3>MAD-X release 5.05.03 (2000.YY.YYY)</h3>
+<h3>MAD-X release 5.05.03 (2020.08.13)</h3>
+
+<h4>Added features/updates/improvements</h4>
 <ul>
-
-
 <li> Possible to write the eigenvectors of the one turn map to a file.
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/804">#804</a>. (Tobias)
 <li> Arbitrary aperture definition in TRACK.
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/806">#806</a>. (Tobias)
 <li> Signficant speed up of the thin TRACK.
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/807">#807</a>. (Tobias)
-<li> Fixed a bug in the move command when FROM was used for location.
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/815">#815</a>. (Tobias)
 <li> OPENMP compilation restored.
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/815">#815</a>. (Tobias, Laurent)
 <li> Signficant speed up of the thick TRACK.
@@ -39,7 +37,7 @@
 <li> When k0 is not equal to the angle is now exported to SixTrack. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/826">#826</a>. (Tobias)
 <li> Thin combine function magnet implemented in TRACK and TWISS. 
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/826">#826</a>. (Tobias, Malte)
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/827">#827</a>. (Tobias, Malte)
 <li> Bug fix for the syntax of the option using ADD errors. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/798">#798</a>. (Laurent)
 <li> Fix in PTC-MADX interface when a skew component was present as well as other orders. 
@@ -54,20 +52,63 @@
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/838">#838</a>. (Tobias)
 <li> If strength is 0 of a dipole it uses the exact drift in TRACK. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/846">#846</a>. (Tobias)
-<li> A corrector could have a length that was disregarded by TRACK. 
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/851">#851</a>. (Tobias)
-<li> Segmentation fault when weights were used wrongly with MACRO. 
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/854">#854</a>. (Tobias)
-<li> Radiation and thin solenoid gave NaN values in TWISS. 
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/858">#858</a>. (Tobias)
-<li> RF cavity defined with HARMON and zero LENGTH gets FREQ set to zero. 
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/858">#858</a>. (Tobias)
 <li> PTC_TWISS with CENTRE option gave one element offset for the S postion. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/859">#859</a>. (Piotr)
 <li> Get the average value when tracking many particles. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/864">#864</a>. (Tobias)
+<li> PTC from 2020.03.25
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/885">#885</a>. (Piotr)
+<li> When the CHROM option is used in TWISS the chromaticity is given as DQ/DPT (before it was DELTAP).
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/887">#887</a>. (Tobias)
+<li> Set Jacobian bisec default to 3.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/893">#893</a>. (Laurent)
+<li> Fix of the NPART in BEAM that was overwritten when the beam was updated.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/901">#901</a>. (Tobias)
+<li> RF-fringe field implemented.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/902">#902</a>. (Tobias)
+<li> Tapering included in TWISS.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/905">#905</a>. (Tobias, Leon)
+<li> Added WIRE attributes to the collimator and export to SixTrack.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/929">#914,#929</a>. (Tobias, Helmut)
+<li> FDSTEP is now used in matching to define step size.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/924">#921</a>. (Laurent)
+<li> Added radiation integrals I6 and I8.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/924">#924</a>. (Tobias, Leon)
+<li> Fix warnings in plot module for non-twiss tables with haxis=s.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/923">#923</a>. (Laurent)
+<li> Update constants to CODATA 2018.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/925">#925</a>. (Tobias)
+<li> The strength of the dipole is now defining the fringe fields for dipoles.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/934">#934</a>. (Tobias)
 </ul>
 
+<h4>Bug Fixes</h4>
+<ul>
+<li> Fixed a bug in the move command when FROM was used for location.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/815">#815</a>. (Tobias)
+<li> Segmentation fault when weights were used wrongly with MACRO. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/835">#835</a>. (Tobias)
+<li> Fixes a bug in the MOVE command for complicated references. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/854">#854</a>. (Tobias)
+<li> Radiation and thin solenoid gave NaN values in TWISS. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/858">#858</a>. (Tobias)
+<li> Fix of a problem dipedge in TRACK. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/850">#850</a>. (Andrea)
+<li> A corrector could have a length that was disregarded by TRACK. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/851">#851</a>. (Tobias)
+<li> RF cavity defined with HARMON and zero LENGTH gets FREQ set to zero. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/858">#858</a>. (Tobias)
+<li> Prevent infinite loop when aperture is exactly on closed orbit.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/874">#874</a>. (Tobias)
+<li> Fix of the thin combined function magnets in TWISS.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/898">#898</a>. (Malte, Riccardo, Tobias)
+<li> Fixes in the aperture algorithm as well as the addition of dispersion.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/890">#890</a>. (Tobias, Thys)
+<li> Corrected the scaling of the TWISS functions with PT in PTC.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/903">#903</a>. (Tobias, Piotr)
+<li> BV flag fixed for the element CRABCAVITY to have correct behavior.
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/919">#919</a>. (Tobias, Helmut)
+</ul>
 
 <h3>MAD-X release 5.05.02 (2019.07.26)</h3>
 <ul>
@@ -83,6 +124,7 @@
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/788">#788</a>. (Tobias)
 </ul>
 
+
  
 <h3>MAD-X release 5.05.01 (2019.06.07)</h3>
 
@@ -91,11 +133,10 @@
      <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/781">#781</a>. (Laurent, Tobias, Ewen)
 </ul>
 
-
 <h3>MAD-X release 5.05.00 (2019.05.10)</h3>
 <h4>Backward incompatibilties with previous releases</h4>
 <ul>
-<li> Changes the sign of the y-rotation in the survey.  
+<li> Changes the sign of the y-rotation in the survey.
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/729">#729</a>. (Tobias, Laurent)
 <li> Prevents energy spread always beeing recalculated from the longitudinal emittance.   
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/755">#755</a>. (Tobias) 
