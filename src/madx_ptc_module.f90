@@ -1425,6 +1425,17 @@ CONTAINS
           key%list%ang(i)=patch_ang(i)
           key%list%t(i)=patch_trans(i)
        enddo
+    case(36) ! TRANSLATION
+       key%magnet="CHANGEREF"
+       PATCH_ANG = zero
+       patch_trans(1)=node_value('dx ')
+       patch_trans(2)=node_value('dy ')
+       patch_trans(3)=node_value('ds ')
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
     case(37)!CRAB ??
        key%magnet="rfcavity"
        key%list%volt=zero
