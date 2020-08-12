@@ -1810,4 +1810,26 @@ label: CHANGEREF, \= PATCH\_ANG={real, real, real}, \\
 be referred to the new coordinate system where both translations and
 rotations are applied.
 
-%%% END
+
+\section{SixTrack Marker}
+
+\madbox{
+label: SIXMARKER, \= ELTYPE=real, ATTR=\{real, \ldots \},  \\
+               \> F3STRING=string, F3VECTOR=\{real, \ldots \} ;
+}
+f3string="NEW ELEMENT {newline} {0}, {1} {newline}NEXT"
+The \texttt{SIXMARKER} element allows the definition of an arbitrary marker that is converted to SixTrack.
+The element has no impact in MAD-X.
+\begin{madlist}
+   \ttitem{ELTYPE} is the element type number in SixTrack, converted to the first column in fc.2.
+   \ttitem{ATTR} This defines the remaining columns of the fc.2 file.
+   \ttitem{F3STRING} Defines the String that is written to the fc.3 file, \{newline\} creates a new line in the output
+   and \{0\}\ldots\{10\} are being replaced with the values in F3VECTOR.
+   \ttitem{F3VECTOR} The values defined will be converted to the location defined in the F3STRING. 
+\end{madlist}
+
+\textbf{Example:}
+\madxmp{
+DR1: \= DRIFT, \= L=1.5; \\
+DR2: \> DRIFT, \> L=DR1->L;
+}
