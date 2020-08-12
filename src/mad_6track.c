@@ -3309,10 +3309,10 @@ write_f3_sixmarker(struct element* el){
   if (!f3) f3 = fopen("fc.3", "w");
     
   tmp =command_par_string("f3string",el->def);
-  nl = element_vector(el, "attr", attrtemp);
+  nl = element_vector(el, "f3vector", attrtemp);
   
   for(int i=0; i<nl; i++){
-    
+
     sprintf(str_att_value, "%12.8e", attrtemp[i]);
     
     strcpy(nstr2,"{");
