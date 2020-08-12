@@ -1,0 +1,13 @@
+none = 0;
+co: collimator,lrad:= 1;
+co_wire: wire,xma:={ 0.001, 0.002},yma:={ 0.003, 0.004},current:={ 3, 4},l_int:={ 1, 2},l_phy:={ 3, 4},closed_orbit:= 1;
+wi..1: wire,lrad:= 1,xma:={ 0.007, 0.008},yma:={ 0.009, 0.001},current:={ 1.5, 2},l_int:={ 8, 9},l_phy:={ 10, 11},closed_orbit:= 1;
+wi: marker;
+wi..2: wire,lrad:= 1,xma:={ 0.007, 0.008},yma:={ 0.009, 0.001},current:={ 1.5, 2},l_int:={ 8, 9},l_phy:={ 10, 11},closed_orbit:= 1;
+testseq: sequence, l = 20;
+co, at = ( 1 ) + ( 0 ) ;
+co_wire, at = ( 1 ) + ( 0 ) ;
+wi..1, at = ( ( 5 ) + ( 0 ) ) + ( 0 - 1 ) ;
+wi, at = ( 5 ) + ( 0 ) ;
+wi..2, at = ( ( 5 ) + ( 0 ) ) + ( 1 ) ;
+endsequence;

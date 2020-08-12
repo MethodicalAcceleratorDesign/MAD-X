@@ -46,7 +46,7 @@ namespace MaTh
   static unsigned int Verbose;
   static const std::vector<std::string> DoNotCopy ={"l","lrad","slot_id","assembly_id","slice","comments"};
   static const std::vector<std::string> DoNotCopy2=           {"slot_id","assembly_id"};
-  static const std::vector<std::string> WireCollimatorParmList={"xma","yma","ilnorm"};
+  static const std::vector<std::string> WireCollimatorParmList={"xma","yma","closed_orbit", "current", "l_phy", "l_int"};
   static char ExtraChar='_';
 }
 
@@ -1657,7 +1657,7 @@ element* SeqElList::new_marker_element(const std::string el_name, const element*
 element* SeqElList::create_wire_element(const element* thick_elem,int slice_no) // for slicing wire collimators, wire(s) with zero length
 {
   element* newwire=nullptr;
-  command_parameter* ilnorm_param = return_param_recurse("ilnorm",thick_elem);
+  command_parameter* ilnorm_param = return_param_recurse("current",thick_elem);
   if(ilnorm_param)
   {
     command* cmd = new_cmdptr( find_element("wire", base_type_list) );
@@ -2423,7 +2423,7 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
 
 void SeqElList::slice_attributes_to_slice(command* cmd,const element* thick_elem)
 { // looks for attributes like kick that need slicing, modify them in cmd used to construct the sliced element
-  const std::vector<std::string> attributes_to_slice = { "kick", "hkick", "vkick", "chkick", "cvkick", "ilnorm"};
+  const std::vector<std::string> attributes_to_slice = { "kick", "hkick", "vkick", "chkick", "cvkick", "current"};
   ElmAttr theElmAttr(thick_elem);
   std::vector<std::string> active_par_to_be_used=theElmAttr.get_list_of_active_attributes();
   for(unsigned i=0;i<active_par_to_be_used.size();++i)
@@ -2541,7 +2541,7 @@ void SeqElList::slice_node() // main steering, decides how to split an individua
   {
     if(verbose>1) std::cout << " now see what to do with work_node=" << std::left << std::setw(MaTh::par_name_maxlen) << work_node->name <<  " depending on its base=" << std::setw(MaTh::par_name_maxlen) << work_node->base_name << std::right << '\n';
     const double eps=1.e-15; // used to check if a value is compatible with zero
-    bool IsWireCollimator = ( strcmp(work_node->base_name,"collimator") == 0 && return_param_recurse("ilnorm",thick_elem) );
+    bool IsWireCollimator = ( strcmp(work_node->base_name,"collimator") == 0 && return_param_recurse("current",thick_elem) );
     if ( fabs(el_par_value("l",thick_elem)) <eps ) // if the length is compatible with zero copy it directly
     {
       if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " zero length place directly copy of element " << work_node->name << '\n';

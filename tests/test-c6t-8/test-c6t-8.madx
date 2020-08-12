@@ -1,0 +1,25 @@
+
+co  : collimator,    l=1,  xma={0.001,0.002}, yma={0.003,0.004}, current={3,4},l_int={1,2}, l_phy={3,4}, closed_orbit=1, comments="Thick=1,Material=Cu";
+wi  : wire,    l=2,  xma={0.007,0.008}, yma={0.009,0.0010}, current={3,4},l_int={8,9}, l_phy={10,11}, closed_orbit=1, comments="Thick=1,Material=Cu";
+
+testseq: sequence,l=20;
+co,  at=1;
+wi,  at =5;
+endsequence;
+
+
+//-- strength can also be set after sequence definition
+beam;
+use, sequence=testseq;
+
+select, flag = makethin, class=collimator,  slice=1	;
+select, flag = makethin, class=wire,  slice=2	;
+
+makethin, sequence=testseq;
+use, sequence=testseq;
+
+twiss, betx=1, bety=1, file ="thin.twiss";
+
+sixtrack;
+
+save sequence=testseq, file="thin.seq";
