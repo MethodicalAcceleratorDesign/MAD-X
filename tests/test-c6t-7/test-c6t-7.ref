@@ -1,15 +1,15 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.06.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:40:44      +
+  + Release   date: 2020.08.13               +
+  + Execution date: 2020.08.12 09:18:15      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=10;
 
 
 
-sm1:sixmarker, eltype=2, attr={0.1,2,3,4,5,6,7}, f3string="NEW ELEMENT {newline} {0}, {1} {newline}NEXT", f3vector={0.2, 0.5};
+sm1:SIXMARKER, eltype=2, attr={0.1,2,3,4,5,6,7}, f3string="NEW_ELEMENT {newline} {0}, {1} {newline}NEXT", f3vector={0.2, 0.5};
 
 m1: multipole, knl={0, 0.2};
 
@@ -26,7 +26,7 @@ parameter: polarity   double value:                  0
 parameter: tilt   double value:                  0
 parameter: lrad   double value:                  0
 parameter: magnet   integer:          0
-parameter: f3string   string: NEW ELEMENT {newline} {0}, {1} {newline}NEXT
+parameter: f3string   string: NEW_ELEMENT {newline} {0}, {1} {newline}NEXT
 parameter: f3vector   double array: 2.000000e-01 5.000000e-01 
 parameter: eltype   integer:          2
 parameter: attr   double array: 1.000000e-01 2.000000e+00 3.000000e+00 4.000000e+00 5.000000e+00 6.000000e+00 7.000000e+00 
@@ -77,7 +77,7 @@ parameter: polarity   double value:                  0
 parameter: tilt   double value:                  0
 parameter: lrad   double value:                  0
 parameter: magnet   integer:          0
-parameter: f3string   string: NEW ELEMENT {newline} {0}, {1} {newline}NEXT
+parameter: f3string   string: NEW_ELEMENT {newline} {0}, {1} {newline}NEXT
 parameter: f3vector   double array: 2.000000e-01 5.000000e-01 
 parameter: eltype   integer:          2
 parameter: attr   double array: 1.000000e-01 2.000000e+00 3.000000e+00 4.000000e+00 5.000000e+00 6.000000e+00 7.000000e+00 
