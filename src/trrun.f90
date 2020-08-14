@@ -961,6 +961,9 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
     case (code_rfmultipole)
        call ttrfmult(track,ktrack,turn)
 
+    case (code_wire)
+       call ttwire(track,ktrack)
+
     case (code_hmonitor:code_rcollimator, code_instrument, &
         code_slmonitor:code_imonitor, code_placeholder, code_collimator)
         if(el .gt. 0) call ttdrf(el,track,ktrack)
@@ -4555,6 +4558,102 @@ subroutine ttnllens(track,ktrack)
   enddo
 end subroutine ttnllens
 
+subroutine ttwire(track, ktrack)
+  use twtrrfi
+  use trackfi
+  use math_constfi, only : zero, one, two, four
+  use phys_constfi, only : clight
+  implicit none
+  double precision :: track(6,*)
+  integer :: ktrack
+  double precision :: xma(0:maxmul), yma(0:maxmul), current(0:maxmul), l_int(0:maxmul)
+  double precision :: l_phy(0:maxferr)
+  integer :: i, j, wire_flagco, nn, ibeco
+  double precision :: dx, dy, embl, l, cur, dxi, dyi, chi, nnorm, xi, yi, RTWO, pc
+  ! WIRE basd on the SixTrack implementation
+  double precision, external :: node_value, get_value
+  call get_node_vector('xma ', nn, xma)
+  call get_node_vector('yma ', nn, yma)
+  call get_node_vector('current ', nn, current)
+  call get_node_vector('l_int ', nn, l_int)
+  call get_node_vector('l_phy ', nn, l_phy)
+  
+  pc = get_value('probe ','pc ')
+  wire_flagco = node_value('closed_orbit ')
+  print *, "cccccc", wire_flagco
+  ibeco = 1
+do i = 0, nn
+  dx   = xma(i) ! displacement x [m]
+  dy   = yma(i) ! displacement y [mm]
+  embl = l_int(i)  ! integrated length [m]
+  l    = l_phy(i) ! physical length [m]
+  cur  = current(i)
+
+  if(wire_flagco == 1) then
+    !dxi = (dx+wire_clo(1,wire_num(i)))
+    !dyi = (dy+wire_clo(2,wire_num(i)))
+  else if(wire_flagco == -1) then
+    dxi = dx
+    dyi = dy
+  else
+    print *, "HAS TO BE 1 or -1"
+  end if
+
+  do j=1,ktrack
+  !  yv1(j) = TRACK(2,j)*c1m3 ! [m]
+  !  yv2(j) = TRACK(4,j)*c1m3 ! [m]
+
+    ! 1 shift
+    if(wire_flagco == 1) then
+      xi = (TRACK(1,j)+dx) ! [m]
+      yi = (TRACK(3,j)+dy) ! [m]
+    else if(wire_flagco == -1) then
+      print * , "Not implemented yet"
+      !xi = (TRACK(1,j)+( dx-wire_clo(1,wire_num(i)) ))*c1m3 ! [m]
+      !yi = (TRACK(3,j)+( dy-wire_clo(2,wire_num(i)) ))*c1m3 ! [m]
+    end if
+
+    ! x'-> px; y'->py
+    ! TRACK(2,j) = TRACK(2,j)*(one + dpsv(j))/mtc(j)
+    ! TRACK(4,j) = TRACK(4,j)*(one + dpsv(j))/mtc(j)
+    
+    chi = pc*1e9/clight
+    NNORM=1e-7/chi
+    print *, "nnnn", NNORM
+   
+    if(ibeco == 0) then
+      ! 3 apply wire kick
+      RTWO = xi**2+yi**2
+      TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+      TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+
+    elseif(ibeco == 1) then
+
+      ! 3 apply wire kick
+      RTWO = xi**2+yi**2
+      TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+      TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+
+      ! subtract closed orbit kick
+      ! wire kick is negative px -> px - wirekick - (-closed orbit kick)
+      RTWO = dxi**2+dyi**2
+      TRACK(2,j) = TRACK(2,j)+(((CUR*NNORM)*dxi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+      TRACK(4,j) = TRACK(4,j)+(((CUR*NNORM)*dyi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+
+    end if
+
+    ! px -> x'; py -> y'
+   ! yv1(j) = yv1(j)*mtc(j)/(one + dpsv(j))
+   ! yv2(j) = yv2(j)*mtc(j)/(one + dpsv(j))
+
+    ! END OF WIRE MAP
+   ! yv1(j) = yv1(j)*c1e3
+   ! yv2(j) = yv2(j)*c1e3
+  end do
+end do
+ 
+
+end subroutine ttwire
 !FIXME Unused dummy argument 'turn'
 subroutine ttrfmult(track, ktrack, turn)
   use twtrrfi
