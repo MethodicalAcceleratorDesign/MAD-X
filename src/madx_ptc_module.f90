@@ -1414,6 +1414,16 @@ CONTAINS
        key%list%psi=node_value("psi ")
        key%list%harmon=one
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
+    case(34) ! XROTATION
+       key%magnet="CHANGEREF"
+       PATCH_ANG = zero
+       PATCH_TRANS = zero
+       patch_ang(1)=node_value('angle ')
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
     case(35)
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
