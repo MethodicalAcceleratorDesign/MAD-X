@@ -4581,10 +4581,11 @@ subroutine ttwire(track, ktrack)
   pc = get_value('probe ','pc ')
   wire_flagco = node_value('closed_orbit ')
   print *, "cccccc", wire_flagco
-  ibeco = 1
-do i = 0, nn
+  ibeco = 0
+do i = 0, nn-1
   dx   = xma(i) ! displacement x [m]
   dy   = yma(i) ! displacement y [mm]
+  print * ,"ddddxxx", dx, dy
   embl = l_int(i)  ! integrated length [m]
   l    = l_phy(i) ! physical length [m]
   cur  = current(i)
@@ -4600,13 +4601,12 @@ do i = 0, nn
   end if
 
   do j=1,ktrack
-  !  yv1(j) = TRACK(2,j)*c1m3 ! [m]
-  !  yv2(j) = TRACK(4,j)*c1m3 ! [m]
 
     ! 1 shift
     if(wire_flagco == 1) then
       xi = (TRACK(1,j)+dx) ! [m]
       yi = (TRACK(3,j)+dy) ! [m]
+      print * ,"ddddxxx2", dx, dy
     else if(wire_flagco == -1) then
       print * , "Not implemented yet"
       !xi = (TRACK(1,j)+( dx-wire_clo(1,wire_num(i)) ))*c1m3 ! [m]
@@ -4624,6 +4624,7 @@ do i = 0, nn
     if(ibeco == 0) then
       ! 3 apply wire kick
       RTWO = xi**2+yi**2
+      print *, "rrrr", RTWO, cur, nnorm, embl, l
       TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
       TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
 
@@ -4641,14 +4642,6 @@ do i = 0, nn
       TRACK(4,j) = TRACK(4,j)+(((CUR*NNORM)*dyi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
 
     end if
-
-    ! px -> x'; py -> y'
-   ! yv1(j) = yv1(j)*mtc(j)/(one + dpsv(j))
-   ! yv2(j) = yv2(j)*mtc(j)/(one + dpsv(j))
-
-    ! END OF WIRE MAP
-   ! yv1(j) = yv1(j)*c1e3
-   ! yv2(j) = yv2(j)*c1e3
   end do
 end do
  
