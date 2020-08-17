@@ -45,7 +45,9 @@ struct node                /* the sequence is a linked list of nodes */
   struct constraint_list* cl; /* pointer to constraint list during match */
   struct double_array* obs_orbit; /* for track observation point */
   struct double_array* orbit_ref; /* for threader orbit + cum. matrix */
+
   struct double_array* interp_at; /* array of positions for intermediate values */
+  struct double_array* closed_orbit; /* closed orbit for WIRE */
   /* RF-Multipole errors (EFCOMP) */
   struct double_array* p_ph_err; /* pointer to rf-multipole phase error array AL: */
   /* RF-Multipoles */
@@ -118,6 +120,8 @@ void    set_tt_multipoles(int *maxmul);
 void    get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl);
 double  node_obs_point(void);
 void    store_orbit_correctors(void);
+double  get_closed_orb_node(int *index);
+void    set_closed_orb_node(int *index, double *pos);
 
 #endif // MAD_NODE_H
 

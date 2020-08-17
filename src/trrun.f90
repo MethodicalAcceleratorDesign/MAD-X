@@ -527,7 +527,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         
         !-------- Track through element  // suppress dxt 13.12.04
         call ttmap(switch, code, el, z, jmax, dxt, dyt, sum, tot_turn+turn, part_id, &
-             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass, debug, theta, thin_foc)
+             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass, debug, theta, thin_foc,.false.)
 
         !-------- Space Charge update
 !frs on 04.06.2016 - fixing
@@ -761,7 +761,7 @@ subroutine init_elements
 end subroutine init_elements
 
 subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
-     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc)
+     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc, isFirst)
   use twtrrfi
   use twiss0fi
   use name_lenfi
@@ -789,7 +789,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   double precision :: last_orbit(6,*), maxaper(6), al_errors(align_max)
   logical :: aperflag, onepass, lost_global
 
-  logical :: fmap, debug
+  logical :: fmap, debug, isFirst
   logical :: run=.false., dynap=.false., thin_foc
   integer :: i, nn, jtrk, apint
   double precision :: ct, tmp, st, theta
@@ -962,7 +962,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call ttrfmult(track,ktrack,turn)
 
     case (code_wire)
-       call ttwire(track,ktrack)
+       call ttwire(track,ktrack, isFirst)
 
     case (code_hmonitor:code_rcollimator, code_instrument, &
         code_slmonitor:code_imonitor, code_placeholder, code_collimator)
@@ -3887,7 +3887,7 @@ subroutine trclor(switch,orbit0)
   double precision :: last_pos(6), last_orbit(6,1), maxaper(6)
   character(len=12) :: char_a
 
-  integer, parameter :: itmax=10
+  integer, parameter :: itmax=20
 
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
   double precision, external :: node_value, get_value, get_variable, get_length
@@ -3908,7 +3908,7 @@ subroutine trclor(switch,orbit0)
      Z(:,k) = ORBIT0
   enddo
 
-  DDD(1:6) = 1d-15
+  DDD(1:6) = 1d-10
 
 ! How does it work without the code right after? i.e. A will always be singular!
 !  do k = 1, 6
@@ -3993,7 +3993,7 @@ subroutine trclor(switch,orbit0)
     theta = node_value('tilt ')
         !-------- Track through element
         call ttmap(switch,code,el,z,pmax,dxt,dyt,sum,turn,part_id, &
-             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc)
+             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc, .true.)
 
         !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. code_drift .and. n_align .ne. 0)  then
@@ -4558,7 +4558,7 @@ subroutine ttnllens(track,ktrack)
   enddo
 end subroutine ttnllens
 
-subroutine ttwire(track, ktrack)
+subroutine ttwire(track, ktrack, isFirst)
   use twtrrfi
   use trackfi
   use math_constfi, only : zero, one, two, four
@@ -4566,22 +4566,37 @@ subroutine ttwire(track, ktrack)
   implicit none
   double precision :: track(6,*)
   integer :: ktrack
+  logical :: isFirst
   double precision :: xma(0:maxmul), yma(0:maxmul), current(0:maxmul), l_int(0:maxmul)
   double precision :: l_phy(0:maxferr)
   integer :: i, j, wire_flagco, nn, ibeco
   double precision :: dx, dy, embl, l, cur, dxi, dyi, chi, nnorm, xi, yi, RTWO, pc
+  double precision :: wire_clo_x, wire_clo_y
   ! WIRE basd on the SixTrack implementation
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value, get_value, get_closed_orb_node
+  external ::set_closed_orb_node
+
   call get_node_vector('xma ', nn, xma)
   call get_node_vector('yma ', nn, yma)
   call get_node_vector('current ', nn, current)
   call get_node_vector('l_int ', nn, l_int)
   call get_node_vector('l_phy ', nn, l_phy)
-  
+
+
   pc = get_value('probe ','pc ')
   wire_flagco = node_value('closed_orbit ')
-  print *, "cccccc", wire_flagco
+  if(isFirst) then
+    call set_closed_orb_node(1, track(1,1));
+    call set_closed_orb_node(3, track(3,1));
+  endif
+  wire_clo_x = get_closed_orb_node(1)
+  wire_clo_y = get_closed_orb_node(3)
+ !! dx = get_closed_orb_node(i)
+
   ibeco = 0
+
+
+
 do i = 0, nn-1
   dx   = xma(i) ! displacement x [m]
   dy   = yma(i) ! displacement y [mm]
@@ -4591,8 +4606,8 @@ do i = 0, nn-1
   cur  = current(i)
 
   if(wire_flagco == 1) then
-    !dxi = (dx+wire_clo(1,wire_num(i)))
-    !dyi = (dy+wire_clo(2,wire_num(i)))
+    dxi = wire_clo_x
+    dyi = wire_clo_y
   else if(wire_flagco == -1) then
     dxi = dx
     dyi = dy
@@ -4606,11 +4621,9 @@ do i = 0, nn-1
     if(wire_flagco == 1) then
       xi = (TRACK(1,j)+dx) ! [m]
       yi = (TRACK(3,j)+dy) ! [m]
-      print * ,"ddddxxx2", dx, dy
     else if(wire_flagco == -1) then
-      print * , "Not implemented yet"
-      !xi = (TRACK(1,j)+( dx-wire_clo(1,wire_num(i)) ))*c1m3 ! [m]
-      !yi = (TRACK(3,j)+( dy-wire_clo(2,wire_num(i)) ))*c1m3 ! [m]
+      xi = TRACK(1,j)+( dx-wire_clo_x) ! [m]
+      yi = TRACK(3,j)+( dy-wire_clo_y) ! [m]
     end if
 
     ! x'-> px; y'->py
@@ -4644,7 +4657,7 @@ do i = 0, nn-1
     end if
   end do
 end do
- 
+print *, "eeeeeeeeee", track(:,1)
 
 end subroutine ttwire
 !FIXME Unused dummy argument 'turn'

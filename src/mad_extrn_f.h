@@ -96,6 +96,9 @@
 #define get_tt_attrib get_tt_attrib_
 #define set_tt_multipoles set_tt_multipoles_
 #define get_tt_multipoles get_tt_multipoles_
+
+#define get_closed_orb_node get_closed_orb_node_
+#define set_closed_orb_node set_closed_orb_node_
 // from mad_option.c
 #define get_option get_option_ // *
 #define set_option set_option_
