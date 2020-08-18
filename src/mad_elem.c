@@ -166,6 +166,7 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
 {
   int i, k = 1;
   double at;
+  update_element(el, cmd->clone);
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, current_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, current_sequ->cavities, 0);
