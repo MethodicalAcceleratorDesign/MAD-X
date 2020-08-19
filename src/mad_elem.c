@@ -164,9 +164,9 @@ static void
 enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
   /* enters an element in a sequence */
 {
-  int i, k = 1;
+  int i, nupdates=1, k = 1;
   double at;
-  update_element(el, cmd->clone);
+
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, current_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, current_sequ->cavities, 0);
@@ -183,8 +183,11 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
   current_node->at_value = at;
   current_node->at_expr = command_par_expr("at", cmd->clone);
   const char* from = command_par_string_user("from", cmd->clone);
-  if (from)
+  if (from){
     current_node->from_name = permbuff(from);
+    nupdates = 2;
+  }
+    check_for_update_in_seq(el, cmd->clone, nupdates);
 }
 
 static int
@@ -894,6 +897,7 @@ enter_element(struct in_cmd* cmd)
     if (k == 0 || strcmp(toks[0], toks[2]) == 0) el = parent;
     else
     {
+      printf("vvvvvvvvvvvvvv %s  %s \n" , toks[0], toks[2]);
       if ((el = make_element(toks[0], parent->name,
                              cmd->clone, 1+sequ_is_on)) == NULL) return;
       el->def_type = sequ_is_on;
@@ -929,6 +933,25 @@ find_element(const char* name, struct el_list* ell)
   if ((pos = name_list_pos(name, ell->list)) < 0)
     return NULL;
   return ell->elem[pos];
+}
+
+void
+check_for_update_in_seq(struct element* el, struct command* update, int nupdates)
+  /* updates the parameters of el from those read into update */
+{
+  struct command_parameter_list* e_pl = el->def->par;
+  int pos, cupdate=0;
+  for (pos = 0; pos < e_pl->curr; pos++)
+  {
+    if (update->par_names->inform[pos])  /* parameter has been read */
+    {
+      cupdate++;
+      if(cupdate>nupdates)
+        fatal_error("Not possible to update attribute for element in sequence definition: ", el->name );
+    }
+  }
+  dump_command(update);
+
 }
 
 void
