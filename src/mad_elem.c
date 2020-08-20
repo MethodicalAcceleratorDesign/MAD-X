@@ -161,7 +161,7 @@ export_el_par_8(struct command_parameter* par, char* string)
 }
 
 static void
-enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
+enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupdating)
   /* enters an element in a sequence */
 {
   int i, nupdates=1, k = 1;
@@ -187,7 +187,7 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
     current_node->from_name = permbuff(from);
     nupdates = 2;
   }
-    check_for_update_in_seq(el, cmd->clone, nupdates);
+    if (isupdating==0) check_for_update_in_seq(el, cmd->clone, nupdates);
 }
 
 static int
@@ -894,10 +894,11 @@ enter_element(struct in_cmd* cmd)
     cmd->clone = clone_command(cmd->cmd_def);
     strcpy(cmd->clone->name, toks[0]);
     scan_in_cmd(cmd);
-    if (k == 0 || strcmp(toks[0], toks[2]) == 0) el = parent;
+    if (k == 0 || strcmp(toks[0], toks[2]) == 0) {
+      el = parent;
+    }
     else
     {
-      printf("vvvvvvvvvvvvvv %s  %s \n" , toks[0], toks[2]);
       if ((el = make_element(toks[0], parent->name,
                              cmd->clone, 1+sequ_is_on)) == NULL) return;
       el->def_type = sequ_is_on;
@@ -912,7 +913,7 @@ enter_element(struct in_cmd* cmd)
         el->bv = command_par_value("bv", comm);
       else el->bv = parent->bv;
     }
-    if (sequ_is_on) enter_elm_reference(cmd, el, flag);
+    if (sequ_is_on) enter_elm_reference(cmd, el, flag, k);
   }
 }
 
@@ -937,7 +938,7 @@ find_element(const char* name, struct el_list* ell)
 
 void
 check_for_update_in_seq(struct element* el, struct command* update, int nupdates)
-  /* updates the parameters of el from those read into update */
+  /* checks if someone tries to update the element in sequence creation */
 {
   struct command_parameter_list* e_pl = el->def->par;
   int pos, cupdate=0;
@@ -950,8 +951,6 @@ check_for_update_in_seq(struct element* el, struct command* update, int nupdates
         fatal_error("Not possible to update attribute for element in sequence definition: ", el->name );
     }
   }
-  dump_command(update);
-
 }
 
 void
