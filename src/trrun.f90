@@ -2950,14 +2950,14 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
        ss = part_id(i)
        call double_to_table_curr(table, 'number ', ss)
        do j = 1, 6
-          tmp = z(j,i) - orbit0(j)
+          tmp = z(j,i)
           call double_to_table_curr(table, vec_names(j), tmp)
        enddo
        call double_to_table_curr(table,vec_names(7),spos)
        call augment_count(table)
     enddo
   endif
-
+print *, "kkkend", orbit0
 end subroutine tt_putone
 
 subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
@@ -2993,10 +2993,12 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   call double_to_table_curr(table, 'turn ', tt)
   call double_to_table_curr(table, 'number ', tn)
   call double_to_table_curr(table, 'e ', energy)
+
   do i = 1, 6
-     tmp = orbit(i) - orbit0(i)
+     tmp = orbit(i)
      call double_to_table_curr(table, vec_names(i), tmp)
   enddo
+
   call double_to_table_curr(table,vec_names(7),spos)
   call augment_count(table)
 end subroutine tt_puttab
@@ -4592,7 +4594,7 @@ subroutine ttwire(track, ktrack, isFirst)
   wire_clo_x = get_closed_orb_node(1)
   wire_clo_y = get_closed_orb_node(3)
  !! dx = get_closed_orb_node(i)
-
+  
   ibeco = 0
 
 
@@ -4600,7 +4602,6 @@ subroutine ttwire(track, ktrack, isFirst)
 do i = 0, nn-1
   dx   = xma(i) ! displacement x [m]
   dy   = yma(i) ! displacement y [mm]
-  print * ,"ddddxxx", dx, dy
   embl = l_int(i)  ! integrated length [m]
   l    = l_phy(i) ! physical length [m]
   cur  = current(i)
