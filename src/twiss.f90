@@ -3618,14 +3618,15 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
      fintx = g_elpar(b_fintx)
      sks = g_elpar(b_k1s)
      h = an / el
-     h_k = h
+     h_k = h * bvk
      !---- Apply field errors and change coefficients using DELTAP.
      F_ERRORS = zero
      n_ferr = node_fd_errors(f_errors)
      if (sk0 .ne. 0) then 
       f_errors(0) = f_errors(0) + sk0*el - g_elpar(b_angle)
-      h_k = sk0
+      h_k = sk0 * bvk
     endif
+
 
 
      
