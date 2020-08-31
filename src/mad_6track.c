@@ -3400,7 +3400,8 @@ write_f3_wire(void)
       }
 
       fprintf(f3,name_format_short,current_element->name);
-      for(int i=1; i < 9; i++) fprintf(f3,name_format_6, current_element->value[i]);
+      fprintf(f3, "%d", (int)current_element->value[1]);
+      for(int i=2; i < 9; i++) fprintf(f3,name_format_6, current_element->value[i]);
       fprintf(f3,"\n"); 
     }
      current_element = current_element->next;
