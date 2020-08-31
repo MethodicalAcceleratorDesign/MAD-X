@@ -3595,11 +3595,11 @@ subroutine trsol(track,ktrack,dxt,dyt)
 
   double precision :: omega, length
   double precision :: x_, y_, z_, px_, py_, pt_
-  double precision :: pxf_, pyf_
+  double precision :: pxf_, pyf_, xtilt, pxbeta, startrot,xtilt_rad
   double precision :: bet, length_, elrad
   double precision :: curv, const, rfac
   double precision :: beta_sqr, f_damp_t
-
+  double precision, parameter :: ten5m=1d-5
   !---- Initialize.
   bet0 = get_value('probe ','beta ')
 
@@ -3692,9 +3692,25 @@ subroutine trsol(track,ktrack,dxt,dyt)
      enddo ! i
 
   else
-     if (sk.ne.zero) then
-        skl = sk*length
 
+     if (sk.ne.zero) then
+        xtilt_rad = node_value('xtilt ')
+        startrot =node_value('rot_start ')
+        skl = sk*length
+        xtilt = -sin(xtilt_rad)
+        pxbeta = xtilt*startrot/bet0
+        print *, "aaa1", track(2,1)
+        if(abs(xtilt_rad) > ten5m) then
+          do  i = 1, ktrack ! Rotate the particles
+            px_ = track(2,i)
+            track(1,i) = track(1,i)+startrot*xtilt-pxbeta*track(6,i)
+            track(2,i) = track(2,i)+xtilt
+            track(5,i) = track(5,i)-0.5d0*pxbeta*xtilt - pxbeta*px_
+          enddo
+        endif
+
+
+  print *, "aaa", track(2,1)
         !---- Loop over particles
         do  i = 1, ktrack
            do step = 1, 3
@@ -3763,6 +3779,17 @@ subroutine trsol(track,ktrack,dxt,dyt)
            enddo ! step
 
         enddo ! i
+
+        if(abs(xtilt_rad) > ten5m) then
+          xtilt=-xtilt
+          pxbeta = xtilt*(length+startrot)/bet0
+          do  i = 1, ktrack ! Rotate the particles back
+            px_ = track(2,i)
+            track(1,i) = track(1,i)+(length+startrot)*xtilt-pxbeta*track(6,i)
+            track(2,i) = track(2,i)+xtilt
+            track(5,i) = track(5,i)-0.5d0*pxbeta*xtilt - pxbeta*px_
+          enddo
+        endif
      else
         call ttdrf(length,track,ktrack);
      endif
