@@ -1,12 +1,12 @@
 @ NAME             %05s "CORR1"
 @ TYPE             %05s "CORR1"
 @ TITLE            %62s "LHC 6.503 with errors and two beam orbit correction using MADX"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "10/08/20"
-@ TIME             %08s "13.26.36"
+@ ORIGIN           %16s "5.06.00 Linux 64"
+@ DATE             %08s "31/08/20"
+@ TIME             %08s "16.54.22"
 * NAME                           PX.OLD             PY.OLD      PX.CORRECTION      PY.CORRECTION 
 $ %s                                %le                %le                %le                %le 
- "MCBXH.1R1"                          0                  0   -1.115668086e-06                  0
+ "MCBXH.1R1"                          0                  0   -1.115690418e-06                  0
  "MCBXH.2R1"                          0                  0                  0                  0
  "MCBXH.3R1"                          0                  0                  0                  0
  "MCBXH.3L2"                          0                  0                  0                  0
@@ -17,8 +17,8 @@ $ %s                                %le                %le                %le   
  "MCBXH.3R2"                          0                  0                  0                  0
  "MCBXH.3L5"                          0                  0                  0                  0
  "MCBXH.2L5"                          0                  0                  0                  0
- "MCBXH.1L5"                          0                  0    5.765931795e-07                  0
- "MCBXH.1R5"                          0                  0    -1.08438951e-06                  0
+ "MCBXH.1L5"                          0                  0    5.765825041e-07                  0
+ "MCBXH.1R5"                          0                  0   -1.084404528e-06                  0
  "MCBXH.2R5"                          0                  0                  0                  0
  "MCBXH.3R5"                          0                  0                  0                  0
  "MCBXH.3L8"                          0                  0                  0                  0
@@ -29,4 +29,4 @@ $ %s                                %le                %le                %le   
  "MCBXH.3R8"                          0                  0                  0                  0
  "MCBXH.3L1"                          0                  0                  0                  0
  "MCBXH.2L1"                          0                  0                  0                  0
- "MCBXH.1L1"                          0                  0    2.271670499e-06                  0
+ "MCBXH.1L1"                          0                  0    2.271654094e-06                  0
