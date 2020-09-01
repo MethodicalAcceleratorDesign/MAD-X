@@ -1804,7 +1804,6 @@ subroutine ttchangep0(track,ktrack)
 
   pc0 = get_value('beam ','pc ')
   bet0 = get_value('beam ','beta ')
-  print *, "aaaaaaaaa"
   do i =1, ktrack
     px_ = track(1,i)
     py_ = track(3,i)
