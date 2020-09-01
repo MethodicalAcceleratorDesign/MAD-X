@@ -961,6 +961,9 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
     case (code_rfmultipole)
        call ttrfmult(track,ktrack,turn)
 
+    case(code_changerefp0)
+      call ttchangep0(track,ktrack)
+
     case (code_hmonitor:code_rcollimator, code_instrument, &
         code_slmonitor:code_imonitor, code_placeholder, code_collimator)
         if(el .gt. 0) call ttdrf(el,track,ktrack)
@@ -1801,7 +1804,7 @@ subroutine ttchangep0(track,ktrack)
 
   pc0 = get_value('beam ','pc ')
   bet0 = get_value('beam ','beta ')
-
+  print *, "aaaaaaaaa"
   do i =1, ktrack
     px_ = track(1,i)
     py_ = track(3,i)
