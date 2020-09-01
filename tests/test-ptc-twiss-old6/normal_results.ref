@@ -1,10 +1,10 @@
 @ NAME             %14s "NORMAL_RESULTS"
 @ TYPE             %10s "NORMAL_RES"
 @ TITLE            %24s " Chromaticity correction"
-@ ORIGIN           %16s "5.06.00 Linux 64"
-@ DATE             %08s "31/08/20"
-@ TIME             %08s "16.58.04"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "01/09/20"
+@ TIME             %08s "18.19.06"
 * NAME                   ORDER1     ORDER2     ORDER3     ORDER4              VALUE 
 $ %s                         %d         %d         %d         %d                %le 
- "DQ1"                        1          0          0          0        10.42037082
- "DQ2"                        1          0          0          0       -1.084707711
+ "DQ1"                        1          0          0          0        2.000002835
+ "DQ2"                        1          0          0          0        1.999997664
