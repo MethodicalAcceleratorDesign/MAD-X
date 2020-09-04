@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+
+# Check whether the given executable is fully static.
+ldd "$@" 2>&1 | tee lddfile
+grep 'not a dynamic executable' lddfile >/dev/null
