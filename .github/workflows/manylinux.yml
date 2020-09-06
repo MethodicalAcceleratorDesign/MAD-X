@@ -43,7 +43,48 @@ jobs:
             quay.io/pypa/manylinux${{ matrix.manylinux }} \
             .github/build_manylinux_${{ matrix.buildtool }}
 
+      - name: Collect build artifacts
+        run: |
+          mkdir bin
+          cp "$(readlink -f madx$ARCH)" bin
+          cp "$(readlink -f numdiff$ARCH)" bin
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: bin-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}
+          path: bin
+
       - run: .github/utils/is-static madx$ARCH
+
+  test:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-16.04
+          - ubuntu-18.04
+          - ubuntu-20.04
+        buildtool:
+          - make
+          - cmake
+        manylinux:
+          - 1_x86_64
+            # TODO: enable this platform (tons of errors, extremely slow):
+            # - 1_i686
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: bin-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}
+          path: bin
+
+      - name: Setup symlinks
+        run: |
+          ln -sf bin/madx$ARCH .
+          ln -sf bin/numdiff$ARCH .
 
       - name: Install runtime dependencies
         run: sudo apt-get install -qy gnuplot
@@ -63,7 +104,7 @@ jobs:
         if: failure() && steps.tests.outcome == 'failure'
         uses: actions/upload-artifact@v2
         with:
-          name: failures-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}
+          name: failures-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}-${{ matrix.os }}
           path: |
             tests/tests-log.txt
             tests/tests-summary.txt
