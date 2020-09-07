@@ -13,7 +13,7 @@ if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER 4.3.9)
         add_definitions(-D_GFORTRAN)
     endif()
-    if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 10.0.0)
+    if(NOT ${CMAKE_Fortran_COMPILER_VERSION} VERSION_LESS 10.0.0)
         set(CMAKE_Fortran_FLAGS "-fallow-invalid-boz ${CMAKE_Fortran_FLAGS}")
     endif()
     # Release flags:
