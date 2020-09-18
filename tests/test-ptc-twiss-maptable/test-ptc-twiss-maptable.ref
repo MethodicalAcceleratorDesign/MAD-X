@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:07:11      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:35:16      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -847,7 +847,7 @@ Determined SECTOR NMUL MAX :  2
        78.54370266       0.1241077849           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.6258930445        2.838575748       0.8200596224 
+          -1000000      -0.6258930555        2.838575748       0.8200596224 
 
                 q2                dq1                dq2                 qs 
       0.7198292883       -2.176620133        -4.74110766                  0 
@@ -874,22 +874,22 @@ Determined SECTOR NMUL MAX :  2
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886442e-08 
+                 0                  0                  0    1.068886242e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546139122e-09                  0                  0                  0 
+   2.546139572e-09                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    1.168573391e-08                  0    3.059593852e-09 
+                 0    1.168573367e-08                  0    3.059593786e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    2.508646064e-08 
+                 0                  0                  0    2.508645904e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287025e-08                  0                 -0 
+                 0    1.106286966e-08                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.449191389e-12                  0   -1.106286975e-08 
+                 0   -1.447405766e-12                  0   -1.106286976e-08 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
@@ -934,28 +934,28 @@ Determined SECTOR NMUL MAX :  2
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0        -10.3020712    0.0005941579858 
+                 0                  0        -10.3020712    0.0005941579857 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886393e-08 
+                 0                  0                  0    1.068886213e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546139617e-09                  0                  0                  0 
+   2.546139641e-09                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    1.168573429e-08                  0    3.059593993e-09 
+                -0     1.16857338e-08                  0    3.059593818e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    2.508646099e-08 
+                 0                  0                  0    2.508645969e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0     1.10628705e-08                  0                 -0 
+                 0    1.106286987e-08                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.449256918e-12                  0   -1.106287044e-08 
+                 0   -1.447729023e-12                  0   -1.106287002e-08 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 

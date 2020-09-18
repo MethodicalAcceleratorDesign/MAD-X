@@ -241,7 +241,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: x2, y2, t2, px2, py2, pt2
 
   double precision :: el, tilt, bvk
-  double precision :: edg1, edg2, sk1, sk2, hgap, fint, sks, sksol, h, ct
+  double precision :: edg1, edg2, sk0, sk1, sk2, hgap, fint, sks, sksol, h, ct
   double precision :: corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
   double precision :: tedg1, fact1, dfact1_dx, rfac, rfac1, drfac1_dx, drfac1_dy
   double precision :: h2, hcb2, tedg2, fact2, dfact2_dx, rfac2
@@ -285,13 +285,16 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         tilt = -node_value('tilt ')
         edg1 = bvk * node_value('e1 ')
         edg2 = bvk * node_value('e2 ')
-        sk1 = bvk * node_value('k1 ')
-        sk2 = bvk * node_value('k2 ')
+        sk0  = bvk * node_value('k0 ')
+        sk1 = bvk * (node_value('k1 ') + node_value('k1tap ')) 
+        sk2 = bvk * (node_value('k2 ') + node_value('k2tap '))
         hgap = node_value('hgap ')
         fint = node_value('fint ')
         sks = zero
         h = an / el
 
+       if (sk0.ne.0)  h = sk0
+       
         !---- Refer orbit and eigenvectors to magnet midplane.
         ct = cos(tilt)
         st = sin(tilt)
@@ -473,12 +476,12 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         sksol = zero
         select case (code)
         case (code_quadrupole)  !---- Quadrupole
-           sk1 = bvk * node_value('k1 ')
+           sk1 = bvk * (node_value('k1 ') + node_value('k1tap ')) 
            str  = sk1
            n    = 1
            twon = two
         case (code_sextupole)   !---- Sextupole
-           sk2 = bvk * node_value('k2 ')
+           sk2 = bvk * (node_value('k2 ') + node_value('k2tap '))
            str  = sk2 / two
            n    = 2
            twon = four
@@ -667,7 +670,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
      case (code_rfcavity) !---- RF cavities.
         rfv = node_value('volt ') * ten3m ! MV but u0 is in GeV
         rff = node_value('freq ') * ten6p * two * pi / clight
-        rfl = node_value('lag ')  * two * pi
+        rfl = (node_value('lag ') + node_value('lagtap '))  * two * pi
         time = half * (orb1(5) + orb2(5))
         sumu0 = sumu0 + rfv * sin(rfl - rff * time)
 

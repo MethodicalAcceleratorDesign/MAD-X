@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %20s "test of rf-multipole"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.53.50"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.42.27"
 * NAME                                S               BETX               ALFX                MUX               BETY               ALFY                MUY                 DX                 DY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TEST_LINE$START"                    0                  1                  0                  0                0.5                  0                  0                  0                  0

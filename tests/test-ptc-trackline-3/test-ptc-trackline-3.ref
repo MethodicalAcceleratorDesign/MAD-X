@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:07:33      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:35:38      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example script showing usage of tracking with PTC
 
@@ -112,7 +112,7 @@ ptc_create_layout, model=2, method=6, nst=20, exact=true, closed_layout=true;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.450000E+03
  Setting MADx with 
-     energy           450.00097817060191     
+     energy           450.00097817061624     
      method                   6
      Num. of steps           20
      charge           1.0000000000000000     
@@ -125,7 +125,7 @@ ptc_create_layout, model=2, method=6, nst=20, exact=true, closed_layout=true;
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After    end:    1.2170347930495041E-004   2.9337307977728667E-014  -7.9690752521344166E-005
- HARMONIC NUMBER defined in the ring:        35640
+ HARMONIC NUMBER defined in the ring:    35640.000000000000     
 
 
 ptc_setswitch, debuglevel=0, nocavity=true, 

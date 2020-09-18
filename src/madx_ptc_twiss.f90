@@ -636,6 +636,11 @@ contains
       rmatrix = .true. ! for the time being force if ptc_select or ptc_knob was defined
     endif
 
+    maptable = get_value('ptc_twiss ','maptable ') .ne. 0
+    if (maptable) then
+      rmatrix = .true. 
+    endif
+    
     isTMsave = .false.
 
     no = get_value('ptc_twiss ','no ')
@@ -1384,7 +1389,6 @@ contains
     endif
 
 
-    maptable = get_value('ptc_twiss ','maptable ') .ne. 0
     if(maptable) then
        call makemaptable(theTransferMap%x,no)
     endif
@@ -1728,7 +1732,7 @@ contains
       double precision    :: deltae ! for reference energy increase via acceleration
       double precision    :: deltap ! for deltap treatment
       ! added on 3 November 2010 to hold Edwards & Teng parametrization
-      real(dp) :: betx,bety,alfx,alfy,R11,R12,R21,R22
+      real(dp) :: betx,bety,alfx,alfy,R11,R12,R21,R22, pt_, onedp
       ! to convert between Ripken and Edwards-Teng parametrization
       real(dp) :: kappa,u,ax,ay,kx,ky,kxy2,usqrt,bx,by,cx,cy,cosvp,sinvp,cosvm,sinvm,cosv2,sinv2,cosv1,sinv1
       real(dp) :: deltaeValue
@@ -1844,76 +1848,83 @@ contains
 
       endif
 
-      deltap = A_script_probe%x(5).sub.'0'
-      deltae = deltae * (1.0 + deltap)
+      !deltap = A_script_probe%x(5).sub.'0'
+      !deltae = deltae * (1.0 + deltap)
+      if(default%time) then
+        pt_ = A_script_probe%x(5).sub.'0'
+        onedp   = sqrt( one + two*pt_/relativisticBeta + (pt_**2))
+      else
+        onedp = one + A_script_probe%x(5).sub.'0'
+      endif
+      
 
 
-      opt_fun(beta11)= tw%beta(1,1) * deltae ! beta11=1
-      opt_fun(beta12)= tw%beta(1,2) * deltae
-      opt_fun(beta13)= tw%beta(1,3) * deltae
-      opt_fun(beta21)= tw%beta(2,1) * deltae
-      opt_fun(beta22)= tw%beta(2,2) * deltae
-      opt_fun(beta23)= tw%beta(2,3) * deltae
-      opt_fun(beta31)= tw%beta(3,1) * deltae
-      opt_fun(beta32)= tw%beta(3,2) * deltae
-      opt_fun(beta33)= tw%beta(3,3) * deltae
+      opt_fun(beta11)= tw%beta(1,1) * onedp ! beta11=1
+      opt_fun(beta12)= tw%beta(1,2) * onedp
+      opt_fun(beta13)= tw%beta(1,3) * onedp
+      opt_fun(beta21)= tw%beta(2,1) * onedp
+      opt_fun(beta22)= tw%beta(2,2) * onedp
+      opt_fun(beta23)= tw%beta(2,3) * onedp
+      opt_fun(beta31)= tw%beta(3,1) * onedp
+      opt_fun(beta32)= tw%beta(3,2) * onedp
+      opt_fun(beta33)= tw%beta(3,3) * onedp
 
-      opt_fun(alfa11)= tw%alfa(1,1) * deltae
-      opt_fun(alfa12)= tw%alfa(1,2) * deltae
-      opt_fun(alfa13)= tw%alfa(1,3) * deltae
-      opt_fun(alfa21)= tw%alfa(2,1) * deltae
-      opt_fun(alfa22)= tw%alfa(2,2) * deltae
-      opt_fun(alfa23)= tw%alfa(2,3) * deltae
-      opt_fun(alfa31)= tw%alfa(3,1) * deltae
-      opt_fun(alfa32)= tw%alfa(3,2) * deltae
-      opt_fun(alfa33)= tw%alfa(3,3) * deltae
+      opt_fun(alfa11)= tw%alfa(1,1) 
+      opt_fun(alfa12)= tw%alfa(1,2) 
+      opt_fun(alfa13)= tw%alfa(1,3) 
+      opt_fun(alfa21)= tw%alfa(2,1) 
+      opt_fun(alfa22)= tw%alfa(2,2) 
+      opt_fun(alfa23)= tw%alfa(2,3) 
+      opt_fun(alfa31)= tw%alfa(3,1) 
+      opt_fun(alfa32)= tw%alfa(3,2) 
+      opt_fun(alfa33)= tw%alfa(3,3) 
 
-      opt_fun(gama11)= tw%gama(1,1) * deltae
-      opt_fun(gama12)= tw%gama(1,2) * deltae
-      opt_fun(gama13)= tw%gama(1,3) * deltae
-      opt_fun(gama21)= tw%gama(2,1) * deltae
-      opt_fun(gama22)= tw%gama(2,2) * deltae
-      opt_fun(gama23)= tw%gama(2,3) * deltae
-      opt_fun(gama31)= tw%gama(3,1) * deltae
-      opt_fun(gama32)= tw%gama(3,2) * deltae
-      opt_fun(gama33)= tw%gama(3,3) * deltae
+      opt_fun(gama11)= tw%gama(1,1) / onedp
+      opt_fun(gama12)= tw%gama(1,2) / onedp
+      opt_fun(gama13)= tw%gama(1,3) / onedp
+      opt_fun(gama21)= tw%gama(2,1) / onedp
+      opt_fun(gama22)= tw%gama(2,2) / onedp
+      opt_fun(gama23)= tw%gama(2,3) / onedp
+      opt_fun(gama31)= tw%gama(3,1) / onedp
+      opt_fun(gama32)= tw%gama(3,2) / onedp
+      opt_fun(gama33)= tw%gama(3,3) / onedp
 
 
       ! --- derivatives of Twiss paramters w.r.t delta_p
-      ! NOW why do we need to multiply by deltae, as for the other Twiss parameters?
+      ! NOW why do we need to multiply by onedp, as for the other Twiss parameters?
       if (deltap_dependency) then
-         opt_fun(beta11p)= tw%beta_p(1,1) * deltae
-         opt_fun(beta12p)= tw%beta_p(1,2) * deltae
-         opt_fun(beta13p)= tw%beta_p(1,3) * deltae
-         opt_fun(beta21p)= tw%beta_p(2,1) * deltae
-         opt_fun(beta22p)= tw%beta_p(2,2) * deltae
-         opt_fun(beta23p)= tw%beta_p(2,3) * deltae
-         opt_fun(beta32p)= tw%beta_p(3,2) * deltae
-         opt_fun(beta33p)= tw%beta_p(3,3) * deltae
+         opt_fun(beta11p)= tw%beta_p(1,1) * onedp
+         opt_fun(beta12p)= tw%beta_p(1,2) * onedp
+         opt_fun(beta13p)= tw%beta_p(1,3) * onedp
+         opt_fun(beta21p)= tw%beta_p(2,1) * onedp
+         opt_fun(beta22p)= tw%beta_p(2,2) * onedp
+         opt_fun(beta23p)= tw%beta_p(2,3) * onedp
+         opt_fun(beta32p)= tw%beta_p(3,2) * onedp
+         opt_fun(beta33p)= tw%beta_p(3,3) * onedp
 
-         opt_fun(alfa11p)= tw%alfa_p(1,1) * deltae
-         opt_fun(alfa12p)= tw%alfa_p(1,2) * deltae
-         opt_fun(alfa13p)= tw%alfa_p(1,3) * deltae
-         opt_fun(alfa21p)= tw%alfa_p(2,1) * deltae
-         opt_fun(alfa22p)= tw%alfa_p(2,2) * deltae
-         opt_fun(alfa23p)= tw%alfa_p(2,3) * deltae
-         opt_fun(alfa31p)= tw%alfa_p(3,1) * deltae
-         opt_fun(alfa32p)= tw%alfa_p(3,2) * deltae
-         opt_fun(alfa33p)= tw%alfa_p(3,3) * deltae
+         opt_fun(alfa11p)= tw%alfa_p(1,1) 
+         opt_fun(alfa12p)= tw%alfa_p(1,2) 
+         opt_fun(alfa13p)= tw%alfa_p(1,3) 
+         opt_fun(alfa21p)= tw%alfa_p(2,1) 
+         opt_fun(alfa22p)= tw%alfa_p(2,2) 
+         opt_fun(alfa23p)= tw%alfa_p(2,3) 
+         opt_fun(alfa31p)= tw%alfa_p(3,1) 
+         opt_fun(alfa32p)= tw%alfa_p(3,2) 
+         opt_fun(alfa33p)= tw%alfa_p(3,3) 
 
-         opt_fun(gama11p)= tw%gama_p(1,1) * deltae
-         opt_fun(gama12p)= tw%gama_p(1,2) * deltae
-         opt_fun(gama13p)= tw%gama_p(1,3) * deltae
-         opt_fun(gama21p)= tw%gama_p(2,1) * deltae
-         opt_fun(gama22p)= tw%gama_p(2,2) * deltae
-         opt_fun(gama23p)= tw%gama_p(2,3) * deltae
-         opt_fun(gama31p)= tw%gama_p(3,1) * deltae
-         opt_fun(gama32p)= tw%gama_p(3,2) * deltae
-         opt_fun(gama33p)= tw%gama_p(3,3) * deltae
+         opt_fun(gama11p)= tw%gama_p(1,1) / onedp
+         opt_fun(gama12p)= tw%gama_p(1,2) / onedp
+         opt_fun(gama13p)= tw%gama_p(1,3) / onedp
+         opt_fun(gama21p)= tw%gama_p(2,1) / onedp
+         opt_fun(gama22p)= tw%gama_p(2,2) / onedp
+         opt_fun(gama23p)= tw%gama_p(2,3) / onedp
+         opt_fun(gama31p)= tw%gama_p(3,1) / onedp
+         opt_fun(gama32p)= tw%gama_p(3,2) / onedp
+         opt_fun(gama33p)= tw%gama_p(3,3) / onedp
       endif
       ! --- end
 
-      ! march 10th: do we need to multiply by deltae the following?
+      ! march 10th: do we need to multiply by onedp the following?
       opt_fun(mu1)=tw%mu(1) !* deltae
       opt_fun(mu2)=tw%mu(2) !* deltae
       opt_fun(mu3)=tw%mu(3) !* deltae
@@ -2034,10 +2045,10 @@ contains
          ! to get the same values between twiss and ptc_twiss
          ! beta11, alfa11 etc... are multiplied by deltae before output
          ! hence we reflect this in the formula from Lebedev
-         betx = tw%beta(1,1) * deltaeValue
-         bety = tw%beta(2,2) * deltaeValue
-         alfx = tw%alfa(1,1) * deltaeValue
-         alfy = tw%alfa(2,2) * deltaeValue
+         betx = tw%beta(1,1) * onedp
+         bety = tw%beta(2,2) * onedp
+         alfx = tw%alfa(1,1)
+         alfy = tw%alfa(2,2)
 
       else
 
@@ -2045,9 +2056,9 @@ contains
          ky=sqrt(tw%beta(2,1)/tw%beta(2,2));
 
          ! beta11, alfa11 etc... are multiplied by deltae before output
-         ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx;
+         ax=kx*tw%alfa(1,1) * onedp -tw%alfa(1,2) * onedp /kx;
          ! hence we reflect this in the formula from Lebedev
-         ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky;
+         ay=ky*tw%alfa(2,2) * onedp -tw%alfa(2,1) * onedp /ky;
          kxy2=kx*kx*ky*ky;
 
 
@@ -2071,10 +2082,10 @@ contains
 
             kappa=one-u
 
-            betx = (tw%beta(1,1)/kappa) * deltaeValue
-            bety = (tw%beta(2,2)/kappa) * deltaeValue
-            alfx = (tw%alfa(1,1)/kappa) * deltaeValue
-            alfy = (tw%alfa(2,2)/kappa) * deltaeValue
+            betx = (tw%beta(1,1)/kappa) * onedp
+            bety = (tw%beta(2,2)/kappa) * onedp
+            alfx = (tw%alfa(1,1)/kappa) 
+            alfy = (tw%alfa(2,2)/kappa) 
 
             bx = kx*kappa+u/kx
             by = ky*kappa-u/ky
@@ -2106,10 +2117,10 @@ contains
             print*, "ky=",ky
             print*, "kxy2=",kxy2
 
-            betx = tw%beta(1,1) * deltaeValue
-            bety = tw%beta(2,2) * deltaeValue
-            alfx = tw%alfa(1,1) * deltaeValue
-            alfy = tw%alfa(2,2) * deltaeValue
+            betx = tw%beta(1,1) * onedp
+            bety = tw%beta(2,2) * onedp
+            alfx = tw%alfa(1,1)
+            alfy = tw%alfa(2,2)
          endif
 
       endif
@@ -2128,7 +2139,7 @@ contains
 
       !
       !--- track the Twiss functions' extremas
-      call trackBetaExtrema(tw%beta,deltae,betx,bety,tw%disp)
+      call trackBetaExtrema(tw%beta,onedp,betx,bety,tw%disp)
       !---
 
     end subroutine puttwisstable

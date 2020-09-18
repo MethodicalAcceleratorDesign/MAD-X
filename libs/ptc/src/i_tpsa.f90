@@ -12,7 +12,7 @@ MODULE TPSA
 
 
   private factorial, poly_eval
-  integer,private::ndel ,nd2par,nd2part,nd2partt
+  integer,private::ndel ,nd2par,nd2part,nd2partt,nd2parfilter
   integer,private,dimension(lnv)::jfil,jfilt
 
   private equal,DAABSEQUAL,Dequaldacon ,equaldacon ,Iequaldacon  !,AABSEQUAL 2002.10.17
@@ -20,7 +20,7 @@ MODULE TPSA
   private getdiff,getdATRA  ,mul,dmulsc,dscmul
   private mulsc,scmul,imulsc,iscmul
   private div,ddivsc,dscdiv,divsc,scdiv,idivsc,iscdiv
-  private unaryADD,add,daddsc,dscadd,addsc,scadd,iaddsc,iscadd 
+  private unaryADD,add,daddsc,dscadd,addsc,scadd,iaddsc,iscadd
   private unarySUB,subs,dsubsc,dscsub,subsc,scsub,isubsc,iscsub
   private allocda,KILLda,A_OPT,K_opt
   private dexpt,dcost,dsint,dsqrtt,dtant,datanht,dtanht,c_exp_quaternion
@@ -33,7 +33,7 @@ MODULE TPSA
   !PRIVATE null_0,ALLOC_U,FILL_N,REFILL_N
   !  public, alloc_uni, null_uni, fill_uni, refill_uni
   private rcmulq,cmulqr,ccmulq,cmulqc
-  private fill_uni_r ! new sagan
+  private fill_uni_r,taylor_cycle_dabnew,taylor_cycle_gtpsa ! new sagan
 ! quaternion
    private subq,unarysubq,addq,unaryADDq,absq,absq2,mulq,divq,EQUALq,EQUALqr,EQUALqi,powq,printq ,invq
    private EQUALcq,cEQUALqr,cEQUALqi,cPOWq,EQUALq_cq,EQUALcq_q
@@ -49,13 +49,19 @@ MODULE TPSA
   private insert_da,append_da,GETINTegrate
 INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
 !INTEGER, private, PARAMETER :: DP = KIND(1.0D0)
- 
+
 logical:: switch_bessel=.true.
 private norm_bessel_Ir,nbit,nbittr,nbitrt,etienne_bessel_Ir,etienne_bessel_It,etienne_bessel_Itr,etienne_bessel_Irt
-private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
+private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr,CFU000_new
   type(dalevel) scratchda(ndumt)   !scratch levels of DA using linked list
   real(dp), pointer :: tn0(:)=>null()
-  
+
+
+
+
+
+
+
  INTERFACE nbi
      MODULE PROCEDURE nbitreal
      MODULE PROCEDURE nbittaylor
@@ -169,9 +175,9 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
      MODULE PROCEDURE scmul
      MODULE PROCEDURE imulsc
      MODULE PROCEDURE iscmul
-     MODULE PROCEDURE rcmulq 
-     MODULE PROCEDURE cmulqr 
-     MODULE PROCEDURE ccmulq 
+     MODULE PROCEDURE rcmulq
+     MODULE PROCEDURE cmulqr
+     MODULE PROCEDURE ccmulq
      MODULE PROCEDURE cmulqc
   END INTERFACE
 
@@ -259,8 +265,8 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
 
   INTERFACE abs
      MODULE PROCEDURE DAABSEQUAL  ! remove 2002.10.17
-     MODULE PROCEDURE absq 
-     MODULE PROCEDURE cabsq  
+     MODULE PROCEDURE absq
+     MODULE PROCEDURE cabsq
   END INTERFACE
 
 
@@ -389,7 +395,7 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
   !  END INTERFACE
 
   INTERFACE cfu
-     MODULE PROCEDURE cfu000  ! not private
+     MODULE PROCEDURE CFU000_new  ! not private
   END INTERFACE
 
   INTERFACE full_abs
@@ -450,12 +456,7 @@ private nbitreal,nbittaylor,nbittaylorrt,nbittaylortr
 
 CONTAINS
 
-  subroutine fliptaylor(xy,xyf,i)
-    implicit none
-    type(taylor), intent(inout) ::  xy,xyf
-    integer i
-    call flip_i(xy%i,xyf%i,i)
-  end subroutine fliptaylor
+
 
 
   SUBROUTINE  change_default_tpsa(i)
@@ -495,6 +496,7 @@ CONTAINS
   subroutine count_taylor(n,ns,ne)
     implicit none
     integer n,ns,ne,i
+
     call count_da(n)
     ns=0
     do i=1,ndumt
@@ -510,9 +512,9 @@ CONTAINS
     implicit none
     TYPE (quaternion) unaryADDq
     TYPE (quaternion), INTENT (IN) :: S1
- 
 
- 
+
+
 
 
     unaryADDq=s1
@@ -523,7 +525,7 @@ CONTAINS
     implicit none
     TYPE (quaternion) unarySUBq
     TYPE (quaternion), INTENT (IN) :: S1
- 
+
 
          unarySUBq%x= -s1%x
 
@@ -536,7 +538,7 @@ CONTAINS
     TYPE (quaternion), INTENT (IN) :: S1
     real(dp) norm
      integer i
-  
+
               invq=s1
               do i=1,3
                 invq%x(i)=-invq%x(i)
@@ -545,7 +547,7 @@ CONTAINS
               do i=0,3
                 invq%x(i)=invq%x(i)/norm
               enddo
-      
+
   END FUNCTION invq
 
 
@@ -555,8 +557,8 @@ CONTAINS
     TYPE (quaternion), INTENT (IN) :: S1
     integer i
 
- 
-   
+
+
      absq=sqrt(abs_square(s1))
   END FUNCTION absq
 
@@ -567,7 +569,7 @@ CONTAINS
     TYPE (quaternion), INTENT (IN) :: S1
     integer i
 
-  
+
            absq2=0
        do i=0,3
          absq2 = s1%x(i)**2+absq2
@@ -581,9 +583,9 @@ CONTAINS
     implicit none
     TYPE (complex_quaternion) cunaryADDq
     TYPE (complex_quaternion), INTENT (IN) :: S1
- 
 
- 
+
+
 
     cunaryADDq=s1
 
@@ -593,7 +595,7 @@ CONTAINS
     implicit none
     TYPE (complex_quaternion) cunarySUBq
     TYPE (complex_quaternion), INTENT (IN) :: S1
- 
+
 
          cunarySUBq%x= -s1%x
 
@@ -606,7 +608,7 @@ CONTAINS
     TYPE (complex_quaternion), INTENT (IN) :: S1
     real(dp) norm
      integer i
- 
+
               cinvq=s1
               do i=1,3
                 cinvq%x(i)=-cinvq%x(i)
@@ -615,7 +617,7 @@ CONTAINS
               do i=0,3
                 cinvq%x(i)=cinvq%x(i)/norm
               enddo
-      
+
   END FUNCTION cinvq
 
 
@@ -625,8 +627,8 @@ CONTAINS
     TYPE (complex_quaternion), INTENT (IN) :: S1
     integer i
 
- 
-   
+
+
      cabsq=sqrt(abs_square(s1))
   END FUNCTION cabsq
 
@@ -637,7 +639,7 @@ CONTAINS
     TYPE (complex_quaternion), INTENT (IN) :: S1
     integer i
 
-  
+
            cabsq2=0
        do i=0,3
          cabsq2 = abs(s1%x(i))**2+cabsq2
@@ -645,10 +647,10 @@ CONTAINS
   END FUNCTION cabsq2
 
 
- subroutine log_complex_quaternion(qn0,logqn0,epso) 
+ subroutine log_complex_quaternion(qn0,logqn0,epso)
 !#restricted: normal
 !# This routine takes the log assuming no orbital map
-!# 
+!#
   implicit none
 
   type(complex_quaternion), intent (inout) :: qn0,logqn0
@@ -659,12 +661,12 @@ CONTAINS
   complex(dp) cn
   logical diff
   integer i,k
- 
+
   eps=1.d-3
   if(present(epso)) eps=epso
   sn=sqrt(qn0%x(1)**2+qn0%x(2)**2+qn0%x(3)**2)
 
-if(sn>eps) then 
+if(sn>eps) then
   q1=qn0
   q1%x(0)=0.0_dp
   qs=0.0_dp
@@ -694,7 +696,7 @@ dr=logqn0
   logqn0=logqn0+cn*qs
 dr=dr-logqn0
   qs=qs*q1
-  
+
 ! call c_full_norm_quaternion(dr,k,norma)
 norma=abs(dr)
     if(diff) then
@@ -712,7 +714,7 @@ endif
 write(6,*) " no convergence  in  log_quaternion"
 
 1 continue
- 
+
 
  end  subroutine log_complex_quaternion
 
@@ -728,7 +730,7 @@ write(6,*) " no convergence  in  log_quaternion"
     complex(dp) c
     logical check
 
-  
+
 
 
     check=.true.
@@ -736,9 +738,9 @@ write(6,*) " no convergence  in  log_quaternion"
     nmax=1000
 
      c_exp_quaternion=1.0_dp
-  
+
     dh=h_axis
- 
+
 
     dhn=1.0_dp
     c=1.0_dp
@@ -750,7 +752,7 @@ write(6,*) " no convergence  in  log_quaternion"
 
        dr=c_exp_quaternion
 
-       c_exp_quaternion=c_exp_quaternion+dhn 
+       c_exp_quaternion=c_exp_quaternion+dhn
 
        dr=c_exp_quaternion+(-1.0_dp,0.0_dp)*dr
 
@@ -816,10 +818,12 @@ write(6,*) " no convergence  in  log_quaternion"
     localmaster=master
 
     call ass(unarySUB)
-
-    call dacmu(s1%i,-1.0_dp,temp%i)
-    call dacop(temp%i,unarySUB%i)
-
+    if(old_package) then
+     call dacmu(s1%i,-1.0_dp,temp%i)
+     call dacop(temp%i,unarySUB%i)
+     else
+! GTPSA REMOVED !      call mad_tpsa_scl(s1%j,-1.0_dp,unarySUB%j)
+     endif
     master=localmaster
 
   END FUNCTION unarySUB
@@ -831,11 +835,11 @@ write(6,*) " no convergence  in  log_quaternion"
     type (TAYLOR),INTENT(inOUT):: s2
     IF(.NOT.C_%STABLE_DA) RETURN
 
-    !    if(old) then
+        if(old_package) then
     call mtree((/s1%i/),1,(/s2%i/),1)
-    !   else
-    !      call newdacop(s1%j,s2%j)
-    !   endif
+       else
+          s2=s1
+       endif
   END SUBROUTINE maketree
 
   SUBROUTINE  allocda(S1)
@@ -843,19 +847,20 @@ write(6,*) " no convergence  in  log_quaternion"
     type (TAYLOR),INTENT(INOUT)::S1
 
     !    IF(first_time) THEN
-    IF(last_tpsa==0) THEN
- 
-       write(6,*) " No TPSA package ever initialized " 
- 
- 
+    IF(last_tpsa==0.and.old_package) THEN
+
+       write(6,*) " No TPSA package ever initialized "
+
+
     ENDIF
-    !    if(old) then
+        if(old_package) then
     s1%i=0
     call etall1(s1%i)
-    !    else
-    !       call nullnewda(s1%j)
-    !       call allocnewda(s1%j)
-    !    endif
+        else
+! GTPSA REMOVED !  s1%j=mad_tpsa_newd(d_berz , mad_tpsa_default)
+        !   call nullnewda(s1%j)
+        !   call allocnewda(s1%j)
+        endif
   END SUBROUTINE allocda
 
   SUBROUTINE  A_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
@@ -914,11 +919,12 @@ write(6,*) " no convergence  in  log_quaternion"
   SUBROUTINE  KILLda(S1)
     implicit none
     type (TAYLOR),INTENT(INOUT)::S1
-    !    if(old) then
+        if(old_package) then
     call DADAL1(s1%i)
-    !    else
-    !       call KILLNEWDAs(s1%j)
-    !    endif
+        else
+! GTPSA REMOVED !             call mad_tpsa_del  (S1%j);
+! GTPSA REMOVED !              S1%j=c_null
+        endif
 
   END SUBROUTINE KILLda
 
@@ -951,11 +957,16 @@ write(6,*) " no convergence  in  log_quaternion"
 
     call check_snake
     !    if(old) then
-    if(s2%i==0) then
+    if(s2%i==0.and.old_package) then
+       call crap1("EQUAL 1 in tpsa") !call allocw(s2)
+! GTPSA REMOVED !    elseif(.not.c_associated(s2%j).and.(.not.(old_package))) then
        call crap1("EQUAL 1 in tpsa") !call allocw(s2)
     endif
-    if(s1%i==0) call crap1("EQUAL 2") ! call allocw(s1)
-    CALL DACOP(S1%I,S2%I)
+     if(old_package) then
+      CALL DACOP(S1%I,S2%I)
+     else
+! GTPSA REMOVED !      call mad_tpsa_copy(S1%j,S2%j)
+     endif
     !    else
     !      IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("EQUAL 3") !call allocw(s2)
     !      IF (.NOT. ASSOCIATED(s1%j%r)) call crap1("EQUAL 4") !call allocw(s1)
@@ -968,8 +979,8 @@ write(6,*) " no convergence  in  log_quaternion"
     type (quaternion),INTENT(inOUT)::S2
     type (quaternion),INTENT(IN)::S1
     integer i
- 
-    
+
+
     do i=0,3
     s2%x(i)=s1%x(i)
     enddo
@@ -982,8 +993,8 @@ write(6,*) " no convergence  in  log_quaternion"
     type (complex_quaternion),INTENT(inOUT)::S2
     type (complex_quaternion),INTENT(IN)::S1
     integer i
- 
-    
+
+
     do i=0,3
     s2%x(i)=s1%x(i)
     enddo
@@ -996,7 +1007,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (complex_quaternion),INTENT(inOUT)::S2
     type (quaternion),INTENT(IN)::S1
     integer i
-     
+
     do i=0,3
     s2%x(i)=s1%x(i)
     enddo
@@ -1008,8 +1019,8 @@ write(6,*) " no convergence  in  log_quaternion"
     type (quaternion),INTENT(inOUT)::S2
     type (complex_quaternion),INTENT(IN)::S1
     integer i
- 
-    
+
+
     do i=0,3
     s2%x(i)=s1%x(i)
     enddo
@@ -1021,7 +1032,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (quaternion),INTENT(inOUT)::S2
     real(dp),INTENT(IN)::S1
     integer i
- 
+
 
     do i=0,3
     s2%x(i)=0
@@ -1035,7 +1046,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (complex_quaternion),INTENT(inOUT)::S2
     real(dp),INTENT(IN)::S1
     integer i
- 
+
 
     do i=0,3
     s2%x(i)=0
@@ -1048,7 +1059,7 @@ write(6,*) " no convergence  in  log_quaternion"
     type (quaternion),INTENT(inOUT)::S2
     integer,INTENT(IN)::S1
     integer i
- 
+
 
     do i=0,3
     s2%x(i)=0
@@ -1075,8 +1086,11 @@ write(6,*) " no convergence  in  log_quaternion"
     real(dp), INTENT(inOUT)::R1
     IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
-
+    if(old_package ) then
     R1=S2.SUB.'0'
+    else
+! GTPSA REMOVED !     r1=mad_tpsa_get0(s2%j)
+    endif
   END SUBROUTINE DEQUAL
 
   SUBROUTINE  REQUAL(R1,S2)
@@ -1088,7 +1102,11 @@ write(6,*) " no convergence  in  log_quaternion"
     if(real_warning) call real_stop
     call check_snake
 
+    if(old_package ) then
     R1=S2.SUB.'0'
+    else
+! GTPSA REMOVED !     r1=mad_tpsa_get0(s2%j)
+    endif
 
   END SUBROUTINE REQUAL
 
@@ -1099,8 +1117,12 @@ write(6,*) " no convergence  in  log_quaternion"
     DAABSEQUAL=0
     IF(.NOT.C_%STABLE_DA) RETURN
 
-
+    if(old_package ) then
     DAABSEQUAL=abs(S2.sub.'0')
+    else
+! GTPSA REMOVED !     DAABSEQUAL=abs(mad_tpsa_get0(s2%j))
+    endif
+
 
   END function DAABSEQUAL
 
@@ -1112,8 +1134,17 @@ write(6,*) " no convergence  in  log_quaternion"
     IF(.NOT.C_%STABLE_DA) RETURN
 
     !    if(old) then
-    if(s2%i==0)  call crap1("DEQUALDACON 1") !call allocw(s2)
-    CALL DACON(S2%I,R1)
+    if(s2%i==0.and.old_package) then
+       call crap1("EQUAL 1 in DEQUALDACON") !call allocw(s2)
+! GTPSA REMOVED !    elseif(.not.c_associated(s2%j).and.(.not.(old_package))) then
+       call crap1("EQUAL 1 in DEQUALDACON") !call allocw(s2)
+    endif
+    if(old_package ) then
+     CALL DACON(S2%I,R1)
+    else
+! GTPSA REMOVED !     call  mad_tpsa_setvar(S2%j,r1,0,0.0_dp)
+    endif
+
     !    else
     !       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("DEQUALDACON 2") !call allocw(s2)
     !       CALL newDACON(S2%j,R1)
@@ -1131,12 +1162,14 @@ write(6,*) " no convergence  in  log_quaternion"
 
     if(real_warning) call real_stop
     !    if(old) then
-    if(s2%i==0) call crap1("EQUALDACON 1") !call allocw(s2)
+  !  if(s2%i==0) call crap1("EQUALDACON 1") !call allocw(s2)
     !    else
     !       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("EQUALDACON 2") !call allocw(s2)
     !    endif
-    r2=REAL(r1,kind=DP)
-    s2=r2
+
+     r2=REAL(r1,kind=DP)
+     s2=r2
+
   END SUBROUTINE EQUALDACON
 
   SUBROUTINE  IEQUALDACON(S2,R1)
@@ -1149,12 +1182,14 @@ write(6,*) " no convergence  in  log_quaternion"
 
 
     ! if(old) then
-    if(s2%i==0) call crap1("IEQUALDACON 1") !call allocw(s2)
+  !  if(s2%i==0) call crap1("IEQUALDACON 1") !call allocw(s2)
     !    else
     !       IF (.NOT. ASSOCIATED(s2%j%r)) call crap1("IEQUALDACON 2") !call allocw(s2)
     !    endif
     r2=REAL(r1,kind=DP)
     s2=r2
+
+
   END SUBROUTINE IEQUALDACON
 
   FUNCTION dexpt( S1 )
@@ -1163,7 +1198,7 @@ write(6,*) " no convergence  in  log_quaternion"
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
     IF(.NOT.C_%STABLE_DA) then
-     dexpt%i=0 
+     dexpt%i=0
      RETURN
     endif
     localmaster=master
@@ -1171,12 +1206,12 @@ write(6,*) " no convergence  in  log_quaternion"
     !    call check(s1)
     call ass(dexpt)
 
-    ! if(old) then
+     if(old_package) then
     call dafun('EXP ',s1%i,temp%i)
     call dacop(temp%i,dexpt%i)
-    !    else
-    !       call newdafun('EXP ',s1%j,dexpt%j)
-    !    endif
+        else
+! GTPSA REMOVED !          call  mad_tpsa_exp(s1%j,dexpt%j)
+        endif
 
     master=localmaster
 
@@ -1190,11 +1225,11 @@ write(6,*) " no convergence  in  log_quaternion"
     IF(.NOT.C_%STABLE_DA) RETURN
     !    call check(s1)
 
-    ! if(old) then
-    CALL DAABS(S1%I,FULL_ABST)
-    !    else
-    !       CALL newDAABS(S1%j,FULL_ABST)
-    !    endif
+     if(old_package ) then
+      CALL DAABS(S1%I,FULL_ABST)
+        else
+! GTPSA REMOVED !           FULL_ABST= mad_tpsa_nrm1(S1%j,c_null)
+        endif
 
   END FUNCTION FULL_ABST
 
@@ -1216,17 +1251,14 @@ write(6,*) " no convergence  in  log_quaternion"
     !    call check(s1)
     call ass(dtant)
 
-    ! if(old) then
+     if(old_package) then
     call dafun('SIN ',s1%i,temp%i)
     call dacop(temp%i,dtant%i)
     call dafun('COS ',s1%i,temp%i)
     call dadiv(dtant%i,temp%i,dtant%i)
-    !    else
-    !       call newdafun('SIN ',s1%j,temp%il)
-    !       call newdacop(temp%il,dtant%j)
-    !       call newdafun('COS ',s1%j,temp%il)
-    !       call newdadiv(dtant%j,temp%il,dtant%j)
-    !    endif
+        else
+! GTPSA REMOVED !    call mad_tpsa_tan(s1%j,dtant%j)
+        endif
 
     master=localmaster
 
@@ -1246,8 +1278,11 @@ write(6,*) " no convergence  in  log_quaternion"
     !    call check(s1)
     call ass(datanht)
 
-    datanht=log((1+s1)/sqrt(1-s1))/2.0_dp
-
+    if(old_package ) then
+     datanht=log((1+s1)/sqrt(1-s1))/2.0_dp
+    else
+! GTPSA REMOVED !     call mad_tpsa_atanh(S1%j,datanht%j)
+    endif
     master=localmaster
 
   END FUNCTION datanht
@@ -1268,12 +1303,12 @@ write(6,*) " no convergence  in  log_quaternion"
     !    call check(s1)
     call ass(dcost)
 
-    ! if(old) then
+     if(old_package) then
     call dafun('COS ',s1%i,temp%i)
     call dacop(temp%i,dcost%i)
-    !    else
-    !       call newdafun('COS ',s1%j,dcost%j)
-    !    endif
+        else
+! GTPSA REMOVED !    call mad_tpsa_cos(s1%j,dcost%j)
+        endif
 
     master=localmaster
 
@@ -1293,12 +1328,12 @@ write(6,*) " no convergence  in  log_quaternion"
 
     !    call check(s1)
     call ass(dsint)
-    ! if(old) then
+     if(old_package) then
     call dafun('SIN ',s1%i,temp%i)
     call dacop(temp%i,dsint%i)
-    !    else
-    !       call newdafun('SIN ',s1%j,dsint%j)
-    !    endif
+        else
+! GTPSA REMOVED !         call  mad_tpsa_sin(s1%j,dsint%j)
+        endif
 
     master=localmaster
 
@@ -1318,12 +1353,12 @@ write(6,*) " no convergence  in  log_quaternion"
 
     !    call check(s1)
     call ass(dsinHt)
-    ! if(old) then
+     if(old_package) then
     call dafun('SINH',s1%i,temp%i)
     call dacop(temp%i,dsinHt%i)
-    !    else
-    !       call newdafun('SINH',s1%j,dsinHt%j)
-    !    endif
+        else
+! GTPSA REMOVED !           call mad_tpsa_sinh(s1%j,dsinHt%j)
+        endif
     master=localmaster
 
   END FUNCTION dsinHt
@@ -1342,12 +1377,12 @@ write(6,*) " no convergence  in  log_quaternion"
 
     !    call check(s1)
     call ass(DCOSHT)
-    ! if(old) then
+     if(old_package) then
     call dafun('COSH',s1%i,temp%i)
     call dacop(temp%i,DCOSHT%i)
-    !    else
-    !       call newdafun('COSH',s1%j,DCOSHT%j)
-    !    endif
+        else
+! GTPSA REMOVED !           call mad_tpsa_cosh(s1%j,DCOSHT%j)
+        endif
 
     master=localmaster
 
@@ -1367,12 +1402,12 @@ write(6,*) " no convergence  in  log_quaternion"
 
     !    call check(s1)
     call ass(dtanht)
-    ! if(old) then
+     if(old_package) then
 
     dtanht=sinh(s1)/cosh(s1)
-    !    else
-    !       call newdafun('COSH',s1%j,DCOSHT%j)
-    !    endif
+        else
+! GTPSA REMOVED !           call mad_tpsa_tanh(s1%j,dtanht%j)
+        endif
 
     master=localmaster
 
@@ -1392,12 +1427,12 @@ write(6,*) " no convergence  in  log_quaternion"
 
     !    call check(s1)
     call ass(dlogt)
-    ! if(old) then
+     if(old_package) then
     call dafun('LOG ',s1%i,temp%i)
     call dacop(temp%i,dlogt%i)
-    !    else
-    !       call newdafun('LOG ',s1%j,dlogt%j)
-    !    endif
+        else
+! GTPSA REMOVED !           call mad_tpsa_log(s1%j,dlogt%j)
+        endif
 
     master=localmaster
 
@@ -1418,12 +1453,12 @@ write(6,*) " no convergence  in  log_quaternion"
     !    call check(s1)
     call ass(dsqrtt)
 
-    ! if(old) then
+     if(old_package) then
     call dafun('SQRT',s1%i,temp%i)
     call dacop(temp%i,dsqrtt%i)
-    !    else
-    !       call newdafun('SQRT',s1%j,dsqrtt%j)
-    !    endif
+        else
+! GTPSA REMOVED !           call mad_tpsa_sqrt(s1%j,dsqrtt%j)
+        endif
 
     master=localmaster
 
@@ -1445,12 +1480,12 @@ write(6,*) " no convergence  in  log_quaternion"
     !    call check(s2)
     call ass(mul)
 
-    ! if(old) then
+     if(old_package) then
     call damul(s1%i,s2%i,temp%i)
     call dacop(temp%i,mul%i)
-    !    else
-    !       call newdamul(s1%j,s2%j,mul%j)
-    !    endif
+        else
+! GTPSA REMOVED !           call mad_tpsa_mul(s1%j,s2%j,mul%j)
+        endif
 
     master=localmaster
 
@@ -1473,17 +1508,15 @@ write(6,*) " no convergence  in  log_quaternion"
     !    call check(s2)
     call ass(pbbra)
 
-    ! if(old) then
+     if(old_package ) then
     pbbra=0.0_dp
     do i=1,nd
        pbbra=(s1.d.(2*i-1))*(s2.d.(2*i))-(s2.d.(2*i-1))*(s1.d.(2*i))+pbbra
     enddo
-    !    call DAPOI(s1%i,s2%i,temp%i,nd)
-    !    call dacop(temp%i,pbbra%i)
-    !    else
-    !       call newDAPOI(s1%j,s2%j,temp%il,nd)
-    !       call newdacop(temp%il,pbbra%j)
-    !    endif
+
+        else
+! GTPSA REMOVED !          call mad_tpsa_poisson(s1%j,s2%j,pbbra%j,nd2)
+        endif
 
     master=localmaster
 
@@ -1505,13 +1538,14 @@ write(6,*) " no convergence  in  log_quaternion"
     !    call check(s1)
     call ass(GETORDER)
 
-    ! if(old) then
-    CALL TAKE(S1%I,S2,temp%i)
-    call dacop(temp%i,GETORDER%i)
-    !    else
-    !       CALL NEWTAKE(S1%J,S2,temp%iL)
-    !       call NEWdacop(temp%iL,GETORDER%J)
-    !    endif
+     if(old_package ) then
+    CALL TAKE(S1%I,S2,GETORDER%i)
+ !   call dacop(temp%i,GETORDER%i)
+        else
+! GTPSA REMOVED !       call  mad_tpsa_cutord(S1%j,temp%j,s2+1)
+! GTPSA REMOVED !       call  mad_tpsa_cutord(S1%j,GETORDER%j,s2)
+! GTPSA REMOVED !       call mad_tpsa_sub(temp%j,GETORDER%j,GETORDER%j)
+        endif
     master=localmaster
 
   END FUNCTION GETORDER
@@ -1524,7 +1558,7 @@ write(6,*) " no convergence  in  log_quaternion"
     TYPE (taylor) CUTORDER
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
-    integer localmaster
+    integer localmaster,s
     IF(.NOT.C_%STABLE_DA) then
        CUTORDER%i=0
       RETURN
@@ -1534,21 +1568,18 @@ write(6,*) " no convergence  in  log_quaternion"
     !    call check(s1)
     call ass(CUTORDER)
 
-    ! if(old) then
-    call datrunc(S1%I,s2,CUTORDER%i)
-    !    call dacop(S1%I,CUTORDER%i)
+     if(old_package ) then
+       if(s2>0) then
+      call datrunc(S1%I,s2,CUTORDER%i)
+      else
+       s=-s2+1
+       call datrunc(S1%I,s,CUTORDER%i)
+        call dasub(S1%I,CUTORDER%i,CUTORDER%i)
+      endif
+    else
+! GTPSA REMOVED !       call  mad_tpsa_cutord(S1%j,CUTORDER%j,s2)
+   endif
 
-    !    DO I=S2,NO
-    !       CALL TAKE(CUTORDER%I,I,TEMP)
-    !       CALL DASUB(CUTORDER%I,TEMP,CUTORDER%I)
-    !    ENDDO
-    !    else
-    !       call NEWdacop(S1%J,CUTORDER%J)
-    !       DO I=S2,NO
-    !          CALL NEWTAKE(CUTORDER%J,I,TEMPL)
-    !          CALL NEWDASUB(CUTORDER%J,TEMPL,CUTORDER%J)
-    !       ENDDO
-    !    endif
     master=localmaster
 
   END FUNCTION CUTORDER
@@ -1571,7 +1602,6 @@ write(6,*) " no convergence  in  log_quaternion"
 
     call ass(dputchar)
 
-
     resul = trim(ADJUSTL (s2))
 
     do i=1,lnv
@@ -1583,14 +1613,14 @@ write(6,*) " no convergence  in  log_quaternion"
     !frs    do i=1,len(trim(ADJUSTL (s2)))
     do i=1,nd2par
        CALL  CHARINT(RESUL(I:I),J(I))
-       if(i>nv) then
-          if(j(i)>0) then
-             dputchar=0.0_dp
-             !             call var(dputchar,zero,0)
-    master=localmaster
-             return
-          endif
-       endif
+   !    if(i>nv) then
+   !       if(j(i)>0) then
+   !          dputchar=0.0_dp
+   !          !             call var(dputchar,zero,0)
+   ! master=localmaster
+   !          return
+   !       endif
+!       endif
     enddo
 
 
@@ -1598,6 +1628,7 @@ write(6,*) " no convergence  in  log_quaternion"
     dputchar=0.0_dp
     !    call var(dputchar,zero,0)
     CALL pok(dputchar,j,s1)
+
     master=localmaster
 
   END FUNCTION dputchar
@@ -1613,6 +1644,8 @@ write(6,*) " no convergence  in  log_quaternion"
        dputint%i=0
       RETURN
     endif
+
+
     localmaster=master
 
 
@@ -1645,6 +1678,7 @@ write(6,*) " no convergence  in  log_quaternion"
     dputint=0.0_dp
     !    call var(dputint,zero,0)
     CALL pok(dputint,j,s1)
+
     master=localmaster
 
   END FUNCTION dputint
@@ -1660,17 +1694,31 @@ write(6,*) " no convergence  in  log_quaternion"
        dputint0%i=0
       RETURN
     endif
+if(check_gtpsa(i=s2)) then
+ else
+    localmaster=master
+    call ass(dputint0)
+   dputint0=S1
+    master=localmaster
+       return
+!  write(6,*) " check_gtpsa failed dputint0 "
+!  stop 999
+ endif
+
     localmaster=master
 
 
     call ass(dputint0)
 
-    j=0
     if(s2>nv) then
        dputint0=S1
     master=localmaster
        return
     endif
+
+if(old_package ) then
+    j=0
+
 
 
     dputint0=0.0_dp
@@ -1678,7 +1726,13 @@ write(6,*) " no convergence  in  log_quaternion"
 
     j(s2)=1
     CALL pok(dputint0,j,s1)
+else
 
+! GTPSA REMOVED ! call mad_tpsa_clear(dputint0%j)
+!  bug laurent
+! GTPSA REMOVED !  call  mad_tpsa_setsm(dputint0%j,2,[s2,1],0.0_dp,s1)
+
+endif
     master=localmaster
 
   END FUNCTION dputint0
@@ -1726,7 +1780,6 @@ write(6,*) " no convergence  in  log_quaternion"
 
     call ass(GETintnd2s)
 
-
     GETintnd2s=s1.par.s2
 
     call  shiftda(GETintnd2s,GETintnd2s, size(s2) )
@@ -1753,7 +1806,6 @@ write(6,*) " no convergence  in  log_quaternion"
     call ass(GETintk)
 
 
-
     call  shiftda(s1,GETintk, s2 )
 
     master=localmaster
@@ -1763,7 +1815,7 @@ write(6,*) " no convergence  in  log_quaternion"
 
 
 
-  FUNCTION GETchar( S1, S2 ) 
+  FUNCTION GETchar( S1, S2 )
 
     implicit none
     real(dp) GETchar,r1
@@ -1775,22 +1827,21 @@ write(6,*) " no convergence  in  log_quaternion"
     getchar=0
     IF(.NOT.C_%STABLE_DA) RETURN
 
- 
 
-    resul = s2    
-    call context(resul) 
+    resul = s2
+    call context(resul)
 
     do i=1,lnv
        j(i)=0
     enddo
 
- 
-    nd2par= len_trim(resul)  
+
+    nd2par= len_trim(resul)
 
 
 
 
- 
+
     do i=1,nd2par
        CALL  CHARINT(RESUL(I:I),J(I))
     enddo
@@ -1800,19 +1851,22 @@ c=0
        c=j(i)+c
     enddo
 
+
+
+
+
 if(c>0) then
 r1=0.0_dp
 else
-    CALL dapek(S1%I,j,r1)
+    CALL pek(S1,j,r1)
 endif
 
-
-    GETchar=r1
+     GETchar=r1
 
   END FUNCTION GETchar
 
 
- 
+
 
   FUNCTION GETint( S1, S2 )
     implicit none
@@ -1824,15 +1878,15 @@ endif
      getint=0
     IF(.NOT.C_%STABLE_DA) RETURN
 
- 
+
 
     do i=1,lnv
        j(i)=0
     enddo
 
-   
+
     nd2par= size(s2)
-   
+
     do i=1,nd2par
        J(I)=s2(i)
     enddo
@@ -1845,9 +1899,9 @@ endif
 if(c>0) then
 r1=0.0_dp
 else
-    CALL dapek(S1%I,j,r1)
+    CALL pek(S1,j,r1)
 endif
- 
+
     GETint=r1
 
   END FUNCTION GETint
@@ -1872,13 +1926,12 @@ endif
     !    call check(s1)
     call ass(GETdiff)
 
-    ! if(old) then
+     if(old_package ) then
     CALL dader(S2,S1%I,temp%i)
     call dacop(temp%i,GETdiff%i)
-    !    else
-    !       CALL NEWdader(S2,S1%J,temp%iL)
-    !       call NEWdacop(temp%iL,GETdiff%J)
-    !    endif
+         else
+! GTPSA REMOVED !      call mad_tpsa_deriv(S1%j,GETdiff%j,s2)
+        endif
     master=localmaster
 
   END FUNCTION GETdiff
@@ -1898,6 +1951,7 @@ endif
     endif
     localmaster=master
 
+!if(old_package ) then
     allocate(jc(c_%nv))
     jc=0
     !    call check(s1)
@@ -1909,7 +1963,6 @@ endif
 
     do i=1,n
        call taylor_cycle(t,ii=i,value=value,j=jc)
- 
          x=((value/(jc(s2)+1)).mono.jc)*(1.0_dp.mono.s2)+x
 
     enddo
@@ -1918,17 +1971,56 @@ endif
 
     call kill(t,x)
     deallocate(jc)
+!else
+!endif
     master=localmaster
 
   END FUNCTION GETINTegrate
 
+ function check_gtpsa(i,J)
+ implicit none
+ logical check_gtpsa
+ integer,optional :: i
+ integer,optional :: J(:)
+ integer ii,k
+
+  check_gtpsa=.true.
+
+ if(present(i)) then
+   if(.not.(i>=1.and.i<=c_%nv)) then
+    check_gtpsa=.false.
+    write(6,*)"i,c_%nv", i,c_%nv
+  endif
+ else
+  k=0
+ do ii=1,min(c_%nv,size(j))
+  k=k+j(ii)
+ enddo
+ if(k>c_%no) then
+   check_gtpsa=.false.
+ !   write(6,*)"k>c_%no", k,c_%no
+  endif
+ k=0
+  do ii=c_%nv+1,size(j)
+  k=k+j(ii)
+  enddo
+  if(k>0) then
+   check_gtpsa=.false.
+    write(6,*)"=c_%nv+1,size(j) ", j(c_%nv+1:size(j))
+  endif
+ endif
+
+ end function check_gtpsa
 
   FUNCTION GETdatra( S1, S2 )
     implicit none
     TYPE (taylor) GETdatra
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
-    integer localmaster
+    integer localmaster,j(lnv)
+     type(taylor) junk
+      integer i,mf
+    real(dp) value
     IF(.NOT.C_%STABLE_DA) then
        GETdatra%i=0
       RETURN
@@ -1939,13 +2031,28 @@ endif
     !    call check(s1)
     call ass(GETdatra)
 
-    ! if(old) then
+     if(old_package ) then
     CALL datra(S2,S1%I,temp%i)
     call dacop(temp%i,GETdatra%i)
-    !    else
-    !       CALL NEWdatra(S2,S1%J,temp%iL)
-    !       call NEWdacop(temp%iL,GETdatra%J)
-    !    endif
+        else
+    call alloc(junk)
+   junk=0.0_dp
+   call taylor_cycle(S1,size=mf)
+
+   do i=1,mf
+   call taylor_cycle(s1,ii=i,value=VALUE,j=J)
+!   write(6,*) i,value
+
+   if(value/=0.d0) then
+    if(j(S2)/=0) then
+     j(S2)=j(S2)-1
+     junk=junk +  (VALUE.mono.J)
+    endif
+   endif
+  enddo
+    GETdatra=junk
+    call kill(junk)
+        endif
     master=localmaster
 
   END FUNCTION GETdatra
@@ -1958,7 +2065,7 @@ endif
     INTEGER, INTENT (IN) :: R2
     INTEGER I,R22
     integer localmaster
- 
+
     temp=1.0_dp
 
     R22=IABS(R2)
@@ -1969,7 +2076,7 @@ endif
        temp=invq(temp)
     ENDIF
      powq=temp
- 
+
   END FUNCTION POWq
 
 
@@ -1980,7 +2087,7 @@ endif
     INTEGER, INTENT (IN) :: R2
     INTEGER I,R22
     integer localmaster
- 
+
     temp=1.0_dp
 
     R22=IABS(R2)
@@ -1991,7 +2098,7 @@ endif
        temp=cinvq(temp)
     ENDIF
      cpowq=temp
- 
+
   END FUNCTION cPOWq
 
   FUNCTION POW( S1, R2 )
@@ -2011,7 +2118,7 @@ endif
     !    call check(s1)
     call ass(POW)
 
-    ! if(old) then
+     if(old_package) then
     CALL DACON(temp%i,1.0_dp)
 
     R22=IABS(R2)
@@ -2022,7 +2129,21 @@ endif
        CALL DADIC(temp%i,1.0_dp,temp%i)
     ENDIF
     call dacop(temp%i,POW%i)
- 
+    else
+    temp=1.0_dp
+ !   CALL DACON(temp%i,1.0_dp)
+
+    R22=IABS(R2)
+    DO I=1,R22
+! GTPSA REMOVED !      call mad_tpsa_mul(temp%j,s1%j,temp%j)
+!       CALL DAMUL(temp%i,S1%I,temp%i)
+    ENDDO
+    IF(R2.LT.0) THEN
+       CALL DADIC(temp%i,1.0_dp,temp%i)
+    ENDIF
+      pow=temp
+ !   call dacop(temp%i,POW%i)
+    endif
     master=localmaster
   END FUNCTION POW
 
@@ -2103,12 +2224,12 @@ endif
     !    call check(s1)
     call ass(dmulsc)
 
-    ! if(old) then
+     if(old_package) then
     call dacmu(s1%i,sc,temp%i)
     call dacop(temp%i,dmulsc%i)
-    !    else
-    !       call newdacmu(s1%j,sc,dmulsc%j)
-    !    endif
+        else
+! GTPSA REMOVED !          call mad_tpsa_scl(s1%j,sc,dmulsc%j)
+         endif
 
     master=localmaster
   END FUNCTION dmulsc
@@ -2130,12 +2251,12 @@ endif
     !    call check(s1)
     call ass(mulsc)
 
-    ! if(old) then
+     if(old_package) then
     call dacmu(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,mulsc%i)
-    !    else
-    !       call newdacmu(s1%j,REAL(sc,kind=DP),mulsc%j)
-    !    endif
+        else
+! GTPSA REMOVED !              call mad_tpsa_scl(s1%j,REAL(sc,kind=DP),mulsc%j)
+        endif
     master=localmaster
   END FUNCTION mulsc
 
@@ -2156,12 +2277,12 @@ endif
     call ass(imulsc)
 
 
-    ! if(old) then
+     if(old_package) then
     call dacmu(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,imulsc%i)
-    !    else
-    !       call newdacmu(s1%j,REAL(sc,kind=DP),imulsc%j)
-    !    endif
+        else
+! GTPSA REMOVED !    call mad_tpsa_scl(s1%j,REAL(sc,kind=DP),imulsc%j)
+        endif
 
     master=localmaster
   END FUNCTION imulsc
@@ -2175,19 +2296,19 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        dscmul%i=0
       RETURN
-    endif     
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(dscmul)
 
-    ! if(old) then
+     if(old) then
     call dacmu(s1%i,sc,temp%i)
     call dacop(temp%i,dscmul%i)
-    !    else
-    !       call newdacmu(s1%j,sc,dscmul%j)
-    !    endif
+        else
+! GTPSA REMOVED !           call mad_tpsa_scl(s1%j,REAL(sc,kind=DP),dscmul%j)
+        endif
 
     master=localmaster
 
@@ -2202,7 +2323,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        scmul%i=0
       RETURN
-    endif     
+    endif
     localmaster=master
 
 
@@ -2211,12 +2332,12 @@ endif
     call ass(scmul)
 
 
-    ! if(old) then
+     if(old_package) then
     call dacmu(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,scmul%i)
-    !    else
-    !       call newdacmu(s1%j,REAL(sc,kind=DP),scmul%j)
-    !    endif
+        else
+! GTPSA REMOVED !           call mad_tpsa_scl(s1%j,REAL(sc,kind=DP),scmul%j)
+        endif
 
     master=localmaster
 
@@ -2231,19 +2352,19 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        iscmul%i=0
       RETURN
-    endif  
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(iscmul)
 
-    ! if(old) then
+     if(old_package) then
     call dacmu(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,iscmul%i)
-    !    else
-    !       call newdacmu(s1%j,REAL(sc,kind=DP),iscmul%j)
-    !    endif
+        else
+! GTPSA REMOVED !           call mad_tpsa_scl(s1%j,REAL(sc,kind=DP),iscmul%j)
+        endif
 
     master=localmaster
 
@@ -2257,7 +2378,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        div%i=0
       RETURN
-    endif  
+    endif
     localmaster=master
 
 
@@ -2265,13 +2386,12 @@ endif
     !    call check(s2)
     call ass(div)
 
-    ! if(old) then
+     if(old_package) then
     call dadiv(s1%i,s2%i,temp%i)
     call dacop(temp%i,div%i)
-    !    else
-    !       call newdadiv(s1%j,s2%j,templ)
-    !       call newdacop(templ,div%j)
-    !    endif
+        else
+! GTPSA REMOVED !           call mad_tpsa_div(s1%j,s2%j,div%j)
+        endif
 
     master=localmaster
   END FUNCTION div
@@ -2285,19 +2405,20 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        dscdiv%i=0
       RETURN
-    endif  
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(dscdiv)
 
-    ! if(old) then
+     if(old_package) then
     call dadic(s1%i,sc,temp%i)
     call dacop(temp%i,dscdiv%i)
-    !    else
-    !       call newdadic(s1%j,sc,dscdiv%j)
-    !    endif
+        else
+        temp=sc
+! GTPSA REMOVED !         call mad_tpsa_div(temp%j,s1%j,dscdiv%j)
+        endif
 
     master=localmaster
 
@@ -2312,7 +2433,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        scdiv%i=0
       RETURN
-    endif  
+    endif
     localmaster=master
 
 
@@ -2321,13 +2442,13 @@ endif
     call ass(scdiv)
 
 
-    ! if(old) then
+     if(old_package) then
     call dadic(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,scdiv%i)
-    !    else
-    !       call newdadic(s1%j,REAL(sc,kind=DP),scdiv%j)
-    !    endif
-
+        else
+        temp=REAL(sc,kind=DP)
+! GTPSA REMOVED !         call mad_tpsa_div(temp%j,s1%j,scdiv%j)    !    endif
+    endif
     master=localmaster
   END FUNCTION scdiv
 
@@ -2340,20 +2461,20 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        iscdiv%i=0
       RETURN
-    endif  
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(iscdiv)
 
-    ! if(old) then
+     if(old_package) then
     call dadic(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,iscdiv%i)
-    !    else
-    !       call newdadic(s1%j,REAL(sc,kind=DP),iscdiv%j)
-    !    endif
-
+        else
+        temp=REAL(sc,kind=DP)
+! GTPSA REMOVED !         call mad_tpsa_div(temp%j,s1%j,iscdiv%j)    !    endif
+    endif
 
     master=localmaster
   END FUNCTION iscdiv
@@ -2363,11 +2484,12 @@ endif
     TYPE (taylor) ddivsc
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
+    real(dp) v
     integer localmaster
     IF(.NOT.C_%STABLE_DA) then
        ddivsc%i=0
       RETURN
-    endif  
+    endif
     localmaster=master
 
 
@@ -2375,12 +2497,15 @@ endif
     call ass(ddivsc)
 
 
-    ! if(old) then
+     if(old_package) then
     call dacdi(s1%i,sc,temp%i)
     call dacop(temp%i,ddivsc%i)
-    !    else
-    !       call newdacdi(s1%j,sc,ddivsc%j)
-    !    endif
+        else
+        v=1.0_dp/sc
+! GTPSA REMOVED !       !  call mad_tpsa_div(s1%j,temp%j,ddivsc%j)    !    endif
+! GTPSA REMOVED !          call mad_tpsa_scl(s1%j,v,ddivsc%j)
+     endif
+
     master=localmaster
 
   END FUNCTION ddivsc
@@ -2391,10 +2516,11 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
+    real(dp) v
     IF(.NOT.C_%STABLE_DA) then
        divsc%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -2402,12 +2528,15 @@ endif
     !    call check(s1)
     call ass(divsc)
 
-    ! if(old) then
+     if(old_package) then
     call dacdi(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,divsc%i)
-    !    else
-    !       call newdacdi(s1%j,REAL(sc,kind=DP),divsc%j)
-    !    endif
+        else
+        v=1.0_dp/REAL(sc,kind=DP)
+! GTPSA REMOVED !       !  call mad_tpsa_div(s1%j,temp%j,ddivsc%j)    !    endif
+! GTPSA REMOVED !          call mad_tpsa_scl(s1%j,v,divsc%j)
+     endif
+
     master=localmaster
 
   END FUNCTION divsc
@@ -2419,10 +2548,11 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
+    real(dp) v
     IF(.NOT.C_%STABLE_DA) then
        idivsc%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -2430,12 +2560,15 @@ endif
     call ass(idivsc)
 
 
-    ! if(old) then
+     if(old_package) then
     call dacdi(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,idivsc%i)
-    !    else
-    !       call newdacdi(s1%j,REAL(sc,kind=DP),idivsc%j)
-    !    endif
+        else
+        v=1.0_dp/REAL(sc,kind=DP)
+! GTPSA REMOVED !       !  call mad_tpsa_div(s1%j,temp%j,ddivsc%j)    !    endif
+! GTPSA REMOVED !          call mad_tpsa_scl(s1%j,v,idivsc%j)
+     endif
+
     master=localmaster
 
   END FUNCTION idivsc
@@ -2449,7 +2582,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        add%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -2458,14 +2591,11 @@ endif
     call ass(add)
 
 
-    ! if(old) then
+     if(old) then
     call daadd(s1%i,s2%i,add%i)
-    !  call dacop(temp,add%i)
-    !  call daadd(s1%i,s2%i,temp)
-    !  call dacop(temp,add%i)
-    !    else
-    !       call newdaadd(s1%j,s2%j,add%j)
-    !    endif
+       else
+! GTPSA REMOVED !           call mad_tpsa_add(s1%j,s2%j,add%j)
+        endif
 
     master=localmaster
 
@@ -2477,7 +2607,7 @@ endif
     TYPE (quaternion) addq
     TYPE (quaternion), INTENT (IN) :: S1, S2
 
- 
+
        addq%x=s1%x+s2%x
   END FUNCTION addq
 
@@ -2486,7 +2616,7 @@ endif
     implicit none
     TYPE (quaternion) subq
     TYPE (quaternion), INTENT (IN) :: S1, S2
- 
+
           subq%x=s1%x-s2%x
 
   END FUNCTION subq
@@ -2497,7 +2627,7 @@ endif
     TYPE (quaternion), INTENT (IN) :: S1, S2
     integer i
 
-  
+
           mulq=0.0_dp
 
           mulq%x(0)=s1%x(0)*s2%x(0)-s1%x(1)*s2%x(1)-s1%x(2)*s2%x(2)-s1%x(3)*s2%x(3)
@@ -2517,8 +2647,8 @@ endif
     TYPE (quaternion) divq
     TYPE (quaternion), INTENT (IN) :: S1, S2
 
- 
-        
+
+
        divq=s1*invq(s2)
 
   END FUNCTION divq
@@ -2531,7 +2661,7 @@ endif
     TYPE (complex_quaternion) caddq
     TYPE (complex_quaternion), INTENT (IN) :: S1, S2
 
-   
+
        caddq%x=s1%x+s2%x
   END FUNCTION caddq
 
@@ -2541,7 +2671,7 @@ endif
     TYPE (complex_quaternion) csubq
     TYPE (complex_quaternion), INTENT (IN) :: S1, S2
 
-  
+
           csubq%x=s1%x-s2%x
 
   END FUNCTION csubq
@@ -2552,7 +2682,7 @@ endif
     TYPE (complex_quaternion), INTENT (IN) :: S1, S2
     integer i
 
-   
+
           cmulq=0.0_dp
 
           cmulq%x(0)=s1%x(0)*s2%x(0)-s1%x(1)*s2%x(1)-s1%x(2)*s2%x(2)-s1%x(3)*s2%x(3)
@@ -2573,7 +2703,7 @@ endif
     TYPE (complex_quaternion), INTENT (IN) :: S1
     complex(dp), INTENT (IN) :: c
     integer i
- 
+
 
           cmulqc%x= s1%x*c
 
@@ -2585,7 +2715,7 @@ endif
     TYPE (complex_quaternion), INTENT (IN) :: S1
     complex(dp), INTENT (IN) :: c
     integer i
- 
+
           ccmulq%x= s1%x*c
 
   END FUNCTION ccmulq
@@ -2596,7 +2726,7 @@ endif
     TYPE (complex_quaternion), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: c
     integer i
-  
+
 
           cmulqr%x= s1%x*c
 
@@ -2609,7 +2739,7 @@ endif
     real(dp), INTENT (IN) :: c
     integer i
 
-  
+
 
           rcmulq%x= s1%x*c
 
@@ -2621,13 +2751,13 @@ endif
     TYPE (complex_quaternion) cdivq
     TYPE (complex_quaternion), INTENT (IN) :: S1, S2
 
-  
-        
+
+
        cdivq=s1*cinvq(s2)
 
   END FUNCTION cdivq
 
-!!!!!  
+!!!!!
 
   FUNCTION daddsc( S1, sc )
     implicit none
@@ -2638,19 +2768,20 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        daddsc%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(daddsc)
 
-    ! if(old) then
+     if(old_package) then
     call dacad(s1%i,sc,temp%i)
     call dacop(temp%i,daddsc%i)
-    !    else
-    !       call newdacad(s1%j,sc,daddsc%j)
-    !    endif
+        else
+         daddsc=s1
+! GTPSA REMOVED !           call mad_tpsa_set0(daddsc%j,1.0_dp,sc) ! t[0] = a*t[0]+b
+        endif
     master=localmaster
 
   END FUNCTION daddsc
@@ -2664,7 +2795,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        addsc%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -2673,12 +2804,13 @@ endif
     call ass(addsc)
 
 
-    ! if(old) then
+     if(old_package) then
     call dacad(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,addsc%i)
-    !    else
-    !       call newdacad(s1%j,REAL(sc,kind=DP),addsc%j)
-    !    endif
+        else
+         addsc=s1
+! GTPSA REMOVED !           call mad_tpsa_set0(addsc%j,1.0_dp,REAL(sc,kind=DP)) ! t[0] = a*t[0]+b
+        endif
     master=localmaster
 
   END FUNCTION addsc
@@ -2692,19 +2824,20 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        iaddsc%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(iaddsc)
 
-    ! if(old) then
+     if(old_package) then
     call dacad(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,iaddsc%i)
-    !    else
-    !       call newdacad(s1%j,REAL(sc,kind=DP),iaddsc%j)
-    !    endif
+        else
+         iaddsc=s1
+! GTPSA REMOVED !           call mad_tpsa_set0(iaddsc%j,1.0_dp,REAL(sc,kind=DP)) ! t[0] = a*t[0]+b
+        endif
     master=localmaster
 
   END FUNCTION iaddsc
@@ -2718,19 +2851,20 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        dscadd%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(dscadd)
 
-    ! if(old) then
+     if(old_package) then
     call dacad(s1%i,sc,temp%i)
     call dacop(temp%i,dscadd%i)
-    !    else
-    !       call newdacad(s1%j,sc,dscadd%j)
-    !    endif
+        else
+         dscadd=s1
+! GTPSA REMOVED !           call mad_tpsa_set0(dscadd%j,1.0_dp,sc) ! t[0] = a*t[0]+b
+        endif
     master=localmaster
 
   END FUNCTION dscadd
@@ -2744,7 +2878,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        scadd%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -2752,12 +2886,13 @@ endif
     !    call check(s1)
     call ass(scadd)
 
-    ! if(old) then
+     if(old_package) then
     call dacad(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,scadd%i)
-    !    else
-    !       call newdacad(s1%j,REAL(sc,kind=DP),scadd%j)
-    !    endif
+        else
+         scadd=s1
+! GTPSA REMOVED !           call mad_tpsa_set0(scadd%j,1.0_dp,REAL(sc,kind=DP)) ! t[0] = a*t[0]+b
+        endif
 
     master=localmaster
 
@@ -2772,7 +2907,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        iscadd%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -2780,12 +2915,13 @@ endif
     call ass(iscadd)
 
 
-    ! if(old) then
+     if(old_package) then
     call dacad(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,iscadd%i)
-    !    else
-    !       call newdacad(s1%j,REAL(sc,kind=DP),iscadd%j)
-    !    endif
+        else
+         iscadd=s1
+! GTPSA REMOVED !           call mad_tpsa_set0(iscadd%j,1.0_dp,REAL(sc,kind=DP)) ! t[0] = a*t[0]+b
+        endif
     master=localmaster
 
   END FUNCTION iscadd
@@ -2798,7 +2934,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        subs%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -2808,12 +2944,12 @@ endif
 
 
 
-    ! if(old) then
+     if(old_package) then
     call dasub(s1%i,s2%i,temp%i)
     call dacop(temp%i,subs%i)
-    !    else
-    !       call newdasub(s1%j,s2%j,subs%j)
-    !    endif
+        else
+! GTPSA REMOVED !       call mad_tpsa_sub(s1%j,s2%j,subs%j)
+        endif
     master=localmaster
 
   END FUNCTION subs
@@ -2827,19 +2963,20 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        dsubsc%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(dsubsc)
 
-    ! if(old) then
+      if(old_package) then
     call dacsu(s1%i,sc,temp%i)
     call dacop(temp%i,dsubsc%i)
-    !    else
-    !       call newdacsu(s1%j,sc,dsubsc%j)
-    !    endif
+    else
+       temp=sc
+! GTPSA REMOVED !       call mad_tpsa_sub(s1%j,temp%j,dsubsc%j)
+    endif
 
     master=localmaster
 
@@ -2855,7 +2992,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        subsc%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -2863,12 +3000,13 @@ endif
     !    call check(s1)
     call ass(subsc)
 
-    ! if(old) then
+     if(old_package) then
     call dacsu(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,subsc%i)
-    !    else
-    !       call newdacsu(s1%j,REAL(sc,kind=DP),subsc%j)
-    !    endif
+   else
+       temp=REAL(sc,kind=DP)
+! GTPSA REMOVED !       call mad_tpsa_sub(s1%j,temp%j,subsc%j)
+    endif
     master=localmaster
 
   END FUNCTION subsc
@@ -2882,19 +3020,20 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        isubsc%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(isubsc)
 
-    ! if(old) then
+     if(old_package) then
     call dacsu(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,isubsc%i)
-    !    else
-    !       call newdacsu(s1%j,REAL(sc,kind=DP),isubsc%j)
-    !    endif
+    else
+       temp=REAL(sc,kind=DP)
+! GTPSA REMOVED !       call mad_tpsa_sub(s1%j,temp%j,isubsc%j)
+    endif
     master=localmaster
 
   END FUNCTION isubsc
@@ -2908,19 +3047,20 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        dscsub%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(dscsub)
 
-    ! if(old) then
+     if(old_package) then
     call dasuc(s1%i,sc,temp%i)
     call dacop(temp%i,dscsub%i)
-    !    else
-    !       call newdasuc(s1%j,sc,dscsub%j)
-    !    endif
+    else
+       temp=REAL(sc,kind=DP)
+! GTPSA REMOVED !       call mad_tpsa_sub(temp%j,s1%j,dscsub%j)
+    endif
     master=localmaster
 
   END FUNCTION dscsub
@@ -2934,7 +3074,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        scsub%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -2942,12 +3082,13 @@ endif
     !    call check(s1)
     call ass(scsub)
 
-    ! if(old) then
+     if(old_package) then
     call dasuc(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,scsub%i)
-    !    else
-    !       call newdasuc(s1%j,REAL(sc,kind=DP),scsub%j)
-    !    endif
+     else
+       temp=REAL(sc,kind=DP)
+! GTPSA REMOVED !       call mad_tpsa_sub(temp%j,s1%j,scsub%j)
+    endif
     master=localmaster
 
   END FUNCTION scsub
@@ -2961,19 +3102,20 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        iscsub%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
     !    call check(s1)
     call ass(iscsub)
 
-    ! if(old) then
+     if(old_package) then
     call dasuc(s1%i,REAL(sc,kind=DP),temp%i)
     call dacop(temp%i,iscsub%i)
-    !    else
-    !       call newdasuc(s1%j,REAL(sc,kind=DP),iscsub%j)
-    !    endif
+     else
+       temp=REAL(sc,kind=DP)
+! GTPSA REMOVED !       call mad_tpsa_sub(temp%j,s1%j,iscsub%j)
+    endif
     master=localmaster
 
   END FUNCTION iscsub
@@ -2992,7 +3134,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        varf%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -3013,7 +3155,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        varf001%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
 
@@ -3033,18 +3175,66 @@ endif
     INTEGER,INTENT(IN)::s
     type (taylor),INTENT(IN)::S1
     type (taylor),INTENT(inout)::S2
+    type(taylor) junk
+    integer j(lnv),jj(lnv),i,mf
+    real(dp) value
     IF(.NOT.C_%STABLE_DA) RETURN
 
-    ! if(old) then
-    if(s2%i==0) call crap1("shift000  1" )  !call etall1(s2%i)
-    CALL DAshift(s1%i,s2%i,s)
-    !   else
-    !      if(.NOT. ASSOCIATED(s2%j%r))call crap1("shift000  2" )   ! call newetall(s2%j,1)
-    !
-    !      CALL NEWDAshift(s1%j,s2%j,s)
-    !   endif
-    !
+
+!    if(s2%i==0) call crap1("shift000  1" )  !call etall1(s2%i)
+     if(old_package) then
+        CALL DAshift(s1%i,s2%i,s)
+       else
+    j=0
+    call alloc(junk)
+   junk=0.0_dp
+   call taylor_cycle(S1,size=mf)
+
+   do i=1,mf
+   call taylor_cycle(s1,ii=i,value=VALUE,j=JJ)
+
+   if(value/=0.d0) then
+    j=0
+    j(1:c_%nv-s)  =   jj(s+1:c_%nv)
+    junk=junk + (VALUE.mono.J)
+   endif
+  enddo
+    s2=junk
+    call kill(junk)
+
+   endif
+
   END SUBROUTINE shift000
+
+
+  SUBROUTINE  pek0(S1,R1,j)
+    implicit none
+    INTEGER,INTENT(IN)::j
+    real(dp),INTENT(inOUT)::R1(:)
+    type (taylor),INTENT(IN)::S1(:)
+    integer i
+ !   integer k
+    IF(.NOT.C_%STABLE_DA) RETURN
+      do i=1,j
+       r1(i)=s1(i)
+      enddo
+    !
+  END SUBROUTINE pek0
+
+  SUBROUTINE  pok0(S1,R1,j)
+    implicit none
+    INTEGER,INTENT(IN)::j
+    real(dp),INTENT(in)::R1(:)
+    type (taylor),INTENT(INout)::S1(:)
+    integer i,jj(lnv)
+ !   integer k
+      jj=0
+    IF(.NOT.C_%STABLE_DA) RETURN
+      do i=1,j
+       call pok(s1(i),jj,r1(i))
+      enddo
+    !
+  END SUBROUTINE pok0
 
 
   SUBROUTINE  pek000(S1,J,R1)
@@ -3055,15 +3245,23 @@ endif
  !   integer k
     IF(.NOT.C_%STABLE_DA) RETURN
     ! if(old) then
-    if(s1%i==0) call crap1("pek000  1" )  !call etall1(s1%i)
+   ! if(s1%i==0) call crap1("pek000  1" )  !call etall1(s1%i)
  !   k=s1%i
 !    write(6,*) r1,k
-    CALL DApek(s1%i,j,r1)
-    !    else
-    !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("pek000  2" ) ! newetall(s1%j,1)
-    !
-    !      CALL newDApek(s1%j,j,r1)
-    !    endif
+     if(.not.check_gtpsa(j=j)) then  
+         r1=0
+     !   write(6,*) "error in pek000"
+     !    write(6,*) j
+     !    write(6,*)"c_%nv,c_%no",c_%nv,c_%no
+       return
+     endif
+    if(old_package) then
+       CALL DApek(s1%i,j,r1)
+        else
+         mo_gtpsa=0
+         mo_gtpsa=j(1:size(j))
+! GTPSA REMOVED !        r1=mad_tpsa_getm(s1%j,c_%nv,mo_gtpsa)
+    endif
     !
   END SUBROUTINE pek000
 
@@ -3072,25 +3270,40 @@ endif
     INTEGER,INTENT(in),dimension(:)::j
     real(dp),INTENT(in)::R1
     type (taylor),INTENT(inout)::S1
+    integer i,siz
+    integer(1) jj(lnv)
     IF(.NOT.C_%STABLE_DA) RETURN
 
-    if(check_j(j)/=0) return
+if(check_gtpsa(j=j)) then
+ else
+ ! write(6,*) " check_gtpsa failed pok000 "
+  return
+!  stop 999
+ endif
+!    if(check_j(j)/=0) return
     ! if(old) then
-    if(s1%i==0) call crap1("pok000 1" )  ! call etall1(s1%i)
-    CALL DApok(s1%i,j,r1)
-    !    else
-    !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("pok000  2" )  ! call newetall(s1%j,1)
-    !
-    !       CALL newDApok(s1%j,j,r1)
-    !    endif
-    !
+    !if(s1%i==0) call crap1("pok000 1" )  ! call etall1(s1%i)
+    if(old_package) then
+      CALL DApok(s1%i,j,r1)
+    else
+
+     jj=0
+     jj(1:size(j))=j
+     siz=min(size(j),nv)
+
+! GTPSA REMOVED !      call  mad_tpsa_setm(s1%j,siz,jj ,0.0_dp,r1)
+    endif
+
   END SUBROUTINE pok000
 
   SUBROUTINE  TAYLOR_ran(S1,r1,R2)
     implicit none
     real(dp),INTENT(in)::R1
     real(dp),INTENT(inout)::R2
+    integer j(lnv),mf,i
     type (taylor),INTENT(inout)::S1
+    type(taylor) junk
+    real(dp) value
     IF(.NOT.C_%STABLE_DA) RETURN
 
     !
@@ -3098,45 +3311,58 @@ endif
     !     FOR R1 > 0, THE VECTOR IS FILLED WITH REALS,
     !     FOR R1 < 0, THE VECTOR IS FILLED WITH SINGLE DIGIT INTEGERS
     !     ABS(R1) IS THE FILLING FACTOR
-    ! if(old) then
+    if(old) then
     if(s1%i==0) call crap1("tAYLOR_ran  1" )  ! call etall1(s1%i)
     call daran(s1%i,r1,R2)
-    !    else
-    !       if(.NOT. ASSOCIATED(s1%j%r))call crap1("tAYLOR_ran  2" )  !  call newetall(s1%j,1)
-    !
-    !       call newdaran(s1%j,r1,R2)
-    !    endif
+        else
+
+    j=0
+    call alloc(junk)
+   junk=0.0_dp
+   call taylor_cycle(S1,size=mf)
+
+   do i=1,mf
+   call taylor_cycle(s1,ii=i,value=VALUE,j=J)
+         if(r1.gt.0.0_dp) then
+             VALUE = bran(R2)
+             if(VALUE.gt.r1) VALUE = 0.0_dp
+          elseif(r1.lt.0.0_dp) then
+             VALUE = int(1+10*bran(R2))
+             if(VALUE.gt.-ten*r1) VALUE = 0.0_dp
+          endif
+
+     junk=junk + (VALUE.mono.J)
+
+  enddo
+    s1=junk
+    call kill(junk)
+
+       endif
     !
   END SUBROUTINE TAYLOR_ran
 
-  SUBROUTINE  intd_taylor(S1,S2,factor)
-    implicit none
-    type (taylor),INTENT(inOUT)::S2
-    type (taylor),INTENT(IN)::S1(:)
-    real(dp),INTENT(IN):: factor
-    IF(.NOT.C_%STABLE_DA) RETURN
+! obsolete
+!  SUBROUTINE  intd_taylor(S1,S2,factor)
+!    implicit none
+!    type (taylor),INTENT(inOUT)::S2
+!   type (taylor),INTENT(IN)::S1(:)
+!    real(dp),INTENT(IN):: factor
+!    IF(.NOT.C_%STABLE_DA) RETURN
 
-    ! if(old) then
-    if(s1(1)%i==0) call crap1("intd_taylor 1")  !call etall1(s2%h%i)
-    CALL intd(S1%i,s2%i,factor)
-    !    else
-    !       if(.NOT. ASSOCIATED(s1(1)%j%r)) call crap1("intd_taylor 2")  !call etall1(s2%h%i)
-    !       CALL newintd(S1%j,s2%j,factor)
-    !    endif
-  END SUBROUTINE intd_taylor
+!    CALL intd(S1%i,s2%i,factor)
 
-  SUBROUTINE  DIFd_taylor(S2,S1,factor)
-    implicit none
-    type (taylor),INTENT(in)::S2
-    type (taylor),INTENT(INOUT)::S1(:)
-    real(dp),INTENT(IN):: factor
-    IF(.NOT.C_%STABLE_DA) RETURN
-    ! if(old) then
-    CALL DIFD(S2%i,s1%i,factor)
-    !    else
-    !       CALL NEWDIFD(S2%j,s1%j,factor)
-    !    endif
-  END SUBROUTINE DIFd_taylor
+!  END SUBROUTINE intd_taylor
+
+!  SUBROUTINE  DIFd_taylor(S2,S1,factor)
+!    implicit none
+!    type (taylor),INTENT(in)::S2
+!    type (taylor),INTENT(INOUT)::S1(:)
+!    real(dp),INTENT(IN):: factor
+!    IF(.NOT.C_%STABLE_DA) RETURN
+!
+!    CALL DIFD(S2%i,s1%i,factor)
+!
+!  END SUBROUTINE DIFd_taylor
 
 
   SUBROUTINE  CFU000(S2,FUN,S1)
@@ -3156,39 +3382,83 @@ endif
 
   END SUBROUTINE CFU000
 
-  SUBROUTINE  CFUR(S2,FUN,S1)
+  SUBROUTINE  DACFU_GTPSA(S2,FUN,S1)
     implicit none
     type (taylor),INTENT(INOUT)::S1
     type (taylor),INTENT(IN)::S2
-    complex(dp) FUN
-    EXTERNAL FUN
+    real(dp) VALUE
+    INTEGER MF,I,J(LNV)
+    type (taylor)   junk
+    interface
+       function fun(abc)
+         use precision_constants
+         implicit none
+         real(dp) fun
+         integer,dimension(:)::abc
+       end function fun
+    end interface
+
     IF(.NOT.C_%STABLE_DA) RETURN
-    ! if(old) then
-    if(s1%i==0) call crap1("CFUR  1" )  ! call etall1(s1%i)
-    CALL DACFUR(s2%i,FUN,s1%i)
-    !   else
-    !      if(.NOT. ASSOCIATED(s1%j%r))call crap1("CFUR  2" )  !  call newetall(s1%j,1)
-    !      CALL NEWDACFUR(s2%J,FUN,s1%J)
-    !   endif
+    j=0
+    call alloc(junk)
+   junk=0.0_dp
+   call taylor_cycle(S2,size=mf)
 
-  END SUBROUTINE CFUR
+   do i=1,mf
+   call taylor_cycle(s2,ii=i,value=VALUE,j=J)
+!   write(6,*) i,value
 
-  SUBROUTINE  CFUI(S2,FUN,S1)
+   if(value/=0.d0) then
+    junk=junk + fun(j)*(VALUE.mono.J)
+   endif
+  enddo
+    s1=junk
+    call kill(junk)
+  END SUBROUTINE DACFU_GTPSA
+
+  SUBROUTINE  CFU000_new (S2,FUN,S1)
     implicit none
     type (taylor),INTENT(INOUT)::S1
     type (taylor),INTENT(IN)::S2
-    complex(dp) FUN
+    real(dp) FUN
     EXTERNAL FUN
-    IF(.NOT.C_%STABLE_DA) RETURN
-    ! if(old) then
-    if(s1%i==0)call crap1("CFUI  1" ) ! call etall1(s1%i)
-    CALL DACFUI(s2%i,FUN,s1%i)
-    !    else
-    !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("CFUI  2" ) !call newetall(s1%j,1)
-    !       CALL NEWDACFUI(s2%J,FUN,s1%J)
-    !    endif
 
-  END SUBROUTINE CFUI
+    IF(.NOT.C_%STABLE_DA) RETURN
+      if(old_package) then
+          call CFU000 (S2,FUN,S1)
+         else
+            call DACFU_GTPSA(S2,FUN,S1)
+         endif
+
+  END SUBROUTINE CFU000_new
+
+! obsolete
+!  SUBROUTINE  CFUR(S2,FUN,S1)
+!    implicit none
+!    type (taylor),INTENT(INOUT)::S1
+!    type (taylor),INTENT(IN)::S2
+!    complex(dp) FUN
+!    EXTERNAL FUN
+!    IF(.NOT.C_%STABLE_DA) RETURN
+!
+!    if(s1%i==0) call crap1("CFUR  1" )  ! call etall1(s1%i)
+!    CALL DACFUR(s2%i,FUN,s1%i)
+!
+!  END SUBROUTINE CFUR
+
+! obsolete
+!  SUBROUTINE  CFUI(S2,FUN,S1)
+!    implicit none
+!    type (taylor),INTENT(INOUT)::S1
+!    type (taylor),INTENT(IN)::S2
+!    complex(dp) FUN
+!    EXTERNAL FUN
+!    IF(.NOT.C_%STABLE_DA) RETURN
+!    ! if(old) then
+!    if(s1%i==0)call crap1("CFUI  1" ) ! call etall1(s1%i)
+!    CALL DACFUI(s2%i,FUN,s1%i)
+!
+!  END SUBROUTINE CFUI
 
   SUBROUTINE  taylor_eps(r1)
     implicit none
@@ -3215,49 +3485,51 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        GETCHARnd2%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
     ndel=0
     !    call check(s1)
     call ass(GETCHARnd2)
 
-    call alloc(junk)
+
     resul = trim(ADJUSTR (s2))
 
     do i=1,lnv
        jfil(i)=0
     enddo
 
-    nd2par= len(trim(ADJUSTR (s2)))
+    nd2parfilter= len(trim(ADJUSTR (s2)))
 
     !frs get around compiler problem
     !frs    do i=1,len(trim(ADJUSTR (s2)))
-    do i=1,nd2par
+    do i=1,nd2parfilter
        CALL  CHARINT(RESUL(I:I),Jfil(I))
        if(i>nv) then
           if(Jfil(i)>0) then
              GETCHARnd2=0.0_dp
-             return
+          write(6,*) " error jfil(i)/=0 for .para. "
+               stop  101
+
           endif
        endif
 
     enddo
 
     !do i=nd2+ndel+1,nv
-    do i=nd2par+1,nv
+    do i=nd2parfilter+1,nv
        if(jfil(i)/=0) then
- 
+
          write(6,*) " error in getchar for .para. "
- 
+
           stop
        endif
     enddo
-
+    call alloc(junk)
     call cfu(s1,filter,junk)
 
-    !DO I=1,ND2+ndel
-    DO I=1,ND2par
+
+    DO I=1,nd2parfilter
        DO K=1,JFIL(I)
           JUNK=JUNK.K.I
        ENDDO
@@ -3280,7 +3552,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        GETintnd2%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
     !    call check(s1)
@@ -3291,16 +3563,17 @@ endif
     do i=1,lnv
        jfil(i)=0
     enddo
-    nd2par=size(s2)
+    nd2parfilter=size(s2)
     ndel=0
 
     !frs get around compiler problem
     !frs    do i=1,len(trim(ADJUSTR (s2)))
-    do i=1,nd2par
+    do i=1,nd2parfilter
        Jfil(I)=s2(i)
        if(i>nv) then
           if(Jfil(i)>0) then
              GETintnd2=0.0_dp
+          write(6,*) " error in i>nv for .para. "
              return
           endif
        endif
@@ -3308,19 +3581,17 @@ endif
     enddo
 
     !do i=nd2+ndel+1,nv
-    do i=nd2par+1,nv
+    do i=nd2parfilter+1,nv
        if(jfil(i)/=0) then
-
-          write(6,*) " error in GETintnd2 for .para. "
-          ! call !write_e(0)
-          stop
+          write(6,*) " error in jfil(i)/=0 for .para. "
+          stop 102
        endif
     enddo
 
     call cfu(s1,filter,junk)
 
     !DO I=1,ND2+ndel
-    DO I=1,ND2par
+    DO I=1,nd2parfilter
        DO K=1,JFIL(I)
           JUNK=JUNK.K.I
        ENDDO
@@ -3344,7 +3615,7 @@ endif
     IF(.NOT.C_%STABLE_DA) then
        GETintnd2t%i=0
       RETURN
-    endif 
+    endif
     localmaster=master
 
     !    call check(s1)
@@ -3375,7 +3646,7 @@ endif
     !do i=nd2+ndel+1,nv
     do i=nd2partt+1,nv
        if(jfilt(i)/=0) then
- 
+
             write(6,*) " error in GETintnd2t for .part_taylor. "
           ! call !write_e(0)
           stop
@@ -3398,8 +3669,22 @@ endif
 
   END FUNCTION GETintnd2t
 
-
   SUBROUTINE  taylor_cycle(S1,size,ii,VALUE,J)
+    implicit none
+    type (taylor),INTENT(IN)::S1
+    integer,optional, intent(inout):: size
+    integer,optional, intent(in):: ii
+    integer,optional, intent(inout)::J(:)
+    real(dp), OPTIONAL, intent(inout):: value
+     if(old_package) then
+      call taylor_cycle_dabnew(S1,size,ii,VALUE,J)
+     else
+      call taylor_cycle_gtpsa(S1,size,ii,VALUE,J)
+     endif
+  end SUBROUTINE  taylor_cycle
+
+
+  SUBROUTINE  taylor_cycle_dabnew(S1,size,ii,VALUE,J)
     implicit none
     type (taylor),INTENT(IN)::S1
     integer,optional, intent(inout):: size
@@ -3419,8 +3704,37 @@ endif
        stop 888
     ENDIF
 
-  END SUBROUTINE taylor_cycle
+  END SUBROUTINE taylor_cycle_dabnew
 
+  SUBROUTINE  taylor_cycle_gtpsa(S1,size,ii,VALUE,J)
+    implicit none
+    type (taylor),INTENT(IN)::S1
+    integer,optional, intent(inout):: size
+    integer,optional, intent(in):: ii
+    integer,optional, intent(inout)::J(:)
+    real(dp), OPTIONAL, intent(inout):: value
+    INTEGER err,ii_gtpsa
+    IF(.NOT.C_%STABLE_DA) RETURN
+    ! if(old) THEN
+    IF(PRESENT(J).AND.PRESENT(VALUE).and.present(ii)) THEN
+   !    call dacycle(S1%i,ii,value,illa,J)
+! GTPSA REMOVED !        ii_gtpsa=ii-1
+! GTPSA REMOVED !   VALUE=mad_tpsa_geti(S1%j,ii_gtpsa)
+! GTPSA REMOVED !  err=mad_tpsa_mono(S1%j,c_%nv,mo_gtpsa,ii_gtpsa)
+! GTPSA REMOVED !    j(1:c_%nv)=mo_gtpsa
+! GTPSA REMOVED !  if(err<0) then
+! GTPSA REMOVED !     write(6,*) " error in taylor_cycle_gtpsa "
+! GTPSA REMOVED !   stop
+! GTPSA REMOVED !  endif
+
+    ELSEif(present(size)) then
+! GTPSA REMOVED !       size=mad_desc_maxlen(d_berz)
+    else
+       write(6,*) "error in taylor_cycle"
+       stop 888
+    ENDIF
+
+  END SUBROUTINE taylor_cycle_gtpsa
 
  ! SUBROUTINE  taylor_clean(S1,VALUE)
  !   implicit none
@@ -3439,9 +3753,9 @@ endif
        endif
        iass0user(master)=0
     case(ndumt+1:)
- 
-         write(6,*) "Should not be here in check_snake" 
-  
+
+         write(6,*) "Should not be here in check_snake"
+
        ! call !write_e(101)
     end select
     master=master-1
@@ -3510,7 +3824,7 @@ endif
     do i=1,size(j)
        no=j(i)+no
     enddo
- 
+
     if(no>c_%no) then
        check_j=no
        return
@@ -3533,7 +3847,7 @@ endif
 
     filter=1.0_dp
     !do i=1,nd2+ndel
-    do i=1,nd2par
+    do i=1,nd2parfilter
        if(jfil(i)/=j(i)) filter=0.0_dp
     enddo
 
@@ -3597,7 +3911,7 @@ endif
       else
             if(present(pr))pr=.false.
       endif
-     else 
+     else
 
       write(mfi,*) " complex_quaternion "
     DO I=0,3
@@ -3616,7 +3930,7 @@ endif
      bmadparser=1
     call pri(S1,MFILE,prec,ind)
      bmadparser=0
-  
+
   end SUBROUTINE  print_for_bmad_parse
 
   SUBROUTINE  pri(S1,MFILE,prec,ind)
@@ -3656,7 +3970,7 @@ endif
           it=jc(i)+it
        enddo
        if(it==0.and.abs(value)>depst) then
-        kt=kt+1 
+        kt=kt+1
        endif
 
     enddo
@@ -3675,7 +3989,7 @@ endif
        enddo
        if(it==0.and.abs(value)>depst) then
         kl=kl+1
-        write(line,*) "{",indo,":",value,","  
+        write(line,*) "{",indo,":",value,","
         call context(line)
         do j=1,c_%nd2
          write(line(len_trim(line)+1:255),*)jc(j),"&"
@@ -3709,17 +4023,24 @@ endif
 
 
    else
-   
 
 
 
-    ! if(old) then
+
+     if(old_package) then
     if(print77) then
        CALL DAPRI77(s1%i,mfi)
     else
        CALL DAPRI(s1%i,mfi)
     endif
-
+    else
+      PREC1=0.0_dp
+      if(present(prec)) prec1=prec
+     if(mfi==6) then
+! GTPSA REMOVED !       call mad_tpsa_print(s1%j, "no name"//c_eos, prec1, 0, c_null);  ! 1 enleve le header nv, etc..
+       else
+     endif
+    endif
     !
 endif
     IF(PRESENT(prec))  CALL taylor_eps(PREC1)
@@ -3815,13 +4136,13 @@ endif
     implicit none
     type (UNIVERSAL_TAYLOR),INTENT(INOUT)::S2
     type (TAYLOR), intent(in):: s1
-    INTEGER ipresent,k,n,I,illa
+    INTEGER ipresent,k,n,I
     real(dp) value
     INTEGER, allocatable :: j(:)
     call check_snake
 
     ! if(old) then
-    if(s1%i==0)  call crap1("FILL_N 1")
+   ! if(s1%i==0)  call crap1("FILL_N 1")
     !    else
     !       IF (.NOT. ASSOCIATED(s1%j%r)) call crap1("FILL_N 2")
     !    endif
@@ -3830,12 +4151,12 @@ endif
     IF(ASSOCIATED(S2%N)) S2=-1
     S2=0
     ipresent=1
-    call dacycle(S1%I,ipresent,value,n)
+    call taylor_cycle(S1,n)
     CALL ALLOC_U(S2,N,c_%nv)
     allocate(j(c_%nv))
 
     do i=1,N
-       call dacycle(S1%I,i,value,illa,j)
+       call taylor_cycle(S1,ii=i,value=value,j=j)
        S2%C(I)=value
        DO k=1,S2%NV
           S2%J(i,k)=J(k)
@@ -3857,7 +4178,7 @@ endif
     logical(lp) DOIT
 
     ! if(old) then
-    if(s1%i==0)  call crap1("REFILL_N 1")
+    !if(s1%i==0)  call crap1("REFILL_N 1")
     !    else
     !       IF (.NOT. ASSOCIATED(s1%j%r)) call crap1("REFILL_N 2")
     !    endif
@@ -3866,7 +4187,7 @@ endif
     S1=0.0_dp
 
     IF(.not.ASSOCIATED(S2%N)) THEN
- 
+
          write(6,*) " ERROR IN REFILL_N: UNIVERSAL_TAYLOR DOES NOT EXIST"
        ! call !write_e(123)
     ENDIF
@@ -3898,9 +4219,11 @@ endif
   subroutine printunitaylor(ut,iunit)
     implicit none
     type(universal_taylor) :: ut
-    integer                :: iunit
+    integer, optional               :: iunit
     integer                :: i,ii
-
+    integer inuit0
+    inuit0=6
+    if(present(iunit)) inuit0=iunit
     if (.not. associated(ut%n)) then
        write(iunit,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSOCIATED)'
        write(6,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSOCIATED)'
@@ -3937,11 +4260,11 @@ endif
   subroutine crap1(STRING)
     implicit none
     CHARACTER(*) STRING
- 
- 
+
+
       write(6,*) "ERROR IN :"
       write(6,*) STRING
- 
+
 
   end subroutine crap1
 
@@ -3949,7 +4272,7 @@ endif
     implicit none
     integer i(1),j
 
- 
+
     write(6,*) " You are using a kind(1.0_dp) "
     write(6,*)" set real_warning to false to permit this "
     write(6,*)" write 1 to continue or -1 for a crash "
@@ -3965,10 +4288,10 @@ endif
     integer ipause,II(0:1)
 
 
- 
- 
+
+
       write(6,*)  " *  Should never be here in New Linked List Scheme               *"
- 
+
     call read(ipause)
     ii(2000*ipause)=0
 
@@ -4172,7 +4495,7 @@ endif
        iass0user(i)=0
     enddo
     ! if(old) then
-    CALL ETALL1(DUMMY)
+!    CALL ETALL1(DUMMY)
  !   call etall1(temp)
     call alloc(temp)
     !    else
@@ -4190,7 +4513,7 @@ endif
        iass0user(i)=0
     enddo
     ! if(old) then
-    CALL DADAL1(DUMMY)
+!    CALL DADAL1(DUMMY)
     call kill(temp)
 !    call DADAL1(temp)
     !    else
@@ -4218,6 +4541,8 @@ endif
     !    write(26,*) "   taylor ",master
     call ass0(s1)
 
+! GTPSA REMOVED !    if(.not.old_package) call mad_tpsa_clear(s1%j)
+
   end subroutine ASStaylor
 
   subroutine ass0(s1)
@@ -4238,11 +4563,11 @@ endif
     ELSE
        scratchda(master)%PRESENT=>scratchda(master)%PRESENT%NEXT
     ENDIF
-    ! if(old) then
+     if(old_package) then
     s1%i=scratchda(master)%PRESENT%T%i
-    !    else
-    !       s1%j=scratchda(master)%PRESENT%T%j
-    !    endif
+        else
+! GTPSA REMOVED !           s1%j=scratchda(master)%PRESENT%T%j
+        endif
 
 
   end subroutine ASS0
@@ -4262,13 +4587,12 @@ endif
 
     call alloc(t)
     t=0.0_dp
-    ipresent=1
-    call dacycle(S1%I,ipresent,value,n)
 
+     call taylor_cycle(s1,size=n)
     allocate(j(c_%nv))
 
     do i=1,N
-       call dacycle(S1%I,i,value,illa,j)
+       call taylor_cycle(S1,ii=i,value=value,j=j)
        if(abs(value)>prec) then
           t=t+(value.mono.j)
        endif
@@ -4285,7 +4609,7 @@ endif
     type (pbfield),INTENT(INOUT)::S2
     type (pbfield), intent(INOUT):: s1
     real(dp) prec
-     
+
     call clean_taylor(s1%h,s2%h,prec)
 
   END SUBROUTINE clean_pbfield
@@ -4295,7 +4619,7 @@ endif
     type (pbresonance),INTENT(INOUT)::S2
     type (pbresonance), intent(INOUT):: s1
     real(dp) prec
-     
+
     call clean_pbfield(s1%cos,s2%cos,prec)
    call clean_pbfield(s1%sin,s2%sin,prec)
 
@@ -4406,13 +4730,13 @@ r2 = x**2 + y**2
 km0=15
 if(present(km)) km0=km
 scale = 1.0_dp/2**n !/ (2**n * factorial(n))
-  
+
 
 do k=1,n
 scale=scale/k
 enddo
 
- 
+
 
 ! Close to origin case.
 ! Crossover point is hurestically derived for n <= 30
@@ -4427,7 +4751,7 @@ enddo
   do k = 1, nk_max
     r2k = r2k * rr2
     denom = denom * k * (n + k)
-    dval = r2k / denom 
+    dval = r2k / denom
     value = value + dval
     dvalo=dval
   if(done) then
@@ -4477,13 +4801,13 @@ r2 = x**2 + y**2
 km0=15
 if(present(km)) km0=km
 scale = 1.0_dp/2**n !/ (2**n * factorial(n))
-  
+
 
 do k=1,n
 scale=scale/k
 enddo
 
- 
+
 
 ! Close to origin case.
 ! Crossover point is hurestically derived for n <= 30
@@ -4498,7 +4822,7 @@ enddo
   do k = 1, nk_max
     r2k = r2k * rr2
     denom = denom * k * (n + k)
-    dval = r2k / denom 
+    dval = r2k / denom
     value = value + dval
     dvalo=dval
   if(done) then
@@ -4526,7 +4850,7 @@ function etienne_bessel_Itr(n, x, y,km) result (value)
 
 implicit none
 
-type(taylor) x 
+type(taylor) x
 type(taylor)   r2, rr2, denom, r2k, r, scale, dval, value,dvalo
 real(dp) eps,y
 integer, optional :: km
@@ -4550,13 +4874,13 @@ r2 = x**2 + y**2
 km0=15
 if(present(km)) km0=km
 scale = 1.0_dp/2**n !/ (2**n * factorial(n))
-  
+
 
 do k=1,n
 scale=scale/k
 enddo
 
- 
+
 
 ! Close to origin case.
 ! Crossover point is hurestically derived for n <= 30
@@ -4571,7 +4895,7 @@ enddo
   do k = 1, nk_max
     r2k = r2k * rr2
     denom = denom * k * (n + k)
-    dval = r2k / denom 
+    dval = r2k / denom
     value = value + dval
     dvalo=dval
   if(done) then
@@ -4623,13 +4947,13 @@ r2 = x**2 + y**2
 km0=15
 if(present(km)) km0=km
 scale = 1.0_dp/2**n !/ (2**n * factorial(n))
-  
+
 
 do k=1,n
 scale=scale/k
 enddo
 
- 
+
 
 ! Close to origin case.
 ! Crossover point is hurestically derived for n <= 30
@@ -4644,7 +4968,7 @@ enddo
   do k = 1, nk_max
     r2k = r2k * rr2
     denom = denom * k * (n + k)
-    dval = r2k / denom 
+    dval = r2k / denom
     value = value + dval
     dvalo=dval
   if(done) then
@@ -4675,7 +4999,7 @@ end function etienne_bessel_Irt
 !+
 ! Function norm_bessel_I(n, x, y) result (value)
 !
-! Routine to return the normalized bessel function defined to be 
+! Routine to return the normalized bessel function defined to be
 !   I_n(r) / r^n
 ! where I_n is the standard modified Bessel function of the first kind of order n and
 !   r^2 = x^2 + y^2
@@ -4727,7 +5051,7 @@ if (r2 < 2.28 * (n+7)) then
   do k = 1, nk_max
     r2k = r2k * rr2
     denom = denom * k * (n + k)
-    dval = r2k / denom 
+    dval = r2k / denom
     value = value + dval
     if (dval < 1d-16 * value) exit
     if (k == nk_max) then
@@ -4915,7 +5239,7 @@ end function
     implicit none
     TYPE (taylor) nbittaylortr
     TYPE (taylor), INTENT (IN) :: x
-    real(dp) y 
+    real(dp) y
     integer, INTENT (IN) :: n
     integer localmaster
     IF(.NOT.C_%STABLE_DA) then
@@ -4963,7 +5287,7 @@ end function
   FUNCTION nbittaylor( n,x,y )
     implicit none
     TYPE (taylor) nbittaylor
-    TYPE (taylor), INTENT (IN) :: x,y 
+    TYPE (taylor), INTENT (IN) :: x,y
     integer, INTENT (IN) :: n
     integer localmaster
     IF(.NOT.C_%STABLE_DA) then
@@ -4986,7 +5310,7 @@ end function
   FUNCTION nbitreal( n,x,y )
     implicit none
     real(dp) nbitreal
-    real(dp),  INTENT (IN) :: x,y 
+    real(dp),  INTENT (IN) :: x,y
     integer, INTENT (IN) :: n
 
     if(switch_bessel) then
@@ -4997,13 +5321,13 @@ end function
      nbitreal=nbi_david(n,x,y)
 
     endif
- 
+
     END FUNCTION nbitreal
 
   FUNCTION nbit( n,x,y )
     implicit none
     TYPE (taylor) nbit
-    TYPE (taylor), INTENT (IN) :: x,y 
+    TYPE (taylor), INTENT (IN) :: x,y
     integer, INTENT (IN) :: n
     integer localmaster,i
     TYPE (taylor) t,dx,tn
@@ -5013,7 +5337,7 @@ end function
      RETURN
     endif
     localmaster=master
-    
+
     call ass(nbit)
     call alloc(dx,tn)
 
@@ -5026,7 +5350,7 @@ end function
      do i=1,no
       tn=tn*dx
       fac=fac/i/2.0_dp
-      div=nbi_david(n+i,x0,y0)*fac 
+      div=nbi_david(n+i,x0,y0)*fac
       nbit=nbit+tn*div
      enddo
 
@@ -5038,7 +5362,7 @@ end function
 FUNCTION nbitrt( n,xx,y )
     implicit none
     TYPE (taylor) nbitrt
-    TYPE (taylor), INTENT (IN) :: y 
+    TYPE (taylor), INTENT (IN) :: y
     real(dp), INTENT (IN) :: xx
     integer, INTENT (IN) :: n
     integer localmaster,i
@@ -5049,7 +5373,7 @@ FUNCTION nbitrt( n,xx,y )
      RETURN
     endif
     localmaster=master
-    
+
     call ass(nbitrt)
     call alloc(x)
       x=xx
@@ -5074,7 +5398,7 @@ FUNCTION nbittr( n,x,yy )
      RETURN
     endif
     localmaster=master
-    
+
     call ass(nbittr)
     call alloc(y)
       y=yy

@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:55:13      +
+  + Execution date: 2020.07.29 16:31:50      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! reads the user privided one turn matrix via command parameters
 
@@ -931,10 +931,10 @@ Determined SECTOR NMUL MAX :  2
        78.54370266       0.1241077907         3.17138227           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.6258930386        2.838575681       0.8200596199 
+          -1000000      -0.6258930496        2.838575681       0.8200596199 
 
                 q2                dq1                dq2                 qs 
-      0.7198292803       -4.353247388       -9.482230836                  0 
+      0.7198292803       -4.353247483       -9.482231044                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282153606        15.12420824        1.633285386        20.07025827 
@@ -943,19 +943,19 @@ Determined SECTOR NMUL MAX :  2
        3.282153606        15.12420824                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-    6.23622028e-07        424.5320396                  0                  0 
+   6.227109887e-07        424.5320544                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
        1.633285386        20.07025827                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
-   2.799154326e-07        129.3455587                  0                  0 
+   2.796621084e-07         129.345562                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11653        -20.6041753      0.00118704765 
+                 1        38793.12038       -20.60417565     0.001186971204 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086228281        9.086227476                  0                  0 
+      -9.086228374        9.086227476                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 
@@ -967,16 +967,16 @@ Determined SECTOR NMUL MAX :  2
                  0    2.512911304e-08                  0    4.205036582e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    3.754739541e-08                  0    5.077465416e-08 
+                 0     3.75473955e-08                  0    5.077465416e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.192583567e-08                  0    1.059678691e-07 
+                 0    1.192583567e-08                  0    1.059678694e-07 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0   -2.737736087e-08                  0   -1.115555338e-08 
 
            pycomin             tcomin            ptcomin 
-                 0   -2.737139471e-08                  0 
+                 0    -2.73713987e-08                  0 
   
 
   

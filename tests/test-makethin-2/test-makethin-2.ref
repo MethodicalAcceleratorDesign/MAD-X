@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.13 19:25:46      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:23:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
@@ -66,8 +66,8 @@ final orbit vector:     4.820013E-09 -1.038276E-09  0.000000E+00  0.000000E+00 -
      synch_2      synch_3      synch_4      synch_5 
     0.000000     0.000000     0.000000     0.000000 
 
-      nflips 
-    0.000000 
+     synch_6      synch_8       nflips 
+    0.000000     0.000000     0.000000 
 
 
 ! convert to THIN
@@ -117,8 +117,8 @@ final orbit vector:     4.657226E-09 -1.019559E-09  0.000000E+00  0.000000E+00 -
      synch_2      synch_3      synch_4      synch_5 
     0.000000     0.000000     0.000000     0.000000 
 
-      nflips 
-    0.000000 
+     synch_6      synch_8       nflips 
+    0.000000     0.000000     0.000000 
 save,sequence=lhcb1,file="V6.5.thin.b1.seq";
 
 ++++++ warning: SAVE makes all previous USE invalid !  

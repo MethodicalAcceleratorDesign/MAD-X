@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:56:54      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:24:25      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test case for coupling calculations
 
@@ -248,7 +248,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
       0.0228849519                  0                  0         3.81146767 
 
                dq2            betymax              dymax              dyrms 
-    -0.00452488212        27.21066085    1.254832134e-05     5.96279526e-06 
+    -0.00452488212        27.21066085    1.254832134e-05    5.962795259e-06 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -256,8 +256,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
   Number of warnings: 0
 

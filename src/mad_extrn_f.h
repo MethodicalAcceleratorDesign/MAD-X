@@ -133,6 +133,7 @@
 // from mad_seq.c
 #define restart_sequ restart_sequ_
 #define get_nnodes get_nnodes_
+#define get_ncavities get_ncavities_
 
 // from mad_table.c
 // warning:augment_counts is provided by madx_ptc_knobs.f90
@@ -283,6 +284,7 @@ void trrun_(F_INTEGER switch_, F_INTEGER turns, F_DOUBLE orbit0, F_DOUBLE rt, F_
 	    F_INTEGER last_turn, F_DOUBLE last_pos, F_DOUBLE z, F_DOUBLE dxt, F_DOUBLE dyt,
 	    F_DOUBLE last_orbit, F_DOUBLE eigen, F_DOUBLE coords, F_INTEGER e_flag,
 	    F_INTEGER code_buf, F_DOUBLE l_buf);
+void trbegn_(F_DOUBLE rt, F_DOUBLE eigen);
 
 // from twiss.f90
 void tmrefe_(F_DOUBLE rf);

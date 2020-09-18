@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.13 23:11:56      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.08.10 13:26:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-warn,-info;
 
@@ -32,7 +32,7 @@ orbit:  -2.314121E-09 -7.003851E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
         26658.8832                 -0    0.0003216341688        55.75950505 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000068        2.000000105        595.1194009        2.859817201 
+       64.28000068        2.000000105         595.119401        2.859817201 
 
              dxrms             xcomax             xcorms                 q2 
        1.396821986     3.33542306e-08    8.590562235e-09        59.31000011 
@@ -46,8 +46,8 @@ orbit:  -2.314121E-09 -7.003851E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 Use, period=lhcb1;
 
 twiss;
@@ -63,7 +63,7 @@ orbit:  -2.314121E-09 -7.003851E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
         26658.8832                 -0    0.0003216341688        55.75950505 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000068        2.000000105        595.1194009        2.859817201 
+       64.28000068        2.000000105         595.119401        2.859817201 
 
              dxrms             xcomax             xcorms                 q2 
        1.396821986     3.33542306e-08    8.590562235e-09        59.31000011 
@@ -77,11 +77,11 @@ orbit:  -2.314121E-09 -7.003851E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ibs,file="ibs-table.tfs";
 
- sige    4.6800203460590855E-004
+ sige    4.6800203460593836E-004
  Twiss was calculated at the exit of the elements.
  Twiss functions at the center of the elements are calculated through linear interpolation
 
@@ -92,7 +92,7 @@ radiate = F:
      C           26658.883200 m              f0              0.011245 MHz            T0             88.924656 microseconds
      alfa            0.321634E-03            eta             0.317287E-03            gamma(tr)      55.759505
      Bcurrent        0.000198 A/bunch        Kbunch         1                        Npart           0.110000E+12 per bunch
-     E             450.000000 GeV            gamma         479.605020                beta            0.999998
+     E             450.000000 GeV            gamma         479.605016                beta            0.999998
 
  Emittances:
 

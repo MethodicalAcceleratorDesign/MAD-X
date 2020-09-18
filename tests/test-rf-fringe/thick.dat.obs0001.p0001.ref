@@ -1,0 +1,10 @@
+@ NAME             %19s "TRACK.OBS0001.P0001"
+@ TYPE             %08s "TRACKOBS"
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "16.24.26"
+*     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
+$         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
+          1          0               0.01                  0               0.02                  0                  0                  0                  0                 10
+          1          1       0.0100209617    4.192519448e-05      0.02004192339    8.385038897e-05   -1.977340183e-09   -4.392337536e-09                  0                 10

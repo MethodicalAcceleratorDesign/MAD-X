@@ -191,7 +191,8 @@ exec_chdir(struct in_cmd* cmd)
 
   char* dir = command_par_string_user("dir", cmd->clone);
   if (dir) {
-    chdir(dir);
+    if (chdir(dir)!= 0)
+      warning("no directory with name:", dir);
   }
   else warning("chdir without dirname:", "ignored");
 }

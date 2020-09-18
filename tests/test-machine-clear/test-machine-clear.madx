@@ -69,11 +69,13 @@ match, use_macro;
       !
       !
       !! min bet* at ACS0640
-      constraint, weight=10000, expr=table(twiss, CA.WFM0645, betx) < 5; 
-      constraint, weight=10000, expr=table(twiss, CA.WFM0645, bety) < 5; 
-      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfx) < 0.1 ; 
-      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfy) < 0.1 ; 
+      constraint, weight=10000, expr=table(twiss, CA.WFM0645, betx) = 5; 
+      constraint, weight=10000, expr=table(twiss, CA.WFM0645, bety) = 5; 
+      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfx) = 0.1 ; 
+      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfy) = 0.1 ; 
       !
+
+
       !! min beta* at CA.MTV0730
       constraint, weight=1000, expr=table(twiss, CA.BTV0730, betx) < 25; 
       constraint, weight=1000, expr=table(twiss, CA.BTV0730, bety) < 25; 
@@ -88,7 +90,7 @@ match, use_macro;
 
 
      !!!! minimisation method !!!!!!!!!!!!!!!
-      lmdif,   tolerance:=1e-06, calls:=10000;
+      lmdif,   tolerance:=1e-12, calls:=10000;
 !      simplex,  tolerance:=1e-09, calls:=1000;
 !      lmdif,    tolerance:=1e-09, calls:=1000;
 !      jacobian, tolerance:=1e-09, calls:=1000;

@@ -310,7 +310,7 @@ subroutine pefill(ierr)
   !----------------------------------------------------------------------*
   integer, intent(OUT) :: ierr
 
-  integer :: i, j, k, l, nint, new1, new2, currtyp, crow, pltyp, pos_flag
+  integer :: i, j, k, l, nint, new1, new2, currtyp, crow, pltyp, pos_flag, warn
   integer :: ilist(mtype), p(mxplot), proc_n(2, mxcurv)
   double precision :: fact, d_val, d_val1
   double precision :: currpos, currleng, currtilt
@@ -334,6 +334,9 @@ subroutine pefill(ierr)
 
   !--- Initialize return code
   ierr = 0
+
+  !-- Retrieve warn value
+  warn = get_option('warn ')
 
   !--- Initialize marker_plot logical
   marker_plot = get_value('plot ','marker_plot ') .ne. zero
@@ -460,12 +463,14 @@ subroutine pefill(ierr)
         ! for codes 1 to 8 only and elements with length
         if (currleng.gt.0.d0 .and. currtyp.gt.1 .and. currtyp.lt.8) then
            currtilt = node_value('tilt ')
+           call set_option('warn ', 0) !-- LD: hugly fix as this code always expect a twiss table...
            k = double_from_table_row(tabname, 'k1l ' , j, currk1l);  currk1l  = currk1l /currleng
            k = double_from_table_row(tabname, 'k1sl ', j, currk1sl); currk1sl = currk1sl/currleng
            k = double_from_table_row(tabname, 'k2l ' , j, currk2l);  currk2l  = currk2l /currleng
            k = double_from_table_row(tabname, 'k2sl ', j, currk2sl); currk2sl = currk2sl/currleng
            k = double_from_table_row(tabname, 'k3l ' , j, currk3l);  currk3l  = currk3l /currleng
            k = double_from_table_row(tabname, 'k3sl ', j, currk3sl); currk3sl = currk3sl/currleng
+           call set_option('warn ', warn)
         endif
 
         !--- sbend, rbend
@@ -2359,7 +2364,7 @@ subroutine plginit
   integer :: ipseps, iset=0, nint, ndble, k, int_arr(100), char_l(100)
   double precision :: d_arr(100)
   real :: tmpval
-  character(len=40) :: char_a
+  character(len=120) :: char_a !hbu increased from len=40 to 120 as required below
 
   !--- definitions of function primitives
   double precision, external :: plot_option

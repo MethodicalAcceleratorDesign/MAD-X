@@ -1873,10 +1873,7 @@ static void pro_correct_option(struct in_cmd* cmd)
 
 static int pro_correct_getcommands(struct in_cmd* cmd) {
 
-  static char att[10][8] = { "iterate", "plane", "ncorr", "error", "clist",
-           "mlist", "flag", "mode", "", "" };
-
-  static int iplane = 1;
+  int iplane = 1;
   char plane[20];
 
   if (get_option("debug"))
@@ -1887,7 +1884,7 @@ static int pro_correct_getcommands(struct in_cmd* cmd) {
     return (-1);
   }
 
-  strcpy(plane, command_par_string(att[1], cmd->clone));
+  strcpy(plane, command_par_string("plane", cmd->clone));
   if      (strcmp("x", plane) == 0) iplane = 1;
   else if (strcmp("y", plane) == 0) iplane = 2;
   else if (strcmp("h", plane) == 0) iplane = 1;
@@ -1897,7 +1894,7 @@ static int pro_correct_getcommands(struct in_cmd* cmd) {
     iplane = 1;
   }
 
-  return (iplane);
+  return iplane;
 }
 
 static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
@@ -1915,8 +1912,8 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 
   int j;
 
-  int cntm = { 0 };
-  int cntc = { 0 };
+  int cntm = 0;
+  int cntc = 0;
 
   double ounits;
 
@@ -2177,7 +2174,7 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
 	  rx = m->val.before[0];
 	  ry = m->val.before[1];
 	  if (debug) printf("\nA: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
-	  m->val.before[0] = rx * cos(dpsi) + ry * sin(dpsi);
+	  m->val.before[0] =  rx * cos(dpsi) + ry * sin(dpsi);
 	  m->val.before[1] = -rx * sin(dpsi) + ry * cos(dpsi);
 	  if (debug) printf("B: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
 	  m->val.before[0] += m->p_node->p_al_err->a[6] * 1000.;

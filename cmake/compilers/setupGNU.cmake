@@ -9,19 +9,22 @@ if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     # General:
     set(CMAKE_Fortran_FLAGS " -fno-range-check -fno-f2c -cpp ") # remove -g -O2 from main list
     execute_process(COMMAND ${CMAKE_Fortran_COMPILER} --version OUTPUT_VARIABLE CMAKE_Fortran_COMPILER_VERSION)
-    string(REGEX MATCH "[3-9].[0-9].[0-9]" CMAKE_Fortran_COMPILER_VERSION ${CMAKE_Fortran_COMPILER_VERSION})
+    string(REGEX MATCH "1?[0-9].[0-9].[0-9]" CMAKE_Fortran_COMPILER_VERSION ${CMAKE_Fortran_COMPILER_VERSION})
     if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER 4.3.9)
         add_definitions(-D_GFORTRAN)
+    endif()
+    if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 10.0.0)
+        set(CMAKE_Fortran_FLAGS "-fallow-invalid-boz ${CMAKE_Fortran_FLAGS}")
     endif()
     # Release flags:
     # ON APPLE machines and on 32bit Linux systems, -O2 seems to be the highest optimization level possible
     # for file l_complex_taylor.f90
     if(APPLE OR IS32BIT)
         if (${CMAKE_Fortran_COMPILER_VERSION} VERSION_LESS 4.6)
-          set(CMAKE_Fortran_FLAGS_RELEASE "-O1")
+          set(CMAKE_Fortran_FLAGS_RELEASE "-O1 ${CMAKE_Fortran_FLAGS_RELEASE}")
         endif()
     else()
-        set(CMAKE_Fortran_FLAGS_RELEASE "-O4")
+        set(CMAKE_Fortran_FLAGS_RELEASE "-O4 ${CMAKE_Fortran_FLAGS_RELEASE}")
     endif()
     set(CMAKE_Fortran_FLAGS_RELEASE "-funroll-loops ${CMAKE_Fortran_FLAGS_RELEASE}")
 

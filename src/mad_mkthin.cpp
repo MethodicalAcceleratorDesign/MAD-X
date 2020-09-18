@@ -11,6 +11,7 @@
  2016 : Extra markers, sbend_from_rbend transmit aper_tol
  2018 : Thick solenoid slicing, write bend angle to multipole if different from k0*l
  2019 : New elements from element definition, all attributes enabled
+ 2020 : Tapering, wire compensation
 
  */
 
@@ -45,6 +46,7 @@ namespace MaTh
   static unsigned int Verbose;
   static const std::vector<std::string> DoNotCopy ={"l","lrad","slot_id","assembly_id","slice","comments"};
   static const std::vector<std::string> DoNotCopy2=           {"slot_id","assembly_id"};
+  static const std::vector<std::string> WireCollimatorParmList={"xma","yma","closed_orbit", "current", "l_phy", "l_int"};
   static char ExtraChar='_';
 }
 
@@ -151,11 +153,14 @@ private:
   double hybrid_at_shift(const int slices, const int slice_no) const;
   double at_shift(const int slices, const int slice_no,const std::string local_slice_style) const; // return at relative shifts from centre of unsliced magnet
   void kn_ks_from_thick_elem(const element* thick_elem,command_parameter* kn_pars[4],command_parameter* ks_pars[4]) const; // read k0-k3, k0s-k3s in thick_elem and put them in kn_pars, ks_pars
-  command_parameter* make_k_list(const std::string parnam,command_parameter* k_pars[4],command_parameter* k_param) const; // from k values 0-3 to  expr lists
-  element* new_marker_element(const std::string el_name, const element* el_inp);
+  void add_ktap(command_parameter* k_param,const element* thick_elem);
+  void add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem);
+  command_parameter* make_k_list(const std::string parnam,command_parameter* k_pars[4]) const; // from k values 0-3 to  expr lists
+  element*   new_marker_element(const std::string el_name, const element* el_inp);
+  element*  create_wire_element(const element* thick_elem, int slice_no);
   element*        sbend_from_rbend(element* rbend_el);
   element*      create_thick_slice(const element* thick_elem,const int slice_type);
-  element*    create_sliced_magnet(const element* thick_elem, int slice_no,bool ThickSLice);
+  element*      create_thin_slices(const element* thick_elem, int slice_no);
   element*    create_thin_solenoid(const element* thick_elem, int slice_no);
   element* create_thin_elseparator(const element* thick_elem, int slice_no);
   element*   create_sliced_element(const element* thick_elem, int slice_no);
@@ -163,11 +168,14 @@ private:
   void finish_make_sliced_elem(element*& sliced_elem, const element* thick_elem, command* cmd, const std::string parent_name, int slice_no); // final common steps
   void slice_node_translate();  // slice/translate and add slices to sliced sequence
   void slice_node_default();    // like collimator and add slices to sliced sequence
+  void slice_attributes_to_slice(command* cmd,const element* thick_elem); // deal with attributes like kick
   void place_thick_slice(const element* thick_elem, element* sliced_elem, const int i);
   void place_start_or_end_marker(const bool at_start);
   node* copy_thin(node* thick_node);
   node* thick_node;  // current node, that is considered for slicing
   node*  work_node;  // clone of thick_node for non-destructive rbend->sbend translation
+  const element* thick_elem_sliced; // last thick_elem sliced
+  command_parameter *knl_param, *kns_param;
   SequenceList* theSequenceList;
   sequence *sliced_seq;
   std::string seqname; // name of the sequence
@@ -208,7 +216,12 @@ ElmAttr::ElmAttr(const element* el) // constructor
       On.push_back( el_cmd->par_names->inform[i] );
     }
     bool look_at_parent=true;
-    if(look_at_parent && el->parent && el != el->parent && std::string(el->parent->name) != std::string(el->parent->base_type->name) ) TurnOnActive(el->parent);
+    element* el_parent= el->parent;
+    while (look_at_parent && el_parent && el != el_parent && std::string(el_parent->name) != std::string(el_parent->base_type->name) )
+    {
+      TurnOnActive(el_parent);
+      el_parent=el_parent->parent; // check recursively through parents
+    }
   }
 }
 
@@ -287,26 +300,54 @@ static std::vector<std::string> str_v_join(const std::vector<std::string> v1,con
 
 static double my_get_expression_value(expression* ex) // check for NULL and update the value as done in dump_expression
 {
-  double result=0;
   if(ex)
   {
-    result = expression_value(ex, 2); // get valie
-    ex->value = result; // also make sure the value stored agrees with the expression
+    //if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ex->value=" << ex->value << " ex->status=" << ex->status << std::endl;
+    ex->value = expression_value(ex, 2); // get/update value, makes sure the value stored agrees with the expression
+    //if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ex->value=" << ex->value << " ex->status=" << ex->status << std::endl;
   }
-  return result;
+  return ex->value; // no expression, just value
 }
 
-static std::string my_dump_expression(expression* ex) // dump_expression in mad_expr.c only prints the value, here show also the expression and check for NULL
+static std::string my_dump_expression(expression* ex,bool detailed=false) // dump_expression in mad_expr.c only prints the value, here show also the expression and check for NULL
 {
   std::ostringstream ostr;
+  // if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << std::endl;
   ostr << std::setprecision(15) << "expression ";
   if(ex==nullptr) ostr << " is nullptr";
   else
   {
     if(ex->string) ostr << " string=" << std::left << std::setw(MaTh::el_name_maxlen) << ex->string << std::right;
-    ostr << " value=" << std::setw(8) << my_get_expression_value(ex);
+    if(detailed) ostr << " status=" << ex->status;
+    if(detailed) ostr << " polish=" << ex->polish;
+    if(detailed) ostr << " value=" << std::setw(8) << ex->value;
+    if(detailed) ostr << " my_get_expression_value=" << std::setw(8) << my_get_expression_value(ex);
+    else ostr << " value=" << std::setw(8) << my_get_expression_value(ex);
   }
   return ostr.str();
+}
+
+static expression* expr_from_value(double value)
+{
+  std::ostringstream ostr;
+  ostr << std::setprecision(15) << value; // use the value as string
+  char exprstring[80];
+  strcpy(exprstring,ostr.str().c_str());
+  expression* expr = new_expression(exprstring, deco); // where deco is a global. Seems expression value not well defined
+  // expression* expr = new_expression(exprstring, nullptr); // where deco is a global. Seems expression value not well defined
+  // expression* expr = new_expression(ostr.str().c_str(), nullptr); // where deco is a global. Seems expression value not well defined
+  expr->value=value;
+  expr->status=1;
+  return expr;
+}
+
+static expression* expr_from_value_2(double value)
+{
+  std::ostringstream ostr;
+  ostr << std::setprecision(15) << value; // use the value as string
+  expression* new_expr = new_expression(ostr.str().c_str(), deco); // where deco is a global.
+  new_expr = compound_expr( new_expr,0,"+",0,0,1); // trick to update value
+  return new_expr;
 }
 
 static double my_get_int_or_double_value(const element* el,const std::string parnam,bool &found) // works for integer and double, also useful as   my_get_int_or_double_value(el->base_type,char* parnam);  to get the default values
@@ -367,7 +408,7 @@ static std::string my_dump_command_parameter(const command_parameter* cp) // dum
 {
   std::ostringstream ostr;
   ostr << std::setprecision(15) << "my_dump_command_parameter ";
-  if(cp==nullptr) ostr << " is NULL";
+  if(cp==nullptr) ostr << " is nullptr" << '\n';
   else
   {
     ostr << "parameter:" << std::left << std::setw(MaTh::par_name_maxlen) << cp->name;
@@ -380,15 +421,15 @@ static std::string my_dump_command_parameter(const command_parameter* cp) // dum
       case k_logical:
         ostr << "logical: ";
         if( (int) cp->double_value) ostr << "true"; else ostr << "false";
-        ostr << '\n';
+        ostr << std::endl;
         break;
       case k_int:    // int    value of expression, actually same as double value
       case k_double: // double value of expression
-        if(cp->expr) ostr << my_dump_expression(cp->expr); else ostr << " expression=NULL ";
+        if(cp->expr) ostr << my_dump_expression(cp->expr); else ostr << " expression=nullptr ";
         if(cp->call_def) default_val=cp->call_def->double_value;
         if(cp->expr==nullptr && fabs(cp->double_value-default_val)>eps)
           ostr << " value=" << std::setw(10) << cp->double_value << " default=" << std::setw(10) << default_val;
-        ostr << '\n';
+        ostr << std::endl;
         break;
       case k_int_array:    // int array,     expr_list
       case k_double_array: // double array,  expr_list, used for example for Aperture, http://mad.web.cern.ch/mad/madx.old/Introduction/aperture.html
@@ -399,19 +440,22 @@ static std::string my_dump_command_parameter(const command_parameter* cp) // dum
             ostr << "array of " << cp->double_array->curr << "  ";
             for (int ei = 0; ei < cp->double_array->curr; ++ei)
             {
-              if (ei < cp->expr_list->curr && cp->expr_list->list[ei] != NULL)
+              if (ei < cp->expr_list->curr && cp->expr_list->list[ei] != nullptr)
               {
                 ostr << std::right << std::setw(3) << ei << " :" << std::left << my_dump_expression(cp->expr_list->list[ei]) << std::right; // show expression and value
               }
+              else ostr << std::right << std::setw(3) << ei << " is nullptr ";
             }
+            ostr << "double array:";
+            for (int ei = 0; ei < cp->double_array->curr; ++ei) ostr << cp->double_array->a[ei] << " ";
           }
         }
-        ostr << '\n';
+        ostr << std::endl;
         break;
       case k_cstring:
         ostr << "cstring:";
         if(cp->string) ostr << cp->string; else ostr << " NULL";
-        ostr << '\n';
+        ostr << std::endl;
         break;
       case k_cstring_array: // string array
         dump_char_p_array(cp->m_string);
@@ -559,7 +603,7 @@ static std::string my_dump_command(const command* cmd)
     ostr << "within command par:";       if(cmd->par)       ostr << '\n' << my_dump_command_parameter_list(cmd->par); else ostr << " NULL" << '\n';
   }
   ostr << '\n';
-  ostr << "my_dump_command command end" << '\n';
+  ostr << "my_dump_command command end" << std::endl;
   return ostr.str();
 }
 
@@ -620,7 +664,7 @@ static std::string my_dump_node(const node* node)
     if(node->p_elem) ostr << my_dump_element(node->p_elem);
     if(node->cl) { for(int i=0; i< node->cl->curr; ++i) dump_constraint(node->cl->constraints[i]); }
   }
-  ostr << '\n';
+  ostr << std::endl;
   return ostr.str();
 }
 
@@ -671,7 +715,7 @@ static std::string my_dump_sequence(const sequence* c_sequ,const int level)
       c_node = c_node->next;
     }
     ostr << "===== sum of node length=" << std::setw(8) << suml << '\n';
-    ostr << '\n';
+    ostr << std::endl;
   }
   return ostr.str();
 }
@@ -679,7 +723,6 @@ static std::string my_dump_sequence(const sequence* c_sequ,const int level)
 static std::string my_get_cmd_expr_str(const command_parameter* cmd) // return the expression as string, if there is only a value, return the value as string
 {
   std::string result="";
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << my_dump_command_parameter(cmd);
   if(cmd)
   {
     if(cmd->expr && cmd->expr->string) result=cmd->expr->string; // the expression is define as string, use this
@@ -712,13 +755,7 @@ static expression* my_get_param_expression(const element* el,const std::string p
     const command_parameter* cp = el_def->par->parameters[ei]; // pointer to original parameter
     if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " for element " << std::setw(MaTh::par_name_maxlen) << el->name << " parameter " << std::setw(MaTh::par_name_maxlen) << parnam << " ei=" << ei << " my_dump_expression(cp->expr):" << my_dump_expression(cp->expr) << " cp->double_value=" << cp->double_value << '\n';
     command_parameter* cp_copy = clone_command_parameter( cp );  // copy of the original parameter that can be modified
-    if(cp_copy->expr==nullptr) // no expression yet
-    { // use the value as new expression if the expression was NULL
-      std::ostringstream ostr;
-      ostr << std::setprecision(15) << cp->double_value; // use the value as string
-      cp_copy->expr = new_expression(ostr.str().c_str(),deco); // where deco is a global.  // cp_copy->expr->value = cp->double_value; has no effect and this not needed
-      if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " cp_copy->expr was NULL, create new expression from string " << ostr.str() << " now " << my_dump_expression(cp_copy->expr) << '\n';
-    }
+    if(cp_copy->expr==nullptr) cp_copy->expr = expr_from_value(cp->double_value);
     else if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " expression exists use it, expr=" << my_dump_expression(cp_copy->expr) << '\n';
     ep = cp_copy->expr;
   }
@@ -770,7 +807,6 @@ static command_parameter* par_scaled(const command_parameter* par_inp, const com
 
   if( par_inp && length_param )
   {
-    if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " par_inp: " << my_dump_command_parameter(par_inp);
     par_out=clone_command_parameter(par_inp); // start from clone of input parameter
     strcpy(par_out->name,new_par_name.c_str());
     if (length_param->expr ) // first * l, expression or value
@@ -794,8 +830,7 @@ static command_parameter* par_scaled(const command_parameter* par_inp, const com
       par_out->double_value=my_get_expression_value(par_out->expr);
       par_out->expr=nullptr;
     }
-    if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " par_out: " << my_dump_command_parameter(par_out) << '\n';
-  }
+   }
   return par_out;
 }
 
@@ -906,24 +941,22 @@ static std::string make_thin_name(const std::string name_inp,const int slice) //
 }
 
 static command_parameter*
-scale_and_slice(command_parameter* kn_param,const command_parameter* length_param,const int nslices,const bool mult_with_length,const int kl_flag) // multiply the k by length and divide by slice
+scale_and_slice(command_parameter* knsl_param,const command_parameter* length_param,const int nslices,const bool mult_with_length) // multiply the kn or ks parameter by the length and divide by slice
 {
   int last_non_zero=-1;
-  if (kn_param     == nullptr) return nullptr;
+  if (knsl_param   == nullptr) return nullptr;
   if (length_param == nullptr) return nullptr;
   const double eps=1.e-15; // used to check if strength is compatible with zero
 
-  for (int i=0; i<kn_param->expr_list->curr; ++i)
+  for (int i=0; i<knsl_param->expr_list->curr; ++i)
   {
-    expression* kn_i_expr = kn_param->expr_list->list[i];
-    double kn_i_val  = kn_param->double_array->a[i];
-
-    // if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " kn_param->expr_list->curr=" << kn_param->expr_list->curr << " i=" << i << " kn_i_val=" << kn_i_val << " kn_i_expr=" << kn_i_expr << std::endl;
+    expression* kn_i_expr = knsl_param->expr_list->list[i];
+    double kn_i_val  = knsl_param->double_array->a[i];
 
     if ((kn_i_expr != nullptr && zero_string(kn_i_expr->string)==0) || fabs(kn_i_val)>eps )
     {
       last_non_zero=i;
-      if (kl_flag == 0 && (mult_with_length||i>0)) // apply mult_with_length only to zero order multipole
+      if ( mult_with_length||i>0 ) // apply mult_with_length only to zero order multipole
       {
         if (length_param->expr || kn_i_expr)
           kn_i_expr = compound_expr(kn_i_expr, kn_i_val, "*", length_param->expr, length_param->double_value,1); // multiply expression with length
@@ -934,22 +967,17 @@ scale_and_slice(command_parameter* kn_param,const command_parameter* length_para
         if (kn_i_expr) kn_i_expr = compound_expr(kn_i_expr,kn_i_val,"/",nullptr,nslices,1);
         else kn_i_val *= 1./nslices;
       }
-      if(MaTh::Verbose>1)
-      {
-        std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " kn_i_val=" << kn_i_val << " kl_flag=" << kl_flag << " ";
-        if(kn_i_expr) std::cout << my_dump_expression(kn_i_expr) << '\n';
-      }
     }
-    if(kn_i_expr) kn_param->expr_list->list[i] = kn_i_expr;
-    kn_param->double_array->a[i] = kn_i_val;
+    if(kn_i_expr) knsl_param->expr_list->list[i] = kn_i_expr;
+    knsl_param->double_array->a[i] = kn_i_val;
   } // for i ..
   if (last_non_zero==-1)
   {
-    delete_command_parameter(kn_param);
-    kn_param=nullptr;
+    delete_command_parameter(knsl_param);
+    knsl_param=nullptr;
   }
   if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " end" << std::endl;
-  return kn_param;
+  return knsl_param;
 }
 
 static void set_lrad(command* cmd,const command_parameter* length_param,const int nslices)
@@ -1062,7 +1090,6 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const std::
       to_param->double_value=my_get_expression_value(to_param->expr);
       to_param->expr=nullptr;
     }
-    if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " to_parm_name=" << to_parm_name << "        now  to_param " << my_dump_command_parameter(to_param);
   }
 }
 
@@ -1073,9 +1100,9 @@ static void place_node_at(const node* node, sequence* to_sequ, element* sliced_e
   this_node->from_name = node->from_name;
   this_node->at_value  = at;
   if(at_expr) this_node->at_expr   = at_expr;
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " place " << sliced_elem->name << " using at_expr where " << my_dump_expression(at_expr) << " at_value=" << at << '\n';
+  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " place " << sliced_elem->name << " using at_expr where " << my_dump_expression(at_expr) << " at_value=" << at << std::endl;
   add_node_at_end_of_sequence(this_node,to_sequ); // add the thick node to the sequences
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " dump_node(this_node)   :" << '\n';
+  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " dump_node(this_node)   :" << std::endl;
 }
 
 static void place_thin_slice(const node* node, sequence* to_sequ, element* sliced_elem,const double rel_shift) // used to place dipedge and markers
@@ -1315,10 +1342,12 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
     if (ipos2 >= 0)
     {
       sequence* thick_sequ = sequences->sequs[ipos2];
-      if(thick_sequ->ref_flag!=0){
+      if(thick_sequ->ref_flag!=0)
+      {
         warning("REFER in lattice must be set to CENTER, MAKETHIN:", "ignored");
       }
-      else{
+      else
+      {
         sequence* sliced_seq = sliced_seqlist.slice_sequence(slice_style,thick_sequ,LastSequenceSliced,LastStyle); // slice the sequence
         disable_line(sliced_seq->name, line_list);
         sliced_seq->start->previous = sliced_seq->end;
@@ -1554,15 +1583,13 @@ void ElementListWithSlices::Print(std::ostream &StrOut) const
 
 //--------  SeqElList
 SeqElList::SeqElList(const std::string seqname,const std::string slice_style,/* sequence* thick_sequ,*/sequence* sliced_seq,node* thick_node,SequenceList* theSequenceList)
-: thick_node(thick_node), work_node(thick_node), theSequenceList(theSequenceList), sliced_seq(sliced_seq), seqname(seqname), slice_style(slice_style), verbose(MaTh::Verbose), eps(1.e-15), MakeDipedge(MaTh::iMakeDipedge) // SeqElList constructor, eps used to check if values are is compatible with zero
+: thick_node(thick_node), work_node(thick_node), thick_elem_sliced(nullptr), knl_param(nullptr), kns_param(nullptr), theSequenceList(theSequenceList), sliced_seq(sliced_seq), seqname(seqname), slice_style(slice_style), verbose(MaTh::Verbose), eps(1.e-15), MakeDipedge(MaTh::iMakeDipedge) // SeqElList constructor, eps used to check if values are is compatible with zero
 {
-
 }
 
 SeqElList::~SeqElList() // destructor
 {
   if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << std::endl;
-
 }
 
 double SeqElList::simple_at_shift(const int slices,const int slice_no) const // return at relative shifts from centre of unsliced magnet
@@ -1624,39 +1651,76 @@ element* SeqElList::new_marker_element(const std::string el_name, const element*
 {
   command* cmd = new_cmdptr( find_element("marker", base_type_list) );
   copy_params_from_elem(cmd,el_inp,MaTh::DoNotCopy);
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " el_out_cmd " << my_dump_command(cmd) << std::endl;
   return my_El_List->my_make_element(el_name,"marker",cmd,-1); // makes new marker
+}
+
+element* SeqElList::create_wire_element(const element* thick_elem,int slice_no) // for slicing wire collimators, wire(s) with zero length
+{
+  element* newwire=nullptr;
+  command_parameter* ilnorm_param = return_param_recurse("current",thick_elem);
+  if(ilnorm_param)
+  {
+    command* cmd = new_cmdptr( find_element("wire", base_type_list) );
+    for(unsigned i=0;i<MaTh::WireCollimatorParmList.size();++i)
+    {
+      command_parameter* cp=return_param_recurse(MaTh::WireCollimatorParmList[i].c_str(),thick_elem); // copy wire parameters from collimator wire
+      SetParameter_in_cmd(cmd,cp,MaTh::WireCollimatorParmList[i],1);
+    }
+    slice_attributes_to_slice(cmd,thick_elem); // scale ilnorm with nslices
+    std::string WireName=std::string(thick_elem->name)+"_wire";
+    if(nslices>1) WireName=WireName+".."+std::to_string(slice_no);
+    newwire= my_El_List->my_make_element(WireName,"wire",cmd,-1);
+  }
+  return newwire;
 }
 
 void SeqElList::kn_ks_from_thick_elem(const element* thick_elem,command_parameter* kn_pars[4],command_parameter* ks_pars[4]) const
 { // read k0-k3, k0s-k3s in thick_elem and put them in kn_pars, ks_pars;  clone to allow for changes in copy
-  if(verbose>1)
-  {
-    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__;
-    std::cout << " kn_pars=";
-    for(int i=0;i<4;++i) std::cout << " " << kn_pars[i];
-    std::cout << " ks_pars=";
-    for(int i=0;i<4;++i) std::cout << " " << ks_pars[i];
-    std::cout << std::endl;
-  }
-  const struct command_parameter* p;
+  command_parameter* p;
   const std::vector<std::string> kn_name={"k0", "k1", "k2", "k3"};
   const std::vector<std::string> ks_name={"k0s","k1s","k2s","k3s"};
   for(unsigned int i=0;i<kn_name.size();++i) kn_pars[i] = (p=return_param_recurse(kn_name[i].c_str() ,thick_elem)) ? clone_command_parameter(p) : nullptr;
   for(unsigned int i=0;i<ks_name.size();++i) ks_pars[i] = (p=return_param_recurse(ks_name[i].c_str() ,thick_elem)) ? clone_command_parameter(p) : nullptr;
 }
 
-command_parameter* SeqElList::make_k_list(const std::string parnam,command_parameter* k_pars[4],command_parameter* k_param) const
-{ // from k values 0-3 to  expr lists with these values
+void SeqElList::add_ktap(command_parameter* k_param,const element* thick_elem)
+{
+  if(!k_param) return;
+  std::string k_param_name=k_param->name;
+  std::string k_name,ktap_name;
+  for(unsigned int i=1;i<3;++i)
+  {
+    k_name="k"+std::to_string(i); // k1, k2
+    if(k_param_name=="ksl") k_name=k_name+"s"; // or  k1s, k2s
+    ktap_name=k_name+"tap"; // corresponding tap attribute
+    add_ktap_i(i,k_param,k_name,ktap_name,thick_elem);
+  }
+}
+
+void SeqElList::add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem)
+{
+  if( command_parameter *p     = return_param_recurse(k_name.c_str(), thick_elem) )  // has k1n, or k1s, k2n, k2s
+    if( command_parameter *p_tap = return_param_recurse(ktap_name.c_str(), thick_elem) )// has corresponding tap
+    {
+      if(p->expr) k_param->expr_list->list[i] = compound_expr(p->expr,                          p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
+      else        k_param->expr_list->list[i] = compound_expr(expr_from_value(p->double_value), p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
+    }
+}
+
+command_parameter* SeqElList::make_k_list(const std::string parnam,command_parameter* k_pars[4]) const
+{
+  command_parameter* k_param=nullptr;
+  // from k values 0-3 to  expr lists with these values
   if ( k_pars[0] || k_pars[1] || k_pars[2] || k_pars[3] )
   {
     k_param = new_command_parameter(parnam.c_str(), k_double_array);
     k_param->expr_list = new_expr_list(10);
     k_param->double_array = new_double_array(10);
 
-    for(int i=0; i<4; ++i) // set k_param, ks_param with expr_list
+    for(int i=0; i<4; ++i) // set k_param with expr_list
     { // initialize the parameters with nullptr for expression and 0 for the value
-      k_param->expr_list->list[i] = nullptr; k_param->double_array->a[i] = 0;
+      k_param->expr_list->list[i] = nullptr;
+      k_param->double_array->a[i] = 0;
       if (k_pars[i]) // copy existing k's
       {
         if (k_pars[i]->expr) k_param->expr_list->list[i] = clone_expression(k_pars[i]->expr);
@@ -1664,7 +1728,6 @@ command_parameter* SeqElList::make_k_list(const std::string parnam,command_param
       }
       k_param->expr_list->curr++; k_param->double_array->curr++; // update the number of k's in our arrays
     }
-
   }
   return k_param;
 }
@@ -1727,8 +1790,8 @@ element* SeqElList::create_bend_dipedge_element(element* thick_elem,const bool E
     }
     else // Exit
     {
-      const command_parameter *fintxparam = return_param("fintx",(const element*)thick_elem); // use my const version of return_param to check the presence of fintx in thick_elem
-      const command_parameter *fintparam  = return_param("fint", (const element*)thick_elem);
+      const command_parameter *fintxparam = return_param_recurse("fintx",(const element*)thick_elem); // use my const version of return_param to check the presence of fintx in thick_elem
+      const command_parameter *fintparam  = return_param_recurse("fint", (const element*)thick_elem);
       if(fintxparam!=nullptr) SetParameter_in_cmd(dipedge_cmd, fintxparam, "fint",1); // use fintx if given, no check on value, allows for fintx=0 to turn off exit
       else                    SetParameter_in_cmd(dipedge_cmd, fintparam,  "fint",1); // use fint
       if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << my_dump_command_parameter(fintxparam) << '\n';
@@ -1934,16 +1997,15 @@ element* SeqElList::create_thick_slice(const element* thick_elem,const int slice
     }
     else Remove_All_Fringe_Field_Parameters(sliced_elem); // thick magnet body, remove fringe fields
   }
-  if (verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ <<  my_dump_element(sliced_elem) << '\n';
   theSliceList->put_slice(thick_elem,sliced_elem); //-- store what is done in theSliceList
   return sliced_elem;
 } // create_thick_slice
 
-element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no,bool ThickSLice) // create the sliced element, recursively for parents
+element* SeqElList::create_thin_slices(const element* thick_elem, int slice_no) // create thin magnet slices using multipole, recursively for parents
 {
   element *sliced_elem_parent;
   if (thick_elem == thick_elem->parent) return nullptr; // no further parent to consider
-  else sliced_elem_parent = create_sliced_magnet(thick_elem->parent,slice_no,ThickSLice); // recursively slice parent       --- element specific
+  else sliced_elem_parent = create_thin_slices(thick_elem->parent,slice_no); // recursively slice parent       --- element specific
   std::string parent_or_base="multipole";
   if(sliced_elem_parent) parent_or_base=sliced_elem_parent->name;
   if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << std::left << std::setw(MaTh::el_name_maxlen) << thick_elem->name << " parent_or_base= " << std::setw(MaTh::el_type_maxlen) << parent_or_base << " thick_elem base_type=" << thick_elem->base_type->name << " slice_no=" << slice_no << " nslices=" << nslices << '\n';
@@ -2014,40 +2076,34 @@ element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no
     if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " has angle_param,  kn_pars[0] " << my_dump_command_parameter(kn_pars[0]) << std::endl;
   }
 
-  command_parameter *kn_param = nullptr, *ks_param = nullptr;
-  if( ThickSLice )
-  { // from  knl:={amb ,( kmb ) * ( lmb ) };   to
-    if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ThickSLice=" << ThickSLice << " set kn, ks to zero" << '\n';
-  }
-  else // thin, make knl, ksl lists      like  knl:={k0l,k1l,k2l,k3l};  , where k0l normally the same as the angle
+  if(thick_elem != thick_elem_sliced)
   {
-    kn_param = return_param_recurse("knl",thick_elem);
-    ks_param = return_param_recurse("ksl",thick_elem);
-    int knl_flag = 0, ksl_flag = 0;
-    if (kn_param) { kn_param = clone_command_parameter(kn_param); ++knl_flag; }
-    if (ks_param) { ks_param = clone_command_parameter(ks_param); ++ksl_flag; }
+    knl_param=make_k_list("knl",kn_pars); // make new knl 0,1,2,3 expr_list based on kn_pars from thick
+    kns_param=make_k_list("ksl",ks_pars); // make new ksl 0,1,2,3 expr_list based on ks_pars from thick
 
-    kn_param=make_k_list("knl",kn_pars,kn_param); // if any kn 0,1,2,3 given, make make new knl list
-    ks_param=make_k_list("ksl",ks_pars,ks_param); // if any ks 0,1,2,3 given, make make new ksl list
+    add_ktap(knl_param,thick_elem);
+    add_ktap(kns_param,thick_elem);
 
     // multiply the k by length and divide by slice
-    kn_param = scale_and_slice(kn_param,length_param,nslices,mult_with_length,knl_flag+ksl_flag);
-    ks_param = scale_and_slice(ks_param,length_param,nslices,mult_with_length,knl_flag+ksl_flag);
-
-    if(multipole_angle_param && nslices>1) // case of angle different from k0l
-    {
-      if (angle_param->expr) multipole_angle_param->expr  =  compound_expr(angle_param->expr,0.,"/",nullptr,nslices,1);
-      else multipole_angle_param->double_value /= nslices;
-    }
+    knl_param = scale_and_slice(knl_param,length_param,nslices,mult_with_length);
+    kns_param = scale_and_slice(kns_param,length_param,nslices,mult_with_length);
   }
+
+  if(multipole_angle_param && nslices>1) // case of angle different from k0l
+  {
+    if (angle_param->expr) multipole_angle_param->expr  =  compound_expr(angle_param->expr,0.,"/",nullptr,nslices,1);
+    else multipole_angle_param->double_value /= nslices;
+  }
+
   command* cmd = new_cmdptr( find_element("multipole", base_type_list) );
   copy_params_from_elem(cmd,thick_elem,str_v_join(MaTh::DoNotCopy,{"angle","kill_ent_fringe","kill_exi_fringe"}));
-  SetParameter_in_cmd(cmd,kn_param,"knl",1);
-  SetParameter_in_cmd(cmd,ks_param,"ksl",1);
+  SetParameter_in_cmd(cmd,knl_param,"knl",1);
+  SetParameter_in_cmd(cmd,kns_param,"ksl",1);
   if(multipole_angle_param) SetParameter_in_cmd(cmd,multipole_angle_param,"angle",1);
   set_lrad(cmd,length_param,nslices); // keep l  as lrad
   finish_make_sliced_elem(sliced_elem, thick_elem, cmd, parent_or_base, slice_no);
   ParameterRemove("l",sliced_elem);
+  thick_elem_sliced=thick_elem;
   return sliced_elem;
 }
 
@@ -2064,8 +2120,8 @@ element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no
 
   // work on the parameters, specific for solenoid
   const command_parameter* length_param  = return_param_recurse("l",thick_elem);
-  const command_parameter* ks_param      = return_param_recurse("ks",thick_elem);
-  command_parameter* ksi_par=par_scaled(ks_param,length_param,"ksi",nslices);
+  const command_parameter* kns_param     = return_param_recurse("ks",thick_elem);
+  command_parameter* ksi_par=par_scaled(kns_param,length_param,"ksi",nslices);
   command* cmd = new_cmdptr( thick_elem );
   copy_params_from_elem(cmd,thick_elem,str_v_join(MaTh::DoNotCopy,{"kill_ent_fringe","kill_exi_fringe"}));
   SetParameter_in_cmd(cmd,ksi_par,"ksi",1);
@@ -2201,7 +2257,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
 
     if(EntryDipedge==nullptr) // create new EntryDipedge for this bend
     { // first look if e1 or h1 are there
-      const command_parameter   *e1param = return_param("e1"  ,(const element*) thick_elem);
+      const command_parameter   *e1param = return_param_recurse("e1"  ,(const element*) thick_elem);
       if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " e1param=" << e1param << " cmd_par_val(e1param)=" << cmd_par_val(e1param) << '\n';
       if (command_par_value("kill_ent_fringe",thick_elem->def) == false)
       {
@@ -2217,7 +2273,6 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       {
         ExitDipedge=create_bend_dipedge_element(thick_elem,false); // make new ExitDipedge element and remove e2 from thick_elem
         theBendEdgeList->put_slice(thick_elem,ExitDipedge);        // to remember this has been translated
-        if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << " thick node " << work_node->name << " " << thick_elem->name << " now has ExitDipedge=" << EntryDipedge << " " << my_dump_element(ExitDipedge) << '\n';
       }
     } // new ExitDipedge
     if(!already_translated_rbend) Remove_All_Fringe_Field_Parameters(thick_elem); // remove what is taken care of by dipedges
@@ -2244,23 +2299,12 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
 
   expression* at_expr = work_node->at_expr;
   double at = work_node->at_value;
-  if(at_expr==nullptr) // then make a new expression from the value
-  {
-    std::ostringstream ostr;
-    ostr << std::setprecision(15) << at; // use the value as string
-    at_expr = new_expression(ostr.str().c_str(), nullptr);    // where deco is a global.   Seems expression value not well defined
-    at_expr = compound_expr( at_expr,0,"+",0,0,1); // trick to update value
-    if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " from at value=" << std::setw(8) << at << " new at_expr " << my_dump_expression(at_expr) << '\n';
-  }
+  if(at_expr==nullptr) at_expr=expr_from_value_2(at); // make a new expression from the value
 
   double length = work_node->length; // direct curved thick_elem->length
 
   expression* l_expr = nullptr;
-  if (length_param)
-  {
-    l_expr  = length_param->expr;
-    // if(l_expr) l_expr_val = my_get_expression_value(l_expr);
-  }
+  if (length_param) l_expr  = length_param->expr;
 
   int middle=-1;
   if (nslices>1) middle = nslices/2+1; // used to determine after which slide to place the central marker in case of thin slicing
@@ -2289,11 +2333,11 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       else // magnet which can be sliced
       {
         if (IsSolenoid && !ThickSLice) slice_i = create_thin_solenoid(thick_elem,i); // create the solenoid slices
-        else slice_i = create_sliced_magnet(thick_elem,i,ThickSLice); // create the magnet slices
+        else slice_i = create_thin_slices(thick_elem,i); // create the magnet slices
       }
       if (fabs(at_shift(nslices,i,local_slice_style))>0.0)
       {
-        if( MaTh::iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",  nullptr, length*at_shift(nslices,i,local_slice_style),1 );  // use length and shift values, no expressions
+        if( MaTh::iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",  nullptr, length*at_shift(nslices,i,local_slice_style) ,1);  // use length and shift values, no expressions
         else thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",scale_expr(l_expr,at_shift(nslices,i,local_slice_style)),length*at_shift(nslices,i,local_slice_style),1); // use length expressions
       }
       else
@@ -2327,7 +2371,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
 
 void SeqElList::slice_node_default() // slice/translate and add slices to sliced sequence  sliced_seq,  here make always end markers
 {
-  element* thick_elem=work_node->p_elem; // work directly on this element  --  to do translation only once, element maybe used several times in sequence
+  const element* thick_elem=work_node->p_elem; // work directly on this element  --  to do translation only once, element maybe used several times in sequence
 
 
   command_parameter* length_param = return_param_recurse("l",thick_elem); // get original length, value or expression
@@ -2335,14 +2379,7 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
 
   expression* at_expr = work_node->at_expr;
   double at = work_node->at_value;
-  if(at_expr==nullptr) // then make a new expression from the value
-  {
-    std::ostringstream ostr;
-    ostr << std::setprecision(15) << at; // use the value as string
-    at_expr = new_expression(ostr.str().c_str(), nullptr);    // where deco is a global.   Seems expression value not well defined
-    at_expr = compound_expr( at_expr,0,"+",0,0,1); // trick to update value
-    if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " from at value=" << std::setw(8) << at << " new at_expr " << my_dump_expression(at_expr) << '\n';
-  }
+  if(at_expr==nullptr)  at_expr=expr_from_value_2(at); // make a new expression from the value
 
   double length = work_node->length;
 
@@ -2356,12 +2393,16 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
 
   for (int i=1; i<=nslices; ++i) // loop to place the nslices in the sequence
   {
+    element* wirecoll=nullptr;
+    if(std::string(thick_elem->base_type->name)=="collimator") wirecoll=create_wire_element(thick_elem,i); // special case wire collimator
+
     element* slice_i = create_sliced_element(thick_elem,i); // same type, l set to 0 and kept in lrad   (if existing)
-    if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " i=" << i << " new sliced element slice_i " << slice_i->name << std::endl;
+    if(wirecoll) for(unsigned int i=0;i<MaTh::WireCollimatorParmList.size();++i) ParameterRemove(MaTh::WireCollimatorParmList[i], slice_i);  // remove wire parameter provided by the wirecoll
+
     expression* thin_at_expr=nullptr;
     if (fabs(at_shift(nslices,i,local_slice_style))>0.0)
     {
-      if( MaTh::iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",  nullptr, length*at_shift(nslices,i,local_slice_style) ,1);  // use length and shift values, no expressions
+      if( MaTh::iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",  nullptr, length*at_shift(nslices,i,local_slice_style),1);  // use length and shift values, no expressions
       else thin_at_expr = compound_expr(at_expr,work_node->at_value,"+",scale_expr(l_expr,at_shift(nslices,i,local_slice_style)),length*at_shift(nslices,i,local_slice_style),1); // use length expressions
     }
     else
@@ -2369,18 +2410,67 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
       if (at_expr) thin_at_expr = clone_expression(at_expr);
     }
 
-    if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " work_node->base_name=" << " el->name=" << std::left << std::setw(MaTh::el_type_maxlen) << work_node->base_name << " i=" << i << " middle=" << middle << " nslices=" << nslices << " slice_i->name=" << slice_i->name << " at_expr " << my_dump_expression(at_expr) << " l_expr " << my_dump_expression(l_expr) << '\n';
 
     if (i==middle) // create and place new marker with name of thick_elem  in the middle = poition of thick_elem
     {
       element* middle_marker=new_marker_element(thick_elem->name,thick_elem);
       place_node_at(work_node, sliced_seq, middle_marker,at_expr);
-      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " work_node " << work_node->name << " nslices=" << nslices << " i=" << i << " middle=" << middle << " place middle marker at=" << work_node->at_value << " at_expr=" << at_expr
-        << " thin_at_value=" << my_get_expression_value(thin_at_expr) << '\n';
     }
     if(slice_i) place_node_at(work_node, sliced_seq, slice_i,thin_at_expr);
+    if(wirecoll) place_node_at(work_node, sliced_seq, wirecoll,thin_at_expr);
   }
 } // SeqElList::slice_node_default()
+
+void SeqElList::slice_attributes_to_slice(command* cmd,const element* thick_elem)
+{ // looks for attributes like kick that need slicing, modify them in cmd used to construct the sliced element
+  const std::vector<std::string> attributes_to_slice = { "kick", "hkick", "vkick", "chkick", "cvkick", "current"};
+  ElmAttr theElmAttr(thick_elem);
+  std::vector<std::string> active_par_to_be_used=theElmAttr.get_list_of_active_attributes();
+  for(unsigned i=0;i<active_par_to_be_used.size();++i)
+  {
+    bool found=false;
+    std::string attribute_name=active_par_to_be_used[i];
+    for(unsigned int j=0;j<attributes_to_slice.size();++j) // all active attributes
+    {
+      if(attribute_name==attributes_to_slice[j]) // found in attributes_to_slice
+      {
+        found=true;
+        break;
+      }
+    }
+    if(found)
+    {
+      name_list* nl=cmd->par_names;
+      const int ei=name_list_pos(attribute_name.c_str(),nl);
+      if(ei>-1)
+      {
+        command_parameter* cp=cmd->par->parameters[ei];
+        if (cp->type==k_double_array) // double array,  expr_list as used for ilnorm; scale every value, or expression
+        {
+          if (cp->double_array)
+          {
+            if (cp->expr_list) // calculate the values
+            {
+              for (int ei = 0; ei < cp->double_array->curr; ++ei)
+              {
+                if (ei < cp->expr_list->curr && cp->expr_list->list[ei] != nullptr)
+                {
+                  cp->expr_list->list[ei] = compound_expr(cp->expr_list->list[ei],0.,"/",nullptr,nslices,1); // scale expression in list
+                }
+              }
+              for (int ei = 0; ei < cp->double_array->curr; ++ei) cp->double_array->a[ei]/=nslices; // scale value in array
+            }
+          }
+        }
+        else // single expression/value
+        {
+          if(cp->expr) cp->expr = compound_expr(cp->expr,0.,"/",nullptr,nslices,1);
+          else cp->double_value /= nslices;
+        }
+      }
+    }
+  }
+}
 
 element* SeqElList::create_sliced_element(const element* thick_elem, int slice_no)
 {
@@ -2395,7 +2485,7 @@ element* SeqElList::create_sliced_element(const element* thick_elem, int slice_n
   {
     return sliced_elem; // already done
   }
-  const command_parameter* at_param = return_param(("at"),thick_elem);  // handle parent with possibly different slice number than child
+  const command_parameter* at_param = return_param_recurse("at",thick_elem);  // handle parent with possibly different slice number than child
   if(!at_param && thick_elem == thick_elem->parent) slice_no=nslices=1; // do not slice this one
   if(slice_no > nslices && thick_elem!=thick_elem->parent ) slice_no=1; // check, but not for base classes
   if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << std::left << std::setw(MaTh::el_name_maxlen) << thick_elem->name << " " << std::setw(MaTh::el_type_maxlen) << work_node->base_name << " slice_no=" << slice_no << " nslices=" << nslices << " is parent=" << (thick_elem==thick_elem->parent) << '\n';
@@ -2404,6 +2494,7 @@ element* SeqElList::create_sliced_element(const element* thick_elem, int slice_n
   command* cmd = new_cmdptr( thick_elem );
   copy_params_from_elem(cmd,thick_elem,str_v_join(MaTh::DoNotCopy,{"kill_ent_fringe","kill_exi_fringe"}));
   set_lrad(cmd,length_param,nslices); // keep l  as lrad
+  if(nslices>1) slice_attributes_to_slice(cmd,thick_elem); // like kick
   finish_make_sliced_elem(sliced_elem, thick_elem, cmd, parent_or_base, slice_no);
   ParameterRemove("l", sliced_elem);
   return sliced_elem;
@@ -2450,10 +2541,16 @@ void SeqElList::slice_node() // main steering, decides how to split an individua
   {
     if(verbose>1) std::cout << " now see what to do with work_node=" << std::left << std::setw(MaTh::par_name_maxlen) << work_node->name <<  " depending on its base=" << std::setw(MaTh::par_name_maxlen) << work_node->base_name << std::right << '\n';
     const double eps=1.e-15; // used to check if a value is compatible with zero
+    bool IsWireCollimator = ( strcmp(work_node->base_name,"collimator") == 0 && return_param_recurse("current",thick_elem) );
     if ( fabs(el_par_value("l",thick_elem)) <eps ) // if the length is compatible with zero copy it directly
     {
       if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " zero length place directly copy of element " << work_node->name << '\n';
       add_node_at_end_of_sequence( copy_thin(work_node),sliced_seq );
+    }
+    else if( nslices==0)
+    {
+      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " number of slices is 0, place as is " << work_node->name << '\n';
+      add_node_at_end_of_sequence( work_node,sliced_seq );
     }
     else if ( strcmp(work_node->base_name,"matrix") == 0 ) add_node_at_end_of_sequence(work_node,sliced_seq); // Take matrix as it is, including any length
     else if ( strcmp(work_node->base_name,"drift")  == 0 ) ; // do nothing for drift
@@ -2462,11 +2559,11 @@ void SeqElList::slice_node() // main steering, decides how to split an individua
     {
       slice_node_translate(); // slice/translate and add slices to sliced sequence
     }
-    else if(nslices>1)
+    else if(nslices>1 || IsWireCollimator) // in case of wire collimator translate also single slice
     {
       slice_node_default(); // and add slices to sliced sequence
     }
-    else
+    else // single slice
     {
       node* thin_node;
       if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " nslices=" << nslices << " place copy of work_node " << work_node->name << '\n';
@@ -2499,13 +2596,13 @@ void SeqElList::place_thick_slice(const element* thick_elem, element* sliced_ele
   if(sliced_elem==nullptr) return; // nothing to place
   const int n=nslices-1; // in case of thick slices,
   SliceDistPos SP(n, slice_style==std::string("teapot") );
-  if(verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " sliced_elem->name=" << sliced_elem->name << " nslices=" << nslices << " n=" << n << " start from thick_elem " << thick_elem->name << " MaTh::iMoreExpressions=" << MaTh::iMoreExpressions;
+  if(verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->base_type->name << " " << sliced_elem->name << " nslices=" << nslices << " n=" << n << " start from thick_elem " << thick_elem->name << " MaTh::iMoreExpressions=" << MaTh::iMoreExpressions << std::endl;
 
   expression* l_par_expr=my_get_param_expression(thick_elem, "l"); // with this l_par_expr should not be NULL
   expression* at_expr = clone_expression(work_node->at_expr);
   double at = work_node->at_value;
 
-  if(verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " at_expr" << my_dump_expression(at_expr) << '\n';
+  if(verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " at_expr " << my_dump_expression(at_expr) << '\n';
 
   double rel_shift;
 
@@ -2545,8 +2642,9 @@ void SeqElList::place_thick_slice(const element* thick_elem, element* sliced_ele
     // multiply with lpar
     rel_shift_expr=compound_expr(l_par_expr,at, "*", rel_shift_expr,  0,1 );
     if(verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " rel_shift_expr " << my_dump_expression(rel_shift_expr) << '\n';
-    at_expr = compound_expr(at_expr,at, "+", rel_shift_expr,  0,1 ); // this also updates the value
+    at_expr = compound_expr(at_expr,at, "+", rel_shift_expr, 0, 1); // this also updates the value
   }
+
   place_node_at(work_node,sliced_seq,sliced_elem,at_expr);
 }
 
@@ -2652,8 +2750,12 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
 
   const std::string name = thick_sequ->name;
   std::cout << "makethin: slicing sequence : " << name << '\n';
-
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " my_dump_sequence thick_sequ " << my_dump_sequence(thick_sequ,2) << '\n'; // dump level 2, without nodes/elements
+  if(MaTh::Verbose>1)
+  {
+    int level=1;
+    if(MaTh::Verbose>2) level=2;
+    std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " my_dump_sequence thick_sequ " << my_dump_sequence(thick_sequ,level) << std::endl; // dump level 2, without nodes/elements
+  }
 
   sliced_seq = new_sequence(name.c_str(), thick_sequ->ref_flag);
   sliced_seq->start = nullptr;
@@ -2674,7 +2776,7 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
     if (theSeqElList.current_node() == thick_sequ->end)
     {
       break;
-    } 
+    }
     if(theSeqElList.current_node()->p_elem!=nullptr){
       if(strcmp(theSeqElList.current_node()->p_elem->base_type->name, "rfcavity")==0 &&
         find_element(theSeqElList.current_node()->p_elem->name, sliced_seq->cavities) == nullptr){
@@ -2701,7 +2803,6 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
   put_sequ(thick_sequ); // Slicing done for this sequence. Add to list of sequences sliced
   if(MaTh::Verbose) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " before print theSeqElList" << std::endl;
   if(MaTh::Verbose) theSeqElList.Print(); // print final list
-
 
   return sliced_seq;
 } // slice_sequence

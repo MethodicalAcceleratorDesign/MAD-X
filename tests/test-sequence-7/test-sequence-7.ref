@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.00  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.03.02               +
-  + Execution date: 2018.03.05 11:02:54      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.08.10 13:31:10      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -79,8 +79,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 stop;

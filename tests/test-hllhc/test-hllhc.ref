@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.01  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.06.07               +
-  + Execution date: 2019.06.25 11:36:12      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 21:40:27      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -619,8 +619,8 @@ long_ir5_2         =             0.0525 ;
 hocharge_ir8       =                0.2 ;
 long_ir8_1         =            0.01995 ;
 long_ir8_2         =             0.0525 ;
-beamx              =    3.350971719e-10 ;
-beamy              =    3.350971719e-10 ;
+beamx              =    3.350971743e-10 ;
+beamy              =    3.350971743e-10 ;
 sigz               =              0.075 ;
 sige               =            0.00011 ;
 ho_charge          =                  1 ;
@@ -651,8 +651,8 @@ orbit:  -2.436716E-13  3.750813E-15  2.749182E-13  3.137430E-15  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 xnom1              =            0.00075 ;
 xnom2              =              0.002 ;
 xnom5              =    3.833305201e-15 ;
@@ -694,8 +694,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 beta.ip1           =       0.1499911845 ;
 enter Twiss module
   
@@ -722,8 +722,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -749,8 +749,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 Running survey for aligment calculations...
 mbrc_mech_sep      =                188 ;
 mbrd_mech_sep      =                186 ;
@@ -1680,9 +1680,9 @@ iapbr              =                  2 ;
   77         MCD  slices in sector  8
  Collision energy
    8.6736173798840355E-019
+   6.6613381477509392E-016
    0.0000000000000000     
-   0.0000000000000000     
-   0.0000000000000000     
+  -2.2204460492503131E-016
            6 D2  MBRD.4L5.B1..1      
            6 D2  MBRD.4L5.B1..2      
            6 D2  MBRD.4L5.B1..3      
@@ -2964,7 +2964,7 @@ if(mylhcbeam > 1)
 
 START MATCHING
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.172215E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.172390E-11 (symplectifying R)                                                                                                               
  global, q1=qx00+qmid,q2=qy00+qmid;
 
  vary,   name=kqtf, step=1.E-9;
@@ -2979,81 +2979,86 @@ total constraints:      2
 
 START LMDIF:
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.172215E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.172390E-11 (symplectifying R)                                                                                                               
 Initial Penalty Function =   0.11696971E+01
 
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.581910E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.620834E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.356426E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.581729E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.620964E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.532163E-11 (symplectifying R)                                                                                                               
 call:       4   Penalty function =   0.16870913E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.231279E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.356060E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.365441E-11 (symplectifying R)                                                                                                               
-call:       7   Penalty function =   0.14418961E-02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.239750E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.175149E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.328793E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.220907E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.839770E-11 (symplectifying R)                                                                                                               
-call:      12   Penalty function =   0.13546728E-02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.217548E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.276701E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.214787E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.333125E-11 (symplectifying R)                                                                                                               
-call:      16   Penalty function =   0.13363866E-02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.366621E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.291522E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.136649E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.142752E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.292560E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.164188E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.14418960E-02
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.304290E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.512201E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.164964E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.224387E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.165384E-11 (symplectifying R)                                                                                                               
+call:      12   Penalty function =   0.13546725E-02
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.383388E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.362052E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.207961E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.417008E-11 (symplectifying R)                                                                                                               
+call:      16   Penalty function =   0.13363865E-02
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.198219E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.255918E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.256234E-11 (symplectifying R)                                                                                                               
 call:      19   Penalty function =   0.13332705E-02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.252745E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.283418E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.407066E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.302522E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.301692E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.476230E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.445749E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.130623E-11 (symplectifying R)                                                                                                               
 call:      23   Penalty function =   0.13315377E-02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.181130E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.300848E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.315117E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.215172E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.248393E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.429495E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.473743E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.294076E-11 (symplectifying R)                                                                                                               
 call:      27   Penalty function =   0.13315101E-02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.393321E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.240272E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.381259E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.206157E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.229800E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.159200E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.398626E-11 (symplectifying R)                                                                                                               
 call:      31   Penalty function =   0.13315005E-02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.363090E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.158726E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.270353E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.285599E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.228378E-11 (symplectifying R)                                                                                                               
 call:      34   Penalty function =   0.13314962E-02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.330758E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.377134E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.229958E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.389369E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.549355E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.269218E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.296430E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.174705E-11 (symplectifying R)                                                                                                               
 call:      38   Penalty function =   0.13314956E-02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.213635E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.442296E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.246694E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.195360E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.236522E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.205369E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.332778E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.318634E-11 (symplectifying R)                                                                                                               
- ++++++++++ LMDIF ended: converged without success
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.389369E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.252998E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.229197E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.239742E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.232059E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.269290E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.801387E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.231715E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.367656E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.332223E-11 (symplectifying R)                                                                                                               
 call:      47   Penalty function =   0.13314956E-02
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.211936E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.279171E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.236239E-11 (symplectifying R)                                                                                                               
+ ++++++++++ LMDIF ended: converged without success
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.332223E-11 (symplectifying R)                                                                                                               
+call:      50   Penalty function =   0.13314956E-02
  endmatch;
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.389369E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.332223E-11 (symplectifying R)                                                                                                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.389369E-11 (symplectifying R)                                                                                                               
-Global constraint:         q1           4     6.23150000E+01     6.23175525E+01     6.51547431E-04
-Global constraint:         q2           4     6.03150000E+01     6.03123924E+01     6.79948185E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.332223E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23150000E+01     6.23175525E+01     6.51545670E-04
+Global constraint:         q2           4     6.03150000E+01     6.03123924E+01     6.79949944E-04
 
 
-Final Penalty Function =   1.33149562e-03
+Final Penalty Function =   1.33149561e-03
 
 
 
@@ -3066,7 +3071,7 @@ kqtd                      3.35677e-04  0.00000e+00 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.33149562e-03
+VARIABLE "TAR" SET TO   1.33149561e-03
  
 
  
@@ -3089,9 +3094,9 @@ orbit:   1.625330E-05 -5.662640E-06 -6.422008E-04 -7.033901E-06  0.000000E+00  0
 iteration:   2 error:   7.438400E-06 deltap:   0.000000E+00
 orbit:   1.964630E-05 -5.744830E-06 -6.470230E-04 -7.105232E-06  0.000000E+00  0.000000E+00
   
-iteration:   3 error:   1.276734E-10 deltap:   0.000000E+00
+iteration:   3 error:   1.276740E-10 deltap:   0.000000E+00
 orbit:   1.964616E-05 -5.744828E-06 -6.470230E-04 -7.105232E-06  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.389369E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.332223E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -3099,22 +3104,22 @@ orbit:   1.964616E-05 -5.744828E-06 -6.470230E-04 -7.105232E-06  0.000000E+00  0
         26658.8832                 -0    0.0003473782977        53.65357424 
 
                 q1                dq1            betxmax              dxmax 
-       62.31755254       -7.547228738        25635.89423        2.969536449 
+       62.31755254       -7.547228671        25635.89297        2.969536449 
 
              dxrms             xcomax             xcorms                 q2 
-       1.456484858     0.009810148304     0.001716346607        60.31239242 
+       1.456484858     0.009810148306     0.001716346607        60.31239242 
 
                dq2            betymax              dymax              dyrms 
-        1.75253818        28948.00516        1.529894107        0.201406666 
+       1.752538204        28948.00466        1.529894134       0.2014066689 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01244876273     0.001649349739                  0                  0 
+     0.01244876262      0.00164934973                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
  cta0     = abs(qx-qy-tsplit);
 
  closest0 = cta0;
@@ -3133,9 +3138,9 @@ orbit:   1.807896E-05 -5.702515E-06 -6.418545E-04 -7.009095E-06  0.000000E+00  0
 iteration:   2 error:   7.370761E-06 deltap:   0.000000E+00
 orbit:   2.149455E-05 -5.784866E-06 -6.467099E-04 -7.080954E-06  0.000000E+00  0.000000E+00
   
-iteration:   3 error:   1.337648E-10 deltap:   0.000000E+00
+iteration:   3 error:   1.337645E-10 deltap:   0.000000E+00
 orbit:   2.149441E-05 -5.784864E-06 -6.467099E-04 -7.080954E-06  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.264685E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.485290E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -3143,22 +3148,22 @@ orbit:   2.149441E-05 -5.784864E-06 -6.467099E-04 -7.080954E-06  0.000000E+00  0
         26658.8832                 -0    0.0003473782204        53.65358021 
 
                 q1                dq1            betxmax              dxmax 
-       62.31725183       -7.545397326        26401.90893        2.969350628 
+       62.31725182        -7.54539726        26401.90661        2.969350628 
 
              dxrms             xcomax             xcorms                 q2 
-       1.456424232     0.009815984043      0.00171775605        60.31268077 
+       1.456424232     0.009815984045     0.001717756049        60.31268077 
 
                dq2            betymax              dymax              dyrms 
-        1.75745983        29830.89791        1.530566499       0.2014430027 
+       1.757459853        29830.89632        1.530566526       0.2014430056 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01242843102     0.001647845121                  0                  0 
+     0.01242843091     0.001647845111                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
  ctap     = abs(qx-qy-tsplit);
 
  
@@ -3170,14 +3175,14 @@ orbit:   2.149441E-05 -5.784864E-06 -6.467099E-04 -7.080954E-06  0.000000E+00  0
 enter Twiss module
   
 iteration:   1 error:   1.264045E-03 deltap:   0.000000E+00
-orbit:   1.443235E-05 -5.622958E-06 -6.425652E-04 -7.058897E-06  0.000000E+00  0.000000E+00
+orbit:   1.443235E-05 -5.622958E-06 -6.425653E-04 -7.058897E-06  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   7.505637E-06 deltap:   0.000000E+00
 orbit:   1.780361E-05 -5.705002E-06 -6.473550E-04 -7.129708E-06  0.000000E+00  0.000000E+00
   
-iteration:   3 error:   1.216245E-10 deltap:   0.000000E+00
+iteration:   3 error:   1.216243E-10 deltap:   0.000000E+00
 orbit:   1.780348E-05 -5.705000E-06 -6.473550E-04 -7.129708E-06  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.182640E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.363792E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -3185,22 +3190,22 @@ orbit:   1.780348E-05 -5.705000E-06 -6.473550E-04 -7.129708E-06  0.000000E+00  0
         26658.8832                 -0    0.0003473783747         53.6535683 
 
                 q1                dq1            betxmax              dxmax 
-       62.31837661       -7.560127395        25020.18453         2.96972518 
+       62.31837661       -7.560127327        25020.18402         2.96972518 
 
              dxrms             xcomax             xcorms                 q2 
-       1.456546126     0.009804328931      0.00171493675        60.31158297 
+       1.456546126     0.009804328933      0.00171493675        60.31158297 
 
                dq2            betymax              dymax              dyrms 
-       1.745425086        28273.27279        1.529257449       0.2013769821 
+       1.745425111        28273.27294        1.529257476        0.201376985 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01246888823     0.001650851828                  0                  0 
+     0.01246888812     0.001650851819                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
  ctam     = abs(qx-qy-tsplit);
 
  
@@ -3217,9 +3222,9 @@ orbit:   1.798505E-05 -5.700462E-06 -6.418719E-04 -7.010364E-06  0.000000E+00  0
 iteration:   2 error:   7.374246E-06 deltap:   0.000000E+00
 orbit:   2.139946E-05 -5.782804E-06 -6.467255E-04 -7.082197E-06  0.000000E+00  0.000000E+00
   
-iteration:   3 error:   1.334513E-10 deltap:   0.000000E+00
-orbit:   2.139932E-05 -5.782802E-06 -6.467255E-04 -7.082196E-06  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.159603E-11 (symplectifying R)                                                                                                               
+iteration:   3 error:   1.334505E-10 deltap:   0.000000E+00
+orbit:   2.139933E-05 -5.782802E-06 -6.467255E-04 -7.082196E-06  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.362818E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -3227,22 +3232,22 @@ orbit:   2.139932E-05 -5.782802E-06 -6.467255E-04 -7.082196E-06  0.000000E+00  0
         26658.8832                 -0    0.0003473782244         53.6535799 
 
                 q1                dq1            betxmax              dxmax 
-       62.31724984       -7.545126194        26369.43855        2.969360103 
+       62.31724984       -7.545126128        26369.43627        2.969360103 
 
              dxrms             xcomax             xcorms                 q2 
-       1.456427331     0.009815683844      0.00171768365        60.31268333 
+       1.456427331     0.009815683846      0.00171768365        60.31268333 
 
                dq2            betymax              dymax              dyrms 
-       1.757283067        29790.48047        1.530531082       0.2014409738 
+        1.75728309        29790.47892        1.530531109       0.2014409767 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01242948054     0.001647922478                  0                  0 
+     0.01242948044     0.001647922468                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
  cta0     = abs(qx-qy-tsplit);
 
  
@@ -3256,12 +3261,12 @@ enter Twiss module
 iteration:   1 error:   1.299886E-03 deltap:   0.000000E+00
 orbit:   1.907984E-05 -5.687592E-06 -6.442364E-04 -7.037269E-06  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   7.366153E-06 deltap:   0.000000E+00
-orbit:   2.254345E-05 -5.770518E-06 -6.490323E-04 -7.108734E-06  0.000000E+00  0.000000E+00
+iteration:   2 error:   7.366152E-06 deltap:   0.000000E+00
+orbit:   2.254346E-05 -5.770518E-06 -6.490323E-04 -7.108734E-06  0.000000E+00  0.000000E+00
   
-iteration:   3 error:   1.327784E-10 deltap:   0.000000E+00
+iteration:   3 error:   1.327781E-10 deltap:   0.000000E+00
 orbit:   2.254332E-05 -5.770515E-06 -6.490323E-04 -7.108734E-06  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.546405E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.168832E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -3269,22 +3274,22 @@ orbit:   2.254332E-05 -5.770515E-06 -6.490323E-04 -7.108734E-06  0.000000E+00  0
         26658.8832                 -0    0.0003473781455          53.653586 
 
                 q1                dq1            betxmax              dxmax 
-       62.31628219       -7.524476987        26326.71714        2.968286081 
+       62.31628218       -7.524476922        26326.71338        2.968286082 
 
              dxrms             xcomax             xcorms                 q2 
-       1.456351032     0.009815009977     0.001718735927        60.31362019 
+       1.456351032     0.009815009979     0.001718735926        60.31362018 
 
                dq2            betymax              dymax              dyrms 
-       1.757172486        29786.69734         1.53328118       0.2018254552 
+       1.757172509        29786.69467        1.533281207       0.2018254581 
 
             ycomax             ycorms             deltap            synch_1 
-      0.0124636315     0.001651125567                  0                  0 
+     0.01246363139     0.001651125557                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
  ctap     = abs(qx-qy-tsplit);
 
  
@@ -3301,9 +3306,9 @@ orbit:   1.683029E-05 -5.712098E-06 -6.394622E-04 -6.983156E-06  0.000000E+00  0
 iteration:   2 error:   7.381306E-06 deltap:   0.000000E+00
 orbit:   2.019382E-05 -5.793828E-06 -6.443733E-04 -7.055349E-06  0.000000E+00  0.000000E+00
   
-iteration:   3 error:   1.338663E-10 deltap:   0.000000E+00
+iteration:   3 error:   1.338661E-10 deltap:   0.000000E+00
 orbit:   2.019368E-05 -5.793825E-06 -6.443733E-04 -7.055348E-06  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.195385E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.261757E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -3311,22 +3316,22 @@ orbit:   2.019368E-05 -5.793825E-06 -6.443733E-04 -7.055348E-06  0.000000E+00  0
         26658.8832                 -0    0.0003473783057        53.65357363 
 
                 q1                dq1            betxmax              dxmax 
-       62.31174452       -7.433824336        23205.51195        2.970418923 
+       62.31174452       -7.433824278        23205.51106        2.970418924 
 
              dxrms             xcomax             xcorms                 q2 
-       1.456502294     0.009816192283     0.001716594441        60.31822087 
+       1.456502294     0.009816192285      0.00171659444        60.31822087 
 
                dq2            betymax              dymax              dyrms 
-       1.789442371        27061.36373        1.527885776       0.2010736277 
+       1.789442393         27061.3628        1.527885803       0.2010736306 
 
             ycomax             ycorms             deltap            synch_1 
-      0.0123950804      0.00164470078                  0                  0 
+     0.01239508029     0.001644700771                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
  ctam     = abs(qx-qy-tsplit);
 
  
@@ -3341,11 +3346,11 @@ iteration:   1 error:   1.306758E-03 deltap:   0.000000E+00
 orbit:   1.978146E-05 -5.678258E-06 -6.457988E-04 -7.055161E-06  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   7.360138E-06 deltap:   0.000000E+00
-orbit:   2.327717E-05 -5.761559E-06 -6.505558E-04 -7.126377E-06  0.000000E+00  0.000000E+00
+orbit:   2.327717E-05 -5.761560E-06 -6.505558E-04 -7.126377E-06  0.000000E+00  0.000000E+00
   
-iteration:   3 error:   1.321841E-10 deltap:   0.000000E+00
+iteration:   3 error:   1.321838E-10 deltap:   0.000000E+00
 orbit:   2.327704E-05 -5.761557E-06 -6.505557E-04 -7.126376E-06  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.342781E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.365413E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -3353,22 +3358,22 @@ orbit:   2.327704E-05 -5.761557E-06 -6.505557E-04 -7.126376E-06  0.000000E+00  0
         26658.8832                 -0    0.0003473780938        53.65358999 
 
                 q1                dq1            betxmax              dxmax 
-       62.31563895       -7.510757989        26365.88084        2.967556273 
+       62.31563895       -7.510757924        26365.87362        2.967556273 
 
              dxrms             xcomax             xcorms                 q2 
-       1.456299078     0.009814465282     0.001719422302        60.31424354 
+       1.456299078     0.009814465283     0.001719422302        60.31424353 
 
                dq2            betymax              dymax              dyrms 
-       1.757537821        29856.03926        1.535188369       0.2020934151 
+       1.757537844        29856.03387        1.535188396        0.202093418 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01248642411     0.001653265821                  0                  0 
+       0.012486424     0.001653265811                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
  closest1 =abs(qx-qy-tsplit);
@@ -3383,7 +3388,7 @@ orbit:   2.327704E-05 -5.761557E-06 -6.505557E-04 -7.126376E-06  0.000000E+00  0
 
 START MATCHING
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.342781E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.365413E-11 (symplectifying R)                                                                                                               
  global, q1=qx00+qmid, q2=qy00+qmid;
 
  vary,   name=kqtf, step=1.E-9;
@@ -3398,70 +3403,72 @@ total constraints:      2
 
 START LMDIF:
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.342781E-11 (symplectifying R)                                                                                                               
-Initial Penalty Function =   0.98049534E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.365413E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.98049594E-04
 
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.192948E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.160413E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.566705E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.787434E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.445549E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.454578E-11 (symplectifying R)                                                                                                               
-call:       7   Penalty function =   0.97703458E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.276981E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.131387E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.279082E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.282366E-11 (symplectifying R)                                                                                                               
-call:      11   Penalty function =   0.97489388E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.191788E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.322917E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.418743E-11 (symplectifying R)                                                                                                               
-call:      15   Penalty function =   0.97481149E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.181619E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.271794E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.283903E-11 (symplectifying R)                                                                                                               
-call:      18   Penalty function =   0.97470931E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.437309E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.508657E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.184597E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.160588E-11 (symplectifying R)                                                                                                               
-call:      22   Penalty function =   0.97469124E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.418882E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.288208E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.393785E-11 (symplectifying R)                                                                                                               
-call:      26   Penalty function =   0.97468899E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.394687E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.200326E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.455330E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.340350E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.115152E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.384645E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.372558E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.733136E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.307951E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.97703673E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.361675E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.125491E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.279998E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.490888E-11 (symplectifying R)                                                                                                               
+call:      11   Penalty function =   0.97489361E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.457420E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.392131E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.435987E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.218320E-11 (symplectifying R)                                                                                                               
+call:      15   Penalty function =   0.97481126E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.184003E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.301809E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.530193E-11 (symplectifying R)                                                                                                               
+call:      18   Penalty function =   0.97470921E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.626738E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.213546E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.111705E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.445230E-11 (symplectifying R)                                                                                                               
+call:      22   Penalty function =   0.97469114E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.282169E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.351827E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.292205E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.418016E-11 (symplectifying R)                                                                                                               
+call:      26   Penalty function =   0.97468893E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.261022E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.413217E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.267875E-11 (symplectifying R)                                                                                                               
 call:      29   Penalty function =   0.97468534E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.431008E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.153191E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.327702E-11 (symplectifying R)                                                                                                               
-call:      32   Penalty function =   0.97467206E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.174030E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.539799E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.163108E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.373171E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.381467E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.229114E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.344705E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.359690E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.367714E-11 (symplectifying R)                                                                                                               
+call:      32   Penalty function =   0.97467207E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.512429E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.341471E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.328743E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.229652E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.226660E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.277903E-11 (symplectifying R)                                                                                                               
  ++++++++++ LMDIF ended: converged: info =            1
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.327702E-11 (symplectifying R)                                                                                                               
-call:      38   Penalty function =   0.97467206E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.367714E-11 (symplectifying R)                                                                                                               
+call:      38   Penalty function =   0.97467207E-04
  endmatch;
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.327702E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.367714E-11 (symplectifying R)                                                                                                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.327702E-11 (symplectifying R)                                                                                                               
-Global constraint:         q1           4     6.23150000E+01     6.23156913E+01     4.77925932E-05
-Global constraint:         q2           4     6.03150000E+01     6.03142952E+01     4.96746126E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.367714E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23150000E+01     6.23156913E+01     4.77924980E-05
+Global constraint:         q2           4     6.03150000E+01     6.03142952E+01     4.96747090E-05
 
 
-Final Penalty Function =   9.74672057e-05
+Final Penalty Function =   9.74672070e-05
 
 
 
@@ -3474,14 +3481,14 @@ kqtd                      3.35323e-04  3.35677e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   9.74672057e-05
+VARIABLE "TAR" SET TO   9.74672070e-05
 
 
  match;
 
 START MATCHING
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.327702E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.367714E-11 (symplectifying R)                                                                                                               
  global, q1=qx00+qmid, q2=qy00+qmid;
 
  vary,   name=cmrskew, step=1.E-9;
@@ -3496,48 +3503,47 @@ total constraints:      2
 
 START LMDIF:
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.327702E-11 (symplectifying R)                                                                                                               
-Initial Penalty Function =   0.97467206E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.367714E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.97467207E-04
 
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.328138E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.416428E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.133580E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.510078E-11 (symplectifying R)                                                                                                               
-call:       5   Penalty function =   0.86342004E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.283046E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.374520E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.448025E-11 (symplectifying R)                                                                                                               
-call:       8   Penalty function =   0.68564596E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.227415E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.247125E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.278536E-11 (symplectifying R)                                                                                                               
-call:      11   Penalty function =   0.40681877E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.393283E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.376774E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.151187E-11 (symplectifying R)                                                                                                               
-call:      14   Penalty function =   0.28706614E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.173292E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.496542E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.436676E-11 (symplectifying R)                                                                                                               
-call:      17   Penalty function =   0.16235719E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.229036E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.211944E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.400407E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.192121E-11 (symplectifying R)                                                                                                               
+call:       5   Penalty function =   0.86336505E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.558564E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.515857E-11 (symplectifying R)                                                                                                               
+call:       8   Penalty function =   0.68585550E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.203582E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.594830E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.105296E-11 (symplectifying R)                                                                                                               
+call:      11   Penalty function =   0.40735121E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.128439E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.231534E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.233100E-11 (symplectifying R)                                                                                                               
+call:      14   Penalty function =   0.29577653E-04
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.310851E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.104081E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.432271E-11 (symplectifying R)                                                                                                               
+call:      17   Penalty function =   0.18127028E-05
  ++++++++++ LMDIF ended: converged successfully
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.436676E-11 (symplectifying R)                                                                                                               
-call:      17   Penalty function =   0.16235719E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.432271E-11 (symplectifying R)                                                                                                               
+call:      17   Penalty function =   0.18127028E-05
  endmatch;
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.436676E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.432271E-11 (symplectifying R)                                                                                                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.436676E-11 (symplectifying R)                                                                                                               
-Global constraint:         q1           4     6.23150000E+01     6.23150728E+01     5.30430100E-07
-Global constraint:         q2           4     6.03150000E+01     6.03148954E+01     1.09314175E-06
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.432271E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23150000E+01     6.23150780E+01     6.09052494E-07
+Global constraint:         q2           4     6.03150000E+01     6.03148903E+01     1.20365026E-06
 
 
-Final Penalty Function =   1.62357185e-06
+Final Penalty Function =   1.81270275e-06
 
 
 
@@ -3545,19 +3551,19 @@ Final Penalty Function =   1.62357185e-06
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-cmrskew                   2.23456e-03  2.44752e-03 -1.00000e+20  1.00000e+20
-cmiskew                   5.27696e-03  3.81658e-03 -1.00000e+20  1.00000e+20
+cmrskew                   2.24774e-03  2.44752e-03 -1.00000e+20  1.00000e+20
+cmiskew                   5.27202e-03  3.81658e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.62357185e-06
+VARIABLE "TAR" SET TO   1.81270275e-06
 
 
  match;
 
 START MATCHING
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.436676E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.432271E-11 (symplectifying R)                                                                                                               
  global, q1=qx00+qmid, q2=qy00+qmid;
 
  vary,   name=kqtf, step=1.E-9;
@@ -3572,70 +3578,69 @@ total constraints:      2
 
 START LMDIF:
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.436676E-11 (symplectifying R)                                                                                                               
-Initial Penalty Function =   0.16235719E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.432271E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.18127028E-05
 
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.484485E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.215652E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.549474E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.212827E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.321934E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.225456E-11 (symplectifying R)                                                                                                               
-call:       7   Penalty function =   0.15979985E-05
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.252745E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.178532E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.343647E-11 (symplectifying R)                                                                                                               
-call:      10   Penalty function =   0.15972551E-05
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.337957E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.254188E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.282949E-11 (symplectifying R)                                                                                                               
-call:      13   Penalty function =   0.15968736E-05
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.486938E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.237152E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.177403E-11 (symplectifying R)                                                                                                               
-call:      16   Penalty function =   0.15967007E-05
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.211009E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.551056E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.361430E-11 (symplectifying R)                                                                                                               
-call:      19   Penalty function =   0.15966138E-05
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.300826E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.456205E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.312356E-11 (symplectifying R)                                                                                                               
-call:      22   Penalty function =   0.15965702E-05
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.313446E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.554634E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.278608E-11 (symplectifying R)                                                                                                               
-call:      25   Penalty function =   0.15965484E-05
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.144693E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.485667E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.216455E-11 (symplectifying R)                                                                                                               
-call:      28   Penalty function =   0.15965375E-05
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.215847E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.361808E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.403699E-11 (symplectifying R)                                                                                                               
-call:      31   Penalty function =   0.15965320E-05
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.215991E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.121733E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.356540E-11 (symplectifying R)                                                                                                               
-call:      34   Penalty function =   0.15965292E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.250305E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.425920E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.230962E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.309713E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.253778E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.370642E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.17879303E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.354203E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.461550E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.563294E-11 (symplectifying R)                                                                                                               
+call:      10   Penalty function =   0.17873086E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.367567E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.393763E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.17869912E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.154068E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.384753E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.268532E-11 (symplectifying R)                                                                                                               
+call:      16   Penalty function =   0.17868458E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.637868E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.277625E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.280939E-11 (symplectifying R)                                                                                                               
+call:      19   Penalty function =   0.17867728E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.392106E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.322889E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.259795E-11 (symplectifying R)                                                                                                               
+call:      22   Penalty function =   0.17867362E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.296663E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.392780E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171743E-11 (symplectifying R)                                                                                                               
+call:      25   Penalty function =   0.17867179E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.366238E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.255571E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.242048E-11 (symplectifying R)                                                                                                               
+call:      28   Penalty function =   0.17867087E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.147188E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.494232E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.342404E-11 (symplectifying R)                                                                                                               
+call:      31   Penalty function =   0.17867041E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.545944E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.174613E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171801E-11 (symplectifying R)                                                                                                               
+call:      34   Penalty function =   0.17867018E-05
  ++++++++++ LMDIF ended: converged without success
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.356540E-11 (symplectifying R)                                                                                                               
-call:      34   Penalty function =   0.15965292E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171801E-11 (symplectifying R)                                                                                                               
+call:      34   Penalty function =   0.17867018E-05
  endmatch;
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.356540E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171801E-11 (symplectifying R)                                                                                                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.356540E-11 (symplectifying R)                                                                                                               
-Global constraint:         q1           4     6.23150000E+01     6.23149011E+01     9.77676567E-07
-Global constraint:         q2           4     6.03150000E+01     6.03150787E+01     6.18852673E-07
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171801E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23150000E+01     6.23148956E+01     1.08909377E-06
+Global constraint:         q2           4     6.03150000E+01     6.03150835E+01     6.97608069E-07
 
 
-Final Penalty Function =   1.59652924e-06
+Final Penalty Function =   1.78670184e-06
 
 
 
@@ -3643,19 +3648,19 @@ Final Penalty Function =   1.59652924e-06
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf                     -5.95114e-04 -5.95137e-04 -1.00000e+20  1.00000e+20
-kqtd                      3.35257e-04  3.35323e-04 -1.00000e+20  1.00000e+20
+kqtf                     -5.95115e-04 -5.95137e-04 -1.00000e+20  1.00000e+20
+kqtd                      3.35262e-04  3.35323e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.59652924e-06
+VARIABLE "TAR" SET TO   1.78670184e-06
 
 
  match;
 
 START MATCHING
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.356540E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171801E-11 (symplectifying R)                                                                                                               
  global, q1=qx00+qmid, q2=qy00+qmid;
 
  vary,   name=cmrskew, step=1.E-9;
@@ -3670,37 +3675,42 @@ total constraints:      2
 
 START LMDIF:
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.356540E-11 (symplectifying R)                                                                                                               
-Initial Penalty Function =   0.15965292E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171801E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.17867018E-05
 
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.159420E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.257222E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.218545E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.154782E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.133119E-11 (symplectifying R)                                                                                                               
-call:       6   Penalty function =   0.75097055E-06
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.664399E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.285202E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.325215E-11 (symplectifying R)                                                                                                               
-call:       9   Penalty function =   0.17946723E-06
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.418940E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.263858E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.204708E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.296063E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.255579E-11 (symplectifying R)                                                                                                               
+call:       6   Penalty function =   0.66382911E-06
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.351325E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.338188E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.211273E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.155989E-11 (symplectifying R)                                                                                                               
+call:      10   Penalty function =   0.32210899E-06
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.225062E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.211040E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.531630E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.32194115E-07
  ++++++++++ LMDIF ended: converged successfully
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.325215E-11 (symplectifying R)                                                                                                               
-call:       9   Penalty function =   0.17946723E-06
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.531630E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.32194115E-07
  endmatch;
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.325215E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.531630E-11 (symplectifying R)                                                                                                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.325215E-11 (symplectifying R)                                                                                                               
-Global constraint:         q1           4     6.23150000E+01     6.23149612E+01     1.50872706E-07
-Global constraint:         q2           4     6.03150000E+01     6.03150169E+01     2.85945192E-08
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.531630E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23150000E+01     6.23149832E+01     2.83697913E-08
+Global constraint:         q2           4     6.03150000E+01     6.03149938E+01     3.82432346E-09
 
 
-Final Penalty Function =   1.79467225e-07
+Final Penalty Function =   3.21941148e-08
 
 
 
@@ -3708,19 +3718,19 @@ Final Penalty Function =   1.79467225e-07
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-cmrskew                   2.09998e-03  2.23456e-03 -1.00000e+20  1.00000e+20
-cmiskew                   5.41933e-03  5.27696e-03 -1.00000e+20  1.00000e+20
+cmrskew                   2.13664e-03  2.24774e-03 -1.00000e+20  1.00000e+20
+cmiskew                   5.45099e-03  5.27202e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.79467225e-07
+VARIABLE "TAR" SET TO   3.21941148e-08
 
 
  match;
 
 START MATCHING
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.325215E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.531630E-11 (symplectifying R)                                                                                                               
  global, q1=qx00+qmid, q2=qy00+qmid;
 
  vary,   name=kqtf, step=1.E-9;
@@ -3735,49 +3745,27 @@ total constraints:      2
 
 START LMDIF:
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.325215E-11 (symplectifying R)                                                                                                               
-Initial Penalty Function =   0.17946723E-06
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.531630E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.32194115E-07
 
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.302833E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.197403E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.823974E-11 (symplectifying R)                                                                                                               
-call:       4   Penalty function =   0.15867846E-06
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.484851E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.185846E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.154707E-11 (symplectifying R)                                                                                                               
-call:       7   Penalty function =   0.15860523E-06
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.423878E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.405437E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.267322E-11 (symplectifying R)                                                                                                               
-call:      10   Penalty function =   0.15498804E-06
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.699366E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.107181E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.216910E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.419473E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.129333E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.272429E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.490355E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.364159E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.235786E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.555658E-11 (symplectifying R)                                                                                                               
- ++++++++++ LMDIF ended: converged without success
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.267322E-11 (symplectifying R)                                                                                                               
-call:      21   Penalty function =   0.15498804E-06
+ ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.531630E-11 (symplectifying R)                                                                                                               
+call:       1   Penalty function =   0.32194115E-07
  endmatch;
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.267322E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.531630E-11 (symplectifying R)                                                                                                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.267322E-11 (symplectifying R)                                                                                                               
-Global constraint:         q1           4     6.23150000E+01     6.23150278E+01     7.74939813E-08
-Global constraint:         q2           4     6.03150000E+01     6.03149722E+01     7.74940631E-08
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.531630E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23150000E+01     6.23149832E+01     2.83697913E-08
+Global constraint:         q2           4     6.03150000E+01     6.03149938E+01     3.82432346E-09
 
 
-Final Penalty Function =   1.54988044e-07
+Final Penalty Function =   3.21941148e-08
 
 
 
@@ -3785,59 +3773,59 @@ Final Penalty Function =   1.54988044e-07
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf                     -5.95023e-04 -5.95114e-04 -1.00000e+20  1.00000e+20
-kqtd                      3.35184e-04  3.35257e-04 -1.00000e+20  1.00000e+20
+kqtf                     -5.95115e-04 -5.95115e-04 -1.00000e+20  1.00000e+20
+kqtd                      3.35262e-04  3.35262e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.54988044e-07
+VARIABLE "TAR" SET TO   3.21941148e-08
 
 
  twiss;  qx=table(summ,q1); qy=table(summ,q2);
 
 enter Twiss module
   
-iteration:   1 error:   1.312208E-03 deltap:   0.000000E+00
-orbit:   2.015355E-05 -5.660241E-06 -6.474371E-04 -7.077096E-06  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.312527E-03 deltap:   0.000000E+00
+orbit:   2.020778E-05 -5.660985E-06 -6.474665E-04 -7.077097E-06  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   7.368373E-06 deltap:   0.000000E+00
-orbit:   2.368275E-05 -5.743976E-06 -6.521470E-04 -7.147954E-06  0.000000E+00  0.000000E+00
+iteration:   2 error:   7.366233E-06 deltap:   0.000000E+00
+orbit:   2.373726E-05 -5.744716E-06 -6.521764E-04 -7.147961E-06  0.000000E+00  0.000000E+00
   
-iteration:   3 error:   1.305245E-10 deltap:   0.000000E+00
-orbit:   2.368262E-05 -5.743974E-06 -6.521469E-04 -7.147954E-06  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.267322E-11 (symplectifying R)                                                                                                               
+iteration:   3 error:   1.306134E-10 deltap:   0.000000E+00
+orbit:   2.373712E-05 -5.744714E-06 -6.521763E-04 -7.147960E-06  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.531630E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003473773109        53.65365045 
+        26658.8832                 -0    0.0003473774374        53.65364068 
 
                 q1                dq1            betxmax              dxmax 
-       62.31502784       -7.497063039         24753.5948        2.966795221 
+       62.31498316       -7.496201679        23975.11621        2.966779999 
 
              dxrms             xcomax             xcorms                 q2 
-       1.456248016     0.009812834575     0.001719956126        60.31497216 
+       1.456246806     0.009812937706     0.001719985987        60.31499382 
 
                dq2            betymax              dymax              dyrms 
-       1.757563695        28374.33245        1.536889455       0.2023501507 
+       1.757779882        28050.57704        1.536980376       0.2023607361 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01251401819     0.001655797116                  0                  0 
+     0.01251402114     0.001655804195                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
  closest2=abs(qx-qy-tsplit);
 
  value, closest0, closest1, closest2, cmrskew, cmiskew;
 
-closest0           =     0.005160124324 ;
-closest1           =       0.0013954146 ;
-closest2           =    5.567549628e-05 ;
-cmrskew            =     0.002099982719 ;
-cmiskew            =     0.005419326289 ;
+closest0           =     0.005160124248 ;
+closest1           =     0.001395414459 ;
+closest2           =    1.065922292e-05 ;
+cmrskew            =      0.00213663806 ;
+cmiskew            =     0.005450986387 ;
  
 
  if(mylhcbeam==1)
@@ -5426,7 +5414,7 @@ if(mylhcbeam>1)
 
 START MATCHING
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.898409E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.736072E-11 (symplectifying R)                                                                                                               
  global, q1=qx0, q2=qy0;
 
  vary,   name=kqtf, step=1.0E-7 ;
@@ -5441,45 +5429,46 @@ total constraints:      2
 
 START LMDIF:
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.898409E-11 (symplectifying R)                                                                                                               
-Initial Penalty Function =   0.12602032E+01
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.736072E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.12601919E+01
 
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.272854E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.191347E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.431997E-11 (symplectifying R)                                                                                                               
-call:       4   Penalty function =   0.19977769E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.251127E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.252065E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.293465E-11 (symplectifying R)                                                                                                               
-call:       7   Penalty function =   0.17997452E-03
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.293143E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.254067E-11 (symplectifying R)                                                                                                               
-call:      10   Penalty function =   0.28161891E-09
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.423071E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.197908E-11 (symplectifying R)                                                                                                               
-call:      13   Penalty function =   0.22755626E-19
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.557457E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.340597E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171669E-11 (symplectifying R)                                                                                                               
-call:      16   Penalty function =   0.10910262E-22
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.234990E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.601405E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.283230E-11 (symplectifying R)                                                                                                               
+call:       4   Penalty function =   0.19977418E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.361965E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.427440E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.17833196E-03
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.164671E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.478170E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.454842E-11 (symplectifying R)                                                                                                               
+call:      10   Penalty function =   0.28403734E-09
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.300516E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.287458E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.579093E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.22983100E-19
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.277071E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.199382E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.233801E-11 (symplectifying R)                                                                                                               
+call:      16   Penalty function =   0.15449052E-22
  ++++++++++ LMDIF ended: converged successfully
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171669E-11 (symplectifying R)                                                                                                               
-call:      16   Penalty function =   0.10910262E-22
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.233801E-11 (symplectifying R)                                                                                                               
+call:      16   Penalty function =   0.15449052E-22
  endmatch;
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171669E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.233801E-11 (symplectifying R)                                                                                                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171669E-11 (symplectifying R)                                                                                                               
-Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     9.77430216E-24
-Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     1.13595970E-24
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.233801E-11 (symplectifying R)                                                                                                               
+Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     1.47220378E-23
+Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     7.27014210E-25
 
 
-Final Penalty Function =   1.09102619e-23
+Final Penalty Function =   1.54490520e-23
 
 
 
@@ -5487,20 +5476,20 @@ Final Penalty Function =   1.09102619e-23
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf                     -6.26091e-04  0.00000e+00 -1.00000e+20  1.00000e+20
-kqtd                      3.05787e-04  0.00000e+00 -1.00000e+20  1.00000e+20
+kqtf                     -6.26071e-04  0.00000e+00 -1.00000e+20  1.00000e+20
+kqtd                      3.05806e-04  0.00000e+00 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.09102619e-23
+VARIABLE "TAR" SET TO   1.54490520e-23
 
 
  match,chrom;
 
 START MATCHING
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.180590E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171669E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.160217E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.233801E-11 (symplectifying R)                                                                                                               
  global, dq1=qprime, dq2=qprime;
 
  vary,   name=ksf;
@@ -5515,92 +5504,85 @@ total constraints:      2
 
 START LMDIF:
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.180590E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.171669E-11 (symplectifying R)                                                                                                               
-Initial Penalty Function =   0.68178046E+02
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.160217E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.233801E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.67694721E+02
 
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.553612E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.485891E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.112905E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.159729E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.286661E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.387646E-11 (symplectifying R)                                                                                                               
-call:       4   Penalty function =   0.52698671E+02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.181744E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.326928E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.199473E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.168439E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.390640E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.592745E-11 (symplectifying R)                                                                                                               
-call:       7   Penalty function =   0.28177742E+02
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.268612E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.281972E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.195721E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.227249E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.445106E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.260716E-11 (symplectifying R)                                                                                                               
-call:      10   Penalty function =   0.24805670E+01
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.337114E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.367733E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.392070E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.219368E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.194349E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.156446E-11 (symplectifying R)                                                                                                               
-call:      13   Penalty function =   0.42444853E-04
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.243520E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.484547E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.625249E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.257188E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.313120E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.558399E-11 (symplectifying R)                                                                                                               
-call:      16   Penalty function =   0.30937217E-10
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.118611E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.423443E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.158726E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.286239E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.314562E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.270924E-11 (symplectifying R)                                                                                                               
-call:      19   Penalty function =   0.10551134E-12
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.146699E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.271899E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.373064E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.246320E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.217013E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.186004E-11 (symplectifying R)                                                                                                               
-call:      22   Penalty function =   0.70897221E-13
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.288483E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.211098E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.231188E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.288477E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.456172E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.475257E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.456172E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.475257E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.402772E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.391441E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.287261E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.244135E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.193489E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.357145E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.330141E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.125228E-11 (symplectifying R)                                                                                                               
+call:       4   Penalty function =   0.52277910E+02
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.292172E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.294759E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.259159E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.269869E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.261201E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.189409E-11 (symplectifying R)                                                                                                               
+call:       7   Penalty function =   0.27876233E+02
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.524607E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.304608E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.203973E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.165418E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.157405E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.249900E-11 (symplectifying R)                                                                                                               
+call:      10   Penalty function =   0.23714528E+01
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.356268E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.262707E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.169549E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.149206E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.348147E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.156246E-11 (symplectifying R)                                                                                                               
+call:      13   Penalty function =   0.71346515E-05
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.422871E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.142122E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.441715E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.305232E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.248001E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.302861E-11 (symplectifying R)                                                                                                               
+call:      16   Penalty function =   0.15712894E-09
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.220234E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.365398E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.277177E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.462257E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.296436E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.266392E-11 (symplectifying R)                                                                                                               
+call:      19   Penalty function =   0.30970328E-13
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.187328E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.365746E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.343059E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.134205E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.346911E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.198278E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.346911E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.198278E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.346911E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.198278E-11 (symplectifying R)                                                                                                               
  ++++++++++ LMDIF ended: converged without success
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.217013E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.186004E-11 (symplectifying R)                                                                                                               
-call:      27   Penalty function =   0.70897221E-13
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.296436E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.266392E-11 (symplectifying R)                                                                                                               
+call:      24   Penalty function =   0.30970328E-13
  endmatch;
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.217013E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.186004E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.296436E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.266392E-11 (symplectifying R)                                                                                                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.217013E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.296436E-11 (symplectifying R)                                                                                                               
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.186004E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.266392E-11 (symplectifying R)                                                                                                               
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
-Global constraint:         dq1          4     2.00000000E+00     2.00000026E+00     7.02020661E-14
-Global constraint:         dq2          4     2.00000000E+00     1.99999997E+00     6.95155233E-16
+Global constraint:         dq1          4     2.00000000E+00     2.00000012E+00     1.42798473E-14
+Global constraint:         dq2          4     2.00000000E+00     1.99999987E+00     1.66904810E-14
 
 
-Final Penalty Function =   7.08972214e-14
+Final Penalty Function =   3.09703284e-14
 
 
 
@@ -5608,20 +5590,20 @@ Final Penalty Function =   7.08972214e-14
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-ksf                       8.24604e-03  0.00000e+00 -1.00000e+20  1.00000e+20
-ksd                      -2.43414e-03  0.00000e+00 -1.00000e+20  1.00000e+20
+ksf                       8.22058e-03  0.00000e+00 -1.00000e+20  1.00000e+20
+ksd                      -2.43315e-03  0.00000e+00 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   7.08972214e-14
+VARIABLE "TAR" SET TO   3.09703284e-14
 
 
  match,chrom;
 
 START MATCHING
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.217013E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.186004E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.296436E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.266392E-11 (symplectifying R)                                                                                                               
  global, dq1=qprime, dq2=qprime;
 
  global, q1=qx0, q2=qy0;
@@ -5642,81 +5624,58 @@ total constraints:      4
 
 START LMDIF:
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.217013E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.186004E-11 (symplectifying R)                                                                                                               
-Initial Penalty Function =   0.15890766E-10
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.296436E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.266392E-11 (symplectifying R)                                                                                                               
+Initial Penalty Function =   0.15708559E-10
 
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.288483E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.211098E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.231188E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.288477E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.423168E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.287310E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.251724E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.220052E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.473051E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.435261E-11 (symplectifying R)                                                                                                               
-call:       6   Penalty function =   0.45198336E-12
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.228388E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.626621E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.260302E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.361050E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.217889E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.363866E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.250858E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.416181E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.322826E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.479494E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.322826E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.479494E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.202661E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.191455E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.268065E-11 (symplectifying R)                                                                                                               
-call:      14   Penalty function =   0.36579363E-12
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.326261E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.219320E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.611222E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.125097E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.288217E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.152504E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.219876E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.386141E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.408412E-11 (symplectifying R)                                                                                                               
-call:      19   Penalty function =   0.64235488E-13
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.488889E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.209768E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.393951E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.436301E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.332055E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.686664E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.555676E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.314612E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.418637E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.187328E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.365746E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.343059E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.134205E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.323417E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.250650E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.185842E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.195100E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.245437E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.385733E-11 (symplectifying R)                                                                                                               
+call:       6   Penalty function =   0.13298509E-12
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.257613E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.176384E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.388978E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.234798E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.369809E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.281025E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.526013E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.176213E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.335307E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.331392E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.335307E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.331392E-11 (symplectifying R)                                                                                                               
  ++++++++++ LMDIF ended: converged without success
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.386141E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.408412E-11 (symplectifying R)                                                                                                               
-call:      24   Penalty function =   0.64235488E-13
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.245437E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.385733E-11 (symplectifying R)                                                                                                               
+call:      12   Penalty function =   0.13298509E-12
  endmatch;
 
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.386141E-11 (symplectifying R)                                                                                                               
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.408412E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.245437E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.385733E-11 (symplectifying R)                                                                                                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.386141E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.245437E-11 (symplectifying R)                                                                                                               
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.408412E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.385733E-11 (symplectifying R)                                                                                                               
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
-Global constraint:         dq1          4     2.00000000E+00     1.99999977E+00     5.07680942E-14
-Global constraint:         dq2          4     2.00000000E+00     2.00000009E+00     7.62496421E-15
-Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     3.88853053E-15
-Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     1.95389943E-15
+Global constraint:         dq1          4     2.00000000E+00     1.99999995E+00     2.60425920E-15
+Global constraint:         dq2          4     2.00000000E+00     2.00000036E+00     1.30380823E-13
+Global constraint:         q1           4     6.23100000E+01     6.23100000E+01     2.43164039E-21
+Global constraint:         q2           4     6.03200000E+01     6.03200000E+01     4.89838446E-21
 
 
-Final Penalty Function =   6.42354884e-14
+Final Penalty Function =   1.32985089e-13
 
 
 
@@ -5724,14 +5683,14 @@ Final Penalty Function =   6.42354884e-14
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-ksf                       8.24604e-03  8.24604e-03 -1.00000e+20  1.00000e+20
-ksd                      -2.43412e-03 -2.43414e-03 -1.00000e+20  1.00000e+20
-kqtf                     -6.26093e-04 -6.26091e-04 -1.00000e+20  1.00000e+20
-kqtd                      3.05786e-04  3.05787e-04 -1.00000e+20  1.00000e+20
+ksf                       8.22058e-03  8.22058e-03 -1.00000e+20  1.00000e+20
+ksd                      -2.43313e-03 -2.43315e-03 -1.00000e+20  1.00000e+20
+kqtf                     -6.26073e-04 -6.26071e-04 -1.00000e+20  1.00000e+20
+kqtd                      3.05806e-04  3.05806e-04 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   6.42354884e-14
+VARIABLE "TAR" SET TO   1.32985089e-13
 
 
 
@@ -5821,62 +5780,62 @@ kctsx3.r5/kmctsxmax1*100 =       -1.157602124 ;
 ************************************
 kqtf.a12b1/kmqtmax*100 =     -0.04039992022 ;
 kqtd.a12b1/kmqtmax*100 =      -0.6635041224 ;
-kqtf.a23b1/kmqtmax*100 =       -12.86061556 ;
-kqtd.a23b1/kmqtmax*100 =        6.102449593 ;
-kqtf.a34b1/kmqtmax*100 =       -11.80102365 ;
-kqtd.a34b1/kmqtmax*100 =        6.192364961 ;
+kqtf.a23b1/kmqtmax*100 =       -12.86023478 ;
+kqtd.a23b1/kmqtmax*100 =        6.102827468 ;
+kqtf.a34b1/kmqtmax*100 =       -11.80064286 ;
+kqtd.a34b1/kmqtmax*100 =        6.192742836 ;
 kqtf.a45b1/kmqtmax*100 =        4.358313587 ;
 kqtd.a45b1/kmqtmax*100 =         2.36097632 ;
 kqtf.a56b1/kmqtmax*100 =       -5.249721244 ;
 kqtd.a56b1/kmqtmax*100 =       -5.714358854 ;
-kqtf.a67b1/kmqtmax*100 =        -15.0767723 ;
-kqtd.a67b1/kmqtmax*100 =        1.998964169 ;
-kqtf.a78b1/kmqtmax*100 =       -17.21391581 ;
-kqtd.a78b1/kmqtmax*100 =      -0.3844670518 ;
+kqtf.a67b1/kmqtmax*100 =       -15.07639151 ;
+kqtd.a67b1/kmqtmax*100 =        1.999342044 ;
+kqtf.a78b1/kmqtmax*100 =       -17.21353502 ;
+kqtd.a78b1/kmqtmax*100 =       -0.384089177 ;
 kqtf.a81b1/kmqtmax*100 =       0.4561425417 ;
 kqtd.a81b1/kmqtmax*100 =        1.010078258 ;
 kqs.r1b1/kmqsmax*100 =        14.98749953 ;
 kqs.l2b1/kmqsmax*100 =        14.98749953 ;
-kqs.a23b1/kmqsmax*100 =       -8.425692102 ;
-kqs.r3b1/kmqsmax*100 =         5.94865327 ;
-kqs.l4b1/kmqsmax*100 =         5.94865327 ;
+kqs.a23b1/kmqsmax*100 =       -8.488856924 ;
+kqs.r3b1/kmqsmax*100 =        5.932712114 ;
+kqs.l4b1/kmqsmax*100 =        5.932712114 ;
 kqs.a45b1/kmqsmax*100 =        12.22636411 ;
 kqs.r5b1/kmqsmax*100 =            3.25199 ;
 kqs.l6b1/kmqsmax*100 =            3.25199 ;
-kqs.a67b1/kmqsmax*100 =        8.123223406 ;
-kqs.r7b1/kmqsmax*100 =        15.37421882 ;
-kqs.l8b1/kmqsmax*100 =        15.37421882 ;
+kqs.a67b1/kmqsmax*100 =        8.160729625 ;
+kqs.r7b1/kmqsmax*100 =        15.40896522 ;
+kqs.l8b1/kmqsmax*100 =        15.40896522 ;
 kqs.a81b1/kmqsmax*100 =        6.260574639 ;
 ksf1.a12b1/kmsmax*100 =        62.56274012 ;
 ksf2.a12b1/kmsmax*100 =         15.8046875 ;
-ksf1.a23b1/kmsmax*100 =         19.9154662 ;
-ksf2.a23b1/kmsmax*100 =         19.9154662 ;
-ksf1.a34b1/kmsmax*100 =         19.9154662 ;
-ksf2.a34b1/kmsmax*100 =         19.9154662 ;
+ksf1.a23b1/kmsmax*100 =        19.90875961 ;
+ksf2.a23b1/kmsmax*100 =        19.90875961 ;
+ksf1.a34b1/kmsmax*100 =        19.90875961 ;
+ksf2.a34b1/kmsmax*100 =        19.90875961 ;
 ksf1.a45b1/kmsmax*100 =        66.66620547 ;
 ksf2.a45b1/kmsmax*100 =         15.8046875 ;
 ksf1.a56b1/kmsmax*100 =        61.33490273 ;
 ksf2.a56b1/kmsmax*100 =         15.8046875 ;
-ksf1.a67b1/kmsmax*100 =         19.9154662 ;
-ksf2.a67b1/kmsmax*100 =         19.9154662 ;
-ksf1.a78b1/kmsmax*100 =         19.9154662 ;
-ksf2.a78b1/kmsmax*100 =         19.9154662 ;
+ksf1.a67b1/kmsmax*100 =        19.90875961 ;
+ksf2.a67b1/kmsmax*100 =        19.90875961 ;
+ksf1.a78b1/kmsmax*100 =        19.90875961 ;
+ksf2.a78b1/kmsmax*100 =        19.90875961 ;
 ksf1.a81b1/kmsmax*100 =        68.89165117 ;
 ksf2.a81b1/kmsmax*100 =         15.8046875 ;
 ksd1.a12b1/kmsmax*100 =       -26.07773438 ;
 ksd2.a12b1/kmsmax*100 =        -103.272804 ;
-ksd1.a23b1/kmsmax*100 =       -31.91129376 ;
-ksd2.a23b1/kmsmax*100 =       -31.91129376 ;
-ksd1.a34b1/kmsmax*100 =       -31.91129376 ;
-ksd2.a34b1/kmsmax*100 =       -31.91129376 ;
+ksd1.a23b1/kmsmax*100 =       -31.91103183 ;
+ksd2.a23b1/kmsmax*100 =       -31.91103183 ;
+ksd1.a34b1/kmsmax*100 =       -31.91103183 ;
+ksd2.a34b1/kmsmax*100 =       -31.91103183 ;
 ksd1.a45b1/kmsmax*100 =       -26.07773438 ;
 ksd2.a45b1/kmsmax*100 =       -105.3997087 ;
 ksd1.a56b1/kmsmax*100 =       -26.07773438 ;
 ksd2.a56b1/kmsmax*100 =         -103.33901 ;
-ksd1.a67b1/kmsmax*100 =       -31.91129376 ;
-ksd2.a67b1/kmsmax*100 =       -31.91129376 ;
-ksd1.a78b1/kmsmax*100 =       -31.91129376 ;
-ksd2.a78b1/kmsmax*100 =       -31.91129376 ;
+ksd1.a67b1/kmsmax*100 =       -31.91103183 ;
+ksd2.a67b1/kmsmax*100 =       -31.91103183 ;
+ksd1.a78b1/kmsmax*100 =       -31.91103183 ;
+ksd2.a78b1/kmsmax*100 =       -31.91103183 ;
 ksd1.a81b1/kmsmax*100 =       -26.07773438 ;
 ksd2.a81b1/kmsmax*100 =        -110.487746 ;
 kss.a12b1/kmssmax*100 =       -22.65129597 ;
@@ -5973,49 +5932,49 @@ twiss;
 
 enter Twiss module
   
-iteration:   1 error:   3.799332E-05 deltap:   0.000000E+00
-orbit:   3.367363E-06 -1.485266E-07 -3.333388E-06 -4.071356E-08  4.905956E-06  4.086428E-06
+iteration:   1 error:   3.799331E-05 deltap:   0.000000E+00
+orbit:   3.367289E-06 -1.485231E-07 -3.333928E-06 -4.072102E-08  4.905953E-06  4.086429E-06
   
-iteration:   2 error:   1.080348E-09 deltap:   0.000000E+00
-orbit:   3.366700E-06 -1.485125E-07 -3.333459E-06 -4.071400E-08  4.905970E-06  4.086445E-06
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.430262E-11 (symplectifying R)                                                                                                               
+iteration:   2 error:   1.078000E-09 deltap:   0.000000E+00
+orbit:   3.366627E-06 -1.485090E-07 -3.333998E-06 -4.072146E-08  4.905968E-06  4.086445E-06
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.351372E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832   -4.905970412e-06    0.0003474542022        53.64771337 
+        26658.8832   -4.905967557e-06    0.0003474541589        53.64771671 
 
                 q1                dq1            betxmax              dxmax 
-       62.31000835        1.848748817        23704.78971        2.957852994 
+       62.31000825        1.822118269        23704.98119        2.957836321 
 
              dxrms             xcomax             xcorms                 q2 
-       1.457796914      0.01647666563     0.002006314765        60.32000819 
+       1.457794877      0.01647666786     0.002006314996        60.32000819 
 
                dq2            betymax              dymax              dyrms 
-       2.203873364        27903.34538        1.572486856       0.2140665254 
+       2.207824874        27903.57317        1.572549373       0.2140739384 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01641596245     0.001990376563                  0                  0 
+     0.01641595884     0.001990376169                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 !emit;
 
  value, table(summ,q1);
 
-table( summ q1 )   =        62.31000835 ;
+table( summ q1 )   =        62.31000825 ;
  value, table(summ,q2);
 
 table( summ q2 )   =        60.32000819 ;
  value, table(summ,dq1);
 
-table( summ dq1 )  =        1.848748817 ;
+table( summ dq1 )  =        1.822118269 ;
  value, table(summ,dq2);
 
-table( summ dq2 )  =        2.203873364 ;
+table( summ dq2 )  =        2.207824874 ;
  sixtrack,cavall, radius=0.017;
 
   ++++++++++++++++++++++++++++
@@ -6044,35 +6003,35 @@ twiss,file="last_twiss.1";
 
 enter Twiss module
   
-iteration:   1 error:   3.799332E-05 deltap:   0.000000E+00
-orbit:   3.367363E-06 -1.485266E-07 -3.333388E-06 -4.071356E-08  4.905956E-06  4.086428E-06
+iteration:   1 error:   3.799331E-05 deltap:   0.000000E+00
+orbit:   3.367289E-06 -1.485231E-07 -3.333928E-06 -4.072102E-08  4.905953E-06  4.086429E-06
   
-iteration:   2 error:   1.080348E-09 deltap:   0.000000E+00
-orbit:   3.366700E-06 -1.485125E-07 -3.333459E-06 -4.071400E-08  4.905970E-06  4.086445E-06
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.430262E-11 (symplectifying R)                                                                                                               
+iteration:   2 error:   1.078000E-09 deltap:   0.000000E+00
+orbit:   3.366627E-06 -1.485090E-07 -3.333998E-06 -4.072146E-08  4.905968E-06  4.086445E-06
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.351372E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832   -4.905970412e-06    0.0003474542022        53.64771337 
+        26658.8832   -4.905967557e-06    0.0003474541589        53.64771671 
 
                 q1                dq1            betxmax              dxmax 
-       62.31000835        1.848748817        23704.78971        2.957852994 
+       62.31000825        1.822118269        23704.98119        2.957836321 
 
              dxrms             xcomax             xcorms                 q2 
-       1.457796914      0.01647666563     0.002006314765        60.32000819 
+       1.457794877      0.01647666786     0.002006314996        60.32000819 
 
                dq2            betymax              dymax              dyrms 
-       2.203873364        27903.34538        1.572486856       0.2140665254 
+       2.207824874        27903.57317        1.572549373       0.2140739384 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01641596245     0.001990376563                  0                  0 
+     0.01641595884     0.001990376169                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 ! cleaning files
@@ -6090,8 +6049,8 @@ system, "rm -rf temp" ;
 stop;
 
 
-  Number of warnings: 709
-377 in C and 332 in Fortran
+  Number of warnings: 672
+377 in C and 295 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

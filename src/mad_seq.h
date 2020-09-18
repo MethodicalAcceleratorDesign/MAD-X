@@ -93,6 +93,7 @@ void    set_sequence(char* name);
 int     set_cont_sequence(void);
 int     sequ_check_valid_twiss(struct sequence*);
 int     get_nnodes(void);
+int     get_ncavities(void);
 
 #endif // MAD_SEQ_H
 

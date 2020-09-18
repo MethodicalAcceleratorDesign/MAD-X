@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:53:30      +
+  + Execution date: 2020.07.29 16:28:15      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -59,8 +59,8 @@ orbit:   8.417120E-34  4.970451E-34  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 q1 = table(summ, q1);
@@ -135,7 +135,7 @@ Determined SECTOR NMUL MAX :  2
               24.2       0.3931569163           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000       0.3843533713        1.594839708       0.6356419808 
+          -1000000       0.3843533712        1.594839708       0.6356419808 
 
                 q2                dq1                dq2                 qs 
        0.732977059                 -0                 -0                  0 
@@ -264,7 +264,7 @@ obs_points: 2
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps      5
- This is a proton
+ This a particle with    1836.1526734253     times the electron mass 
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     1
        RADIATION   =  FALSE

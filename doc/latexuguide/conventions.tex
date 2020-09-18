@@ -664,7 +664,7 @@ slightly from those in \cite{Montague1979}.
 Notice also that in \madx, PT substitutes DELTAP as longitudinal
 variable. Dispersive and chromatic functions are hence derivatives with
 respect to PT. 
-Since PT=BETA*DELTAP, where BETA is the relativistic Lorentz 
+Since PT=BETA/DELTAP, where BETA is the relativistic Lorentz 
 factor, those functions given by \madx must be multiplied by BETA a
 number of times equal to the order of the derivative to find the
 functions given in the literature. 
@@ -740,7 +740,9 @@ contains the following variables:
 	\ttitem{SYNCH\_2} Second synchrotron radiation integral  
 	\ttitem{SYNCH\_3} Third synchrotron radiation integral  
 	\ttitem{SYNCH\_4} Fourth synchrotron radiation integral  
-	\ttitem{SYNCH\_5} Fifth synchrotron radiation integral  
+	\ttitem{SYNCH\_5} Fifth synchrotron radiation integral    
+	\ttitem{SYNCH\_6} Sixth synchrotron radiation integral  
+	\ttitem{SYNCH\_8} Eighth synchrotron radiation integral  
 \end{madlist}
 
 Notice that in \madx, PT substitutes DELTAP as longitudinal
@@ -750,6 +752,24 @@ And since PT=BETA*DELTAP, where BETA is the relativistic Lorentz
 factor, those functions given by \madx must be multiplied by BETA a
 number of time equal to the order of the derivative to find the
 functions given in the literature. 
+
+The first five radiation integrals, SYNCH\_1 through to SYNCH\_5, 
+are defined and computed using the expressions in~\cite{Helm1973}. 
+It should be noted that these integrals assume that the beam traverses 
+through the centre of each element and does not take into account effects 
+from non-zero closed orbits, including orbits resulting from chromatic effects. 
+These integrals are therefore useful for estimating various radiation 
+properties of an ideal machine but the EMIT module should be used for 
+a more general case. 
+
+The integrals six and eight,  SYNCH\_6 and SYNCH\_8, as defined 
+in~\cite{Jowett1986} have been implemented to capture phenomena 
+not considered by the first five integrals. Integral six is required 
+for computing the radiation in the quadrupoles and integral eight 
+can be used to understand how the partition function varies for off 
+momentum beams as detailed in~\cite{Jowett1986}. Again, these 
+estimates should be used with caution and the EMIT module should 
+be used for precise computations.
 
 \subsection{Variables in the TRACK Table}
 \label{subsec:tables-track}

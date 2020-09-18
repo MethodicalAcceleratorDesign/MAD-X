@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:55:10      +
+  + Execution date: 2020.07.29 16:31:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test for ptc_twiss,initial_map_manual=true;
 
@@ -872,19 +872,19 @@ Determined SECTOR NMUL MAX :  2
        3.282153742        15.12420849                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-   6.252625152e-07        424.5320293                  0                  0 
+   6.243502782e-07        424.5320441                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
        1.633285447        20.07025832                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
-   2.799089335e-07        129.3455325                  0                  0 
+   2.796555818e-07        129.3455332                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11645       -20.60417504     0.001186533499 
+                 1         38793.1203        -20.6041754     0.001186457053 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086228277        9.086227667                  0                  0 
+      -9.086228369        9.086227667                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886484e-08 
@@ -896,16 +896,16 @@ Determined SECTOR NMUL MAX :  2
   -3.650253905e-08    2.618629597e-08                  0    5.157243422e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0     7.43487202e-08                  0    3.700765924e-08 
+                 0    7.434872326e-08                  0    3.700765924e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287032e-08                  0   -2.790402201e-08 
+                 0    1.106287032e-08                  0   -2.790402241e-08 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0    -4.99843157e-08                  0   -1.274910961e-08 
 
            pycomin             tcomin            ptcomin 
-                 0   -1.773242698e-07                  0 
+                 0   -1.773242757e-07                  0 
 
 
   write, table=twiss, file="leir.56dt.ptc.twiss";
@@ -936,19 +936,19 @@ Determined SECTOR NMUL MAX :  2
        3.282153742        15.12420849                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-   6.252625152e-07        424.5320293                  0                  0 
+   6.243502782e-07        424.5320441                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
        1.633285447        20.07025832                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
-   2.799089335e-07        129.3455325                  0                  0 
+   2.796555818e-07        129.3455332                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11645       -20.60417504     0.001186533499 
+                 1         38793.1203        -20.6041754     0.001186457053 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086228277        9.086227667                  0                  0 
+      -9.086228369        9.086227667                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886484e-08 
@@ -960,16 +960,16 @@ Determined SECTOR NMUL MAX :  2
   -3.650253905e-08    2.618629597e-08                  0    5.157243422e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0     7.43487202e-08                  0    3.700765924e-08 
+                 0    7.434872326e-08                  0    3.700765924e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287032e-08                  0   -2.790402201e-08 
+                 0    1.106287032e-08                  0   -2.790402241e-08 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0    -4.99843157e-08                  0   -1.274910961e-08 
 
            pycomin             tcomin            ptcomin 
-                 0   -1.773242698e-07                  0 
+                 0   -1.773242757e-07                  0 
   write, table=twiss, file="leir.56dt.ptc.mtx.twiss";
 
 
@@ -996,19 +996,19 @@ Determined SECTOR NMUL MAX :  2
        3.282153742        15.12420843                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-   6.249127796e-07        424.5320149                  0                  0 
+   6.240007975e-07        424.5320297                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
        1.633285458        20.07025827                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
-   2.799156765e-07        129.3455324                  0                  0 
+   2.796623162e-07        129.3455324                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11575       -20.60417504     0.001186021459 
+                 1         38793.1196        -20.6041754     0.001185945014 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086228277        9.086227678                  0                  0 
+      -9.086228369        9.086227678                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 
@@ -1020,16 +1020,16 @@ Determined SECTOR NMUL MAX :  2
                  0    3.908422753e-10                  0    6.540246179e-11 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    5.840861881e-10                  0    7.897167283e-10 
+                 0    5.840851666e-10                  0    7.897167283e-10 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.854868291e-10                  0    1.648691738e-09 
+                 0    1.854868291e-10                  0    1.648689115e-09 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0   -4.258097151e-10                  0   -1.735064656e-10 
 
            pycomin             tcomin            ptcomin 
-                 0   -4.253175589e-10                  0 
+                 0   -4.253204455e-10                  0 
   write, table=twiss, file="leir.56dt.ptc.noorb.twiss";
 
    

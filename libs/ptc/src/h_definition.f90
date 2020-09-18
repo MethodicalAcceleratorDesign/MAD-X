@@ -9,8 +9,8 @@ module definition
   !  use my_own_1D_TPSA
   use lielib_yang_berz, junk_no=>no,junk_nd=>nd,junk_nd2=>nd2,junk_ndpt=>ndpt,junk_nv=>nv
   use c_dabnew
-  !  use newda
-  !  USE LIELIB_ETIENNE
+
+! GTPSA REMOVED !  use GTPSA
   implicit none
   public
   logical(lp) :: newread=.false. ,newprint =  .false. , first_time = .true.
@@ -27,7 +27,7 @@ module definition
   !  integer,parameter::lnv=100
   !  scratch variables
   INTEGER iassdoluser(ndumt)
-  integer DUMMY  !,temp
+!  integer DUMMY  !,temp
   integer iass0user(ndumt)
   integer c_DUMMY !,c_temp
   integer c_iass0user(ndumt)
@@ -55,7 +55,12 @@ module definition
   integer :: bmadparser = 0
   integer,parameter :: nacmax = 3
   logical :: tangent = .false.,force_rescale=.false.   ! force_rescale for vorname=HELICAL see fibre_work routine
-  TYPE sub_taylor
+  logical(lp),TARGET :: OLD_PACKAGE = .true.
+! GTPSA REMOVED !   type(c_ptr)      :: d_berz
+   integer(1),allocatable :: vo_berz(:)
+   integer(1) ,allocatable ::  mo_gtpsa(:)
+logical :: use_quaternion_in_so3=.false.
+TYPE sub_taylor
      INTEGER j(lnv)
      INTEGER min,max
   END TYPE sub_taylor
@@ -63,7 +68,7 @@ module definition
   !!&1
   TYPE taylor
      INTEGER I !@1  integer I is a pointer in old da-package of Berz
-     !     type (taylorlow) j !@1   Taylorlow is an experimental type not supported
+! GTPSA REMOVED !          type (c_ptr) j !@1  gtpsa
   END TYPE taylor
   type(taylor) temp
   !@2  UNIVERSAL_TAYLOR is used by Sagan in BMAD Code at Cornell
@@ -99,13 +104,13 @@ module definition
 
  type  quaternion
   real(dp) x(0:3)
- end type  quaternion  
+ end type  quaternion
 
  type  complex_quaternion
   complex(dp) x(0:3)
- end type  complex_quaternion  
+ end type  complex_quaternion
 
- type  quaternion_8 
+ type  quaternion_8
   type(real_8) x(0:3)
 END TYPE quaternion_8
 
@@ -133,7 +138,7 @@ END TYPE quaternion_8
  ! END TYPE ENV_8
 
   type spinor
-         real(dp) x(3)  ! x(3) = (s_x, s_y, s_z)   with  |s|=1   
+         real(dp) x(3)  ! x(3) = (s_x, s_y, s_z)   with  |s|=1
   end type spinor
 
   type spinor_8
@@ -191,10 +196,10 @@ END TYPE quaternion_8
   END TYPE tree
 
   !Radiation
-  TYPE radtaylor
-     type (taylor) v
-     type (taylor) e(ndim2)
-  END TYPE radtaylor
+!  TYPE radtaylor
+!     type (taylor) v
+!     type (taylor) e(ndim2)
+!  END TYPE radtaylor
 
   !&5
   TYPE DRAGTFINN
@@ -287,9 +292,9 @@ END TYPE quaternion_8
      logical, pointer :: symptrack,usenonsymp,factored
   end  type tree_element
   !@3 ---------------------------------------------</br>
- 
+
   !@3 ---------------------------------------------</br>
- 
+
   !@3 ---------------------------------------------</br>
 
   !@3 ---------------------------------------------</br>
@@ -338,6 +343,10 @@ type probe_8
    logical u,use_q
    type(integration_node),pointer :: last_node=>null()
   real(dp) e
+  real(dp) damps(3,3)
+  real(dp) b_kin(3,3)
+  real(dp) D_spin(3)
+  real(dp) t_bks(3,3),t_bks0 
 end type probe_8
   !@3 ---------------------------------------------</br>
   type TEMPORAL_PROBE
@@ -391,7 +400,7 @@ end type probe_8
   !@3 ---------------------------------------------</br>
 
 type c_yu_w
- type (c_taylor),pointer :: w(:,:)=> null() !@1 orbital part of the map 
+ type (c_taylor),pointer :: w(:,:)=> null() !@1 orbital part of the map
  integer :: n=0 !@1 of non zero w
 end type c_yu_w
 
@@ -400,47 +409,50 @@ end type c_yu_w
 END TYPE c_quaternion
 
 type c_damap
- type (c_taylor) v(lnv) !@1 orbital part of the map 
+ type (c_taylor) v(lnv) !@1 orbital part of the map
  integer :: n=0 !@1 number of plane allocated
  type(c_spinmatrix) s !@1 spin matrix
  type(c_quaternion) q
- complex(dp) e_ij(6,6) !@1 stochastic fluctuation in radiation theory
- complex(dp) x0(lnv) 
+ complex(dp) x0(lnv)
  logical :: tpsa=.false.
+ complex(dp) e_ij(6,6) !@1 stochastic fluctuation in radiation theory
+  real(dp) sm(3,3)
+  real(dp) damps(3,3)
+  real(dp) b_kin(3,3),D_spin(3)
 end type c_damap
 
   !@3 ---------------------------------------------</br>
   TYPE c_vector_field  !@1
-   !@1 n dimension used v(1:n) (nd2 by default) ; nrmax some big integer if eps<1  
+   !@1 n dimension used v(1:n) (nd2 by default) ; nrmax some big integer if eps<1
    integer :: n=0,nrmax
-   !@1 if eps=-integer  then |eps| # of Lie brackets are taken 
+   !@1 if eps=-integer  then |eps| # of Lie brackets are taken
    !@ otherwise eps=eps_tpsalie=10^-9
    real(dp) eps
-   type (c_taylor) v(lnv)  
- !  type(c_spinor) om 
+   type (c_taylor) v(lnv)
+ !  type(c_spinor) om
    type(c_quaternion) q
   END TYPE c_vector_field
   !@3 ---------------------------------------------</br>
-  TYPE c_vector_field_fourier  !@1 
+  TYPE c_vector_field_fourier  !@1
       integer :: n=0
-      type (c_vector_field), pointer :: f(:)  =>null()                       
+      type (c_vector_field), pointer :: f(:)  =>null()
   END TYPE c_vector_field_fourier
   !@3 ---------------------------------------------</br>
   TYPE c_factored_lie
-      integer :: n = 0   
-      integer :: dir= 0     
-       type (c_vector_field), pointer :: f(:)=>null()                   
+      integer :: n = 0
+      integer :: dir= 0
+       type (c_vector_field), pointer :: f(:)=>null()
   END TYPE c_factored_lie
   !@3 ---------------------------------------------</br>
 TYPE c_normal_form
  type(c_damap) a1   !@1 brings to fix point at least linear
- type(c_damap) a2   !@1 linear normal form 
+ type(c_damap) a2   !@1 linear normal form
  type(c_factored_lie) g   !@1 nonlinear part of a in phasors
  type(c_factored_lie) ker !@1  kernel i.e. normal form in phasors
- type(c_damap) a_t !@1 transformation a (m=a n a^-1) 
- type(c_damap) n   !@1 transformation n (m=a n a^-1)      
- type(c_damap) As  !@1  For Spin   (m = As a n a^-1 As^-1)  
- type(c_damap) Atot  !@1  For Spin   (m = Atot n Atot^-1)  
+ type(c_damap) a_t !@1 transformation a (m=a n a^-1)
+ type(c_damap) n   !@1 transformation n (m=a n a^-1)
+ type(c_damap) As  !@1  For Spin   (m = As a n a^-1 As^-1)
+ type(c_damap) Atot  !@1  For Spin   (m = Atot n Atot^-1)
  integer NRES,M(NDIM2t/2,NRESO),ms(NRESO) !@1 stores resonances to be left in the map, including spin (ms)
  real(dp) tune(NDIM2t/2),damping(NDIM2t/2),spin_tune !@1 Stores simple information
  logical positive ! forces positive tunes (close to 1 if <0)
@@ -465,8 +477,9 @@ type(c_taylor) c_temp
 
 TYPE fibre_array
    type(fibre), pointer :: p  => null()
+   type(integration_node), pointer :: t  => null()
    integer, pointer :: pos  => null()
-   real(dp),pointer :: v=> null() , vmax=> null(); 
+   real(dp),pointer :: v=> null() , vmax=> null();
    real(dp), pointer :: s(:)=> null()
    real(dp), pointer :: err=> null()
 END TYPE fibre_array
@@ -475,7 +488,7 @@ END TYPE fibre_array
 TYPE node_array
    type(integration_node), pointer :: t  => null()
    integer, pointer :: pos  => null()
-   real(dp),pointer :: v=> null() , vmax=> null(); 
+   real(dp),pointer :: v=> null() , vmax=> null();
    complex(dp), pointer :: s(:)=> null()
    real(dp), pointer :: err=> null()
    type(c_vector_field), pointer :: f => null()

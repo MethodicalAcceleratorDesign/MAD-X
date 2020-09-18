@@ -2,16 +2,16 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %06s "SMACH2"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le        0.9382720813
+@ MASS             %le        0.9382720882
 @ CHARGE           %le                   1
 @ ENERGY           %le                 450
 @ PC               %le         449.9990218
-@ GAMMA            %le         479.6050197
+@ GAMMA            %le         479.6050162
 @ KBUNCH           %le                   1
-@ BCURRENT         %le                   0
+@ BCURRENT         %le     9.606367662e-13
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
-@ NPART            %le                   0
+@ NPART            %le                   1
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.34.40"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "16.23.29"
 * NAME                                S                  X                 PX                  Y                 PY                  T                 PT                  L 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le 
  "ENDMK"                             50       0.0956993052    0.0003268034491                  0                  0     -0.04821911066                  0                  0

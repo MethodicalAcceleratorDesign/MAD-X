@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.13 22:33:29      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:24:09      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Based on : ../../examples/twiss/job.sample.thin.new.madx
 
@@ -98,8 +98,8 @@ final orbit vector:     8.057460E-09  2.105015E-09  0.000000E+00  0.000000E+00 -
      synch_2      synch_3      synch_4      synch_5 
     0.000000     0.000000     0.000000     0.000000 
 
-      nflips 
-    0.000000 
+     synch_6      synch_8       nflips 
+    0.000000     0.000000     0.000000 
 
 
  use,    period=lhcb2;
@@ -121,7 +121,7 @@ enter Twiss module
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     1.509233E-08 -5.867979E-09  0.000000E+00  0.000000E+00  5.217471E-10  0.000000E+00
+final orbit vector:     1.510210E-08 -5.869721E-09  0.000000E+00  0.000000E+00  5.218845E-10  0.000000E+00
 
 ++++++ table: summ
 
@@ -129,13 +129,13 @@ final orbit vector:     1.509233E-08 -5.867979E-09  0.000000E+00  0.000000E+00  
 26658.883200    -0.000000     0.000000     0.000000 
 
           q1          dq1      betxmax        dxmax 
-   66.323118     0.000000 42969.944564     9.494742 
+   66.323079     0.000000 42993.988126     9.494046 
 
        dxrms       xcomax       xcorms           q2 
-    2.008654     0.000000     0.000000    61.511088 
+    2.008528     0.000000     0.000000    61.511088 
 
          dq2      betymax        dymax        dyrms 
-    0.000000 74690.565824     0.000000     0.000000 
+    0.000000 74690.565812     0.000000     0.000000 
 
       ycomax       ycorms       deltap      synch_1 
     0.000000     0.000000     0.000000     0.000000 
@@ -143,8 +143,8 @@ final orbit vector:     1.509233E-08 -5.867979E-09  0.000000E+00  0.000000E+00  
      synch_2      synch_3      synch_4      synch_5 
     0.000000     0.000000     0.000000     0.000000 
 
-      nflips 
-    0.000000 
+     synch_6      synch_8       nflips 
+    0.000000     0.000000     0.000000 
 
 
 stop;

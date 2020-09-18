@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:55:04      +
+  + Execution date: 2020.07.29 16:31:32      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -882,10 +882,10 @@ obs_points pro_ptc_setswitch Done
        78.54370266       0.1241077847        3.171382482           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.6258930447         2.83857575       0.8200596224 
+          -1000000      -0.6258930556         2.83857575       0.8200596224 
 
                 q2                dq1                dq2                 qs 
-      0.7198292883       -4.353247487       -9.482231049                  0 
+      0.7198292883       -4.353247583       -9.482231257                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282153615        15.12420817        1.633285387        20.07025827 
@@ -903,10 +903,10 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -20.60417657     0.001188317943 
+                 0                  0       -20.60417702     0.001188317969 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086229451        9.086229451                  0                  0 
+       -9.08622965         9.08622965                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886242e-08 
@@ -918,10 +918,10 @@ obs_points pro_ptc_setswitch Done
                  0    1.168573367e-08                  0    3.059593786e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        92.00347451                  0    2.508645904e-08 
+                 0        92.00347652                  0    2.508645904e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106286966e-08                  0        157.0876659 
+                 0    1.106286966e-08                  0        157.0876694 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0   -1.447405766e-12                  0   -1.106286976e-08 

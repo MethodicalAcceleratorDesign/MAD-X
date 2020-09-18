@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:55:08      +
+  + Execution date: 2020.07.29 16:31:40      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !example of 6D calculation on ALS (synchrotron light source)
 
@@ -50,7 +50,7 @@ Determined SECTOR NMUL MAX :  2
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.150000E+01
  Setting MADx with 
-     energy           1.5000000870399719     
+     energy           1.5000000870399732     
      method                   2
      Num. of steps           20
      charge          -1.0000000000000000     
@@ -114,7 +114,7 @@ obs_points pro_ptc_setswitch Done
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    1.8493132495089608E-015  -9.8063471131797323E-020   0.0000000000000000        0.0000000000000000      -0.14989622899975868        1.5404364333733981E-012
+ Closed orbit:    1.8608707367593039E-015   7.2537516204515339E-019   0.0000000000000000        0.0000000000000000      -0.14989622899975863        1.5563338414860037E-012
 
 ++++++ table: ptc_twiss_summary
 
@@ -131,43 +131,43 @@ obs_points pro_ptc_setswitch Done
       0.8243387316        12.21021568        1.344962596        22.46553125 
 
          beta11min          beta11max          beta12min          beta12max 
-      0.8243387316        12.21021568    4.720496314e-37    4.244782869e-34 
+      0.8243387316        12.21021568    1.502774779e-36    1.351025927e-33 
 
          beta13min          beta13max          beta21min          beta21max 
-    5.33500918e-09     0.003445478433    4.742867677e-37    9.260174994e-36 
+   5.335009179e-09     0.003445478433    9.894187562e-38     3.76263891e-36 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.344962596        22.46553125    2.625382144e-33    9.730328758e-31 
+       1.344962596        22.46553125    3.254446787e-33    8.683609464e-29 
 
          beta31min          beta31max          beta32min          beta32max 
-   1.297134175e-07      0.01267018466    5.068911176e-34    2.270415387e-33 
+   1.297134175e-07      0.01267018466    3.146920898e-34    3.229193657e-33 
 
          beta33min          beta33max           disp1min           disp1max 
        16.49298388        16.49448224                  0       0.2383825177 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1918836664       0.1918826719   -8.044167115e-16    8.034882696e-16 
+     -0.1918836664       0.1918826719   -9.347200039e-16    8.066347527e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -4.384116001e-16    4.341706412e-16                  0     1.84931325e-15 
+  -5.087202892e-16     5.08802404e-16                  0    1.860870737e-15 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -9.806347113e-20                  0                  0    1.540436433e-12 
+    7.25375162e-19                  0                  0    1.556333841e-12 
 
            orbit_t             xcorms             ycorms            pxcorms 
-      -0.149896229    1.796834153e-13                  0    1.699545599e-13 
+      -0.149896229    1.815495358e-13                  0    1.717196635e-13 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        0.149896229    1.540436312e-12    3.671968951e-13 
+                 0        0.149896229    1.556333831e-12    3.710023432e-13 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    2.955696519e-13                  0       -0.149896229 
+                 0    2.986336838e-13                  0       -0.149896229 
 
            ptcomax             xcomin             ycomin            pxcomin 
-   1.540436433e-12    4.521846686e-16                  0   -2.955710265e-13 
+   1.556333841e-12    4.584726485e-16                  0   -2.986350158e-13 
 
            pycomin             tcomin            ptcomin 
-                 0       -0.149896229    1.540403378e-12 
+                 0       -0.149896229    1.556331002e-12 
 !  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
 
   

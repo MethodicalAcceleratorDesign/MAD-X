@@ -85,7 +85,7 @@ const int ap_table_types[] =
   2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2, 2, 2, 2,
-  2, 2, 2
+  2, 2, 2, 2, 2
 };
 
 const char* const ap_table_cols[] =
@@ -94,14 +94,14 @@ const char* const ap_table_cols[] =
   "aper_1", "aper_2", "aper_3", "aper_4",
   "rtol", "xtol", "ytol", "xoffset", "yoffset",
   "s", "betx", "bety", "dx", "dy", "x", "y", "px", "py",
-  "on_ap", "on_elem", "spec",
+  "on_ap", "on_elem", "spec", "x_pos_hit", "y_pos_hit",
   " "  /* blank terminates */
 };
 
 const int survey_table_types[] =
 {
   3, 3, 2, 2, 2, 2,
-  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2, 2,
   1, 1, 2,
   /*== dealt with the new property v_pos as for mech_sep */
   2,3
@@ -111,13 +111,15 @@ const int survey_table_types[] =
 const char* const survey_table_cols[] =
 {
   "name", "keyword", "s", "l", "angle", "x",
-  "y", "z", "theta", "phi", "psi", "globaltilt",
+  "y", "z", "theta", "phi", "psi", "globaltilt", "tilt",
   "slot_id", "assembly_id", "mech_sep",
-  /*== dealt with the new property v_pos as for mech_sep */
+  /*== dealt with the new property v_pos asc for mech_sep */
   "v_pos", "comments",
   /*==*/
   " "  /* blank terminates */
 };
+
+
 
 const int efield_table_types[] =
 {
@@ -643,9 +645,11 @@ const int summ_table_types[] =
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2,
+  2, 2, 2, 2, 
   //2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2, //for nflips
+  2, 2, 2, 2, 2,
+  2, 2,
+  2, //for nflips
 };
 
 const char* const summ_table_cols[] =
@@ -655,7 +659,9 @@ const char* const summ_table_cols[] =
   "xcorms", "q2", "dq2", "betymax", "dymax",
   "dyrms", "ycomax", "ycorms", "deltap",
   //"synch_1","synch_2","synch_3","synch_4","synch_5",
-  "synch_1","synch_2","synch_3","synch_4","synch_5", "nflips", //for nflips
+  "synch_1","synch_2","synch_3","synch_4","synch_5",
+  "synch_6","synch_8",
+   "nflips", //for nflips
   " "  /* blank terminates */
 };
 
@@ -690,6 +696,18 @@ const char* const track_table_cols[] =
   "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
   " "  /* blank terminates */
 };
+
+const char* const dist_table_cols[] =
+{
+  "number", "x", "px", "y", "py", "t", "pt",
+  " "  /* blank terminates */
+};
+
+const int dist_table_types[] =
+{
+  1, 2, 2, 2, 2, 2, 2
+};
+
 
 const int track_table_cols_len = sizeof track_table_cols / sizeof track_table_cols[0];
 

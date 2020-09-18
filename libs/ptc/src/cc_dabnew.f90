@@ -9,14 +9,14 @@ module c_dabnew
   private
 !  public
   private daalc_lno1,daall,damult,dasqrt,dacmut,dacma,DALINt,dacctt
-  private dainvt,dapint,dadert,dacfut
+  private dainvt,dadert,dacfut
   private dadeb,dapac,dachk,damch,dadcd,dancd,hash,dehash
   public C_STABLE_DA,C_watch_user,c_daini,c_daall0,c_davar,c_damul,c_dacycle
   public c_dapok,c_dapek,c_etall1,c_DAshift,c_dacop,c_dacon,c_daadd,c_dacad,c_dasub
   public c_dacsu,c_dasuc,c_dacmu,c_dadal1,c_dapri,c_dapri77,c_darea,c_darea77,c_daeps
   public c_dacdi,c_dadic,c_count_da,c_mtree,c_dafun,c_DAABS,c_dadiv,c_take,c_datrunc,c_dader,c_datra
   public c_daran,c_dacfu,c_matinv,c_dapek0,c_dapok0,c_dacct,c_dainv,c_etcom,c_danot
-  public c_print_eps
+  public c_print_eps,c_lda_used,c_dapint
   integer,private,parameter:: lsw=1
   integer :: c_lda_max_used=0
   ! integer,private,parameter::nmax=400,lsw=1
@@ -3530,7 +3530,7 @@ contains
           ml(ij)=0
        enddo
        call daall(ml,ib,'$$DAJUNK$$',inob,invb)
-       call dapint(ma,ia,ml,ib,jx)
+       call c_dapint(ma,ia,ml,ib,jx)
        do i=1,ib
           call c_dacop(ml(i),mb(i))
        enddo
@@ -3540,7 +3540,7 @@ contains
           call c_dapek(ma(i),jj,x(i))
           call c_dapok(ma(i),jj,(0.0_dp,0.0_dp))
        enddo
-       call dapint(ma,ia,mb,ib,jx)
+       call c_dapint(ma,ia,mb,ib,jx)
        do i=1,ia
           call c_dapok(ma(i),jj,x(i))
        enddo
@@ -3548,7 +3548,7 @@ contains
     return
   end subroutine dapin
 
-  subroutine dapint(ma,ia,mb,ib,jind)
+  subroutine c_dapint(ma,ia,mb,ib,jind)
     implicit none
     !     **********************************
     !
@@ -3611,7 +3611,7 @@ contains
     call dadal(mn,ia)
     !
     return
-  end subroutine dapint
+  end subroutine c_dapint
   !
   subroutine c_dader(idif,ina,inc)
     !  subroutine dader(idif,ina,inc)

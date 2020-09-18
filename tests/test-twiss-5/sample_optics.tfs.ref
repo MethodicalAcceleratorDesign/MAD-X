@@ -2,16 +2,16 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le        0.9382720813
+@ MASS             %le        0.9382720882
 @ CHARGE           %le                   1
 @ ENERGY           %le         450.0009782
 @ PC               %le                 450
-@ GAMMA            %le         479.6060622
+@ GAMMA            %le         479.6060587
 @ KBUNCH           %le                   1
-@ BCURRENT         %le                   0
+@ BCURRENT         %le     1.801719823e-15
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
-@ NPART            %le                   0
+@ NPART            %le                   1
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
@@ -27,7 +27,7 @@
 @ DXMAX            %le         2.815212715
 @ DYMAX            %le        0.1894286768
 @ XCOMAX           %le      0.008477874214
-@ YCOMAX           %le      0.008499924148
+@ YCOMAX           %le      0.008499924147
 @ BETXMAX          %le         595.1194704
 @ BETYMAX          %le         609.5259704
 @ XCORMS           %le     0.0007074557983
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %30s "LHC Version 6.503 -  July 2009"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.33.46"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "10/08/20"
+@ TIME             %08s "13.26.21"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "IP1"                                0        11.00000336        11.00000569

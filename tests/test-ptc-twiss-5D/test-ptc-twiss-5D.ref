@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:04:14      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:31:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -805,9 +805,9 @@ twiss, rmatrix, chrom, save;
 enter Twiss module
   
 iteration:   1 error:   1.763228E-04 deltap:   1.000000E-06
-orbit:  -9.649253E-06 -2.298584E-06  0.000000E+00  0.000000E+00 -2.965938E-06  5.991432E-07
+orbit:  -9.649253E-06 -2.298584E-06  0.000000E+00  0.000000E+00 -2.965939E-06  5.991432E-07
   
-iteration:   2 error:   1.052580E-09 deltap:   1.000000E-06
+iteration:   2 error:   1.051748E-09 deltap:   1.000000E-06
 orbit:  -9.649474E-06 -2.298528E-06  0.000000E+00  0.000000E+00 -2.068187E-06  5.991503E-07
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -819,13 +819,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        78.54370266                 -0       0.1241075638        2.838578276 
 
                 q1                dq1            betxmax              dxmax 
-       1.820059621       -5.030192641        15.12421277        20.60419792 
+       1.820059621       -10.06040217        15.12421277        20.60419838 
 
              dxrms             xcomax             xcorms                 q2 
-       9.639963193                  0                  0         2.71982919 
+       9.639963405                  0                  0         2.71982919 
 
                dq2            betymax              dymax              dyrms 
-      -10.39500524        20.07025727                  0                  0 
+      -20.79004538        20.07025727                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        9.747887059 
@@ -833,8 +833,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
        1.526297364       0.3728165258       0.5042000294        4.147872957 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+       52.84960067        256.7869428                  0 
 
 
 write, table=summ, file="leir.summ.twiss";
@@ -922,7 +922,7 @@ Determined SECTOR NMUL MAX :  2
        78.54370266       0.1241077849           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.6258930445        2.838575748       0.8200596224 
+          -1000000      -0.6258930555        2.838575748       0.8200596224 
 
                 q2                dq1                dq2                 qs 
       0.7198292883       -2.176620133        -4.74110766                  0 
@@ -949,22 +949,22 @@ Determined SECTOR NMUL MAX :  2
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886442e-08 
+                 0                  0                  0    1.068886242e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546139122e-09                  0                  0                  0 
+   2.546139572e-09                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    1.168573391e-08                  0    3.059593852e-09 
+                 0    1.168573367e-08                  0    3.059593786e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    2.508646064e-08 
+                 0                  0                  0    2.508645904e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287025e-08                  0                 -0 
+                 0    1.106286966e-08                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.449191389e-12                  0   -1.106286975e-08 
+                 0   -1.447405766e-12                  0   -1.106286976e-08 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 

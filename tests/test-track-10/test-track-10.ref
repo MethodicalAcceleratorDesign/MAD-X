@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2019.04.30 14:58:10      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:23:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! based on examples/emit/LEP/
 
@@ -12,34 +12,34 @@ option, -echo,-warn,-info;
 enter Twiss module
   
 iteration:   1 error:   5.293620E-02 deltap:   0.000000E+00
-orbit:  -3.739151E-03  1.105827E-04  0.000000E+00  0.000000E+00  1.255156E-01  4.669275E-04
+orbit:  -3.726483E-03  1.100746E-04  0.000000E+00  0.000000E+00  1.255157E-01  4.669720E-04
   
-iteration:   2 error:   1.177482E-02 deltap:   0.000000E+00
-orbit:   3.155094E-04  2.049378E-07  0.000000E+00  0.000000E+00  1.530803E-01  7.049757E-04
+iteration:   2 error:   1.174362E-02 deltap:   0.000000E+00
+orbit:   3.148314E-04  1.818033E-07  0.000000E+00  0.000000E+00  1.530461E-01  7.050191E-04
   
-iteration:   3 error:   2.984777E-04 deltap:   0.000000E+00
-orbit:   5.108716E-05 -4.033873E-07  0.000000E+00  0.000000E+00  1.525259E-01  7.213358E-04
+iteration:   3 error:   3.014431E-04 deltap:   0.000000E+00
+orbit:   5.111449E-05 -3.967647E-07  0.000000E+00  0.000000E+00  1.525256E-01  7.213445E-04
   
-iteration:   4 error:   1.313217E-06 deltap:   0.000000E+00
-orbit:   4.965214E-05 -4.284574E-07  0.000000E+00  0.000000E+00  1.525165E-01  7.214353E-04
+iteration:   4 error:   1.302086E-06 deltap:   0.000000E+00
+orbit:   4.965542E-05 -4.217450E-07  0.000000E+00  0.000000E+00  1.525165E-01  7.214353E-04
   
-iteration:   5 error:   1.853161E-08 deltap:   0.000000E+00
-orbit:   4.965188E-05 -4.287247E-07  0.000000E+00  0.000000E+00  1.525164E-01  7.214376E-04
+iteration:   5 error:   1.822850E-08 deltap:   0.000000E+00
+orbit:   4.965488E-05 -4.220133E-07  0.000000E+00  0.000000E+00  1.525164E-01  7.214375E-04
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       26658.87208      -0.1525163926    0.0001453605831        82.94241411 
+       26658.87208      -0.1525163824    0.0001453605791        82.94241525 
 
                 q1                dq1            betxmax              dxmax 
-       98.27686301        1.178496691        408.8527192        1.033800733 
+       98.27799441        1.159262994        409.3247344        1.033687024 
 
              dxrms             xcomax             xcorms                 q2 
-      0.6196816374      0.00408335567     0.001276704911         96.1860528 
+      0.6196808501     0.004082952979     0.001276693366        96.18712261 
 
                dq2            betymax              dymax              dyrms 
-      0.8217413734        216.0318443                  0                  0 
+      0.8083622608        215.9865521                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -47,41 +47,41 @@ orbit:   4.965188E-05 -4.287247E-07  0.000000E+00  0.000000E+00  1.525164E-01  7
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 makethin: style chosen : hybrid
 makethin: slicing sequence : lep
 enter Twiss module
   
 iteration:   1 error:   5.239522E-02 deltap:   0.000000E+00
-orbit:  -3.455641E-03  9.332290E-05  0.000000E+00  0.000000E+00  1.255450E-01  4.713058E-04
+orbit:  -3.455640E-03  9.332289E-05  0.000000E+00  0.000000E+00  1.255450E-01  4.713058E-04
   
 iteration:   2 error:   1.044041E-02 deltap:   0.000000E+00
 orbit:   2.283295E-04 -1.206173E-06  0.000000E+00  0.000000E+00  1.520058E-01  7.077063E-04
   
 iteration:   3 error:   3.037441E-04 deltap:   0.000000E+00
-orbit:   5.124909E-05 -3.314252E-07  0.000000E+00  0.000000E+00  1.525243E-01  7.213752E-04
+orbit:   5.124908E-05 -3.314252E-07  0.000000E+00  0.000000E+00  1.525243E-01  7.213752E-04
   
-iteration:   4 error:   1.231750E-06 deltap:   0.000000E+00
-orbit:   4.965601E-05 -3.456830E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212389E-04
+iteration:   4 error:   1.231751E-06 deltap:   0.000000E+00
+orbit:   4.965601E-05 -3.456829E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212389E-04
   
-iteration:   5 error:   6.452810E-09 deltap:   0.000000E+00
+iteration:   5 error:   6.452801E-09 deltap:   0.000000E+00
 orbit:   4.964953E-05 -3.458931E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212367E-04
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       26658.87208      -0.1525320289    0.0001438648505        83.37246665 
+       26658.87208      -0.1525320224    0.0001438648494        83.37246695 
 
                 q1                dq1            betxmax              dxmax 
-        98.2915524        1.225780034        411.3890424        1.040758209 
+        98.2915524        1.225780023        411.3890416        1.040758208 
 
              dxrms             xcomax             xcorms                 q2 
-      0.6254096956     0.004109089032     0.001288427764        96.19762311 
+      0.6254096956      0.00410908894     0.001288427736        96.19762311 
 
                dq2            betymax              dymax              dyrms 
-      0.6897789656        219.9870765                  0                  0 
+      0.6897789709        219.9870762                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -89,24 +89,24 @@ orbit:   4.964953E-05 -3.458931E-07  0.000000E+00  0.000000E+00  1.525320E-01  7
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter TRACK module
 damp is on
   
 iteration:   1 error:   5.239522E-02 deltap:   0.000000E+00
-orbit:  -3.455641E-03  9.332290E-05  0.000000E+00  0.000000E+00  1.255450E-01  4.713058E-04
+orbit:  -3.455640E-03  9.332289E-05  0.000000E+00  0.000000E+00  1.255450E-01  4.713058E-04
   
 iteration:   2 error:   1.044041E-02 deltap:   0.000000E+00
 orbit:   2.283295E-04 -1.206173E-06  0.000000E+00  0.000000E+00  1.520058E-01  7.077063E-04
   
 iteration:   3 error:   3.037441E-04 deltap:   0.000000E+00
-orbit:   5.124909E-05 -3.314252E-07  0.000000E+00  0.000000E+00  1.525243E-01  7.213752E-04
+orbit:   5.124908E-05 -3.314252E-07  0.000000E+00  0.000000E+00  1.525243E-01  7.213752E-04
   
-iteration:   4 error:   1.231750E-06 deltap:   0.000000E+00
-orbit:   4.965601E-05 -3.456830E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212389E-04
+iteration:   4 error:   1.231751E-06 deltap:   0.000000E+00
+orbit:   4.965601E-05 -3.456829E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212389E-04
   
-iteration:   5 error:   6.452810E-09 deltap:   0.000000E+00
+iteration:   5 error:   6.452801E-09 deltap:   0.000000E+00
 orbit:   4.964953E-05 -3.458931E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212367E-04
 
 Full 6D closed orbit search.
@@ -114,8 +114,8 @@ Initial value of 6-D closed orbit from Twiss:
 orbit0   4.964953E-05 -3.458931E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212367E-04
 
 6D closed orbit found by subroutine trclor 
-iteration:  11 error:   3.921151E-07 deltap:   0.000000E+00
-orbit:   4.973131E-05 -3.414450E-07  0.000000E+00  0.000000E+00  1.525323E-01  7.211124E-04
+iteration:  11 error:   1.242826E-06 deltap:   0.000000E+00
+orbit:   4.975911E-05 -3.416782E-07  0.000000E+00  0.000000E+00  1.525334E-01  7.215119E-04
 exit TRACK module
 
 

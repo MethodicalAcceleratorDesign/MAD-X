@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:56:54      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 11:38:16      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -411,8 +411,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 ! explicit at end
@@ -451,8 +451,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 ! single slice
@@ -491,8 +491,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 ! big step (bigger than any element)
@@ -531,8 +531,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 
@@ -581,8 +581,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 ! centre+end for quadrupole
@@ -621,8 +621,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 
@@ -671,8 +671,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 ! five-slice for quadrupole
@@ -711,8 +711,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 
@@ -761,8 +761,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 
@@ -811,8 +811,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 select, flag=interpolate, clear;
@@ -851,8 +851,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 
@@ -899,8 +899,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 select, flag=interpolate, clear;
@@ -939,8 +939,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 
@@ -997,8 +997,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
 
 ! selection stays intact after USE
@@ -1035,8 +1035,8 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 1 
+           synch_6            synch_8             nflips 
+                 0                  0                  1 
 
   Number of warnings: 15
 0 in C and 15 in Fortran

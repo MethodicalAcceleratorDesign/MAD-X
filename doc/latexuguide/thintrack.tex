@@ -278,7 +278,10 @@ A \texttt{SEED} value is an integer in the range [0...999999999] (default:
       tr\$macro(turn): macro=\{ \\
       commands that can depend on the turnnumber;\\
       \};
-    } 
+    }
+
+   \ttitem{KEEPTRACK} a logical flag to keep data from previous tracking and append new results to tables. (Default:~false)
+
   \end{madlist}
 
 \end{madlist}
@@ -432,8 +435,6 @@ The \texttt{RUN} command has three attributes:
    observation points. (Default:~1)\\
 
    \texttt{FFILE=n} will print coordinates every n-th turn only. 
-
-   \ttitem{KEEPTRACK} a logical flag to keep data from previous tracking and append new results to tables. (Default:~false)
 
    \ttitem{TRACK\_HARMON} is used to calculate the maximum time difference before a particle is considered lost ($t_{max}$). 
     $t_{max} =\frac{C}{h_{track}*\beta}$ where $h_{track}$=TRACK\_HARMON and $C$ is the total length of the machine.  (Default: 1)

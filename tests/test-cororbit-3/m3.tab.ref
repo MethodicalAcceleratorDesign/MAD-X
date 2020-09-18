@@ -1,9 +1,9 @@
 @ NAME             %03s "MON"
 @ TYPE             %03s "MON"
 @ TITLE            %01s "s"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.34.05"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "16.24.44"
 * NAME                            X.OLD              Y.OLD                  X                  Y 
 $ %s                                %le                %le                %le                %le 
  "BPHA"                  0.002426736553                  0    0.0002203125151                  0

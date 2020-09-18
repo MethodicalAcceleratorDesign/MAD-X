@@ -98,7 +98,7 @@
 !----------------------------------------------------------------------*
 
       integer izero
-      integer i,iflag,info,j,level,m,n,calls,call_lim
+      integer i,iflag,info,j,level,m,n,calls,call_lim,ecalls
       integer ireset,strategy,bisec,match_mode
       double precision fmin_old,epsfcn
       double precision ftol,gtol
@@ -117,7 +117,11 @@
       double precision WORK(1000*(N+M)),SV(N+M),COND
       integer IWORK(30*(N+M)),RANK
       integer effcon, effvar,coninfo(M),varinfo(N)
+      integer debug
+      integer, external :: get_option
 
+      debug = get_option('debug ')
+      ecalls = 0
       ireset = 0
       izero = 0
       info = 0
@@ -184,11 +188,24 @@
 !---- Start main loop
   20  continue
 
+      if (debug .ne. 0) then
+        write(*,*) "Current variables values"
+        do i=1,N
+          write(*,'(i5,e20.12)') i, x(i)
+        enddo
+      endif
+
 !---- Reset ireset
       ireset=0
 
 !---- Calculate the jacobian
       call fdjac2(fcn,m,n,x,fvec,fjac,m,iflag,xtol,wa4)
+      ecalls=ecalls+n
+      if (iflag .ne. 0) then
+        call fort_warn('JACOBIAN', ' stopped, possibly unstable')
+        info = - 1
+        go to 300
+      endif
 
       if (strategy.eq.2) then
 !        call DGESDD('A',M,N,fjac,M,SV,U,M,VT,N,                         &
@@ -196,6 +213,13 @@
 !---- Print the jacobian on the match2 variables and exit
         call jacob_print(n,match_mode)
         goto 300
+      endif
+
+      if (debug .ne. 0) then
+        write(*,*) "Jacobian: "
+        do i=1,M
+          write(*,'(100e20.12)') (fjac(i,j),j=1,N)
+        enddo
       endif
 
 !---- Reset solution vector
@@ -235,6 +259,8 @@
         endif
       end do
 
+!-- BUG, effjac and effsol can be empty in case jacobian is e.g. full of zero...
+
  33   continue
 
 
@@ -253,6 +279,14 @@
 !---- CALL DGELS(TRANSA, M, N, NRHS, DA, LDA, DB, LDB, DWORK,
 !---- LDWORK,INFO)
       write(*,*) "Solve system with ",effcon,"con,",effvar,"var"
+
+      if (debug .ne. 0) then
+        write(*,*) "Effective Jacobian: "
+        do i=1,effcon
+          write(*,'(100e20.12)') (effjac(i,j),j=1,effvar)
+        enddo
+      endif
+
 !      call DGELS ('N',effcon,effvar,1,effjac,M,effsol,N+M,              &
 !     &WORK,2*(N+M),INFO)
 !      DGELSD( M, N, NRHS, A, LDA, B, LDB, S,  RCOND,
@@ -347,7 +381,7 @@
         enddo
 
         if (ireset.eq.20) then
-          write(*,*) "Too loops in system resizing, set strategy=1"
+          write(*,*) "Too many loops in system resizing, set strategy=1"
           strategy=1
 !----     Exit var cancel loop
           goto 34
@@ -357,7 +391,7 @@
 
         if ((effvar.lt.effcon+1).or.(condnum.gt.1E10)) then
 !----     Impossible to get  better
-          write(*,*) "Too var to exclude, set strategy=1"
+          write(*,*) "Too many variables to exclude, set strategy=1"
           strategy=1
 !----     Exit var cancel loop
           goto 34
@@ -379,6 +413,12 @@
 
 !----- Calculate the penalty function
       call FCN(M,N,x,fvec,IFLAG)
+      ecalls=ecalls+1
+      if (iflag .ne. 0) then
+        call fort_warn('JACOBIAN', ' stopped, possibly unstable')
+        info = - 1
+        go to 300
+      endif
 
       fmin_old=fmin
       fmin = vdot(m, fvec,fvec)
@@ -395,12 +435,18 @@
         ! go back to average solution
         do i=1,N
           x(i)=(x(i)+xold(i))*.5
-          dx(i)=(x(i)-xold(i))*.5
+          dx(i)=(x(i)-xold(i))*.5                   ! LD: never used
         enddo
         j=j+1
         call FCN(M,N,x,fvec,IFLAG)
+        ecalls=ecalls+1
+        if (iflag .ne. 0) then
+          call fort_warn('JACOBIAN', ' stopped, possibly unstable')
+          info = - 1
+          go to 300
+        endif
         fmin = vdot(m,fvec,fvec)
-        dxnorm=sqrt(vdot(N, dx, dx)/vdot(N, x, x))
+        dxnorm=sqrt(vdot(N, dx, dx)/vdot(N, x, x))  ! LD: never used
         if (fmin.gt.fmin_old2) then
           goto 37
         endif
@@ -417,9 +463,13 @@
 !---- calculate the target function and set new values
       call FCN(M,N,x,fvec,IFLAG)
       calls=calls+1
+      if (iflag .ne. 0) then
+        call fort_warn('JACOBIAN', ' stopped, possibly unstable')
+        info = - 1
+        go to 300
+      endif
 
       fmin = vdot(m,fvec,fvec)
-
       xnorm=DNRM2(N, x, 1)
       dxnorm=DNRM2(effvar, effsol, 1)/xnorm
       write(*,"('call: ',I5,' Dx = ', e16.8,                            &
@@ -445,7 +495,7 @@
         goto 300
       endif
       ! Iteration do not converge
-      ! For the first calls it can happen due to not fisical penalty
+      ! For the first calls it can happen due to not physical penalty
       if((calls.ge.3).and.(abs(1-fmin/fmin_old).lt.1D-15) ) then
 !        print *, 'dbg',fmin,fmin_old,abs(1-fmin/fmin_old)
         print *, '++++++++++ JACOBIAN ended: minimum found'
@@ -478,11 +528,20 @@
       enddo
       ! set values to the previous solution
       call FCN(M,N,X,fvec,IFLAG)
+      ecalls=ecalls+1
+      if (iflag .ne. 0) then
+        call fort_warn('JACOBIAN', ' stopped, possibly unstable')
+        info = - 1
+      endif
 
 !---- Store the final distance
       do i = 1, n
         dx(i)=(x(i)-xstart(i))
       enddo
+
+      if (debug .ne. 0) then
+        write(*,*) 'Effective number of calls:', calls+ecalls
+      endif
 
 !      xnorm=DNRM2(N, x, 1)
       dxnorm=sqrt(DNRM2(N, dx, 1))

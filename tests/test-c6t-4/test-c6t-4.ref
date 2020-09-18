@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.02.13 23:13:12      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.08.10 13:27:04      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "test-c6t-4 conversion of thick elements with apertures";
 
@@ -85,8 +85,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
   
@@ -114,8 +114,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -141,8 +141,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 open line - error with deltap:   0.000000E+00
@@ -169,18 +169,18 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   2.349229E-03 deltap:   0.000000E+00
 orbit:  -2.021583E-03  1.000628E-06  2.720966E-06 -1.724208E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   3.645514E-05 deltap:   0.000000E+00
-orbit:  -2.000005E-03 -7.832126E-10  2.327269E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000005E-03 -7.832127E-10  2.327266E-09 -1.700002E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   5.547939E-09 deltap:   0.000000E+00
-orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -194,16 +194,16 @@ orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0
        1.352953497      0.01191651163     0.001284492482        59.31000003 
 
                dq2            betymax              dymax              dyrms 
-       2.999999971        609.4788379       0.1932632514      0.05916187374 
+       2.999999971         609.478838       0.1932632514      0.05916187374 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01353295385     0.001377607928                  0                  0 
+     0.01353295385     0.001377607927                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 Processing apertures from s.ds.l1.b1:1 to e.ds.r1.b1:1...
 +++++++ deltap from TWISS            0
@@ -249,8 +249,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
   
@@ -278,8 +278,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -305,8 +305,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: betxaux redefined
 ++++++ info: betyaux redefined
 ++++++ info: alfxaux redefined
@@ -339,8 +339,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: r11 redefined
 ++++++ info: r12 redefined
 ++++++ info: r21 redefined
@@ -357,10 +357,10 @@ iteration:   1 error:   2.349229E-03 deltap:   0.000000E+00
 orbit:  -2.021583E-03  1.000628E-06  2.720966E-06 -1.724208E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   3.645514E-05 deltap:   0.000000E+00
-orbit:  -2.000005E-03 -7.832126E-10  2.327269E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000005E-03 -7.832127E-10  2.327266E-09 -1.700002E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   5.547939E-09 deltap:   0.000000E+00
-orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -374,16 +374,16 @@ orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0
        1.352953497      0.01191651163     0.001284492482        59.31000003 
 
                dq2            betymax              dymax              dyrms 
-       2.999999971        609.4788379       0.1932632514      0.05916187374 
+       2.999999971         609.478838       0.1932632514      0.05916187374 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01353295385     0.001377607928                  0                  0 
+     0.01353295385     0.001377607927                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 Processing apertures from s.ds.l2.b1:1 to e.ds.r2.b1:1...
 +++++++ deltap from TWISS            0
@@ -431,8 +431,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
   
@@ -460,8 +460,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -487,8 +487,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: betxaux redefined
 ++++++ info: betyaux redefined
 ++++++ info: alfxaux redefined
@@ -521,8 +521,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: r11 redefined
 ++++++ info: r12 redefined
 ++++++ info: r21 redefined
@@ -539,10 +539,10 @@ iteration:   1 error:   2.349229E-03 deltap:   0.000000E+00
 orbit:  -2.021583E-03  1.000628E-06  2.720966E-06 -1.724208E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   3.645514E-05 deltap:   0.000000E+00
-orbit:  -2.000005E-03 -7.832126E-10  2.327269E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000005E-03 -7.832127E-10  2.327266E-09 -1.700002E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   5.547939E-09 deltap:   0.000000E+00
-orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -556,16 +556,16 @@ orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0
        1.352953497      0.01191651163     0.001284492482        59.31000003 
 
                dq2            betymax              dymax              dyrms 
-       2.999999971        609.4788379       0.1932632514      0.05916187374 
+       2.999999971         609.478838       0.1932632514      0.05916187374 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01353295385     0.001377607928                  0                  0 
+     0.01353295385     0.001377607927                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 Processing apertures from s.ds.l3.b1:1 to e.ds.r3.b1:1...
 +++++++ deltap from TWISS            0
@@ -617,8 +617,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
   
@@ -646,8 +646,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -673,8 +673,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: betxaux redefined
 ++++++ info: betyaux redefined
 ++++++ info: alfxaux redefined
@@ -707,8 +707,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: r11 redefined
 ++++++ info: r12 redefined
 ++++++ info: r21 redefined
@@ -725,10 +725,10 @@ iteration:   1 error:   2.349229E-03 deltap:   0.000000E+00
 orbit:  -2.021583E-03  1.000628E-06  2.720966E-06 -1.724208E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   3.645514E-05 deltap:   0.000000E+00
-orbit:  -2.000005E-03 -7.832126E-10  2.327269E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000005E-03 -7.832127E-10  2.327266E-09 -1.700002E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   5.547939E-09 deltap:   0.000000E+00
-orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -742,16 +742,16 @@ orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0
        1.352953497      0.01191651163     0.001284492482        59.31000003 
 
                dq2            betymax              dymax              dyrms 
-       2.999999971        609.4788379       0.1932632514      0.05916187374 
+       2.999999971         609.478838       0.1932632514      0.05916187374 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01353295385     0.001377607928                  0                  0 
+     0.01353295385     0.001377607927                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 Processing apertures from s.ds.l4.b1:1 to e.ds.r4.b1:1...
 +++++++ deltap from TWISS            0
@@ -792,8 +792,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
   
@@ -821,8 +821,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -848,8 +848,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: betxaux redefined
 ++++++ info: betyaux redefined
 ++++++ info: alfxaux redefined
@@ -882,8 +882,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: r11 redefined
 ++++++ info: r12 redefined
 ++++++ info: r21 redefined
@@ -900,10 +900,10 @@ iteration:   1 error:   2.349229E-03 deltap:   0.000000E+00
 orbit:  -2.021583E-03  1.000628E-06  2.720966E-06 -1.724208E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   3.645514E-05 deltap:   0.000000E+00
-orbit:  -2.000005E-03 -7.832126E-10  2.327269E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000005E-03 -7.832127E-10  2.327266E-09 -1.700002E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   5.547939E-09 deltap:   0.000000E+00
-orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -917,16 +917,16 @@ orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0
        1.352953497      0.01191651163     0.001284492482        59.31000003 
 
                dq2            betymax              dymax              dyrms 
-       2.999999971        609.4788379       0.1932632514      0.05916187374 
+       2.999999971         609.478838       0.1932632514      0.05916187374 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01353295385     0.001377607928                  0                  0 
+     0.01353295385     0.001377607927                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 Processing apertures from s.ds.l5.b1:1 to e.ds.r5.b1:1...
 +++++++ deltap from TWISS            0
@@ -987,8 +987,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
   
@@ -1016,8 +1016,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -1043,8 +1043,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: betxaux redefined
 ++++++ info: betyaux redefined
 ++++++ info: alfxaux redefined
@@ -1077,8 +1077,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: r11 redefined
 ++++++ info: r12 redefined
 ++++++ info: r21 redefined
@@ -1095,10 +1095,10 @@ iteration:   1 error:   2.349229E-03 deltap:   0.000000E+00
 orbit:  -2.021583E-03  1.000628E-06  2.720966E-06 -1.724208E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   3.645514E-05 deltap:   0.000000E+00
-orbit:  -2.000005E-03 -7.832126E-10  2.327269E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000005E-03 -7.832127E-10  2.327266E-09 -1.700002E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   5.547939E-09 deltap:   0.000000E+00
-orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -1112,16 +1112,16 @@ orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0
        1.352953497      0.01191651163     0.001284492482        59.31000003 
 
                dq2            betymax              dymax              dyrms 
-       2.999999971        609.4788379       0.1932632514      0.05916187374 
+       2.999999971         609.478838       0.1932632514      0.05916187374 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01353295385     0.001377607928                  0                  0 
+     0.01353295385     0.001377607927                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 Processing apertures from s.ds.l6.b1:1 to e.ds.r6.b1:1...
 +++++++ deltap from TWISS            0
@@ -1172,8 +1172,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
   
@@ -1201,8 +1201,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -1228,8 +1228,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: betxaux redefined
 ++++++ info: betyaux redefined
 ++++++ info: alfxaux redefined
@@ -1262,8 +1262,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: r11 redefined
 ++++++ info: r12 redefined
 ++++++ info: r21 redefined
@@ -1280,10 +1280,10 @@ iteration:   1 error:   2.349229E-03 deltap:   0.000000E+00
 orbit:  -2.021583E-03  1.000628E-06  2.720966E-06 -1.724208E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   3.645514E-05 deltap:   0.000000E+00
-orbit:  -2.000005E-03 -7.832126E-10  2.327269E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000005E-03 -7.832127E-10  2.327266E-09 -1.700002E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   5.547939E-09 deltap:   0.000000E+00
-orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -1297,16 +1297,16 @@ orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0
        1.352953497      0.01191651163     0.001284492482        59.31000003 
 
                dq2            betymax              dymax              dyrms 
-       2.999999971        609.4788379       0.1932632514      0.05916187374 
+       2.999999971         609.478838       0.1932632514      0.05916187374 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01353295385     0.001377607928                  0                  0 
+     0.01353295385     0.001377607927                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 Processing apertures from s.ds.l7.b1:1 to e.ds.r7.b1:1...
 +++++++ deltap from TWISS            0
@@ -1369,8 +1369,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
   
@@ -1398,8 +1398,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -1425,8 +1425,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: betxaux redefined
 ++++++ info: betyaux redefined
 ++++++ info: alfxaux redefined
@@ -1459,8 +1459,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ++++++ info: r11 redefined
 ++++++ info: r12 redefined
 ++++++ info: r21 redefined
@@ -1477,10 +1477,10 @@ iteration:   1 error:   2.349229E-03 deltap:   0.000000E+00
 orbit:  -2.021583E-03  1.000628E-06  2.720966E-06 -1.724208E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   3.645514E-05 deltap:   0.000000E+00
-orbit:  -2.000005E-03 -7.832126E-10  2.327269E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000005E-03 -7.832127E-10  2.327266E-09 -1.700002E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   5.547939E-09 deltap:   0.000000E+00
-orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -1494,16 +1494,16 @@ orbit:  -2.000003E-03 -6.692130E-10  3.076735E-11 -1.700000E-04  0.000000E+00  0
        1.352953497      0.01191651163     0.001284492482        59.31000003 
 
                dq2            betymax              dymax              dyrms 
-       2.999999971        609.4788379       0.1932632514      0.05916187374 
+       2.999999971         609.478838       0.1932632514      0.05916187374 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01353295385     0.001377607928                  0                  0 
+     0.01353295385     0.001377607927                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 Processing apertures from s.ds.l8.b1:1 to e.ds.r8.b1:1...
 +++++++ deltap from TWISS            0
@@ -1623,8 +1623,8 @@ orbit:  -2.000065E-03  3.112314E-09 -3.956450E-08 -1.699883E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 Sixtrack, aperture;

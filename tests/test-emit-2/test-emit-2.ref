@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.01  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.06.07               +
-  + Execution date: 2019.06.07 17:54:25      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:24:56      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
@@ -24,31 +24,31 @@ parameter: particle   string: electron
 parameter: sequence   string: machine
 parameter: bunched   logical: true
 parameter: radiate   logical: true
-parameter: mass   double value:    0.0005109989461
+parameter: mass   double value:      0.00051099895
 parameter: charge   double value:                 -1
 parameter: energy   double value:                  3
 parameter: pc   double value:        2.999999956
-parameter: gamma   double value:        5870.853595
+parameter: gamma   double value:        5870.853551
 parameter: beta   double value:       0.9999999855
 parameter: brho   double value:        10.00692271
 parameter: ex   double value:                  1
-parameter: exn   double value:         5870.85351
+parameter: exn   double value:        5870.853466
 parameter: ey   double value:                  1
-parameter: eyn   double value:         5870.85351
+parameter: eyn   double value:        5870.853466
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    2.901332477e-08
+parameter: alfa   double value:    2.901332521e-08
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    2.817940323e-15
+parameter: arad   double value:    2.817940325e-15
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -57,34 +57,34 @@ Twiss;
 enter Twiss module
   
 iteration:   1 error:   2.157363E-04 deltap:   0.000000E+00
-orbit:  -4.599789E-09 -1.532396E-07 -1.254925E-20 -5.010531E-21 -2.166246E-03  2.998543E-08
+orbit:  -4.605154E-09 -1.532397E-07 -9.846024E-21 -1.980154E-20 -2.166246E-03  2.994875E-08
   
-iteration:   2 error:   9.315625E-07 deltap:   0.000000E+00
-orbit:   6.830763E-10 -1.536905E-07 -2.673971E-21  1.206394E-21 -2.156961E-03 -2.238259E-10
+iteration:   2 error:   9.315624E-07 deltap:   0.000000E+00
+orbit:   6.815788E-10 -1.536905E-07 -1.075601E-20 -1.724984E-21 -2.156961E-03 -2.340628E-10
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-         67.200074     0.002156961062    0.0008829339349        33.65393841 
+         67.200074     0.002156961081    0.0008829339348        33.65393841 
 
                 q1                dq1            betxmax              dxmax 
-       4.544746479        0.328048408        17.73701551       0.2344520761 
+        4.54474663       0.3280505993        17.73706873       0.2344520762 
 
              dxrms             xcomax             xcorms                 q2 
-      0.1455152745    1.388446724e-05    5.588612801e-06        2.093002374 
+      0.1455152745    1.388447088e-05    5.588613468e-06        2.093002659 
 
                dq2            betymax              dymax              dyrms 
-      0.1526852447        19.36580268    5.258279369e-16    2.861171912e-16 
+      0.1526855382        19.36583074    6.056153697e-16    3.126496252e-16 
 
             ycomax             ycorms             deltap            synch_1 
-   7.083666808e-21     2.63730488e-21                  0                  0 
+   3.182513417e-20    1.670909773e-20                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 Emit, DELTAP=0.0 ;
 
 enter EMIT module
@@ -94,36 +94,36 @@ enter EMIT module
  C                  67.200074 m          f0               4.461192314 MHz
  T0              0.2241553221 musecs     alfa         0.0008829339203 
  eta           0.000882904907            gamma(tr)        33.65393868 
- Bcurrent                   0 A/bunch    Kbunch             1 
- Npart                      0 /bunch     Energy                     3 GeV 
- gamma            5870.853595            beta            0.9999999855
+ Bcurrent     7.147617982e-13 A/bunch    Kbunch             1 
+ Npart                      1 /bunch     Energy                     3 GeV 
+ gamma            5870.853551            beta            0.9999999855
  dtbyds                     0
      U0              0.254202 [MeV/turn]
  
                                                   M o d e   1         M o d e   2         M o d e   3
- Fractional tunes            undamped              0.54473120          0.09300237          0.01229083
-                             damped                0.54473120          0.09300237          0.01229083
+ Fractional tunes            undamped              0.54473135          0.09300266          0.01229083
+                             damped                0.54473135          0.09300266          0.01229083
  
- beta* [m]                   x                 0.11192592E+02      0.13010552E-29      0.19146961E-02
-                             y                 0.42830908E-30      0.59288108E+01      0.13461397E-30
-                             t                 0.27866856E-01      0.74899480E-29      0.76902873E+00
+ beta* [m]                   x                 0.11192629E+02      0.64987715E-30      0.19146899E-02
+                             y                 0.31481089E-30      0.59288268E+01      0.88635462E-31
+                             t                 0.27866856E-01      0.62667312E-30      0.76902873E+00
  
- gamma* [1/m]                px                0.89342399E-01      0.24660956E-30      0.96685603E-07
-                             py                0.99788209E-31      0.16866790E+00      0.27566030E-30
-                             pt                0.67029607E-08      0.70547583E-31      0.13003062E+01
+ gamma* [1/m]                px                0.89342106E-01      0.11953454E-30      0.96685946E-07
+                             py                0.10409052E-30      0.16866745E+00      0.82964310E-30
+                             pt                0.67029625E-08      0.94071436E-31      0.13003062E+01
  
- beta(max) [m]               x                 0.17732390E+02      0.27702132E-28      0.63317975E-02
-                             y                 0.51653677E-29      0.19365803E+02      0.19253181E-30
-                             t                 0.71609725E-01      0.24320037E-28      0.76902874E+00
+ beta(max) [m]               x                 0.17732443E+02      0.17504591E-28      0.63318064E-02
+                             y                 0.50077991E-29      0.19365831E+02      0.92987360E-31
+                             t                 0.71609725E-01      0.12205217E-28      0.76902874E+00
  
- gamma(max) [1/m]            px                0.58774952E+01      0.68400579E-29      0.49283519E-05
-                             py                0.15165232E-29      0.41245501E+01      0.29927911E-30
-                             pt                0.26021594E-01      0.53905911E-29      0.13022468E+01
+ gamma(max) [1/m]            px                0.58775140E+01      0.50258077E-29      0.49283364E-05
+                             py                0.14857205E-29      0.41245574E+01      0.85462281E-30
+                             pt                0.26021594E-01      0.26511774E-29      0.13022468E+01
  
  Damping partition numbers                         1.49533276          1.00000032          1.50467344
- Damping constants [1/s]                           0.28262935E+03      0.18900772E+03      0.28439481E+03
- Damping times [s]                                 0.35382030E-02      0.52907891E-02      0.35162386E-02
- Emittances [pi micro m]                       0.11259322E-02      0.27519820E-30      0.95690415E+00
+ Damping constants [1/s]                           0.28262934E+03      0.18900772E+03      0.28439480E+03
+ Damping times [s]                                 0.35382031E-02      0.52907892E-02      0.35162387E-02
+ Emittances [pi micro m]                       0.11259326E-02      0.12918817E-30      0.95690420E+00
 
  EMIT: beam parameters have been updated.
 
@@ -137,31 +137,31 @@ parameter: particle   string: electron
 parameter: sequence   string: machine
 parameter: bunched   logical: true
 parameter: radiate   logical: true
-parameter: mass   double value:    0.0005109989461
+parameter: mass   double value:      0.00051099895
 parameter: charge   double value:                 -1
 parameter: energy   double value:                  3
 parameter: pc   double value:        2.999999956
-parameter: gamma   double value:        5870.853595
+parameter: gamma   double value:        5870.853551
 parameter: beta   double value:       0.9999999855
 parameter: brho   double value:        10.00692271
-parameter: ex   double value:    1.125932175e-09
-parameter: exn   double value:    6.610182862e-06
-parameter: ey   double value:    2.751981994e-37
-parameter: eyn   double value:    1.615648315e-33
-parameter: et   double value:    9.569041543e-07
-parameter: sigt   double value:    0.0008578396932
-parameter: sige   double value:     0.001115467778
+parameter: ex   double value:    1.125932592e-09
+parameter: exn   double value:    6.610185259e-06
+parameter: ey   double value:    1.291881741e-37
+parameter: eyn   double value:    7.584448396e-34
+parameter: et   double value:    9.569042041e-07
+parameter: sigt   double value:    0.0008578397155
+parameter: sige   double value:     0.001115467807
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
-parameter: bcurrent   double value:                  0
+parameter: npart   double value:                  1
+parameter: bcurrent   double value:    7.147617982e-13
 parameter: freq0   double value:        4.461192314
 parameter: circ   double value:          67.200074
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    2.901332477e-08
-parameter: u0   double value:    0.0002542024392
+parameter: alfa   double value:    2.901332521e-08
+parameter: u0   double value:    0.0002542024335
 parameter: qs   double value:      0.01229083024
-parameter: arad   double value:    2.817940323e-15
+parameter: arad   double value:    2.817940325e-15
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.495333e+00 1.000000e+00 1.504673e+00 
 parameter: n1min   double value:                 -1
@@ -190,31 +190,31 @@ parameter: particle   string: electron
 parameter: sequence   string: machine2
 parameter: bunched   logical: true
 parameter: radiate   logical: true
-parameter: mass   double value:    0.0005109989461
+parameter: mass   double value:      0.00051099895
 parameter: charge   double value:                 -1
 parameter: energy   double value:                  3
 parameter: pc   double value:        2.999999956
-parameter: gamma   double value:        5870.853595
+parameter: gamma   double value:        5870.853551
 parameter: beta   double value:       0.9999999855
 parameter: brho   double value:        10.00692271
 parameter: ex   double value:                  1
-parameter: exn   double value:         5870.85351
+parameter: exn   double value:        5870.853466
 parameter: ey   double value:                  1
-parameter: eyn   double value:         5870.85351
+parameter: eyn   double value:        5870.853466
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
 parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
+parameter: npart   double value:                  1
 parameter: bcurrent   double value:                  0
 parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    2.901332477e-08
+parameter: alfa   double value:    2.901332521e-08
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    2.817940323e-15
+parameter: arad   double value:    2.817940325e-15
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -223,34 +223,34 @@ Twiss;
 enter Twiss module
   
 iteration:   1 error:   2.157346E-04 deltap:   0.000000E+00
-orbit:  -4.265993E-09 -1.522421E-07  1.565806E-20  2.054753E-21 -2.166229E-03  2.994453E-08
+orbit:  -4.271358E-09 -1.522422E-07 -6.196387E-20 -2.078391E-21 -2.166229E-03  2.990785E-08
   
-iteration:   2 error:   9.296620E-07 deltap:   0.000000E+00
-orbit:   8.638867E-10 -1.527012E-07  8.791553E-21  2.764023E-21 -2.156963E-03 -1.958219E-10
+iteration:   2 error:   9.296619E-07 deltap:   0.000000E+00
+orbit:   8.623892E-10 -1.527012E-07 -2.720436E-20  3.363084E-21 -2.156963E-03 -2.060591E-10
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-         67.200074      0.00215696329    0.0008829339353         33.6539384 
+         67.200074     0.002156963309    0.0008829339352         33.6539384 
 
                 q1                dq1            betxmax              dxmax 
-       4.544746479       0.3280501793        17.73759903       0.2344530234 
+        4.54474663       0.3280523706        17.73765224       0.2344530235 
 
              dxrms             xcomax             xcorms                 q2 
-     0.09739666865    1.418133583e-05    3.995477334e-06        2.093002372 
+     0.09739666865    1.418133945e-05    3.995477793e-06        2.093002656 
 
                dq2            betymax              dymax              dyrms 
-       0.152681934        24.82321137     4.11798781e-16    2.226898956e-16 
+      0.1526822276        24.82324322    3.121185311e-16    1.217215308e-16 
 
             ycomax             ycorms             deltap            synch_1 
-    3.73068033e-20    1.984358608e-20                  0                  0 
+    1.02259563e-19    5.554657779e-20                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 Emit, DELTAP=0.0 ;
 
 enter EMIT module
@@ -260,36 +260,36 @@ enter EMIT module
  C                  67.200074 m          f0               4.461192314 MHz
  T0              0.2241553221 musecs     alfa         0.0008829339203 
  eta           0.000882904907            gamma(tr)        33.65393868 
- Bcurrent                   0 A/bunch    Kbunch             1 
- Npart                      0 /bunch     Energy                     3 GeV 
- gamma            5870.853595            beta            0.9999999855
+ Bcurrent     7.147617982e-13 A/bunch    Kbunch             1 
+ Npart                      1 /bunch     Energy                     3 GeV 
+ gamma            5870.853551            beta            0.9999999855
  dtbyds                     0
      U0              0.254202 [MeV/turn]
  
                                                   M o d e   1         M o d e   2         M o d e   3
- Fractional tunes            undamped              0.54473120          0.09300237          0.01229083
-                             damped                0.54473120          0.09300237          0.01229082
+ Fractional tunes            undamped              0.54473135          0.09300266          0.01229083
+                             damped                0.54473135          0.09300266          0.01229082
  
- beta* [m]                   x                 0.11192592E+02      0.50132093E-29      0.19146961E-02
-                             y                 0.24489317E-29      0.59288110E+01      0.15434933E-31
-                             t                 0.27866856E-01      0.30576191E-29      0.76902873E+00
+ beta* [m]                   x                 0.11192629E+02      0.62160899E-29      0.19146898E-02
+                             y                 0.10391344E-29      0.59288271E+01      0.18794906E-30
+                             t                 0.27866856E-01      0.83349403E-29      0.76902873E+00
  
- gamma* [1/m]                px                0.89342402E-01      0.31772759E-31      0.96685602E-07
-                             py                0.48707474E-31      0.16866791E+00      0.29358016E-30
-                             pt                0.66991203E-08      0.63513043E-31      0.13003062E+01
+ gamma* [1/m]                px                0.89342109E-01      0.49159208E-32      0.96685945E-07
+                             py                0.20883953E-32      0.16866745E+00      0.45218220E-30
+                             pt                0.66991221E-08      0.61189670E-31      0.13003062E+01
  
- beta(max) [m]               x                 0.17732973E+02      0.28699915E-28      0.82592093E-02
-                             y                 0.10326042E-28      0.24823211E+02      0.54295807E-31
-                             t                 0.71610288E-01      0.21118454E-28      0.76904712E+00
+ beta(max) [m]               x                 0.17733027E+02      0.18478616E-28      0.82592310E-02
+                             y                 0.27888104E-29      0.24823243E+02      0.23498228E-30
+                             t                 0.71610288E-01      0.34623301E-28      0.76904712E+00
  
- gamma(max) [1/m]            px                0.58776605E+01      0.45685538E-29      0.49283518E-05
-                             py                0.35953802E-29      0.41248810E+01      0.29358016E-30
-                             pt                0.26021781E-01      0.35925532E-29      0.13022468E+01
+ gamma(max) [1/m]            px                0.58776792E+01      0.30135014E-29      0.49283363E-05
+                             py                0.99503135E-30      0.41248882E+01      0.45218220E-30
+                             pt                0.26021781E-01      0.61431313E-29      0.13022468E+01
  
  Damping partition numbers                         1.29624117          1.00000041          1.70376019
- Damping constants [1/s]                           0.24499886E+03      0.18900724E+03      0.32202288E+03
- Damping times [s]                                 0.40816516E-02      0.52908026E-02      0.31053694E-02
- Emittances [pi micro m]                       0.44845305E-02      0.59353367E-31      0.84509855E+00
+ Damping constants [1/s]                           0.24499886E+03      0.18900724E+03      0.32202287E+03
+ Damping times [s]                                 0.40816517E-02      0.52908027E-02      0.31053695E-02
+ Emittances [pi micro m]                       0.44845345E-02      0.38861112E-30      0.84509860E+00
 
  EMIT: beam parameters have been updated.
 
@@ -309,31 +309,31 @@ parameter: particle   string: electron
 parameter: sequence   string: machine2
 parameter: bunched   logical: true
 parameter: radiate   logical: true
-parameter: mass   double value:    0.0005109989461
+parameter: mass   double value:      0.00051099895
 parameter: charge   double value:                 -1
 parameter: energy   double value:                  3
 parameter: pc   double value:        2.999999956
-parameter: gamma   double value:        5870.853595
+parameter: gamma   double value:        5870.853551
 parameter: beta   double value:       0.9999999855
 parameter: brho   double value:        10.00692271
-parameter: ex   double value:    4.484530517e-09
-parameter: exn   double value:    2.632802173e-05
-parameter: ey   double value:    5.935336675e-38
-parameter: eyn   double value:    3.484549215e-34
-parameter: et   double value:    8.450985528e-07
-parameter: sigt   double value:    0.0008061722208
-parameter: sige   double value:     0.001048278042
+parameter: ex   double value:    4.484534544e-09
+parameter: exn   double value:    2.632804517e-05
+parameter: ey   double value:    3.886111202e-37
+parameter: eyn   double value:    2.281478942e-33
+parameter: et   double value:    8.450985968e-07
+parameter: sigt   double value:    0.0008061722418
+parameter: sige   double value:     0.001048278069
 parameter: kbunch   double value:                  1
-parameter: npart   double value:                  0
-parameter: bcurrent   double value:                  0
+parameter: npart   double value:                  1
+parameter: bcurrent   double value:    7.147617982e-13
 parameter: freq0   double value:        4.461192314
 parameter: circ   double value:          67.200074
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    2.901332477e-08
-parameter: u0   double value:    0.0002542017677
+parameter: alfa   double value:    2.901332521e-08
+parameter: u0   double value:     0.000254201762
 parameter: qs   double value:      0.01229083026
-parameter: arad   double value:    2.817940323e-15
+parameter: arad   double value:    2.817940325e-15
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.296241e+00 1.000000e+00 1.703760e+00 
 parameter: n1min   double value:                 -1
@@ -352,34 +352,34 @@ TWISS, SEQUENCE=Machine, FILE="twiss1";
 enter Twiss module
   
 iteration:   1 error:   2.157363E-04 deltap:   0.000000E+00
-orbit:  -4.599789E-09 -1.532396E-07 -1.254925E-20 -5.010531E-21 -2.166246E-03  2.998543E-08
+orbit:  -4.605154E-09 -1.532397E-07 -9.846024E-21 -1.980154E-20 -2.166246E-03  2.994875E-08
   
-iteration:   2 error:   9.315625E-07 deltap:   0.000000E+00
-orbit:   6.830763E-10 -1.536905E-07 -2.673971E-21  1.206394E-21 -2.156961E-03 -2.238259E-10
+iteration:   2 error:   9.315624E-07 deltap:   0.000000E+00
+orbit:   6.815788E-10 -1.536905E-07 -1.075601E-20 -1.724984E-21 -2.156961E-03 -2.340628E-10
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-         67.200074     0.002156961062    0.0008829339349        33.65393841 
+         67.200074     0.002156961081    0.0008829339348        33.65393841 
 
                 q1                dq1            betxmax              dxmax 
-       4.544746479        0.328048408        17.73701551       0.2344520761 
+        4.54474663       0.3280505993        17.73706873       0.2344520762 
 
              dxrms             xcomax             xcorms                 q2 
-      0.1455152745    1.388446724e-05    5.588612801e-06        2.093002374 
+      0.1455152745    1.388447088e-05    5.588613468e-06        2.093002659 
 
                dq2            betymax              dymax              dyrms 
-      0.1526852447        19.36580268    5.258279369e-16    2.861171912e-16 
+      0.1526855382        19.36583074    6.056153697e-16    3.126496252e-16 
 
             ycomax             ycorms             deltap            synch_1 
-   7.083666808e-21     2.63730488e-21                  0                  0 
+   3.182513417e-20    1.670909773e-20                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 stop;

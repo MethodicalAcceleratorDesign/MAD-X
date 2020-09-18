@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:57:24      +
+  + Execution date: 2020.07.29 16:35:33      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example of PTC_TRACK command with 6D and totalpath true
 
@@ -29,7 +29,7 @@
 
 option,-echo;
 
-betarel            =       0.9720997088 ;
+betarel            =       0.9720997084 ;
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -41,13 +41,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        160.1029241                 -0      0.08232069558        3.485342678 
 
                 q1                dq1            betxmax              dxmax 
-       3.600856589       -3.350234778        9.087520369        2.359954278 
+       3.600856589       -3.350234779        9.087520369        2.359954279 
 
              dxrms             xcomax             xcorms                 q2 
-       2.135070862                  0                  0        5.739685153 
+       2.135070863                  0                  0        5.739685153 
 
                dq2            betymax              dymax              dyrms 
-      -11.31959364        23.04886746                  0                  0 
+      -11.31959365        23.04886746                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -55,8 +55,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 rf1_spos           =        10.50643276 ;
 rf2_spos           =        20.51286551 ;
 rf2_spos-rf1_spos  =        10.00643276 ;
@@ -85,52 +85,52 @@ Determined SECTOR NMUL MAX :  2
        160.1029241      0.08108628463           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      0.02606412847        3.511771898       0.6264471292 
+          -1000000      0.02606412766        3.511771898       0.6264471292 
 
                 q2                dq1                dq2                 qs 
-      0.8178647592                  0                  0      0.00331601849 
+      0.8178647592                  0                  0      0.00331601844 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       4.795874594         8.65225191         2.12769675        18.67437144 
+       4.795874669        8.652252047        2.127696783        18.67437173 
 
          beta11min          beta11max          beta12min          beta12max 
-       4.795874594         8.65225191     5.85228859e-32    1.503629894e-30 
+       4.795874669        8.652252047    5.515197899e-33     1.41810527e-31 
 
          beta13min          beta13max          beta21min          beta21max 
-     0.01598501709      0.02617710236    2.680527121e-33    1.066047022e-30 
+     0.01598501642      0.02617710319    1.414535859e-32    1.995610965e-30 
 
          beta22min          beta22max          beta23min          beta23max 
-        2.12769675        18.67437144     5.00462727e-32     7.36988402e-28 
+       2.127696783        18.67437173    4.834543547e-32    2.201825165e-28 
 
          beta31min          beta31max          beta32min          beta32max 
-      0.5647686671       0.7168179366    3.828775456e-31    2.016427066e-30 
+      0.5647686765       0.7168179486    3.345350677e-32    2.075923337e-31 
 
          beta33min          beta33max           disp1min           disp1max 
-       211.9250655        211.9696919        -2.35542319        -1.84059132 
+       211.9250657        211.9696921       -2.355423191        -1.84059132 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.6091164518       0.6091073638   -1.287677153e-14     1.48146605e-14 
+      -0.609116452        0.609107364   -4.648189918e-15    5.035423181e-15 
 
           disp4min           disp4max             deltap            orbit_x 
-  -5.527344797e-15    5.456690288e-15                  0    5.205943962e-06 
+  -1.924551388e-15     1.88211893e-15                  0    5.205944433e-06 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   6.465200835e-07                  0                  0    5.501535769e-07 
+   6.465200841e-07                  0                  0    5.501533498e-07 
 
            orbit_t             xcorms             ycorms            pxcorms 
-      -4.706852589    5.493537216e-06                  0    1.242668928e-06 
+      -4.706852591      5.4935372e-06                  0    1.242668926e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        100.9279987    1.180236134e-06    7.259296354e-06 
+                 0        100.9279988    1.180236107e-06    7.259296896e-06 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    2.854407446e-06                  0        169.4049002 
+                 0     2.85440731e-06                  0        169.4049002 
 
            ptcomax             xcomin             ycomin            pxcomin 
-   5.501535769e-07   -9.867480027e-06                  0   -2.930060887e-06 
+   5.501533498e-07     -9.8674795e-06                  0   -2.930060751e-06 
 
            pycomin             tcomin            ptcomin 
-                 0        4.706852589   -3.926025439e-06 
+                 0        4.706852591   -3.926025668e-06 
  Setting debug level to           1
 maxaccel is found and its value is 0.000000
 exact_mis is found and its value is 1.000000
@@ -149,7 +149,7 @@ obs_points pro_ptc_setswitch Done
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     2
   Default integration steps     15
- This is a proton
+ This a particle with    1836.1526734253     times the electron mass 
        EXACT_MODEL =  FALSE
        TOTALPATH   =     1
        RADIATION   =  FALSE
@@ -169,15 +169,18 @@ obs_points pro_ptc_setswitch Done
  ********************************************************************
  MAXAPER check of T variable not to be done because TOTALPATH is used
  ********************************************************************
-x_co               =    5.205943962e-06 ;
+++++++ warning: ptc_track:  Can not enable TOTALPATH subtraction schema
+ ptc_track: Common denominator of the present wavelengths corresponds to more than 100000 max wavelengths
+x_co               =    5.205944433e-06 ;
 y_co               =                  0 ;
-t_co               =       -4.706852589 ;
-px_co              =    6.465200835e-07 ;
+t_co               =       -4.706852591 ;
+px_co              =    6.465200841e-07 ;
 py_co              =                  0 ;
-pt_co              =    5.501535769e-07 ;
-betarel            =       0.9720997088 ;
+pt_co              =    5.501533498e-07 ;
+betarel            =       0.9720997084 ;
 
-  Number of warnings: 0
+  Number of warnings: 1
+0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

@@ -8,10 +8,10 @@
 @ PC               %le        0.9999998694
 @ GAMMA            %le         1956.951198
 @ KBUNCH           %le                   1
-@ BCURRENT         %le                   0
+@ BCURRENT         %le     4.803203419e-12
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
-@ NPART            %le                   0
+@ NPART            %le                   1
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.02 Linux 64"
-@ DATE             %08s "19/02/19"
-@ TIME             %08s "10.27.59"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.53.44"
 * NAME               APERTYPE                       APER_1             APER_2              ANGLE 
 $ %s                 %s                                %le                %le                %le 
  "TESTORDER$START"   "CIRCLE"                             0                  0                  0

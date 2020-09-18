@@ -2,18 +2,18 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le        0.9382720813
+@ MASS             %le        0.9382720882
 @ CHARGE           %le                   1
 @ ENERGY           %le                7000
 @ PC               %le         6999.999937
-@ GAMMA            %le         7460.522528
+@ GAMMA            %le         7460.522474
 @ KBUNCH           %le                   1
-@ BCURRENT         %le     0.0001981900369
+@ BCURRENT         %le     0.0001981900385
 @ SIGE             %le             0.00011
 @ SIGT             %le               0.077
 @ NPART            %le             1.1e+11
-@ EX               %le     5.026457578e-10
-@ EY               %le     5.026457578e-10
+@ EX               %le     5.026457615e-10
+@ EY               %le     5.026457615e-10
 @ ET               %le               0.001
 @ BV_FLAG          %le                  -1
 @ LENGTH           %le          26658.8832
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.02 Linux 64"
-@ DATE             %08s "28/03/19"
-@ TIME             %08s "09.55.11"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "16.25.09"
 * NAME                                X                  Y               BETX               BETY 
 $ %s                                %le                %le                %le                %le 
  "LHCB2$START"                   0.0005   -8.988606552e-15               0.55               0.55

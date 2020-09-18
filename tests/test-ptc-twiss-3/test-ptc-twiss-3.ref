@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:53:53      +
+  + Execution date: 2020.07.29 16:29:14      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -42,8 +42,8 @@ orbit:   3.260716E-04  2.596347E-06  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 command: beta0  module: control
 parameter: betx   double value:        177.7010914
 parameter: alfx   double value:        -2.41257182
@@ -124,7 +124,7 @@ Determined SECTOR NMUL MAX :  2
              534.6    0.0004431145119           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000     0.000355079062        47.50529435       0.2546195015 
+          -1000000    0.0003550790607        47.50529435       0.2546195015 
 
                 q2                dq1                dq2                 qs 
       0.2546003528        1.051169737        1.046958093                  0 
@@ -175,7 +175,7 @@ Determined SECTOR NMUL MAX :  2
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps     10
- This is a proton
+ This a particle with    1836.1526734253     times the electron mass 
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
        RADIATION   =  FALSE

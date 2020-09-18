@@ -2,37 +2,37 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %08s "FIVECELL"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le        0.9382720813
+@ MASS             %le        0.9382720882
 @ CHARGE           %le                   1
 @ ENERGY           %le                 100
 @ PC               %le         99.99559813
-@ GAMMA            %le         106.5788933
+@ GAMMA            %le         106.5788925
 @ KBUNCH           %le                  10
-@ BCURRENT         %le      0.009433073161
+@ BCURRENT         %le      0.009433073238
 @ SIGE             %le             0.00011
 @ SIGT             %le               0.077
 @ NPART            %le            1.05e+11
-@ EX               %le     3.518520305e-08
-@ EY               %le     3.518520305e-08
+@ EX               %le     3.518520331e-08
+@ EY               %le     3.518520331e-08
 @ ET               %le               0.002
 @ BV_FLAG          %le                  -1
 @ LENGTH           %le               534.6
-@ ALFA             %le     0.0004432298308
+@ ALFA             %le     0.0004427120366
 @ ORBIT5           %le                  -0
-@ GAMMATR          %le         47.49911401
-@ Q1               %le          1.25457059
-@ Q2               %le         1.254635416
-@ DQ1              %le        -7.806096655
-@ DQ2              %le        -2.007682523
-@ DXMAX            %le         2.176740606
+@ GAMMATR          %le         47.52688328
+@ Q1               %le          1.25534672
+@ Q2               %le         1.253858989
+@ DQ1              %le        -7.797689246
+@ DQ2              %le         -2.00682031
+@ DXMAX            %le         2.174238975
 @ DYMAX            %le                  -0
 @ XCOMAX           %le                   0
 @ YCOMAX           %le                   0
-@ BETXMAX          %le         177.6982659
-@ BETYMAX          %le         177.6832141
+@ BETXMAX          %le         177.6431822
+@ BETYMAX          %le         177.7384609
 @ XCORMS           %le                   0
 @ YCORMS           %le                   0
-@ DXRMS            %le          1.65465441
+@ DXRMS            %le          1.65273771
 @ DYRMS            %le                   0
 @ DELTAP           %le                   0
 @ SYNCH_1          %le                   0
@@ -41,13 +41,13 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.33.42"
+@ ORIGIN           %16s "5.06.00 Linux 64"
+@ DATE             %08s "31/08/20"
+@ TIME             %08s "16.53.55"
 * NAME               PARENT             KEYWORD                             S               BETX               BETY                 DX                 DY                K1L 
 $ %s                 %s                 %s                                %le                %le                %le                %le                %le                %le 
- "QD.1"              "MQ"                "QUADRUPOLE"                     56.56        177.6982659        32.05478978       -2.176740606                  0       0.0270560945
- "QD.2"              "MQ"                "QUADRUPOLE"                    163.48        177.6982659        32.05478978       -2.176740606                  0       0.0270560945
- "QD.3"              "MQ"                "QUADRUPOLE"                     270.4        177.6982659        32.05478978       -2.176740606                  0       0.0270560945
- "QD.4"              "MQ"                "QUADRUPOLE"                    377.32        177.6982659        32.05478978       -2.176740606                  0       0.0270560945
- "QD.5"              "MQ"                "QUADRUPOLE"                    484.24        177.6982659        32.05478978       -2.176740606                  0       0.0270560945
+ "QD.1"              "MQ"                "QUADRUPOLE"                     56.56        177.6431822        32.08240949       -2.174238975                  0       0.0270560945
+ "QD.2"              "MQ"                "QUADRUPOLE"                    163.48        177.6431822        32.08240949       -2.174238975                  0       0.0270560945
+ "QD.3"              "MQ"                "QUADRUPOLE"                     270.4        177.6431822        32.08240949       -2.174238975                  0       0.0270560945
+ "QD.4"              "MQ"                "QUADRUPOLE"                    377.32        177.6431822        32.08240949       -2.174238975                  0       0.0270560945
+ "QD.5"              "MQ"                "QUADRUPOLE"                    484.24        177.6431822        32.08240949       -2.174238975                  0       0.0270560945

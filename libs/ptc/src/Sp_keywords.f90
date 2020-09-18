@@ -10,7 +10,8 @@ module madx_keywords
   logical(lp),private :: do_survey =my_false
   logical(lp) :: print_marker =my_true
   type(tree_element), private, allocatable :: t_e(:),t_ax(:),t_ay(:)
-  real(dp), private :: a_(3),ent_(3,3), b_(3),exi_(3,3)
+  real(dp), private :: a_(3),ent_(3,3), b_(3),exi_(3,3),angcsp,xcsp,dcsp,hcsp,vcsp
+
   logical :: old_name_vorname = .false.
   logical :: readingmaps = .true.
   type keywords
@@ -1200,6 +1201,177 @@ M%B_L=M%B_T
 
     call read_pancake_field(el,filename)
   end subroutine read_pancake
+
+
+
+
+  subroutine read_pancake_new(el,file,t_em)
+    implicit none
+    type(ELEMENT), pointer :: el
+    integer mf,nstc,ORDER,I,ii
+    real(dp)  L,hc,cl,BRHO,ld,xc,dc,vc,hd,lc,angc,ANGLE,ds,a
+    logical(lp) REPEAT
+    character(*) file
+    type(tree_element), allocatable :: t_em(:)
+    TYPE(TAYLOR) B(nbe),ba(nbe),bf(nbe),bn(nbe),it  !,ax(2),ay(2)
+
+    cl=(clight/1e8_dp)
+    BRHO=el%p%p0c*10.0_dp/cl
+
+
+
+
+    a=0.0_dp
+   ! file_fitted=file
+
+
+
+
+
+    call kanalnummer(mf)
+    open(unit=mf,file=file)
+    read(mf,*) LD,hD  !,REPEAT   ! L and Hc are geometric
+    read(mf,*) nstc, ORDER 
+    read(mf,*) LC,hc
+    read(mf,*) dc,vc,xc
+    read(mf,*) angc
+
+       angcsp=angc
+       xcsp=xc
+       dcsp=dc
+       hcsp=hc
+       vcsp=vc
+
+    ds=LC/nstc
+    ii=0
+!    if(present(no)) order=no
+ 
+
+
+    order=order+1   
+ CALL INIT(ORDER,1,0,0)
+
+    CALL ALLOC(B)
+    CALL ALLOC(Bf)
+    CALL ALLOC(Ba)
+    CALL ALLOC(Bn)
+    call alloc(it) 
+bf(1)=0.0_dp;bf(2)=0.0_dp;bf(3)=0.0_dp;
+ba(1)=0.0_dp;ba(2)=0.0_dp;ba(3)=0.0_dp;
+
+
+!    IF(REPEAT.AND.NST==0) NST=NSTD
+
+    ALLOCATE(t_em(NSTc))  
+
+    read(mf,*) ii 
+          CALL READ(Bf(1),mf);CALL READ(Bf(2),mf);CALL READ(Bf(3),mf);
+
+          Bf(1)=Bf(1)/BRHO
+          Bf(2)=Bf(2)/BRHO
+          Bf(3)=Bf(3)/BRHO
+    read(mf,*) ii 
+          CALL READ(Ba(1),mf);CALL READ(Ba(2),mf);CALL READ(Ba(3),mf);
+
+
+          Ba(1)=Ba(1)/BRHO
+          Ba(2)=Ba(2)/BRHO
+          Ba(3)=Ba(3)/BRHO
+
+    DO I=3,NSTc 
+
+
+
+    read(mf,*) ii 
+          CALL READ(B(1),mf);CALL READ(B(2),mf);CALL READ(B(3),mf);
+
+ 
+          B(1)=B(1)/BRHO
+          B(2)=B(2)/BRHO
+          B(3)=B(3)/BRHO
+
+         if(i==3) then
+          Bn(1)=Bf(1)
+          Bn(2)=Bf(2)
+          Bn(3)=Bf(3)
+          bn(4)=-(bn(3).i.2)  ! ax
+          it=1.0_dp+hc*(1.0_dp.mono.1)
+          bn(5)=(4*b(4)-ba(4)-3*bf(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s 
+          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s  
+          bn(7)=bn(4).d.1   !  d/dx Ax
+          bn(8)=bn(4).d.2   !  d/dy Ax   
+          CALL SET_TREE_g(t_em(1),Bn)
+         elseif(i==nstc) then
+          Bn(1)=B(1)
+          Bn(2)=B(2)
+          Bn(3)=B(3)
+          bn(4)=-(bn(3).i.2)  ! ax
+          it=1.0_dp+hc*(1.0_dp.mono.1)
+          bn(5)=(3*b(4)+bf(4)-4*ba(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s 
+          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s  
+          bn(7)=bn(4).d.1   !  d/dx Ax
+          bn(8)=bn(4).d.2   !  d/dy Ax   
+          CALL SET_TREE_g(t_em(i),Bn)
+         endif
+
+          Bn(1)=Ba(1)
+          Bn(2)=Ba(2)
+          Bn(3)=Ba(3)
+          bn(4)=-(bn(3).i.2)  ! ax
+          it=1.0_dp+hc*(1.0_dp.mono.1)
+          bn(5)=(b(4)-bf(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s 
+          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s  
+          bn(7)=bn(4).d.1   !  d/dx Ax
+          bn(8)=bn(4).d.2   !  d/dy Ax   
+          CALL SET_TREE_g(t_em(i-1),Bn)
+ 
+          Bf(1)=Ba(1)
+          Bf(2)=Ba(2)
+          Bf(3)=Ba(3)  
+          Bf(4)=Ba(4)
+          Bf(5)=Ba(5)
+          Bf(6)=Ba(6)
+          Bf(7)=Ba(7)
+          Bf(8)=Ba(8)    
+  
+          Ba(1)=B(1)
+          Ba(2)=B(2)
+          Ba(3)=B(3)
+          Ba(4)=B(4)
+          Ba(5)=B(5)
+          Ba(6)=B(6)
+          Ba(7)=B(7)
+          Ba(8)=B(8)
+
+    enddo
+    call KILL(B)
+    call KILL(Bf)
+    call KILL(Ba)
+    call KILL(Bn)
+    call KILL(it) 
+
+
+ close(MF)
+ !  else
+ !    NST=size(t_em)
+ !  endif
+    ANGLE=LD*HD
+
+
+    !    IF(ANG/=zero.AND.R/=zero) THEN
+    if(hc/=0.0_dp) then
+       el%p%LC=2.0_dp*SIN(ANGLE/2.0_dp)/hD
+    else
+       el%p%LC=LD
+    endif
+!    el%p%B0=hD                     wrong in fibre
+!    el%p%LD=LD
+!    el%p%L=lc
+
+
+
+
+  end subroutine read_pancake_new
 
 
   subroutine read_pancake_field(el,filename)
@@ -2585,9 +2757,16 @@ ENDIF
     if(s2%kind/=kindpa) then
        CALL SETFAMILY(S2) 
     else
-       CALL SETFAMILY(S2,t=T_E)  !,T_ax=T_ax,T_ay=T_ay)
+             call read_pancake_new(s2,s2%vorname,t_e)
+       CALL SETFAMILY(S2,t=T_E)
        S2%P%METHOD=4
-       deallocate(T_E,t_ax,t_ay)
+       s2%pa%angc=angcsp
+       s2%pa%xc=xcsp
+       s2%pa%dc=dcsp
+       s2%pa%hc=hcsp
+       s2%pa%vc=vcsp
+       s2%pa%xprime=xprime_pancake
+       deallocate(T_E)
     endif    
 
  
@@ -2685,7 +2864,6 @@ end subroutine read_lattice
     case(KINDWIGGLER)
       read(mf,NML=wigname)
     case(KINDpa)
- 
    case default
        write(MF,*) " not supported in print_specific_element",kind
  !      stop 101

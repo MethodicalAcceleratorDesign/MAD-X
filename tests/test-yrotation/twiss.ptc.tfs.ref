@@ -2,16 +2,16 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %03s "SEQ"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le        0.9382720813
+@ MASS             %le        0.9382720882
 @ CHARGE           %le                   1
 @ ENERGY           %le                5500
 @ PC               %le          5499.99992
-@ GAMMA            %le         5861.839129
+@ GAMMA            %le         5861.839086
 @ KBUNCH           %le                   1
-@ BCURRENT         %le                   0
+@ BCURRENT         %le     1.601068191e-11
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
-@ NPART            %le                   0
+@ NPART            %le                   1
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
@@ -83,9 +83,9 @@
 @ PTCOMIN          %le                   0
 @ PTCOMAX          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.33.51"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "16.24.25"
 * NAME                                S                  X                 PX                  Y                 PY                 PT                  T 
 $ %s                                %le                %le                %le                %le                %le                %le                %le 
  "SEQ$START"                          0                  0                  0                  0                  0                  0                 -0

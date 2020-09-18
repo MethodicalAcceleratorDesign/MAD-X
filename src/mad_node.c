@@ -480,6 +480,36 @@ store_node_value(const char* par, double* value)
   else if (strcmp(lpar, "sel_sector") == 0) current_node->sel_sector = *value;
   else if (strcmp(lpar, "enable") == 0) current_node->enable = *value;
 
+  else if (strcmp(lpar, "k0") == 0) {
+    store_comm_par_value("k0",*value,el->def);
+    el->def->par_names->inform[8] = 1;
+  }
+  
+  else if (strcmp(lpar, "k1") == 0) store_comm_par_value("k1",*value,el->def);
+  else if (strcmp(lpar, "k2") == 0) store_comm_par_value("k2",*value,el->def);
+  // The inform is to make sure they are written out to a new sequence. 
+  else if (strcmp(lpar, "k1tap") == 0) {
+    store_comm_par_value("k1tap",*value,el->def);
+    el->def->par_names->inform[9] = 1;
+  }
+  else if (strcmp(lpar, "k1stap") == 0) {
+    store_comm_par_value("k1stap",*value,el->def);
+    el->def->par_names->inform[10] = 1;
+  }
+  else if (strcmp(lpar, "k2tap") == 0){
+    store_comm_par_value("k2tap",*value,el->def);
+    el->def->par_names->inform[9] = 1;
+  }
+  else if (strcmp(lpar, "k2stap") == 0){
+    store_comm_par_value("k2stap",*value,el->def);
+    el->def->par_names->inform[10] = 1;
+  }
+  else if (strcmp(lpar, "lagtap") == 0) {
+    store_comm_par_value("lagtap",*value,el->def);
+    el->def->par_names->inform[9] = 1;
+  }
+  else if (strcmp(lpar, "lag") == 0) store_comm_par_value("lag",*value,el->def);
+
   /* added by E. T. d'Amico 27 feb 2004 */
 
   else if (strcmp(lpar, "e1") == 0) store_comm_par_value("e1",*value,el->def);
@@ -540,6 +570,9 @@ store_node_value(const char* par, double* value)
   else if (strcmp(lpar, "rm64") == 0) store_comm_par_value("rm64",*value,el->def);
   else if (strcmp(lpar, "rm65") == 0) store_comm_par_value("rm65",*value,el->def);
   else if (strcmp(lpar, "rm66") == 0) store_comm_par_value("rm66",*value,el->def);
+  // This needs to be cleaned up.
+  
+  
 
   /* end of additions */
 }
@@ -725,13 +758,22 @@ line_nodes(struct char_p_array* flat)
   int i, j, k;
   double pos = zero, val;
   struct element* el;
+  
   for (j = 0; j < flat->curr; j++)
-  {
+   {
     if ((el = find_element(flat->p[j], element_list)) == NULL)
+     {
+      
       fatal_error("line contains unknown element:", flat->p[j]);
+     }
+     
     if (strcmp(el->base_type->name, "rfcavity") == 0 &&
         find_element(el->name, current_sequ->cavities) == NULL)
+     {   
       add_to_el_list(&el, 0, current_sequ->cavities, 0);
+     }
+     
+     
     val = el_par_value("l", el);
     pos += val / 2;
     k = 1;

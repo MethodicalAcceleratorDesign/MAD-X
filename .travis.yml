@@ -2,12 +2,37 @@ language: cpp
 compiler:
   - gcc
 
+language: python
+dist: xenial
+  - "3.6"
+
+env:
+  - MADXDIR="$HOME/.local"
+
 install:
-  - pip install --user cpp-coveralls
+  - pip install cpp-coveralls
   - make madx-linux64-gnu COVERAGE=yes
   - make numdiff-linux64-gnu
 
+  - pip install cython
+  - git clone https://github.com/tpersson/cpymad.git
+  - cd cpymad
+  - git checkout addingDistribution
+  - cd ..
+  - ./buildcpymad.sh
+  - cd cpymad && python setup.py build_ext --no-X11 --blas --lapack --madxdir=$MADXDIR
+  - pip install -e .
+  - cd test && python test_madx.py
+
+
+
+
 script:
+
+  -  python test_madx.py > /dev/null 2>&1
+  -  python test_util.py > /dev/null 2>&1
+  -  cd ../../
+
   - make tests &&
     NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt) &&
     [[ $NUM_FAILED -eq 0 ]]
@@ -23,6 +48,8 @@ after_success:
 addons:
   apt:
     packages:
+    - libblas-dev 
+    - liblapack-dev
     - gfortran
     - gnuplot
     - texlive-latex-base

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2019.04.30 17:23:23      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:24:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -61,7 +61,7 @@ twiss,sequence=PDR,file=pdr-twiss.tfs;
 
 enter Twiss module
   
-iteration:   1 error:   9.386147E-04 deltap:   0.000000E+00
+iteration:   1 error:   9.386146E-04 deltap:   0.000000E+00
 orbit:   5.006843E-06  2.672273E-07  0.000000E+00  0.000000E+00  1.293603E-02  1.758935E-04
   
 iteration:   2 error:   1.263169E-05 deltap:   0.000000E+00
@@ -74,16 +74,16 @@ orbit:   2.225068E-06  3.094154E-07  0.000000E+00  0.000000E+00  1.311525E-02  1
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       389.1501964     -0.01311525378      0.00360976986        16.64409718 
+       389.1501964     -0.01311525348      0.00360976986        16.64409718 
 
                 q1                dq1            betxmax              dxmax 
-       16.38588252    4.120905924e-05        26.59605695       0.4543718468 
+       16.38588252    4.120842965e-05        26.59605701       0.4543718468 
 
              dxrms             xcomax             xcorms                 q2 
-      0.1473892004    0.0001340897447    3.582791807e-05        12.26536843 
+      0.1473892004    0.0001340897417    3.582791727e-05        12.26536843 
 
                dq2            betymax              dymax              dyrms 
-   -0.002893777128        25.38937613                 -0                  0 
+   -0.002893771248        25.38937617                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -91,8 +91,8 @@ orbit:   2.225068E-06  3.094154E-07  0.000000E+00  0.000000E+00  1.311525E-02  1
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 !plot,haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,title="TME cell",noversion=true;!,interpolate=true;
@@ -113,7 +113,7 @@ twiss,centre;
 
 enter Twiss module
   
-iteration:   1 error:   9.386147E-04 deltap:   0.000000E+00
+iteration:   1 error:   9.386146E-04 deltap:   0.000000E+00
 orbit:   5.006843E-06  2.672273E-07  0.000000E+00  0.000000E+00  1.293603E-02  1.758935E-04
   
 iteration:   2 error:   1.263169E-05 deltap:   0.000000E+00
@@ -126,16 +126,16 @@ orbit:   2.225068E-06  3.094154E-07  0.000000E+00  0.000000E+00  1.311525E-02  1
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       389.1501964     -0.01311525378      0.00360976986        16.64409718 
+       389.1501964     -0.01311525348      0.00360976986        16.64409718 
 
                 q1                dq1            betxmax              dxmax 
-       16.38588252    4.120905924e-05        26.59605695        0.461052348 
+       16.38588252    4.120842965e-05        26.59605701        0.461052348 
 
              dxrms             xcomax             xcorms                 q2 
-      0.1473892004    0.0001361428131    3.582791807e-05        12.26536843 
+      0.1473892004    0.0001361428101    3.582791727e-05        12.26536843 
 
                dq2            betymax              dymax              dyrms 
-   -0.002893777128        25.78243728                 -0                  0 
+   -0.002893771248        25.78243732                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -143,11 +143,11 @@ orbit:   2.225068E-06  3.094154E-07  0.000000E+00  0.000000E+00  1.311525E-02  1
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ibs,file=ibs-table.tfs;
 
- sige    1.5000000478849695E-002
+ sige    1.5000000478849704E-002
  Twiss was calculated at the center of the elements. No interpolation is used
 
  Global parameters for the machine: 
@@ -157,12 +157,12 @@ radiate = T:
      C             389.150196 m              f0              0.770377 MHz            T0              1.298065 microseconds
      alfa            0.360605E-02            eta             0.360602E-02            gamma(tr)      16.652675
      Bcurrent        0.055543 A/bunch        Kbunch       312                        Npart           0.450000E+12 per bunch
-     E               2.860000 GeV            gamma        5596.880428                beta            1.000000
+     E               2.860000 GeV            gamma        5596.880385                beta            1.000000
 
  Emittances:
 
      Ex            0.125070E+01 pi*mm*mrad     sigx            2.579966 mm
-     Ey            0.125070E+04 pi*mm*mrad     sigy           88.883452 mm
+     Ey            0.125070E+04 pi*mm*mrad     sigy           88.883451 mm
      Et            0.750000E+02 pi*mm*mrad     sigt            9.000000 mm             sigE         15.000000 1/1000
 
 sequence name: pdr
@@ -188,7 +188,7 @@ rf  0.100000E-04   10.0000       999.950      0.500000       0.00000
  Ring average values (m) 
 
      betx   =   5.32188E+00    bety   =   6.31668E+00    Dx  =  1.34257E-01    Dy  =  0.00000E+00
-     alfx   =  -5.83355E-06    alfy   =  -1.65822E-05    Dpx =  1.80480E-06    Dpy =  0.00000E+00
+     alfx   =  -5.83359E-06    alfy   =  -1.65822E-05    Dpx =  1.80480E-06    Dpy =  0.00000E+00
      1/betx =   2.64019E-01    1/bety =   1.96289E-01
 
      (Weighted) average rates (1/sec):

@@ -2,16 +2,16 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %12s "TLEPMINIBETA"
 @ PARTICLE         %08s "ELECTRON"
-@ MASS             %le     0.0005109989461
+@ MASS             %le       0.00051099895
 @ CHARGE           %le                  -1
 @ ENERGY           %le                 175
 @ PC               %le                 175
-@ GAMMA            %le         342466.4597
+@ GAMMA            %le         342466.4571
 @ KBUNCH           %le                   1
-@ BCURRENT         %le                   0
+@ BCURRENT         %le     1.931317008e-15
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
-@ NPART            %le                   0
+@ NPART            %le                   1
 @ EX               %le                   1
 @ EY               %le                   1
 @ ET               %le               0.001
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.33.50"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "16.24.20"
 * NAME                                S               BETX               BETY               ALFX               ALFY                MUX                MUY                 WX                 WY               PHIX               PHIY               DMUX               DMUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP1"                                0                  1              0.001                  0                  0                  0                  0                  0                  0                  0                  0                  0                  0

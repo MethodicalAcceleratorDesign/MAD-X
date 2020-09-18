@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:54:00      +
+  + Execution date: 2020.07.29 16:29:30      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -41,8 +41,8 @@ beam, particle = proton, energy =   eg        ,
 
 value,epsx,epsy;
 
-epsx               =    3.518520305e-08 ;
-epsy               =    3.518520305e-08 ;
+epsx               =    3.518520331e-08 ;
+epsy               =    3.518520331e-08 ;
 option,-echo;
 
 
@@ -206,8 +206,8 @@ orbit:   3.260716E-04  2.596347E-06  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)
@@ -314,7 +314,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=1;
              534.6    0.0004430990863           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003550636364        47.50612124       0.2546759882 
+          -1000000    0.0003550636351        47.50612124       0.2546759882 
 
                 q2                dq1                dq2                 qs 
        0.254674956                 -0                 -0                  0 
@@ -369,7 +369,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=1;
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps     10
- This is a proton
+ This a particle with    1836.1526734253     times the electron mass 
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
        RADIATION   =  FALSE
@@ -465,7 +465,7 @@ ptc_twiss,icase=5,no=1,
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps      5
- This is a proton
+ This a particle with    1836.1526734253     times the electron mass 
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
        RADIATION   =  FALSE

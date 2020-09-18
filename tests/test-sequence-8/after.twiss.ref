@@ -11,7 +11,7 @@
 @ BCURRENT         %le      0.000000
 @ SIGE             %le      0.001000
 @ SIGT             %le      1.000000
-@ NPART            %le      0.000000
+@ NPART            %le      1.000000
 @ EX               %le      1.000000
 @ EY               %le      1.000000
 @ ET               %le      0.001000
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le      0.000000
 @ SYNCH_5          %le      0.000000
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.04.02 Linux 64"
-@ DATE             %08s "25/10/18"
-@ TIME             %08s "10.40.27"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "11.53.44"
 * NAME               KEYWORD                       S            L          K1L 
 $ %s                 %s                          %le          %le          %le 
  "MQ4"               "QUADRUPOLE"            1.000000     0.000000     0.300000

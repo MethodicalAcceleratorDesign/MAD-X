@@ -60,30 +60,30 @@ aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarte
     y = (*ap3)*sqrt(1-((*ap1)*(*ap1))/((*ap3)*(*ap3)));
 
     if (y > (*ap2)) // the rectangle is contained within the ellipse; there is no curved part.
-      alfa = atan2((*ap2),(*ap1));
+    alfa = atan2((*ap2),(*ap1));
     else            // the rectangle extends beyond the ellipse; there is a curved part
       alfa = atan2(y,*ap1); // this angle is not the geometrical angle
-  }
+    }
 
-  if ( (*ap2) >= (*ap4) ) theta = 0.;
+    if ( (*ap2) >= (*ap4) ) theta = 0.;
   // the vertical rectangle extent is larger than the ellipse
   // the curved part extends all the way to pi/2
-  else {
-    x = (*ap4) * sqrt(1 - ((*ap2)*(*ap2))/((*ap4)*(*ap4)));
+    else {
+      x = (*ap4) * sqrt(1 - ((*ap2)*(*ap2))/((*ap4)*(*ap4)));
 
     if (x > (*ap1)) // the rectangle is contained within the ellipse; there is no curved part.
-      theta = atan2((*ap1),(*ap2));
+    theta = atan2((*ap1),(*ap2));
     else            // the rectangle extends beyond the ellipse; there is a curved part
       theta = atan2(x,*ap2); // this angle is not the geometrical angle
-  }
+    }
 
   // at this point we know if we have a full ellipse (alfa=0, theta=0), a full rectangle (alfa+theta=pi/2) or a mixed curve.
   // we can calculate the number of apexes (napex+1) and the interval depending on the shape
 
-  if (*quarterlength) {
-    napex = 9 ;
-    dangle = ((pi/2) - (alfa+theta)) / napex;
-  }
+    if (*quarterlength) {
+      napex = 9 ;
+      dangle = ((pi/2) - (alfa+theta)) / napex;
+    }
 
   else if (fabs(alfa+theta-pi/2) < MIN_DOUBLE * 1.e10) { //rectangle, single point, zero interval
     napex = 0 ;
@@ -131,7 +131,8 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
      due to tolerance uncertainty for every angle */
   /* NEW VERSION of aper_race, 20feb08 BJ, potential zero-divide issues cleared */
 
-  double angle0, angle1, angle2, alfa, gamma, theta;
+  double angle0, angle1;
+  double tang, at, bt, ct, disc;
   int quadrant;
 
   if (xshift==0 && yshift==0 && r==0) {
@@ -139,21 +140,31 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
     return;
   }
 
+  
+
   quadrant = angle/(pi/2) + 1;
 
   switch (quadrant) /*adjusting angle to first quadrant*/
-    {
+  {
     case 1: /* angle = angle; */    break;
     case 2: angle = pi - angle;     break;
     case 3: angle = angle - pi;     break;
     case 4: angle = twopi - angle;  break;
-    }
+    case 5: angle = twopi - angle;  break;     /* for angles very slightly larger than twopi */
+  }
+
+
+  if (xshift==0 && yshift==0) {
+    *x=r*cos(angle); 
+    *y=r*sin(angle);
+    return;
+  }
+
 
   if (angle == pi/2) {
     *x=0;
     *y=yshift+r;
   }
-
   else {
     /*finding where arc starts and ends*/
     angle0 = atan2( yshift , xshift + r );
@@ -165,52 +176,60 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
       *y = tan(angle) * (xshift+r);
     }
     else if (angle < angle1) {
-      /* if this is a circle, angle2 useless */
+
+      tang = tan(angle);
+      at = 1 + tang*tang;
+      bt = -2 * (xshift + tang*yshift);
+      ct = xshift*xshift + yshift*yshift - r*r;
+      disc = bt*bt - 4*at*ct;
+      *x = (-bt + sqrt(disc)) / (2 * at);
+      *y = *x * tang;
+
+    }
+      /* if this is a circle, angle2 useless 
       if (!xshift && !yshift)  angle2 = 0;
       else angle2 = atan2( yshift , xshift );
 
       alfa = fabs(angle-angle2);
       if (alfa < MIN_DOUBLE * 1.e10) {
-	/* alfa==0 is a simpler case */
+	// alfa==0 is a simpler case 
         *x = cos(angle) * (r + sqrt(xshift*xshift + yshift*yshift));
         *y = sin(angle) * (r + sqrt(xshift*xshift + yshift*yshift));
       }
       else {
-	/* solving sine rule w.r.t. gamma */
+	// solving sine rule w.r.t. gamma 
         gamma = asin(sqrt(xshift*xshift + yshift*yshift)/r*sin(alfa));
-	/*theta is the last corner in the triangle*/
+	// theta is the last corner in the triangle
         theta = pi - (alfa+gamma);
         *x = cos(angle) * r * sin(theta)/sin(alfa);
         *y = sin(angle) * r * sin(theta)/sin(alfa);
       }
-    }
+    }  */
     /* upper flat part */
     else {
       *y = r + yshift;
       *x = (r+yshift) * tan(pi/2-angle);
     }
+    return;
   }
-
-  return;
 }
-
 static void
 aper_adj_quad(double angle, double x, double y, double* xquad, double* yquad)
 {
   int quadrant;
   quadrant = angle / (pi/2) + 1;
   switch (quadrant)
-    {
+  {
     case 1: *xquad=x;  *yquad=y;  break;
     case 2: *xquad=-x; *yquad=y;  break;
     case 3: *xquad=-x; *yquad=-y; break;
     case 4: *xquad=x;  *yquad=-y; break;
-    }
+  }
 }
 
 static void
 aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat,
-		 double halox[], double haloy[], int halolength, double haloxsi[], double haloysi[])
+ double halox[], double haloy[], int halolength, double haloxsi[], double haloysi[])
 {
   int j;
 
@@ -253,7 +272,7 @@ aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipeleng
 
 static int
 aper_intersect(double a1, double b1, double c1, double a2, double b2, double c2,
-		double *xm, double *ym)
+  double *xm, double *ym)
 { // calculates the intersection point between two general equation lines
   // returns 0 if lines are parallel, 1 otherwise
 
@@ -275,13 +294,13 @@ aper_linepar(double x1,double y1,double x2,double y2,double *a,double *b,double 
 
 static int
 aper_on_line(double xm, double ym, double x1, double y1,
-	      double x2, double y2, double dist_limit)
+ double x2, double y2, double dist_limit)
 {
   // first check colinearity of (p1,p2) and (p1,M); return 0 if false
   if ( fabs((x2-x1)*(ym-y1) - (xm-x1)*(y2-y1)) > dist_limit ) return 0;
   // check M is between p1 and p2, with tolerance for point overlap
   if ( xm <= fmax(x1,x2)+dist_limit && xm >= fmin(x1,x2)-dist_limit &&
-       ym <= fmax(y1,y2)+dist_limit && ym >= fmin(y1,y2)-dist_limit ) return 1;
+   ym <= fmax(y1,y2)+dist_limit && ym >= fmin(y1,y2)-dist_limit ) return 1;
   return 0; // outside of (p1,p2)
 }
 
@@ -304,16 +323,16 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
      to exactly zero. */
 
 
-  int i,j;
-  int debug = get_option("debug");
+int i,j;
+int debug = get_option("debug");
 
-  if (debug) printf("+++ aper_fill_quadrants: quarterlength = %d\n", quarterlength);
+if (debug) printf("+++ aper_fill_quadrants: quarterlength = %d\n", quarterlength);
 
   // The counter i starts at quarterlength+1, ie the first point to be mirrored.
-  i = quarterlength + 1;
+i = quarterlength + 1;
 
   /*copying first quadrant coordinates to second quadrant*/
-  for (j=quarterlength; j>=0; j--) {
+for (j=quarterlength; j>=0; j--) {
     // 2015-Jul-21  16:45:36  ghislain: avoid duplicate points on axes
     if (polyx[j] < 1.e-10) {polyx[j] = 0. ; continue;} // do not mirror a point at x = 0
     polyx[i] = -polyx[j];
@@ -353,7 +372,7 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
 
   if (debug) {
     for (j=0; j<=i; j++) printf("  %d  %10.5e  %10.5e \n", j, polyx[j], polyy[j]);
-    printf("\n");
+      printf("\n");
   }
 
   return;
@@ -361,8 +380,7 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
 
 static void
 aper_read_twiss(const char* table, int* jslice, double* s, double* x, double* y,
-		double* px, double* py,
-                double* betx, double* bety, double* dx, double* dy)
+  double* px, double* py, double* betx, double* bety, double* dx, double* dy, double* pt)
 {
   double_from_table_row(table, "s", jslice, s);
   double_from_table_row(table, "x", jslice, x);
@@ -373,6 +391,7 @@ aper_read_twiss(const char* table, int* jslice, double* s, double* x, double* y,
   double_from_table_row(table, "bety", jslice, bety);
   double_from_table_row(table, "dx", jslice, dx);
   double_from_table_row(table, "dy", jslice, dy);
+  double_from_table_row(table, "pt", jslice, pt);
 
   return;
 }
@@ -381,35 +400,35 @@ static int
 aper_external_file(char *file, double tablex[], double tabley[])
 { /* receives the name of file containing coordinates. Puts coordinates into tables. */
   /* returns status -1 in case of error and number of points read otherwise */
-  int i=0;
-  FILE *filept;
+int i=0;
+FILE *filept;
 
   /* no file provided */
-  if (file == NULL) return -1;
+if (file == NULL) return -1;
 
   /* file cannot be opened in read mode */
-  if ((filept=fopen(file, "r")) == NULL) {
-    warning("Can not open file: ", file);
-    return -1;
-  }
+if ((filept=fopen(file, "r")) == NULL) {
+  warning("Can not open file: ", file);
+  return -1;
+}
 
   /* build table */
-  while (2==fscanf(filept, "%lf %lf", &tablex[i], &tabley[i])) {
-    i++;
-    if (i >= MAXARRAY) {
+while (2==fscanf(filept, "%lf %lf", &tablex[i], &tabley[i])) {
+  i++;
+  if (i >= MAXARRAY) {
       // should give the value of the MAXARRAY set limit that is exceeded
       // warn("Memory full in aper_external_file; number of coordinates exceeds MAXARRAY = ", MAXARRAY)
-      fatal_error("Memory full in aper_external_file. ", "Number of coordinates exceeds set limit");
-    }
+    fatal_error("Memory full in aper_external_file. ", "Number of coordinates exceeds set limit");
   }
+}
 
   /* closing the shape: a last point is inserted in table
      with coordinates equal to those of the first point */
-    tablex[i]=tablex[0];
-    tabley[i]=tabley[0];
-    fclose(filept);
+tablex[i]=tablex[0];
+tabley[i]=tabley[0];
+fclose(filept);
 
-    return i;
+return i;
 }
 
 static int
@@ -438,10 +457,10 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
   element_vector(current_node->p_elem, "aperture", aperture_vec);
 
   if(current_node->p_elem->aper->custom_inter==1){
-      element_vector(current_node->p_elem, "aper_vx", pipex);
-      *pipelength = element_vector(current_node->p_elem, "aper_vy", pipey);
-      *ap1 = *ap2 = *ap3 = *ap4 = 0;
-      return 1;
+    element_vector(current_node->p_elem, "aper_vx", pipex);
+    *pipelength = element_vector(current_node->p_elem, "aper_vy", pipey);
+    *ap1 = *ap2 = *ap3 = *ap4 = 0;
+    return 1;
   }
 
   int debug = get_option("debug");
@@ -452,85 +471,85 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     *ap3 = aperture_vec[0]; /*radius circle*/
     if ( (*ap3) <= 0. ) {
       if (debug)
-	printf("+++ aper_build screen, circle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
-      return 0;
-    }
+       printf("+++ aper_build screen, circle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
+     return 0;
+   }
     // make a square just containing the circle
-    *ap1 = *ap2 = *ap4 = *ap3;
+   *ap1 = *ap2 = *ap4 = *ap3;
 
-    aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
-    return 1;
-  }
+   aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+   aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
+   return 1;
+ }
 
-  else if (!strcmp(apertype,"ellipse")) {
+ else if (!strcmp(apertype,"ellipse")) {
     *ap3 = aperture_vec[0]; /*half hor axis ellipse*/
     *ap4 = aperture_vec[1]; /*half ver axis ellipse*/
-    if ( (*ap3) <= 0 || (*ap4) <= 0) {
-      if (debug)
-	printf("+++ aper_build screen, ellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
-      return 0;
-    }
+  if ( (*ap3) <= 0 || (*ap4) <= 0) {
+    if (debug)
+     printf("+++ aper_build screen, ellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
+   return 0;
+ }
     // make a rectangle just containing the ellipse
-    *ap1 = *ap3;   *ap2 = *ap4;
+ *ap1 = *ap3;   *ap2 = *ap4;
 
-    aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
-    return 1;
-  }
+ aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+ aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
+ return 1;
+}
 
-  else if (!strcmp(apertype,"rectangle")) {
+else if (!strcmp(apertype,"rectangle")) {
     *ap1 = aperture_vec[0];      /*half width rect*/
     *ap2 = aperture_vec[1];      /*half height rect*/
-    if ( (*ap1) <= 0 || (*ap2) <= 0) {
-      if (debug)
-	printf("+++ aper_build screen, rectangle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
-      return 0;
-    }
+  if ( (*ap1) <= 0 || (*ap2) <= 0) {
+    if (debug)
+     printf("+++ aper_build screen, rectangle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
+   return 0;
+ }
     // make a circle containing the rectangle
-    *ap3 = *ap4 = sqrt( (*ap1)*(*ap1) + (*ap2)*(*ap2) );
+ *ap3 = *ap4 = sqrt( (*ap1)*(*ap1) + (*ap2)*(*ap2) );
 
-    aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
-    return 1;
-  }
+ aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+ aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
+ return 1;
+}
 
-  else if (!strcmp(apertype,"lhcscreen") || !strcmp(apertype, "rectcircle")) {
+else if (!strcmp(apertype,"lhcscreen") || !strcmp(apertype, "rectcircle")) {
     // the type lhcscreen should be deprecated at some point to keep MAD agnostic...
     *ap1=aperture_vec[0]; /*half width rect*/
     *ap2=aperture_vec[1]; /*half height rect*/
     *ap3=aperture_vec[2]; /*radius circle*/
 
-    if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0) {
-      if (debug)
-	printf("+++ aper_build screen, rectcircle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
-      return 0;
-    }
+  if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0) {
+    if (debug)
+     printf("+++ aper_build screen, rectcircle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
+   return 0;
+ }
     // ensure the ellipse is a circle
-    *ap4 = *ap3;
+ *ap4 = *ap3;
 
-    aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
-    return 1;
-  }
+ aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+ aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
+ return 1;
+}
 
-  else if (!strcmp(apertype,"rectellipse")) {
+else if (!strcmp(apertype,"rectellipse")) {
     *ap1=aperture_vec[0]; /*half width rect*/
     *ap2=aperture_vec[1]; /*half height rect*/
     *ap3=aperture_vec[2]; /*half hor axis ellipse*/
     *ap4=aperture_vec[3]; /*half ver axis ellipse*/
 
-    if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0 || (*ap4) <= 0) {
-      if (debug)
-	printf("+++ aper_build screen, rectellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
-      return 0;
-    }
-    aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
-    return 1;
-  }
+  if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0 || (*ap4) <= 0) {
+    if (debug)
+     printf("+++ aper_build screen, rectellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
+   return 0;
+ }
+ aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+ aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
+ return 1;
+}
 
-  else if (!strcmp(apertype,"racetrack")) {
+else if (!strcmp(apertype,"racetrack")) {
     *ap1=aperture_vec[0]; /*half width extension*/
     *ap2=aperture_vec[1]; /*half height extension*/
     *ap3=aperture_vec[2]; /*horizontal semi-axis*/
@@ -541,54 +560,54 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     // zero horizontal or vertical explosion factors, and zero radius should be allowed.
     // 2015-Mar-09  14:43:33  ghislain: change meaning of parameters: ap1 and ap2 are now full rectangle extension,
     // 2015-Mar-10  10:18:46  ghislain: change rounded corners from circular to generalized elliptical shape
-    if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 || (*ap4) < 0 || (*ap1) < (*ap3) || (*ap2) < (*ap4)) {
-      if (debug)
-	printf("+++ aper_build screen, racetrack parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
-      return 0;
-    }
+  if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 || (*ap4) < 0 || (*ap1) < (*ap3) || (*ap2) < (*ap4)) {
+    if (debug)
+     printf("+++ aper_build screen, racetrack parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
+   return 0;
+ }
     // special call to build an ellipse first: note that we cannot invoque ap1 or ap2
-    aper_rectellipse(ap3, ap4, ap3, ap4, &quarterlength, pipex, pipey);
+ aper_rectellipse(ap3, ap4, ap3, ap4, &quarterlength, pipex, pipey);
 
     /* displace the quartercircle */
-    for (i=0;i<=quarterlength;i++) {
-      pipex[i] += (*ap1) - (*ap3);
-      pipey[i] += (*ap2) - (*ap4);
-    }
+ for (i=0;i<=quarterlength;i++) {
+  pipex[i] += (*ap1) - (*ap3);
+  pipey[i] += (*ap2) - (*ap4);
+}
 
-    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
-    return 1;
-  }
+aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
+return 1;
+}
 
   // 2015-Feb-05  18:35:01  ghislain: adding octagon aperture type
-  else if (!strcmp(apertype,"octagon")) {
+else if (!strcmp(apertype,"octagon")) {
     *ap1=aperture_vec[0]; /*half width rect ; >= 0 */
     *ap2=aperture_vec[1]; /*half height rect ; >=0 */
     *ap3=aperture_vec[2]; /*first angle ; >=0, <=pi/2 */
     *ap4=aperture_vec[3]; /*second angle ; >=0, <=pi/2, >= *ap3*/
 
-    if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 || (*ap4) < 0 || (*ap3) > pi/2 || (*ap4) > pi/2 || (*ap4) < (*ap3))  {
-      if (debug)
-	printf("+++ aper_build screen, octagon parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
-      return 0;
-    }
+  if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 || (*ap4) < 0 || (*ap3) > pi/2 || (*ap4) > pi/2 || (*ap4) < (*ap3))  {
+    if (debug)
+     printf("+++ aper_build screen, octagon parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
+   return 0;
+ }
 
-    quarterlength = 1;
-    pipex[0] = (*ap1);                      pipey[0] = (*ap1) * tan((*ap3));
-    pipex[1] = (*ap2) * tan(pi/2 - (*ap4)); pipey[1] = (*ap2);
+ quarterlength = 1;
+ pipex[0] = (*ap1);                      pipey[0] = (*ap1) * tan((*ap3));
+ pipex[1] = (*ap2) * tan(pi/2 - (*ap4)); pipey[1] = (*ap2);
 
-    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
-    return 1;
-  }
+ aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
+ return 1;
+}
 
-  else if (strlen(apertype)) {
+else if (strlen(apertype)) {
     // general case, assume the given type is a filename
-    *pipelength = aper_external_file(apertype, pipex, pipey);
-    *ap1 = *ap2 = *ap3 = *ap4 = 0;
-    if (*pipelength > -1) return 1; else return 0;
-  }
+  *pipelength = aper_external_file(apertype, pipex, pipey);
+  *ap1 = *ap2 = *ap3 = *ap4 = 0;
+  if (*pipelength > -1) return 1; else return 0;
+}
 
-  *pipelength = -1;
-  return 0;
+*pipelength = -1;
+return 0;
 
 }
 
@@ -704,8 +723,8 @@ aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* refnod
           k=0; j=3;
           while (j == 3 && k < E_D_MAX) {
             j=fscanf(e_d_pt, "%lf %lf %lf", &e_d_tab[*cnt].tab[k][0],
-                     &e_d_tab[*cnt].tab[k][1],
-                     &e_d_tab[*cnt].tab[k][2]);
+             &e_d_tab[*cnt].tab[k][1],
+             &e_d_tab[*cnt].tab[k][2]);
             k++;
 
             if (e_d_tab[*cnt].curr == E_D_MAX) printf("\nToo many points of x,y displacement...\n");
@@ -717,21 +736,21 @@ aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* refnod
 
           if (*cnt == curr_e_d_max) { /* grow e_d array */
             /* printf("\nToo many special elements...(less than %d expected)\n", E_D_MAX); */
-            new_e_d_max = curr_e_d_max + E_D_LIST_CHUNK;
-            printf("\ngrowing e_d_max array to %d\n", new_e_d_max);
-            e_d_tab_loc = mycalloc("Aperture", new_e_d_max, sizeof *e_d_tab_loc);
+          new_e_d_max = curr_e_d_max + E_D_LIST_CHUNK;
+          printf("\ngrowing e_d_max array to %d\n", new_e_d_max);
+          e_d_tab_loc = mycalloc("Aperture", new_e_d_max, sizeof *e_d_tab_loc);
 
-            for( l=0 ; l < curr_e_d_max; l++)
-              e_d_tab_loc[l] = e_d_tab[l];
+          for( l=0 ; l < curr_e_d_max; l++)
+            e_d_tab_loc[l] = e_d_tab[l];
 
-            myfree("Aperture", e_d_tab);
+          myfree("Aperture", e_d_tab);
 
-            e_d_tab = e_d_tab_loc;
-            curr_e_d_max = new_e_d_max;
-          }
-
-          i=j;
+          e_d_tab = e_d_tab_loc;
+          curr_e_d_max = new_e_d_max;
         }
+
+        i=j;
+      }
       } /* while !EOF */
 
       printf("\nUsing extra displacements from file \"%s\"\n",e_d_name);
@@ -779,94 +798,94 @@ aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
       if ((tmp = strtok(NULL, sep)) != NULL
 	  && strcmp(tmp, "REFERENCE") == 0) { /* search for reference node */
 	if ((name = strtok(NULL, sep)) != NULL) { /* skip format */
-	  if ((name = strtok(NULL, sep)) != NULL) {
-	    strcpy(refnode, name);
-	    stolower(refnode);
-	    strcat(refnode, ":1");
-	  }
-	}
-      }
-    }
+       if ((name = strtok(NULL, sep)) != NULL) {
+         strcpy(refnode, name);
+         stolower(refnode);
+         strcat(refnode, ":1");
+       }
+     }
+   }
+ }
 
     else if (*cc == '*' && tnl == NULL) { /* search for column names and register them*/
-      tnl = new_name_list("table_names", 20);
-      while ((tmp = strtok(NULL, sep)) != NULL)
-	add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
-    }
+ tnl = new_name_list("table_names", 20);
+ while ((tmp = strtok(NULL, sep)) != NULL)
+   add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
+}
 
     else if (*cc == '$' && tcpa == NULL) { /* search for formats */
-      if (tnl == NULL) {
+if (tnl == NULL) {
 	warning("formats before names","skipped"); return NULL;
-      }
-      tcpa = new_char_p_array(20);
-      while ((tmp = strtok(NULL, sep)) != NULL) {
+}
+tcpa = new_char_p_array(20);
+while ((tmp = strtok(NULL, sep)) != NULL) {
 	if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
 	if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
 	else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
 	else if (strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
 	else                              tnl->inform[tcpa->curr] = 2;
 	tcpa->p[tcpa->curr++] = permbuff(tmp);
-      }
-    }
+}
+}
 
-    else {
-      if(t == NULL) {
-	if (tcpa == NULL) {
-	  warning("TFS table without formats,","skipped"); error = 1;
-	}
-	else if (tnl == NULL) {
-	  warning("TFS table without column names,","skipped"); error = 1;
-	}
-	else if (tnl->curr == 0) {
-	  warning("TFS table: empty column name list,","skipped");
-	  error = 1;
-	}
-	else if (tnl->curr != tcpa->curr) {
-	  warning("TFS table: number of names and formats differ,", "skipped");
-	  error = 1;
-	}
-	if (error) {
-	  delete_name_list(tnl); return NULL;
-	}
-	if(e_d_name != NULL) {
-	  t = new_table(e_d_name, "OFFSETS",    500, tnl);
-	} else {
-	  t = new_table(e_d_name, "OFFSETS",    500, tnl);
-	}
-	t->curr = 0;
-      }
+else {
+  if(t == NULL) {
+   if (tcpa == NULL) {
+     warning("TFS table without formats,","skipped"); error = 1;
+   }
+   else if (tnl == NULL) {
+     warning("TFS table without column names,","skipped"); error = 1;
+   }
+   else if (tnl->curr == 0) {
+     warning("TFS table: empty column name list,","skipped");
+     error = 1;
+   }
+   else if (tnl->curr != tcpa->curr) {
+     warning("TFS table: number of names and formats differ,", "skipped");
+     error = 1;
+   }
+   if (error) {
+     delete_name_list(tnl); return NULL;
+   }
+   if(e_d_name != NULL) {
+     t = new_table(e_d_name, "OFFSETS",    500, tnl);
+   } else {
+     t = new_table(e_d_name, "OFFSETS",    500, tnl);
+   }
+   t->curr = 0;
+ }
 
-      for (i = 0; i < tnl->curr; i++) {
-	if (t->curr == t->max) grow_table(t);
-	tmp = tcpa->p[i];
-	if (strcmp(tmp,"%s") == 0)  {
+ for (i = 0; i < tnl->curr; i++) {
+   if (t->curr == t->max) grow_table(t);
+   tmp = tcpa->p[i];
+   if (strcmp(tmp,"%s") == 0)  {
 	  char buf[strlen(cc)+3]; // reserve enough space for strcat
 	  t->s_cols[i][t->curr] = tmpbuff(stolower(strcat(strcpy(buf, cc), ":1")));
 	}
 	else if (strcmp(tmp,"%d") == 0 ) {
-	  sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
-	}
-	else if (strcmp(tmp,"%hd") == 0 ) {
-	  sscanf(cc, tmp, &sk); t->d_cols[i][t->curr] = sk;
-	}
-	else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
-	if (i+1 < tnl->curr) {
-	  if ((cc =strtok(NULL, sep)) == NULL) {
-	    warning("incomplete table line starting with:", aux_buff->c);
-	    return NULL;
-	  }
-	}
-      }
-      t->curr++;
-    }
-  }
+   sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
+ }
+ else if (strcmp(tmp,"%hd") == 0 ) {
+   sscanf(cc, tmp, &sk); t->d_cols[i][t->curr] = sk;
+ }
+ else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
+ if (i+1 < tnl->curr) {
+   if ((cc =strtok(NULL, sep)) == NULL) {
+     warning("incomplete table line starting with:", aux_buff->c);
+     return NULL;
+   }
+ }
+}
+t->curr++;
+}
+}
 
-  fclose(tab_file);
-  t->origin = 1;
+fclose(tab_file);
+t->origin = 1;
   /*  next line commented : avoid memory error at 2nd APERTURE command */
   /*  when the offset file has the same same, BJ 8apr2009 */
   /*  add_to_table_list(t, table_register);*/
-  return t;
+return t;
 }
 
 static void
@@ -1027,11 +1046,11 @@ aper_trim_ws(char* string, int len)
 
 static void
 aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
-		 double* rtol, double* xtol, double* ytol, double* xoffset, double* yoffset,
-		 char* apertype,double* ap1,double* ap2,double* ap3,double* ap4,
-		 double* on_ap, double* on_elem, double* spec,double* s,
-		 double* x, double* y, double* px, double* py,
-		 double* betx, double* bety,double* dx, double* dy, char *table)
+ double* rtol, double* xtol, double* ytol, double* xoffset, double* yoffset,
+ char* apertype,double* ap1,double* ap2,double* ap3,double* ap4,
+ double* on_ap, double* on_elem, double* spec,double* s,
+ double* x, double* y, double* px, double* py,
+ double* betx, double* bety,double* dx, double* dy, double* x_intersect, double* y_intersect, char *table)
 {
   string_to_table_curr(table, "name", name);
   double_to_table_curr(table, "n1", n1);
@@ -1059,15 +1078,16 @@ aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
   double_to_table_curr(table, "bety", bety);
   double_to_table_curr(table, "dx", dx);
   double_to_table_curr(table, "dy", dy);
-
+  double_to_table_curr(table, "x_pos_hit", x_intersect);
+  double_to_table_curr(table, "y_pos_hit", y_intersect);
   augment_count(table);
 }
 
 
 static double
 aper_calc(double p, double q, double* minhl,
-	  double halox[], double haloy[], int halolength, double haloxadj[],double haloyadj[],
-	  double pipex[], double pipey[], int pipelength, double notsimple)
+ double halox[], double haloy[], int halolength, double haloxadj[],double haloyadj[],
+ double pipex[], double pipey[], int pipelength, double notsimple, double *x_inter, double *y_inter)
 { // 2015-Jul-30  ghislain: partially rewritten from original to limit number of calculations
   // in loop to find ratios.
   int i=0, j=0, c=0;
@@ -1112,18 +1132,18 @@ aper_calc(double p, double q, double* minhl,
 
       for (i=0; i<=pipelength; i++) {
 	/* Find general line equation for line joining halo centre to pipe apex point*/
-	aper_linepar(p, q, pipex[i], pipey[i], &a1, &b1, &c1);
+       aper_linepar(p, q, pipex[i], pipey[i], &a1, &b1, &c1);
 
-	/* find intersection coordinates; cycle if lines are parallel */
-	if (0 == aper_intersect(a1, b1, c1, a2, b2, c2, &xm, &ym)) continue; // parallel lines
-	/* intersection point must be on halo line segment */
-	if (0 == aper_on_line(xm, ym, haloxadj[j], haloyadj[j], haloxadj[j+1], haloyadj[j+1], dist_limit)) continue;
-	/* pipe apex must be between halo center and intersection point */
-	if (0 == aper_on_line(pipex[i], pipey[i], p, q, xm, ym, dist_limit)) continue;
+      	/* find intersection coordinates; cycle if lines are parallel */
+      	if (0 == aper_intersect(a1, b1, c1, a2, b2, c2, &xm, &ym)) continue; // parallel lines
+      	/* intersection point must be on halo line segment */
+      	if (0 == aper_on_line(xm, ym, haloxadj[j], haloyadj[j], haloxadj[j+1], haloyadj[j+1], dist_limit)) continue;
+      	/* pipe apex must be between halo center and intersection point */
+      	if (0 == aper_on_line(pipex[i], pipey[i], p, q, xm, ym, dist_limit)) continue;
 
-	tmphalox[c] = xm;
-	tmphaloy[c] = ym;
-	c++;
+      	tmphalox[c] = xm;
+      	tmphaloy[c] = ym;
+      	c++;
       }
     }
 
@@ -1147,13 +1167,14 @@ aper_calc(double p, double q, double* minhl,
       aper_linepar(pipex[i], pipey[i], pipex[i+1], pipey[i+1], &a2, &b2, &c2);
 
       if ( // not parallel lines
-	  0 != aper_intersect(a1, b1, c1, a2, b2, c2, &xm, &ym)
+       0 != aper_intersect(a1, b1, c1, a2, b2, c2, &xm, &ym)
 	  // intersection point is inside the bounding box
-	  &&  ( xm < bbxmax && xm > bbxmin && ym < bbymax && ym > bbymin)
+       &&  ( xm <= bbxmax && xm >= bbxmin && ym <= bbymax && ym >= bbymin)
+
 	  // intersection point is inside pipe line segment
-	  && 0 != aper_on_line(xm, ym, pipex[i], pipey[i], pipex[i+1], pipey[i+1], dist_limit)
+       && 0 != aper_on_line(xm, ym, pipex[i], pipey[i], pipex[i+1], pipey[i+1], dist_limit)
 	  // halo center is not inside segement defined by halo apex and intersection point
-	  && 0 != aper_on_line(p,q,haloxadj[j],haloyadj[j],xm,ym,dist_limit) )
+       && 0 != aper_on_line(p,q,haloxadj[j],haloyadj[j],xm,ym,dist_limit) )
 	      break; // valid point is found
 
       if (++i == pipelength ) i = 0; // cycle through the pipeline
@@ -1161,10 +1182,15 @@ aper_calc(double p, double q, double* minhl,
 
     h = sqrt((xm-p)*(xm-p) + (ym-q)*(ym-q));
     l = sqrt((haloxadj[j]-p)*(haloxadj[j]-p) + (haloyadj[j]-q)*(haloyadj[j]-q));
-    if (h/l < *minhl) *minhl = h/l;
-  }
+    if (h/l < *minhl) {
+     *x_inter = xm; 
+     *y_inter = ym;
+     *minhl = h/l;
 
-  return 0;
+   }
+ }
+
+ return 0;
 }
 
 
@@ -1178,7 +1204,7 @@ get_aperattr(struct node* node, const char* attrname, const char* par)
   int i, k, n = strlen(par);
   double val = zero, vec[100];
   for (i = 0; i < n; i++)  if (isdigit(par[i])) break;
-  if (i == n) return val;
+    if (i == n) return val;
   sscanf(&par[i], "%d", &k); k--;
   if ((n = element_vector(node->p_elem, attrname, vec)) > k)  val = vec[k];
   return val;
@@ -1247,25 +1273,25 @@ pro_aperture(struct in_cmd* cmd)
   limit_pt = aperture(table, use_range, tw_cp, &tw_cnt, limit_pt);
   /*If TWISS CENTRE is used and some elements with a non-zero length and aperture. Than the node interpolation is wrong. */
   if(current_sequ->tw_centre==1 && isSliced==1){
-       warning("Aperture module - not possible to use TWISS, CENTRE=TRUE with thick apperture elements.", "Aperture command ignored");
-    return;
-  }
+   warning("Aperture module - not possible to use TWISS, CENTRE=TRUE with thick apperture elements.", "Aperture command ignored");
+   return;
+ }
 
-  if (limit_pt->n1 != -1) {
-    printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
+ if (limit_pt->n1 != -1) {
+  printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
 
-    aper_header(aperture_table, limit_pt);
+  aper_header(aperture_table, limit_pt);
 
-    file = command_par_string("file", this_cmd->clone);
-    if (file != NULL) out_table(table, aperture_table, file);
+  file = command_par_string("file", this_cmd->clone);
+  if (file != NULL) out_table(table, aperture_table, file);
 
     // 2015-Jul-31  11:41:59  ghislain: aperture twiss file for output of twiss table ! not needed
     //if (strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);
-  }
-  else warning("Could not run aperture command.","Aperture command ignored");
+}
+else warning("Could not run aperture command.","Aperture command ignored");
 
   /* set pointer to updated Twiss table */
-  current_sequ->tw_table=tw_cp;
+current_sequ->tw_table=tw_cp;
 }
 
 static struct aper_node*
@@ -1282,27 +1308,28 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double ex, ey;
   double dqf, betaqfx, dp, dparx, dpary;
   double cor, bbeat, nco, halo[4], interval, spec, notsimple;
-  double s=0, x=0, y=0, px=0, py=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, length; // nr not used
+  double s=0, x=0, y=0, px=0, py=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, length, pt_ele; // nr not used
   double xeff=0,yeff=0;
   double n1x_m, n1y_m;
   double s_start, s_curr, s_end;
   double node_s=-1, node_n1=-1;
   double aper_tol[3], ap1, ap2, ap3, ap4;
-  double dispx, dispy, tolx, toly;
-  double dispxadj=0, dispyadj=0, coxadj, coyadj, tolxadj=0, tolyadj=0;
+  double dispdesx, dispdesy, tolx, toly, dispparax, dispparay;
+  double dispxadj=0, dispyadj=0, tolxadj=0, tolyadj=0;
   double angle, dangle, deltax, deltay;
   double xshift, yshift, r;
   double halox[MAXARRAY], haloy[MAXARRAY], haloxsi[MAXARRAY], haloysi[MAXARRAY];
   double haloxadj[MAXARRAY], haloyadj[MAXARRAY];
   double pipex[MAXARRAY], pipey[MAXARRAY];
-  double parxd,paryd;
+  double parxd,paryd, beta0;
+  double x_intersect, y_intersect,x_intersect_ang, y_intersect_ang, ratio_ang;
   char *halofile, *truefile, *offsfile;
   char refnode[NAME_L]="";
   char *cmd_refnode;
   char apertype[NAME_L];
   char name[NAME_L];
   char tol_err_mess[80] = "";
-  int code;
+  int code, nchecks;
 
   // 2014-Sep-18  17:19:52  ghislain: attempt to read offset values from element attributes...
   double aper_offset[2], xoffset, yoffset;
@@ -1332,6 +1359,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   // 2015-Mar-03  17:25:49  ghislain: get geometric emittances from BEAM command
   ex = get_value("beam","ex");
   ey = get_value("beam","ey");
+  beta0 = get_value("beam","beta");
 
   dqf = command_par_value("dqf", this_cmd->clone);
   betaqfx = command_par_value("betaqfx", this_cmd->clone);
@@ -1374,8 +1402,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   offs_tab = aper_e_d_read_tfs(offsfile, &offs_cnt, refnode);
 
   if (cmd_refnode != NULL) {
-      strcpy(refnode, cmd_refnode);
-      strcat(refnode, ":1");
+    strcpy(refnode, cmd_refnode);
+    strcat(refnode, ":1");
   }
   if (strcmp(refnode,"")) printf("\nreference node: %s\n",refnode);
 
@@ -1400,7 +1428,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       if ( pipelength > -1) ext_pipe=1; */
 
   /* get initial twiss parameters, from start of first element in range */
-  aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy);
+  aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, &pt_ele);
   
   // LD: shift further results by one step (?) and finish outside the table
   //  (*tw_cnt)++;
@@ -1479,11 +1507,12 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     if (ap == 0 || first == 1) {
       /* if no pipe can be built, the n1 is set to inf and Twiss parms read for reference*/
       n1=999999; n1x_m=999999; n1y_m=999999; on_ap=-999999; nint=1;
+      x_intersect = 999999; y_intersect = 999999;
 
-      aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy);
+      aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, &pt_ele);
       aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
-		       apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec,
-                       &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, table);
+       apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec,
+       &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, &x_intersect, &y_intersect, table);
       on_ap=1;
 
       double_to_table_row(tw_cp->name, "n1", tw_cnt, &n1);
@@ -1513,73 +1542,73 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       node_n1   = 999999;
       true_node = 0;
       offs_node = 0;
-      
+
 
       /* calculate the number of slices per node */
-      if (true_flag == 0)
-        nint = length / interval;
-      else {
-        true_node = aper_tab_search(true_cnt, true_tab, name, &truepos);
-        if (true_node) nint = true_tab[truepos].curr;
-        else nint = length / interval;
-      }
+        if (true_flag == 0)
+          nint = length / interval;
+        else {
+          true_node = aper_tab_search(true_cnt, true_tab, name, &truepos);
+          if (true_node) nint = true_tab[truepos].curr;
+          else nint = length / interval;
+        }
 
-      if (debug) printf("name: %s, nint: %d, length: %f\n", name, nint, length);
+        if (debug) printf("name: %s, nint: %d, length: %f\n", name, nint, length);
 
-      if (!nint) nint = 1;
+        if (!nint) nint = 1;
 
       /* do not interpolate 0-length elements*/
-      if (fabs(length) < MIN_DOUBLE ) {
-        is_zero_len = 1;
-      }
-      else{
-        isSliced = 1;
-      }
+        if (fabs(length) < MIN_DOUBLE ) {
+          is_zero_len = 1;
+        }
+        else{
+          isSliced = 1;
+        }
 
 
       /* slice the node, call survey if necessary, make twiss for slices*/
-      interpolate_node(&nint);
+        interpolate_node(&nint);
 
       /* do survey */
-      if (do_survey) {
-        double offs_row[8] = { 0 };
+        if (do_survey) {
+          double offs_row[8] = { 0 };
 
-        aper_surv(surv_init, nint);
+          aper_surv(surv_init, nint);
 
-        offs_node = aper_tab_search_tfs(offs_tab, name, offs_row);
-        if (offs_node) {
-          xa=offs_row[4];
-          xb=offs_row[3];
-          xc=offs_row[2];
-          ya=offs_row[7];
-          yb=offs_row[6];
-          yc=offs_row[5];
-	  if (debug) {
-	    printf("\nusing offset:");
-	    printf("\n xa: %f, xb: %f, xc: %f \n ya: %f, yb: %f, yc: %f\n", xa, xb, xc, ya, yb, yc);
-	  }
-        }
-      }
+          offs_node = aper_tab_search_tfs(offs_tab, name, offs_row);
+          if (offs_node) {
+            xa=offs_row[4];
+            xb=offs_row[3];
+            xc=offs_row[2];
+            ya=offs_row[7];
+            yb=offs_row[6];
+            yc=offs_row[5];
+            if (debug) {
+             printf("\nusing offset:");
+             printf("\n xa: %f, xb: %f, xc: %f \n ya: %f, yb: %f, yc: %f\n", xa, xb, xc, ya, yb, yc);
+           }
+         }
+       }
 
-      embedded_twiss();
+       embedded_twiss();
 
       /* Treat each slice, for all angles */
-      for (jslice=0; jslice <= nint; jslice++) {
-        ratio=999999;
+       for (jslice=0; jslice <= nint; jslice++) {
+        ratio=x_intersect=y_intersect=999999;
 
         if (jslice == 0) {
           // parameters from previous node will be used
           s_curr += 1.e-12;     /*to get correct plot at start of elements*/
           s = 0;                /*used to calculate survey adjustments */
         }
-	else {
+        else {
           aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y, &px, &py,
-			  &betx, &bety, &dx, &dy);
+           &betx, &bety, &dx, &dy,  &pt_ele);
 
-	  if(debug) printf("embedded twiss for slice %d: s= %f betx= %f bety= %f dx= %f dy= %f\n",
-			   jslice, s, betx, bety, dx, dy);
+          if(debug) printf("embedded twiss for slice %d: s= %f betx= %f bety= %f dx= %f dy= %f\n",
+            jslice, s, betx, bety, dx, dy);
 
-          s_curr = s_start + s;
+            s_curr = s_start + s;
           aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
 
           /* calculate normal+parasitic disp.*/
@@ -1599,90 +1628,135 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         xeff = x;
         yeff = y;
 
-	/* offset adjustment */
-	if (noffset == 2) {
-	  xeff -= xoffset;
-	  yeff -= yoffset;
-	}
+      	/* offset adjustment */
+        if (noffset == 2) {
+         xeff -= xoffset;
+         yeff -= yoffset;
+       }
 
         /* survey adjustments */
-        if (offs_node) {
-          xeff += surv_x - (xa*s*s + xb*s + xc);
-          yeff += surv_y - (ya*s*s + yb*s + yc);
-        }
+       if (offs_node) {
+        xeff += surv_x - (xa*s*s + xb*s + xc);
+        yeff += surv_y - (ya*s*s + yb*s + yc);
+      }
 
         /* discrete adjustments */
-        if (true_node) {
-          xeff += true_tab[truepos].tab[jslice][1];
-          yeff += true_tab[truepos].tab[jslice][2];
+      if (true_node) {
+        xeff += true_tab[truepos].tab[jslice][1];
+        yeff += true_tab[truepos].tab[jslice][2];
+      }
+
+      if (debug) printf("\n adjustments xeff: %f, yeff: %f\n",xeff,yeff);
+
+
+        dispdesx = dx*dp; //Design dispersion   
+        dispdesy = dy*dp; 
+
+        dispparax = bbeat*(parxd*(fabs(lim_pt->deltap_twiss/beta0 + pt_ele)+dp))
+        +(bbeat-1)*fabs(dx*dp); //Parasitic disperison 
+        dispparay = bbeat*(paryd*(fabs(lim_pt->deltap_twiss/beta0 + pt_ele)+dp))
+        +(bbeat-1)*fabs(dy*dp);
+
+        if(notsimple){
+          nchecks = 8; //Extra checks 
+        }
+        else if(fabs(dx) > 0 || fabs(dy) > 0){
+          nchecks = 1;
+        }
+        else{
+          nchecks=0;
         }
 
-	if (debug) printf("\n adjustments xeff: %f, yeff: %f\n",xeff,yeff);
+        for(int dispc=0; dispc <= nchecks; dispc++){
+          ratio_ang = 999999; x_intersect_ang=999999; y_intersect_ang=999999;
 
-        for (angle=0; angle<twopi; angle+=dangle) {
-          /* new 27feb08 BJ */
-          dispx = bbeat * (fabs(dx)*dp + parxd*(fabs(lim_pt->deltap_twiss)+dp) );
-          dispy = bbeat * (fabs(dy)*dp + paryd*(fabs(lim_pt->deltap_twiss)+dp) );
-
-          /*adjust dispersion to worst-case for quadrant*/
-          aper_adj_quad(angle, dispx, dispy, &dispxadj, &dispyadj);
-
-          /*calculate displacement co+tol for each angle*/
-          coxadj = cor * cos(angle); coyadj = cor * sin(angle);
-
-          /* Error check added 20feb08 BJ */
-          if ( xshift < 0 || yshift < 0 || r < 0 ) {
-            sprintf(tol_err_mess,"In element : %s\n",name);
-            fatal_error("Illegal negative tolerance",tol_err_mess);
+          if(dispc == 0){
+            dispxadj = dispdesx;
+            dispyadj = dispdesy;
+          }
+          else if(dispc == 1){
+            dispxadj = -dispdesx;
+            dispyadj = -dispdesy;
+          }
+          else{
+            dispxadj = -dispdesx + 2*dispdesx*(dispc-1)/nchecks; //-1 becuase end point is already checked
+            dispyadj = -dispdesy + 2*dispdesx*(dispc-1)/nchecks;
           }
 
-          aper_race(xshift, yshift, r, angle, &tolx, &toly);
-          aper_adj_quad(angle, tolx, toly, &tolxadj, &tolyadj);
+          for (angle=0; angle<twopi; angle+=dangle) {
 
-          /* add all displacements */
-          deltax = coxadj + tolxadj + xeff + dispxadj;
-          deltay = coyadj + tolyadj + yeff + dispyadj;
+            /* new 27feb08 BJ */
 
-          /* send beta adjusted halo and its displacement to aperture calculation */
-          aper_calc(deltax, deltay, &ratio, haloxsi, haloysi, halolength, haloxadj, haloyadj,
-                    pipex, pipey, pipelength, notsimple);
+            /*adjust dispersion to worst-case for quadrant, now only done when there is only dispersion in one plane*/
+            //if(nchecks==0)
+              //aper_adj_quad(angle, fabs(dispdesx), fabs(dispdesy), &dispxadj, &dispyadj);
 
-	  if (debug) printf("\n Angle: %f deltax: %f deltay: %f minratio: %f\n", angle, deltax, deltay, ratio);
+            /*calculate displacement co+tol for each angle*/
+           // coxadj = cor * cos(angle); coyadj = cor * sin(angle);
+            /* Error check added 20feb08 BJ */
+            if ( xshift < 0 || yshift < 0 || r < 0 ) {
+              sprintf(tol_err_mess,"In element : %s\n",name);
+              fatal_error("Illegal negative tolerance",tol_err_mess);
+            }
+
+            aper_race(xshift+dispparax, yshift+dispparay, cor+r, angle, &tolx, &toly);
+            aper_adj_quad(angle, tolx, toly, &tolxadj, &tolyadj);
+
+            /* add all displacements */
+           // printf("aaaabbb %f %f %f %f %f %f %f %f %f \n", tolxadj,tolx, xshift, yshift, xeff, yeff, dispxadj, dispxadj, cor, r);
+            deltax =  tolxadj + xeff + dispxadj;
+            deltay =  tolyadj + yeff + dispyadj;
+
+            /* send beta adjusted halo and its displacement to aperture calculation */
+            aper_calc(deltax, deltay, &ratio_ang, haloxsi, haloysi, halolength, haloxadj, haloyadj,
+              pipex, pipey, pipelength, notsimple, &x_intersect_ang, &y_intersect_ang);
+            
+            if(ratio_ang < ratio){
+              ratio = ratio_ang;
+              x_intersect = x_intersect_ang;
+              y_intersect = y_intersect_ang;
+            }
+
+            if (debug) printf("\n Angle: %e deltax: %e deltay: %e minratio: %e, ratioang: %e, interx: %e, intery: %e, dispyadj: %e, dispxadjy: %e \n", 
+              angle, deltax, deltay, ratio, ratio_ang, x_intersect_ang, y_intersect_ang, dispxadj, dispyadj );
+          }
         }
 
         //nr = ratio * halo[1];
         //n1 = nr / (halo[1]/halo[0]); /* ratio r/n = 1.4 */
-	n1 = ratio * halo[0]; // 2015-Jul-30  17:23:26  ghislain: replaced above two lines.
+      	n1 = ratio * halo[0]; // 2015-Jul-30  17:23:26  ghislain: replaced above two lines.
 
 
-	if (debug) printf("\n Found ratio: %f n1: %f \n",ratio,n1);
+      	if (debug) printf("\n Found ratio: %f n1: %f \n",ratio,n1);
 
         n1x_m = n1 * bbeat * sqrt(betx*ex);
         n1y_m = n1 * bbeat * sqrt(bety*ey);
 
-	/* Change below, BJ 23oct2008                              */
-	/* test block 'if (n1 < node_n1)' included in test block   */
+      	/* Change below, BJ 23oct2008                              */
+      	/* test block 'if (n1 < node_n1)' included in test block   */
 
+        x_intersect -=xoffset;
+        y_intersect -=yoffset;
         if (is_zero_len == 0 || jslice == 1) {
           aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
-			   apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
-                           &xeff, &yeff, &px, &py, &betx, &bety, &dx, &dy, table);
+            apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
+            &xeff, &yeff, &px, &py, &betx, &bety, &dx, &dy, &x_intersect, &y_intersect, table);
 
-	  /* save node minimum n1 */
+      	  /* save node minimum n1 */
           if (n1 < node_n1) {
-              node_n1 = n1;
-              node_s = s_curr;
+            node_n1 = n1;
+            node_s = s_curr;
           }
-	} // if is_zero_len
+      	} // if is_zero_len
       } // for jslice
 
       reset_interpolation();
 
-      /* insert minimum node value into Twiss table */
+            /* insert minimum node value into Twiss table */
       double_to_table_row(tw_cp->name, "n1", tw_cnt, &node_n1);
       (*tw_cnt)++;
 
-      /* save range minimum n1 */
+            /* save range minimum n1 */
       if (node_n1 < lim_pt->n1) {
         strcpy(lim_pt->name,name);
         lim_pt->n1 = node_n1;
@@ -1707,7 +1781,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   if ( (offs_tab != NULL) && (do_survey == 0)) {
     warning("Offset reference node was not found in the active range", "Offsets were not used.");
     printf("\nOffset reference node: %s active range: %s / %s\n",
-	    refnode, use_range[0]->name, use_range[1]->name);
+     refnode, use_range[0]->name, use_range[1]->name);
   }
 
   myfree("Aperture",true_tab);

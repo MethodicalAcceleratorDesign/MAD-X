@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:56:54      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 11:38:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option,-echo,-warn;
 
@@ -24,7 +24,7 @@ final orbit vector:    -1.452494E-03  6.298396E-03  0.000000E+00  0.000000E+00 -
   
 open line - error with deltap:   2.775558E-17
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -1.523314E-29 -4.656899E-29  0.000000E+00  0.000000E+00 -1.688833E-22  0.000000E+00
+final orbit vector:    -1.523314E-29 -4.656976E-29  0.000000E+00  0.000000E+00 -1.688833E-22  0.000000E+00
   
 open line - error with deltap:   1.000000E-01
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -94,14 +94,14 @@ final orbit vector:    -2.077855E-03 -3.853374E-02  0.000000E+00  0.000000E+00 -
                  0                  0                  0                  0 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
-                 0 
-                 0 
-                 0 
-                 0 
-                 0 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+                 0                  0                  0 
+                 0                  0                  0 
+                 0                  0                  0 
+                 0                  0                  0 
+                 0                  0                  0 
+                 0                  0                  0 
 
   Number of warnings: 0
 

@@ -1,9 +1,9 @@
 @ NAME             %19s "TRACK.OBS0001.P0003"
 @ TYPE             %08s "TRACKOBS"
 @ TITLE            %26s "thin_foc with edge effects"
-@ ORIGIN           %16s "5.04.02 Linux 64"
-@ DATE             %08s "06/03/19"
-@ TIME             %08s "11.07.11"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "16.26.13"
 *     NUMBER       TURN                      X                     PX                      Y                     PY                      T                     PT                      S                      E 
 $         %d         %d                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le 
           3          0                  1e-06                      0                  1e-06                      0                  -1.75                      0                      0                1000000

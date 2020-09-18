@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.26 14:49:19      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:34:28      +
   ++++++++++++++++++++++++++++++++++++++++++++
 mydrift: drift, l=1;
 
@@ -158,10 +158,10 @@ obs_points pro_ptc_setswitch Done
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-              8.81   -2.374452044e-17           -1000000           -1000000 
+              8.81    4.192032333e-16           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000   -6.204097726e-15                  0       0.3631575976 
+          -1000000   -5.761150066e-15        48841353.22       0.3631575976 
 
                 q2                dq1                dq2                 qs 
       0.3363625015      -0.3603189255      -0.3583420407                  0 
@@ -194,7 +194,7 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0                  0                  0                  0 
+                 0                  0                  0                  0 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0                  0 

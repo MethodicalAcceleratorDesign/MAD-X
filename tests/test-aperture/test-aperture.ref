@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:00:29      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:27:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'LHC Cell APERTURE example';
 
@@ -137,8 +137,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
   synch_2   synch_3   synch_4   synch_5 
   0.00000   0.00000   0.00000   0.00000 
 
-   nflips 
-  0.00000 
+  synch_6   synch_8    nflips 
+  0.00000   0.00000   0.00000 
 
 
 !!! uses default beam and halo data (lhc at injection)
@@ -164,7 +164,7 @@ Processing apertures from lhccell$start:1 to lhccell$end:1...
 reference node: lhccell$start:1
 
 
-APERTURE LIMIT: mq1:1, n1: 4.85602, at: 3.1
+APERTURE LIMIT: mq1:1, n1: 4.76761, at: 3.1
 
 
 
@@ -172,7 +172,7 @@ APERTURE LIMIT: mq1:1, n1: 4.85602, at: 3.1
 
 Value, beam->n1min;
 
-beam->n1min        =   4.85602 ;
+beam->n1min        =   4.76761 ;
 
 
 !-----
@@ -260,8 +260,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
   synch_2   synch_3   synch_4   synch_5 
   0.00000   0.00000   0.00000   0.00000 
 
-   nflips 
-  0.00000 
+  synch_6   synch_8    nflips 
+  0.00000   0.00000   0.00000 
 
 
 !!! uses default beam and halo data (lhc at injection)

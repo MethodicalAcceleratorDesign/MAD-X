@@ -2,18 +2,18 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %08s "FIVECELL"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le        0.9382720813
+@ MASS             %le        0.9382720882
 @ CHARGE           %le                   1
 @ ENERGY           %le                 100
 @ PC               %le         99.99559813
-@ GAMMA            %le         106.5788933
+@ GAMMA            %le         106.5788925
 @ KBUNCH           %le                  10
-@ BCURRENT         %le      0.009433073161
+@ BCURRENT         %le      0.009433073238
 @ SIGE             %le             0.00011
 @ SIGT             %le               0.077
 @ NPART            %le            1.05e+11
-@ EX               %le     3.518520305e-08
-@ EY               %le     3.518520305e-08
+@ EX               %le     3.518520331e-08
+@ EY               %le     3.518520331e-08
 @ ET               %le               0.002
 @ BV_FLAG          %le                   1
 @ LENGTH           %le               534.6
@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "18/12/19"
-@ TIME             %08s "10.54.01"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "16.29.34"
 * NAME                                S               BETX               BETY                 DX                 DY 
 $ %s                                %le                %le                %le                %le                %le 
  "FIVECELL$START"                     0        177.7010914         32.0344759        2.174564191                  0

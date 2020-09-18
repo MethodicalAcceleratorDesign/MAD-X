@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:57:22      +
+  + Execution date: 2020.07.29 16:35:29      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !MADX test for rf lag handling in PTC
 
@@ -13,22 +13,22 @@ option,-echo,-info;
 
 enter Twiss module
   
-iteration:   1 error:   4.021246E-07 deltap:   0.000000E+00
-orbit:   1.839784E-06  5.524609E-13  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+iteration:   1 error:   4.021252E-07 deltap:   0.000000E+00
+orbit:   1.839782E-06  5.524594E-13  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-               6.5                 -0    0.0006278008505         39.9106729 
+               6.5                 -0    0.0006277993121         39.9107218 
 
                 q1                dq1            betxmax              dxmax 
-      0.1072458631      -0.1135571289        13.83023176        0.299880421 
+      0.1072460238      -0.1135571418        13.83023881       0.2998799811 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2679119522    1.839784269e-06    1.643654689e-06       0.1058719085 
+      0.2679115172     1.83978157e-06     1.64365202e-06       0.1058720683 
 
                dq2            betymax              dymax              dyrms 
-     -0.1107430802        13.59506758                  0                  0 
+     -0.1107430995        13.59507428                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -36,8 +36,8 @@ orbit:   1.839784E-06  5.524609E-13  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 makethin: style chosen : hybrid
 ++++++ warning: makethin: no selection list, slicing all to one thin lens.
 makethin: slicing sequence : c314
@@ -77,7 +77,7 @@ obs_points pro_ptc_setswitch Done
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     2
   Default integration steps      5
- This a particle with    206.76828260879     times the electron mass 
+ This a particle with    206.76828298767     times the electron mass 
        EXACT_MODEL =  FALSE
        TOTALPATH   =     0
        RADIATION   =  FALSE
@@ -94,7 +94,7 @@ obs_points pro_ptc_setswitch Done
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   -5.7717262220723603E-014  -1.3902493279666039E-019   0.0000000000000000        0.0000000000000000      -0.40625000000000466       -2.0064785050542425E-013
+ Closed orbit:    1.1507542606750509E-014   3.4254951154135137E-018   0.0000000000000000        0.0000000000000000      -0.40625000000000466        3.9886648766890976E-014
 
 ++++++ table: ptc_twiss_summary
 
@@ -102,58 +102,58 @@ obs_points pro_ptc_setswitch Done
               2041    0.0005895756913           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0005475579559        41.18416029       0.2048692657 
+          -1000000    0.0005475579551        41.18416029       0.2048692657 
 
                 q2                dq1                dq2                 qs 
-      0.1462918506                  0                  0      0.02056478692 
+      0.1462918506                  0                  0      0.02056478691 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        6.836712715        13.61411602        6.885900951        13.77102758 
 
          beta11min          beta11max          beta12min          beta12max 
-       6.836712715        13.61411602    3.395162299e-34     6.70607447e-32 
+       6.836712715        13.61411602    3.905747432e-33    7.302011188e-32 
 
          beta13min          beta13max          beta21min          beta21max 
-    0.004250828635     0.009538941926     1.43713695e-32    9.540496885e-32 
+    0.004250828638     0.009538941933    7.908150528e-33    2.381341874e-32 
 
          beta22min          beta22max          beta23min          beta23max 
-       6.885900951        13.77102758    1.926252268e-32    4.039368119e-29 
+       6.885900951        13.77102758    3.206441252e-31     2.82679954e-29 
 
          beta31min          beta31max          beta32min          beta32max 
-    0.006077299655     0.006077299675    1.830675568e-32     9.83195337e-32 
+    0.006077299655     0.006077299675    4.335535869e-31    6.512074959e-31 
 
          beta33min          beta33max           disp1min           disp1max 
-       8.673544247        8.673544278                  0       0.2876393017 
+        8.67354424        8.673544271                  0       0.2876393017 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.02976635338      0.02976635338   -3.931167436e-15    3.754890337e-15 
+    -0.02976635338      0.02976635338   -2.769075345e-15    2.844097301e-15 
 
           disp4min           disp4max             deltap            orbit_x 
-  -4.901926795e-16    5.002505039e-16                  0   -5.771726222e-14 
+  -3.605779732e-16    3.564291789e-16                  0    1.150754261e-14 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -1.390249328e-19                  0                  0   -2.006478505e-13 
+   3.425495115e-18                  0                  0    3.988664877e-14 
 
            orbit_t             xcorms             ycorms            pxcorms 
-          -0.40625     5.07246919e-14                  0    5.340409383e-15 
+          -0.40625      9.9666464e-15                  0    1.049315798e-15 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0            0.40625    2.006451925e-13   -3.850057828e-14 
+                 0            0.40625    3.948664461e-14    1.152081664e-14 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.977999117e-15                  0           -0.40625 
+                 0    1.194290785e-15                  0           -0.40625 
 
            ptcomax             xcomin             ycomin            pxcomin 
-  -2.005933626e-13   -5.776118533e-14                  0   -5.977999107e-15 
+   3.988664877e-14    7.343829969e-15                  0   -1.194288528e-15 
 
            pycomin             tcomin            ptcomin 
-                 0           -0.40625   -2.006796431e-13 
+                 0           -0.40625    3.892802256e-14 
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     2
   Default integration steps      5
- This a particle with    206.76828260879     times the electron mass 
+ This a particle with    206.76828298767     times the electron mass 
        EXACT_MODEL =  FALSE
        TOTALPATH   =     0
        RADIATION   =  FALSE

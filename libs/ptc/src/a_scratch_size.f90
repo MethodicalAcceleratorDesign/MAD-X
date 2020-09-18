@@ -19,7 +19,7 @@
 ! FITNESS FOR A PARTICULAR PURPOSE.
 
 
-module precision_constants
+module precision_constants 
   implicit none
   public
   integer,parameter  :: newscheme_max =200 
@@ -75,10 +75,10 @@ module precision_constants
   real(dp)::rpi4
   real(dp),parameter::RAD_TO_DEG_=180.0_dp/pi,DEG_TO_RAD_=pi/180.0_dp
   !Physical Constants
-  real(dp),parameter::A_ELECTRON=1.1596521809126e-3_dp ! NIST CODATA 2014
-   real(dp),parameter::A_MUON=1.1659208963e-3_dp        ! NIST CODATA 2014
-   real(dp),parameter::A_PROTON=1.79284735e-0_dp        !
-   real(dp),parameter::pmaMUON=105.658374524E-3_dp      ! NIST CODATA 2014
+  real(dp),parameter::A_ELECTRON=1.15965218128e-3_dp ! NIST CODATA 2018
+   real(dp),parameter::A_MUON=1.16592089e-3_dp        ! NIST CODATA 2018
+   real(dp),parameter::A_PROTON=1.79284735e-0_dp      !
+   real(dp),parameter::pmaMUON=105.6583755E-3_dp      ! NIST CODATA 2018
    real(dp) :: e_muon = 0.d0, volt_c=1.0e-3_dp, volt_i=1.0_dp
  !  real(dp),parameter:: pmadt = 1.875612793e0_dp    ! sateesh
   !  real(dp),parameter:: pmah3 = 2.808391e0_dp    ! sateesh
@@ -87,13 +87,13 @@ module precision_constants
   logical(lp),  public :: longprint = my_true
 
    real(dp) :: A_particle=A_ELECTRON
-   real(dp),parameter::pmae=5.109989461e-4_dp     ! NIST CODATA 2014
-   real(dp),parameter::pmae_amu=5.4461702177e-4_dp  ! NIST CODATA 2014 [GeV]
-   real(dp),parameter::pmap=0.9382720813e0_dp     ! NIST CODATA 2014 [GeV]
+   real(dp),parameter::pmae=5.1099895000E-4_dp     ! NIST CODATA 2018
+   real(dp),parameter::pmae_amu=5.446170214876E-4_dp  ! NIST CODATA 2018 [GeV] 5.446170214876E-4
+   real(dp),parameter::pmap=0.93827208816e0_dp     ! NIST CODATA 2018 [GeV]
    real(dp),parameter::CLIGHT=2.99792458e8_dp       ! exact [m/s]
-   real(dp),parameter::hbar=6.582119514e-25_dp    ! NIST CODATA 2014 [GeV*s]
-   real(dp),parameter::dhbar=1.054571800e-34_dp   ! NIST CODATA 2014 [J*s]
-   real(dp),parameter::qelect=1.6021766208e-19_dp ! NIST CODATA 2014 [A*s]
+   real(dp),parameter::hbar=6.582119569e-25_dp    ! NIST CODATA 2018 [GeV*s]
+   real(dp),parameter::dhbar=1.054571817e-34_dp   ! NIST CODATA 2018 [J*s]
+   real(dp),parameter::qelect=1.602176634e-19_dp ! NIST CODATA 2018 [A*s]
    real(dp),parameter::eps_0=8.854187817e-12_dp     ! exact [A*S/V*m]
    real(dp),parameter::class_e_radius=qelect/4.0_dp/pi/eps_0/pmae/1e9_dp ![m]
    real(dp),parameter::CGAM=4.0_dp*pi/3.0_dp*class_e_radius/pmae**3 ![m/Gev^3] old: 8.846056192e-5_dp
@@ -204,6 +204,16 @@ module precision_constants
   logical :: use_quaternion = .false.
   logical :: use_tpsa = .false.
   logical :: conversion_xprime_in_abell=.true.
+  character(18) ::         format1="(1(1x,g23.16,1x))"
+  character(18) ::         format2="(2(1x,g23.16,1x))"
+  character(18) ::         format3="(3(1x,g23.16,1x))"
+  character(18) ::         format4="(4(1x,g23.16,1x))"
+  character(18) ::         format5="(5(1x,g23.16,1x))"
+  character(18) ::         format6="(6(1x,g23.16,1x))"
+  character(18) ::         format7="(7(1x,g23.16,1x))"
+  character(18) ::         format8="(8(1x,g23.16,1x))"
+  character(18) ::         format9="(9(1x,g23.16,1x))"
+  character(19) ::         format10="(10(1x,g23.16,1x))"
   !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence

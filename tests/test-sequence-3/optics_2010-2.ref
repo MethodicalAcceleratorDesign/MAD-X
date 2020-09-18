@@ -6,12 +6,12 @@
 @ CHARGE           %le  1.00000000000
 @ ENERGY           %le  1.00000000000
 @ PC               %le  0.99999986944
-@ GAMMA            %le  1956.95119849485
+@ GAMMA            %le  1956.95118355918
 @ KBUNCH           %le  1.00000000000
 @ BCURRENT         %le  0.00000000000
 @ SIGE             %le  0.00100000000
 @ SIGT             %le  1.00000000000
-@ NPART            %le  0.00000000000
+@ NPART            %le  1.00000000000
 @ EX               %le  1.00000000000
 @ EY               %le  1.00000000000
 @ ET               %le  0.00100000000
@@ -41,9 +41,9 @@
 @ SYNCH_4          %le  0.00000000000
 @ SYNCH_5          %le  0.00000000000
 @ TITLE            %44s "AD HE 2010 optics. Anti-Protons - 3.57 GeV/c"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "19.16.42"
+@ ORIGIN           %16s "5.05.02 Linux 64"
+@ DATE             %08s "29/07/20"
+@ TIME             %08s "16.40.00"
 * NAME                              S             L          ALFX          BETX            DX          ALFY          BETY 
 $ %s                              %le           %le           %le           %le           %le           %le           %le 
  "STARTAD"              0.00000000000 0.00000000000 -0.00000200026 3.85095118133 0.11519440181 0.00000000000 1.00000000000

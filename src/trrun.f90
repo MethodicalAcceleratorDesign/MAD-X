@@ -299,7 +299,6 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            if ((code.eq.code_sextupole .or. &
               code.eq.code_octupole .or. &
               code.eq.code_elseparator .or. &
-              code.eq.code_rfcavity .or. &
               code.eq.code_crabcavity) .and. el.ne.zero) then
               !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
               call element_name(el_name,len(el_name))
@@ -714,6 +713,9 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
     case (code_rfmultipole)
        call ttrfmult(track,ktrack,turn)
 
+    case(code_changerefp0)
+      call ttchangep0(track,ktrack)
+
     case (code_hmonitor:code_rcollimator, code_instrument, &
         code_slmonitor:code_imonitor, code_placeholder, code_collimator)
         if(el .gt. 0) call ttdrf(el,track,ktrack)
@@ -814,11 +816,11 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   dipr = bvk * normal(0) !vals(1,0)
   dipi = bvk * skew(0)  
 
-  !!print *, "ggggg_old", gstr, sstr
+
      ! cf magnet with quadrupole & sextupole
      gstr = normal(1)/elrad
      sstr = normal(2)/elrad
-     !print *, "uuuu", gstr, sstr, dipr, dipi
+
     do jtrk = 1,ktrack
        x = track(1,jtrk)
        px0 = track(2,jtrk)
@@ -832,7 +834,6 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
        ! particle
        deltapp = bet0i*sqrt((1d0 + bet0*orb60)**2 - 1 + bet0**2)
        
-       !deltapp = 0 !HASSSSSSSSSSSSSSSST TOB CHANGE 
        ! orbit transformation:
        ! attention: The following formulas constitute only the kick part
        ! of the CF in a drift-kick-drift decomposition.
@@ -861,7 +862,7 @@ end SUBROUTINE ttmult_cf_mini
 
 SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   use twtrrfi
-  use twissbeamfi, only : deltap, beta
+  use twissbeamfi, only : beta
   use math_constfi, only : zero, one, two, three
   use time_varfi
   use trackfi
@@ -891,9 +892,8 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
   integer, external :: Factorial
   double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
-  double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle, tilt2
+  double precision :: dtmp, an, angle, tilt2, etahat
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
-  !double precision :: orbit(6),
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
                     dxx, dxy, dyy, rp, rm
   double complex :: lambda(0:maxmul)
@@ -914,7 +914,6 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   an = get_tt_attrib(enum_angle)
   time_var = get_tt_attrib(enum_time_var) .ne. 0  
 
-  
   !---- Multipole components.
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
@@ -924,31 +923,14 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   !---- Angle (no bvk in track)
   if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
 
-
-
   !-----added FrankS, 10-12-2008
-  !nd = 2 * max(nn, ns, n_ferr/2-1)
-
-  !---- Dipole error.
-  !      dbr = bvk * field(1,0) / (one + deltas)
-  !      dbi = bvk * field(2,0) / (one + deltas)
-  dbr = bvk * f_errors(0) !field(1,0)
-  dbi = bvk * f_errors(1) !field(2,0)
-
-  !---- Nominal dipole strength.
-  !      dipr = bvk * vals(1,0) / (one + deltas)
-  !      dipi = bvk * vals(2,0) / (one + deltas)
-  dipr = bvk * normal(0) !vals(1,0)
-  dipi = bvk * skew(0)   !vals(2,0)
-
+  nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !Below here should not be commented output
   !---- Other components and errors.
   ! that loop should start at one since nominal dipole strength already taken into account above
   !needs to be here though
   nord = 0
-  nd = 2 * max(nn, ns, n_ferr/2-1)
-
   do iord = 1, nd/2
      f_errors(2*iord)   = bvk * (f_errors(2*iord) + normal(iord))
      f_errors(2*iord+1) = bvk * (f_errors(2*iord+1) + skew(iord))
@@ -961,7 +943,6 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   if (elrad.gt.zero) then
     lambda(0) = (normal(0) + (0, 1)*skew(0))/elrad
      do k = 1, nord
-        ! The factor (one + deltap) below is taken from the original MAD-X routine.
         lambda(k) = (f_errors(2*k) + (0, 1)*f_errors(2*k+1))/elrad/Factorial(k)
      enddo
   else
@@ -997,7 +978,10 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
      g(k + 1, k + 1) = conjg(g(k + 1, 0))
   enddo
 
-   do jtrk = 1,ktrack
+  do jtrk = 1, ktrack
+     etahat = sqrt(two*track(6,jtrk)/beta + track(6,jtrk)**2 + one) - one ! etahat = deltap of individual particle
+     h0 = sqrt((one + etahat)**2 - track(2,jtrk)**2 - track(4,jtrk)**2)
+
      rp = (track(1,jtrk) + (0, 1)*track(3,jtrk))/two
      rm = conjg(rp)
 
@@ -1011,16 +995,16 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
         del_p_g = del_p_g + sum0
      enddo
      ! Now compute kick (Eqs. (38) in Ref. above)
-     !pkick = elrad*(barkappa*(one + deltap) + del_p_g)
-    pkick = elrad*(barkappa+ del_p_g)
+     pkick = elrad*(barkappa*h0 + del_p_g)
      dpx = real(pkick)
      dpy = - aimag(pkick)
-     track(2,jtrk) = track(2,jtrk) + dpx! - dbr
-     track(4,jtrk) = track(4,jtrk) + dpy! + dbi
+     track(1, jtrk) = track(1, jtrk) + elrad*(kx*track(1, jtrk) + ky*track(3, jtrk))*track(2, jtrk)/h0
+     track(2, jtrk) = track(2, jtrk) + dpx
+     track(3, jtrk) = track(3, jtrk) + elrad*(kx*track(1, jtrk) + ky*track(3, jtrk))*track(4, jtrk)/h0
+     track(4, jtrk) = track(4, jtrk) + dpy
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
-     track(5,jtrk) = track(5,jtrk) - elrad*(kx*track(1,jtrk) + ky*track(3,jtrk)) &
-                *(one + beta*track(6,jtrk))/(one + deltap)/beta
-  
+     track(5, jtrk) = track(5, jtrk) - elrad*(kx*track(1, jtrk) + ky*track(3, jtrk)) &
+                *(one + beta*track(6, jtrk))/beta/(one + etahat)
   enddo
 
 
@@ -1450,7 +1434,7 @@ subroutine ttrf(track,ktrack)
   use name_lenfi
   use time_varfi
   use trackfi
-  use math_constfi, only : zero, one, two, ten3m, ten6p, twopi
+  use math_constfi, only : zero, one, two, ten3m, ten6p, twopi, half,pi
   use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
@@ -1470,10 +1454,11 @@ subroutine ttrf(track,ktrack)
   !----------------------------------------------------------------------*
   double precision :: track(6,*)
   integer :: ktrack, itrack, get_option
-  logical :: time_var
+  logical :: time_var, Fringe
   integer :: i, mylen
   double precision :: omega, phirf, pt, rff, rfl, rfv, vrf, pc0, bvk
-  double precision :: bucket_half_length, dummy
+  double precision :: bucket_half_length, dummy, tcorr
+  double precision :: el, V, c1(ktrack), s1(ktrack), jc
   !      double precision px,py,ttt,beti,el1
   character(len=name_len) :: name
 
@@ -1482,9 +1467,7 @@ subroutine ttrf(track,ktrack)
   !---- BV flag
   bvk = node_value('other_bv ')
 
-  !---- Fetch data.
-  !      el = node_value('l ')
-  !      el1 = node_value('l ')
+
   rfv = bvk * node_value('volt ')
 
   !---- Time Variation
@@ -1505,86 +1488,49 @@ subroutine ttrf(track,ktrack)
   endif
 
   rff = node_value('freq ')
-  rfl = node_value('lag ')
-  !      deltap = get_value('probe ','deltap ')
-  !      deltas = get_variable('track_deltap ')
-  !      pc = get_value('probe ','pc ')
+  rfl = node_value('lag ')+node_value('lagtap ')
   pc0 = get_value('beam ','pc ')
-  !      betas = get_value('probe ','beta ')
-  !      gammas= get_value('probe ','gamma ')
-  !      dtbyds = get_value('probe ','dtbyds ')
-
-  !      print *,"RF cav.  volt=",rfv, "  freq.",rff
-
-  !*---- Get the longitudinal wakefield filename (parameter #17).
-  !      if (iq(lcelm+melen+15*mcsiz-2) .eq. 61) then
-  !        lstr = iq(lcelm+melen+15*mcsiz)
-  !        call uhtoc(iq(lq(lcelm-17)+1), mcwrd, lfile, 80)
-  !      else
-  !        lfile = ' '
-  !      endif
-
-  !*---- Get the transverse wakefield filename (parameter #18).
-  !      if (iq(lcelm+melen+16*mcsiz-2) .eq. 61) then
-  !        lstr = iq(lcelm+melen+16*mcsiz)
-  !        call uhtoc(iq(lq(lcelm-18)+1), mcwrd, tfile, 80)
-  !      else
-  !        tfile = ' '
-  !      endif
-
-  !*---- If there are wakefields split the cavity.
-  !      if (lfile .ne. ' ' .or. tfile .ne. ' ') then
-  !        el1 = el / two
-  !        rfv = rfv / two
-  !        lwake = .true.
-  !      else
-  !        el1 = el
-  !        lwake = .false.
-  !      endif
-  !---- Set up.
   omega = rff * (ten6p * twopi / clight)
+
   ! vrf   = rfv * ten3m / (pc * (one + deltas))
   vrf   = rfv * ten3m
   phirf = rfl * twopi
   ! dl    = el / two
   ! bi2gi2 = one / (betas * gammas) ** 2
+  el  = node_value('l ')
+  fringe = node_value('fringe ') .gt. zero
+  if(el .gt. zero) then
+    if(fringe) then
+      tcorr = el/(2*betas)
+      jc = one
+      V = jc*vrf/(pc0*el)
+      s1=sin(phirf - omega*(TRACK(5,1:ktrack)+tcorr))
+      c1=cos(phirf - omega*(TRACK(5,1:ktrack)+tcorr))
+
+      TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
+      TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
+      TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.25d0*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
+    endif
+    call ttdrf(el/2,track,ktrack)
+  endif
 
   TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
 
-  !*---- If there were wakefields, track the wakes and then the 2nd half
-  !*     of the cavity.
-  !      if (lwake) then
-  !        call ttwake(two*el1, nbin, binmax, lfile, tfile, ener1, track,
-  !     +              ktrack)
-  !
-  !*---- Track 2nd half of cavity -- loop for all particles.
-  !      do 20 i = 1, ktrack
-  !
-  !*---- Drift to centre.
-  !         px = track(2,i)
-  !         py = track(4,i)
-  !         pt = track(6,i)
-  !         ttt = one/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
-  !         track(1,i) = track(1,i) + dl*ttt*px
-  !         track(3,i) = track(3,i) + dl*ttt*py
-  !         track(5,i) = track(5,i)
-  !     +        + dl*(beti - (beti+pt)*ttt) + dl*pt*dtbyds
-  !
-  !*---- Acceleration.
-  !         pt = pt + vrf * sin(phirf - omega * track(5,i))
-  !         track(6,i) = pt
-  !
-  !*---- Drift to end.
-  !         ttt = one/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
-  !         track(1,i) = track(1,i) + dl*ttt*px
-  !         track(3,i) = track(3,i) + dl*ttt*py
-  !         track(5,i) = track(5,i)
-  !     +        + dl*(beti - (beti+pt)*ttt) + dl*pt*dtbyds
-  ! 20   continue
-  !      endif
+  if(el .gt. zero) then
+    call ttdrf(el/2,track,ktrack)
+    if(fringe) then
+      jc = -one
+      V = jc*vrf/(pc0*el)
+      s1=sin(phirf - (omega)*(TRACK(5,1:ktrack)+jc*tcorr))
+      c1=cos(phirf - (omega)*(TRACK(5,1:ktrack)+jc*tcorr))
 
-  !! frs add-on (bring lost particules back to the bucket long-term studies)
-  if(get_option('bucket_swap ').eq.1) then
+      TRACK(2,1:ktrack)=TRACK(2,1:ktrack)-V*S1*(TRACK(1,1:ktrack))*half
+      TRACK(4,1:ktrack)=TRACK(4,1:ktrack)-V*S1*(TRACK(3,1:ktrack))*half
+      TRACK(6,1:ktrack)=TRACK(6,1:ktrack)+0.25d0*(TRACK(1,1:ktrack)**2+TRACK(3,1:ktrack)**2)*V*c1*omega
+    endif
+  endif
+
+   if(get_option('bucket_swap ').eq.1) then
     bucket_half_length = &
       get_value('probe ','circ ') / (two * get_value('probe ', 'beta ') &
                                      * node_value('harmon '));
@@ -1596,7 +1542,35 @@ subroutine ttrf(track,ktrack)
     enddo
   endif
   !! frs add-on end
+ 
 end subroutine ttrf
+
+subroutine ttchangep0(track,ktrack)
+  use math_constfi, only : zero, two, one
+  use phys_constfi, only : clight
+  implicit none
+  double precision :: track(6,*) 
+  double precision :: get_value, bet0
+  double precision :: pc0, px_, py_, pt_, onedp
+  integer :: i, ktrack
+
+  pc0 = get_value('beam ','pc ')
+  bet0 = get_value('beam ','beta ')
+  do i =1, ktrack
+    px_ = track(1,i)
+    py_ = track(3,i)
+    pt_ = track(6,i) 
+    
+    onedp   = sqrt( one + two*pt_/bet0 + (pt_**2))
+
+    TRACK(2,i) = TRACK(2,i)/onedp
+    TRACK(4,i) = TRACK(4,i)/onedp
+    TRACK(6,i) = zero
+  end do
+
+end subroutine ttchangep0
+
+
 
 subroutine ttcrabrf(track,ktrack,turn)
   use math_constfi, only : zero, ten3m, ten6p, twopi
@@ -1671,7 +1645,8 @@ subroutine ttcrabrf(track,ktrack,turn)
 
   TRACK(6,1:ktrack) = TRACK(6,1:ktrack) - &
        omega * vrf * TRACK(1,1:ktrack) * cos(phirf - bvk*omega*TRACK(5,1:ktrack))
-
+  
+ 
 end subroutine ttcrabrf
 
 subroutine tthacdip(track,ktrack,turn)
@@ -3744,7 +3719,6 @@ subroutine trclor(switch,orbit0)
             (code.eq.code_sextupole .or. &
             code.eq.code_octupole .or. &
             code.eq.code_elseparator .or. &
-            code.eq.code_rfcavity .or. &
             code.eq.code_crabcavity) .and. el.ne.zero) then
            !  .not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
            print *,"\ncode: ",code," el: ",el,"   THICK ELEMENT FOUND\n"
@@ -3983,7 +3957,6 @@ subroutine ttrfmult(track, ktrack, turn)
       field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord))
       field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z))
     enddo
-
     Cm2 = zero; Sm2 = zero; Cm1 = zero; Sm1 = zero;
     Cp0 = zero; Sp0 = zero; Cp1 = zero; Sp1 = zero;
 
@@ -4229,8 +4202,8 @@ subroutine tttquad(track, ktrack)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = g_elpar(q_k1)
-  k1s = g_elpar(q_k1s)
+  k1  = g_elpar(q_k1)  + g_elpar(q_k1t)
+  k1s = g_elpar(q_k1s) + g_elpar(q_k1st)
   
   !k1  = node_value('k1 ')
   !k1s = node_value('k1s ')
@@ -4451,7 +4424,7 @@ subroutine tttdipole(track, ktrack, code)
   endif
   !---- Apply entrance dipole edge effect
   if (node_value('kill_ent_fringe ') .eq. zero) &
-       call ttdpdg_map(track, ktrack, e1, h, hgap, fint, zero)
+       call ttdpdg_map(track, ktrack, e1, k0, hgap, fint, zero)
 
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
@@ -4540,7 +4513,7 @@ subroutine tttdipole(track, ktrack, code)
   !---- Apply exit dipole edge effect
   if (node_value('kill_exi_fringe ') .eq. zero) then
      if (fintx .lt. zero) fintx = fint
-     call ttdpdg_map(track, ktrack, e2, h, hgap, fintx, zero)
+     call ttdpdg_map(track, ktrack, e2, k0, hgap, fintx, zero)
   endif
 
 end subroutine tttdipole

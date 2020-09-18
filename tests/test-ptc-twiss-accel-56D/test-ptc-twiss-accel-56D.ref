@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:05:05      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:31:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 PTCNSTEPS=3;
 
@@ -107,22 +107,22 @@ Determined SECTOR NMUL MAX :  0
      0.01901193552           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-                10        10.13672095                 10        10.13672095 
+       9.633259021             10.001        9.633259021             10.001 
 
          beta11min          beta11max          beta12min          beta12max 
-                10        10.13672095                  0                  0 
+       9.633259021             10.001                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
                  0                  0                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
-                10        10.13672095                  0                  0 
+       9.633259021             10.001                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        1.050000001                  0                  0 
+                 1        1.000000002                  0                  0 
 
           disp2min           disp2max           disp3min           disp3max 
                  0                  0                  0                  0 
@@ -134,7 +134,7 @@ Determined SECTOR NMUL MAX :  0
                  0                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0                  0                  0                  0 
+                 0                  0                  0                  0 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0       0.8717825051                  0                  0 

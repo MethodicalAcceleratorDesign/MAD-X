@@ -21,20 +21,23 @@ module phys_constfi
   public
   !--- Definition of physical constants
   ! sources  :
-  ! J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012
-  ! K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG 2014
+  ! https://physics.nist.gov/cuu/pdf/wall_2018.pdf
   double precision, parameter :: clight = 299792458d0        ! Speed of light in vacuum [m/s]
-  double precision, parameter :: qelect = 1.6021766208d-19   ! Elementary charge [A*s]
-  double precision, parameter :: hbar   = 6.582119514e-25    ! Reduced Plack's constant [GeV*s]
+  double precision, parameter :: qelect = 1.602176634d-19   ! Elementary charge [A*s]
+
+  double precision, parameter :: hbar   = 6.582119569e-25    ! Reduced Plack's constant [GeV*s]
+
   double precision, parameter :: amu0   = 4d-7 * pi          ! Permeability of vacuum [V*s/A*m]
   ! Rest Mass [GeV]
-  double precision, parameter ::  emass  = 0.5109989461d-3   ! GeV CODATA 2014
-  double precision, parameter ::  pmass  = 0.9382720813      ! GeV CODATA 2014
-  double precision, parameter ::  nmass  = 0.9314940954      ! GeV CODATA 2014
-  double precision, parameter ::  mumass = 0.1056583745      ! GeV CODATA 2014
+  double precision, parameter ::  emass  = 0.51099895000d-3   ! GeV CODATA 2018
+
+  double precision, parameter ::  pmass  = 0.93827208816     ! GeV CODATA 2018
+
+  double precision, parameter ::  nmass  = 0.93956542052      ! GeV CODATA 2018
+  double precision, parameter ::  mumass = 0.1056583755     ! GeV CODATA 2018
 
   ! Classical radius [m]
-  double precision, parameter :: erad   = 2.8179403227d-15
+  double precision, parameter :: erad   = 2.8179403262d-15
   double precision, parameter :: prad   = erad*emass/pmass
 end module phys_constfi
 
@@ -111,6 +114,8 @@ module code_constfi
   integer, parameter :: code_nllens = 42
   integer, parameter :: code_rfmultipole = 43
   integer, parameter :: code_collimator = 44
+  integer, parameter :: code_changerefp0 = 45
+  integer, parameter :: code_sixmarker = 46
 end module code_constfi
 
 module aperture_enums
@@ -369,6 +374,7 @@ module twisscfi
   double precision :: wgt=0.d0, suml=0.d0, circ=0.d0, eta=0.d0, alfa=0.d0, gamtr=0.d0
   double precision :: wx=0.d0, phix=0.d0, dmux=0.d0, xix=0.d0, wy=0.d0, phiy=0.d0, dmuy=0.d0, xiy=0.d0
   double precision :: synch_1=0.d0, synch_2=0.d0, synch_3=0.d0, synch_4=0.d0, synch_5=0.d0
+  double precision :: synch_6=0.d0, synch_7=0.d0, synch_8=0.d0
   double precision :: gammacp=1.d0
   integer :: nmode_flip=0
 end module twisscfi
@@ -408,9 +414,9 @@ module twiss_elpfi
   integer, parameter :: b_k2s=16, b_h1=17, b_h2=18, b_hgap=19
   integer, parameter :: b_fint=20, b_fintx=21, b_k3=22, b_k3s=23
   !-quad
-  integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9
+  integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9, q_k1t=10, q_k1st=11
   !-sext
-  integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9
+  integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9, s_k2t=10, s_k2st=11
   !-oct
   integer, parameter :: o_tilt=7, o_k3=8, o_k3s=9
   !-mult
@@ -418,7 +424,7 @@ module twiss_elpfi
   !-sol
   integer, parameter :: so_lrad=7, so_ks=8, so_ksi=9
   !-rfc
-  integer, parameter :: r_volt=7, r_lag=8, r_freq=9
+  integer, parameter :: r_volt=7, r_lag=8, r_freq=9, r_lagt=10
   !-elsep
   integer, parameter :: e_tilt=7, e_ex=8, e_ey=9
   !-hkick
@@ -441,6 +447,14 @@ module twtrrfi
   !---- maxmul is the maximum multipole order both in twiss and trrun
   integer, parameter :: maxmul=20, maxferr=50, maxnaper=100
 end module twtrrfi
+
+module twtapering
+  implicit none
+  public
+  !---- for tapering
+  integer :: totrfcav =0, orderrun=0
+  double precision ::  endpt=0
+end module twtapering
 
 module ibsdbfi
   implicit none
@@ -551,7 +565,7 @@ module plotfi
   !--- parameters used in the routine peschm in file plot.F
 
   integer, parameter :: mobj = 14, msize = 88
-  integer, parameter :: mtitl  = 128, mxlabl = 160
+  integer, parameter :: mtitl  = 128, mxlabl = 300 !hbu mxlabl = 160 increased to 300 as required by plot.f90
   integer, parameter :: mnvar = 74, mxdep = 2
   integer, parameter :: mqadd = 100000
   integer, parameter :: mntmax = 20, mksmax = 10

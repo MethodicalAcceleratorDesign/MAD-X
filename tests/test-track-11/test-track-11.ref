@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2019.03.06 11:04:30      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 11:37:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -86,6 +86,7 @@ enter Twiss module
   
 iteration:   1 error:   1.026361E-07 deltap:   0.000000E+00
 orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.133094E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -93,10 +94,10 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
         26658.8832                 -0    0.0003463097584        53.73628458 
 
                 q1                dq1            betxmax              dxmax 
-       62.30999979        2.000072951        19393.43379         2.71665413 
+       62.30999979        2.000072951         19393.4338         2.71665413 
 
              dxrms             xcomax             xcorms                 q2 
-       1.451766744    1.162795311e-06    1.785920639e-07        60.32000043 
+       1.451766744    1.162795312e-06     1.78592064e-07        60.32000043 
 
                dq2            betymax              dymax              dyrms 
        2.000043744        19393.44125                 -0                  0 
@@ -107,13 +108,14 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 beta.ip1           =                  0 ;
 enter Twiss module
   
 iteration:   1 error:   1.026361E-07 deltap:   0.000000E+00
 orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.133094E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -121,10 +123,10 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
         26658.8832                 -0    0.0003463097584        53.73628458 
 
                 q1                dq1            betxmax              dxmax 
-       62.30999979        2.000072951        19393.43379         2.71665413 
+       62.30999979        2.000072951         19393.4338         2.71665413 
 
              dxrms             xcomax             xcorms                 q2 
-       1.451766744    1.162795311e-06    1.785920639e-07        60.32000043 
+       1.451766744    1.162795312e-06     1.78592064e-07        60.32000043 
 
                dq2            betymax              dymax              dyrms 
        2.000043744        19393.44125                 -0                  0 
@@ -135,12 +137,13 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter Twiss module
   
 iteration:   1 error:   1.026361E-07 deltap:   0.000000E+00
 orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.133094E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -148,10 +151,10 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
         26658.8832                 -0    0.0003463097584        53.73628458 
 
                 q1                dq1            betxmax              dxmax 
-       62.30999979        2.000072951        19393.43379         2.71665413 
+       62.30999979        2.000072951         19393.4338         2.71665413 
 
              dxrms             xcomax             xcorms                 q2 
-       1.451766744    1.162795311e-06    1.785920639e-07        60.32000043 
+       1.451766744    1.162795312e-06     1.78592064e-07        60.32000043 
 
                dq2            betymax              dymax              dyrms 
        2.000043744        19393.44125                 -0                  0 
@@ -162,8 +165,8 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 on_x1              =                  0 ;
 on_x2              =                  0 ;
 on_x5              =                  0 ;
@@ -215,25 +218,25 @@ Initial Penalty Function =   0.61493613E-16
 
 
 call:      10   Penalty function =   0.14222031E-17
-call:      19   Penalty function =   0.65353024E-38
+call:      19   Penalty function =   0.72090191E-39
  ++++++++++ LMDIF ended: converged successfully
-call:      19   Penalty function =   0.65353024E-38
+call:      19   Penalty function =   0.72090191E-39
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-ip1:1                      x            4     0.00000000E+00    -5.13213237E-23     2.63387826E-45
-ip1:1                      px           4     0.00000000E+00     4.31106498E-23     1.85852813E-43
-ip1:1                      y            4     0.00000000E+00    -1.29861529E-21     1.68640168E-42
-ip1:1                      py           4     0.00000000E+00     6.27259874E-23     3.93454950E-43
-s.ds.r1.b1:1               x            4     0.00000000E+00    -7.45907234E-20     5.56377602E-39
-s.ds.r1.b1:1               px           4     0.00000000E+00     2.94405644E-21     8.66746831E-40
-s.ds.r1.b1:1               y            4     0.00000000E+00     9.10663892E-21     8.29308724E-41
-s.ds.r1.b1:1               py           4     0.00000000E+00     4.42497104E-22     1.95803687E-41
+ip1:1                      x            4     0.00000000E+00    -6.66991375E-22     4.44877495E-43
+ip1:1                      px           4     0.00000000E+00     2.16804817E-24     4.70043288E-46
+ip1:1                      y            4     0.00000000E+00    -1.98278639E-21     3.93144186E-42
+ip1:1                      py           4     0.00000000E+00     3.14599113E-23     9.89726020E-44
+s.ds.r1.b1:1               x            4     0.00000000E+00     1.25865329E-20     1.58420810E-40
+s.ds.r1.b1:1               px           4     0.00000000E+00    -2.08120345E-21     4.33140779E-40
+s.ds.r1.b1:1               y            4     0.00000000E+00     1.02058356E-20     1.04159081E-40
+s.ds.r1.b1:1               py           4     0.00000000E+00     4.55032682E-22     2.07054742E-41
 
 
-Final Penalty Function =   6.53530243e-39
+Final Penalty Function =   7.20901906e-40
 
 
 
@@ -242,17 +245,17 @@ Final Penalty Function =   6.53530243e-39
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
 acbch6.l1b1              -1.09285e-10  0.00000e+00 -8.98700e-05  8.98700e-05
-acbcv5.l1b1               2.95482e-23  0.00000e+00 -8.98700e-05  8.98700e-05
+acbcv5.l1b1               7.17577e-23  0.00000e+00 -8.98700e-05  8.98700e-05
 acbch5.r1b1               1.96477e-10  0.00000e+00 -8.98700e-05  8.98700e-05
-acbcv6.r1b1               2.12757e-23  0.00000e+00 -8.98700e-05  8.98700e-05
+acbcv6.r1b1              -4.98893e-23  0.00000e+00 -8.98700e-05  8.98700e-05
 acbyhs4.l1b1              8.53347e-11  0.00000e+00 -9.63000e-05  9.63000e-05
 acbyhs4.r1b1             -2.33729e-10  0.00000e+00 -9.63000e-05  9.63000e-05
-acbyvs4.l1b1             -8.15128e-23  0.00000e+00 -9.63000e-05  9.63000e-05
-acbyvs4.r1b1             -6.55726e-25  0.00000e+00 -9.63000e-05  9.63000e-05
+acbyvs4.l1b1             -1.34839e-22  0.00000e+00 -9.63000e-05  9.63000e-05
+acbyvs4.r1b1              6.10147e-24  0.00000e+00 -9.63000e-05  9.63000e-05
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   6.53530243e-39
+VARIABLE "TAR" SET TO   7.20901906e-40
 START MATCHING
 
 number of sequences: 1
@@ -370,25 +373,25 @@ Initial Penalty Function =   0.51962458E-16
 
 
 call:      10   Penalty function =   0.12997187E-17
-call:      19   Penalty function =   0.19574275E-37
+call:      19   Penalty function =   0.73513963E-38
  ++++++++++ LMDIF ended: converged successfully
-call:      19   Penalty function =   0.19574275E-37
+call:      19   Penalty function =   0.73513963E-38
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-ip5:1                      x            4     0.00000000E+00     1.09722460E-21     1.20390183E-42
-ip5:1                      px           4     0.00000000E+00     4.49435839E-23     2.01992574E-43
-ip5:1                      y            4     0.00000000E+00    -4.41664817E-21     1.95067810E-41
-ip5:1                      py           4     0.00000000E+00    -5.37009858E-23     2.88379587E-43
-s.ds.r5.b1:1               x            4     0.00000000E+00    -7.29118751E-20     5.31614153E-39
-s.ds.r5.b1:1               px           4     0.00000000E+00     3.97603171E-21     1.58088281E-39
-s.ds.r5.b1:1               y            4     0.00000000E+00     1.01679454E-19     1.03387113E-38
-s.ds.r5.b1:1               py           4     0.00000000E+00     4.81387413E-21     2.31733841E-39
+ip5:1                      x            4     0.00000000E+00    -3.72867271E-22     1.39030001E-43
+ip5:1                      px           4     0.00000000E+00     3.72502588E-23     1.38758178E-43
+ip5:1                      y            4     0.00000000E+00     2.34440023E-21     5.49621246E-42
+ip5:1                      py           4     0.00000000E+00     4.57547946E-23     2.09350123E-43
+s.ds.r5.b1:1               x            4     0.00000000E+00     3.46278468E-20     1.19908777E-39
+s.ds.r5.b1:1               px           4     0.00000000E+00    -1.93992922E-21     3.76332536E-40
+s.ds.r5.b1:1               y            4     0.00000000E+00    -6.88030746E-20     4.73386308E-39
+s.ds.r5.b1:1               py           4     0.00000000E+00    -3.21889661E-21     1.03612954E-39
 
 
-Final Penalty Function =   1.95742751e-38
+Final Penalty Function =   7.35139627e-39
 
 
 
@@ -397,17 +400,17 @@ Final Penalty Function =   1.95742751e-38
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
 acbch6.l5b1              -1.20197e-10  0.00000e+00 -8.98700e-05  8.98700e-05
-acbcv5.l5b1               2.39773e-22  0.00000e+00 -8.98700e-05  8.98700e-05
+acbcv5.l5b1              -1.35389e-22  0.00000e+00 -8.98700e-05  8.98700e-05
 acbch5.r5b1               1.72995e-10  0.00000e+00 -8.98700e-05  8.98700e-05
-acbcv6.r5b1              -6.33019e-22  0.00000e+00 -8.98700e-05  8.98700e-05
+acbcv6.r5b1               5.26248e-22  0.00000e+00 -8.98700e-05  8.98700e-05
 acbyhs4.l5b1              9.55779e-11  0.00000e+00 -9.63000e-05  9.63000e-05
 acbyhs4.r5b1             -2.07250e-10  0.00000e+00 -9.63000e-05  9.63000e-05
-acbyvs4.l5b1             -3.52646e-22  0.00000e+00 -9.63000e-05  9.63000e-05
-acbyvs4.r5b1              8.10427e-22  0.00000e+00 -9.63000e-05  9.63000e-05
+acbyvs4.l5b1              1.91066e-22  0.00000e+00 -9.63000e-05  9.63000e-05
+acbyvs4.r5b1             -6.14749e-22  0.00000e+00 -9.63000e-05  9.63000e-05
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.95742751e-38
+VARIABLE "TAR" SET TO   7.35139627e-39
 START MATCHING
 
 number of sequences: 1
@@ -487,48 +490,48 @@ VARIABLE "TAR" SET TO   0.00000000e+00
 enter Twiss module
   
 iteration:   1 error:   4.115632E-11 deltap:   0.000000E+00
-orbit:   2.292565E-12  2.911529E-14  9.267915E-14  5.983269E-16  4.824161E-10 -4.466269E-12
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.192882E-11 (symplectifying R)                                                                                                               
+orbit:   2.292565E-12  2.911529E-14  9.267977E-14  5.983349E-16  4.824161E-10 -4.466269E-12
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.129294E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832   -4.824161204e-10    0.0003463029846        53.73681013 
+        26658.8832   -4.824161205e-10    0.0003463029846        53.73681013 
 
                 q1                dq1            betxmax              dxmax 
        62.30999994        2.000096878        19393.42999        2.716682711 
 
              dxrms             xcomax             xcorms                 q2 
-       1.451766608     7.74846614e-09    6.523472196e-10         60.3200002 
+       1.451766608    7.748466143e-09      6.5234722e-10         60.3200002 
 
                dq2            betymax              dymax              dyrms 
-       2.000000346        19393.42412    1.139596682e-10    1.971659153e-11 
+       2.000000346        19393.42412    1.139595355e-10     1.97165682e-11 
 
             ycomax             ycorms             deltap            synch_1 
-   1.488170429e-12    1.827730715e-13                  0                  0 
+     1.4881674e-12    1.827726802e-13                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 enter TRACK module
   
 iteration:   1 error:   4.115632E-11 deltap:   0.000000E+00
-orbit:   2.292565E-12  2.911529E-14  9.267915E-14  5.983269E-16  4.824161E-10 -4.466269E-12
+orbit:   2.292565E-12  2.911529E-14  9.267977E-14  5.983349E-16  4.824161E-10 -4.466269E-12
 
 Full 6D closed orbit search.
 Initial value of 6-D closed orbit from Twiss: 
-orbit0   2.292565E-12  2.911529E-14  9.267915E-14  5.983269E-16  4.824161E-10 -4.466269E-12
+orbit0   2.292565E-12  2.911529E-14  9.267977E-14  5.983349E-16  4.824161E-10 -4.466269E-12
 
 6D closed orbit found by subroutine trclor 
 iteration:  11 error:   5.544470E-13 deltap:   0.000000E+00
-orbit:   2.279345E-12  2.913325E-14 -3.477437E-19 -4.627625E-21 -5.229164E-12 -4.464873E-12
+orbit:   2.279345E-12  2.913325E-14  2.684429E-19  3.307368E-21 -5.229164E-12 -4.464873E-12
 exit TRACK module
 
 
-  Number of warnings: 1
-0 in C and 1 in Fortran
+  Number of warnings: 4
+0 in C and 4 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

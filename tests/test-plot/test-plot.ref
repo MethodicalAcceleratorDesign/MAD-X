@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:08:43      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.08.10 21:45:24      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn, info, echo;
 
@@ -41,8 +41,8 @@ twiss, chrom, table;
 
 enter Twiss module
   
-iteration:   1 error:   3.148199E-12 deltap:   1.000000E-06
-orbit:   1.575937E-11  1.440482E-12  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+iteration:   1 error:   3.147865E-12 deltap:   1.000000E-06
+orbit:   1.575894E-11  1.440466E-12  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -53,13 +53,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
         26658.8832                 -0    0.0003171305985        56.15402958 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000118        1.985440718        595.2900593        2.860758575 
+       64.28000118        2.000263748        595.2900593        2.860758575 
 
              dxrms             xcomax             xcorms                 q2 
        1.347846458                  0                  0        59.31000027 
 
                dq2            betymax              dymax              dyrms 
-       2.000223951         611.782944                 -0                  0 
+       2.000228263         611.782944                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -67,8 +67,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 // track particles
@@ -168,8 +168,8 @@ twiss, chrom, table;
 
 enter Twiss module
   
-iteration:   1 error:   3.148199E-12 deltap:   1.000000E-06
-orbit:   1.575937E-11  1.440482E-12  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+iteration:   1 error:   3.147865E-12 deltap:   1.000000E-06
+orbit:   1.575894E-11  1.440466E-12  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -180,13 +180,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
         26658.8832                 -0    0.0003171305985        56.15402958 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000118        1.985440718        595.2900593        2.860758575 
+       64.28000118        2.000263748        595.2900593        2.860758575 
 
              dxrms             xcomax             xcorms                 q2 
        1.347846458                  0                  0        59.31000027 
 
                dq2            betymax              dymax              dyrms 
-       2.000223951         611.782944                 -0                  0 
+       2.000228263         611.782944                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -194,8 +194,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 // track particles

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.04.02  (64 bit, Linux)       +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2018.10.03               +
-  + Execution date: 2019.04.30 14:24:47      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:24:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -120,7 +120,7 @@ orbit:  -8.359849E-07 -1.313310E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
        0.294117647      -0.2485530769        4.004112697       0.3322876002 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2845484323    1.170023018e-06    9.749746328e-07       0.1764705882 
+      0.2845484323    1.170022992e-06    9.749746111e-07       0.1764705882 
 
                dq2            betymax              dymax              dyrms 
      -0.3357680436        9.503633189                  0                  0 
@@ -131,8 +131,8 @@ orbit:  -8.359849E-07 -1.313310E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 !plot,haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,title="TME cell",noversion=true;!,interpolate=true;
@@ -166,7 +166,7 @@ orbit:  -8.359849E-07 -1.313310E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
        0.294117647      -0.2485530769        4.004112697        0.335514865 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2845484323    1.178866511e-06    9.749746328e-07       0.1764705882 
+      0.2845484323    1.178866485e-06    9.749746111e-07       0.1764705882 
 
                dq2            betymax              dymax              dyrms 
      -0.3357680436        9.503633189                  0                  0 
@@ -177,11 +177,11 @@ orbit:  -8.359849E-07 -1.313310E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 ibs,file=ibs-table.tfs;
 
- sige    1.5000000478849695E-002
+ sige    1.5000000478849704E-002
  Twiss was calculated at the center of the elements. No interpolation is used
 
  Global parameters for the machine: 
@@ -190,8 +190,8 @@ radiate = T:
 
      C               5.314466 m              f0             56.410642 MHz            T0              0.017727 microseconds
      alfa            0.786658E-02            eta             0.786655E-02            gamma(tr)      11.274754
-     Bcurrent        4.067091 A/bunch        Kbunch       312                        Npart           0.450000E+12 per bunch
-     E               2.860000 GeV            gamma        5596.880428                beta            1.000000
+     Bcurrent        4.067092 A/bunch        Kbunch       312                        Npart           0.450000E+12 per bunch
+     E               2.860000 GeV            gamma        5596.880385                beta            1.000000
 
  Emittances:
 
@@ -231,7 +231,7 @@ sequence name: tme
 
      (Weighted) average lifetimes (sec):
      Longitudinal=    2.138169E+08
-     Horizontal  =    3.601849E+07
+     Horizontal  =    3.601848E+07
      Vertical    =   -5.160032E+15
 
 

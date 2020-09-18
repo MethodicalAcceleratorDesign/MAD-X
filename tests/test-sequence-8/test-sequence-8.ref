@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2019.09.11 11:32:49      +
+  + Execution date: 2020.07.29 11:53:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! try to keep expressions for strengths and positions when saving a sequence
 
@@ -142,8 +142,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
      synch_2      synch_3      synch_4      synch_5 
     0.000000     0.000000     0.000000     0.000000 
 
-      nflips 
-    0.000000 
+     synch_6      synch_8       nflips 
+    0.000000     0.000000     0.000000 
 
 
 stop;

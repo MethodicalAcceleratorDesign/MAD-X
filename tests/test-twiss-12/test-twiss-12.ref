@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:56:54      +
+  + Release   date: 2019.07.25               +
+  + Execution date: 2020.07.29 16:24:25      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test-sigma
 
@@ -45,10 +45,10 @@ call:      13   Penalty function =   0.33613048E+01
 call:      16   Penalty function =   0.14562665E+00
 call:      19   Penalty function =   0.47437201E-03
 call:      22   Penalty function =   0.54352705E-08
-call:      25   Penalty function =   0.47420646E-15
-call:      28   Penalty function =   0.17515762E-22
+call:      25   Penalty function =   0.47420688E-15
+call:      28   Penalty function =   0.17564222E-22
  ++++++++++ LMDIF ended: converged successfully
-call:      28   Penalty function =   0.17515762E-22
+call:      28   Penalty function =   0.17564222E-22
 endmatch;
 
 
@@ -56,11 +56,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-mk:1                       betx         4     5.00000000E+00     5.00000000E+00     1.33969416E-23
-mk:1                       bety         4     5.00000000E+00     5.00000000E+00     4.11882028E-24
+mk:1                       betx         4     5.00000000E+00     5.00000000E+00     1.34490064E-23
+mk:1                       bety         4     5.00000000E+00     5.00000000E+00     4.11521597E-24
 
 
-Final Penalty Function =   1.75157618e-23
+Final Penalty Function =   1.75642223e-23
 
 
 
@@ -73,7 +73,7 @@ kd                       -1.78349e+00 -2.00000e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.75157618e-23
+VARIABLE "TAR" SET TO   1.75642223e-23
 
 
 select, flag=twiss, column=s, name,betx, bety, sig11, sig12, sig13, sig14, sig15, sig16, sig21, sig22, sig23, sig24, sig25, sig26, sig31, sig32, sig33, sig34, sig35, sig36, sig41, sig42, sig43, sig44, sig45, sig46, sig51, sig52, sig53, sig54, sig55, sig56, sig61, sig62, sig63, sig64, sig65, sig66 ;
@@ -107,8 +107,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 !savebeta, label=tw, place=#s;
 
 !plot, haxis=s, vaxis1=betx, sig11, colour=100, interpolate=true;

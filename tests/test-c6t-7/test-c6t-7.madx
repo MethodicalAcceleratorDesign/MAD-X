@@ -1,0 +1,22 @@
+circum=10;
+
+sm1:SIXMARKER, eltype=2, attr={0.1,2,3,4,5,6,7}, f3string="NEW_ELEMENT {newline} {0}, {1} {newline}NEXT", f3vector={0.2, 0.5};
+m1: multipole, knl={0, 0.2};
+show, sm1;
+
+seq: sequence, refer=center, l=circum;
+sm1,   at = 1;
+m1,    at = 2;
+endsequence;
+
+beam;
+show, sm1;
+use, sequence=seq;
+SELECT, FLAG=makethin, SLICE=3, pattern=full;
+
+makethin, sequence=seq;
+use, sequence=seq;
+twiss, betx=1, bety=1;
+sixtrack;
+
+save, sequence=seq, file="thin.seq";

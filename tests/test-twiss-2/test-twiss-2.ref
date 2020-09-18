@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.06.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:56:41      +
+  + Release   date: 2020.08.13               +
+  + Execution date: 2020.08.31 16:53:55      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for MAD-X';
 
@@ -37,8 +37,8 @@ beam, particle = proton, energy =   eg        ,
 
 value,epsx,epsy;
 
-epsx               =    3.518520305e-08 ;
-epsy               =    3.518520305e-08 ;
+epsx               =    3.518520331e-08 ;
+epsy               =    3.518520331e-08 ;
 option,-echo;
 
 
@@ -134,34 +134,34 @@ table=my_table,file=twiss_fv9;
 
 enter Twiss module
   
-iteration:   1 error:   1.646937E-03 deltap:   0.000000E+00
-orbit:  -1.966105E-04  2.378502E-07  4.833405E-04  9.585886E-08  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.648921E-03 deltap:   0.000000E+00
+orbit:  -1.952345E-04  2.282130E-07  4.851652E-04  1.095794E-07  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   5.848410E-07 deltap:   0.000000E+00
-orbit:  -1.967992E-04  2.414294E-07  4.837652E-04  1.007908E-07  0.000000E+00  0.000000E+00
+iteration:   2 error:   5.829340E-07 deltap:   0.000000E+00
+orbit:  -1.954213E-04  2.317880E-07  4.855885E-04  1.144830E-07  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-             534.6                 -0    0.0004436742712        47.47531748 
+             534.6                 -0    0.0004431551558        47.50311582 
 
                 q1                dq1            betxmax              dxmax 
-       1.253934631       -7.810108771        181.5167874        2.224387301 
+       1.254719523       -7.801692116        181.4560979        2.221658184 
 
              dxrms             xcomax             xcorms                 q2 
-       1.661132647     0.001135107338    0.0005825813871        1.254640048 
+       1.659192702     0.001133054924    0.0005812744453        1.253855313 
 
                dq2            betymax              dymax              dyrms 
-      -2.008153625        181.6896079     0.003815311527     0.002201693134 
+      -2.007287479        181.7326125     0.003843350295     0.002217480582 
 
             ycomax             ycorms             deltap            synch_1 
-    0.001154084592    0.0004595899128                  0                  0 
+    0.001156879989    0.0004609275537                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 
 
 stop;

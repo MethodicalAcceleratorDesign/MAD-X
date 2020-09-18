@@ -3,7 +3,7 @@
   +     MAD-X 5.05.02  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2019.07.25               +
-  + Execution date: 2020.01.17 10:03:21      +
+  + Execution date: 2020.07.29 16:40:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !
 
@@ -1095,8 +1095,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 !plot, noversion=true, table=twiss, haxis=s, vaxis1=betx,bety, interpolate,
 
 !     title="Initial CLEAR optics", colour=100;
@@ -1153,15 +1153,19 @@ match, use_macro;
 
       !! min bet* at ACS0640
 
-      constraint, weight=10000, expr=table(twiss, CA.WFM0645, betx) < 5; 
+      constraint, weight=10000, expr=table(twiss, CA.WFM0645, betx) = 5; 
 
-      constraint, weight=10000, expr=table(twiss, CA.WFM0645, bety) < 5; 
+      constraint, weight=10000, expr=table(twiss, CA.WFM0645, bety) = 5; 
 
-      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfx) < 0.1 ; 
+      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfx) = 0.1 ; 
 
-      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfy) < 0.1 ; 
+      constraint, weight=1000, expr=table(twiss, CA.WFM0645, alfy) = 0.1 ; 
 
       !
+
+
+
+
 
       !! min beta* at CA.MTV0730
 
@@ -1191,7 +1195,7 @@ match, use_macro;
 
      !!!! minimisation method !!!!!!!!!!!!!!!
 
-      lmdif,   tolerance:=1e-06, calls:=10000;
+      lmdif,   tolerance:=1e-12, calls:=10000;
 
 number of variables:    6
 user given constraints: 0
@@ -1199,27 +1203,35 @@ total constraints:      8
 
 START LMDIF:
 
-Initial Penalty Function =   0.74635570E+11
+Initial Penalty Function =   0.74647346E+11
 
 
-reset parameter: ca.iqfd0350             from  0.43891904E+01  to  0.26150000E+02
-reset parameter: ca.iqfd0510             from  0.12139406E+02  to  0.24400000E+02
-reset parameter: ca.iqdd0515             from -0.97319798E+02  to  0.38300000E+02
-reset parameter: ca.iqfd0520             from -0.17228878E+02  to  0.21800000E+02
-call:       9   Penalty function =   0.96875725E+10
-call:      16   Penalty function =   0.31263721E+09
-call:      23   Penalty function =   0.35655934E+08
-call:      30   Penalty function =   0.37238203E+07
-call:      37   Penalty function =   0.29488942E+05
-call:      44   Penalty function =   0.28216432E+02
-call:      53   Penalty function =   0.34763345E+01
-call:      62   Penalty function =   0.34537639E+01
-call:      69   Penalty function =   0.34094348E+01
-call:      77   Penalty function =   0.34009628E+01
-call:      85   Penalty function =   0.33985204E+01
-call:      92   Penalty function =   0.33976729E+01
- ++++++++++ LMDIF ended: converged without success
-call:      99   Penalty function =   0.33976729E+01
+reset parameter: ca.iqfd0350             from  0.13330380E+03  to  0.68850000E+02
+reset parameter: ca.iqfd0360             from -0.10415497E+02  to  0.31900000E+02
+reset parameter: ca.iqfd0510             from  0.12701299E+03  to  0.63600000E+02
+reset parameter: ca.iqdd0515             from  0.19274024E+03  to  0.10530000E+03
+call:       9   Penalty function =   0.95303482E+10
+call:      18   Penalty function =   0.12849795E+10
+call:      27   Penalty function =   0.96789431E+09
+call:      34   Penalty function =   0.83848429E+09
+call:      41   Penalty function =   0.60742909E+09
+call:      48   Penalty function =   0.32879545E+09
+call:      55   Penalty function =   0.13954742E+09
+call:      63   Penalty function =   0.98437188E+08
+call:      70   Penalty function =   0.68116912E+08
+call:      77   Penalty function =   0.28006775E+08
+call:      84   Penalty function =   0.67503311E+07
+call:      91   Penalty function =   0.41050627E+06
+call:      99   Penalty function =   0.17410363E+06
+call:     106   Penalty function =   0.13371850E+06
+call:     113   Penalty function =   0.10220391E+06
+call:     120   Penalty function =   0.98959183E+05
+call:     127   Penalty function =   0.15445109E+03
+call:     134   Penalty function =   0.13847118E-02
+call:     141   Penalty function =   0.55268827E-08
+call:     148   Penalty function =   0.15200396E-13
+ ++++++++++ LMDIF ended: converged successfully
+call:     148   Penalty function =   0.15200396E-13
 !      simplex,  tolerance:=1e-09, calls:=1000;
 
 !      lmdif,    tolerance:=1e-09, calls:=1000;
@@ -1235,64 +1247,64 @@ MATCH SUMMARY
 
 --------------------------------------------------------------------
 macro: m11                 
-  constraint: table(twiss,ca.wfm0645,betx)<5          
-  values:     +5.00000e+00<+5.00000e+00
+  constraint: table(twiss,ca.wfm0645,betx)=5          
+  values:     +5.00000e+00=+5.00000e+00
   weight:     +1.00000e+04
-  penalty:    +1.52927e-02
+  penalty:    -3.12728e-08
 
-  constraint: table(twiss,ca.wfm0645,bety)<5          
-  values:     +5.00001e+00<+5.00000e+00
+  constraint: table(twiss,ca.wfm0645,bety)=5          
+  values:     +5.00000e+00=+5.00000e+00
   weight:     +1.00000e+04
-  penalty:    +8.87550e-02
+  penalty:    -1.19211e-07
 
-  constraint: table(twiss,ca.wfm0645,alfx)<0.1        
-  values:     +1.01841e-01<+1.00000e-01
+  constraint: table(twiss,ca.wfm0645,alfx)=0.1        
+  values:     +1.00000e-01=+1.00000e-01
   weight:     +1.00000e+03
-  penalty:    +1.84108e+00
+  penalty:    +8.66099e-10
 
-  constraint: table(twiss,ca.wfm0645,alfy)<0.1        
-  values:     -9.13640e-01<+1.00000e-01
+  constraint: table(twiss,ca.wfm0645,alfy)=0.1        
+  values:     +1.00000e-01=+1.00000e-01
   weight:     +1.00000e+03
-  penalty:    +0.00000e+00
+  penalty:    +3.21318e-09
 
   constraint: table(twiss,ca.btv0730,betx)<25         
-  values:     +6.35708e+00<+2.50000e+01
+  values:     +6.36792e+00<+2.50000e+01
   weight:     +1.00000e+03
   penalty:    +0.00000e+00
 
   constraint: table(twiss,ca.btv0730,bety)<25         
-  values:     +1.43721e+01<+2.50000e+01
+  values:     +6.36792e+00<+2.50000e+01
   weight:     +1.00000e+03
   penalty:    +0.00000e+00
 
   constraint: table(summ,betxmax)<1000                
-  values:     +3.51426e+01<+1.00000e+03
+  values:     +3.51831e+01<+1.00000e+03
   weight:     +1.00000e+02
   penalty:    +0.00000e+00
 
   constraint: table(summ,betymax)<1000                
-  values:     +3.60740e+01<+1.00000e+03
+  values:     +2.39925e+01<+1.00000e+03
   weight:     +1.00000e+02
   penalty:    +0.00000e+00
 
 
 
-Final Penalty Function =   3.39767293e+00
+Final Penalty Function =   1.52003961e-14
 
 
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-ca.iqfd0350               4.29441e+01  4.75000e+01  2.37500e+01  7.12500e+01
-ca.iqdd0355               7.25713e+01  8.64000e+01  4.32000e+01  1.29600e+02
-ca.iqfd0360               4.28691e+01  5.90000e+01  2.95000e+01  8.85000e+01
-ca.iqfd0510               5.45573e+01  4.40000e+01  2.20000e+01  6.60000e+01
-ca.iqdd0515               7.16060e+01  7.18000e+01  3.59000e+01  1.07700e+02
-ca.iqfd0520               4.66769e+01  3.88000e+01  1.94000e+01  5.82000e+01
+ca.iqfd0350               4.53587e+01  4.75000e+01  2.37500e+01  7.12500e+01
+ca.iqdd0355               7.31250e+01  8.64000e+01  4.32000e+01  1.29600e+02
+ca.iqfd0360               4.44673e+01  5.90000e+01  2.95000e+01  8.85000e+01
+ca.iqfd0510               6.28497e+01  4.40000e+01  2.20000e+01  6.60000e+01
+ca.iqdd0515               7.24666e+01  7.18000e+01  3.59000e+01  1.07700e+02
+ca.iqfd0520               3.69979e+01  3.88000e+01  1.94000e+01  5.82000e+01
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   3.39767293e+00
+VARIABLE "TAR" SET TO   1.52003961e-14
 
 
 !
@@ -1319,13 +1331,13 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
             18.292                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-       1.109645109                  0        35.14260159                  0 
+       1.120066197                  0        35.18313468                  0 
 
              dxrms             xcomax             xcorms                 q2 
-                 0                  0                  0       0.8127025056 
+                 0                  0                  0       0.7037091564 
 
                dq2            betymax              dymax              dyrms 
-                 0        36.07402492                  0                  0 
+                 0        23.99246062                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -1333,8 +1345,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-            nflips 
-                 0 
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 !plot, noversion=true, table=twiss, haxis=s, vaxis1=betx,bety, interpolate,
 
 !     title="Optimised CLEAR Optics", colour=100;

@@ -172,20 +172,24 @@ The attributes are:
   right hand rule. (Default:~0~rad).  
 
   \ttitem{MREX} The horizontal read error for a monitor. This is ignored if
-  the element is not a monitor. \\
+  the element is not a monitor. Note that this is ignored by TWISS and TRACK
+  and only used by the orbit correction command.  \\
   If \texttt{MREX}$>$0 the reading for \textit{x} is too high (default: 0 m). 
 
   \ttitem{MREY} The vertical read error for a monitor. This is ignored if
-  the element is not a monitor. \\  
+  the element is not a monitor. Note that this is ignored by TWISS and TRACK
+  and only used by the orbit correction command.  \\  
   If \texttt{MREY}$>$0, the reading for \textit{y} is too high (default: 0 m). 
 
   \ttitem{MSCALX} The relative horizontal scaling error for a monitor. This
-  is ignored if the element is not a monitor. \\ 
+  is ignored if the element is not a monitor. Note that this is ignored by TWISS and TRACK
+  and only used by the orbit correction command.  \\ 
   If \texttt{MSCALX}$>$0 the reading for \textit{x} is too high (default: 0). A
   value of 0.5 implies that the actual reading is multiplied by 1.5.  
 
   \ttitem{MSCALY} The relative vertical scaling error for a monitor. This is
-  ignored if the element is not a monitor. \\  
+  ignored if the element is not a monitor. Note that this is ignored by TWISS and TRACK
+  and only used by the orbit correction command.  \\ 
   If \texttt{MSCALY}$>$0 the reading for \textit{y} is too high (default: 0). A
   value of -0.3 implies that the actual reading is multiplied by 0.7.  
 
@@ -500,7 +504,7 @@ ESAVE, FILE = err.file;
 \textbf{Please note: in case of field errors, the absolute errors are
   saved and not relative errors. } 
 
-\section{ETABLE: Saving the}
+\section{ETABLE: Saving the errors to a table}
 \label{sec:esave}
 
 \madbox{
@@ -514,7 +518,7 @@ USE command.
 
 Example: 
 \madxmp{
-SELECT, FLAG=myerrortable, RANGE=range, CLASS=name, PATTERN=string;
+SELECT, FLAG=myerrortable, RANGE=range, CLASS=name, PATTERN=string; \\
 ETABLE, TABLE=myerrortable;
 }
 and elements selected by the  \hyperref[sec:select]{\texttt{SELECT}}

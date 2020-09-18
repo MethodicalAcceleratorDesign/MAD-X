@@ -154,7 +154,7 @@ match2_setconstrinrange(struct node** nodes, double w, char* parname, char s, ch
 {
 /* sets the same consraint for a range of elements defined bu nodes */
   struct node* c_node;
-  char tablecmd[500];
+  char tablecmd[750];
   char buff[500];
   char* p;
 

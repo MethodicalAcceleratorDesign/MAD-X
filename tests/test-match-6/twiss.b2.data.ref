@@ -2,13 +2,13 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le        0.9382720813
+@ MASS             %le        0.9382720882
 @ CHARGE           %le                   1
 @ ENERGY           %le                 450
 @ PC               %le         449.9990218
-@ GAMMA            %le         479.6050197
+@ GAMMA            %le         479.6050162
 @ KBUNCH           %le                   1
-@ BCURRENT         %le     0.0001891805798
+@ BCURRENT         %le     0.0001891805814
 @ SIGE             %le             0.00045
 @ SIGT             %le                   1
 @ NPART            %le            1.05e+11
@@ -29,7 +29,7 @@
 @ XCOMAX           %le       0.01140997641
 @ YCOMAX           %le      0.006931835558
 @ BETXMAX          %le         4402.816581
-@ BETYMAX          %le         4402.813044
+@ BETYMAX          %le         4402.813045
 @ XCORMS           %le      0.000824182213
 @ YCORMS           %le     0.0004842285896
 @ DXRMS            %le         1.414526976
@@ -41,13 +41,13 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %74s "Matching chromaticity for beam1 and beam2 of the LHC 6.4 lattice with MADX"
-@ ORIGIN           %16s "5.04.00 Linux 64"
-@ DATE             %08s "15/05/18"
-@ TIME             %08s "18.31.17"
+@ ORIGIN           %16s "5.06.00 Linux 64"
+@ DATE             %08s "31/08/20"
+@ TIME             %08s "16.55.56"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "IP1"                                0       0.5499995661       0.5500000588
- "IP2"                      3332.284216        9.999994208        9.999999675
+ "IP2"                      3332.284216        9.999994207        9.999999675
  "IP3"                        6664.7208        121.5671284        218.5844518
  "IP4"                      9997.157384        164.2544412        267.7258555
  "IP5"                      13329.59397       0.5500002092       0.5499999953
