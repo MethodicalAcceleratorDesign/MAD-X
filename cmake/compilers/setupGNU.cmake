@@ -6,14 +6,13 @@
 ###
 
 if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-    # General:
-    set(CMAKE_Fortran_FLAGS " -fno-range-check -fno-f2c -cpp ") # remove -g -O2 from main list
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fno-range-check -fno-f2c -cpp ")
     execute_process(COMMAND ${CMAKE_Fortran_COMPILER} --version OUTPUT_VARIABLE CMAKE_Fortran_COMPILER_VERSION)
     string(REGEX MATCH "1?[0-9].[0-9].[0-9]" CMAKE_Fortran_COMPILER_VERSION ${CMAKE_Fortran_COMPILER_VERSION})
     if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER 4.3.9)
         add_definitions(-D_GFORTRAN)
     endif()
-    if(${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 10.0.0)
+    if(NOT ${CMAKE_Fortran_COMPILER_VERSION} VERSION_LESS 10.0.0)
         set(CMAKE_Fortran_FLAGS "-fallow-invalid-boz ${CMAKE_Fortran_FLAGS}")
     endif()
     # Release flags:

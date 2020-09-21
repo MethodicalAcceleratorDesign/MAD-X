@@ -1,0 +1,10 @@
+#! /usr/bin/env bash
+set -ex
+
+[[ $(arch) == i686 ]] && ARCH=32 || ARCH=64
+
+make all-linux$ARCH-gnu \
+    STATIC=yes ONLINE=no \
+    NTPSA=yes USEGC=yes \
+    ARCH=$ARCH COVERAGE=no \
+    X11=no

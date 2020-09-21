@@ -1,0 +1,111 @@
+# Build MAD-X as manylinux compatible binaries. This platform tag describes
+# binaries with external dependencies limited to a standardized, restricted
+# subset of linux kernel and userspace ABI. Binaries conforming to this
+# standard are in practice compatible with most desktop and server linux
+# distributions in common use. For more information, see:
+#
+#   https://www.python.org/dev/peps/pep-0513/
+#   https://github.com/pypa/manylinux/
+#
+# In the future, we may want to release shared library builds of MAD-X based
+# on this platform. One remaining issue for this is that we don't have access
+# to a static libgfortran.a that was built with -fPIC and so have to link
+# against libgfortran.so, which has to be redistributed in order to be
+# manylinux compatible. For the cpymad build, libgfortran.so is automatically
+# included in the distribution using the `auditwheel` tool, that is available
+# in the docker container.
+
+name: manylinux
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        buildtool: [make, cmake]
+        manylinux:
+          - 1_i686
+          - 1_x86_64
+    env:
+      ARCH: ${{ contains(matrix.manylinux, 'i686') && '32' || '64' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build MAD-X
+        run: |
+          docker run --rm --init \
+            -v `pwd`:/mnt -w /mnt/ \
+            quay.io/pypa/manylinux${{ matrix.manylinux }} \
+            .github/build_manylinux_${{ matrix.buildtool }}
+
+      - name: Collect build artifacts
+        run: |
+          mkdir bin
+          cp "$(readlink -f madx$ARCH)" bin
+          cp "$(readlink -f numdiff$ARCH)" bin
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: bin-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}
+          path: bin
+
+      - run: .github/utils/is-static madx$ARCH
+
+  test:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-16.04
+          - ubuntu-18.04
+          - ubuntu-20.04
+        buildtool:
+          - make
+          - cmake
+        manylinux:
+          - 1_x86_64
+            # TODO: enable this platform (tons of errors, extremely slow):
+            # - 1_i686
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: bin-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}
+          path: bin
+
+      - name: Setup symlinks
+        run: |
+          ln -sf bin/madx$ARCH .
+          ln -sf bin/numdiff$ARCH .
+
+      - name: Install runtime dependencies
+        run: sudo apt-get install -qy gnuplot
+
+      - name: Run tests
+        # Skip 32bit build - it's broken and mind-boggelingly slow (>>2h)!
+        if: env.ARCH != '32'
+        id: tests
+        run: .github/utils/make_tests ARCH=$ARCH
+        env:
+          GFORTRAN_UNBUFFERED_PRECONNECTED: y
+
+      - name: Upload failed tests output for inspection
+        # This below condition looks redundant - but there is something about
+        # the failure() and always() functions that prevents an implicit
+        # `if success()` that would otherwise be conditioned on.
+        if: failure() && steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v2
+        with:
+          name: failures-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}-${{ matrix.os }}
+          path: |
+            tests/tests-log.txt
+            tests/tests-summary.txt
+            ${{ steps.tests.outputs.failed-tests }}

@@ -1,0 +1,146 @@
+# This workflow configures, builds, and tests MAD-X on several platforms
+# and configurations using CMake.
+
+# TODO:
+# - add builds for macos
+# - add more configuration settings, these are quick!
+# - fix test failures: test-track-9 test-thick-quad-2
+
+name: cmake
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  configure:
+    # Configure on several platforms using many different settings. This
+    # doesn't build or test, so can give only basic protection against syntax
+    # errors in the CMake config.
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu
+          - windows
+        cmake:
+          - v2.8    2.8.12.2  Linux-i386    win32-x86
+          - v3.0    3.0.2     Linux-i386    win32-x86
+          - v3.10   3.10.3    Linux-x86_64  win64-x64
+          - v3.18   3.18.2    Linux-x86_64  win64-x64
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download cmake for Linux
+        if: matrix.os == 'ubuntu'
+        run: |
+          set -ex
+          tags=(${{ matrix.cmake }})
+          filename="cmake-${tags[1]}-${tags[2]}.tar.gz"
+          curl -Lo "$filename" "https://cmake.org/files/${tags[0]}/$filename"
+          tar -xzf "$filename" --one-top-level=cmake-dist --strip-components 1
+
+      - name: Download cmake for Windows
+        if: matrix.os == 'windows'
+        run: |
+          set -ex
+          tags=(${{ matrix.cmake }})
+          filename="cmake-${tags[1]}-${tags[3]}.zip"
+          curl -Lo "$filename" "https://cmake.org/files/${tags[0]}/$filename"
+          7z x "$filename"
+          mv "${filename%.zip}" cmake-dist
+
+      - name: Setup cmake
+        run: |
+          cat >configure <<EOF
+          #!/usr/bin/env bash
+          rm -rf build
+          mkdir build
+          cd build
+          if [[ ${{ matrix.os }} == windows ]]; then
+            $(pwd)/cmake-dist/bin/cmake .. "\$@" -G "MSYS Makefiles"
+          else
+            $(pwd)/cmake-dist/bin/cmake .. "\$@"
+          fi
+          EOF
+          chmod +x configure
+
+      - run: ./configure
+      - run: ./configure -DBUILD_SHARED_LIBS=OFF
+      - run: ./configure -DBUILD_SHARED_LIBS=ON
+      - run: ./configure -DCMAKE_BUILD_TYPE=Debug
+      - run: ./configure -DCMAKE_BUILD_TYPE=Release
+      - run: ./configure -DMADX_STATIC=OFF
+      - run: ./configure -DMADX_STATIC=ON
+      - run: ./configure -DMADX_DEBUG=OFF
+      - run: ./configure -DMADX_DEBUG=ON
+      - run: ./configure -DMADX_NTPSA=OFF
+      - run: ./configure -DMADX_NTPSA=ON
+      - run: ./configure -DUSE_GC=OFF
+      - run: ./configure -DUSE_GC=ON
+      - run: ./configure -DMADX_FORCE_32=OFF
+      - run: ./configure -DMADX_FORCE_32=ON
+      - run: ./configure -DMADX_ONLINE=OFF
+      - run: ./configure -DMADX_ONLINE=ON
+        if: matrix.os == 'linux'
+      - run: ./configure -DMADX_X11=OFF
+      - run: ./configure -DMADX_X11=ON
+
+  build:
+    # Configure, build, and test with few settings. This is slow, so shouldn't
+    # add too many combinations here.
+    runs-on: ubuntu-16.04
+    env:
+      MADXDIR: ${{ github.workspace }}/dist
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {name: defaults, flags: ''}
+          - {name: x11,      flags: -DMADX_X11=ON}
+          - {name: static,   flags: -DMADX_STATIC=ON}
+          - {name: shared,   flags: -DBUILD_SHARED_LIBS=ON}
+          - {name: release,  flags: -DCMAKE_BUILD_TYPE=Release}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install MAD-X build dependencies
+        run: |
+          sudo apt-get install -qy \
+            libblas-dev \
+            liblapack-dev \
+            gfortran \
+            gnuplot
+
+      - name: Build MAD-X as library
+        run: |
+          set -ex
+          mkdir build && cd build
+          cmake ${{ matrix.flags }} ..
+          cmake --build .
+
+      - name: Run tests
+        id: tests
+        # exclude LONG tests:
+        # TODO: debug why test-track-9/test-thick-quad-2 are failing and
+        # then reenable:
+        run: cd build && ../.github/utils/ctest -E 'LONG|track-9|thick-quad-2'
+        env:
+          GFORTRAN_UNBUFFERED_PRECONNECTED: y
+
+      - name: Upload test outputs for inspection
+        # Keep the redundant condition (see main.yml)!
+        if: failure() && steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v2
+        with:
+          name: failures-cmake-${{ matrix.name }}
+          path: |
+            build/tests/tests-log.txt
+            build/tests/tests-summary.txt
+            ${{ steps.tests.outputs.failed-tests }}
