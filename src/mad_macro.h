@@ -17,6 +17,7 @@ struct macro     /* stores one line or macro definition */
   struct char_p_array* tokens;  /* token pointers into body if split (line) */
   struct char_array* body;      /* contains all statements */
   int stamp;
+  struct char_array* original;
 };
 
 struct macro_list
@@ -41,6 +42,6 @@ void  disable_line(char* name, struct macro_list*);
 void  replace_lines(struct macro*, int replace, char** reps);
 
 void  exec_macro(struct in_cmd*, int pos);
-
+void  void_print_macros(void);
 #endif // MAD_MACRO_H
 

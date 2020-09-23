@@ -123,11 +123,17 @@ make_macro(char* statement)
   /* makes a new macro from input command, stores name in name list */
 {
   struct macro* m;
+  printf("mmmm %s fffffff \n", statement );
   char** toks = tmp_l_array->p;
   int i, n, rs, re, start_2;
   int len = strlen(statement);
+  
+
+
   while(len >= aux_buff->max) grow_char_array(aux_buff);
-  strcpy(aux_buff->c, statement);
+
+
+  
   get_bracket_range(aux_buff->c, '{', '}', &rs, &re);
   start_2 = rs + 1;
   aux_buff->c[rs] = '\0'; aux_buff->c[re] = '\0'; /* drop '{' and '}' */
@@ -136,14 +142,23 @@ make_macro(char* statement)
   get_bracket_t_range(toks, '(', ')', 0, tmp_l_array->curr-1, &rs, &re);
   if ((n = re - rs - 1) < 0) n = 0; /* number of formal arguments if any */
   m = new_macro(n, strlen(&aux_buff->c[start_2]), 0);
+  m->original = new_char_array(len);
+  strcpy(aux_buff->c, statement);
   strcpy(m->name, toks[0]); rs++;
   for (i = 0; i < n; i++) m->formal->p[i] = permbuff(toks[rs+i]);
   if (n > 0) m->formal->curr = n;
   strcpy(m->body->c, &aux_buff->c[start_2]); m->body->curr = strlen(m->body->c);
   add_to_macro_list(m, macro_list);
+  void_print_macros();
   return 0;
 }
 
+void
+void_print_macros(void){
+  for(int i=0; i<macro_list->curr; i++){
+    printf("ii: %d macro: %s", i, macro_list->macros[i]->original->c);
+  }
+}
 void
 exec_macro(struct in_cmd* cmd, int pos)
   /* executes a macro */
