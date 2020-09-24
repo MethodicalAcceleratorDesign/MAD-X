@@ -43,5 +43,6 @@ void  replace_lines(struct macro*, int replace, char** reps);
 
 void  exec_macro(struct in_cmd*, int pos);
 void  void_print_macros(void);
+void  store_state(struct in_cmd*);
 #endif // MAD_MACRO_H
 
