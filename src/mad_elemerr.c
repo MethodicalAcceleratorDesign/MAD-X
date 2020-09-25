@@ -32,7 +32,7 @@ find_index_in_table2(const char * const cols[], int ncols, const char *name )
 
 
 static void
-pro_error_make_efield_table(const char *tablename)
+pro_error_make_efield_table(const char *tablename, double save_all)
 {
   struct table *ttb = efield_table;
   struct node *nanf;
@@ -43,8 +43,9 @@ pro_error_make_efield_table(const char *tablename)
   nanf = mysequ->ex_start;
   nend = mysequ->ex_end;
 
+
       while (nanf != nend) {
-        if(nanf->sel_err == 1) {
+        if(nanf->sel_err == 1 || save_all==1) {
            string_to_table_curr(tablename,"name",nanf->name);
 /* */
                   /*
@@ -249,7 +250,7 @@ error_seterr(struct in_cmd* cmd)
   }
 }
 
-static void
+void
 error_esave(struct in_cmd* cmd)
 {
     char *ef_table_file;
@@ -257,7 +258,8 @@ error_esave(struct in_cmd* cmd)
        efield_table = make_table("efield", "efield", efield_table_cols,
                                efield_table_types, 10000);
        add_to_table_list(efield_table, table_register);
-       pro_error_make_efield_table("efield");
+       double isfull = command_par_value("full",cmd->clone);
+       pro_error_make_efield_table("efield", isfull);
 /*  }                          */
     ef_table_file = command_par_string("file",cmd->clone);
     out_table("efield",efield_table,ef_table_file);
@@ -271,7 +273,9 @@ error_etable(struct in_cmd* cmd)
        efield_table = make_table(ef_table, ef_table, efield_table_cols,
                                efield_table_types, 10000);
        add_to_table_list(efield_table, table_register);
-       pro_error_make_efield_table(ef_table);
+       double isfull = command_par_value("full",cmd->clone);
+
+       pro_error_make_efield_table(ef_table, isfull);
 /*  }                          */
     //ef_table_file = command_par_string("file",cmd->clone);
     //out_table("efield",efield_table,ef_table_file);

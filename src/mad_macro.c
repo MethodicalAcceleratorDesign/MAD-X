@@ -143,20 +143,41 @@ make_macro(char* statement)
     m->original = new_char_array(len);
   strcpy(m->original->c, statement);
   add_to_macro_list(m, macro_list);
-  void_print_macros();
   return 0;
 }
 void
-void_print_macros(void){
-  printf("aaa %d", macro_list->curr);
+save_macros2file(const char* fname){
+  FILE *fptr;
+
+    // opening file in writing mode
+  fptr = fopen(fname, "w");
   for(int i=0; i<macro_list->curr; i++){
     printf("ii: %d macro: %s \n", i, macro_list->macros[i]->original->c);
-
+    fprintf(fptr, "%s \n", macro_list->macros[i]->original->c);
   }
+
+  fclose(fptr);
+
 }
 void
 store_state(struct in_cmd* cmd){
-  //void_print_macros();
+  char tmperrn [100];
+  char* fname  = command_par_string_user("file", cmd->clone);
+  strcpy(tmperrn, fname);
+  strcat(tmperrn, "_macro");
+  save_macros2file(tmperrn);
+  
+  strcpy(tmperrn, fname);
+  strcat(tmperrn, "_errors");
+  set_selected_errors();
+  error_esave(cmd);
+  rename(fname, tmperrn);
+  
+  strcpy(tmperrn, fname);
+  strcat(tmperrn, "_seq");
+  
+  exec_save(cmd);
+  rename(fname, tmperrn);
 }
 void
 exec_macro(struct in_cmd* cmd, int pos)
