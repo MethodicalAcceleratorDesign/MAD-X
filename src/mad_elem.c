@@ -161,11 +161,12 @@ export_el_par_8(struct command_parameter* par, char* string)
 }
 
 static void
-enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
+enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupdating)
   /* enters an element in a sequence */
 {
-  int i, k = 1;
+  int i, nupdates=1, k = 1;
   double at;
+
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, current_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, current_sequ->cavities, 0);
@@ -182,8 +183,11 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
   current_node->at_value = at;
   current_node->at_expr = command_par_expr("at", cmd->clone);
   const char* from = command_par_string_user("from", cmd->clone);
-  if (from)
+  if (from){
     current_node->from_name = permbuff(from);
+    nupdates = 2;
+  }
+    if (isupdating==0) check_for_update_in_seq(el, cmd->clone, nupdates);
 }
 
 static int
@@ -890,7 +894,9 @@ enter_element(struct in_cmd* cmd)
     cmd->clone = clone_command(cmd->cmd_def);
     strcpy(cmd->clone->name, toks[0]);
     scan_in_cmd(cmd);
-    if (k == 0 || strcmp(toks[0], toks[2]) == 0) el = parent;
+    if (k == 0 || strcmp(toks[0], toks[2]) == 0) {
+      el = parent;
+    }
     else
     {
       if ((el = make_element(toks[0], parent->name,
@@ -907,7 +913,7 @@ enter_element(struct in_cmd* cmd)
         el->bv = command_par_value("bv", comm);
       else el->bv = parent->bv;
     }
-    if (sequ_is_on) enter_elm_reference(cmd, el, flag);
+    if (sequ_is_on) enter_elm_reference(cmd, el, flag, k);
   }
 }
 
@@ -928,6 +934,23 @@ find_element(const char* name, struct el_list* ell)
   if ((pos = name_list_pos(name, ell->list)) < 0)
     return NULL;
   return ell->elem[pos];
+}
+
+void
+check_for_update_in_seq(struct element* el, struct command* update, int nupdates)
+  /* checks if someone tries to update the element in sequence creation */
+{
+  struct command_parameter_list* e_pl = el->def->par;
+  int pos, cupdate=0;
+  for (pos = 0; pos < e_pl->curr; pos++)
+  {
+    if (update->par_names->inform[pos])  /* parameter has been read */
+    {
+      cupdate++;
+      if(cupdate>nupdates)
+        fatal_error("Not possible to update attribute for element in sequence definition: ", el->name );
+    }
+  }
 }
 
 void
