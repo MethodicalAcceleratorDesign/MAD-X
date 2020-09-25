@@ -647,6 +647,7 @@ store_set(struct command* comm, int flag)
       if (strchr(p, 's')) strcpy(string_format, p);
       else if (strpbrk(p, "id")) strcpy(int_format, p);
       else if (strpbrk(p, "feEgG")) strcpy(float_format, p);
+      else if (strpbrk(p, "feEgGA")) strcpy(float_format, p);
     }
   }
   if (flag && command_par("sequence", comm, &cp))
