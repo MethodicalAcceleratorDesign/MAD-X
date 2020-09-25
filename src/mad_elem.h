@@ -96,6 +96,7 @@ void    grow_el_list(struct el_list*);
 void    set_aperture_element(struct element *el, struct command* def);
 int     is_custom_set(void);
 void    update_node_aperture(void);
+void    check_for_update_in_seq(struct element* el, struct command* update, int nupdates);
 // used by mad_mkthin.c
 struct command_parameter* return_param(const char* par, const struct element*);
 struct command_parameter* return_param_recurse(const char* par, const struct element*);
