@@ -162,12 +162,17 @@ save_macros2file(const char* fname){
 void
 store_state(struct in_cmd* cmd){
   char tmperrn [100];
+  char tmp_form[10];
+  strcpy(tmp_form, float_format);
+  strcpy(float_format, "A"); 
+ 
   char* fname  = command_par_string_user("file", cmd->clone);
   FILE *fptr;
-  mkdir("test", EEXIST);
+  mkdir("testaa", EEXIST);
   strcpy(tmperrn, fname);
   strcat(tmperrn, ".madx");
   fptr = fopen(tmperrn, "w");
+  //rename(fname, tmperrn);
 
   //saves the sequences
   strcpy(tmperrn, fname);
@@ -205,9 +210,7 @@ store_state(struct in_cmd* cmd){
   fprintf(fptr, "Readmytable, file=%s, table=selectederrors; \n", tmperrn);
   fprintf(fptr, "Seterr, table=%s ;\n" , "selectederrors");
   
-
-
-    //saves the sequences
+  //saves the sequences
   strcpy(tmperrn, fname);
   strcat(tmperrn, "_seq");
   exec_save(cmd);
@@ -215,6 +218,23 @@ store_state(struct in_cmd* cmd){
 
 
   fclose(fptr);
+  strcpy(float_format, tmp_form); 
+  //char ch, source_file[20], target_file[20];
+  FILE *source, *target;
+  char ch;
+
+  source = fopen(mad_argv[1], "r");
+
+  printf("Enter name of target file\n");
+
+  target = fopen("input_copied.madx", "w");
+
+  while ((ch = fgetc(source)) != EOF)
+      fputc(ch, target);
+   
+  fclose(source);
+  fclose(target);
+
 }
 
 

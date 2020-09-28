@@ -31,7 +31,7 @@ find_index_in_table2(const char * const cols[], int ncols, const char *name )
 }
 
 
-static void
+static int
 pro_error_make_efield_table(const char *tablename, double save_all)
 {
   struct table *ttb = efield_table;
@@ -39,7 +39,7 @@ pro_error_make_efield_table(const char *tablename, double save_all)
   struct node *nend;
   int    j;
   struct sequence* mysequ = current_sequ;
-
+  int isset = 0 ;
   nanf = mysequ->ex_start;
   nend = mysequ->ex_end;
 
@@ -52,6 +52,7 @@ pro_error_make_efield_table(const char *tablename, double save_all)
            printf("=> %s %e %e %e\n",nanf->name,nanf->p_fd_err,nanf->p_al_err);
                   */
            if(nanf->p_fd_err != NULL) {
+              isset++;
               int from_col = find_index_in_table(efield_table_cols, "k0l");
               int to_col = find_index_in_table(efield_table_cols, "k20sl");
               int ncols = to_col - from_col + 1;
@@ -75,6 +76,7 @@ pro_error_make_efield_table(const char *tablename, double save_all)
            }
            /* AL: RF-errors */
            if(nanf->p_ph_err != NULL) {
+              isset++;
               ttb->d_cols[find_index_in_table(efield_table_cols, "rfm_freq")][ttb->curr] = nanf->rfm_freq;
               ttb->d_cols[find_index_in_table(efield_table_cols, "rfm_harmon")][ttb->curr] = nanf->rfm_harmon;
               ttb->d_cols[find_index_in_table(efield_table_cols, "rfm_lag")][ttb->curr] = nanf->rfm_lag;
@@ -93,6 +95,8 @@ pro_error_make_efield_table(const char *tablename, double save_all)
         }
         nanf = nanf->next;
       }
+      if(isset!= 0 ) return 1;
+      else return 0;
 }
 
 static void
@@ -259,10 +263,11 @@ error_esave(struct in_cmd* cmd)
                                efield_table_types, 10000);
        add_to_table_list(efield_table, table_register);
        double isfull = command_par_value("full",cmd->clone);
-       pro_error_make_efield_table("efield", isfull);
+       int isset = pro_error_make_efield_table("efield", isfull);
 /*  }                          */
     ef_table_file = command_par_string("file",cmd->clone);
-    out_table("efield",efield_table,ef_table_file);
+    if(isset==1) out_table("efield",efield_table,ef_table_file);
+    else warning("Cannot save an empty error table", "ignored");
 }
 static void
 error_etable(struct in_cmd* cmd)

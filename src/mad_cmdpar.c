@@ -125,6 +125,7 @@ dump_command_parameter(struct command_parameter* par)
   int i, k;
   char logic[2][8] = {"false", "true"};
   fprintf(prt_file, "parameter: %s   ", par->name);
+  printf("ggggg %d \n",par->type );
   switch (par->type)
   {
     case 0:
@@ -636,6 +637,7 @@ store_set(struct command* comm, int flag)
 {
   char* p;
   char* name;
+  current_format_f = clone_command(comm);
   struct command_parameter* cp;
   int i, lp, n = 0;
   if (command_par("format", comm, &cp) || !flag)
