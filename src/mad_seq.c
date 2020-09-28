@@ -2134,11 +2134,11 @@ exec_save(struct in_cmd* cmd)
   }
 
   fclose(out_file);
-  if (sqo != sequences) sqo = delete_sequence_list(sqo);
-  sql = delete_sequence_list(sql);
-  ell = delete_el_list(ell);
-  varl = delete_var_list(varl);
-  current_sequ = NULL;
+//  if (sqo != sequences) sqo = delete_sequence_list(sqo);
+//  sql = delete_sequence_list(sql);
+ // ell = delete_el_list(ell);
+ // varl = delete_var_list(varl);
+ // current_sequ = NULL;
 }
 
 void

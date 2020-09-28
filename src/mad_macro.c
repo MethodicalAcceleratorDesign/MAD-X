@@ -152,7 +152,7 @@ save_macros2file(const char* fname){
     // opening file in writing mode
   fptr = fopen(fname, "w");
   for(int i=0; i<macro_list->curr; i++){
-    printf("ii: %d macro: %s \n", i, macro_list->macros[i]->original->c);
+ 
     fprintf(fptr, "%s \n", macro_list->macros[i]->original->c);
   }
 
@@ -163,22 +163,61 @@ void
 store_state(struct in_cmd* cmd){
   char tmperrn [100];
   char* fname  = command_par_string_user("file", cmd->clone);
+  FILE *fptr;
+  mkdir("test", EEXIST);
+  strcpy(tmperrn, fname);
+  strcat(tmperrn, ".madx");
+  fptr = fopen(tmperrn, "w");
+
+  //saves the sequences
+  strcpy(tmperrn, fname);
+  strcat(tmperrn, "_seq");
+ // exec_save(cmd);
+ // rename(fname, tmperrn);
+  fprintf(fptr, "call, file = %s ;\n ",tmperrn);
+  
+  fprintf(fptr,"use, sequence = %s ; \n" , current_sequ->name);
+  
+  // saves the macros
   strcpy(tmperrn, fname);
   strcat(tmperrn, "_macro");
   save_macros2file(tmperrn);
-  
+  fprintf(fptr, "call, file = %s ; \n",tmperrn);
+
+  // saves all errors
   strcpy(tmperrn, fname);
-  strcat(tmperrn, "_errors");
+  strcat(tmperrn, "_errorsall");
   set_selected_errors();
   error_esave(cmd);
   rename(fname, tmperrn);
   
+  fprintf(fptr, "Readmytable, file=%s, table=allerrors; \n", tmperrn);
+
+  //saves the selected errors
+  set_command_par_value("full",cmd->clone, 0);
+  strcpy(tmperrn, fname);
+  strcat(tmperrn, "_errors");
+  
+  set_selected_errors();
+  error_esave(cmd);
+  rename(fname, tmperrn);
+
+  fprintf(fptr, "Readmytable, file=%s, table=selectederrors; \n", tmperrn);
+  fprintf(fptr, "Seterr, table=%s ;\n" , "selectederrors");
+  
+
+
+    //saves the sequences
   strcpy(tmperrn, fname);
   strcat(tmperrn, "_seq");
-  
   exec_save(cmd);
   rename(fname, tmperrn);
+
+
+  fclose(fptr);
 }
+
+
 void
 exec_macro(struct in_cmd* cmd, int pos)
   /* executes a macro */
