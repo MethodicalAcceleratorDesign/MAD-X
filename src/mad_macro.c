@@ -161,7 +161,7 @@ save_macros2file(const char* fname){
 }
 
 static void
-move_files(char* orig_name, char* append, char* dirname){
+move_files(const char* orig_name,const  char* append,const  char* dirname){
   char dest_name[100];
   strcpy(dest_name, dirname);
   strcat(dest_name, "/");
@@ -176,59 +176,64 @@ void
 store_state(struct in_cmd* cmd){
   char tmperrn [100];
   char tmp_form[10];
+  
   strcpy(tmp_form, float_format);
   strcpy(float_format, "A"); 
  
   char* fname  = command_par_string_user("file", cmd->clone);
   FILE *fptr;
-  mkdir("testaa", EEXIST);
+  char dir_name[20] = "testaa";
+  mkdir(dir_name, 0700);
   strcpy(tmperrn, fname);
   strcat(tmperrn, ".madx");
   fptr = fopen(tmperrn, "w");
 
  // rename(fname, tmperrn);
 
-  //saves the sequences
-  strcpy(tmperrn, fname);
-  strcat(tmperrn, "_seq");
- // exec_save(cmd);
-  rename(fname, tmperrn);
+
+
   fprintf(fptr, "call, file = %s ;\n ",tmperrn);
   
   fprintf(fptr,"use, sequence = %s ; \n" , current_sequ->name);
   
   // saves the macros
-  strcpy(tmperrn, fname);
+  strcpy(tmperrn, dir_name);
+  strcat(tmperrn, "/");
+  strcat(tmperrn, fname);
   strcat(tmperrn, "_macro");
   save_macros2file(tmperrn);
   fprintf(fptr, "call, file = %s ; \n",tmperrn);
-
+  
   // saves all errors
-  strcpy(tmperrn, fname);
-  strcat(tmperrn, "_errorsall");
+  //strcpy(tmperrn, fname);
+  //strcat(tmperrn, "_errorsall");
   set_selected_errors();
   error_esave(cmd);
-  rename(fname, tmperrn);
-  
+  //rename(fname, tmperrn);
+  move_files(fname, "_errorsall", dir_name);
+
   fprintf(fptr, "Readmytable, file=%s, table=allerrors; \n", tmperrn);
 
   //saves the selected errors
   set_command_par_value("full",cmd->clone, 0);
   strcpy(tmperrn, fname);
-  strcat(tmperrn, "_errors");
+  //strcat(tmperrn, "_errors");
+
   
   set_selected_errors();
   error_esave(cmd);
-  rename(fname, tmperrn);
+  move_files(fname, "_errors", dir_name); 
+  //rename(fname, tmperrn);
 
   fprintf(fptr, "Readmytable, file=%s, table=selectederrors; \n", tmperrn);
   fprintf(fptr, "Seterr, table=%s ;\n" , "selectederrors");
   
   //saves the sequences
-  strcpy(tmperrn, fname);
-  strcat(tmperrn, "_seq");
+  //strcpy(tmperrn, fname);
+  //strcat(tmperrn, "_seq");
   exec_save(cmd);
-  rename(fname, tmperrn);
+  move_files(fname, "_seq", dir_name);
+  //rename(fname, tmperrn);
 
 
   fclose(fptr);
@@ -241,7 +246,7 @@ store_state(struct in_cmd* cmd){
 
   printf("Enter name of target file\n");
 
-  target = fopen("input_copied.madx", "w");
+  target = fopen(strcat(dir_name, "/input_copied.madx"), "w");
 
   while ((ch = fgetc(source)) != EOF)
       fputc(ch, target);
