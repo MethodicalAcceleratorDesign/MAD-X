@@ -159,6 +159,19 @@ save_macros2file(const char* fname){
   fclose(fptr);
 
 }
+
+static void
+move_files(char* orig_name, char* append, char* dirname){
+  char dest_name[100];
+  strcpy(dest_name, dirname);
+  strcat(dest_name, "/");
+  strcat(dest_name, orig_name);
+  strcat(dest_name, append);
+  printf("vvvv %s \n", dest_name);
+  rename(orig_name, dest_name);
+
+
+}
 void
 store_state(struct in_cmd* cmd){
   char tmperrn [100];
@@ -172,13 +185,14 @@ store_state(struct in_cmd* cmd){
   strcpy(tmperrn, fname);
   strcat(tmperrn, ".madx");
   fptr = fopen(tmperrn, "w");
-  //rename(fname, tmperrn);
+
+ // rename(fname, tmperrn);
 
   //saves the sequences
   strcpy(tmperrn, fname);
   strcat(tmperrn, "_seq");
  // exec_save(cmd);
- // rename(fname, tmperrn);
+  rename(fname, tmperrn);
   fprintf(fptr, "call, file = %s ;\n ",tmperrn);
   
   fprintf(fptr,"use, sequence = %s ; \n" , current_sequ->name);
