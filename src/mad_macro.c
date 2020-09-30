@@ -174,36 +174,35 @@ move_files(const char* orig_name,const  char* append,const  char* dirname){
 }
 void
 store_state(struct in_cmd* cmd){
-  char tmperrn [100];
+  char tmperrn [100], tmperrn2 [100];
   char tmp_form[10];
-  
+  set_command_par_value("beam",cmd->clone, 1);
   strcpy(tmp_form, float_format);
   strcpy(float_format, "A"); 
  
-  char* fname  = command_par_string_user("file", cmd->clone);
+  char* fname     = command_par_string("file", cmd->clone);
+  char* dir_name  = command_par_string("folder", cmd->clone);
+  
   FILE *fptr;
-  char dir_name[20] = "testaa";
   mkdir(dir_name, 0700);
+  strcpy(tmperrn2, fname);
+  strcat(tmperrn2, ".madx");
+  fptr = fopen(tmperrn2, "w");
+
+
   strcpy(tmperrn, fname);
-  strcat(tmperrn, ".madx");
-  fptr = fopen(tmperrn, "w");
+  strcat(tmperrn, "_seq");
 
- // rename(fname, tmperrn);
-
-
-
-  fprintf(fptr, "call, file = %s ;\n ",tmperrn);
+  fprintf(fptr, "call, file = %s ;\n ", tmperrn);
   
   fprintf(fptr,"use, sequence = %s ; \n" , current_sequ->name);
   
   // saves the macros
-  strcpy(tmperrn, dir_name);
-  strcat(tmperrn, "/");
-  strcat(tmperrn, fname);
+  strcpy(tmperrn, fname);
   strcat(tmperrn, "_macro");
   save_macros2file(tmperrn);
   fprintf(fptr, "call, file = %s ; \n",tmperrn);
-  
+  move_files(fname, "_macro", dir_name);
   // saves all errors
   //strcpy(tmperrn, fname);
   //strcat(tmperrn, "_errorsall");
@@ -216,6 +215,7 @@ store_state(struct in_cmd* cmd){
 
   //saves the selected errors
   set_command_par_value("full",cmd->clone, 0);
+
   strcpy(tmperrn, fname);
   //strcat(tmperrn, "_errors");
 
@@ -237,6 +237,7 @@ store_state(struct in_cmd* cmd){
 
 
   fclose(fptr);
+  move_files(tmperrn2, "", dir_name);
   strcpy(float_format, tmp_form); 
   //char ch, source_file[20], target_file[20];
   FILE *source, *target;
