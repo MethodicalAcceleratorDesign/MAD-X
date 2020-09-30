@@ -64,6 +64,7 @@ pro_error_make_efield_table(const char *tablename, double save_all)
               }
            }
            if(nanf->p_al_err != NULL) {
+              isset++;
               int from_col = find_index_in_table(efield_table_cols, "dx");
               int to_col = find_index_in_table(efield_table_cols, "mscaly");
               int ncols = to_col - from_col + 1;
