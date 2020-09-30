@@ -177,7 +177,6 @@ pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
             outbuf->c[cout++] = c; break;
           }
           /* FALLTHRU */
-
         case '+':
           if (left_b > 0)
           {
