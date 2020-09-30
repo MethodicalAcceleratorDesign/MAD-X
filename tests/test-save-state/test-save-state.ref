@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2020.09.30 16:25:37      +
+  + Execution date: 2020.09.30 16:47:20      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option -echo;
 
@@ -107,7 +107,6 @@ orbit:  -2.399184E-06  6.468460E-06  3.989541E-05 -2.516868E-06  9.536489E-05  5
            synch_6            synch_8             nflips 
                  0                  0                  0 
 ++++++ warning: SAVE makes all previous USE invalid !  
-Enter name of target file
 ++++++ warning: Both energy and pc specified; pc was ignored.
 ++++++ warning: Both energy and gamma specified; gamma was ignored.
 ++++++ warning: Both energy and beta specified; beta was ignored.

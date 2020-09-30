@@ -175,25 +175,28 @@ void
 store_state(struct in_cmd* cmd){
   char tmperrn [100], tmperrn2 [100];
   char tmp_form[10];
+  FILE *fptr;
+  
   set_command_par_value("beam",cmd->clone, 1);
+
+  //Change to hexdecimal format for output
   strcpy(tmp_form, float_format);
   strcpy(float_format, "A"); 
  
   char* fname     = command_par_string("file", cmd->clone);
+
   char* dir_name  = command_par_string("folder", cmd->clone);
-  
-  FILE *fptr;
   mkdir(dir_name, 0700);
+  
+  //The file to re-run the script
   strcpy(tmperrn2, fname);
   strcat(tmperrn2, ".madx");
   fptr = fopen(tmperrn2, "w");
 
-
+  // write out the seq
   strcpy(tmperrn, fname);
   strcat(tmperrn, "_seq");
-
   fprintf(fptr, "call, file = %s ;\n ", tmperrn);
-  
   fprintf(fptr,"use, sequence = %s ; \n" , current_sequ->name);
   
   // saves the macros
@@ -202,8 +205,8 @@ store_state(struct in_cmd* cmd){
   save_macros2file(tmperrn);
   fprintf(fptr, "call, file = %s ; \n",tmperrn);
   move_files(tmperrn, "", dir_name);
-  // saves all errors
-
+  
+  //Get selected macros
   set_selected_errors();
   error_esave(cmd);
   strcpy(tmperrn, fname);
@@ -214,40 +217,32 @@ store_state(struct in_cmd* cmd){
 
   //saves the selected errors
   set_command_par_value("full",cmd->clone, 0);
-
   strcpy(tmperrn, fname);
-  //strcat(tmperrn, "_errors");
-
-  
   set_selected_errors();
   error_esave(cmd);
   move_files(fname, "_errors", dir_name); 
   
+
   strcpy(tmperrn, fname);
   strcat(tmperrn, "_errors");
-
   fprintf(fptr, "Readmytable, file=%s, table=selectederrors; \n", tmperrn);
   fprintf(fptr, "Seterr, table=%s ;\n" , "selectederrors");
   
   //saves the sequences
-  //strcpy(tmperrn, fname);
-  //strcat(tmperrn, "_seq");
   exec_save(cmd);
   move_files(fname, "_seq", dir_name);
-  //rename(fname, tmperrn);
-
+  
 
   fclose(fptr);
+  
   move_files(tmperrn2, "", dir_name);
   strcpy(float_format, tmp_form); 
-  //char ch, source_file[20], target_file[20];
+  
+
   FILE *source, *target;
   char ch;
 
   source = fopen(mad_argv[1], "r");
-
-  printf("Enter name of target file\n");
-
   target = fopen(strcat(dir_name, "/input_copied.madx"), "w");
 
   while ((ch = fgetc(source)) != EOF)
