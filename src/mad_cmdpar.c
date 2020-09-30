@@ -125,7 +125,6 @@ dump_command_parameter(struct command_parameter* par)
   int i, k;
   char logic[2][8] = {"false", "true"};
   fprintf(prt_file, "parameter: %s   ", par->name);
-  printf("ggggg %d \n",par->type );
   switch (par->type)
   {
     case 0:
