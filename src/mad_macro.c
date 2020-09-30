@@ -167,7 +167,6 @@ move_files(const char* orig_name,const  char* append,const  char* dirname){
   strcat(dest_name, "/");
   strcat(dest_name, orig_name);
   strcat(dest_name, append);
-  printf("vvvv %s \n", dest_name);
   rename(orig_name, dest_name);
 
 
@@ -202,13 +201,13 @@ store_state(struct in_cmd* cmd){
   strcat(tmperrn, "_macro");
   save_macros2file(tmperrn);
   fprintf(fptr, "call, file = %s ; \n",tmperrn);
-  move_files(fname, "_macro", dir_name);
+  move_files(tmperrn, "", dir_name);
   // saves all errors
-  //strcpy(tmperrn, fname);
-  //strcat(tmperrn, "_errorsall");
+
   set_selected_errors();
   error_esave(cmd);
-  //rename(fname, tmperrn);
+  strcpy(tmperrn, fname);
+  strcat(tmperrn, "_errorsall");
   move_files(fname, "_errorsall", dir_name);
 
   fprintf(fptr, "Readmytable, file=%s, table=allerrors; \n", tmperrn);
@@ -223,7 +222,9 @@ store_state(struct in_cmd* cmd){
   set_selected_errors();
   error_esave(cmd);
   move_files(fname, "_errors", dir_name); 
-  //rename(fname, tmperrn);
+  
+  strcpy(tmperrn, fname);
+  strcat(tmperrn, "_errors");
 
   fprintf(fptr, "Readmytable, file=%s, table=selectederrors; \n", tmperrn);
   fprintf(fptr, "Seterr, table=%s ;\n" , "selectederrors");
