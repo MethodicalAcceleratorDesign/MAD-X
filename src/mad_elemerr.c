@@ -45,7 +45,10 @@ pro_error_make_efield_table(const char *tablename, double save_all)
 
 
       while (nanf != nend) {
-        if(nanf->sel_err == 1 || save_all==1) {
+        
+        double e_val = nanf->p_elem->def->mad8_type;
+
+        if((nanf->sel_err == 1 || save_all==1) && e_val!=1) {
            string_to_table_curr(tablename,"name",nanf->name);
 /* */
                   /*
