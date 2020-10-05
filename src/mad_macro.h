@@ -40,9 +40,6 @@ void               add_to_macro_list(struct macro*, struct macro_list*);
 
 void  disable_line(char* name, struct macro_list*);
 void  replace_lines(struct macro*, int replace, char** reps);
-
-void  exec_macro(struct in_cmd*, int pos);
 void  save_macros2file(const char *);
-void  store_state(struct in_cmd*);
 #endif // MAD_MACRO_H
 
