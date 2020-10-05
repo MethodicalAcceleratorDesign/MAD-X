@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2020.09.30 16:47:20      +
+  + Execution date: 2020.10.05 15:19:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option -echo;
 
@@ -169,9 +169,8 @@ orbit:  -2.399184E-06  6.468460E-06  3.989541E-05 -2.516868E-06  9.536489E-05  5
 ++++++ warning: macro redefined: makefootprint
 ++++++ warning: macro redefined: makefootprinta
 Want to make named table: allerrors
-Want to make named table: selectederrors
-Want to use named table: selectederrors
-The table ==> selectederrors <=== was found 
+Want to use named table: allerrors
+The table ==> allerrors <=== was found 
 enter Twiss module
   
 iteration:   1 error:   2.114790E-04 deltap:   0.000000E+00

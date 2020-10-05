@@ -60,21 +60,14 @@ void store_state(struct in_cmd* cmd)
   
   //Save all errors
   set_selected_errors();
-  error_esave(cmd);
-  strcpy(tmperrn, fname);
-  strcat(tmperrn, "_errorsall");
-  move_files(fname, "_errorsall", dir_name);
-  fprintf(fptr, "Readmytable, file=%s, table=allerrors; \n", tmperrn);
+  if(error_esave(cmd)==1){
+    strcpy(tmperrn, fname);
+    strcat(tmperrn, "_errorsall");
+    move_files(fname, "_errorsall", dir_name);
+    fprintf(fptr, "Readmytable, file=%s, table=allerrors; \n", tmperrn);
+    fprintf(fptr, "Seterr, table=%s ;\n" , "allerrors");
 
-  //saves the selected errors
-  set_command_par_value("full",cmd->clone, 0);
-  set_selected_errors();
-  error_esave(cmd);
-  move_files(fname, "_errors", dir_name); 
-  strcpy(tmperrn, fname);
-  strcat(tmperrn, "_errors");
-  fprintf(fptr, "Readmytable, file=%s, table=selectederrors; \n", tmperrn);
-  fprintf(fptr, "Seterr, table=%s ;\n" , "selectederrors");
+  }
   
   //saves the sequences
   exec_save(cmd);

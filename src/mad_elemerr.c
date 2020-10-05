@@ -258,7 +258,7 @@ error_seterr(struct in_cmd* cmd)
   }
 }
 
-void
+int
 error_esave(struct in_cmd* cmd)
 {
     char *ef_table_file;
@@ -272,6 +272,8 @@ error_esave(struct in_cmd* cmd)
     ef_table_file = command_par_string("file",cmd->clone);
     if(isset==1) out_table("efield",efield_table,ef_table_file);
     else warning("Cannot save an empty error table", "ignored");
+
+    return isset; 
 }
 static void
 error_etable(struct in_cmd* cmd)
