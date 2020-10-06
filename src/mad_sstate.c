@@ -38,6 +38,11 @@ void store_state(struct in_cmd* cmd)
  
   char* fname     = command_par_string("file", cmd->clone);
   char* dir_name  = command_par_string("folder", cmd->clone);
+  #if defined(_WIN32)
+    _mkdir(dir_name);
+  #elif defined(__linux__)
+    mkdir(dir_name, 0777);
+  #endif
   mkdir(dir_name, 0700);
   
   //The file to re-run the script
