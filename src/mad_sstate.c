@@ -41,9 +41,8 @@ void store_state(struct in_cmd* cmd)
   #if defined(_WIN32)
     _mkdir(dir_name);
   #elif defined(__linux__)
-    mkdir(dir_name, 0777);
+    mkdir(dir_name, 0700);
   #endif
-  mkdir(dir_name, 0700);
   
   //The file to re-run the script
   strcpy(tmperrn2, fname);
