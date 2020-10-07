@@ -128,9 +128,8 @@ jobs:
       - name: Run tests
         id: tests
         # exclude LONG tests:
-        # TODO: debug why test-track-9/test-thick-quad-2 are failing and
-        # then reenable:
-        run: cd build && ../.github/utils/ctest -E 'LONG|track-9|thick-quad-2'
+        # sequence-2 is throwing error on purpose
+        run: cd build && ../.github/utils/ctest -E 'LONG|sequence-2'
         env:
           GFORTRAN_UNBUFFERED_PRECONNECTED: y
 
