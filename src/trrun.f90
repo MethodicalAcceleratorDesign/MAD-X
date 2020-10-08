@@ -3593,13 +3593,14 @@ subroutine trupdate(turn)
   !   turn     (integer)    Current turn number.                         *
   !----------------------------------------------------------------------*
   integer       :: turn
-  character(len=50) :: cmd
+  character(len=25) :: cmd1
+  character(len=30) :: cmd2
 
   !---- call pro_input('TR$TURN := turn;')
-  write(cmd, '(''tr$turni := '',i8,'' ; '')') turn
-  call pro_input(cmd)
-  write(cmd, '(''exec, tr$macro($tr$turni) ; '')')
-  call pro_input(cmd)
+  write(cmd1, '(''tr$turni := '',i8,'' ; '')') turn
+  call pro_input(cmd1)
+  write(cmd2, '(''exec, tr$macro($tr$turni) ; '')')
+  call pro_input(cmd2)
   call init_elements() ! added since now temporary variables are used and need to update
 end subroutine trupdate
 
