@@ -1,0 +1,39 @@
+circum=2;
+beam, particle=proton, energy = 1;
+ang=0.005;
+t1: marker;
+qf:  MULTIPOLE, KNL={0.00, 0.001};
+roty: YROTATION, angle=ang;
+rotx: XROTATION, angle=ang;
+xin = 0.001;
+yin = 0.002;
+xpin =0.003;
+ypin =0.004;
+
+seq: sequence, refer=center, l=circum;
+roty, at=1.000;
+rotx, at=1.000;
+t1, at =1.1;
+qf: qf at=1.5;
+endsequence;
+
+
+use, sequence=seq;
+select, flag=twiss, column=name, s, x,px, y, py, PT, T;
+twiss, x=xin, y=yin, px=xpin, py=ypin, t=0.0, pt=0.0, BETX=1, BETY=1, file="rotations.twiss";
+track, onepass, dump, onetable;
+start, x=xin,px=xpin,y=yin,py=ypin; 
+observe, place=mend;
+observe, place=t1;
+run, turns=1;
+endtrack;
+
+ptc_create_universe;
+ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=false, exact_mis=true, time=true, totalpath=false;
+PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=xin, y=yin, px=xpin, py=ypin, t=0.0, pt=0.0;
+write, table=twiss, file="twiss.ptc.tfs";
+ptc_end;
+
+stop;
+
