@@ -4200,7 +4200,7 @@ subroutine tttquad(track, ktrack)
   !beta = get_value('probe ','beta ')
 
   !---- Read-in the parameters
-  elpar_vl = el_par_vector(q_k1s, g_elpar)
+  elpar_vl = el_par_vector(q_k1st, g_elpar)
   
   length = node_value('l ');
   tilt = g_elpar(q_tilt)
