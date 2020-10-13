@@ -1,0 +1,100 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %03s "SEQ"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le        0.9382720882
+@ CHARGE           %le                   1
+@ ENERGY           %le                   1
+@ PC               %le        0.3458980899
+@ GAMMA            %le         1.065788925
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     2.873408873e-12
+@ SIGE             %le               0.001
+@ SIGT             %le                   1
+@ NPART            %le                   1
+@ EX               %le                   1
+@ EY               %le                   1
+@ ET               %le               0.001
+@ DELTAP           %le                   0
+@ LENGTH           %le                   2
+@ ALPHA_C          %le            -1000000
+@ ALPHA_C_P        %le            -1000000
+@ ALPHA_C_P2       %le            -1000000
+@ ALPHA_C_P3       %le            -1000000
+@ ETA_C            %le            -1000000
+@ GAMMA_TR         %le            -1000000
+@ Q1               %le       0.03142264847
+@ Q2               %le       0.03141521176
+@ DQ1              %le            -1000000
+@ DQ2              %le            -1000000
+@ QS               %le            -1000000
+@ BETA_X_MIN       %le                  10
+@ BETA_X_MAX       %le         10.39033378
+@ BETA_Y_MIN       %le                  10
+@ BETA_Y_MAX       %le         10.41104777
+@ BETA11MIN        %le                  10
+@ BETA11MAX        %le         10.39033377
+@ BETA12MIN        %le                   0
+@ BETA12MAX        %le     1.709683825e-08
+@ BETA13MIN        %le                   0
+@ BETA13MAX        %le     3.003664911e-05
+@ BETA21MIN        %le                   0
+@ BETA21MAX        %le     4.399553032e-09
+@ BETA22MIN        %le                  10
+@ BETA22MAX        %le         10.41104776
+@ BETA23MIN        %le                   0
+@ BETA23MAX        %le     5.361676526e-05
+@ BETA31MIN        %le                   0
+@ BETA31MAX        %le      0.002300151805
+@ BETA32MIN        %le                   0
+@ BETA32MAX        %le      0.002364793187
+@ BETA33MIN        %le                  10
+@ BETA33MAX        %le         31.66209115
+@ DISP1MIN         %le     -0.005480570144
+@ DISP1MAX         %le                   0
+@ DISP2MIN         %le                   0
+@ DISP2MAX         %le      0.004575264571
+@ DISP3MIN         %le     -0.007322346978
+@ DISP3MAX         %le                   0
+@ DISP4MIN         %le                   0
+@ DISP4MAX         %le      0.004571092725
+@ ORBIT_X          %le               0.001
+@ ORBIT_PX         %le               0.003
+@ ORBIT_Y          %le               0.002
+@ ORBIT_PY         %le               0.004
+@ ORBIT_PT         %le                   0
+@ ORBIT_T          %le                   0
+@ XCORMS           %le      0.007148155643
+@ PXCORMS          %le       0.00727736698
+@ YCORMS           %le      0.009370780499
+@ PYCORMS          %le      0.007845592504
+@ TCORMS           %le     0.0002432912313
+@ PTCORMS          %le                   0
+@ XCOMIN           %le               0.001
+@ XCOMAX           %le       0.01199684624
+@ PXCOMIN          %le               0.003
+@ PXCOMAX          %le      0.007999879167
+@ YCOMIN           %le               0.002
+@ YCOMAX           %le       0.01500595748
+@ PYCOMIN          %le               0.004
+@ PYCOMAX          %le      0.009010229684
+@ TCOMIN           %le    -0.0003903566369
+@ TCOMAX           %le                  -0
+@ PTCOMIN          %le                   0
+@ PTCOMAX          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "12/10/20"
+@ TIME             %08s "19.30.43"
+* NAME                                S                  X                 PX                  Y                 PY                 PT                  T 
+$ %s                                %le                %le                %le                %le                %le                %le                %le 
+ "SEQ$START"                          0              0.001              0.003              0.002              0.004                  0                 -0
+ "DRIFT_0"                            1     0.004000037501              0.003     0.006000050001              0.004                  0   -3.613848918e-05
+ "ROTY"                               1     0.004000147505     0.007999879167     0.006000130005              0.004                  0   -9.396160179e-05
+ "ROTX"                               1     0.004000387523     0.007999879167     0.006000325019     0.008999729168                  0   -0.0001807001559
+ "DRIFT_1"                          1.1     0.004800433443     0.007999879167     0.006900363188     0.008999729168                  0    -0.000201661382
+ "T1"                               1.1     0.004800433443     0.007999879167     0.006900363188     0.008999729168                  0    -0.000201661382
+ "DRIFT_2"                          1.5      0.00800061712     0.007999879167      0.01050051586     0.008999729168                  0   -0.0002855062861
+ "QF"                               1.5      0.00800061712      0.00799187855      0.01050051586     0.009010229684                  0   -0.0002855062861
+ "DRIFT_3"                            2      0.01199684624      0.00799187855      0.01500595748     0.009010229684                  0   -0.0003903566369
+ "SEQ$END"                            2      0.01199684624      0.00799187855      0.01500595748     0.009010229684                  0   -0.0003903566369
