@@ -6,7 +6,7 @@ PROJECT(madX C CXX Fortran)
 
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
-  if(${CMAKE_VERSION} VERSION_GREATER 2.99999)
+  if(NOT ${CMAKE_VERSION} VERSION_LESS 3.0)
     cmake_policy(SET CMP0042 NEW)
   endif()
 endif()

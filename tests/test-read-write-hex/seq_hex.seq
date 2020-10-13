@@ -1,6 +1,0 @@
-none = 0;
-rfcav: rfcavity,l:= 0.1,volt:= 100,lag:= 0,freq:= 100,fringe:= 1;
-rfcavi: rfcav;
-seq: sequence, l = 15;
-rfcavi: rfcav, at = 1;
-endsequence;

@@ -113,7 +113,7 @@ Spb_fake_gino_sub.o:        $(FC_DIR_PTC)/Spb_fake_gino_sub.f90
 Sq_orbit_ptc.o:             $(FC_DIR_PTC)/Sq_orbit_ptc.f90            Sp_keywords.o
 Sr_spin.o:                  $(FC_DIR_PTC)/Sr_spin.f90                 Sq_orbit_ptc.o
 Sra_fitting.o:              $(FC_DIR_PTC)/Sra_fitting.f90             Sr_spin.o
-St_pointers.o:              $(FC_DIR_PTC)/St_pointers.f90             madx_ptc_module.o Sp_keywords.o
+St_pointers.o:              $(FC_DIR_PTC)/St_pointers.f90             madx_ptc_module.o Sp_keywords.o Su_duan_zhe_map.o
 
 h_definition.o:             $(FC_DIR_PTC)/a_def_frame_patch_chart.inc $(FC_DIR_PTC)/a_def_all_kind.inc \
                             $(FC_DIR_PTC)/a_def_sagan.inc $(FC_DIR_PTC)/a_def_element_fibre_layout.inc
@@ -150,7 +150,7 @@ user2_photon.o:             $(FC_DIR_MAD)/photoni.inc
 
 # chain of dependencies (MAD-X)
 dynap.o:                    $(FC_DIR_MAD)/dynap.f90                   util.o
-emit.o:                     $(FC_DIR_MAD)/emit.f90                    util.o
+emit.o:                     $(FC_DIR_MAD)/emit.f90                    util.o madx_space_charge.o
 gxx11.o:                    $(FC_DIR_MAD)/gxx11.f90                   util.o
 gxx11ps.o:                  $(FC_DIR_MAD)/gxx11ps.f90                 util.o
 ibsdb.o:                    $(FC_DIR_MAD)/ibsdb.f90                   util.o
@@ -160,7 +160,7 @@ matchjc.o:                  $(FC_DIR_MAD)/matchjc.f90                 util.o mat
 matchlib.o:                 $(FC_DIR_MAD)/matchlib.f90                matchlib2.o
 matchlib2.o:                $(FC_DIR_MAD)/matchlib2.f90
 matchsa.o:                  $(FC_DIR_MAD)/matchsa.f90                 util.o
-orbf.o:                     $(FC_DIR_MAD)/orbf.f90		                util.o
+orbf.o:                     $(FC_DIR_MAD)/orbf.f90		      util.o
 plot.o:                     $(FC_DIR_MAD)/plot.f90                    util.o
 poisson.o:                  $(FC_DIR_MAD)/poisson.f90
 resindex.o:                 $(FC_DIR_MAD)/resindex.f90                util.o
@@ -169,8 +169,10 @@ survey.o:                   $(FC_DIR_MAD)/survey.f90                  util.o
 timest.o:                   $(FC_DIR_MAD)/timest.f90
 timex.o:                    $(FC_DIR_MAD)/timex.f90
 touschek.o:                 $(FC_DIR_MAD)/touschek.f90                util.o
-trrun.o:                    $(FC_DIR_MAD)/trrun.f90                   util.o
-twiss.o:                    $(FC_DIR_MAD)/twiss.f90                   util.o
+trrun.o:                    $(FC_DIR_MAD)/trrun.f90                   util.o madx_space_charge.o madx_beam_beam.o
+twiss.o:                    $(FC_DIR_MAD)/twiss.f90                   util.o madx_space_charge.o madx_beam_beam.o
+madx_space_charge.o:	    $(FC_DIR_MAD)/madx_space_charge.f90       util.o
+madx_beam_beam.o:	    $(FC_DIR_MAD)/madx_beam_beam.f90          util.o madx_space_charge.o
 util.o:                     $(FC_DIR_MAD)/util.f90
 
 endif

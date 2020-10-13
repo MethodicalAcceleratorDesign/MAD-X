@@ -101,6 +101,7 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "return")      == 0) ;
   else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
   else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
+  else if (strcmp(toks[k], "save_state")  == 0) store_state(cmd);
   else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
   else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
   else if (strcmp(toks[k], "setplot")     == 0) ;

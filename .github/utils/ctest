@@ -1,0 +1,14 @@
+#! /usr/bin/env bash
+
+# Runs "ctest $@", logs to "tests/tests-log.txt".
+# Returns failed tests as output.
+
+set -o pipefail
+if ! ctest "$@" 2>&1 | tee tests/tests-log.txt; then
+    failed_tests=$(cat tests/tests-log.txt |
+        sed -nE "s/^.* - (.*) \(Failed\).*$/build\/tests\/\1/ p" |
+        sort -u)
+
+    "$(dirname "$BASH_SOURCE")"/set-output failed-tests "$failed_tests"
+    false
+fi

@@ -68,6 +68,7 @@ v_format(const char* string)
           sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
           p++;
         }
+
         else if (c == 'F')  strcat(var_form, float_format);
         else if (c == 'S')  strcat(var_form, string_format);
         else if (c == 'I')  strcat(var_form, int_format);
@@ -92,7 +93,6 @@ simple_double(char** toks, int start, int end)
     else return INVALID;
   }
 }
-
 int
 in_spec_list(char* string)
   /* checks for presence of special commands IF() etc. */
@@ -148,6 +148,7 @@ pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
   int j, k, kn, sl = strlen(inbuf), cout = 0, quote_lv = 0, rb_level = 0;
   int left_b = 0, new_string = 1, c_digit = 0, f_equal = 0, comm_cnt = 0;
   int len = strlen(inbuf);
+
   while (2*len > outbuf->max) grow_char_array(outbuf);
   for (k = 0; k < sl; k++)
   {
@@ -176,7 +177,6 @@ pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
             outbuf->c[cout++] = c; break;
           }
           /* FALLTHRU */
-
         case '+':
           if (left_b > 0)
           {
@@ -262,9 +262,31 @@ pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
           left_b = 0;
           new_string = 1;
           outbuf->c[cout++] = ' ';
-          break;
+          break; 
         default:
           if (c == ' ') outbuf->c[cout++] = c;
+          //This is to handle the case of hexdecimal numbers
+          else if(c=='0' && inbuf[k+1]=='x' && k+1<sl && isalpha(inbuf[k-1])==0 && isdigit(inbuf[k-1])==0) {
+            int start = k;
+            outbuf->c[cout++] = ' ';
+            for (int o=start; o < sl ; o++){
+              if(inbuf[o]=='-' || inbuf[o]=='+'){
+                outbuf->c[cout++] = inbuf[o];
+                outbuf->c[cout++] = inbuf[o+1];
+                if(isdigit(inbuf[o+2]) && o+2<sl) {
+                  outbuf->c[cout++] = inbuf[o+2];
+                  k = o+2;
+                }
+                else{
+                  k = o+1;
+                }
+                outbuf->c[cout++] = ' ';
+                
+                break;
+              }
+              outbuf->c[cout++] = inbuf[o];
+            }
+          }
           else
           {
             left_b = 0;

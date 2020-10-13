@@ -1,0 +1,59 @@
+@ NAME             %08s "TRACKONE"
+@ TYPE             %08s "TRACKONE"
+@ XC               %le                   0
+@ PXC              %le                   0
+@ YC               %le                   0
+@ PYC              %le                   0
+@ TC               %le                   0
+@ PTC              %le                   0
+@ EX               %le                   1
+@ EY               %le                   1
+@ ET               %le               0.001
+@ E11              %le                   1
+@ E12              %le                   0
+@ E13              %le                   0
+@ E14              %le                   0
+@ E15              %le                   0
+@ E16              %le                   0
+@ E21              %le                   0
+@ E22              %le                   1
+@ E23              %le                   0
+@ E24              %le                   0
+@ E25              %le                   0
+@ E26              %le                   0
+@ E31              %le                   0
+@ E32              %le                   0
+@ E33              %le                   1
+@ E34              %le                   0
+@ E35              %le                   0
+@ E36              %le                   0
+@ E41              %le                   0
+@ E42              %le                   0
+@ E43              %le                   0
+@ E44              %le                   1
+@ E45              %le                   0
+@ E46              %le                   0
+@ E51              %le                   0
+@ E52              %le                   0
+@ E53              %le                   0
+@ E54              %le                   0
+@ E55              %le                   1
+@ E56              %le                   0
+@ E61              %le                   0
+@ E62              %le                   0
+@ E63              %le                   0
+@ E64              %le                   0
+@ E65              %le                   0
+@ E66              %le                   1
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "12/10/20"
+@ TIME             %08s "19.30.43"
+*             NUMBER               TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
+$                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
+#segment       1       2       1       0 start                                                                         
+                  1                  0              0.001              0.003              0.002              0.004                  0                  0                  0                  0
+#segment       2       2       1       6 t1                                                                            
+                  1                  1     0.004800433443     0.007999879167     0.006900363188     0.008999729168   -7.439586647e-05                  0                1.1                  0
+#segment       3       2       1      10 seq$end                                                                       
+                  1                  1      0.01199684624      0.00799187855      0.01500595748     0.009010229684   -0.0002630911214                  0                  2                  0

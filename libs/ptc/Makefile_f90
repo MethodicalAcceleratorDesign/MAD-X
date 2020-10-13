@@ -80,7 +80,7 @@ Spb_fake_gino_sub.o:        $(FC_DIR)/Spb_fake_gino_sub.f90
 Sq_orbit_ptc.o:             $(FC_DIR)/Sq_orbit_ptc.f90            Sp_keywords.o
 Sr_spin.o:                  $(FC_DIR)/Sr_spin.f90                 Sq_orbit_ptc.o
 Sra_fitting.o:              $(FC_DIR)/Sra_fitting.f90             Sr_spin.o
-St_pointers.o:              $(FC_DIR)/St_pointers.f90             Sp_keywords.o Ss_fake_mad.o 
+St_pointers.o:              $(FC_DIR)/St_pointers.f90             Sp_keywords.o Ss_fake_mad.o Su_duan_zhe_map.o
 
 h_definition.o:             $(FC_DIR)/a_def_frame_patch_chart.inc $(FC_DIR)/a_def_all_kind.inc \
                             $(FC_DIR)/a_def_sagan.inc $(FC_DIR)/a_def_element_fibre_layout.inc

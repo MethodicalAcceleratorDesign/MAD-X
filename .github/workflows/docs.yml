@@ -1,0 +1,30 @@
+# Build documentation
+
+name: docs
+on:
+  push:
+  pull_request:
+
+jobs:
+  latexuguide:
+    name: LaTeX userguide
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          set -ex
+          sudo apt-get install -qy \
+            texlive-latex-base \
+            texlive-latex-extra \
+            texlive-fonts-recommended
+
+      - name: Build userguide
+        run: |
+          cd doc/latexuguide
+          if ! ./makelatexdoc; then
+            cat doc/latexuguide/makelatexdoc.log
+            false
+          fi

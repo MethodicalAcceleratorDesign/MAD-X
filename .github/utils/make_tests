@@ -1,0 +1,23 @@
+#! /usr/bin/env bash
+
+# Runs "make tests $@", logs to "tests/tests-log.txt".
+# Returns failed tests as output.
+
+make tests "$@" 2>&1 | tee tests/tests-log.txt
+
+NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt)
+
+if [[ $NUM_FAILED -ne 0 ]]; then
+
+    failed_tests=$(cat tests/tests-log.txt |
+        sed -nE "s/^.*warng: files '(.*)'\|'(.*)' from '(.*)' differ.*$/tests\/\3/ p" |
+        sort -u)
+
+    echo The following tests FAILED:
+    for testcase in $failed_tests; do
+        echo "   $testcase"
+    done
+
+    "$(dirname "$BASH_SOURCE")"/set-output failed-tests "$failed_tests"
+    false
+fi

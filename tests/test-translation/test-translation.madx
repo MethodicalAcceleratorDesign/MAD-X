@@ -1,13 +1,13 @@
 circum=2;
-beam, particle=proton, energy = 5500;
+beam, particle=proton, energy = 1;
 
 
 newquad:  MULTIPOLE, KNL={0.00, 0.001}, comments="testing the comments";
-trans: TRANSLATION, DX=0.01, DY=0.002, DS=0.1;
+trans: TRANSLATION, DX=0.01, DY=0.1, DS=0.1;
 
 seq: sequence, refer=center, l=circum;
-trans:trans, at=1.000;
-newquad: newquad at=1.5;
+trans, at=1.000;
+!newquad: newquad at=1.5;
 endsequence;
 
 
@@ -22,4 +22,12 @@ OBSERVE, PLACE="trans";
 START,  x=0, y=0, t=0.0;
 run, turns=1;
 
+
+ptc_create_universe;
+ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=false, exact_mis=true, time=true, totalpath=false;
+PTC_TWISS, table=twiss, icase=56, no=1, betx=1, bety=1, betz=1, x=0, y=0, px=0, py=0, t=0.0, pt=0.0;
+write, table=twiss, file="twiss.ptc.tfs";
+ptc_end;
 stop;

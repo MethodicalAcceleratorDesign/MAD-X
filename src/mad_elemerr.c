@@ -31,26 +31,31 @@ find_index_in_table2(const char * const cols[], int ncols, const char *name )
 }
 
 
-static void
-pro_error_make_efield_table(const char *tablename)
+static int
+pro_error_make_efield_table(const char *tablename, double save_all)
 {
   struct table *ttb = efield_table;
   struct node *nanf;
   struct node *nend;
   int    j;
   struct sequence* mysequ = current_sequ;
-
+  int isset = 0 ;
   nanf = mysequ->ex_start;
   nend = mysequ->ex_end;
 
+
       while (nanf != nend) {
-        if(nanf->sel_err == 1) {
+        
+        double e_val = nanf->p_elem->def->mad8_type;
+
+        if((nanf->sel_err == 1 || save_all==1) && e_val!=1) {
            string_to_table_curr(tablename,"name",nanf->name);
 /* */
                   /*
            printf("=> %s %e %e %e\n",nanf->name,nanf->p_fd_err,nanf->p_al_err);
                   */
            if(nanf->p_fd_err != NULL) {
+              isset++;
               int from_col = find_index_in_table(efield_table_cols, "k0l");
               int to_col = find_index_in_table(efield_table_cols, "k20sl");
               int ncols = to_col - from_col + 1;
@@ -62,6 +67,7 @@ pro_error_make_efield_table(const char *tablename)
               }
            }
            if(nanf->p_al_err != NULL) {
+              isset++;
               int from_col = find_index_in_table(efield_table_cols, "dx");
               int to_col = find_index_in_table(efield_table_cols, "mscaly");
               int ncols = to_col - from_col + 1;
@@ -74,6 +80,7 @@ pro_error_make_efield_table(const char *tablename)
            }
            /* AL: RF-errors */
            if(nanf->p_ph_err != NULL) {
+              isset++;
               ttb->d_cols[find_index_in_table(efield_table_cols, "rfm_freq")][ttb->curr] = nanf->rfm_freq;
               ttb->d_cols[find_index_in_table(efield_table_cols, "rfm_harmon")][ttb->curr] = nanf->rfm_harmon;
               ttb->d_cols[find_index_in_table(efield_table_cols, "rfm_lag")][ttb->curr] = nanf->rfm_lag;
@@ -92,6 +99,8 @@ pro_error_make_efield_table(const char *tablename)
         }
         nanf = nanf->next;
       }
+      if(isset!= 0 ) return 1;
+      else return 0;
 }
 
 static void
@@ -249,7 +258,7 @@ error_seterr(struct in_cmd* cmd)
   }
 }
 
-static void
+int
 error_esave(struct in_cmd* cmd)
 {
     char *ef_table_file;
@@ -257,10 +266,14 @@ error_esave(struct in_cmd* cmd)
        efield_table = make_table("efield", "efield", efield_table_cols,
                                efield_table_types, 10000);
        add_to_table_list(efield_table, table_register);
-       pro_error_make_efield_table("efield");
+       double isfull = command_par_value("full",cmd->clone);
+       int isset = pro_error_make_efield_table("efield", isfull);
 /*  }                          */
     ef_table_file = command_par_string("file",cmd->clone);
-    out_table("efield",efield_table,ef_table_file);
+    if(isset==1) out_table("efield",efield_table,ef_table_file);
+    else warning("Cannot save an empty error table", "ignored");
+
+    return isset; 
 }
 static void
 error_etable(struct in_cmd* cmd)
@@ -271,7 +284,9 @@ error_etable(struct in_cmd* cmd)
        efield_table = make_table(ef_table, ef_table, efield_table_cols,
                                efield_table_types, 10000);
        add_to_table_list(efield_table, table_register);
-       pro_error_make_efield_table(ef_table);
+       double isfull = command_par_value("full",cmd->clone);
+
+       pro_error_make_efield_table(ef_table, isfull);
 /*  }                          */
     //ef_table_file = command_par_string("file",cmd->clone);
     //out_table("efield",efield_table,ef_table_file);

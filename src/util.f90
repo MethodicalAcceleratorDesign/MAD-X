@@ -302,15 +302,6 @@ contains
 
 end module Inf_NaN_Detection
 
-module bbfi
-  implicit none
-  public
-  integer, parameter :: bbd_max=100000
-  integer :: bbd_loc(bbd_max)=0, bbd_cnt=0, bbd_flag=0, bbd_pos=0
-  double precision :: bb_kick(2,bbd_max)=0.d0
-  double precision, parameter :: explim=150.0d0   ! if x > explim, exp(-x) is outside machine limits.
-end module bbfi
-
 module deltrafi
   implicit none
   public
@@ -520,6 +511,14 @@ module trackfi
   double precision, save :: bet0=0.d0, bet0i=0.d0
   double precision :: deltas=0.d0, t_max=1.d20, pt_max=1.d20
   logical :: radiate=.false., damp=.false., quantum=.false., fsecarb=.false., thin_cf=.false.
+
+  !! AL
+  integer, save :: tot_turn = 0;
+  integer, save :: jmax, segment
+  logical :: lost_in_turn = .false., is_lost = .false.
+
+  integer, parameter :: max_part=20000
+  integer, save :: part_id_keep(max_part), last_turn_keep(max_part)
 end module trackfi
 
 module time_varfi
@@ -536,28 +535,6 @@ module time_varfi
   double precision, save :: time_var_m_nt(n_time_var), time_var_p_nt(n_time_var),  time_var_c_nt(n_time_var)
   character(len=name_len), save :: time_var_m_ch(n_time_var), time_var_p_ch(n_time_var), time_var_c_ch(n_time_var)
 end module time_varfi
-
-module spch_bbfi
-  use name_lenfi
-  use bbfi
-  implicit none
-  public
-  logical :: lost_in_turn = .false., is_lost = .false.
-  integer, save :: i_turn, N_macro_surv, N_for_I, N_spch, i_spch
-  integer, parameter :: N_macro_max=16000
-  double precision, save :: Ex_rms, Ey_rms, sigma_p, sigma_z
-  double precision, save :: Ix_array(N_macro_max), Iy_array(N_macro_max)
-  double precision, save :: dpi_array(N_macro_max), z_part_array(N_macro_max)
-  double precision :: alpha, I_div_E_sum_max
-!  parameter(alpha=0.0, I_div_E_sum_max=7.0)
-  double precision, save :: betx_bb(bbd_max), bety_bb(bbd_max), &
-                            alfx_bb(bbd_max), alfy_bb(bbd_max), &
-                            gamx_bb(bbd_max), gamy_bb(bbd_max), &
-                            dx_bb(bbd_max),   dy_bb(bbd_max)
-  double precision,save :: rat_bb_n_ions=1d0
-  double precision, save :: sigma_t=0.d0, mean_t=0.d0  ! calculate and transfer to BB
-  character(len=name_len), save :: spch_bb_name(bbd_max)
-end module spch_bbfi
 
 module plotfi
   implicit none
@@ -770,6 +747,170 @@ module fasterror
   double precision :: hrecip, wtimag(idim), wtreal(idim)
 end module fasterror
 
+module SCdat
+  ! Yuri Alexahin Oct 2017 Mathematica version
+  ! Frank Schmidt Oct 2017 Fortran90 version
+  ! Copyright Fermilab & CERN
+  implicit none
+  public
+  logical eflag,sc_3d_kick,sc_3d_periodic,sc_3d_beamsize
+  integer, parameter :: idim=6,isigmatfit=50000,nptot=500000
+  integer, parameter :: Nintegrate=1000000
+  integer, parameter :: mmax=77,mmum=15,kmaxo=20;
+  double precision, parameter :: Pi = 4d0 * atan(1d0), EulerGamma =&
+       & 0.57721566490153286060651209008240243104215933593992d0
+  double precision, parameter :: dampf=0.85d0, dampeta=0.25d0, epsz=1d-15 !(* damping factor *)
+  double precision, parameter :: alfa=0.25d0 !(* not optimized yet *)
+  double precision, parameter :: efactor=2d0*alfa/(1d0 + 2d0*alfa)**4
+  double precision, parameter :: dmax=6d0
+  double precision, parameter :: um=.1d0;
+  double precision, parameter :: dres=6.5d0;
+  double precision work_1(idim),work_2(idim),work_3(idim)
+  double precision fcore
+  double precision, dimension(6,6) :: sr = reshape(&
+        (/0d0,-1d0,0d0,0d0,0d0,0d0, 1d0,0d0, 0d0,0d0, 0d0,0d0,&
+        0d0,0d0,0d0,-1d0,0d0,0d0, 0d0,0d0,1d0,0d0, 0d0,0d0,&
+        0d0,0d0,0d0,0d0,0d0,-1d0, 0d0,0d0, 0d0,0d0,1d0,0d0/), shape(sr))
+  double precision, dimension(kmaxo) :: lIntdfact=(/ 3.14159265358979d0,&
+       4.71238898038469d0,15.7079632679490d0,82.4668071567321d0,&
+       593.761011528471d0,5442.80927234432d0,60648.4461775510d0,&
+       796010.856080356d0,12028608.4918809d0,205689205.211164d0,&
+       3926793917.66768d0,82789905097.4935d0,1910536271480.62d0,&
+       47899873663549.8d0,1.296489913826749d15,3.767923812058989d16,&
+       1.170272807510086d18,3.868401780380561d19,1.355976624070239d21,&
+       5.023893392180235d22 /)
+  double precision, dimension(kmaxo) :: eIntdfact=(/ 6.28318530717959d0,&
+       18.8495559215388d0,94.2477796076938d0,659.734457253857d0,&
+       5937.61011528471d0,65313.7112681318d0,849078.246485713d0,&
+       12736173.6972857d0,216514952.853857d0,4113784104.22328d0,&
+       86389466188.6889d0,1986957722339.84d0,49673943058496.1d0,&
+       1.341196462579395d15,3.889469741480246d16,1.205735619858876d18,&
+       3.978927545534292d19,1.392624640937002d21,5.152711171466908d22,&
+       2.009557356872094d24 /)
+  double precision, DIMENSION(2*kmaxo, kmaxo+1) :: scbinom=reshape( (/ &
+                                !1
+       1.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !2
+       -1.d0,3.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !3
+       -1.d0,6.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !4
+       1.d0,-10.d0,5.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !5
+       1.d0,-15.d0,15.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !6
+       -1.d0,21.d0,-35.d0,7.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !7
+       -1.d0,28.d0,-70.d0,28.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !8
+       1.d0,-36.d0,126.d0,-84.d0,9.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !9
+       1.d0,-45.d0,210.d0,-210.d0,45.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !10
+       -1.d0,55.d0,-330.d0,462.d0,-165.d0,11.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !11
+       -1.d0,66.d0,-495.d0,924.d0,-495.d0,66.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !12
+       1.d0,-78.d0,715.d0,-1716.d0,1287.d0,-286.d0,13.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !13
+       1.d0,-91.d0,1001.d0,-3003.d0,3003.d0,-1001.d0,91.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !14
+       -1.d0,105.d0,-1365.d0,5005.d0,-6435.d0,3003.d0,-455.d0,15.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !15
+       -1.d0,120.d0,-1820.d0,8008.d0,-12870.d0,8008.d0,-1820.d0,120.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !16
+       1.d0,-136.d0,2380.d0,-12376.d0,24310.d0,-19448.d0,6188.d0,-680.d0,17.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,0.d0,&
+                                !17
+       1.d0,-153.d0,3060.d0,-18564.d0,43758.d0,-43758.d0,18564.d0,-3060.d0,153.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !18
+       -1.d0,171.d0,-3876.d0,27132.d0,-75582.d0,92378.d0,-50388.d0,11628.d0,-969.d0,19.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+       0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !19
+       -1.d0,190.d0,-4845.d0,38760.d0,-125970.d0,184756.d0,-125970.d0,38760.d0,-4845.d0,&
+       190.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !20
+       1.d0,-210.d0,5985.d0,-54264.d0,203490.d0,-352716.d0,293930.d0,-116280.d0,20349.d0,&
+       -1330.d0,21.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !21
+       1.d0,-231.d0,7315.d0,-74613.d0,319770.d0,-646646.d0,646646.d0,-319770.d0,74613.d0,&
+       -7315.d0,231.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !22
+       -1.d0,253.d0,-8855.d0,100947.d0,-490314.d0,1144066.d0,-1352078.d0,817190.d0,-245157.d0,&
+       33649.d0,-1771.d0,23.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !23
+       -1.d0,276.d0,-10626.d0,134596.d0,-735471.d0,1961256.d0,-2704156.d0,1961256.d0,-735471.d0,&
+       134596.d0,-10626.d0,276.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !24
+       1.d0,-300.d0,12650.d0,-177100.d0,1081575.d0,-3268760.d0,5200300.d0,-4457400.d0,2042975.d0,&
+       -480700.d0,53130.d0,-2300.d0,25.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !25
+       1.d0,-325.d0,14950.d0,-230230.d0,1562275.d0,-5311735.d0,9657700.d0,-9657700.d0,5311735.d0,&
+       -1562275.d0,230230.d0,-14950.d0,325.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !26
+       -1.d0,351.d0,-17550.d0,296010.d0,-2220075.d0,8436285.d0,-17383860.d0,20058300.d0,-13037895.d0,&
+       4686825.d0,-888030.d0,80730.d0,-2925.d0,27.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !27
+       -1.d0,378.d0,-20475.d0,376740.d0,-3108105.d0,13123110.d0,-30421755.d0,40116600.d0,-30421755.d0,&
+       13123110.d0,-3108105.d0,376740.d0,-20475.d0,378.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !28
+       1.d0,-406.d0,23751.d0,-475020.d0,4292145.d0,-20030010.d0,51895935.d0,-77558760.d0,67863915.d0,&
+       -34597290.d0,10015005.d0,-1560780.d0,118755.d0,-3654.d0,29.d0,0.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !29
+       1.d0,-435.d0,27405.d0,-593775.d0,5852925.d0,-30045015.d0,86493225.d0,-145422675.d0,145422675.d0,&
+       -86493225.d0,30045015.d0,-5852925.d0,593775.d0,-27405.d0,435.d0,-1.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !30
+       -1.d0,465.d0,-31465.d0,736281.d0,-7888725.d0,44352165.d0,-141120525.d0,265182525.d0,-300540195.d0,&
+       206253075.d0,-84672315.d0,20160075.d0,-2629575.d0,169911.d0,-4495.d0,31.d0,0.d0,0.d0,0.d0,0.d0,0.d0,&
+                                !31
+       -1.d0,496.d0,-35960.d0,906192.d0,-10518300.d0,64512240.d0,-225792840.d0,471435600.d0,-601080390.d0,&
+       471435600.d0,-225792840.d0,64512240.d0,-10518300.d0,906192.d0,-35960.d0,496.d0,-1.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !32
+       1.d0,-528.d0,40920.d0,-1107568.d0,13884156.d0,-92561040.d0,354817320.d0,-818809200.d0,1166803110.d0,&
+       -1037158320.d0,573166440.d0,-193536720.d0,38567100.d0,-4272048.d0,237336.d0,-5456.d0,33.d0,0.d0,&
+       0.d0,0.d0,0.d0,&
+                                !33
+       1.d0,-561.d0,46376.d0,-1344904.d0,18156204.d0,-131128140.d0,548354040.d0,-1391975640.d0,2203961430.d0,&
+       -2203961430.d0,1391975640.d0,-548354040.d0,131128140.d0,-18156204.d0,1344904.d0,-46376.d0,561.d0,-1.d0,&
+       0.d0,0.d0,0.d0,&
+                                !34
+       -1.d0,595.d0,-52360.d0,1623160.d0,-23535820.d0,183579396.d0,-834451800.d0,2319959400.d0,-4059928950.d0,&
+       4537567650.d0,-3247943160.d0,1476337800.d0,-417225900.d0,70607460.d0,-6724520.d0,324632.d0,-6545.d0,35.d0,&
+       0.d0,0.d0,0.d0,&
+                                !35
+       -1.d0,630.d0,-58905.d0,1947792.d0,-30260340.d0,254186856.d0,-1251677700.d0,3796297200.d0,-7307872110.d0,&
+       9075135300.d0,-7307872110.d0,3796297200.d0,-1251677700.d0,254186856.d0,-30260340.d0,1947792.d0,&
+       -58905.d0,630.d0,-1.d0,0.d0,0.d0,&
+                                !36
+       1.d0,-666.d0,66045.d0,-2324784.d0,38608020.d0,-348330136.d0,1852482996.d0,-6107086800.d0,12875774670.d0,&
+       -17672631900.d0,15905368710.d0,-9364199760.d0,3562467300.d0,-854992152.d0,124403620.d0,-10295472.d0,&
+       435897.d0,-7770.d0,37.d0,0.d0,0.d0,&
+                                !37
+       1.d0,-703.d0,73815.d0,-2760681.d0,48903492.d0,-472733756.d0,2707475148.d0,-9669554100.d0,22239974430.d0,&
+       -33578000610.d0,33578000610.d0,-22239974430.d0,9669554100.d0,-2707475148.d0,472733756.d0,-48903492.d0,&
+       2760681.d0,-73815.d0,703.d0,-1.d0,0.d0,&
+                                !38
+       -1.d0,741.d0,-82251.d0,3262623.d0,-61523748.d0,635745396.d0,-3910797436.d0,15084504396.d0,-37711260990.d0,&
+       62359143990.d0,-68923264410.d0,51021117810.d0,-25140840660.d0,8122425444.d0,-1676056044.d0,211915132.d0,&
+       -15380937.d0,575757.d0,-9139.d0,39.d0,0.d0,&
+                                !39
+       -1.d0,780.d0,-91390.d0,3838380.d0,-76904685.d0,847660528.d0,-5586853480.d0,23206929840.d0,-62852101650.d0,&
+       113380261800.d0,-137846528820.d0,113380261800.d0,-62852101650.d0,23206929840.d0,-5586853480.d0,847660528.d0,&
+       -76904685.d0,3838380.d0,-91390.d0,780.d0,-1.d0,&
+                                !40
+       1.d0,-820.d0,101270.d0,-4496388.d0,95548245.d0,-1121099408.d0,7898654920.d0,-35240152720.d0,103077446706.d0,&
+       -202112640600.d0,269128937220.d0,-244662670200.d0,151584480450.d0,-63432274896.d0,17620076360.d0,-3159461968.d0,&
+       350343565.d0,-22481940d0,749398.d0,-10660.d0,41.d0 /), &
+       shape(scbinom), order=(/2,1/) )
+  save sc_3d_kick,sc_3d_periodic,sc_3d_beamsize
+end module SCdat
 
 ! SUBROUTINES
 
@@ -1983,3 +2124,90 @@ subroutine seterrorflag(errorcode,from,descr)
   call seterrorflagfort(errorcode,from,n,descr,m)
 
 end subroutine seterrorflag
+
+integer function get_file_unit (lu_max)
+  !
+  !   get_file_unit returns a unit number that is not in use
+  integer lu_max,  lu, m, iostat
+  logical   opened
+  !
+  m = lu_max  ;  if (m < 1) m = 97
+  do lu = m,1,-1
+     inquire (unit=lu, opened=opened, iostat=iostat)
+     if (iostat.ne.0) cycle
+     if (.not.opened) exit
+  end do
+  !
+  get_file_unit = lu
+  return
+end function get_file_unit
+
+double precision function lInt(n,r,u,v)
+  use SCdat
+  implicit none
+  integer n,i,ii,i1,i2,j
+  double precision r,u,v,result
+  !********************************************************************************
+  result=0.d0
+  SELECT CASE (n)
+  CASE (1:20)
+     i=2*n
+     ii=i-1
+     i1=i
+     i2=0
+     result=result+scbinom(ii,1)*u**i
+     do j=2,n
+        i1=i1-2
+        i2=i2+2
+        result=result+scbinom(ii,j)*u**i1*v**i2
+     enddo
+     result=result+scbinom(ii,n+1)*v**i
+     lInt=lIntdfact(n)*(-1d0+r**2)**n*result
+  CASE DEFAULT
+     call aafail('lInt: Fatal: ',                                     &
+          'Out of range in function lInt: Program stops')
+     stop
+  END SELECT
+end function lInt
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+double precision function eInt(n,r,u,v)
+  use SCdat
+  implicit none
+  integer n,i,i1,i2,j
+  double precision r,u,v,result
+  !********************************************************************************
+  result=0.d0
+  SELECT CASE (n)
+  CASE (1:20)
+     i=2*n
+     i1=i
+     i2=0
+     result=result+scbinom(i,1)*u**i
+     do j=2,n
+        i1=i1-2
+        i2=i2+2
+        result=result+scbinom(i,j)*u**i1*v**i2
+     enddo
+     result=result+scbinom(i,n+1)*v**i
+     eInt=eIntdfact(n)*(-1d0+r**2)**n*u*result
+  CASE DEFAULT
+     call aafail('eInt: Fatal: ',                                     &
+          'Out of range in function eInt: Program stops')
+     stop
+  END SELECT
+end function eInt
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+double precision function bips(a, mmax1)
+
+  implicit none
+  integer mmax1
+  double precision a,r,u,v
+  !********************************************************************************
+  bips=(8388608d0/dble(1+mmax1)+a*(-(4194304d0/dble(2+mmax1))+&
+       &a*(3145728d0/dble(3+mmax1)+a*(-(2621440d0/dble(4+mmax1))+&
+       &a*(2293760d0/dble(5+mmax1)+a*(-(2064384d0/dble(6+mmax1))+&
+       &a*(1892352d0/dble(7+mmax1)+a*(-(1757184d0/dble(8+mmax1))+&
+       &a*(1647360d0/dble(9+mmax1)+17d0*a*(-(91520d0/dble(10+mmax1))+19d0*&
+       &a*(4576d0/dble(11+mmax1)+7d0*a*(-(624d0/dble(12+mmax1))+(598d0*&
+       &a)/dble(13+mmax1)-(575d0*a**2)/dble(14+mmax1)))))))))))))/8388608d0;
+end function bips

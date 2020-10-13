@@ -636,6 +636,7 @@ store_set(struct command* comm, int flag)
 {
   char* p;
   char* name;
+  current_format_f = clone_command(comm);
   struct command_parameter* cp;
   int i, lp, n = 0;
   if (command_par("format", comm, &cp) || !flag)
@@ -647,6 +648,7 @@ store_set(struct command* comm, int flag)
       if (strchr(p, 's')) strcpy(string_format, p);
       else if (strpbrk(p, "id")) strcpy(int_format, p);
       else if (strpbrk(p, "feEgG")) strcpy(float_format, p);
+      else if (strpbrk(p, "feEgGA")) strcpy(float_format, p);
     }
   }
   if (flag && command_par("sequence", comm, &cp))
