@@ -3906,7 +3906,6 @@ subroutine ttwire(track, ktrack, isFirst)
 do i = 0, nn-1
   dx   = xma(i) ! displacement x [m]
   dy   = yma(i) ! displacement y [mm]
-  print * ,"ddddxxx", dx, dy
   embl = l_int(i)  ! integrated length [m]
   l    = l_phy(i) ! physical length [m]
   cur  = current(i)
@@ -3947,7 +3946,7 @@ do i = 0, nn-1
       TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
       TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
 
-    elseif(ibeco == 1) then
+    else if(ibeco == 1) then
 
       ! 3 apply wire kick
       RTWO = xi**2+yi**2
@@ -3963,7 +3962,7 @@ do i = 0, nn-1
     end if
   end do
 end do
-print *, "eeeeeeeeee", track(:,1)
+
 
 end subroutine ttwire
 !FIXME Unused dummy argument 'turn'

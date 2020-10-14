@@ -85,7 +85,15 @@ double
 simple_double(char** toks, int start, int end)
 {
   if (start > end && start + 1 != end)  return INVALID;
-  else if (start == end)  return atof(toks[start]);
+  else if (start == end){
+      if(toks[start][1]=='x'){
+      double tmp;
+      sscanf(toks[start], "%la", &tmp);
+      return tmp;
+    }
+    return atof(toks[start]);
+  } 
+    
   else
   {
     if (*toks[start] == '-') return -atof(toks[end]);
