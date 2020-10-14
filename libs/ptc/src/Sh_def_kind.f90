@@ -1563,10 +1563,11 @@ CONTAINS !----------------------------------------------------------------------
     TOTALPATH_FLAG=k%TOTALPATH
     k%TOTALPATH=el%CAVITY_TOTALPATH
 
-
+    print *, "aaaaaaa", EL%P%METHOD
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
+    print *, "bbbb", D, X, k
        DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
        DD=EL%P%LD/2.0_dp/EL%P%NST
