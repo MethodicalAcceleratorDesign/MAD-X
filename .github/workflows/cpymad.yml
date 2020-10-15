@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  madx:
+  madx-linux:
     runs-on: ubuntu-latest
     env:
       MADXDIR: ${{ github.workspace }}/dist
@@ -40,15 +40,49 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: madx-static-64
+          name: madx-static-ubuntu-64
+          path: ${{ env.MADXDIR }}
+
+  madx-macos:
+    runs-on: macos-latest
+    env:
+      MADXDIR: ${{ github.workspace }}/dist
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure
+        run: |
+          cmake . \
+              -DCMAKE_OSX_ARCHITECTURES=x86_64 \
+              -DCMAKE_C_COMPILER=gcc-9 \
+              -DCMAKE_CXX_COMPILER=g++-9 \
+              -DCMAKE_Fortran_COMPILER=gfortran-9 \
+              -DBUILD_SHARED_LIBS=OFF \
+              -DMADX_STATIC=OFF \
+              -DCMAKE_INSTALL_PREFIX=$MADXDIR \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DMADX_INSTALL_DOC=OFF \
+              -DMADX_ONLINE=OFF \
+              -DMADX_FORCE_32=OFF \
+              -DMADX_X11=OFF
+
+      - name: Build
+        run: cmake --build . --target install
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: madx-static-macos-64
           path: ${{ env.MADXDIR }}
 
   cpymad:
-    runs-on: ubuntu-latest
-    needs: madx
+    runs-on: ${{ matrix.os }}-latest
+    needs: [madx-linux, madx-macos]
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu, macos]
         version: [master, v1.5.0]
     env:
       MADXDIR: madx
@@ -67,7 +101,7 @@ jobs:
       - name: Download MAD-X
         uses: actions/download-artifact@v2
         with:
-          name: madx-static-64
+          name: madx-static-${{ matrix.os }}-64
           path: ${{ env.MADXDIR }}
 
       - name: Install python setup dependencies
@@ -75,6 +109,9 @@ jobs:
 
       - name: Build cpymad
         run: |
+          if [[ ${{ matrix.os }} == macos ]]; then
+            export CC=gcc-9
+          fi
           export X11=0 BLAS=1 LAPACK=1
           pip install -e .
 

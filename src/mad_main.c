@@ -7,9 +7,10 @@
 #undef  const
 
 // readonly global information about program's command line arguments and stack base
-int     mad_argc;
-char**  mad_argv;
-void*   mad_stck;
+#include <stddef.h>
+int     mad_argc = 0;
+char**  mad_argv = NULL;
+void*   mad_stck = NULL;
 
 #ifdef _GFORTRAN
 #define _POSIX_C_SOURCE 200112L
