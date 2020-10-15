@@ -50,9 +50,6 @@ if(NOT (WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "Intel"))
 endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops") #needed for c++ linking
 set(CMAKE_CXX_FLAGS_DEBUG " ${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-if(MADX_DEBUG)
-   add_definitions(-D_DEBUG -DDEBUG_ALL)
-endif()
 
 add_definitions(-D_FULL)
 add_definitions(-D_VERSION=${MADX_VERSION})
@@ -73,9 +70,3 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_Fortran_COMPILER_ID MATCHES "
 endif()
 # -- end of not needed for gnu/intel --
 # end C stuff
-
-if(MADX_ONLINE)
-   message(STATUS "Online model turned on")
-   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_ONLINE ")
-   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_ONLINE ")
-endif()
