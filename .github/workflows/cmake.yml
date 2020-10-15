@@ -106,6 +106,8 @@ jobs:
         if: matrix.os == 'linux'
       - run: ./configure -DMADX_X11=OFF
       - run: ./configure -DMADX_X11=ON
+      - run: ./configure -DMADX_LAPACK=OFF
+      - run: ./configure -DMADX_LAPACK=ON
 
   build:
     # Configure, build, and test with few settings. This is slow, so shouldn't
@@ -118,6 +120,7 @@ jobs:
       matrix:
         include:
           - {name: defaults, flags: ''}
+          - {name: lapack,   flags: -DMADX_LAPACK=OFF}
           - {name: x11,      flags: -DMADX_X11=ON}
           - {name: static,   flags: -DMADX_STATIC=ON}
           - {name: shared,   flags: -DBUILD_SHARED_LIBS=ON}

@@ -5,6 +5,7 @@ option( MADX_DEBUG "Turn on debug output" OFF)
 option( USE_GC "Use Garbage Collector" ON)
 option( MADX_NTPSA "Build with NTPSA" ON)
 option( MADX_FORCE_32 "Force 32bit build" OFF)
+option( MADX_LAPACK "Use system blas/lapack installation if one can be found" ON)
 
 if (NOT (WIN32 OR CYGWIN))
  option( MADX_X11 "Turn on plotting using X11" ON )
