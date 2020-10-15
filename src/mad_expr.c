@@ -414,7 +414,7 @@ scan_expr(int c_item, char** item)   /* split input */
       if (l_cat == cat->max)  grow_int_array(cat);
       if (l_cat == cat_doubles->max) grow_double_array(cat_doubles);
       cat->i[l_cat] = 3;
-      cat_doubles->a[l_cat++] = atof(item[i]);
+      cat_doubles->a[l_cat++] = myatof(item[i]);
     }
     else if (is_operator(c))
     {
