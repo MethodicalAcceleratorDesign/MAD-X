@@ -59,3 +59,12 @@ endif()
 if(USE_GC)
    add_definitions("-D_USEGC")
 endif()
+
+if(MADX_DEBUG)
+   add_definitions(-D_DEBUG -DDEBUG_ALL)
+endif()
+
+if(MADX_ONLINE)
+   message(STATUS "Online model turned on")
+   add_definitions(-D_ONLINE)
+endif()
