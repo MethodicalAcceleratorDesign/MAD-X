@@ -3502,6 +3502,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         ! nothing on purpose!
 
      case (code_wire)
+        call tmwire(ftrk,orbit,fmap,ek,re,te)
         ! nothing for now...
 
      case (code_dipedge)
@@ -3714,6 +3715,119 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
      endif
 
 end SUBROUTINE tmbend
+
+subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
+  use twtrrfi
+  use trackfi
+  use math_constfi, only : zero, one, two, four
+  use phys_constfi, only : clight
+  implicit none
+    !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for WIRE                                           *
+  !     Input:                                                           *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     el        (double)  element length.                              *
+  !     dl        (double)  slice length.                                *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical :: ftrk, fmap, fcentre
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6), el, dl
+  double precision :: xma(0:maxmul), yma(0:maxmul), current(0:maxmul), l_int(0:maxmul)
+  double precision :: l_phy(0:maxferr)
+  integer :: i, j, wire_flagco, nn, ibeco
+  double precision :: dx, dy, embl, l, cur, dxi, dyi, chi, nnorm, xi, yi, RTWO, pc
+  double precision :: wire_clo_x, wire_clo_y
+  ! WIRE basd on the SixTrack implementation
+  double precision, external :: node_value, get_value, get_closed_orb_node
+  external ::set_closed_orb_node
+
+  call get_node_vector('xma ', nn, xma)
+  call get_node_vector('yma ', nn, yma)
+  call get_node_vector('current ', nn, current)
+  call get_node_vector('l_int ', nn, l_int)
+  call get_node_vector('l_phy ', nn, l_phy)
+
+
+  pc = get_value('probe ','pc ')
+  wire_flagco = node_value('closed_orbit ')
+!  if(isFirst) then
+!    call set_closed_orb_node(1, track(1,1));
+!    call set_closed_orb_node(3, track(3,1));
+!  endif
+  wire_clo_x = 0 ! get_closed_orb_node(1)
+  wire_clo_y = 0 ! get_closed_orb_node(3)
+ !! dx = get_closed_orb_node(i)
+  
+  ibeco = 0
+
+
+
+do i = 0, nn-1
+  dx   = xma(i) ! displacement x [m]
+  dy   = yma(i) ! displacement y [mm]
+  embl = l_int(i)  ! integrated length [m]
+  l    = l_phy(i) ! physical length [m]
+  cur  = current(i)
+
+  if(wire_flagco == 1) then
+    dxi = wire_clo_x
+    dyi = wire_clo_y
+  else if(wire_flagco == -1) then
+    dxi = dx
+    dyi = dy
+  else
+    print *, "HAS TO BE 1 or -1"
+  end if
+
+
+    ! 1 shift
+    if(wire_flagco == 1) then
+      xi = orbit(1)+dx ! [m]
+      yi = orbit(3)+dy ! [m]
+    else if(wire_flagco == -1) then
+      xi = orbit(1)+( dx-wire_clo_x) ! [m]
+      yi = orbit(3)+( dy-wire_clo_y) ! [m]
+    end if
+
+    ! x'-> px; y'->py
+    ! TRACK(2,j) = TRACK(2,j)*(one + dpsv(j))/mtc(j)
+    ! TRACK(4,j) = TRACK(4,j)*(one + dpsv(j))/mtc(j)
+    
+    chi = pc*1e9/clight
+    NNORM=1e-7/chi
+    print *, "nnnn", NNORM
+   
+    if(ibeco == 0) then
+      ! 3 apply wire kick
+      RTWO = xi**2+yi**2
+      print *, "rrrr", RTWO, cur, nnorm, embl, l
+      !TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+      !TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+
+    else if(ibeco == 1) then
+
+      ! 3 apply wire kick
+      !RTWO = xi**2+yi**2
+      !TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+      !TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+
+      ! subtract closed orbit kick
+      ! wire kick is negative px -> px - wirekick - (-closed orbit kick)
+      !RTWO = dxi**2+dyi**2
+      !TRACK(2,j) = TRACK(2,j)+(((CUR*NNORM)*dxi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+      !TRACK(4,j) = TRACK(4,j)+(((CUR*NNORM)*dyi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+
+    end if
+end do
+end subroutine
 
 SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
