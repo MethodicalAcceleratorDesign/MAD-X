@@ -3803,12 +3803,18 @@ do i = 0, nn-1
     
     chi = pc*1e9/clight
     NNORM=1e-7/chi
-    print *, "nnnn", NNORM
-   
+    ltot = (embl+L)+abs(embl-L) 
+    Ntot = NNORM*CUR*ltot
     if(ibeco == 0) then
       ! 3 apply wire kick
       RTWO = xi**2+yi**2
       print *, "rrrr", RTWO, cur, nnorm, embl, l
+      re(2,1) = Ntot*(yi**2-x**2)/RTWO**2
+      re(2,3) = -Ntot*(2*x*y)/RTWO**2
+      
+      re(4,3) = Ntot*(x**2-yi**2)/RTWO**2
+      re(4,1) = -Ntot*(2*x*y)/RTWO**2
+      
       !TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
       !TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
 
