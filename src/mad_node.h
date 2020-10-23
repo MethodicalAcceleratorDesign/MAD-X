@@ -53,6 +53,7 @@ struct node                /* the sequence is a linked list of nodes */
   double rfm_freq;   /* frequency of the rf-multipole fields  AL: */
   int    rfm_harmon; /* harmonic number of the rf-multipole fields  AL: */
   double rfm_lag;    /* lag of the rf-multipole fields  AL: */
+  int    perm_misalign; /* flag to tell if permanent misalignments are applied */
 };
 
 struct node_list /* contains list of node pointers sorted by name */

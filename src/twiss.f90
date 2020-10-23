@@ -758,6 +758,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   nobs = node_value('obs_point ')
 
   n_align = node_al_errors(al_errors)
+  n_perm_align = node_permalign()
   if (n_align .ne. 0)  then
     ORBIT2 = ORBIT
     call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
@@ -7788,9 +7789,8 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   !---- Fringe fields effects computed from the TWISS routine tmfrng
   !     tmfrng returns the matrix elements rw(used) and tw(unused)
   !     No radiation effects as it is a pure thin lens with no lrad
-  call tmfrng(.false.,h,zero,e1,zero,zero,corr,rw,tw)
+  call tmfrng(.true.,h,zero,e1,zero,zero,corr,rw,tw)
   call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-
   !---- Apply tilt.
   if (tilt .ne. zero) then
      call tmtilt(.false.,tilt,ek,re,te)
