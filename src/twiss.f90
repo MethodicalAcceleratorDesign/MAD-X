@@ -662,7 +662,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   character(len=150) :: warnstr
   character(len=name_len) :: c_name(2), p_name, el_name
   character(len=2) :: ptxt(2)=(/'x-','y-'/)
-  integer :: j, code, n_align, nobs, node, old, poc_cnt, debug
+  integer :: j, code, n_align, nobs, node, old, poc_cnt, debug, n_perm_align
   integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
   double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6), orbitori(6)
   double precision :: al_errors(align_max), dptemp
@@ -671,7 +671,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
 
-  integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
+  integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option, is_permalign
   double precision, external :: node_value, get_value
   double precision, parameter :: orb_limit=1d1
   integer, parameter :: max_rep=100
@@ -758,7 +758,18 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   nobs = node_value('obs_point ')
 
   n_align = node_al_errors(al_errors)
-  n_perm_align = node_permalign()
+  n_perm_align = is_permalign()
+  
+  if (n_perm_align .ne. 0) then
+    al_errors(1) = al_errors(1) + node_value('dx ')
+    al_errors(2) = al_errors(2) + node_value('dy ')
+    al_errors(3) = al_errors(3) + node_value('ds ')
+    al_errors(5) = al_errors(5) + node_value('dtheta ')
+    al_errors(4) = al_errors(4) + node_value('dphi ')
+    al_errors(6) = al_errors(6) + node_value('dpsi ')
+    n_align = 1
+  endif
+
   if (n_align .ne. 0)  then
     ORBIT2 = ORBIT
     call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
@@ -1809,7 +1820,8 @@ subroutine track_one_element(el, fexit, contrib_rms)
   double precision, intent(in) :: el
   logical :: fexit
   logical :: contrib_rms
-
+  integer n_perm_align
+  integer, external :: is_permalign
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
 !  if (code .eq. code_tkicker)     code = code_kicker
@@ -1827,6 +1839,19 @@ subroutine track_one_element(el, fexit, contrib_rms)
   opt_fun(73) = g_elpar(g_polarity)
 
   n_align = node_al_errors(al_errors)
+  n_perm_align = is_permalign()
+  
+  if (n_perm_align .ne. 0) then
+    al_errors(1) = al_errors(1) + node_value('dx ')
+    al_errors(2) = al_errors(2) + node_value('dy ')
+    al_errors(3) = al_errors(3) + node_value('ds ')
+    al_errors(5) = al_errors(5) + node_value('dtheta ')
+    al_errors(4) = al_errors(4) + node_value('dphi ')
+    al_errors(6) = al_errors(6) + node_value('dpsi ')
+    n_align = 1
+    print * ,"gggg", al_errors
+  endif
+
   if (n_align .ne. 0)  then
      !print*, "coupl1: Element = "
      ele_body = .false.
@@ -2991,6 +3016,8 @@ contains
 
 subroutine track_one_element(el, fexit)
   double precision, intent(in) :: el
+  integer n_perm_align
+  integer, external :: is_permalign
   logical :: fexit
 
   code = node_value('mad8_type ')
@@ -2999,6 +3026,19 @@ subroutine track_one_element(el, fexit)
 
   !---- Physical element.
   n_align = node_al_errors(al_errors)
+  n_perm_align = is_permalign()
+  
+  if (n_perm_align .ne. 0) then
+    al_errors(1) = node_value('dx ')
+    al_errors(2) = node_value('dy ')
+    al_errors(3) = node_value('ds ')
+    al_errors(5) = node_value('dtheta ')
+    al_errors(4) = node_value('dphi ')
+    al_errors(6) = node_value('dpsi ')
+    n_align = 1
+        print * ,"gggg", al_errors
+  endif
+
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)

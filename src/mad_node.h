@@ -108,7 +108,7 @@ int     node_apertype(void);
 int     inside_userdefined_geometry(double *x, double *y);
 int     get_userdefined_geometry(double* x, double *y, int* maxlen);
 int     get_userdefined_geometry_len(void);
-
+int     is_permalign(void);
 double  get_length_(void);
 void    node_aperture_vector(double * vec);
 void    node_aperture_offset(double * vec);

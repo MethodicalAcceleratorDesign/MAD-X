@@ -86,6 +86,8 @@
 #define inside_userdefined_geometry inside_userdefined_geometry_
 #define get_userdefined_geometry get_userdefined_geometry_
 #define get_userdefined_geometry_len get_userdefined_geometry_len_
+#define is_permalign is_permalign_
+
 
 #define node_aperture_vector node_aperture_vector_
 #define node_aperture_offset node_aperture_offset_

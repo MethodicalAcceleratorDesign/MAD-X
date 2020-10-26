@@ -26,9 +26,9 @@ subroutine survey
   double precision :: v(3), v0(3), ve(3), w(3,3), w0(3,3), we(3,3), tx(3)
   double precision :: add_angle(10), org_ang(100)
 
-  integer, external :: restart_sequ, advance_node, set_cont_sequence
+  integer, external :: restart_sequ, advance_node, set_cont_sequence, is_permalign
   double precision, external :: proxim, node_value, get_value
-
+  external :: retreat_node
   !---- Retrieve command attributes.
   v0(1) =  get_value('survey ','x0 ')
   v0(2) =  get_value('survey ','y0 ')
@@ -90,7 +90,23 @@ subroutine survey
      !**  Compute the survey angles at each point
      call suangl(w, theta, phi, psi)
      !**  Fill the survey table
+     if (advance_node().ne.0) then
+        if (is_permalign() .ne. 0) then
+          V(1) =  V(1) + node_value('dx ')
+          V(2) =  V(2) + node_value('dy ')
+          V(3) =  V(3) + node_value('ds ')
+          print *, "heeereee", V
+        endif
+        call retreat_node()
+     endif
+     
      call sufill(suml,v, theta, phi, psi,globaltilt)
+        if (is_permalign() .ne. 0) then
+          V(1) =  V(1) - node_value('dx ')
+          V(2) =  V(2) - node_value('dy ')
+          V(3) =  V(3) - node_value('ds ')
+           print *, "heeereee", V
+        endif
      if (advance_node().ne.0)  goto 10
      !---- end of loop over elements  ***********************************
   enddo

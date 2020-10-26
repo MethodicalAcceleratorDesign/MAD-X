@@ -159,14 +159,14 @@ export_el_par_8(struct command_parameter* par, char* string)
       }
   }
 }
-static int
-check_for_perm_misalign(struct command* clone){
-  if(command_par_expr("dx", clone) || command_par_value("dx", clone)!=0) return 1;
-  if(command_par_expr("dx", clone) || command_par_value("dx", clone)!=0) return 1;
-  if(command_par_expr("dx", clone) || command_par_value("dx", clone)!=0) return 1;
-  if(command_par_expr("dx", clone) || command_par_value("dx", clone)!=0) return 1;
-  if(command_par_expr("dx", clone) || command_par_value("dx", clone)!=0) return 1;
-  if(command_par_expr("dx", clone) || command_par_value("dx", clone)!=0) return 1;
+int
+check_for_perm_misalign(struct in_cmd* cmd){
+  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0) return 1;
+  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0) return 1;
+  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0) return 1;
+  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0) return 1;
+  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0) return 1;
+  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0) return 1;
   
   return 0;
 }
@@ -192,8 +192,11 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupda
   else k = ++occ_list->inform[i];
   make_elem_node(el, k);
   current_node->at_value = at;
-  int is_perm = check_for_perm_misalign(cmd->clone);
-  printf("dddxx %d \n", is_perm);
+  printf("aaaa %f \n",command_par_value("dx", cmd->clone));
+  el->perm_misalign = check_for_perm_misalign(cmd);
+  //current_node->stamp = 0;
+  printf("bbb %s %d \n",current_node->name, current_node->perm_misalign);
+
   current_node->at_expr = command_par_expr("at", cmd->clone);
   const char* from = command_par_string_user("from", cmd->clone);
   if (from){
