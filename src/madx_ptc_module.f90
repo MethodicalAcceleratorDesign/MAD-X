@@ -2140,6 +2140,7 @@ CONTAINS
 10  continue
    
     j=j+1
+    al_errors = 0
     n_align = node_al_errors(al_errors)
     n_perm_align = is_permalign()
     if (n_perm_align .ne. 0) then
@@ -2150,7 +2151,6 @@ CONTAINS
       al_errors(4) = al_errors(4) + node_value('dphi ')
       al_errors(6) = al_errors(6) + node_value('dpsi ')
       n_align = 1
-
     endif
 
     if (n_align.ne.0)  then

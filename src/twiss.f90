@@ -756,7 +756,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   el = node_value('l ')
 
   nobs = node_value('obs_point ')
-
+  al_errors = 0 
   n_align = node_al_errors(al_errors)
   n_perm_align = is_permalign()
   
@@ -768,6 +768,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     al_errors(4) = al_errors(4) + node_value('dphi ')
     al_errors(6) = al_errors(6) + node_value('dpsi ')
     n_align = 1
+    print * ,"gggg00", al_errors
   endif
 
   if (n_align .ne. 0)  then
@@ -1838,6 +1839,7 @@ subroutine track_one_element(el, fexit, contrib_rms)
   opt_fun(72) = g_elpar(g_calib)
   opt_fun(73) = g_elpar(g_polarity)
 
+  al_errors = 0
   n_align = node_al_errors(al_errors)
   n_perm_align = is_permalign()
   
@@ -1849,7 +1851,6 @@ subroutine track_one_element(el, fexit, contrib_rms)
     al_errors(4) = al_errors(4) + node_value('dphi ')
     al_errors(6) = al_errors(6) + node_value('dpsi ')
     n_align = 1
-    print * ,"gggg", al_errors
   endif
 
   if (n_align .ne. 0)  then
@@ -3036,7 +3037,7 @@ subroutine track_one_element(el, fexit)
     al_errors(4) = node_value('dphi ')
     al_errors(6) = node_value('dpsi ')
     n_align = 1
-        print * ,"gggg", al_errors
+    print * ,"gggg", al_errors
   endif
 
   if (n_align .ne. 0)  then
