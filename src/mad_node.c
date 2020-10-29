@@ -334,8 +334,6 @@ double node_obs_point(void){
 }
 
 int is_permalign(void){
-
-  printf("peeerrrrm %s %d %d \n", current_node->name,  current_node->p_elem->perm_misalign, current_node->stamp);
   return current_node->p_elem->perm_misalign;
 }
 

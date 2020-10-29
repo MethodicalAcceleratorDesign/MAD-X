@@ -752,7 +752,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      end select
   endif
 
-  !---- Element length.
+  !---- Element length.t
   el = node_value('l ')
 
   nobs = node_value('obs_point ')
@@ -768,7 +768,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     al_errors(4) = al_errors(4) + node_value('dphi ')
     al_errors(6) = al_errors(6) + node_value('dpsi ')
     n_align = 1
-    print * ,"gggg00", al_errors
   endif
 
   if (n_align .ne. 0)  then

@@ -49,10 +49,10 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   double precision :: re(6,6), te(6,6,6), tt(6,6,6)
   double precision :: betas, bx, gx
 
-  integer :: i, j, j1, j2, k, k1, k2, eflag, n_align, code
+  integer :: i, j, j1, j2, k, k1, k2, eflag, n_align, code, n_perm_align
   logical :: fmap, stabx, staby, stabt, radiate
 
-  integer, external :: restart_sequ, advance_node, node_al_errors
+  integer, external :: restart_sequ, advance_node, node_al_errors, is_permalign
   logical, external :: m66sta
   double precision, external :: get_value, node_value
 
@@ -126,7 +126,20 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
    if(code .eq. code_tkicker)     code = code_kicker
    if(code .eq. code_placeholder) code = code_instrument
 
+   al_errors = 0 
    n_align = node_al_errors(al_errors)
+   n_perm_align = is_permalign()
+    
+   if (n_perm_align .ne. 0) then
+      al_errors(1) = al_errors(1) + node_value('dx ')
+      al_errors(2) = al_errors(2) + node_value('dy ')
+      al_errors(3) = al_errors(3) + node_value('ds ')
+      al_errors(5) = al_errors(5) + node_value('dtheta ')
+      al_errors(4) = al_errors(4) + node_value('dphi ')
+      al_errors(6) = al_errors(6) + node_value('dpsi ')
+      n_align = 1
+   endif
+   
    if (n_align .ne. 0)  then
       ORBIT2 = ORBIT
       call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
