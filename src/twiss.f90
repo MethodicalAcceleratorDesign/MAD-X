@@ -7563,6 +7563,9 @@ SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
   double precision :: orbt(6), v(3), ve(3), w(3,3), we(3,3)
   double precision :: ds, dx, dy, the, phi, psi, s2, tilt
 
+  integer :: code
+  double precision, external :: node_value
+
   !---- Misalignment rotation matrix w.r.t. entrance system.
   dx  = errors(1)
   dy  = errors(2)
@@ -7574,7 +7577,8 @@ SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
   call sumtrx(the, phi, psi, w)
 
   !---- VE and WE represent the change of reference.
-  call suelem(el, ve, we, tilt)
+  code = node_value('mad8_type ') 
+  call suelem(el, ve, we, tilt, code)
 
   !---- Misalignment displacements at exit w.r.t. entrance system.
   v(1) = dx + w(1,1)*ve(1)+w(1,2)*ve(2)+w(1,3)*ve(3)-ve(1)

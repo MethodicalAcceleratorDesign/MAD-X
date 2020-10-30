@@ -76,13 +76,13 @@ subroutine survey
         endif
      endif
 
-     code = node_value('mad8_type ')
+     code = node_value('mad8_type ') 
      !if (code.eq.39) code=15 ! 2015-Aug-06  21:50:12  ghislain: not required here
      !if (code.eq.38) code=24
      !**** el is the arc length for all bends  ********
      ! LD: 2018.02.01, rbarc is computed by node_value (if needed)...
      el = node_value('l ')
-     call suelem(el, ve, we, tilt)
+     call suelem(el, VE, WE, tilt, code, 0)
      suml = suml + el
      !**  Compute the coordinates at each point
      !call sutrak(v, w, ve, we)
@@ -98,6 +98,9 @@ subroutine survey
           V(1) =  V(1) + node_value('dx ')
           V(2) =  V(2) + node_value('dy ')
           V(3) =  V(3) + node_value('ds ')
+          node_value('dtheta ')
+          call suelem(el, VE, WE, tilt, code,0)
+
         endif
         call retreat_node()
      endif
@@ -197,7 +200,7 @@ subroutine sumtrx(theta, phi, psi, w)
 
 end subroutine sumtrx
 
-subroutine suelem(el, ve, we, tilt)
+subroutine suelem(el, ve, we, tilt, code, rotation)
   use twtrrfi
   use matrices, only : EYE
   use math_constfi, only : zero, one
@@ -221,7 +224,7 @@ subroutine suelem(el, ve, we, tilt)
   !   Added LCAVITY element at ISP 27                                    *
   !----------------------------------------------------------------------*
   double precision, intent(IN) :: el
-  double precision, intent(OUT) :: ve(3), we(3,3), tilt
+  double precision, intent(OUT) :: ve(3), we(3,3), tilt, rotation
 
   integer :: code, nn, ns
   double precision :: angle, cospsi, costhe, sinpsi, sinthe, ds, dx, dy, bv, x_t, y_t, z_t
@@ -237,7 +240,7 @@ subroutine suelem(el, ve, we, tilt)
   VE(1:2) = zero ; ve(3) = el
   WE = EYE(:3,:3)
 
-  code = node_value('mad8_type ')
+
   bv   = node_value('other_bv ')
   tilt = node_value('tilt ') * bv
 
@@ -298,22 +301,34 @@ subroutine suelem(el, ve, we, tilt)
 
 
      case (code_xrotation) !---- Rotation around X-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
-        dy = node_value('angle ') * bv
-        we(2,2) =  cos(dy)
-        we(3,2) =  sin(dy)
-        we(2,3) = -sin(dy)
-        we(3,3) =  cos(dy)
+        if(rotation .eq. zero) then
+          dy = node_value('angle ') * bv
+        else
+          dy = rotation
+        endif
+          we(2,2) =  cos(dy)
+          we(3,2) =  sin(dy)
+          we(2,3) = -sin(dy)
+          we(3,3) =  cos(dy)
 
 
      case (code_yrotation) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
-        dx = node_value('angle ') * bv
+        if(rotation .eq. zero) then
+          dx = node_value('angle ') * bv
+        else
+          dx = rotation
+        endif
         we(1,1) =  cos(dx)
         we(3,1) = -sin(dx)
         we(1,3) =  sin(dx)
         we(3,3) =  cos(dx)
 
      case (code_srotation) !---- Rotation around S-axis. SPECIAL CASE
-        tilt = node_value('angle ') * bv
+        if(rotation .eq. zero) then
+          tilt = node_value('angle ') * bv 
+        else
+          tilt = rotation
+        endif
         we(1,1) =  cos(tilt)
         we(2,1) =  sin(tilt) !should be - according to convention in MAD8 PhysG. or MADX manual?
         we(1,2) = -sin(tilt) !should be + according to convention in MAD8 PhysG. or MADX manual?
