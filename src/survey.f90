@@ -23,8 +23,9 @@ subroutine survey
   integer :: angle_count, node_count, node_ref(100)
   double precision :: dphi, dpsi, dtheta, phi, phi0, psi, psi0, theta, theta0
   double precision :: sums, el, suml, tilt, globaltilt
-  double precision :: v(3), v0(3), ve(3), w(3,3), w0(3,3), we(3,3), tx(3)
-  double precision :: add_angle(10), org_ang(100)
+  double precision :: v(3), v0(3), ve(3), w(3,3), w0(3,3), we(3,3), tx(3), we_t(3,3)
+  double precision :: we_b(3,3), v_t(3)
+  double precision :: add_angle(10), org_ang(100), dthetan
 
   integer, external :: restart_sequ, advance_node, set_cont_sequence, is_permalign, get_option
   double precision, external :: proxim, node_value, get_value
@@ -82,35 +83,50 @@ subroutine survey
      !**** el is the arc length for all bends  ********
      ! LD: 2018.02.01, rbarc is computed by node_value (if needed)...
      el = node_value('l ')
-     call suelem(el, VE, WE, tilt, code, 0)
+     call suelem(el, VE, WE, tilt, code)
      suml = suml + el
      !**  Compute the coordinates at each point
      !call sutrak(v, w, ve, we)
      V = V + matmul(W,VE)
      W = matmul(W,WE)
+
+    
+     if (advance_node().ne.0 .and. inc_perm_al) then
+        if (is_permalign() .ne. 0) then
+
+          V(1) =  V(1) + node_value('dx ')
+          V(2) =  V(2) + node_value('dy ')
+          V(3) =  V(3) + node_value('ds ')
+          dthetan = node_value('dtheta ')
+          we_b = W
+          v_t = V 
+          we_t(1,1) =  cos(dthetan)
+          we_t(3,1) = -sin(dthetan)
+          we_t(1,3) =  sin(dthetan)
+          we_t(3,3) =  cos(dthetan)
+          W = matmul(we_t,W)
+        endif
+        call retreat_node()
+     endif
      !**  Compute globaltilt HERE : it's the value at the entrance
      globaltilt = psi + tilt
      !**  Compute the survey angles at each point
      call suangl(w, theta, phi, psi)
-    
-     if (advance_node().ne.0 .and. inc_perm_al) then
-        if (is_permalign() .ne. 0) then
-          V(1) =  V(1) + node_value('dx ')
-          V(2) =  V(2) + node_value('dy ')
-          V(3) =  V(3) + node_value('ds ')
-          node_value('dtheta ')
-          call suelem(el, VE, WE, tilt, code,0)
-
-        endif
-        call retreat_node()
-     endif
 
     !**  Fill the survey table
      call sufill(suml,v, theta, phi, psi,globaltilt)
         if (is_permalign() .ne. 0 .and. inc_perm_al) then
-          V(1) =  V(1) - node_value('dx ')
-          V(2) =  V(2) - node_value('dy ')
-          V(3) =  V(3) - node_value('ds ')
+          !V(1) =  V(1) - node_value('dx ')
+          !V(2) =  V(2) - node_value('dy ')
+          !V(3) =  V(3) - node_value('ds ')
+          W = we_b
+          V = v_t   
+          call suelem(el, VE, WE, tilt, code)
+          !suml = suml + el
+          !**  Compute the coordinates at each point
+     
+          V = V + matmul(W,VE)
+          W = matmul(W,WE)
         endif
      if (advance_node().ne.0)  goto 10
      !---- end of loop over elements  ***********************************
@@ -157,15 +173,30 @@ subroutine suangl(w, theta, phi, psi)
   double precision, intent(IN) :: w(3,3)
   double precision, intent(OUT) :: theta, phi, psi
 
-  double precision :: arg
+  double precision :: arg, eps
   double precision, external :: proxim
 
+  eps = 1e-9
   arg = sqrt(w(2,1)**2 + w(2,2)**2)
 
-  phi = atan2(w(2,3), arg)
-  theta = proxim(atan2(w(1,3), w(3,3)), theta)
-  psi = proxim(atan2(w(2,1), w(2,2)), psi)
+  if (w(2,3) .le. eps .and. arg .le. eps ) then
+    phi = 0d0
+  else 
+    phi = atan2(w(2,3), arg)
+  endif
 
+  if (w(1,3) .le. eps .and. w(3,3) .le. eps ) then
+    theta = 0d0  
+  else
+    theta = proxim(atan2(w(1,3), w(3,3)), theta)
+  endif
+  
+  if (w(2,1) .le. eps .and. w(2,2) .le. eps ) then
+    psi = 0d0
+  else
+    psi = proxim(atan2(w(2,1), w(2,2)), psi)
+  endif
+  
 end subroutine suangl
 
 subroutine sumtrx(theta, phi, psi, w)
@@ -200,7 +231,7 @@ subroutine sumtrx(theta, phi, psi, w)
 
 end subroutine sumtrx
 
-subroutine suelem(el, ve, we, tilt, code, rotation)
+subroutine suelem(el, ve, we, tilt, code)
   use twtrrfi
   use matrices, only : EYE
   use math_constfi, only : zero, one
@@ -224,7 +255,7 @@ subroutine suelem(el, ve, we, tilt, code, rotation)
   !   Added LCAVITY element at ISP 27                                    *
   !----------------------------------------------------------------------*
   double precision, intent(IN) :: el
-  double precision, intent(OUT) :: ve(3), we(3,3), tilt, rotation
+  double precision, intent(OUT) :: ve(3), we(3,3), tilt
 
   integer :: code, nn, ns
   double precision :: angle, cospsi, costhe, sinpsi, sinthe, ds, dx, dy, bv, x_t, y_t, z_t
@@ -301,11 +332,7 @@ subroutine suelem(el, ve, we, tilt, code, rotation)
 
 
      case (code_xrotation) !---- Rotation around X-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
-        if(rotation .eq. zero) then
           dy = node_value('angle ') * bv
-        else
-          dy = rotation
-        endif
           we(2,2) =  cos(dy)
           we(3,2) =  sin(dy)
           we(2,3) = -sin(dy)
@@ -313,22 +340,14 @@ subroutine suelem(el, ve, we, tilt, code, rotation)
 
 
      case (code_yrotation) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
-        if(rotation .eq. zero) then
-          dx = node_value('angle ') * bv
-        else
-          dx = rotation
-        endif
+        dx = node_value('angle ') * bv
         we(1,1) =  cos(dx)
         we(3,1) = -sin(dx)
         we(1,3) =  sin(dx)
         we(3,3) =  cos(dx)
 
      case (code_srotation) !---- Rotation around S-axis. SPECIAL CASE
-        if(rotation .eq. zero) then
-          tilt = node_value('angle ') * bv 
-        else
-          tilt = rotation
-        endif
+        tilt = node_value('angle ') * bv 
         we(1,1) =  cos(tilt)
         we(2,1) =  sin(tilt) !should be - according to convention in MAD8 PhysG. or MADX manual?
         we(1,2) = -sin(tilt) !should be + according to convention in MAD8 PhysG. or MADX manual?
