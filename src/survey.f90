@@ -25,7 +25,7 @@ subroutine survey
   double precision :: sums, el, suml, tilt, globaltilt
   double precision :: v(3), v0(3), ve(3), w(3,3), w0(3,3), we(3,3), tx(3), we_t(3,3)
   double precision :: we_b(3,3), v_t(3)
-  double precision :: add_angle(10), org_ang(100), dthetan
+  double precision :: add_angle(10), org_ang(100)
 
   integer, external :: restart_sequ, advance_node, set_cont_sequence, is_permalign, get_option
   double precision, external :: proxim, node_value, get_value
@@ -93,21 +93,27 @@ subroutine survey
     
      if (advance_node().ne.0 .and. inc_perm_al) then
         if (is_permalign() .ne. 0) then
-
-          V(1) =  V(1) + node_value('dx ')
-          V(2) =  V(2) + node_value('dy ')
-          V(3) =  V(3) + node_value('ds ')
-          dthetan = node_value('dtheta ')
           we_b = W
-          v_t = V 
-          we_t(1,1) =  cos(dthetan)
-          we_t(3,1) = -sin(dthetan)
-          we_t(1,3) =  sin(dthetan)
-          we_t(3,3) =  cos(dthetan)
+          v_t = V
+          
+          VE(1) =   node_value('dx ')
+          VE(2) =   node_value('dy ')
+          VE(3) =   node_value('ds ')
+          !V = V + matmul(W,VE)
+          print *, "veeeee", VE, node_value('ds ')
+          V = V + matmul(W,VE)
+
+          dphi = node_value('dphi ')
+          dpsi = node_value('dpsi ')
+          dtheta = node_value('dtheta ')
+
+          call sumtrx(dtheta, dphi, dpsi, we_t)
           W = matmul(we_t,W)
+                    
         endif
         call retreat_node()
      endif
+
      !**  Compute globaltilt HERE : it's the value at the entrance
      globaltilt = psi + tilt
      !**  Compute the survey angles at each point
@@ -115,10 +121,8 @@ subroutine survey
 
     !**  Fill the survey table
      call sufill(suml,v, theta, phi, psi,globaltilt)
+     
         if (is_permalign() .ne. 0 .and. inc_perm_al) then
-          !V(1) =  V(1) - node_value('dx ')
-          !V(2) =  V(2) - node_value('dy ')
-          !V(3) =  V(3) - node_value('ds ')
           W = we_b
           V = v_t   
           call suelem(el, VE, WE, tilt, code)
@@ -196,7 +200,7 @@ subroutine suangl(w, theta, phi, psi)
   else
     psi = proxim(atan2(w(2,1), w(2,2)), psi)
   endif
-  
+
 end subroutine suangl
 
 subroutine sumtrx(theta, phi, psi, w)
