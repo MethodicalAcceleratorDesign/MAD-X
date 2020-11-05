@@ -19,7 +19,7 @@ subroutine survey
   !   ENERGY from BEAM common, and call TMLCAV for each one to update    *
   !   ENERGY                                                             *
   !----------------------------------------------------------------------*
-  integer :: i, j, code, add_pass, passes, n_add_angle
+  integer :: i, j, code, add_pass, passes, n_add_angle, codep1
   integer :: angle_count, node_count, node_ref(100)
   double precision :: dphi, dpsi, dtheta, phi, phi0, psi, psi0, theta, theta0
   double precision :: sums, el, suml, tilt, globaltilt
@@ -30,9 +30,10 @@ subroutine survey
   integer, external :: restart_sequ, advance_node, set_cont_sequence, is_permalign, get_option
   double precision, external :: proxim, node_value, get_value
   external :: retreat_node
-  logical :: inc_perm_al
+  logical :: inc_perm_al, isNext
 
   inc_perm_al = get_option('perm_align_survey ').eq.one
+  !inc_perm_al = .false.
   !---- Retrieve command attributes.
   v0(1) =  get_value('survey ','x0 ')
   v0(2) =  get_value('survey ','y0 ')
@@ -90,29 +91,30 @@ subroutine survey
      V = V + matmul(W,VE)
      W = matmul(W,WE)
 
-    
-     if (advance_node().ne.0 .and. inc_perm_al) then
-        if (is_permalign() .ne. 0) then
+     isNext = advance_node().ne.0 
+     if (isNext .and. inc_perm_al) then
+        codep1 = node_value('mad8_type ') 
+        if (is_permalign() .ne. 0 .and. codep1 .ne. 36) then
           we_b = W
           v_t = V
-          
+          print *, "veeeee", VE, node_value('ds '), codep1    
+          print *, "veeeee2", V, node_value('ds '), codep1       
           VE(1) =   node_value('dx ')
           VE(2) =   node_value('dy ')
           VE(3) =   node_value('ds ')
           !V = V + matmul(W,VE)
-          print *, "veeeee", VE, node_value('ds ')
+   
           V = V + matmul(W,VE)
 
-          dphi = node_value('dphi ')
-          dpsi = node_value('dpsi ')
+          dphi   = node_value('dphi ')
+          dpsi   = node_value('dpsi ')
           dtheta = node_value('dtheta ')
 
           call sumtrx(dtheta, dphi, dpsi, we_t)
           W = matmul(we_t,W)
-                    
         endif
-        call retreat_node()
      endif
+     if(isNext) call retreat_node()
 
      !**  Compute globaltilt HERE : it's the value at the entrance
      globaltilt = psi + tilt
@@ -183,23 +185,23 @@ subroutine suangl(w, theta, phi, psi)
   eps = 1e-9
   arg = sqrt(w(2,1)**2 + w(2,2)**2)
 
-  if (w(2,3) .le. eps .and. arg .le. eps ) then
-    phi = 0d0
-  else 
+ ! if (w(2,3) .le. eps .and. arg .le. eps ) then
+ !   phi = 0d0
+ ! else 
     phi = atan2(w(2,3), arg)
-  endif
+  !endif
 
-  if (w(1,3) .le. eps .and. w(3,3) .le. eps ) then
-    theta = 0d0  
-  else
+  !if (w(1,3) .le. eps .and. w(3,3) .le. eps ) then
+  !  theta = 0d0  
+  !else
     theta = proxim(atan2(w(1,3), w(3,3)), theta)
-  endif
+  !endif
   
-  if (w(2,1) .le. eps .and. w(2,2) .le. eps ) then
-    psi = 0d0
-  else
+  !if (w(2,1) .le. eps .and. w(2,2) .le. eps ) then
+   ! psi = 0d0
+  !else
     psi = proxim(atan2(w(2,1), w(2,2)), psi)
-  endif
+  !endif
 
 end subroutine suangl
 
