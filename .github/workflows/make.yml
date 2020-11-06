@@ -5,6 +5,7 @@
 #   - ubuntu-18.04: test failures: test-survey-3 test-thick-quad-2 test-track-9
 #   - ubuntu-20.04: internal compiler error
 #   - windows-latest: test failures: test-match-10
+#   - coverage: enable on windows/macos (internal compiler error)
 
 name: make
 on:
@@ -87,7 +88,7 @@ jobs:
             ${{ steps.tests.outputs.failed-tests }}
 
       - name: Upload coverage results
-        if: false
+        if: env.COVERALLS_REPO_TOKEN != ''
         run: coveralls --include src -x .c -x .cpp
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
@@ -115,8 +116,6 @@ jobs:
           sudo ln -s $(which gcc-9)      /usr/local/bin/gcc
           sudo ln -s $(which g++-9)      /usr/local/bin/g++
           sudo ln -s $(which gfortran-9) /usr/local/bin/gfortran
-
-      - run: pip install cpp-coveralls
 
       - name: Build MAD-X
         run: |
@@ -152,12 +151,6 @@ jobs:
             tests/tests-log.txt
             tests/tests-summary.txt
             ${{ steps.tests.outputs.failed-tests }}
-
-      - name: Upload coverage results
-        if: false
-        run: coveralls --include src -x .c -x .cpp
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
   windows:
     runs-on: windows-latest
