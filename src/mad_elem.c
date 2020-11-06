@@ -193,7 +193,6 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupda
   make_elem_node(el, k);
   current_node->at_value = at;
   el->perm_misalign = check_for_perm_misalign(cmd);
-
   current_node->at_expr = command_par_expr("at", cmd->clone);
   const char* from = command_par_string_user("from", cmd->clone);
   if (from){
