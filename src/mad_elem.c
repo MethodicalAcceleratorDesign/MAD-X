@@ -192,10 +192,7 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupda
   else k = ++occ_list->inform[i];
   make_elem_node(el, k);
   current_node->at_value = at;
-  printf("aaaa %f \n",command_par_value("dx", cmd->clone));
   el->perm_misalign = check_for_perm_misalign(cmd);
-  //current_node->stamp = 0;
-  printf("bbb %s %d \n",current_node->name, current_node->perm_misalign);
 
   current_node->at_expr = command_par_expr("at", cmd->clone);
   const char* from = command_par_string_user("from", cmd->clone);

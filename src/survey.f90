@@ -96,24 +96,22 @@ subroutine survey
         codep1 = node_value('mad8_type ') 
         if (is_permalign() .ne. 0 .and. codep1 .ne. 36) then
           we_b = W
-          v_t = V
-          print *, "veeeee", VE, node_value('ds '), codep1    
-          print *, "veeeee2", V, node_value('ds '), codep1       
+          v_t = V    
           VE(1) =   node_value('dx ')
           VE(2) =   node_value('dy ')
           VE(3) =   node_value('ds ')
-          !V = V + matmul(W,VE)
-   
+          
           V = V + matmul(W,VE)
-
           dphi   = node_value('dphi ')
           dpsi   = node_value('dpsi ')
           dtheta = node_value('dtheta ')
 
           call sumtrx(dtheta, dphi, dpsi, we_t)
           W = matmul(we_t,W)
+
         endif
      endif
+     
      if(isNext) call retreat_node()
 
      !**  Compute globaltilt HERE : it's the value at the entrance
@@ -125,15 +123,15 @@ subroutine survey
      call sufill(suml,v, theta, phi, psi,globaltilt)
      
         if (is_permalign() .ne. 0 .and. inc_perm_al) then
+          ! Go back one step since the misalignment does not depend the further steps. 
           W = we_b
           V = v_t   
           call suelem(el, VE, WE, tilt, code)
-          !suml = suml + el
           !**  Compute the coordinates at each point
-     
           V = V + matmul(W,VE)
           W = matmul(W,WE)
         endif
+
      if (advance_node().ne.0)  goto 10
      !---- end of loop over elements  ***********************************
   enddo
