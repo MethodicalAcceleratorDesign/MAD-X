@@ -7833,7 +7833,7 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   !---- Fringe fields effects computed from the TWISS routine tmfrng
   !     tmfrng returns the matrix elements rw(used) and tw(unused)
   !     No radiation effects as it is a pure thin lens with no lrad
-  call tmfrng(.true.,h,zero,e1,zero,zero,corr,rw,tw)
+  call tmfrng(.false.,h,zero,e1,zero,zero,corr,rw,tw)
   call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
   !---- Apply tilt.
   if (tilt .ne. zero) then
