@@ -161,6 +161,7 @@ export_el_par_8(struct command_parameter* par, char* string)
 }
 int
 check_for_perm_misalign(struct in_cmd* cmd){
+
   if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0) return 1;
   if(command_par_expr("dy", cmd->clone) || command_par_value("dy", cmd->clone)!=0) return 1;
   if(command_par_expr("ds", cmd->clone) || command_par_value("ds", cmd->clone)!=0) return 1;

@@ -122,7 +122,7 @@ subroutine survey
     !**  Fill the survey table
      call sufill(suml,v, theta, phi, psi,globaltilt)
      
-        if (is_permalign() .ne. 0 .and. inc_perm_al) then
+        if (is_permalign() .ne. 0 .and. inc_perm_al  .and. code .ne. 36) then
           ! Go back one step since the misalignment does not depend the further steps. 
           W = we_b
           V = v_t   
