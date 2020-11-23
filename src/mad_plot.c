@@ -131,7 +131,6 @@ exec_plot(struct in_cmd* cmd)
   char* pt = title, *haxis_name = NULL, *vaxis_name = NULL;
   char* particle_list;
   struct table* p_table = NULL;
-  struct command* tmp_command;
   const char *table_name = NULL, *file_name = NULL;
   char *last_twiss_table, *trackfile;
   char track_file_name[NAME_L], ps_file_name[NAME_L];
@@ -143,37 +142,31 @@ exec_plot(struct in_cmd* cmd)
 
   /* use correct beam for sequence to be plotted - HG 031127 */
   struct command* keep_beam = current_beam;
-  tmp_command = clone_command(this_cmd->clone);
-  if (attach_beam(current_sequ) == 0){
-    char mychar [100] = "resbeam; neverusedsequencename632:sequence, l=10; q1:quadrupole, at=1; endsequence;";
-    pro_input(mychar);
-    this_cmd->clone = clone_command(tmp_command);
-  }
-    if (attach_beam(current_sequ) == 0)      
-    fatal_error("PLOT - sequence without beam22:", current_sequ->name);
+  if (attach_beam(current_sequ) == 0)
+    fatal_error("PLOT - sequence without beam:", current_sequ->name);
   /* end part1 of HG 031127 */
 
 
-  if (tmp_command == NULL)
+  if (this_cmd == NULL || this_cmd->clone == NULL)
     fatal_error("Plot "," - non existing command");
 
   /* Check table name is the same as in the last twiss command */
 
   /* get vaxis_name */
-  command_par("vaxis", tmp_command, &cp);
+  command_par("vaxis", this_cmd->clone, &cp);
   vaxis_name = cp->m_string->p[0];
 
   /* get interpolation */
-  nointerp = !par_present("interpolation", tmp_command); // TG: should be "interpolate"?!
+  nointerp = !par_present("interpolation", this_cmd->clone); // TG: should be "interpolate"?!
 
   /* get haxis_name & s_haxis flag */
-  haxis_name = command_par_string_user("haxis", tmp_command);
+  haxis_name = command_par_string_user("haxis", this_cmd->clone);
   if (haxis_name) {
     s_haxis = !strcmp(haxis_name,"s");
   }
 
   /* get table_name & track_flag */
-  table_name = command_par_string_user("table", tmp_command);
+  table_name = command_par_string_user("table", this_cmd->clone);
   if(table_name) {
     if(strncmp(table_name,"track",5) == 0)
       track_flag = 1;
@@ -187,7 +180,7 @@ exec_plot(struct in_cmd* cmd)
   }
 
   /* get file_name */
-  file_name = command_par_string_user("file", tmp_command);
+  file_name = command_par_string_user("file", this_cmd->clone);
   if(!file_name) {
     if (track_flag) file_name = "madx_track";
     else file_name = "madx";
@@ -197,22 +190,22 @@ exec_plot(struct in_cmd* cmd)
   /* If table name begins with "track" use the gnuplot package, and access files not tables*/
   if (track_flag) {
     /* get track file name */
-    trackfile = command_par_string("trackfile", tmp_command);
+    trackfile = command_par_string("trackfile", this_cmd->clone);
     printf("trackfile is: %s\n", trackfile);
 
     // now trackfile contains the basis name from which we will get the real file names
 
     /* get particle */
-    command_par("particle", tmp_command, &cp);
+    command_par("particle", this_cmd->clone, &cp);
     curr = cp->m_string->curr;
     for (i = 0; i < curr; i++) {
       particle_list = cp->m_string->p[i];
       part_idx[i] = atoi(particle_list);
     }
 
-    multiple  = par_present("multiple",  tmp_command);
-    noversion = par_present("noversion", tmp_command);
-    nolegend  = par_present("nolegend",  tmp_command);
+    multiple  = par_present("multiple",  this_cmd->clone);
+    noversion = par_present("noversion", this_cmd->clone);
+    nolegend  = par_present("nolegend",  this_cmd->clone);
 
     /* find the column numbers corresponding to haxis_name & vaxis_name */
     track_cols_length = track_table_cols_len-1;

@@ -348,7 +348,6 @@ update_beam(struct command* comm)
   store_comm_par_value("bcurrent", bcurrent, current_beam);
   store_comm_par_value("alfa", alfa, current_beam);
   store_comm_par_value("arad", arad, current_beam);
-  printf("upppdate beam \n");
 }
 
 void

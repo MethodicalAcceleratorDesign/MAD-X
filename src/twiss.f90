@@ -3664,11 +3664,9 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
      !---- Apply field errors and change coefficients using DELTAP.
      F_ERRORS = zero
      n_ferr = node_fd_errors(f_errors)
-     if (sk0 .ne. 0 .or. f_errors(0) .ne. 0) then 
-      h_k = sk0 * bvk + f_errors(0)/el
-      print * , "skkkk0", sk0*el, f_errors(0), h_k
+     if (sk0 .ne. 0) then 
       f_errors(0) = f_errors(0) + sk0*el - g_elpar(b_angle)
-
+      h_k = sk0 * bvk
     endif
 
 
@@ -6547,7 +6545,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
     if(abs(xtilt_rad) > ten5m) then
       te_t1 = zero
-      xtilt = -(xtilt_rad)
+      xtilt = -sin(xtilt_rad)
 
       pxbeta = xtilt*startrot/beta
       ek_t1(1) =  startrot*xtilt
@@ -6555,7 +6553,6 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
       ek_t1(5) = -0.5d0*pxbeta*xtilt
       re_t1(1,6) = -pxbeta
       re_t1(5,2) = -pxbeta
-      !print * , "tiltinsolenoidtttttttt", re_t1
       call tmtrak(ek_t1,re_t1,te_t1,orbit,orbit)
       call tmcat(.true.,re_t1,te_t1,re,te,re,te)
 
@@ -7527,7 +7524,7 @@ SUBROUTINE tmali1(orb1, errors, beta, gamma, orb2, rm)
   rm(5,3) = w(2,3) / (w(3,3) * beta)
   rm(5,4) = rm(5,3) * s2
   rm(5,6) = - s2 / (beta * gamma)**2
-  print *, "RMM matrix", rm
+
   !---- Track orbit.
   ORBT = matmul(RM,ORB1)
   orb2(1) = orbt(1) - (w(2,2) * dx - w(1,2) * dy) / w(3,3)
