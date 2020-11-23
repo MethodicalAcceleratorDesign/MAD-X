@@ -47,7 +47,7 @@ ptc_create_universe;
   ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
 
 
-!  ptc_printframes, file="leir.C", format=rootmacro;!this prints my visualisation with ROOT
+  ptc_printframes, file="leir.C", format=rootmacro;!this prints my visualisation with ROOT
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
   ptc_setswitch, debuglevel=0, exact_mis=true, time=false, totalpath=false;

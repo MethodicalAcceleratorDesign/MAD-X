@@ -166,8 +166,8 @@ check_for_perm_misalign(struct in_cmd* cmd){
   if(command_par_expr("dy", cmd->clone) || command_par_value("dy", cmd->clone)!=0) return 1;
   if(command_par_expr("ds", cmd->clone) || command_par_value("ds", cmd->clone)!=0) return 1;
   if(command_par_expr("dtheta", cmd->clone) || command_par_value("dtheta", cmd->clone)!=0) return 1;
-  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0) return 1;
-  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0) return 1;
+  if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0) return 1;
+  if(command_par_expr("dpsi", cmd->clone) || command_par_value("dpsi", cmd->clone)!=0) return 1;
   
   return 0;
 }
@@ -200,7 +200,7 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupda
     current_node->from_name = permbuff(from);
     nupdates = 2;
   }
-    if (isupdating==0) check_for_update_in_seq(el, cmd->clone, nupdates);
+    //if (isupdating==0) check_for_update_in_seq(el, cmd->clone, nupdates);
 }
 
 static int

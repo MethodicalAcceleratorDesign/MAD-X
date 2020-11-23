@@ -58,8 +58,13 @@ set_defaults(const char* str) /* reset options, beam etc. to defaults */
     }
     else if (strcmp(str, "beam") == 0)
     {
-      if (current_beam == NULL)
+      printf("heeereee tooo \n");
+      current_beam=NULL;
+      if (current_beam == NULL){
+        printf("wWWWAS null");
         current_beam = clone_command(defined_commands->commands[pos]);
+        
+      }
       beam_clone = clone_command(defined_commands->commands[pos]);
       for (i = 0; i < beam_clone->par_names->curr; i++)
         beam_clone->par_names->inform[i] = 1; /* mark as "read" */

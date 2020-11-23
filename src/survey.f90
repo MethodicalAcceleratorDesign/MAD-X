@@ -100,8 +100,9 @@ subroutine survey
           VE(1) =   node_value('dx ')
           VE(2) =   node_value('dy ')
           VE(3) =   node_value('ds ')
-          
+
           V = V + matmul(W,VE)
+
           dphi   = node_value('dphi ')
           dpsi   = node_value('dpsi ')
           dtheta = node_value('dtheta ')
@@ -123,7 +124,7 @@ subroutine survey
      call sufill(suml,v, theta, phi, psi,globaltilt)
      
         if (is_permalign() .ne. 0 .and. inc_perm_al  .and. code .ne. 36) then
-          ! Go back one step since the misalignment does not depend the further steps. 
+          ! Go back one step since the misalignment does not change the further steps. 
           W = we_b
           V = v_t   
           call suelem(el, VE, WE, tilt, code)
