@@ -160,16 +160,36 @@ export_el_par_8(struct command_parameter* par, char* string)
   }
 }
 int
-check_for_perm_misalign(struct in_cmd* cmd){
-
-  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0) return 1;
-  if(command_par_expr("dy", cmd->clone) || command_par_value("dy", cmd->clone)!=0) return 1;
-  if(command_par_expr("ds", cmd->clone) || command_par_value("ds", cmd->clone)!=0) return 1;
-  if(command_par_expr("dtheta", cmd->clone) || command_par_value("dtheta", cmd->clone)!=0) return 1;
-  if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0) return 1;
-  if(command_par_expr("dpsi", cmd->clone) || command_par_value("dpsi", cmd->clone)!=0) return 1;
+check_for_perm_misalign(struct node* c_node, struct in_cmd* cmd){
+  int isperm = 0;
+  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0)         isperm = 1;
+  if(command_par_expr("dy", cmd->clone) || command_par_value("dy", cmd->clone)!=0)         isperm = 1;
+  if(command_par_expr("ds", cmd->clone) || command_par_value("ds", cmd->clone)!=0)         isperm = 1;
+  if(command_par_expr("dtheta", cmd->clone) || command_par_value("dtheta", cmd->clone)!=0) isperm = 1;
+  if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0)     isperm = 1;
+  if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0)     isperm = 1;
+  if(command_par_expr("dpsi", cmd->clone) || command_par_value("dpsi", cmd->clone)!=0)     isperm = 1;
   
-  return 0;
+  if(isperm==1){
+   
+    c_node->perm_align->dx_value     = command_par_value("dx", cmd->clone);
+    printf("beeefore \n");
+    c_node->perm_align->dx_expr      = command_par_expr("dx", cmd->clone);
+     printf("beeefore2 \n");
+    c_node->perm_align->dy_value     = command_par_value("dy", cmd->clone);
+    c_node->perm_align->dy_expr      = command_par_expr("dy", cmd->clone);
+    c_node->perm_align->ds_value     = command_par_value("ds", cmd->clone);
+    c_node->perm_align->ds_expr      = command_par_expr("ds", cmd->clone);
+    c_node->perm_align->dtheta_value = command_par_value("dtheta", cmd->clone);
+    c_node->perm_align->dtheta_expr  = command_par_expr("dtheta", cmd->clone);
+    c_node->perm_align->dphi_value   = command_par_value("dphi", cmd->clone);
+    c_node->perm_align->dphi_expr    = command_par_expr("dphi", cmd->clone);
+    c_node->perm_align->dpsi_value   = command_par_value("dpsi", cmd->clone);
+    c_node->perm_align->dpsi_expr    = command_par_expr("dpsi", cmd->clone);
+    printf("afteeer %f \n",c_node->perm_align->dx_value );
+  }
+  
+  return isperm;
 }
 
 static void
@@ -193,7 +213,8 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupda
   else k = ++occ_list->inform[i];
   make_elem_node(el, k);
   current_node->at_value = at;
-  el->perm_misalign = check_for_perm_misalign(cmd);
+  current_node->perm_misalign = check_for_perm_misalign(current_node, cmd);
+  printf("qqqqq %d %f \n", current_node->perm_misalign, current_node->at_value);
   current_node->at_expr = command_par_expr("at", cmd->clone);
   const char* from = command_par_string_user("from", cmd->clone);
   if (from){

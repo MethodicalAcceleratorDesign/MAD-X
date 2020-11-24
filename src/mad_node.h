@@ -11,6 +11,21 @@ struct constraint_list;
 struct double_array;
 struct name_list;
 
+struct align_info
+{
+  struct expression* dx_expr;
+  double             dx_value;
+  struct expression* dy_expr;
+  double             dy_value;
+  struct expression* ds_expr;
+  double             ds_value;
+  struct expression* dtheta_expr;
+  double             dtheta_value;
+  struct expression* dphi_expr;
+  double             dphi_value;
+  struct expression* dpsi_expr;
+  double             dpsi_value;
+};
 struct node                /* the sequence is a linked list of nodes */
 {
   char name[NAME_L];
@@ -54,8 +69,8 @@ struct node                /* the sequence is a linked list of nodes */
   int    rfm_harmon; /* harmonic number of the rf-multipole fields  AL: */
   double rfm_lag;    /* lag of the rf-multipole fields  AL: */
   int    perm_misalign; /* flag to tell if permanent misalignments are applied */
+  struct align_info* perm_align;
 };
-
 struct node_list /* contains list of node pointers sorted by name */
 {
   int stamp;

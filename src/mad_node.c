@@ -16,6 +16,7 @@ new_node(char* name)
 {
   const char *rout_name = "new_node";
   struct node* p = mycalloc(rout_name, 1, sizeof *p);
+  p->perm_align = mycalloc(rout_name, 1, sizeof *p->perm_align);
   strcpy(p->name, name);
   p->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", p->name);
@@ -59,6 +60,8 @@ clone_node(struct node* p, int flag)
 
   clone->chkick = p->chkick;
   clone->cvkick = p->cvkick;
+  clone->perm_misalign = p->perm_misalign;
+  clone->perm_align = p->perm_align;
   return clone;
 }
 
@@ -308,10 +311,36 @@ node_value(const char* par)
      warning("node_value","current_node pointer in NULL. Sequence not set?");
      return 0.0;
    }
+  {
 
+  }
   mycpy(lpar, par);
   if (strcmp(lpar, "l") == 0) value = current_node->length;
 /*  else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;*/
+  else if(strcmp(lpar, "dx") == 0){  
+      if (current_node->perm_align->dx_expr == NULL) value = current_node->perm_align->dx_value;
+      else                                            value = expression_value(current_node->perm_align->dx_expr , 2);
+  }
+  else if (strcmp(lpar, "dy") == 0){  
+      if (current_node->perm_align->dy_expr == NULL) value = current_node->perm_align->dy_value;
+      else                                            value = expression_value(current_node->perm_align->dy_expr , 2);
+  }
+  else if (strcmp(lpar, "dy") == 0){  
+      if (current_node->perm_align->dy_expr == NULL) value = current_node->perm_align->dy_value;
+      else                                            value = expression_value(current_node->perm_align->dy_expr , 2);
+  }
+  else if(strcmp(lpar, "dtheta") == 0){  
+      if (current_node->perm_align->dtheta_expr == NULL) value = current_node->perm_align->dtheta_value;
+      else                                            value = expression_value(current_node->perm_align->dtheta_expr , 2);
+  }
+  else if (strcmp(lpar, "dphi") == 0){  
+      if (current_node->perm_align->dphi_expr == NULL) value = current_node->perm_align->dphi_value;
+      else                                            value = expression_value(current_node->perm_align->dphi_expr , 2);
+  }
+  else if (strcmp(lpar, "dpsi") == 0){  
+      if (current_node->perm_align->dpsi_expr == NULL) value = current_node->perm_align->dpsi_value;
+      else                                             value = expression_value(current_node->perm_align->dpsi_expr , 2);
+  } 
   else if (strcmp(lpar, "other_bv") == 0) value = current_node->other_bv;
   else if (strcmp(lpar, "chkick") == 0) value = current_node->chkick;
   else if (strcmp(lpar, "cvkick") == 0) value = current_node->cvkick;
@@ -334,7 +363,7 @@ double node_obs_point(void){
 }
 
 int is_permalign(void){
-  return current_node->p_elem->perm_misalign;
+  return current_node->perm_misalign;
 }
 
 void set_tt_multipoles(int *maxmul){

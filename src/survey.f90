@@ -93,7 +93,8 @@ subroutine survey
 
      isNext = advance_node().ne.0 
      if (isNext .and. inc_perm_al) then
-        codep1 = node_value('mad8_type ') 
+        codep1 = node_value('mad8_type ')
+
         if (is_permalign() .ne. 0 .and. codep1 .ne. 36) then
           we_b = W
           v_t = V    
@@ -106,7 +107,7 @@ subroutine survey
           dphi   = node_value('dphi ')
           dpsi   = node_value('dpsi ')
           dtheta = node_value('dtheta ')
-
+          print *, "permmmmm", is_permalign(), node_value('dx '), dphi, dpsi, dtheta
           call sumtrx(dtheta, dphi, dpsi, we_t)
           W = matmul(we_t,W)
 
