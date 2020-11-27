@@ -173,9 +173,7 @@ check_for_perm_misalign(struct node* c_node, struct in_cmd* cmd){
   if(isperm==1){
    
     c_node->perm_align->dx_value     = command_par_value("dx", cmd->clone);
-    printf("beeefore \n");
     c_node->perm_align->dx_expr      = command_par_expr("dx", cmd->clone);
-     printf("beeefore2 \n");
     c_node->perm_align->dy_value     = command_par_value("dy", cmd->clone);
     c_node->perm_align->dy_expr      = command_par_expr("dy", cmd->clone);
     c_node->perm_align->ds_value     = command_par_value("ds", cmd->clone);
@@ -186,7 +184,7 @@ check_for_perm_misalign(struct node* c_node, struct in_cmd* cmd){
     c_node->perm_align->dphi_expr    = command_par_expr("dphi", cmd->clone);
     c_node->perm_align->dpsi_value   = command_par_value("dpsi", cmd->clone);
     c_node->perm_align->dpsi_expr    = command_par_expr("dpsi", cmd->clone);
-    printf("afteeer %f \n",c_node->perm_align->dx_value );
+    
   }
   
   return isperm;
@@ -214,7 +212,6 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupda
   make_elem_node(el, k);
   current_node->at_value = at;
   current_node->perm_misalign = check_for_perm_misalign(current_node, cmd);
-  printf("qqqqq %d %f \n", current_node->perm_misalign, current_node->at_value);
   current_node->at_expr = command_par_expr("at", cmd->clone);
   const char* from = command_par_string_user("from", cmd->clone);
   if (from){

@@ -1099,6 +1099,8 @@ static void place_node_at(const node* node, sequence* to_sequ, element* sliced_e
   double at = node->at_value;
   this_node->from_name = node->from_name;
   this_node->at_value  = at;
+  this_node->perm_align->dx_expr = clone_expression(node->perm_align->dx_expr);
+  this_node->perm_misalign = node->perm_misalign;
   if(at_expr) this_node->at_expr   = at_expr;
   if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " place " << sliced_elem->name << " using at_expr where " << my_dump_expression(at_expr) << " at_value=" << at << std::endl;
   add_node_at_end_of_sequence(this_node,to_sequ); // add the thick node to the sequences
@@ -2298,6 +2300,8 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   }
 
   expression* at_expr = work_node->at_expr;
+  std::cout << "vvvvv" << work_node->at_value<<  my_dump_expression(work_node->perm_align->dx_expr) << "\n";
+ ;
   double at = work_node->at_value;
   if(at_expr==nullptr) at_expr=expr_from_value_2(at); // make a new expression from the value
 

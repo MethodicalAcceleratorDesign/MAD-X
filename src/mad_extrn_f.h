@@ -162,6 +162,7 @@
 #define sector_out sector_out_
 #define table_length table_length_
 #define table_range table_range_
+#define name_to_table_curr name_to_table_curr_
 
 // from mad_track.c
 #define deletetrackstrarpositions deletetrackstrarpositions_

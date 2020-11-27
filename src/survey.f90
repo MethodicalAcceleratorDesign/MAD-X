@@ -25,6 +25,7 @@ subroutine survey
   double precision :: sums, el, suml, tilt, globaltilt
   double precision :: v(3), v0(3), ve(3), w(3,3), w0(3,3), we(3,3), tx(3), we_t(3,3)
   double precision :: we_b(3,3), v_t(3)
+  double precision :: W_AL(3,3), V_AL(3)
   double precision :: add_angle(10), org_ang(100)
 
   integer, external :: restart_sequ, advance_node, set_cont_sequence, is_permalign, get_option
@@ -88,54 +89,53 @@ subroutine survey
      suml = suml + el
      !**  Compute the coordinates at each point
      !call sutrak(v, w, ve, we)
-     V = V + matmul(W,VE)
-     W = matmul(W,WE)
+     if(code .eq. 1) then
+       V = V + matmul(W,VE)
+       W = matmul(W,WE)
+      
+     else
+          V_AL = V
+          W_AL = W
+          if(is_permalign() .ne. 0) then
+            VE(1) =   node_value('dx ')
+            VE(2) =   node_value('dy ')
+            VE(3) =   node_value('ds ')
 
-     isNext = advance_node().ne.0 
-     if (isNext .and. inc_perm_al) then
-        codep1 = node_value('mad8_type ')
+            V_AL = V_AL + matmul(W_AL,VE)
+            dphi   = node_value('dphi ')
+            dpsi   = node_value('dpsi ')
+            dtheta = node_value('dtheta ')
+            
+            call sumtrx(dtheta, dphi, dpsi, we_t)
+            W_AL = matmul(we_t,W_AL) ! Is this the right way?
+          endif
 
-        if (is_permalign() .ne. 0 .and. codep1 .ne. 36) then
-          we_b = W
-          v_t = V    
-          VE(1) =   node_value('dx ')
-          VE(2) =   node_value('dy ')
-          VE(3) =   node_value('ds ')
+          call suangl(W_AL, theta, phi, psi)
 
-          V = V + matmul(W,VE)
-
-          dphi   = node_value('dphi ')
-          dpsi   = node_value('dpsi ')
-          dtheta = node_value('dtheta ')
-          print *, "permmmmm", is_permalign(), node_value('dx '), dphi, dpsi, dtheta
-          call sumtrx(dtheta, dphi, dpsi, we_t)
-          W = matmul(we_t,W)
-
-        endif
-     endif
-     
-     if(isNext) call retreat_node()
-
-     !**  Compute globaltilt HERE : it's the value at the entrance
-     globaltilt = psi + tilt
-     !**  Compute the survey angles at each point
-     call suangl(w, theta, phi, psi)
-
-    !**  Fill the survey table
-     call sufill(suml,v, theta, phi, psi,globaltilt)
-     
-        if (is_permalign() .ne. 0 .and. inc_perm_al  .and. code .ne. 36) then
-          ! Go back one step since the misalignment does not change the further steps. 
-          W = we_b
-          V = v_t   
+          !**  Fill the survey table
+          call sufill(suml,V_AL, theta, phi, psi,globaltilt,1)
           call suelem(el, VE, WE, tilt, code)
-          !**  Compute the coordinates at each point
+          ! This is the normal element
+          V_AL = V_AL + matmul(W_AL,VE)
+          W_AL = matmul(W_AL,WE)
+          !globaltilt = psi + tilt
+          !**  Compute the survey angles at each point
+          call suangl(W_AL, theta, phi, psi)
+
+          !**  Fill the survey table
+          call sufill(suml,V_AL, theta, phi, psi,globaltilt, 2)
+
+          ! The non perturbed propagation
           V = V + matmul(W,VE)
           W = matmul(W,WE)
-        endif
 
+
+
+     endif
      if (advance_node().ne.0)  goto 10
-     !---- end of loop over elements  ***********************************
+!    isNext = advance_node().ne.0 
+     !if (isNext .and. inc_perm_al) then
+
   enddo
 
 
@@ -376,7 +376,7 @@ subroutine suelem(el, ve, we, tilt, code)
 
 end subroutine suelem
 
-subroutine sufill(suml, v, theta, phi, psi, globaltilt)
+subroutine sufill(suml, v, theta, phi, psi, globaltilt,name_add)
   use twtrrfi
   use math_constfi, only : zero
   use code_constfi
@@ -387,18 +387,20 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   ! Output:                                                              *
   !   EL       (real)    Element length along design orbit.              *
   !   V(3)     (real)    Coordinate at the end of the element            *
-  !   theta, phi, psi(real) : the survey angles                            *
+  !   theta, phi, psi(real) : the survey angles                          *
+  !   name_add (integer) 0 - no name change, 1 - .B and 2 -.E
   !----------------------------------------------------------------------*
   double precision, intent(IN) :: suml, v(3), theta, phi, psi, globaltilt
 
-  integer :: code, nn, ns, i
+  integer :: code, nn, ns, i, name_add
   double precision :: ang, el, tmp, surv_vect(7)
   double precision :: normal(0:maxmul), skew(0:maxmul)
 
   double precision, external :: node_value
+!  integer, external :: name_to_table_curr 
 
   el = node_value('l ')
-  call string_to_table_curr('survey ', 'name ', 'name ')
+  call name_to_table_curr('survey ', name_add)
   call string_to_table_curr('survey ', 'keyword ', 'base_name ')
   call string_to_table_curr('survey ', 'comments ', 'comments ')
   call double_to_table_curr('survey ', 's ',suml )
