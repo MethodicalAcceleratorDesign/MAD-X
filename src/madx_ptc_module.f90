@@ -2177,8 +2177,6 @@ CONTAINS
 
 
       if (getdebug() > 3) then
-
-        write(6,*) " vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv "
         call print_elframes(f)
       endif
 

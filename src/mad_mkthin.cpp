@@ -2300,7 +2300,6 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   }
 
   expression* at_expr = work_node->at_expr;
-  std::cout << "vvvvv" << work_node->at_value<<  my_dump_expression(work_node->perm_align->dx_expr) << "\n";
  ;
   double at = work_node->at_value;
   if(at_expr==nullptr) at_expr=expr_from_value_2(at); // make a new expression from the value

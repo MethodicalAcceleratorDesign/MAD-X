@@ -1,10 +1,133 @@
 !  Routines for the survey command in MADX / A. Verdier (started October 2001)
 subroutine survey
-  use math_constfi, only : zero, one
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Execute SURVEY command.                                            *
+  ! Attributes, must be given in this order in the dictionary:           *
+  !   X0        (real)    Initial X position.                            *
+  !   Y0        (real)    Initial Y position.                            *
+  !   Z0        (real)    Initial Z position.                            *
+  !   THETA0    (real)    Initial azimuthal angle.                       *
+  !   PHI0      (real)    Initial elevation angle.                       *
+  !   PSI0      (real)    Initial roll angle.                            *
+  !----------------------------------------------------------------------*
+  ! Modified: 01-APR-1999, M. Woodley (SLAC)                             *
+  !   If we're doing tape file output and there are LCAVITY elements in  *
+  !   the current beamline, initialize ENER1 (in COMMON /OPTIC1/) using  *
+  !   ENERGY from BEAM common, and call TMLCAV for each one to update    *
+  !   ENERGY                                                             *
+  !----------------------------------------------------------------------*
+  integer :: i, j, code, add_pass, passes, n_add_angle , inti0
+  integer :: angle_count, node_count, node_ref(100)
+  double precision :: dphi, dpsi, dtheta, phi, phi0, psi, psi0, theta, theta0
+  double precision :: sums, el, suml, tilt, globaltilt
+  double precision :: v(3), v0(3), ve(3), w(3,3), w0(3,3), we(3,3), tx(3)
+  double precision :: add_angle(10), org_ang(100)
+
+  integer, external :: restart_sequ, advance_node, set_cont_sequence
+  double precision, external :: proxim, node_value, get_value
+  inti0 = 0
+  !---- Retrieve command attributes.
+  v0(1) =  get_value('survey ','x0 ')
+  v0(2) =  get_value('survey ','y0 ')
+  v0(3) =  get_value('survey ','z0 ')
+  theta0 = get_value('survey ','theta0 ')
+  phi0 =   get_value('survey ','phi0 ')
+  psi0 =   get_value('survey ','psi0 ')
+
+  !---- Initialise the angles
+  theta = theta0
+  phi = phi0
+  psi = psi0
+
+  !---- Set up initial V and W.
+  call sumtrx(theta0, phi0, psi0, w0)
+  V = V0
+  W = W0
+
+  suml = zero
+  sums = zero
+
+5 continue
+  !---- loop over passes
+  add_pass = get_value('sequence ','add_pass ')   ! multiple passes allowed
+  do passes = 0, add_pass
+     j = restart_sequ()
+     angle_count = 0
+     node_count = 0
+
+10   continue
+     !---- loop over elements
+     node_count = node_count + 1
+     if (passes .gt. 0)  then
+        call get_node_vector('add_angle ',n_add_angle,add_angle)
+        if (n_add_angle .gt. 0 .and. add_angle(passes) .ne. 0.) then
+           if (passes .eq. 1) then
+              angle_count = angle_count + 1
+              node_ref(angle_count) = node_count
+              org_ang(angle_count) = node_value('angle ')
+           endif
+           call store_node_value('angle ', add_angle(passes))
+        endif
+     endif
+
+     code = node_value('mad8_type ')
+     !if (code.eq.39) code=15 ! 2015-Aug-06  21:50:12  ghislain: not required here
+     !if (code.eq.38) code=24
+     !**** el is the arc length for all bends  ********
+     ! LD: 2018.02.01, rbarc is computed by node_value (if needed)...
+     el = node_value('l ')
+     call suelem(el, ve, we, tilt,code)
+     suml = suml + el
+     !**  Compute the coordinates at each point
+     !call sutrak(v, w, ve, we)
+     V = V + matmul(W,VE)
+     W = matmul(W,WE)
+     !**  Compute globaltilt HERE : it's the value at the entrance
+     globaltilt = psi + tilt
+     !**  Compute the survey angles at each point
+     call suangl(w, theta, phi, psi)
+     !**  Fill the survey table
+     call sufill(suml,v, theta, phi, psi,globaltilt,inti0)
+     if (advance_node().ne.0)  goto 10
+     !---- end of loop over elements  ***********************************
+  enddo
+
+
+  if (add_pass .gt. 0) then
+     j = restart_sequ()
+     angle_count = 1
+     node_count = 0
+
+20   continue
+     !---- loop over elements to
+     ! restore original angle to node if necessary
+     node_count = node_count+1
+     if (node_ref(angle_count) .eq. node_count)  then
+        call store_node_value('angle ', org_ang(angle_count))
+        angle_count = angle_count+1
+     endif
+     if (advance_node().ne.0)  goto 20
+
+  endif
+  if (set_cont_sequence() .ne. 0)  goto 5
+
+  !---- Centre of machine. ! 2016.12.14 ldeniau: vars below are never used.
+  TX = V - V0
+  dtheta = theta - proxim(theta0, theta)
+  dphi = phi - proxim(phi0, phi)
+  dpsi = psi - proxim(psi0, psi)
+end subroutine survey
+
+subroutine element_loc
+
+  use math_constfi, only : zero, one
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Execute SURVEY command with option elemnt_location.                *
   ! Attributes, must be given in this order in the dictionary:           *
   !   X0        (real)    Initial X position.                            *
   !   Y0        (real)    Initial Y position.                            *
@@ -162,7 +285,7 @@ subroutine survey
   dtheta = theta - proxim(theta0, theta)
   dphi = phi - proxim(phi0, phi)
   dpsi = psi - proxim(psi0, psi)
-end subroutine survey
+end subroutine element_loc
 
 subroutine suangl(w, theta, phi, psi)
   implicit none

@@ -2132,7 +2132,6 @@ name_to_table_curr(const char* table, int* ending){
   strcpy(tmp, current_node->p_elem->name);
   if(*ending ==1) strcat(tmp, ".S");
   if(*ending ==2) strcat(tmp, ".E");
-  printf("llll %s %d \n", tmp, *ending);
   
   return string_to_table_curr(table,"name", tmp);
 }

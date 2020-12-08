@@ -218,7 +218,7 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupda
     current_node->from_name = permbuff(from);
     nupdates = 2;
   }
-    //if (isupdating==0) check_for_update_in_seq(el, cmd->clone, nupdates);
+    if (isupdating==0 && current_node->perm_misalign==0) check_for_update_in_seq(el, cmd->clone, nupdates);
 }
 
 static int
@@ -979,7 +979,7 @@ check_for_update_in_seq(struct element* el, struct command* update, int nupdates
     {
       cupdate++;
       if(cupdate>nupdates)
-        fatal_error("Not possible to update attribute for element in sequence definition: ", el->name );
+        warning("Not possible to update attribute for element in sequence definition: ", el->name );
     }
   }
 }
