@@ -6590,10 +6590,10 @@ SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
  y    = node_value('dy ')
  z    = node_value('ds ')
 
- call tmdrf(fsec,ftrk,orbit,fmap,-z,ek,re,te)
-
  ek(1) = ek(1) - x
  ek(3) = ek(3) - y
+ ek(5) = ek(5) - z/beta
+
   !---- Track orbit.
  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 

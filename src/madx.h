@@ -17,6 +17,7 @@
 #include <float.h>
 #include <math.h>
 #include <time.h>
+#include <sys/stat.h>
 
 // defines
 
@@ -77,6 +78,7 @@
 #include "mad_seq.h"
 #include "mad_node.h"
 #include "mad_beam.h"
+#include "mad_sstate.h"
 
 // elements modules
 

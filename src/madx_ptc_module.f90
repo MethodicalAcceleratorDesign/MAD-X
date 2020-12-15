@@ -116,19 +116,19 @@ CONTAINS
     if (getdebug()==0) global_verbose = .false.
 
     lielib_print =  (/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/)
-	 !  lielib_print(1)=1   lieinit prints info
-	 !  lielib_print(2)=1   expflo warning if no convergence
-	 !  lielib_print(3)=1   Shows details in flofacg
-	 !  lielib_print(4)=1   tunes and damping
-	 !  lielib_print(5)=1  order in orbital normal form
-	 !  lielib_print(6)=1  symplectic condition
-	 !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
-	 !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
-	 !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
-	 !  lielib_print(10)=1  print lingyun's checks
-	 !  lielib_print(11)=1  print warning about Teng-Edwards
-	 !  lielib_print(12)=1  print info in make_node_layout
-	 !  lielib_print(13)=1  print info of normal form kernel into file kernel.txt and kernel_spin.txt
+   !  lielib_print(1)=1   lieinit prints info
+   !  lielib_print(2)=1   expflo warning if no convergence
+   !  lielib_print(3)=1   Shows details in flofacg
+   !  lielib_print(4)=1   tunes and damping
+   !  lielib_print(5)=1  order in orbital normal form
+   !  lielib_print(6)=1  symplectic condition
+   !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
+   !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
+   !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
+   !  lielib_print(10)=1  print lingyun's checks
+   !  lielib_print(11)=1  print warning about Teng-Edwards
+   !  lielib_print(12)=1  print info in make_node_layout
+   !  lielib_print(13)=1  print info of normal form kernel into file kernel.txt and kernel_spin.txt
                      !  lielib_print(14)=1  print info about recutting
                      !  lielib_print(15)=1  print info during flat file reading and printing
 
@@ -1306,7 +1306,7 @@ CONTAINS
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
        PATCH_TRANS = zero
-       patch_ang(2)=-node_value('angle ')
+       patch_ang(2)=node_value('angle ')
        key%list%patchg=2
        do i=1,3
           key%list%ang(i)=patch_ang(i)
@@ -1414,12 +1414,33 @@ CONTAINS
        key%list%psi=node_value("psi ")
        key%list%harmon=one
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
+    case(34) ! XROTATION
+       key%magnet="CHANGEREF"
+       PATCH_ANG = zero
+       PATCH_TRANS = zero
+       patch_ang(1)=node_value('angle ')
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
     case(35)
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
        PATCH_TRANS = zero
        call get_node_vector('patch_ang ',3,patch_ang)
        call get_node_vector('patch_trans ',3,patch_trans)
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
+    case(36) ! TRANSLATION
+       key%magnet="CHANGEREF"
+       PATCH_ANG = zero
+       patch_trans(1)=node_value('dx ')
+       patch_trans(2)=node_value('dy ')
+       patch_trans(3)=node_value('ds ')
        key%list%patchg=2
        do i=1,3
           key%list%ang(i)=patch_ang(i)
@@ -3136,9 +3157,9 @@ CONTAINS
                                      map_coor(9)=j(5)
                                      map_coor(10)=j(6)
                                      call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
-                  	                 write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:c_%npara)
-                  	                 coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
-                  	                 call string_to_table_curr("map_table ", "name ", coeffCode);
+                                     write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:c_%npara)
+                                     coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
+                                     call string_to_table_curr("map_table ", "name ", coeffCode);
                                      call augment_count("map_table ")
                                   endif
                                   !write(0,*) 'write coef', coef
@@ -3174,9 +3195,9 @@ CONTAINS
                                  map_coor(9)=j(5)
                                  map_coor(10) = 0
                                  call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
-	                               write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:5),0   !anyway fixed above
+                                 write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:5),0   !anyway fixed above
                                  coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
-	                               call string_to_table_curr("map_table ", "name ", coeffCode);
+                                 call string_to_table_curr("map_table ", "name ", coeffCode);
                                  call augment_count("map_table ")
                                endif
                             endif
@@ -3208,9 +3229,9 @@ CONTAINS
                                map_coor(9)=0
                                map_coor(10)=0
                                call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
-	                             write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:4),0,0
+                               write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:4),0,0
                                coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
-	                             call string_to_table_curr( "map_table ", "name ", coeffCode );
+                               call string_to_table_curr( "map_table ", "name ", coeffCode );
                                call augment_count("map_table ")
                             endif
                          endif

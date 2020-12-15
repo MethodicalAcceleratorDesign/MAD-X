@@ -85,11 +85,11 @@ double
 simple_double(char** toks, int start, int end)
 {
   if (start > end && start + 1 != end)  return INVALID;
-  else if (start == end)  return atof(toks[start]);
+  else if (start == end) return myatof(toks[start]);
   else
   {
-    if (*toks[start] == '-') return -atof(toks[end]);
-    else if (*toks[start] == '+') return atof(toks[end]);
+    if (*toks[start] == '-') return -myatof(toks[end]);
+    else if (*toks[start] == '+') return myatof(toks[end]);
     else return INVALID;
   }
 }
@@ -177,7 +177,6 @@ pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
             outbuf->c[cout++] = c; break;
           }
           /* FALLTHRU */
-
         case '+':
           if (left_b > 0)
           {

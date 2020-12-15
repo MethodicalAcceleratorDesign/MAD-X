@@ -140,8 +140,24 @@ make_macro(char* statement)
   for (i = 0; i < n; i++) m->formal->p[i] = permbuff(toks[rs+i]);
   if (n > 0) m->formal->curr = n;
   strcpy(m->body->c, &aux_buff->c[start_2]); m->body->curr = strlen(m->body->c);
+    m->original = new_char_array(len);
+  strcpy(m->original->c, statement);
   add_to_macro_list(m, macro_list);
   return 0;
+}
+void
+save_macros2file(const char* fname){
+  FILE *fptr;
+
+    // opening file in writing mode
+  fptr = fopen(fname, "w");
+  for(int i=0; i<macro_list->curr; i++){
+ 
+    fprintf(fptr, "%s \n", macro_list->macros[i]->original->c);
+  }
+
+  fclose(fptr);
+
 }
 
 void

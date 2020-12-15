@@ -5,6 +5,7 @@ option( MADX_DEBUG "Turn on debug output" OFF)
 option( USE_GC "Use Garbage Collector" ON)
 option( MADX_NTPSA "Build with NTPSA" ON)
 option( MADX_FORCE_32 "Force 32bit build" OFF)
+option( MADX_LAPACK "Use system blas/lapack installation if one can be found" ON)
 
 if (NOT (WIN32 OR CYGWIN))
  option( MADX_X11 "Turn on plotting using X11" ON )
@@ -57,4 +58,13 @@ endif()
 
 if(USE_GC)
    add_definitions("-D_USEGC")
+endif()
+
+if(MADX_DEBUG)
+   add_definitions(-D_DEBUG -DDEBUG_ALL)
+endif()
+
+if(MADX_ONLINE)
+   message(STATUS "Online model turned on")
+   add_definitions(-D_ONLINE)
 endif()

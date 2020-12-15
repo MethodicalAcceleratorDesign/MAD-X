@@ -1,0 +1,73 @@
+option -echo;
+circum=120.;
+lcell=20.;
+f=lcell/sin(pi/5)/4;
+k=1.0/f;
+
+beam, particle=proton, energy = 2;
+angle = 2*pi/6;
+qfstart: multipole, knl={0, 0.99*k};
+qf: multipole, knl={0, k};
+qd: multipole, knl={0, -k};
+hkick: HKICKER,L=real, KICK=0.0012, TILT=real;
+vkick: VKICKER,L=real, KICK=0.0133, TILT=real;
+kkick: KICKER,L=0;
+rfcav: RFCAVITY, VOLT=0.1, LAG=0.0, L =0.0, HARMON=100;
+
+seq: sequence, refer=center, l=circum;
+k1: kkick, at=0;
+m1: MONITOR, at = 0;
+qfstart: qfstart, at = 0.00*lcell ;
+qd1: qd, at = 0.5 * lcell;
+hkick: hkick, at =0.55* lcell;
+vkick: vkick, at =0.56* lcell;
+m2: MONITOR, at = 1.0 * lcell ;
+k2: kkick, at=1.0 * lcell;
+qf2: qf, at = 1.0 * lcell;
+m3: monitor, at = 1.5 * lcell;
+qd3: qd, at = 1.5 * lcell;
+k3: kkick, at = 2.0 * lcell;
+qf4: qf, at = 2.0 * lcell;
+qd5: qd, at = 2.5 * lcell;
+m4: monitor, at = 2.5 * lcell;
+
+qf6: qf, at =  3*lcell;
+k4: kkick, at = 3.0 * lcell;
+m5: monitor, at = 3.0 * lcell;
+rfcav:rfcav, at = 3.001*lcell;
+qd7: qd, at = 0.5 * lcell+3*lcell;
+qf8: qf, at = 1.0 * lcell+3*lcell;
+qd9: qd, at = 1.5 * lcell+3*lcell;
+qf10: qf, at = 2.0 * lcell+3*lcell;
+qd11: qd, at = 2.5 * lcell+3*lcell;
+endsequence;
+use, sequence=seq;
+
+MAKEFOOTPRINT(nam): macro = {
+v = 1;
+print, "abc";
+value, v;
+};
+
+MAKEFOOTPRINTA(nam): macro = {
+v = 1;
+print, "abc";
+value, v;
+
+}; 
+
+select, flag=error, class=multipole;
+ealign, dx := TGAUSS(2)*0.0001;
+efcomp, dkn:={TGAUSS(2)*0.00001};
+twiss;
+CORRECT, SEQUENCE=seq, mode=svd, plane=x;
+CORRECT, SEQUENCE=seq, mode=svd, plane=y;
+twiss, file = "origi.twiss";
+
+save_state, file=test.out;
+chdir, dir = "saved_state" ;
+call, file = "test.out.madx";
+twiss, file = "../reload.twiss";
+
+
+

@@ -8,7 +8,7 @@ struct char_array;
 struct char_p_array;
 
 // interface
-
+double myatof(const char *instr);
 char* mycpy(char* sout, const char* sin);
 char* mystrchr(char* string, char c);
 void  mystrcpy(struct char_array* target, char* source);

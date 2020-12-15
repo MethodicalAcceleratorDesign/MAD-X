@@ -284,6 +284,9 @@ The parameters are defined as:
 
 	\ttitem {NEWNAME} provides a name for the saved sequence, overriding the 
 	original name. (see \hyperref[sec:extract]{\texttt{EXTRACT}} above)
+  
+  \ttitem{CSAVE} an option that saves the strength of the corrector magnets used
+  for an orbit correction.
 \end{madlist}
 
 Any number of \texttt{SELECT, FLAG=save, ...} commands may precede
@@ -355,5 +358,41 @@ detail in the output is controlled by the \texttt{LEVEL} argument:
 \item[$>2$ : ]    print all nodes with their attached parameters
 \item[$>3$ : ]    print all nodes, and their elements with all parameters
 \end{itemize}
+
+\chapter{Save state}
+\label{chap:savestate}  
+It is sometimes convientine to save the state of a MAD-X script in order to reload it at a later occation or in order to distribute it to another users. 
+The \texttt{SAVE\_STATE} command provide the user with the possiblity to save a sequence, the beam information, the errors, and the macros in a single command. 
+A MAD-X file is also created in order to load the produced files. The files are saved in a separate folder and in hexadecimal format in order not to lose
+any information in the saving.
+
+\madbox{
+SAVE\_STATE, \=SEQUENCE=string{,string}, FILE=filenames, \\
+      \>BEAM=logical, FOLDER=foldername, csave=logical ;
+}
+
+The parameters are defined as: 
+\begin{madlist}
+  \ttitem{SEQUENCE} lists the sequences to be saved, separated by commas. 
+  This attribute is optional and when omitted, all known 
+  sequences are saved. \\
+  However, because of internal inconsistencies that can result in spurious 
+  entries in the output file, the user is strongly advised to always provide 
+  explicitly the names of sequences to be saved.
+
+  \ttitem{FILE} the starting of the filenames the output files will have. (Default: "save")
+
+  \ttitem{BEAM} an optional flag to specify that all beams linked to the
+  specified sequences are saved at the top of the output file. (Default=TRUE)
+
+  \ttitem{FOLDER} the name of the folder where the files are saved (Default:"save\_state")
+
+  \ttitem{CSAVE} an option that saves the strength of the corrector magnets used
+  for an orbit correction (Default=TRUE). 
+
+\end{madlist}
+
+
+
 
 %% EOF

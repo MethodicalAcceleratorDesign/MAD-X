@@ -1,11 +1,11 @@
 # Build and test MAD-X on several platforms using GNU make.
 #
 # TODO:
-# - add builds for macos
 # - follow up on the following issues and re-enable the corresponding settings:
 #   - ubuntu-18.04: test failures: test-survey-3 test-thick-quad-2 test-track-9
 #   - ubuntu-20.04: internal compiler error
 #   - windows-latest: test failures: test-match-10
+#   - coverage: enable on windows/macos (internal compiler error)
 
 name: make
 on:
@@ -88,10 +88,69 @@ jobs:
             ${{ steps.tests.outputs.failed-tests }}
 
       - name: Upload coverage results
-        if: false
+        if: env.COVERALLS_REPO_TOKEN != ''
         run: coveralls --include src -x .c -x .cpp
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+  macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-latest
+        flags:
+          - i=1 STATIC=no  ONLINE=no NTPSA=yes USEGC=yes ARCH=64 X11=no
+          - i=2 STATIC=yes ONLINE=no NTPSA=yes USEGC=yes ARCH=64 X11=no
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Setup gcc/gfortran
+        run: |
+          set -ex
+          sudo ln -s $(which gcc-9)      /usr/local/bin/gcc
+          sudo ln -s $(which g++-9)      /usr/local/bin/g++
+          sudo ln -s $(which gfortran-9) /usr/local/bin/gfortran
+
+      - name: Build MAD-X
+        run: |
+          set -ex
+          # COVERAGE=yes currently fails with internal compiler error in
+          # match.f90:1917:0:
+          make madx-macosx$ARCH-gnu ${{ matrix.flags }} COVERAGE=no
+          make numdiff-macosx$ARCH-gnu ${{ matrix.flags }} COVERAGE=no
+        env:
+          ARCH: ${{ contains(matrix.flags, 'ARCH=32') && '32' || '64' }}
+
+      - name: Run tests
+        id: tests
+        run: |
+          .github/utils/make_tests
+
+      - name: Set artifact name suffix
+        if: failure() && steps.tests.outcome == 'failure'
+        id: jobname
+        run: |
+          ${{ matrix.flags }}
+          .github/utils/set-output i $i
+
+      - name: Upload test outputs for inspection
+        # This below condition looks redundant - but there is something about
+        # the failure() and always() functions that prevents an implicit
+        # `if success()` that would otherwise be conditioned on.
+        if: failure() && steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v2
+        with:
+          name: failures-${{ matrix.os }}-${{ steps.jobname.outputs.i }}
+          path: |
+            tests/tests-log.txt
+            tests/tests-summary.txt
+            ${{ steps.tests.outputs.failed-tests }}
 
   windows:
     runs-on: windows-latest
@@ -127,7 +186,7 @@ jobs:
         run: |
           # TODO: fix test-match-10 failure and reenable
           .github/utils/make_tests \
-              tests-to-rm="test-plot test-match-10" \
+              tests-to-rm="test-plot test-match-10 test-read-write-hex" \
               ARCH=${{ matrix.bits }}
 
       - name: Upload failed tests output for inspection
