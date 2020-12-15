@@ -35,6 +35,7 @@ struct command* current_weight = NULL;  /* current weight clone */
 struct command* current_match = NULL;   /* current match comm. */
 struct command* current_eopt = NULL;    /* to keep eoption command */
 struct command* threader_par = NULL;    /* threader parameters */
+struct command* current_format_f = NULL;   /* current formats */
 
 struct command_list* beam_list;         /* list of all beam commands */
 struct command_list* beta0_list;        /* list of user defined beta0s */

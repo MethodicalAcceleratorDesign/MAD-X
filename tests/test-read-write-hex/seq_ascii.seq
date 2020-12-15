@@ -1,6 +1,0 @@
-none = 0.00000000000000e+00;
-rfcav: rfcavity,l:= 1.00000000000000e-01,volt:= 1.00000000000000e+02,lag:= 9.99999998981366e-02,freq:= 1.00000000000000e+02,fringe:= 1;
-rfcavi: rfcav;
-seq: sequence, l = 1.50000000000000e+01;
-rfcavi: rfcav, at = 1.00000000000000e+00;
-endsequence;

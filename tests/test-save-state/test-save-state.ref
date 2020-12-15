@@ -1,0 +1,210 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2020.10.05 15:19:59      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+option -echo;
+
+Assigned alignment errors to 12 elements
+Assigned field errors to 12 elements
+enter Twiss module
+  
+iteration:   1 error:   1.170379E-01 deltap:   0.000000E+00
+orbit:   2.032951E-02  1.210758E-03  1.776696E-01 -9.552010E-03 -2.141776E-03 -6.336628E-05
+  
+iteration:   2 error:   1.866447E-02 deltap:   0.000000E+00
+orbit:   2.039607E-02  1.216167E-03  1.782378E-01 -9.529837E-03 -1.558531E-03  4.924329E-04
+  
+iteration:   3 error:   1.797301E-05 deltap:   0.000000E+00
+orbit:   2.039644E-02  1.216197E-03  1.782408E-01 -9.529762E-03 -1.565516E-03  4.929822E-04
+  
+iteration:   4 error:   2.551557E-11 deltap:   0.000000E+00
+orbit:   2.039644E-02  1.216197E-03  1.782408E-01 -9.529762E-03 -1.565516E-03  4.929822E-04
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+               120     0.001565516254     0.002203889215        21.30125151 
+
+                q1                dq1            betxmax              dxmax 
+        1.19609311       -1.564463369        34.07450517       0.1384591247 
+
+             dxrms             xcomax             xcorms                 q2 
+     0.09874711538      0.02039644183      0.01337645081        1.200034557 
+
+               dq2            betymax              dymax              dyrms 
+      -1.566533421        33.51836842        2.643656138        1.420434636 
+
+            ycomax             ycorms             deltap            synch_1 
+      0.3496739341       0.2006739877                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+Want to correct orbit of a single ring
+5 monitors and 5 correctors found in input
+5 monitors and 5 correctors enabled
+
+start SVD correction using     5 correctors
+
+CORRECTION SUMMARY:   
+
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
+
+before correction: 5.533858        13.885322          14.947433        36.713203 
+after correction:  -0.000000        0.007888          0.007888        0.023792 
+
+
+Max strength: 3.692256e-01 is below corrector strength limit: 1.000000e+00
+Want to correct orbit of a single ring
+5 monitors and 5 correctors found in input
+5 monitors and 5 correctors enabled
+
+start SVD correction using     5 correctors
+
+CORRECTION SUMMARY:   
+
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
+
+before correction: 82.964254        168.796210          188.083035        431.274601 
+after correction:  -0.000000        0.000000          0.000000        0.000000 
+
+
+Max strength: 9.548602e+00 should be less than corrector strength limit: 1.000000e+00
+++++++ warning: maximum corrector strength larger than limit 
+enter Twiss module
+  
+iteration:   1 error:   2.114790E-04 deltap:   0.000000E+00
+orbit:  -2.404767E-06  6.467857E-06  3.989383E-05 -2.516651E-06  9.536466E-05  5.634379E-06
+  
+iteration:   2 error:   1.015723E-08 deltap:   0.000000E+00
+orbit:  -2.399184E-06  6.468460E-06  3.989541E-05 -2.516868E-06  9.536489E-05  5.634679E-06
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+               120   -9.536488734e-05    0.0004945733467        44.96604037 
+
+                q1                dq1            betxmax              dxmax 
+       1.196857344       -1.564890441        34.09055174     0.005941460695 
+
+             dxrms             xcomax             xcorms                 q2 
+    0.003962787017     0.003357479994     0.001205686201        1.200801419 
+
+               dq2            betymax              dymax              dyrms 
+      -1.566943571         33.5347003       0.1497727659      0.07841554296 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.03994543282      0.01508604775                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+++++++ warning: SAVE makes all previous USE invalid !  
+++++++ warning: Both energy and pc specified; pc was ignored.
+++++++ warning: Both energy and gamma specified; gamma was ignored.
+++++++ warning: Both energy and beta specified; beta was ignored.
+++++++ warning: Both energy and bhro specified; brho was ignored.
+++++++ info: twiss_tol redefined
+++++++ info: circum redefined
+++++++ info: lcell redefined
+++++++ info: f redefined
+++++++ info: k redefined
+++++++ info: angle redefined
+++++++ info: corrlim redefined
+++++++ info: corrmax redefined
+++++++ info: element redefined: kkick
+++++++ info: element redefined: k1
+++++++ info: element redefined: m1
+++++++ info: element redefined: qfstart
+++++++ info: element redefined: qd
+++++++ info: element redefined: qd1
+++++++ info: element redefined: hkick
+++++++ info: element redefined: vkick
+++++++ info: element redefined: m2
+++++++ info: element redefined: k2
+++++++ info: element redefined: qf
+++++++ info: element redefined: qf2
+++++++ info: element redefined: m3
+++++++ info: element redefined: qd3
+++++++ info: element redefined: k3
+++++++ info: element redefined: qf4
+++++++ info: element redefined: qd5
+++++++ info: element redefined: m4
+++++++ info: element redefined: qf6
+++++++ info: element redefined: k4
+++++++ info: element redefined: m5
+++++++ info: element redefined: rfcav
+++++++ info: element redefined: qd7
+++++++ info: element redefined: qf8
+++++++ info: element redefined: qd9
+++++++ info: element redefined: qf10
+++++++ info: element redefined: qd11
+++++++ warning: implicit element re-definition ignored: k1
+++++++ warning: implicit element re-definition ignored: m1
+++++++ warning: implicit element re-definition ignored: qd1
+++++++ warning: implicit element re-definition ignored: m2
+++++++ warning: implicit element re-definition ignored: k2
+++++++ warning: implicit element re-definition ignored: qf2
+++++++ warning: implicit element re-definition ignored: m3
+++++++ warning: implicit element re-definition ignored: qd3
+++++++ warning: implicit element re-definition ignored: k3
+++++++ warning: implicit element re-definition ignored: qf4
+++++++ warning: implicit element re-definition ignored: qd5
+++++++ warning: implicit element re-definition ignored: m4
+++++++ warning: implicit element re-definition ignored: qf6
+++++++ warning: implicit element re-definition ignored: k4
+++++++ warning: implicit element re-definition ignored: m5
+++++++ warning: implicit element re-definition ignored: qd7
+++++++ warning: implicit element re-definition ignored: qf8
+++++++ warning: implicit element re-definition ignored: qd9
+++++++ warning: implicit element re-definition ignored: qf10
+++++++ warning: implicit element re-definition ignored: qd11
+++++++ warning: macro redefined: makefootprint
+++++++ warning: macro redefined: makefootprinta
+Want to make named table: allerrors
+Want to use named table: allerrors
+The table ==> allerrors <=== was found 
+enter Twiss module
+  
+iteration:   1 error:   2.114790E-04 deltap:   0.000000E+00
+orbit:  -2.404767E-06  6.467857E-06  3.989383E-05 -2.516651E-06  9.536466E-05  5.634379E-06
+  
+iteration:   2 error:   1.015723E-08 deltap:   0.000000E+00
+orbit:  -2.399184E-06  6.468460E-06  3.989541E-05 -2.516868E-06  9.536489E-05  5.634679E-06
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+               120   -9.536488734e-05    0.0004945733467        44.96604037 
+
+                q1                dq1            betxmax              dxmax 
+       1.196857344       -1.564890441        34.09055174     0.005941460695 
+
+             dxrms             xcomax             xcorms                 q2 
+    0.003962787017     0.003357479994     0.001205686201        1.200801419 
+
+               dq2            betymax              dymax              dyrms 
+      -1.566943571         33.5347003       0.1497727659      0.07841554296 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.03994543282      0.01508604775                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+
+  Number of warnings: 28
+28 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

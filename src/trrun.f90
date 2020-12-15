@@ -3519,6 +3519,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
 end subroutine trsol
 
 subroutine tttrans(track,ktrack)
+  use trackfi, only : betas
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3526,12 +3527,14 @@ subroutine tttrans(track,ktrack)
   ! Input/output:                                                        *
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !----------------------------------------------------------------------*
+
   double precision :: track(6,*)
   integer :: ktrack
 
   integer :: i
   double precision :: t_x, t_y, t_z
   double precision :: node_value
+
 
   !---- Get translation parameters
   t_x    = node_value('dx ')
@@ -3540,13 +3543,13 @@ subroutine tttrans(track,ktrack)
 
   !---- Loop over particles
 
-  call ttdrf(-t_z,track,ktrack)
 !$OMP PARALLEL PRIVATE(i)
 !$OMP DO
   do  i = 1, ktrack
      ! Add vector to particle coordinates
      track(1,i) = track(1,i) - t_x
      track(3,i) = track(3,i) - t_y
+     track(5,i) = track(5,i) - t_z/betas
   enddo
 
 !$OMP END DO
@@ -3593,13 +3596,14 @@ subroutine trupdate(turn)
   !   turn     (integer)    Current turn number.                         *
   !----------------------------------------------------------------------*
   integer       :: turn
-  character(len=50) :: cmd
+  character(len=25) :: cmd1
+  character(len=30) :: cmd2
 
   !---- call pro_input('TR$TURN := turn;')
-  write(cmd, '(''tr$turni := '',i8,'' ; '')') turn
-  call pro_input(cmd)
-  write(cmd, '(''exec, tr$macro($tr$turni) ; '')')
-  call pro_input(cmd)
+  write(cmd1, '(''tr$turni := '',i8,'' ; '')') turn
+  call pro_input(cmd1)
+  write(cmd2, '(''exec, tr$macro($tr$turni) ; '')')
+  call pro_input(cmd2)
   call init_elements() ! added since now temporary variables are used and need to update
 end subroutine trupdate
 
@@ -4190,13 +4194,12 @@ subroutine tttquad(track, ktrack)
   double precision :: f_errors(0:maxferr)
   integer, external :: node_fd_errors, el_par_vector
   integer :: n_ferr
-  elpar_vl = el_par_vector(q_k1s, g_elpar)
+
   !gamma = get_value('probe ','gamma ')
   !beta = get_value('probe ','beta ')
 
   !---- Read-in the parameters
-  elpar_vl = el_par_vector(r_freq, g_elpar)
-
+  elpar_vl = el_par_vector(q_k1st, g_elpar)
   length = node_value('l ');
   tilt = g_elpar(q_tilt)
 

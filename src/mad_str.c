@@ -5,7 +5,18 @@
 #include "madx.h"
 
 // public interface
-
+double
+myatof(const char *instr){
+  int len = strlen(instr);
+  if(len>1){
+    if(instr[1]=='x'){
+      double tmp;
+      sscanf(instr, "%la", &tmp);
+      return tmp;
+    }
+  }
+  return atof(instr);
+}
 void
 mystrcpy(struct char_array* target, char* source)
 {

@@ -52,7 +52,7 @@ test-track-acd test-track-rotations \
 test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 \
 test-twiss-6 test-twiss-8 test-twiss-9 test-twiss-10 test-twiss-11 test-tapering \
 test-twiss-12 test-twiss-13 test-twiss-14 test-twiss-15 test-translation \
-test-xrotation test-yrotation test-interpolate test-rf-fringe \
+test-xrotation test-yrotation test-rotations test-interpolate test-rf-fringe \
 test-cororbit test-cororbit-2 test-cororbit-3 test-cororbit-4 \
 test-emit test-emit-2 \
 test-ibs test-ibs-2 test-ibs-3 test-ibs-4 \
@@ -66,7 +66,7 @@ test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 test-match-3 test-match-4 \
 test-match-5 test-match-6 test-match-7 test-match-8 test-match-9 test-match-10\
 test-aperture test-aperture-2 test-aperture-3 \
-test-beam test-addexpression test-read-write-hex \
+test-beam test-addexpression test-read-write-hex test-save-state \
 \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 test-rfmultipole-7 \
 \

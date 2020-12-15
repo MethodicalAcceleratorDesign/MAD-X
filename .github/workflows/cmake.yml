@@ -2,7 +2,6 @@
 # and configurations using CMake.
 
 # TODO:
-# - add builds for macos
 # - add more configuration settings, these are quick!
 # - fix test failures: test-track-9 test-thick-quad-2
 
@@ -24,11 +23,12 @@ jobs:
         os:
           - ubuntu
           - windows
+          - macos
         cmake:
-          - v2.8    2.8.12.2  Linux-i386    win32-x86
-          - v3.0    3.0.2     Linux-i386    win32-x86
-          - v3.10   3.10.3    Linux-x86_64  win64-x64
-          - v3.18   3.18.2    Linux-x86_64  win64-x64
+          - v2.8    2.8.12.2  Linux-i386    win32-x86   Darwin64-universal
+          - v3.0    3.0.2     Linux-i386    win32-x86   Darwin64-universal
+          - v3.10   3.10.3    Linux-x86_64  win64-x64   Darwin-x86_64
+          - v3.18   3.18.2    Linux-x86_64  win64-x64   Darwin-x86_64
 
     defaults:
       run:
@@ -55,6 +55,16 @@ jobs:
           7z x "$filename"
           mv "${filename%.zip}" cmake-dist
 
+      - name: Download cmake for MacOS
+        if: matrix.os == 'macos'
+        run: |
+          set -ex
+          tags=(${{ matrix.cmake }})
+          filename="cmake-${tags[1]}-${tags[4]}.tar.gz"
+          curl -Lo "$filename" "https://cmake.org/files/${tags[0]}/$filename"
+          tar -xzf "$filename"
+          mv "${filename%.tar.gz}"/*.app/Contents cmake-dist
+
       - name: Setup cmake
         run: |
           cat >configure <<EOF
@@ -64,6 +74,12 @@ jobs:
           cd build
           if [[ ${{ matrix.os }} == windows ]]; then
             $(pwd)/cmake-dist/bin/cmake .. "\$@" -G "MSYS Makefiles"
+          elif [[ ${{ matrix.os }} == macos ]]; then
+            $(pwd)/cmake-dist/bin/cmake .. "\$@" \
+              -DCMAKE_OSX_ARCHITECTURES=x86_64 \
+              -DCMAKE_C_COMPILER=gcc-9 \
+              -DCMAKE_CXX_COMPILER=g++-9 \
+              -DCMAKE_Fortran_COMPILER=gfortran-9
           else
             $(pwd)/cmake-dist/bin/cmake .. "\$@"
           fi
@@ -90,6 +106,8 @@ jobs:
         if: matrix.os == 'linux'
       - run: ./configure -DMADX_X11=OFF
       - run: ./configure -DMADX_X11=ON
+      - run: ./configure -DMADX_LAPACK=OFF
+      - run: ./configure -DMADX_LAPACK=ON
 
   build:
     # Configure, build, and test with few settings. This is slow, so shouldn't
@@ -102,6 +120,7 @@ jobs:
       matrix:
         include:
           - {name: defaults, flags: ''}
+          - {name: lapack,   flags: -DMADX_LAPACK=OFF}
           - {name: x11,      flags: -DMADX_X11=ON}
           - {name: static,   flags: -DMADX_STATIC=ON}
           - {name: shared,   flags: -DBUILD_SHARED_LIBS=ON}
@@ -128,9 +147,8 @@ jobs:
       - name: Run tests
         id: tests
         # exclude LONG tests:
-        # TODO: debug why test-track-9/test-thick-quad-2 are failing and
-        # then reenable:
-        run: cd build && ../.github/utils/ctest -E 'LONG|track-9|thick-quad-2'
+        # sequence-2 is throwing error on purpose
+        run: cd build && ../.github/utils/ctest -E 'LONG|sequence-2'
         env:
           GFORTRAN_UNBUFFERED_PRECONNECTED: y
 

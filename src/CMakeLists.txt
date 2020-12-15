@@ -14,7 +14,7 @@ endif()
 file(GLOB sdds_remove matchsdds.c)
 file(GLOB mkthin_remove mad_mkthin.c)
 
-if(NOT MADX_FORCE_32)
+if(MADX_LAPACK AND NOT MADX_FORCE_32)
    find_package(LAPACK)
 endif()
 
