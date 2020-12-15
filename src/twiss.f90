@@ -789,7 +789,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         call store_node_value('k0 ',newk0 )
         orbit = orbitori
   	  enddo
-      
+
     case (code_quadrupole)
       call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
       dptemp = (orbit(6)+orbitori(6))/(2*beta)
@@ -806,7 +806,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
       dptemp = (orbit(6)+orbitori(6))/(2*beta)
       tempk = node_value('k2 ')
       newk0 = tempk/(1-dptemp) - tempk
-      call store_node_value('k2tap ',newk0 )  
+      call store_node_value('k2tap ',newk0 )
 
       tempk = node_value('k2s ')
       newk0 = tempk/(1-dptemp) - tempk
@@ -953,6 +953,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   !---- Test for overflow.
   if (maxval(abs(ORBIT)) .ge. orb_limit) then
+     call fort_warn("Orbit too large (> 1m):", "stopping twiss")
      eflag=1
      return
   endif
@@ -3110,7 +3111,7 @@ SUBROUTINE tw_synch_int()
   endif
 
   !---- Synchrotron radiation integrals through bending magnets.
-  
+
      ! Note that calcsyncint expects dx and dpx as derivatives wrt deltap.
      ! since MAD take disp(1) and disp(2) as derivatives wrt pt, they must be
      ! multiplied by beta before the call to calcsyncint.
@@ -3623,14 +3624,14 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
      !---- Apply field errors and change coefficients using DELTAP.
      F_ERRORS = zero
      n_ferr = node_fd_errors(f_errors)
-     if (sk0 .ne. 0) then 
+     if (sk0 .ne. 0) then
       f_errors(0) = f_errors(0) + sk0*el - g_elpar(b_angle)
       h_k = sk0 * bvk
     endif
 
 
 
-     
+
 !!     if (sk0*el .ne. g_elpar(b_angle)) then
 !!        call element_name(name,len(name))
 !!        print *, name, ': k0l ~= angle, delta= ', sk0*el - g_elpar(b_angle), g_elpar(b_angle)
@@ -4267,7 +4268,7 @@ SUBROUTINE tmmult_cf_short(fsec, ftrk, orbit, fmap, re, te)
   !     Note:                                                            *
   !     This 'short' version yields the correct chromaticity of a        *
   !     sliced sector CFM only if TWISS is used without the 'chrom'      *
-  !     option. For a correct treatment of the chrom option,             * 
+  !     option. For a correct treatment of the chrom option,             *
   !     tmmult_cf must be used.                                     *
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk, fmap
@@ -4711,9 +4712,9 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      re(1, 6) = -elrad*(kx*orbit(1) + ky*orbit(3))*orbit(2)/h0**3/beta*(one + beta*orbit(6))
 
      re(2, 1) = real(dxdpg)
-     re(2, 2) = one - elrad*kx*orbit(2)/h0 
+     re(2, 2) = one - elrad*kx*orbit(2)/h0
      re(2, 3) = real(dydpg)
-     re(2, 4) = -elrad*kx*orbit(4)/h0 
+     re(2, 4) = -elrad*kx*orbit(4)/h0
      re(2, 6) = elrad*kx/beta*(one + beta*orbit(6))/h0
 
      re(3, 1) = elrad*kx*orbit(4)/h0
@@ -4814,7 +4815,7 @@ SUBROUTINE tmmult_cf(fsec, ftrk, orbit, fmap, re, te)
      te(2, 4, 2) = te(2, 2, 4)
      te(2, 4, 4) = -elrad*kx*(one/h0 + orbit(4)**2/h0**3)/two ! - te(1, 1, 2) old
      te(2, 4, 6) = elrad*kx*orbit(4)/h0**3/beta*(one + beta*orbit(6))/two
-     
+
      te(2, 6, 2) = te(2, 2, 6)
      te(2, 6, 4) = te(2, 4, 6)
      te(2, 6, 6) = elrad*kx*(one/h0 - (one + beta*orbit(6))**2/beta**2/h0**3)/two  ! = te(1, 1, 2)*bp1 old
@@ -4951,7 +4952,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   !---- Angle (bvk applied later)
   an = node_value('angle ')
-  if (an .ne. 0) then 
+  if (an .ne. 0) then
     anr = an
     f_errors(0) = f_errors(0) + normal(0) - an
   endif
@@ -5051,10 +5052,10 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      !---- Add the missing focussing component of thin dipoles for co
      if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
         if (an .ne. 0) then
-          orbit(2) = orbit(2) - anr*dipr/elrad * x ! 
+          orbit(2) = orbit(2) - anr*dipr/elrad * x !
           orbit(4) = orbit(4) - ani*dipi/elrad * y
         else
-          orbit(2) = orbit(2) - (one+deltap)*dipr*dipr/elrad * x ! 
+          orbit(2) = orbit(2) - (one+deltap)*dipr*dipr/elrad * x !
           orbit(4) = orbit(4) - (one+deltap)*dipi*dipi/elrad * y
         endif
      endif
@@ -6791,7 +6792,7 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
      te(5,4,4) = te(5,2,2)
      te(5,6,6) = te(1,2,6) * three / (beta * gamma) ** 2
   endif
-  
+
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
@@ -6829,11 +6830,11 @@ SUBROUTINE tmchp0(ftrk,orbit,fmap,ek,re, te)
   re = EYE
   ek = zero
   te = zero
-  pt = orbit(6) 
+  pt = orbit(6)
 
   !---- Transfer map.
   fmap = .true.
-  
+
   energy1 = pt*pc+energy
   pc1 = sqrt(energy1**2-mass**2)
   gamma1 = energy1/mass
@@ -6920,7 +6921,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   rff = g_elpar(r_freq)
   rfl = g_elpar(r_lag) +  g_elpar(r_lagt)
   bvk = node_value('other_bv ')
-  
+
 
   !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
   if (bvk .eq. -one) then
@@ -6933,14 +6934,14 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   phirf = rfl * twopi - omega * orbit(5)
 
   istaper = get_value('twiss ','tapering ').ne.zero
-  
+
   if(istaper .and. ftrk) then
-    ncav = get_ncavities()   
+    ncav = get_ncavities()
     phirf = asin((sin(pi*half)*vrf - endpt/ncav)/vrf)
     tmpphase = (phirf+omega*orbit(5))/twopi-g_elpar(r_lag)
     call store_node_value('lagtap ', tmpphase)
   endif
-  
+
   c0 =   vrf * sin(phirf)
   c1 = - vrf * cos(phirf) * omega
   c2 = - vrf * sin(phirf) * omega**2 * half
@@ -6953,7 +6954,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
     fringe = node_value('fringe ') .gt. zero
     ! TODO: generalize for ds!=0.5
     dl = el / two
-    
+
     if (fringe) then
       call tmrffringe(fsec,ftrk,orbit, fmap, el, one, ek, re_f, te_f)
       call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
@@ -6976,17 +6977,17 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
     call tmcat(fsec,re,te,rw,tw,re,te)
 
-    
+
      ! call tmchp0(ftrk,orbit,fmap,ek_ch,re_ch, te_ch)
       !call tmcat(fsec,re_ch,te_ch,re,te,re,te)
-    
+
 
     if (fcentre) return
 
     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,rw,tw,re,te,re,te)
     if (fringe) then
-      call tmrffringe(fsec,ftrk,orbit, fmap, el, -one, ek, re_f, te_f) 
+      call tmrffringe(fsec,ftrk,orbit, fmap, el, -one, ek, re_f, te_f)
       call tmcat(fsec,re_f,te_f,re,te,re,te)
     endif
 
@@ -7005,7 +7006,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
 
 end SUBROUTINE tmrf
 
-SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te) 
+SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
   use twisslfi
   use twiss_elpfi
   use twissbeamfi, only : deltap, pc, beta
@@ -8185,7 +8186,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   !---- First-order terms
   re(2,1) = -REAL(Cm1);
   re(2,3) =  AIMAG(Cm1);
-  
+
   re(2,5) = -krf * REAL(Sp0);
   re(4,1) =  re(2,3);
   re(4,3) = -re(2,1);
