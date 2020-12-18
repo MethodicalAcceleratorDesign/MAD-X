@@ -28,7 +28,7 @@ struct align_info
 };
 struct node                /* the sequence is a linked list of nodes */
 {
-  char name[NAME_L];
+  char name[200];
   char* base_name;         /* basic type */
   struct node* previous;
   struct node* next;

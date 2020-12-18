@@ -764,8 +764,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     al_errors(1) = al_errors(1) + node_value('dx ')
     al_errors(2) = al_errors(2) + node_value('dy ')
     al_errors(3) = al_errors(3) + node_value('ds ')
-    al_errors(5) = al_errors(5) + node_value('dtheta ')
     al_errors(4) = al_errors(4) + node_value('dphi ')
+    al_errors(5) = al_errors(5) + node_value('dtheta ')
     al_errors(6) = al_errors(6) + node_value('dpsi ')
     n_align = 1
   endif
@@ -6688,9 +6688,11 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmsrot
+
 SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
-  use twissbeamfi, only : beta
+  use twissbeamfi, only : beta, gamma
+  use twiss0fi, only : align_max
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6708,37 +6710,41 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   !----------------------------------------------------------------------*
   logical :: ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-
+  double precision :: al_errors(align_max)
   double precision :: angle, ca, sa, ta
   double precision :: node_value
 
   !---- Initialize.
+  al_errors = 0d0
+
   angle = node_value('angle ')
   if (angle .eq. 0) return
 
   angle = angle * node_value('other_bv ')
-
+  al_errors(4) = -angle
   !---- Kick.
-  ca = cos(angle)
-  sa = sin(angle)
-  ta = tan(angle)
+  !ca = cos(angle)
+  !sa = sin(angle)
+  !ta = tan(angle)
 
-  ek(4) = sa
+  !ek(4) = sa
 
+  call tmali1(orbit,al_errors,beta,gamma,orbit,re)
   !---- Transfer matrix.
-  re(3,3) = 1/ca
-  re(4,4) =   ca
-  re(4,6) =   sa/beta
-  re(5,3) =  -ta/beta
+  !re(3,3) = 1/ca
+  !re(4,4) =   ca
+  !re(4,6) =   sa/beta
+  !re(5,3) =  -ta/beta
 
   !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmxrot
 
 SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
-  use twissbeamfi, only : beta
+  use twissbeamfi, only : beta, gamma
+  use twiss0fi, only : align_max
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6759,28 +6765,31 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
   double precision :: angle, ca, sa, ta
   double precision :: node_value
+  double precision :: al_errors(align_max)
 
   !---- Initialize.
   angle = node_value('angle ')
   if (angle .eq. 0) return
-
+  al_errors = 0d0
   angle = angle * node_value('other_bv ')
+  al_errors(5) = - angle
+  call tmali1(orbit,al_errors,beta,gamma,orbit,re)
 
   !---- Kick.
-  ca = cos(angle)
-  sa = sin(angle)
-  ta = tan(angle)
+  !ca = cos(angle)
+  !sa = sin(angle)
+  !ta = tan(angle)
 
-  ek(2) = sa
+  !ek(2) = sa
 
   !---- Transfer matrix.
-  re(1,1) = 1/ca
-  re(2,2) =   ca
-  re(2,6) =   sa/beta
-  re(5,1) =  -ta/beta
+  !re(1,1) = 1/ca
+  !re(2,2) =   ca
+  !re(2,6) =   sa/beta
+  !re(5,1) =  -ta/beta
 
   !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmyrot
 

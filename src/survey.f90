@@ -121,7 +121,7 @@ subroutine survey
   dpsi = psi - proxim(psi0, psi)
 end subroutine survey
 
-subroutine element_loc
+subroutine elementloc
 
   use math_constfi, only : zero, one
   implicit none
@@ -154,10 +154,9 @@ subroutine element_loc
   integer, external :: restart_sequ, advance_node, set_cont_sequence, is_permalign, get_option
   double precision, external :: proxim, node_value, get_value
   external :: retreat_node
-  logical :: inc_perm_al, isNext
+  !logical :: is_permalign
+  globaltilt = 0
 
-  inc_perm_al = get_option('perm_align_survey ').eq.one
-  !inc_perm_al = .false.
   !---- Retrieve command attributes.
   v0(1) =  get_value('survey ','x0 ')
   v0(2) =  get_value('survey ','y0 ')
@@ -236,7 +235,7 @@ subroutine element_loc
           call suangl(W_AL, theta, phi, psi)
 
           !**  Fill the survey table
-          call sufill(suml,V_AL, theta, phi, psi,globaltilt,1)
+          call sufill(suml-el,V_AL, theta, phi, psi,globaltilt,1)
           call suelem(el, VE, WE, tilt, code)
           ! This is the normal element
           V_AL = V_AL + matmul(W_AL,VE)
@@ -253,11 +252,8 @@ subroutine element_loc
           W = matmul(W,WE)
 
 
-
      endif
      if (advance_node().ne.0)  goto 10
-!    isNext = advance_node().ne.0 
-     !if (isNext .and. inc_perm_al) then
 
   enddo
 
@@ -285,7 +281,7 @@ subroutine element_loc
   dtheta = theta - proxim(theta0, theta)
   dphi = phi - proxim(phi0, phi)
   dpsi = psi - proxim(psi0, psi)
-end subroutine element_loc
+end subroutine elementloc
 
 subroutine suangl(w, theta, phi, psi)
   implicit none

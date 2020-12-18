@@ -17,6 +17,7 @@ new_node(char* name)
   const char *rout_name = "new_node";
   struct node* p = mycalloc(rout_name, 1, sizeof *p);
   p->perm_align = mycalloc(rout_name, 1, sizeof *p->perm_align);
+  //if(strlen(name)>20) fatal_error("The string is to long: ", name);
   strcpy(p->name, name);
   p->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", p->name);
@@ -666,7 +667,7 @@ add_to_node_list( /* adds node to alphabetic node list */
 }
 
 int
-count_nodes(struct sequence* sequ)
+count_nodes(struct sequence* sequ) 
 {
   int count = 1;
   struct node* c_node = sequ->start;

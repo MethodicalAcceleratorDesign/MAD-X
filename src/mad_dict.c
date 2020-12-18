@@ -309,7 +309,7 @@ const char *const_command_def =
 "update_from_parent = [l, false, true], "
 "keep_exp_move      = [l, false, true], "
 "thin_cf            = [l, false, true], "
-"perm_align_survey     = [l, true, true], "
+"perm_align_survey     = [l, false, true], "
 "fdstep = [r, 0], " /* ld 07.2020, finite difference step for JACOBIAN and LMDIF */
   /* BB and SPCH related options */
 "bborbit          = [l, false, true], " /* frs */
@@ -1025,6 +1025,7 @@ const char *const_command_def =
 "theta0   = [r, 0], phi0     = [r, 0], psi0     = [r, 0], "
 "file     = [s, none, survey], "
 "table    = [s, none, survey], "
+"perm_align_survey    = [l, false, true],  "
 "sequence = [s, none, sequence]; "
 " "
 "twiss: twiss none 0 0 "

@@ -12,8 +12,10 @@ ypin = 0;
 
 seq: sequence, refer=center, l=circum;
 roty:roty, at=1.000;
-qf: qf at=1.5;
-mroty:mroty, at=2.000;
+m1:marker, at=2.000;
+qf: qf, at=2.5;
+m2:marker, at=3.00;
+mroty:mroty, at=3.000;
 endsequence;
 
 
@@ -22,31 +24,19 @@ select, flag=twiss, column=name, s, x,px, y, py, PT, T;
 twiss,X=xin,Y=yin, BETX=1, BETY=1, file="yrotation.twiss";
 SURVEY, SEQUENCE=seq, FILE= survey.out, x0=xin;
 
+TRACK, file = "yrotation.track",ONEPASS, ONETABLE;
+OBSERVE, PLACE="roty";
+OBSERVE, PLACE="m1";
+OBSERVE, PLACE="mroty";
+START,  x=0, y=0, t=0.0;
+run, turns=1;
 
-seq_notrans: sequence, refer=center, l=circum;
-qf: qf at=1.5;
-endsequence;
-
-use, sequence=seq_notrans;
-SELECT, FLAG=ERROR, range = qf;
-EALIGN, DTHETA=-ang;
-
-select, flag=twiss, column=name, s, x,px, y, py, PT, T;
-twiss,X=xin,Y=yin, BETX=1, BETY=1, file="elementRot.twiss";
-
-
-use, sequence=seq;
-select, flag=twiss, column=name, s, x,px, y, py, PT, T;
 
 ptc_create_universe;
 ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
 
-ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
-ptc_eplacement, range=roty, phi=ang, psi=0, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
-ptc_eplacement, range=mroty, phi=-ang, psi=0, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
-PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=xin, y=yin, px=xpin, py=ypin, t=0.0, pt=0.0;
-write, table=twiss, file="twiss.ptc.tfs";
-PTC_PRINTFRAMES, FILE="ptc_survey.out", FORMAT=text;
+ptc_setswitch, debuglevel=0, nocavity=false, fringe=false, exact_mis=true, time=false, totalpath=false;
+PTC_TWISS, table=twiss, icase=5, no=1, betx=1, bety=1, x=0, y=0, px=0, py=0, t=0.0, pt=0.0;
+write, table=twiss, file="yrotation.ptc";
 ptc_end;
-
 stop;

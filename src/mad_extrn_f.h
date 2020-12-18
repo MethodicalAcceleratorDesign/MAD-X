@@ -277,7 +277,9 @@ void soddin_(F_INTEGER ierr);
 
 // from survey.f90
 void survey_(void);
+void elementloc_(void);
 void survtest_(void);
+
 
 // from toucheck.f90
 void touschek_(void);

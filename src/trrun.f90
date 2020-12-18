@@ -4359,6 +4359,7 @@ subroutine tttquad(track, ktrack)
      track(6,jtrk) = pt
 
   enddo
+print *, "affffter quad", "x:", x,"px:", px, "y:", y,"py:", py
 
 end subroutine tttquad
 

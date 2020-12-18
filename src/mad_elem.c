@@ -923,6 +923,7 @@ enter_element(struct in_cmd* cmd)
   {
     cmd->cmd_def = parent->def;
     cmd->clone = clone_command(cmd->cmd_def);
+    if(strlen(toks[0])>47) fatal_error("String is to long", toks[0]);
     strcpy(cmd->clone->name, toks[0]);
     scan_in_cmd(cmd);
     if (k == 0 || strcmp(toks[0], toks[2]) == 0) {
