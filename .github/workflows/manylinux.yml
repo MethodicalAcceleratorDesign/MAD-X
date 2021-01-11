@@ -87,7 +87,9 @@ jobs:
           ln -sf bin/numdiff$ARCH .
 
       - name: Install runtime dependencies
-        run: sudo apt-get install -qy gnuplot
+        run: |
+          sudo apt-get update \
+          sudo apt-get install -qy gnuplot
 
       - name: Run tests
         # Skip 32bit build - it's broken and mind-boggelingly slow (>>2h)!
