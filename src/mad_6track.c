@@ -344,7 +344,7 @@ static void mod_octupole(struct c6t_element*);
 static void mod_quadrupole(struct c6t_element*);
 static void mod_rbend(struct c6t_element*);
 static void mod_rfcavity(struct c6t_element*);
-static void mod_crabcavity(struct c6t_element*);
+// static void mod_crabcavity(struct c6t_element*);
 // static void mod_dipedge(struct c6t_element*); // not defined
 // static void mod_solenoid(struct c6t_element*); // not defined
 // static void mod_hacdipole(struct c6t_element*); // not defined
@@ -2234,12 +2234,6 @@ mod_rfcavity(struct c6t_element* p)
 }
 
 static void
-mod_crabcavity(struct c6t_element* p)
-{
-  total_voltage += p->value[1];  /* accumulate voltage */
-}
-
-static void
 mod_sextupole(struct c6t_element* p)
 {
   supp_small_comp(p);
@@ -2462,7 +2456,6 @@ pro_elem(struct node* cnode,  int ncombined)
   else if (strcmp(cnode->base_name, "quadrupole") == 0)  mod_quadrupole(current_element);
   else if (strcmp(cnode->base_name, "sextupole") == 0)   mod_sextupole(current_element);
   else if (strcmp(cnode->base_name, "rfcavity") == 0)    mod_rfcavity(current_element);
-  else if (strcmp(cnode->base_name, "crabcavity") == 0)  mod_crabcavity(current_element);
   else if (strcmp(cnode->base_name, "rfmultipole") == 0) mod_rfmultipole(current_element);
 
   if (strstr(cnode->base_name, "kicker") || strstr(cnode->base_name, "tkicker"))
