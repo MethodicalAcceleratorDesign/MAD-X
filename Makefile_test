@@ -45,7 +45,7 @@ test-table test-table-2 \
 test-memory test-control \
 \
 test-makethin test-makethin-2 test-makethin-3 test-makethin-4 test-elseparator\
-test-survey test-survey-2 test-survey-3 \
+test-survey test-survey-2 test-survey-3 test-survey-4 test-survey-5 \
 test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 \
 test-track-7 test-track-8 test-track-9 test-track-10 test-track-11 test-track-12 test-track-13 test-track-14 \
 test-track-acd test-track-rotations \
@@ -67,6 +67,7 @@ test-match test-match-2 test-match-3 test-match-4 \
 test-match-5 test-match-6 test-match-7 test-match-8 test-match-9 test-match-10\
 test-aperture test-aperture-2 test-aperture-3 \
 test-beam test-addexpression test-read-write-hex test-save-state \
+test-permalign test-permalign-2 \
 \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 test-rfmultipole-7 \
 \
