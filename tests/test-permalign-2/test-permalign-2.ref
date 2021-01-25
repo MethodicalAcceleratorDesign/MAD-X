@@ -1,0 +1,146 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2021.01.22 11:25:14      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+a = 0.1;
+
+myseq: sequence, l=1;
+
+q1:quadrupole,  at=0.5, l=1, k1=0.01,dx=0.01, at=0.5;
+
+endsequence;
+
+beam;
+
+use, sequence=myseq;
+
+select,flag=twiss, column=name,s, x,px, y,py;
+
+twiss, file="twiss.tfs", betx=1, bety=1;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     4.995835E-05  9.983342E-05  0.000000E+00  0.000000E+00 -1.663337E-09  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 1                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.1252658784                  0        1.986704397    4.991671484e-05 
+
+             dxrms             xcomax             xcorms                 q2 
+     4.0756827e-05    4.995834722e-05    4.079081969e-05       0.1247353595 
+
+               dq2            betymax              dymax              dyrms 
+                 0        2.013371159                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+save, sequence=myseq, file="myseq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+ptc_create_universe;                                                                                                    
+
+Determined SECTOR NMUL MAX :  0
+ptc_create_layout,model=1, method=2, nst=2, exact=true;
+
+ MAD-X Beam Parameters
+                  Energy : 0.100000E+01
+          Kinetic Energy : 0.999489E+00
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.100000E+01
+ Setting MADx with 
+     energy           1.0000000000000000     
+     method                   2
+     Num. of steps            2
+     charge           1.0000000000000000     
+  Length of machine:    1.0000000000000000     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        1.0000000000000000     
+ptc_align;
+
+ptc_setswitch, debuglevel=0, fringe=false,  time=false, totalpath=false, exact_mis=false;                                                
+
+PTC_TWISS, table=twiss, icase=5, no=5, betx=1, bety=2, betz=10, x=xin, y=yin, t=tin, pt=ptin,px=pxin, py=pyin ;         
+
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+                 1           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000         0.12524935 
+
+                q2                dq1                dq2                 qs 
+     0.07359358392           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+                 1        1.986286305                  2        2.521940105 
+
+         beta11min          beta11max          beta12min          beta12max 
+                 1        1.986286305                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+                 2        2.521940105                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 0                  0   -4.993750047e-05                  0 
+
+          disp2min           disp2max           disp3min           disp3max 
+                 0    1.250000005e-07                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0                  0 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0    4.079931366e-05                  0    8.154759602e-05 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0                  0                  0    4.996875016e-05 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0         9.9875e-05                  0                 -0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0                  0                  0                  0 
+
+           pycomin             tcomin            ptcomin 
+                 0                 -0                  0 
+write, table=twiss, file="twiss.ptc.tfs";                                                                                                                       
+
+  Number of warnings: 1
+1 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

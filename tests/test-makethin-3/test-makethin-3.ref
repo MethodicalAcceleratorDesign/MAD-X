@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:23:21      +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2020.11.08 14:00:24      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
@@ -172,6 +172,12 @@ parameter: fringe   integer:          0
 parameter: bend_fringe   logical: false
 parameter: kill_ent_fringe   logical: false
 parameter: kill_exi_fringe   logical: false
+parameter: dx   double value:     0.000000
+parameter: dy   double value:     0.000000
+parameter: ds   double value:     0.000000
+parameter: dtheta   double value:     0.000000
+parameter: dphi   double value:     0.000000
+parameter: dpsi   double value:     0.000000
 parameter: aper_tilt   double value:     0.000000
 parameter: time_var   logical: false
 parameter: comments   string: (null)
@@ -222,6 +228,12 @@ parameter: fringe   integer:          0
 parameter: bend_fringe   logical: false
 parameter: kill_ent_fringe   logical: false
 parameter: kill_exi_fringe   logical: false
+parameter: dx   double value:     0.000000
+parameter: dy   double value:     0.000000
+parameter: ds   double value:     0.000000
+parameter: dtheta   double value:     0.000000
+parameter: dphi   double value:     0.000000
+parameter: dpsi   double value:     0.000000
 parameter: aper_tilt   double value:     0.000000
 parameter: time_var   logical: false
 parameter: comments   string: (null)

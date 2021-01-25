@@ -114,7 +114,7 @@ int     double_to_table_curr2(const char* table, const char* name, const double*
 int     vector_to_table_curr (const char* table, const char* name, const double* vals, const int* nval);
 int     string_to_table_curr (const char* table, const char* name, const char* string);
 int     comment_to_table_curr(const char* table, const char* comment, const int* length);
-
+int     name_to_table_curr   (const char* table, int *ending);
 // double  get_table_value(const char* table_s, const char *row_s, const char *col_s); // not used
 // void    set_table_value(const char* table_s, const char *row_s, const char *col_s, double *val); // not used
 

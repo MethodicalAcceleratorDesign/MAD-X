@@ -53,7 +53,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   logical :: run=.false.,dynap=.false., thin_foc, onlyaver
   logical, save :: first=.true.
   logical :: fast_error_func
-  integer :: i, j, k, code, ffile
+  integer :: i, j, k, code, ffile, n_perm_align
   integer :: n_align, nlm, j_tot, turn, nobs, lobs
   integer :: nint, ndble, nchar, char_l, tot_segm, int_arr(1)
   
@@ -66,7 +66,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   data vec_names /'x', 'px', 'y', 'py', 't', 'pt', 's'/
   character(len=20) :: text
 
-  integer, external :: restart_sequ, advance_node, get_option, node_al_errors, get_nnodes
+  integer, external :: restart_sequ, advance_node, get_option, node_al_errors, get_nnodes, is_permalign
   double precision, external :: node_value, get_variable, get_value, node_obs_point
 
   external :: set_tt_attrib, alloc_tt_attrib, set_tt_multipoles, get_tt_multipoles
@@ -326,7 +326,19 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         !--------  Misalignment at beginning of element (from twissfs.f)
         if (code .ne. code_drift)  then
            AL_ERRORS = zero
+
            n_align = node_al_errors(al_errors)
+           n_perm_align = is_permalign()
+           if (n_perm_align .ne. 0) then
+              al_errors(1) = al_errors(1) + node_value('dx ')
+              al_errors(2) = al_errors(2) + node_value('dy ')
+              al_errors(3) = al_errors(3) + node_value('ds ')
+              al_errors(5) = al_errors(5) + node_value('dtheta ')
+              al_errors(4) = al_errors(4) + node_value('dphi ')
+              al_errors(6) = al_errors(6) + node_value('dpsi ')
+              n_align = 1
+           endif
+
            if (n_align .ne. 0)  then
               do i = 1, jmax
                  ZZ(:) = Z(:,i)
@@ -3631,7 +3643,7 @@ subroutine trclor(switch,orbit0)
   logical :: aperflag, onepass, debug, thin_foc
   integer :: itra
 
-  integer :: i, j, k, bbd_pos, j_tot, code, irank, n_align
+  integer :: i, j, k, bbd_pos, j_tot, code, irank, n_align, n_perm_align
   integer :: pmax, turn, turnmax, part_id(1), last_turn(1)
   integer :: nint, ndble, nchar, int_arr(1), char_l
   double precision :: re(6,6)
@@ -3644,7 +3656,7 @@ subroutine trclor(switch,orbit0)
 
   integer, parameter :: itmax=10
 
-  integer, external :: restart_sequ, advance_node, get_option, node_al_errors
+  integer, external :: restart_sequ, advance_node, get_option, node_al_errors, is_permalign
   double precision, external :: node_value, get_value, get_variable, get_length
 
   write (*,'(/a)')          'Full 6D closed orbit search.'
@@ -3735,7 +3747,19 @@ subroutine trclor(switch,orbit0)
 
         !--------  Misalignment at beginning of element (from twissfs.f)
         if (code .ne. code_drift)  then
-           AL_ERRORS(:align_max) = zero
+           
+           n_align = node_al_errors(al_errors)
+           n_perm_align = is_permalign()
+           if (n_perm_align .ne. 0) then
+              al_errors(1) = al_errors(1) + node_value('dx ')
+              al_errors(2) = al_errors(2) + node_value('dy ')
+              al_errors(3) = al_errors(3) + node_value('ds ')
+              al_errors(5) = al_errors(5) + node_value('dtheta ')
+              al_errors(4) = al_errors(4) + node_value('dphi ')
+              al_errors(6) = al_errors(6) + node_value('dpsi ')
+              n_align = 1
+           endif
+
            n_align = node_al_errors(al_errors)
            if (n_align .ne. 0)  then
               do i = 1, pmax
@@ -4197,7 +4221,7 @@ subroutine tttquad(track, ktrack)
   
   !gamma = get_value('probe ','gamma ')
   !beta = get_value('probe ','beta ')
-
+  
   !---- Read-in the parameters
   elpar_vl = el_par_vector(q_k1st, g_elpar)
   

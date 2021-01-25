@@ -1,0 +1,51 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "MYSEQ"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le       0.00051099895
+@ CHARGE           %le                   1
+@ ENERGY           %le                   1
+@ PC               %le        0.9999998694
+@ GAMMA            %le         1956.951184
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     4.803203458e-11
+@ SIGE             %le               0.001
+@ SIGT             %le                   1
+@ NPART            %le                   1
+@ EX               %le                   1
+@ EY               %le                   1
+@ ET               %le               0.001
+@ BV_FLAG          %le                   1
+@ LENGTH           %le                   1
+@ ALFA             %le                   0
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le                   0
+@ Q1               %le        0.1252658784
+@ Q2               %le        0.1247353595
+@ DQ1              %le                   0
+@ DQ2              %le                   0
+@ DXMAX            %le     4.991671484e-05
+@ DYMAX            %le                   0
+@ XCOMAX           %le     4.995834722e-05
+@ YCOMAX           %le                   0
+@ BETXMAX          %le         1.986704397
+@ BETYMAX          %le         2.013371159
+@ XCORMS           %le     4.079081969e-05
+@ YCORMS           %le                   0
+@ DXRMS            %le       4.0756827e-05
+@ DYRMS            %le                   0
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "22/01/21"
+@ TIME             %08s "11.22.32"
+* NAME                                S                  X                 PX                  Y                 PY 
+$ %s                                %le                %le                %le                %le                %le 
+ "MYSEQ$START"                        0                  0                  0                  0                  0
+ "Q1"                                 1    4.995834722e-05    9.983341665e-05                  0                  0
+ "MYSEQ$END"                          1    4.995834722e-05    9.983341665e-05                  0                  0
