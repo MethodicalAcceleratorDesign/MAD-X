@@ -326,9 +326,9 @@ node_value(const char* par)
       if (current_node->perm_align->dy_expr == NULL) value = current_node->perm_align->dy_value;
       else                                            value = expression_value(current_node->perm_align->dy_expr , 2);
   }
-  else if (strcmp(lpar, "dy") == 0){  
-      if (current_node->perm_align->dy_expr == NULL) value = current_node->perm_align->dy_value;
-      else                                            value = expression_value(current_node->perm_align->dy_expr , 2);
+  else if (strcmp(lpar, "ds") == 0){  
+      if (current_node->perm_align->ds_expr == NULL) value = current_node->perm_align->ds_value;
+      else                                            value = expression_value(current_node->perm_align->ds_expr , 2);
   }
   else if(strcmp(lpar, "dtheta") == 0){  
       if (current_node->perm_align->dtheta_expr == NULL) value = current_node->perm_align->dtheta_value;
