@@ -664,7 +664,71 @@ make_sequ_from_line(char* name)
 
   if(line_buffer) delete_char_p_array(line_buffer,1);
 }
+static void
+write_permalign_node(struct node* c_node){
+          char s_tmp[50];
+        //DX
+        if(c_node->perm_align->dx_expr!=NULL){
+          strcat(c_dum->c, ", dx := ");
+          strcat(c_dum->c, c_node->perm_align->dx_expr->string);
+        }
+        else if (c_node->perm_align->dx_value!=0){
+          sprintf(s_tmp,v_format("%F "), c_node->perm_align->dx_value);
+          strcat(c_dum->c, ", dx = ");
+          strcat(c_dum->c, s_tmp);
+        }
+        //DY
+        if(c_node->perm_align->dy_expr!=NULL){
+          strcat(c_dum->c, ", dy := ");
+          strcat(c_dum->c, c_node->perm_align->dy_expr->string);
+        }
+        else if (c_node->perm_align->dy_value!=0){
+          sprintf(s_tmp,v_format("%F "), c_node->perm_align->dy_value);
+          strcat(c_dum->c, ", dy = ");
+          strcat(c_dum->c, s_tmp);
+        }
+        //DS
+        if(c_node->perm_align->ds_expr!=NULL){
+          strcat(c_dum->c, ", ds := ");
+          strcat(c_dum->c, c_node->perm_align->ds_expr->string);
+        }
+        else if (c_node->perm_align->ds_value!=0){
+          sprintf(s_tmp,v_format("%F "), c_node->perm_align->ds_value);
+          strcat(c_dum->c, ", ds = ");
+          strcat(c_dum->c, s_tmp);
+        }
+        //DTHETA
+        if(c_node->perm_align->dtheta_expr!=NULL){
+          strcat(c_dum->c, ", dtheta := ");
+          strcat(c_dum->c, c_node->perm_align->dtheta_expr->string);
+        }
+        else if (c_node->perm_align->dtheta_value!=0){
+          sprintf(s_tmp,v_format("%F "), c_node->perm_align->dtheta_value);
+          strcat(c_dum->c, ", dtheta = ");
+          strcat(c_dum->c, s_tmp);
+        }
 
+        //DX
+        if(c_node->perm_align->dphi_expr!=NULL){
+          strcat(c_dum->c, ", dphi := ");
+          strcat(c_dum->c, c_node->perm_align->dphi_expr->string);
+        }
+        else if (c_node->perm_align->dphi_value!=0){
+          sprintf(s_tmp,v_format("%F "), c_node->perm_align->dphi_value);
+          strcat(c_dum->c, ", dphi = ");
+          strcat(c_dum->c, s_tmp);
+        }
+        //dpsi
+        if(c_node->perm_align->dpsi_expr!=NULL){
+          strcat(c_dum->c, ", dpsi := ");
+          strcat(c_dum->c, c_node->perm_align->dpsi_expr->string);
+        }
+        else if (c_node->perm_align->dpsi_value!=0){
+          sprintf(s_tmp,v_format("%F "), c_node->perm_align->dpsi_value);
+          strcat(c_dum->c, ", dpsi = ");
+          strcat(c_dum->c, s_tmp);
+        }
+}
 static void
 export_sequence(struct sequence* sequ, FILE* file, int noexpr)
   /* exports sequence in mad-X format */
@@ -732,6 +796,8 @@ export_sequence(struct sequence* sequ, FILE* file, int noexpr)
         strcat(c_dum->c, ", from = ");
         strcat(c_dum->c, c_node->from_name);
       }
+      if(c_node->perm_misalign==1) write_permalign_node(c_node);
+
       if (exp_par_flag) export_el_def(c_node->p_elem, c_dum->c, noexpr);
       write_nice(c_dum->c, file);
     }
