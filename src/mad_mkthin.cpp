@@ -305,9 +305,8 @@ static double my_get_expression_value(expression* ex) // check for NULL and upda
   double result=0;
   if(ex)
   {
-    //if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ex->value=" << ex->value << " ex->status=" << ex->status << std::endl;
-    result = expression_value(ex, 2); // get/update value, makes sure the value stored agrees with the expression
-    //if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ex->value=" << ex->value << " ex->status=" << ex->status << std::endl;
+    result = expression_value(ex, 2); // get value from expression
+    ex->value = result; // make sure the value agrees with the expression
   }
   return result;
 }
