@@ -40,14 +40,16 @@ auto operator << (std::ostream& os, const T& t) -> decltype(t.Print(os), os)
 namespace MaTh
 {
   static int iMakeDipedge, iMakeEndMarkers, iMoreExpressions; // variables local to module that control makethin behavior
-  static const int  el_type_maxlen=11;   // theElProp->get_el_type_maxlen();
+  static const int  el_type_maxlen=11;
   static const int  el_name_maxlen=25;
   static const int par_name_maxlen=19;
   static unsigned int Verbose;
   static const std::vector<std::string> DoNotCopy ={"l","lrad","slot_id","assembly_id","slice","comments"};
   static const std::vector<std::string> DoNotCopy2=           {"slot_id","assembly_id"};
   static const std::vector<std::string> WireCollimatorParmList={"xma","yma","closed_orbit", "current", "l_phy", "l_int"};
+  static const std::vector<std::string> FringePar = {"e1","e2","fint","fintx","h1","h2","hgap"};
   static char ExtraChar='_';
+  static const std::string Quotes=std::string("\"");
 }
 
 //------------------------------- forward declarations --------------
@@ -159,12 +161,12 @@ private:
   element*   new_marker_element(const std::string el_name, const element* el_inp);
   element*  create_wire_element(const element* thick_elem, int slice_no);
   element*        sbend_from_rbend(element* rbend_el);
-  element*      create_thick_slice(const element* thick_elem,const int slice_type);
+  element*      create_thick_slice(const element* thick_elem, const int slice_type);
   element*      create_thin_slices(const element* thick_elem, int slice_no);
   element*    create_thin_solenoid(const element* thick_elem, int slice_no);
   element* create_thin_elseparator(const element* thick_elem, int slice_no);
   element*   create_sliced_element(const element* thick_elem, int slice_no);
-  element* create_bend_dipedge_element(element* thick_elem,const bool Entry);
+  element* create_bend_dipedge_element(const element* thick_elem, const bool Entry);
   void finish_make_sliced_elem(element*& sliced_elem, const element* thick_elem, command* cmd, const std::string parent_name, int slice_no); // final common steps
   void slice_node_translate();  // slice/translate and add slices to sliced sequence
   void slice_node_default();    // like collimator and add slices to sliced sequence
@@ -196,7 +198,7 @@ static const int     k_int_array=11;
 static const int  k_double_array=12;
 static const int k_cstring_array=13;
 
-static const bool dipedge_h1_h2_fl=false;   // normally false to avoid potentially non-simplectic partial higher order in dipedge. Optionally true as requested by Andrea Latina in 10/2014
+static const bool dipedge_h1_h2_fl=true;    // was false until 10/2020 to avoid non-simplectic partial higher order in dipedge. Now true as already requested by Andrea Latina in 10/2014 and for better agreement with TWISS
 static const bool kill_fringe_fl=true;      // requested by Laurent et al., somewhat redundant, should be sufficient to check existance of non-default h1,e1; h2,e2 parameters
 static const bool Enable_all_attr_fl=true;  // set true to allow to enable all attibutes in the sliced sequence  --- otherwise only attributes defined in thick
 
@@ -300,13 +302,14 @@ static std::vector<std::string> str_v_join(const std::vector<std::string> v1,con
 
 static double my_get_expression_value(expression* ex) // check for NULL and update the value as done in dump_expression
 {
+  double result=0;
   if(ex)
   {
     //if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ex->value=" << ex->value << " ex->status=" << ex->status << std::endl;
-    ex->value = expression_value(ex, 2); // get/update value, makes sure the value stored agrees with the expression
+    result = expression_value(ex, 2); // get/update value, makes sure the value stored agrees with the expression
     //if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ex->value=" << ex->value << " ex->status=" << ex->status << std::endl;
   }
-  return ex->value; // no expression, just value
+  return result;
 }
 
 static std::string my_dump_expression(expression* ex,bool detailed=false) // dump_expression in mad_expr.c only prints the value, here show also the expression and check for NULL
@@ -391,18 +394,6 @@ static double my_get_int_or_double_value(const element* el,const std::string par
   return val;
 }
 
-static double cmd_par_val(const command_parameter* par) // return the double value given by expression or directly the value
-{
-  double result=0;
-  if(par)
-  {
-    if(par->type==k_double)
-    {
-      if(par->expr) result=expression_value(par->expr,0); else result=par->double_value;
-    }
-  }
-  return result;
-}
 
 static std::string my_dump_command_parameter(const command_parameter* cp) // dump_command_parameter in mad_cmdpar.c only prints the value, here show also the expression by calling my_dump_expression and check for NULL
 {
@@ -419,7 +410,7 @@ static std::string my_dump_command_parameter(const command_parameter* cp) // dum
     switch (cp->type)
     {
       case k_logical:
-        ostr << "logical: ";
+        ostr << " logical: ";
         if( (int) cp->double_value) ostr << "true"; else ostr << "false";
         ostr << std::endl;
         break;
@@ -437,7 +428,7 @@ static std::string my_dump_command_parameter(const command_parameter* cp) // dum
         {
           if (cp->expr_list) // calculate the values
           {
-            ostr << "array of " << cp->double_array->curr << "  ";
+            ostr << " array of " << cp->double_array->curr << "  ";
             for (int ei = 0; ei < cp->double_array->curr; ++ei)
             {
               if (ei < cp->expr_list->curr && cp->expr_list->list[ei] != nullptr)
@@ -446,14 +437,14 @@ static std::string my_dump_command_parameter(const command_parameter* cp) // dum
               }
               else ostr << std::right << std::setw(3) << ei << " is nullptr ";
             }
-            ostr << "double array:";
+            ostr << " double array:";
             for (int ei = 0; ei < cp->double_array->curr; ++ei) ostr << cp->double_array->a[ei] << " ";
           }
         }
         ostr << std::endl;
         break;
       case k_cstring:
-        ostr << "cstring:";
+        ostr << " cstring:";
         if(cp->string) ostr << cp->string; else ostr << " NULL";
         ostr << std::endl;
         break;
@@ -627,8 +618,7 @@ static std::string my_dump_element(const element* el)
 
 static void Remove_All_Fringe_Field_Parameters(element* el)
 {
-  static std::vector<std::string> FringePar = {"e1","e2","fint","fintx","h1","h2","hgap"};
-  for(unsigned int i=0; i < FringePar.size(); ++i) ParameterRemove(FringePar[i].c_str(),el);
+  for(unsigned int i=0; i < MaTh::FringePar.size(); ++i) ParameterRemove(MaTh::FringePar[i].c_str(),el);
   if(kill_fringe_fl)
   {
     SetParameterValue("kill_ent_fringe",el,true,k_logical);
@@ -655,6 +645,8 @@ static std::string my_dump_node(const node* node)
     << " occ=" << node->occ_cnt
     << " node->base_name=" << std::left << std::setw(MaTh::el_type_maxlen) << node->base_name << std::right
     << " from_name=" << std::left << std::setw(10) << from_name << std::right
+    << " perm_misalign=" << node->perm_misalign
+    << " align_info=" << node->perm_align
     << " at_value=" << std::setw(10) << node->at_value
     << " position=" << std::setw(10) << node->position
     << " previous=" << std::setw(MaTh::el_name_maxlen) << pname
@@ -671,12 +663,12 @@ static std::string my_dump_node(const node* node)
 static std::string my_dump_sequence(const sequence* c_sequ,const int level)
 { // level 1 little info, 3 dump also nodes, 4 dump also elements
   std::ostringstream ostr;
-  if(c_sequ==nullptr) ostr << "sequence is NULL";
+  if(c_sequ==nullptr) ostr << "my_dump_sequence, sequence is NULL";
   else
   {
     node* c_node;
     double suml = zero;
-    ostr << "sequence:" << c_sequ->name;
+    ostr << "my_dump_sequence, sequence:" << c_sequ->name;
     if(c_sequ->refpos)    ostr << " refpos=" << c_sequ->refpos; else ostr << " refpos=NULL";
     if(c_sequ->next_sequ) ostr << " next_sequ=" << c_sequ->next_sequ; else ostr << " next_sequ=NULL";
     ostr << " ref_flag=" << c_sequ->ref_flag;  // -1 for exit, 0 for centre, 1 for entry
@@ -1093,18 +1085,27 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const std::
   }
 }
 
+static void copy_perm_misalign(const node* node,struct node* this_node)
+{ // copy misalign info
+  this_node->perm_misalign=node->perm_misalign;
+  this_node->perm_align=node->perm_align;
+  if(this_node->perm_misalign>0 && node->perm_align)
+  { //--- warn that angles are currently only copied, not converted
+    if(node->perm_align->dtheta_value || my_get_expression_value(node->perm_align->dtheta_expr)) warning("non-zero align_info dtheta not yet converted","just copied");
+    if(node->perm_align->dphi_value   || my_get_expression_value(node->perm_align->dphi_expr)  ) warning("non-zero align_info dphi   not yet converted","just copied");
+    if(node->perm_align->dpsi_value   || my_get_expression_value(node->perm_align->dpsi_expr)  ) warning("non-zero align_info dpsi   not yet converted","just copied");
+  }
+}
+
 static void place_node_at(const node* node, sequence* to_sequ, element* sliced_elem,expression* at_expr)
 {
   struct node* this_node = new_elem_node(sliced_elem, node->occ_cnt);
   double at = node->at_value;
   this_node->from_name = node->from_name;
   this_node->at_value  = at;
-  this_node->perm_align->dx_expr = clone_expression(node->perm_align->dx_expr);
-  this_node->perm_misalign = node->perm_misalign;
   if(at_expr) this_node->at_expr   = at_expr;
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " place " << sliced_elem->name << " using at_expr where " << my_dump_expression(at_expr) << " at_value=" << at << std::endl;
+  if(node->perm_misalign>0 && node->perm_align) copy_perm_misalign(node,this_node);
   add_node_at_end_of_sequence(this_node,to_sequ); // add the thick node to the sequences
-  if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " dump_node(this_node)   :" << std::endl;
 }
 
 static void place_thin_slice(const node* node, sequence* to_sequ, element* sliced_elem,const double rel_shift) // used to place dipedge and markers
@@ -1254,6 +1255,12 @@ static int set_selected_elements(el_list* the_element_list) //  modify the_eleme
   return 0;
 }
 
+static bool HasFringe(const element* thick_elem)
+{
+  for(unsigned int i=0; i<MaTh::FringePar.size(); ++i) if( return_param_recurse(MaTh::FringePar[i].c_str(), thick_elem) ) return true;
+  return false;
+}
+
 command_parameter* k0_from_angle(const command_parameter* angle_param)
 {
   command_parameter* k0cmdptr=new_command_parameter("k0", k_double);
@@ -1319,12 +1326,10 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
     << " moreexpressions=" << MaTh::iMoreExpressions
     << "   hard coded flags: "
     << " kill_fringe_fl=" << kill_fringe_fl       // set to true for thick bend body slices
-    << " dipedge_h1_h2_fl=" << dipedge_h1_h2_fl   // normally off
+    << " dipedge_h1_h2_fl=" << dipedge_h1_h2_fl
     << " Enable_all_attr_fl=" << Enable_all_attr_fl // implemented 4/2018 to allow for extra parameters on sliced sequence
     << " Verbose=" << MaTh::Verbose
     << '\n';
-    // hard coded
-    if(dipedge_h1_h2_fl) std::cout << "dipedge_h1_h2_fl=" << dipedge_h1_h2_fl << " is on. Higher order h1, h2 parameters will be kept. Tracking may become non-simplectic" << '\n';
   }
 
   if (slice_select->curr > 0)
@@ -1637,7 +1642,7 @@ double SeqElList::at_shift(const int slices,const int slice_no,const std::string
 
 void SeqElList::Print(std::ostream& StrOut) const
 {
-  StrOut << "SeqElList::Print seqname=" << seqname << " theSliceList->VecElemWithSlices.size()=" << theSliceList->VecElemWithSlices.size() << " slice_style=\"" << slice_style << "\"" << '\n';
+  StrOut << "SeqElList::Print seqname=" << seqname << " theSliceList->VecElemWithSlices.size()=" << theSliceList->VecElemWithSlices.size() << " slice_style=" << MaTh::Quotes << slice_style << MaTh::Quotes << std::endl;
 
   StrOut << '\n' << "   theSliceList:" << '\n' << *theSliceList;
   if(verbose) theSliceList->PrintCounter(StrOut);
@@ -1734,7 +1739,7 @@ command_parameter* SeqElList::make_k_list(const std::string parnam,command_param
   return k_param;
 }
 
-element* SeqElList::create_bend_dipedge_element(element* thick_elem,const bool Entry) // using Dipedge  http://mad.web.cern.ch/mad/madx.old/Introduction/dipedge.html
+element* SeqElList::create_bend_dipedge_element(const element* thick_elem,const bool Entry) // using Dipedge  http://mad.web.cern.ch/mad/madx.old/Introduction/dipedge.html
 {
   // see also twiss.f90    SUBROUTINE tmbend,   and  SUBROUTINE tmfrng  for fringe fields, and   SUBROUTINE tmdpdg  for dipedge
   // makes dipedge element for start or end of the dipole
@@ -1749,8 +1754,10 @@ element* SeqElList::create_bend_dipedge_element(element* thick_elem,const bool E
   // request from Laurent Deniau and Andrea Latina in 10/2014   also move any h1, h2  parameters as h parameter to entry, exit dipedge
   //
 
+  if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << " thick node " << work_node->name << " " << thick_elem->name << " Entry=" << Entry << std::endl;
+
   static std::vector<std::string> CheckBendParams = {
-    "polarity", "tilt", "hgap", "mech_sep", "v_pos", "magnet", "model", "method", "exact", "nst" };
+    "polarity", "tilt","hgap", "e1", "e2", "h1", "h2", "mech_sep", "v_pos", "magnet", "model", "method", "exact", "nst" };
 
   element* dipedge=NULL;
   std::string thick_elem_name=thick_elem->name;
@@ -1780,15 +1787,15 @@ element* SeqElList::create_bend_dipedge_element(element* thick_elem,const bool E
     SetParameter_in_cmd(dipedge_cmd,hparam,"h",1);
     if(dipedge_h1_h2_fl)
     {
-      if(Entry) SetParameter_in_cmd(dipedge_cmd, return_param_recurse("h1",thick_elem), "h1",1); // at entry, copy h1 from thick bend as dipedge h1
-      else      SetParameter_in_cmd(dipedge_cmd, return_param_recurse("h2",thick_elem), "h2",1);  // at  exit, copy h2 from thick bend as dipedge h2
+      if(Entry) SetParameter_in_cmd(dipedge_cmd, return_param_recurse("h1",thick_elem), "he",1); // at entry, copy h1 from thick bend as dipedge he
+      else      SetParameter_in_cmd(dipedge_cmd, return_param_recurse("h2",thick_elem), "he",1); // at  exit, copy h2 from thick bend as dipedge he
     }
     if(Entry)   SetParameter_in_cmd(dipedge_cmd, return_param_recurse("e1",thick_elem), "e1",1); // at entry, copy e1 from thick sbend as dipedge e1
     else        SetParameter_in_cmd(dipedge_cmd, return_param_recurse("e2",thick_elem), "e1",1); // at  exit, copy e2 from thick sbend as dipedge e1
 
     if(Entry)
     {
-      SetParameter_in_cmd(dipedge_cmd, return_param_recurse("fint",thick_elem), "fint",1);
+      SetParameter_in_cmd(dipedge_cmd, return_param_recurse("fint",thick_elem),     "fint",1);
     }
     else // Exit
     {
@@ -1817,6 +1824,10 @@ element* SeqElList::create_bend_dipedge_element(element* thick_elem,const bool E
     }
 
     dipedge=my_El_List->my_make_element(dipedge_name, "dipedge", dipedge_cmd,-1); // make the dipedge element using the command dipedge_cmd, -1 means avoid warnings,  1 means delete and warn, 2 means warn and ignore if already present  see  add_to_el_list  mad_elem.c
+    if(Entry) SetParameterValue("entrance",dipedge,true, k_logical);
+    else      SetParameterValue("entrance",dipedge,false,k_logical);
+    ParameterTurnOn("entrance",dipedge); // turn writing on
+
 
   }
   return dipedge;
@@ -2232,7 +2243,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
 
   if(verbose>1)
   {
-    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << " " << work_node->base_name << " slice_style=\"" << slice_style << "\""
+    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << " " << work_node->base_name << " slice_style=" << MaTh::Quotes << slice_style << MaTh::Quotes
     << " nslices=" << nslices << " IsQuad=" << IsQuad << " IsSolenoid=" << IsSolenoid << " IsBend=" << IsBend << " ThickSLice=" << ThickSLice << " at_value=" << std::setw(10) << work_node->at_value << " from_name=";
     if(work_node->from_name) std::cout << work_node->from_name; else std::cout << "NULL ";
   }
@@ -2257,19 +2268,18 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       if(ExitDipedge)  std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << "  ExitDipedge=" << std::setw(MaTh::par_name_maxlen) <<  ExitDipedge->name << " already exists " << EntryDipedge << '\n';
     }
 
-    if(EntryDipedge==nullptr) // create new EntryDipedge for this bend
-    { // first look if e1 or h1 are there
-      const command_parameter   *e1param = return_param_recurse("e1"  ,(const element*) thick_elem);
-      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " e1param=" << e1param << " cmd_par_val(e1param)=" << cmd_par_val(e1param) << '\n';
+    bool hasfringe=HasFringe(thick_elem);
+
+    if(EntryDipedge==nullptr && hasfringe) // create new EntryDipedge for this bend
+    {
       if (command_par_value("kill_ent_fringe",thick_elem->def) == false)
       {
         EntryDipedge=create_bend_dipedge_element(thick_elem,true); // make new StartEdge element and remove e1 from thick_elem
         theBendEdgeList->put_slice(thick_elem,EntryDipedge);       // to remember this has been translated
-        if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << " thick node " << work_node->name << " " << thick_elem->name << " now has EntryDipedge=" << EntryDipedge << '\n';
       }
     }
 
-    if(ExitDipedge==nullptr) // create new ExitDipedge for this bend
+    if(ExitDipedge==nullptr && hasfringe) // create new ExitDipedge for this bend
     {
       if (command_par_value("kill_exi_fringe",thick_elem->def) == false)
       {
@@ -2300,7 +2310,6 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   }
 
   expression* at_expr = work_node->at_expr;
- ;
   double at = work_node->at_value;
   if(at_expr==nullptr) at_expr=expr_from_value_2(at); // make a new expression from the value
 
@@ -2539,7 +2548,6 @@ void SeqElList::slice_node() // main steering, decides how to split an individua
   const element* thick_elem=work_node->p_elem;
   nslices = get_slices_from_elem(thick_elem);
 
-  if(verbose>1) std::cout << '\n'  << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " slice_style=\"" << slice_style << "\"" << " nslices=" << nslices;
   if (thick_elem) // look at the element of this node to see what to do with slicing
   {
     if(verbose>1) std::cout << " now see what to do with work_node=" << std::left << std::setw(MaTh::par_name_maxlen) << work_node->name <<  " depending on its base=" << std::setw(MaTh::par_name_maxlen) << work_node->base_name << std::right << '\n';
@@ -2751,16 +2759,11 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
     return sliced_seq; // do nothing if the sequence was already sliced
   }
 
-  const std::string name = thick_sequ->name;
-  std::cout << "makethin: slicing sequence : " << name << '\n';
-  if(MaTh::Verbose>1)
-  {
-    int level=1;
-    if(MaTh::Verbose>2) level=2;
-    std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " my_dump_sequence thick_sequ " << my_dump_sequence(thick_sequ,level) << std::endl; // dump level 2, without nodes/elements
-  }
+  const std::string thick_seq_name = thick_sequ->name;
+  const std::string sliced_seq_name = thick_sequ_name;
+  std::cout << "makethin: slicing sequence : " << sliced_seq_name << '\n';
 
-  sliced_seq = new_sequence(name.c_str(), thick_sequ->ref_flag);
+  sliced_seq = new_sequence(sliced_seq_name.c_str(), thick_sequ->ref_flag);
   sliced_seq->start = nullptr;
   sliced_seq->share = thick_sequ->share;
   sliced_seq->nested = thick_sequ->nested;
@@ -2772,7 +2775,7 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
   if (sliced_seq->crabcavities != nullptr)  sliced_seq->crabcavities->curr = 0;
   else sliced_seq->crabcavities = new_el_list(100);
 
-  SeqElList theSeqElList(name, slice_style, sliced_seq, thick_sequ->start,this);
+  SeqElList theSeqElList(sliced_seq_name, slice_style, sliced_seq, thick_sequ->start,this);
   while(theSeqElList.current_node() != nullptr) // in current sequence, loop over nodes
   {
     theSeqElList.slice_node(); // decides what to do with current node :  slice_node_translate, slice_node_default or nothing
@@ -2790,11 +2793,12 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
   }
   sliced_seq->end->next = sliced_seq->start;
 
+  if(MaTh::Verbose>1)  std::cout << __FILE__ << " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << std::endl << '\n' << '\n' << " my_dump_sequence sliced_seq " << my_dump_sequence(sliced_seq,2) << std::endl; // dump level 2, without nodes/elements
 
   int pos=0;
-  if ((pos = name_list_pos(name.c_str(), sequences->list)) < 0) // move the pointer in the sequences list to point to our thin sequence
+  if ((pos = name_list_pos(thick_seq_name.c_str(), sequences->list)) < 0) // move the pointer in the sequences list to point to the sliced sequence
   {
-    fatal_error("unknown sequence sliced:", name.c_str());
+    fatal_error("unknown sequence sliced:", thick_sequ->name );
   }
   else
   {
