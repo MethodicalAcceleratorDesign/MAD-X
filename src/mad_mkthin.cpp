@@ -198,7 +198,7 @@ static const int     k_int_array=11;
 static const int  k_double_array=12;
 static const int k_cstring_array=13;
 
-static const bool dipedge_h1_h2_fl=true;    // was false until 10/2020 to avoid non-simplectic partial higher order in dipedge. Now true as already requested by Andrea Latina in 10/2014 and for better agreement with TWISS
+static const bool dipedge_h1_h2_fl=false;   // normally false to avoid potentially non-simplectic partial higher order in dipedge. Optionally true as requested by Andrea Latina in 10/2014
 static const bool kill_fringe_fl=true;      // requested by Laurent et al., somewhat redundant, should be sufficient to check existance of non-default h1,e1; h2,e2 parameters
 static const bool Enable_all_attr_fl=true;  // set true to allow to enable all attibutes in the sliced sequence  --- otherwise only attributes defined in thick
 
