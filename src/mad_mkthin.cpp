@@ -198,7 +198,7 @@ static const int     k_int_array=11;
 static const int  k_double_array=12;
 static const int k_cstring_array=13;
 
-static const bool dipedge_h1_h2_fl=false;   // normally false to avoid potentially non-simplectic partial higher order in dipedge. Optionally true as requested by Andrea Latina in 10/2014
+static const bool dipedge_h1_h2_fl=true;    // Write h parameters to Dipedge as crequsted by Andrea Latina in 10/2014. For the moment ignored on twiss/track level to avoid potentially non-simplectic partial higher orders
 static const bool kill_fringe_fl=true;      // requested by Laurent et al., somewhat redundant, should be sufficient to check existance of non-default h1,e1; h2,e2 parameters
 static const bool Enable_all_attr_fl=true;  // set true to allow to enable all attibutes in the sliced sequence  --- otherwise only attributes defined in thick
 
@@ -1753,10 +1753,8 @@ element* SeqElList::create_bend_dipedge_element(const element* thick_elem,const 
   // request from Laurent Deniau and Andrea Latina in 10/2014   also move any h1, h2  parameters as h parameter to entry, exit dipedge
   //
 
-  if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << " thick node " << work_node->name << " " << thick_elem->name << " Entry=" << Entry << std::endl;
-
   static std::vector<std::string> CheckBendParams = {
-    "polarity", "tilt","hgap", "e1", "e2", "h1", "h2", "mech_sep", "v_pos", "magnet", "model", "method", "exact", "nst" };
+    "polarity", "tilt","hgap", "h1", "h2", "mech_sep", "v_pos", "magnet", "model", "method", "exact", "nst" }; // when "e1", "e2" already done, look at other parameters
 
   element* dipedge=NULL;
   std::string thick_elem_name=thick_elem->name;
@@ -2259,7 +2257,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
     }
     // find any existing EntryDipedge, sbend_el, ExitDipedge    and use them
     EntryDipedge=theBendEdgeList->find_slice(thick_elem,thick_elem_name+"_den"); // dipedge entry, NULL if not yet known or e1=0
-    ExitDipedge =theBendEdgeList->find_slice(thick_elem,thick_elem_name+"_dex"); // dipedge exit,  BULL if not yet known or e2=0
+    ExitDipedge =theBendEdgeList->find_slice(thick_elem,thick_elem_name+"_dex"); // dipedge exit,  NULL if not yet known or e2=0
     if(verbose>1)
     {
       if(verbose>1)    std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << "              " << std::setw(MaTh::par_name_maxlen) <<   thick_elem->name << " " << work_node->base_name << '\n';
