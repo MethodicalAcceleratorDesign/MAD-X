@@ -198,7 +198,7 @@ static const int     k_int_array=11;
 static const int  k_double_array=12;
 static const int k_cstring_array=13;
 
-static const bool dipedge_h1_h2_fl=true;    // Write h parameters to Dipedge as crequsted by Andrea Latina in 10/2014. For the moment ignored on twiss/track level to avoid potentially non-simplectic partial higher orders
+static const bool dipedge_h1_h2_fl=true;    // Write h parameters to Dipedge as requsted by Andrea Latina in 10/2014. For the moment ignored on twiss/track level to avoid potentially non-simplectic partial higher orders
 static const bool kill_fringe_fl=true;      // requested by Laurent et al., somewhat redundant, should be sufficient to check existance of non-default h1,e1; h2,e2 parameters
 static const bool Enable_all_attr_fl=true;  // set true to allow to enable all attibutes in the sliced sequence  --- otherwise only attributes defined in thick
 
