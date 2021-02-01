@@ -1254,12 +1254,6 @@ static int set_selected_elements(el_list* the_element_list) //  modify the_eleme
   return 0;
 }
 
-static bool HasFringe(const element* thick_elem)
-{
-  for(unsigned int i=0; i<MaTh::FringePar.size(); ++i) if( return_param_recurse(MaTh::FringePar[i].c_str(), thick_elem) ) return true;
-  return false;
-}
-
 command_parameter* k0_from_angle(const command_parameter* angle_param)
 {
   command_parameter* k0cmdptr=new_command_parameter("k0", k_double);
@@ -2265,9 +2259,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       if(ExitDipedge)  std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__  << "  ExitDipedge=" << std::setw(MaTh::par_name_maxlen) <<  ExitDipedge->name << " already exists " << EntryDipedge << '\n';
     }
 
-    bool hasfringe=HasFringe(thick_elem);
-
-    if(EntryDipedge==nullptr && hasfringe) // create new EntryDipedge for this bend
+    if(EntryDipedge==nullptr) // create new EntryDipedge for this bend
     {
       if (command_par_value("kill_ent_fringe",thick_elem->def) == false)
       {
@@ -2276,7 +2268,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
       }
     }
 
-    if(ExitDipedge==nullptr && hasfringe) // create new ExitDipedge for this bend
+    if(ExitDipedge==nullptr) // create new ExitDipedge for this bend
     {
       if (command_par_value("kill_exi_fringe",thick_elem->def) == false)
       {
