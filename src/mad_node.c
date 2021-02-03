@@ -17,6 +17,12 @@ new_node(char* name)
   const char *rout_name = "new_node";
   struct node* p = mycalloc(rout_name, 1, sizeof *p);
   p->perm_align = mycalloc(rout_name, 1, sizeof *p->perm_align);
+  p->perm_align->dx_value = 0;
+  p->perm_align->dy_value = 0;
+  p->perm_align->ds_value = 0;
+  p->perm_align->dtheta_value = 0;
+  p->perm_align->dphi_value = 0;
+  p->perm_align->dpsi_value = 0;
   //if(strlen(name)>20) fatal_error("The string is to long: ", name);
   strcpy(p->name, name);
   p->stamp = 123456;
