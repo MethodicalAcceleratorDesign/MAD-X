@@ -2509,13 +2509,31 @@ pro_elem(struct node* cnode,  int ncombined)
       } 
   }
 
-  if (cnode->p_al_err) {
+  if (cnode->p_al_err || cnode->perm_misalign==1) {
     align_cnt++;
-    current_element->na_err = cnode->p_al_err->curr;
+    current_element->na_err = ALIGN_MAX;
     current_element->p_al_err = make_obj("ALDUM",0,ALIGN_MAX,0,0);
-    current_element->p_al_err->c_dble = cnode->p_al_err->curr;
-    for (i=0;i<cnode->p_al_err->curr;i++)
-      current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
+    current_element->p_al_err->c_dble = ALIGN_MAX;
+    if(cnode->p_al_err){
+      for (i=0;i<cnode->p_al_err->curr;i++)
+        current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
+    }
+    if(cnode->perm_misalign==1){
+      double value;
+
+      if (cnode->perm_align->dx_expr == NULL) value = cnode->perm_align->dx_value;
+      else                                            value = expression_value(cnode->perm_align->dx_expr , 2);
+      current_element->p_al_err->a_dble[0] = current_element->p_al_err->a_dble[0] + value;
+
+      if (cnode->perm_align->dy_expr == NULL) value = cnode->perm_align->dy_value;
+      else                                            value = expression_value(cnode->perm_align->dy_expr , 2);
+      current_element->p_al_err->a_dble[1] = current_element->p_al_err->a_dble[1] + value;
+
+      if (cnode->perm_align->dpsi_expr == NULL) value = cnode->perm_align->dpsi_value;
+      else                                             value = expression_value(cnode->perm_align->dpsi_expr , 2);
+      current_element->p_al_err->a_dble[5] = current_element->p_al_err->a_dble[5] + value;    
+     
+    }
   }
 
   /* if we have a tilt set the flag */
