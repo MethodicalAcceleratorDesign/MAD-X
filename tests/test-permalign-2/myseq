@@ -1,0 +1,5 @@
+none = 0;
+q1: quadrupole,l:= 1,k1:= 0.01,dx:= 0.01;
+myseq: sequence, l = 1;
+q1: quadrupole, at = 0.5, dx = 0.01 ,l:= 1,k1:= 0.01,dx:= 0.01;
+endsequence;

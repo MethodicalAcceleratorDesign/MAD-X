@@ -159,6 +159,36 @@ export_el_par_8(struct command_parameter* par, char* string)
       }
   }
 }
+int
+check_for_perm_misalign(struct node* c_node, struct in_cmd* cmd){
+  int isperm = 0;
+  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0)         isperm = 1;
+  if(command_par_expr("dy", cmd->clone) || command_par_value("dy", cmd->clone)!=0)         isperm = 1;
+  if(command_par_expr("ds", cmd->clone) || command_par_value("ds", cmd->clone)!=0)         isperm = 1;
+  if(command_par_expr("dtheta", cmd->clone) || command_par_value("dtheta", cmd->clone)!=0) isperm = 1;
+  if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0)     isperm = 1;
+  if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0)     isperm = 1;
+  if(command_par_expr("dpsi", cmd->clone) || command_par_value("dpsi", cmd->clone)!=0)     isperm = 1;
+  
+  if(isperm==1){
+   
+    c_node->perm_align->dx_value     = command_par_value("dx", cmd->clone);
+    c_node->perm_align->dx_expr      = command_par_expr("dx", cmd->clone);
+    c_node->perm_align->dy_value     = command_par_value("dy", cmd->clone);
+    c_node->perm_align->dy_expr      = command_par_expr("dy", cmd->clone);
+    c_node->perm_align->ds_value     = command_par_value("ds", cmd->clone);
+    c_node->perm_align->ds_expr      = command_par_expr("ds", cmd->clone);
+    c_node->perm_align->dtheta_value = command_par_value("dtheta", cmd->clone);
+    c_node->perm_align->dtheta_expr  = command_par_expr("dtheta", cmd->clone);
+    c_node->perm_align->dphi_value   = command_par_value("dphi", cmd->clone);
+    c_node->perm_align->dphi_expr    = command_par_expr("dphi", cmd->clone);
+    c_node->perm_align->dpsi_value   = command_par_value("dpsi", cmd->clone);
+    c_node->perm_align->dpsi_expr    = command_par_expr("dpsi", cmd->clone);
+    
+  }
+  
+  return isperm;
+}
 
 static void
 enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupdating)
@@ -181,13 +211,14 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupda
   else k = ++occ_list->inform[i];
   make_elem_node(el, k);
   current_node->at_value = at;
+  current_node->perm_misalign = check_for_perm_misalign(current_node, cmd);
   current_node->at_expr = command_par_expr("at", cmd->clone);
   const char* from = command_par_string_user("from", cmd->clone);
   if (from){
     current_node->from_name = permbuff(from);
     nupdates = 2;
   }
-    if (isupdating==0) check_for_update_in_seq(el, cmd->clone, nupdates);
+    if (isupdating==0 && current_node->perm_misalign==0) check_for_update_in_seq(el, cmd->clone, nupdates);
 }
 
 static int
@@ -892,6 +923,9 @@ enter_element(struct in_cmd* cmd)
   {
     cmd->cmd_def = parent->def;
     cmd->clone = clone_command(cmd->cmd_def);
+
+    if(strlen(toks[0])>45) fatal_error("String is too long", toks[0]);
+
     strcpy(cmd->clone->name, toks[0]);
     scan_in_cmd(cmd);
     if (k == 0 || strcmp(toks[0], toks[2]) == 0) {
