@@ -11,9 +11,24 @@ struct constraint_list;
 struct double_array;
 struct name_list;
 
+struct align_info
+{
+  struct expression* dx_expr;
+  double             dx_value;
+  struct expression* dy_expr;
+  double             dy_value;
+  struct expression* ds_expr;
+  double             ds_value;
+  struct expression* dtheta_expr;
+  double             dtheta_value;
+  struct expression* dphi_expr;
+  double             dphi_value;
+  struct expression* dpsi_expr;
+  double             dpsi_value;
+};
 struct node                /* the sequence is a linked list of nodes */
 {
-  char name[NAME_L];
+  char name[200];
   char* base_name;         /* basic type */
   struct node* previous;
   struct node* next;
@@ -53,8 +68,9 @@ struct node                /* the sequence is a linked list of nodes */
   double rfm_freq;   /* frequency of the rf-multipole fields  AL: */
   int    rfm_harmon; /* harmonic number of the rf-multipole fields  AL: */
   double rfm_lag;    /* lag of the rf-multipole fields  AL: */
+  int    perm_misalign; /* flag to tell if permanent misalignments are applied */
+  struct align_info* perm_align;
 };
-
 struct node_list /* contains list of node pointers sorted by name */
 {
   int stamp;
@@ -107,7 +123,7 @@ int     node_apertype(void);
 int     inside_userdefined_geometry(double *x, double *y);
 int     get_userdefined_geometry(double* x, double *y, int* maxlen);
 int     get_userdefined_geometry_len(void);
-
+int     is_permalign(void);
 double  get_length_(void);
 void    node_aperture_vector(double * vec);
 void    node_aperture_offset(double * vec);

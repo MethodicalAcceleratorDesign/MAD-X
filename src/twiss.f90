@@ -662,7 +662,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   character(len=150) :: warnstr
   character(len=name_len) :: c_name(2), p_name, el_name
   character(len=2) :: ptxt(2)=(/'x-','y-'/)
-  integer :: j, code, n_align, nobs, node, old, poc_cnt, debug
+  integer :: j, code, n_align, nobs, node, old, poc_cnt, debug, n_perm_align
   integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
   double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6), orbitori(6)
   double precision :: al_errors(align_max), dptemp
@@ -671,7 +671,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
 
-  integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
+  integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option, is_permalign
   double precision, external :: node_value, get_value
   double precision, parameter :: orb_limit=1d1
   integer, parameter :: max_rep=100
@@ -752,12 +752,24 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      end select
   endif
 
-  !---- Element length.
+  !---- Element length.t
   el = node_value('l ')
 
   nobs = node_value('obs_point ')
-
+  al_errors = 0 
   n_align = node_al_errors(al_errors)
+  n_perm_align = is_permalign()
+  
+  if (n_perm_align .ne. 0) then
+    al_errors(1) = al_errors(1) + node_value('dx ')
+    al_errors(2) = al_errors(2) + node_value('dy ')
+    al_errors(3) = al_errors(3) + node_value('ds ')
+    al_errors(4) = al_errors(4) + node_value('dphi ')
+    al_errors(5) = al_errors(5) + node_value('dtheta ')
+    al_errors(6) = al_errors(6) + node_value('dpsi ')
+    n_align = 1
+  endif
+
   if (n_align .ne. 0)  then
     ORBIT2 = ORBIT
     call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
@@ -1808,7 +1820,8 @@ subroutine track_one_element(el, fexit, contrib_rms)
   double precision, intent(in) :: el
   logical :: fexit
   logical :: contrib_rms
-
+  integer n_perm_align
+  integer, external :: is_permalign
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
 !  if (code .eq. code_tkicker)     code = code_kicker
@@ -1825,7 +1838,20 @@ subroutine track_one_element(el, fexit, contrib_rms)
   opt_fun(72) = g_elpar(g_calib)
   opt_fun(73) = g_elpar(g_polarity)
 
+  al_errors = 0
   n_align = node_al_errors(al_errors)
+  n_perm_align = is_permalign()
+  
+  if (n_perm_align .ne. 0) then
+    al_errors(1) = al_errors(1) + node_value('dx ')
+    al_errors(2) = al_errors(2) + node_value('dy ')
+    al_errors(3) = al_errors(3) + node_value('ds ')
+    al_errors(5) = al_errors(5) + node_value('dtheta ')
+    al_errors(4) = al_errors(4) + node_value('dphi ')
+    al_errors(6) = al_errors(6) + node_value('dpsi ')
+    n_align = 1
+  endif
+
   if (n_align .ne. 0)  then
      !print*, "coupl1: Element = "
      ele_body = .false.
@@ -2990,6 +3016,8 @@ contains
 
 subroutine track_one_element(el, fexit)
   double precision, intent(in) :: el
+  integer n_perm_align
+  integer, external :: is_permalign
   logical :: fexit
 
   code = node_value('mad8_type ')
@@ -2998,6 +3026,19 @@ subroutine track_one_element(el, fexit)
 
   !---- Physical element.
   n_align = node_al_errors(al_errors)
+  n_perm_align = is_permalign()
+  
+  if (n_perm_align .ne. 0) then
+    al_errors(1) = node_value('dx ')
+    al_errors(2) = node_value('dy ')
+    al_errors(3) = node_value('ds ')
+    al_errors(5) = node_value('dtheta ')
+    al_errors(4) = node_value('dphi ')
+    al_errors(6) = node_value('dpsi ')
+    n_align = 1
+    print * ,"gggg", al_errors
+  endif
+
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
@@ -6647,9 +6688,11 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmsrot
+
 SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
-  use twissbeamfi, only : beta
+  use twissbeamfi, only : beta, gamma
+  use twiss0fi, only : align_max
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6667,37 +6710,41 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   !----------------------------------------------------------------------*
   logical :: ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-
+  double precision :: al_errors(align_max)
   double precision :: angle, ca, sa, ta
   double precision :: node_value
 
   !---- Initialize.
+  al_errors = 0d0
+
   angle = node_value('angle ')
   if (angle .eq. 0) return
 
   angle = angle * node_value('other_bv ')
-
+  al_errors(4) = -angle
   !---- Kick.
-  ca = cos(angle)
-  sa = sin(angle)
-  ta = tan(angle)
+  !ca = cos(angle)
+  !sa = sin(angle)
+  !ta = tan(angle)
 
-  ek(4) = sa
+  !ek(4) = sa
 
+  call tmali1(orbit,al_errors,beta,gamma,orbit,re)
   !---- Transfer matrix.
-  re(3,3) = 1/ca
-  re(4,4) =   ca
-  re(4,6) =   sa/beta
-  re(5,3) =  -ta/beta
+  !re(3,3) = 1/ca
+  !re(4,4) =   ca
+  !re(4,6) =   sa/beta
+  !re(5,3) =  -ta/beta
 
   !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmxrot
 
 SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
-  use twissbeamfi, only : beta
+  use twissbeamfi, only : beta, gamma
+  use twiss0fi, only : align_max
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6718,28 +6765,31 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
   double precision :: angle, ca, sa, ta
   double precision :: node_value
+  double precision :: al_errors(align_max)
 
   !---- Initialize.
   angle = node_value('angle ')
   if (angle .eq. 0) return
-
+  al_errors = 0d0
   angle = angle * node_value('other_bv ')
+  al_errors(5) = - angle
+  call tmali1(orbit,al_errors,beta,gamma,orbit,re)
 
   !---- Kick.
-  ca = cos(angle)
-  sa = sin(angle)
-  ta = tan(angle)
+  !ca = cos(angle)
+  !sa = sin(angle)
+  !ta = tan(angle)
 
-  ek(2) = sa
+  !ek(2) = sa
 
   !---- Transfer matrix.
-  re(1,1) = 1/ca
-  re(2,2) =   ca
-  re(2,6) =   sa/beta
-  re(5,1) =  -ta/beta
+  !re(1,1) = 1/ca
+  !re(2,2) =   ca
+  !re(2,6) =   sa/beta
+  !re(5,1) =  -ta/beta
 
   !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmyrot
 
@@ -7522,6 +7572,9 @@ SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
   double precision :: orbt(6), v(3), ve(3), w(3,3), we(3,3)
   double precision :: ds, dx, dy, the, phi, psi, s2, tilt
 
+  integer :: code
+  double precision, external :: node_value
+
   !---- Misalignment rotation matrix w.r.t. entrance system.
   dx  = errors(1)
   dy  = errors(2)
@@ -7533,7 +7586,8 @@ SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
   call sumtrx(the, phi, psi, w)
 
   !---- VE and WE represent the change of reference.
-  call suelem(el, ve, we, tilt)
+  code = node_value('mad8_type ') 
+  call suelem(el, ve, we, tilt, code)
 
   !---- Misalignment displacements at exit w.r.t. entrance system.
   v(1) = dx + w(1,1)*ve(1)+w(1,2)*ve(2)+w(1,3)*ve(3)-ve(1)
@@ -7790,7 +7844,6 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   !     No radiation effects as it is a pure thin lens with no lrad
   call tmfrng(.false.,h,zero,e1,zero,zero,corr,rw,tw)
   call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-
   !---- Apply tilt.
   if (tilt .ne. zero) then
      call tmtilt(.false.,tilt,ek,re,te)

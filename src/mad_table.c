@@ -2126,6 +2126,16 @@ vector_to_table_curr(const char* table, const char* name, const double* vals, co
   return 0;
 }
 
+int 
+name_to_table_curr(const char* table, int* ending){
+  char tmp[strlen(current_node->p_elem->name)+3];
+  strcpy(tmp, current_node->p_elem->name);
+  if(*ending ==1) strcat(tmp, ".S");
+  if(*ending ==2) strcat(tmp, ".E");
+  
+  return string_to_table_curr(table,"name", tmp);
+}
+
 int
 string_to_table_curr(const char* table, const char* name, const char* string)
   /* puts string at current position in column with name "name".

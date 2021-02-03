@@ -30,7 +30,11 @@ pro_survey(struct in_cmd* cmd)
                             survey_table_types, current_sequ->n_nodes);
   add_to_table_list(survey_table, table_register);
   keep_current = current_sequ;
-  survey_();
+  int l_survey = command_par_value("perm_align_survey", current_survey);
+  
+  if(l_survey==1) elementloc_();
+  else            survey_();
+
   current_sequ = keep_current;
   if (w_file) out_table(table_name, survey_table, filename);
 // set_option("rbarc", &keep);

@@ -1129,7 +1129,7 @@ contains
 
              write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
                              ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
-	         ' step ',nodePtr%pos,' PTC msg: ',messagelost(:len_trim(messagelost))
+           ' step ',nodePtr%pos,' PTC msg: ',messagelost(:len_trim(messagelost))
              call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
              call seterrorflag(10,"ptc_twiss ",whymsg);
 
@@ -1145,7 +1145,7 @@ contains
              call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
              call seterrorflag(10,"ptc_twiss: ",whymsg);
              !          Write(6,*) why ! See produce aperture flag routine in sd_frame
-             goto 100
+             !goto 100
           endif
 
           isputdata = .false.

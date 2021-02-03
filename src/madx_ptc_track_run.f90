@@ -1913,13 +1913,18 @@ CONTAINS
 	
 
                ! save coordinates for the current particle ---!
+               
+               if (getdebug() > 3) then
+                 print*, "Saving X for j_th_partic = ", j_th_partic
+               endif
+               
                do k_th_coord=1,6 
                   if (ISNAN(current_x_coord_incl_co(k_th_coord))) then 
                      ! BUG !? Aperture does not work, if lattice with spread multipoles XXXX     +  ! !
                      NaN_coord_after_track_VK=.TRUE.                           
                      x_coord_incl_co(k_th_coord,j_th_partic)=999               
                   else  
-                     x_coord_incl_co(k_th_coord,j_th_partic)=  &     
+	 x_coord_incl_co(k_th_coord,j_th_partic)=  &     
                           current_x_coord_incl_co(k_th_coord)        
                   endif 
                end do 
@@ -2242,7 +2247,12 @@ CONTAINS
          last_turn_of_lost_particle(particle_ID(j_part_tmp))= turn_final		                 !
          last_position_of_lost_particle(particle_ID(j_part_tmp))= sum_length              
          ! remember last turn and position of particles          
+         
           last_orbit_of_lost_particle(:, particle_ID(j_part_tmp))= x_coord_incl_co(:, j_part_tmp)
+          
+          if (ptc_track_debug) then
+            print*, "j_part_tmp ", j_part_tmp, " id ", particle_ID(j_part_tmp), " coord ", x_coord_incl_co(:, j_part_tmp)
+          endif
          !                                                       !
       enddo 
 
@@ -2343,9 +2353,17 @@ CONTAINS
          ENDDO !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!    !
          !                                                                          !
          CALL Coord_PTC_to_MAD(X_PTC,X_MAD)                                         !
-         !                                                                          !
+         !  
+         if (ptc_track_debug) then
+              print*, "putting in tracksumm part no ", j_part_tmp
+         endif                                                                        !
          DO i_coord = 1, 6 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!    !
-            doublenum = X_MAD(i_coord)                                         !    !
+            doublenum = X_MAD(i_coord)   
+                                        !    !
+            if (ptc_track_debug) then
+              print*, "   coord ", i_coord, " = ", doublenum
+            endif
+            
             call double_to_table_curr('tracksumm ', vec_names(i_coord), doublenum)  !    !
             !call double_to_table_curr('tracksumm ', vec_names(j), tmp_d)           !    !
             !                                                                  !    !
@@ -3727,14 +3745,16 @@ CONTAINS
 
     last_position_of(np)=sum_accum_length
     ! Save Position of n_particle
-
-    last_orbit_of(:,np) = x_coord_incl_co(:,np)
+    if(getdebug() > 3) then
+      print*,"kill_ptc_track, n_particle=",n_particle," np=",np, " x = ", x_coord_incl_co(:,n_particle)
+    endif
+    last_orbit_of(:,np) = x_coord_incl_co(:,n_particle)
 
     if (recloss) then
       namelen = LEN_TRIM(el_name)
       if (namelen > name_len) namelen = name_len
       madx_name = el_name(1:namelen)
-      call tp_ploss(np,i_th_turn, sum_accum_length, x_coord_incl_co(:,np), madx_name, en)
+      call tp_ploss(np,i_th_turn, sum_accum_length, x_coord_incl_co(:,n_particle), madx_name, en)
     endif 
 
     ! Renumbering arrays
@@ -3748,7 +3768,14 @@ CONTAINS
        END IF
 
     enddo 
-
+    
+    
+    if(getdebug() > 3) then
+      do j_th=1,j_max
+        print*,"kill_ptc_track, part_ID(",j_th,")",part_ID(j_th)
+      enddo
+    endif
+    
     j_max = j_max - 1
 
   END SUBROUTINE kill_ptc_track
