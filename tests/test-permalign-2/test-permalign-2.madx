@@ -24,4 +24,4 @@ ptc_create_layout,model=1, method=2, nst=2, exact=true;
 ptc_align;
 ptc_setswitch, debuglevel=0, fringe=false,  time=false, totalpath=false, exact_mis=false;                                                
 PTC_TWISS, table=twiss, icase=5, no=5, betx=1, bety=2, betz=10, x=xin, y=yin, t=tin, pt=ptin,px=pxin, py=pyin ;         
-write, table=twiss, file="twiss.ptc.tfs";                                                                                                                       
+write, table=twiss, file="twiss.ptc.tfs";

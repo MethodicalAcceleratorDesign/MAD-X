@@ -1,5 +1,32 @@
 #include "madx.h"
 
+static void
+get_pos_slice_in_node(struct node* cnode, double pos, double* pos_vector){
+
+  struct node* tmpnode;
+  tmpnode = current_node;
+  current_node = cnode;
+  printf("iii %f \n", node_value("dx"));
+  locslice_(&pos, pos_vector);
+
+  current_node = tmpnode;
+
+}
+
+
+static void
+test_align_command(void){
+  struct node* node = current_sequ->start;
+  double tmp[7];
+  while (node != NULL) {
+    get_pos_slice_in_node(node, 0.1, tmp);
+    current_node = node;
+    printf("%s x: %f y: %f s: %f \n", node->name, tmp[0], tmp[1], tmp[2] );
+    if (node == current_sequ->end) break;
+    node = node->next;
+  }
+}
+
 void
 pro_survey(struct in_cmd* cmd)
   /* calls survey module */
@@ -38,6 +65,7 @@ pro_survey(struct in_cmd* cmd)
   current_sequ = keep_current;
   if (w_file) out_table(table_name, survey_table, filename);
 // set_option("rbarc", &keep);
+  test_align_command();
 }
 
 void
@@ -62,6 +90,10 @@ pro_use_survey(void)
   current_survey=(pro_use->clone);
   pro_survey(pro_use);
   exec_delete_table("survey");
-}
 
+
+
+
+
+}
 
