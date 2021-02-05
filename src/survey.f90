@@ -314,8 +314,6 @@ subroutine locslice(spos, displ)
       w_tot = matmul(w_el,w_al) ! Is this the right way?
       displ(1:3) = v_al + matmul(w_tot,v_el)
 
-      print *, "aaaaa", displ, v_al(1),  node_value('dx ')
-
 
 end subroutine locslice
 
