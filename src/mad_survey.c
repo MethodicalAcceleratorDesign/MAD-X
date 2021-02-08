@@ -1,12 +1,12 @@
 #include "madx.h"
 
 static void
-get_pos_slice_in_node(struct node* cnode, double pos, double* pos_vector){
+get_pos_slice_in_node(struct node* cnode, double pos, double* displace_vector){
 
   struct node* tmpnode;
   tmpnode = current_node;
   current_node = cnode;
-  locslice_(&pos, pos_vector);
+  locslice_(&pos, displace_vector);
   current_node = tmpnode;
 
 }
