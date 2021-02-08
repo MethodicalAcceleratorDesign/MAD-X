@@ -283,6 +283,43 @@ subroutine elementloc
   dpsi = psi - proxim(psi0, psi)
 end subroutine elementloc
 
+subroutine locslice(spos, displ)
+    ! Purpose  :
+    ! Give the correct slices locations for an element
+    double precision, intent(IN) :: spos
+    double precision, intent(OUT) :: displ(6)
+
+    double precision :: v_al(3), v_el(3), ve(3), w_el(3,3), w_al(3,3), w_tot(3,3)
+    double precision :: dphi, dpsi, dtheta, tilt
+
+    integer :: code
+    double precision, external :: proxim, node_value, get_value
+
+     !**  Compute the coordinates at each point
+     !call sutrak(v, w, ve, we)
+
+      v_al(1) =   node_value('dx ')
+      v_al(2) =   node_value('dy ')
+      v_al(3) =   node_value('ds ')
+
+      dphi   = node_value('dphi ')
+      dtheta = node_value('dtheta ')
+      dpsi   = node_value('dpsi ')
+      
+      call sumtrx(dtheta, dphi, dpsi, w_al)
+      
+      code = node_value('mad8_type ') 
+      call suelem(spos, v_el, w_el, tilt, code)
+
+      w_tot = matmul(w_el,w_al) ! Is this the right way?
+      displ(1:3) = v_al + matmul(w_tot,v_el)
+      displ(4) = dphi
+      displ(5) = dtheta
+      displ(6) = dpsi
+
+end subroutine locslice
+
+
 subroutine suangl(w, theta, phi, psi)
   implicit none
   !----------------------------------------------------------------------*

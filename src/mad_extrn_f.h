@@ -279,7 +279,7 @@ void soddin_(F_INTEGER ierr);
 void survey_(void);
 void elementloc_(void);
 void survtest_(void);
-
+void locslice_(F_DOUBLE, F_DOUBLE);
 
 // from toucheck.f90
 void touschek_(void);
