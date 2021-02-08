@@ -303,8 +303,8 @@ subroutine locslice(spos, displ)
       v_al(3) =   node_value('ds ')
 
       dphi   = node_value('dphi ')
-      dpsi   = node_value('dpsi ')
       dtheta = node_value('dtheta ')
+      dpsi   = node_value('dpsi ')
       
       call sumtrx(dtheta, dphi, dpsi, w_al)
       
@@ -313,7 +313,9 @@ subroutine locslice(spos, displ)
 
       w_tot = matmul(w_el,w_al) ! Is this the right way?
       displ(1:3) = v_al + matmul(w_tot,v_el)
-
+      displ(4) = dphi
+      displ(5) = dtheta
+      displ(6) = dpsi
 
 end subroutine locslice
 
