@@ -6,9 +6,7 @@ get_pos_slice_in_node(struct node* cnode, double pos, double* pos_vector){
   struct node* tmpnode;
   tmpnode = current_node;
   current_node = cnode;
-  printf("iii %f \n", node_value("dx"));
   locslice_(&pos, pos_vector);
-
   current_node = tmpnode;
 
 }
