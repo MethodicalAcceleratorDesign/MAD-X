@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.02.03 14:43:15      +
+  + Execution date: 2021.02.11 13:54:22      +
   ++++++++++++++++++++++++++++++++++++++++++++
 a = 0.1;
 
@@ -66,10 +66,6 @@ select, flag=makethin, class=quadrupole, slice=3;
 makethin, sequence=myseq;
 
 makethin: slicing sequence : myseq
-++++++ warning: non-zero align_info dpsi   not yet converted just copied
-++++++ warning: non-zero align_info dpsi   not yet converted just copied
-++++++ warning: non-zero align_info dpsi   not yet converted just copied
-++++++ warning: non-zero align_info dpsi   not yet converted just copied
 use, sequence=myseq;
 
 twiss, file="twiss.tfs_thin", betx=1, bety=1;
@@ -205,10 +201,9 @@ PTC_TWISS, table=twiss, icase=5, no=5, betx=1, bety=2, betz=10, x=xin, y=yin, t=
 
            pycomin             tcomin            ptcomin 
    -0.006631611308                 -0                  0 
-write, table=twiss, file="twiss.ptc.tfs";                                                                                                                       
+write, table=twiss, file="twiss.ptc.tfs";
 
-  Number of warnings: 4
-4 in C and 0 in Fortran
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

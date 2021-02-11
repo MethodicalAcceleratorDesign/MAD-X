@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.02.11 09:39:14      +
+  + Execution date: 2021.02.11 13:54:37      +
   ++++++++++++++++++++++++++++++++++++++++++++
 beam;
 
@@ -68,12 +68,6 @@ survey, perm_align_survey, file = "survey_thick.dat";
 makethin, sequence=myseq;
 
 makethin: slicing sequence : myseq
-ooooo 0.000000 
-ooooo 0.500000 
-ooooo 0.000000 
-ooooo 1.000000 
-ooooo 0.000000 
-ooooo 1.500000 
 use, sequence=myseq;
 
 twiss, betx=1, bety=1, file="sliced.dat";
