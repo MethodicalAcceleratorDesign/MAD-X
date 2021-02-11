@@ -6689,6 +6689,60 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
 
 end SUBROUTINE tmsrot
 
+SUBROUTINE tmchangeref(ftrk,orbit,fmap,ek,re,te)
+  use twisslfi
+  use twissbeamfi, only : beta, gamma
+  use twiss0fi, only : align_max
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for rotation about X-axis.                         *
+  !     Treated in a purely linear way.                                  *
+  !     Input:                                                           *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical :: ftrk, fmap
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: al_errors(align_max)
+  double precision :: angle, ca, sa, ta
+  double precision :: node_value
+
+  !---- Initialize.
+  al_errors = 0d0
+
+  angle = node_value('angle ')
+  if (angle .eq. 0) return
+
+  angle = angle * node_value('other_bv ')
+  al_errors(4) = -angle
+  !---- Kick.
+  !ca = cos(angle)
+  !sa = sin(angle)
+  !ta = tan(angle)
+
+  !ek(4) = sa
+
+  call tmali1(orbit,al_errors,beta,gamma,orbit,re)
+  !---- Transfer matrix.
+  !re(3,3) = 1/ca
+  !re(4,4) =   ca
+  !re(4,6) =   sa/beta
+  !re(5,3) =  -ta/beta
+
+  !---- Track orbit.
+  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
+end SUBROUTINE tmchangeref
+
+
+
 SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   use twissbeamfi, only : beta, gamma

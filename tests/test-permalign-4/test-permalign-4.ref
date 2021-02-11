@@ -1,0 +1,110 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2021.02.11 11:36:29      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+beam;
+
+s1:rbend,  angle=0.01, l=1, k1=0.02 ; 
+
+myseq: sequence, l=6;
+
+  s1, at:=1.5, dx=0.001, dtheta=0.015;
+
+endsequence;
+
+
+
+use, sequence=myseq;
+
+select, flag=twiss, column=name,s, dx, dy, betx, bety,x , px, y;
+
+twiss, betx=1, bety=1, file="thick.dat";
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     7.360407E-04  1.685871E-04  0.000000E+00  0.000000E+00 -2.343068E-07  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 6                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2255067288                  0        35.25112181      0.04412277401 
+
+             dxrms             xcomax             xcorms                 q2 
+     0.02799265941    0.0007360406878    0.0004663298821       0.2220041083 
+
+               dq2            betymax              dymax              dyrms 
+                 0         38.7955542                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+select, flag=makethin, class=rbend, slice=50, thick=false;
+
+survey, perm_align_survey, file = "survey_thick.dat";
+
+
+
+makethin, sequence=myseq;
+
+makethin: slicing sequence : myseq
+use, sequence=myseq;
+
+twiss, betx=1, bety=1, file="sliced.dat";
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     7.384931E-04  1.697214E-04  0.000000E+00  0.000000E+00 -2.080229E-07  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 6                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2255027229                  0         35.2508415      0.04412586642 
+
+             dxrms             xcomax             xcorms                 q2 
+    0.006378403762    0.0007384931038    0.0001027825322       0.2220110113 
+
+               dq2            betymax              dymax              dyrms 
+                 0        38.80295035                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+survey, perm_align_survey, file = "survey_thin.dat";
+
+save, sequence=myseq, file="mysliced.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+
+
+
+  Number of warnings: 1
+1 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

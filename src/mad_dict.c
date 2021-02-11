@@ -2972,6 +2972,7 @@ const char *const_element_def =
 "dtheta   = [r, 0],  "
 "dphi     = [r, 0],  "
 "dpsi     = [r, 0],  "
+"misexit  = [r, 0],  "
 "aper_tilt  = [r, 0], "
 "comments = [s, none, none]; "
 " "

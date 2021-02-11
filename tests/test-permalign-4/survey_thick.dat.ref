@@ -1,0 +1,14 @@
+@ NAME             %06s "SURVEY"
+@ TYPE             %06s "SURVEY"
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "11/02/21"
+@ TIME             %08s "11.14.02"
+* NAME               KEYWORD                             S                  L              ANGLE                  X                  Y                  Z              THETA                PHI                PSI         GLOBALTILT               TILT    SLOT_ID ASSEMBLY_ID           MECH_SEP              V_POS COMMENTS           
+$ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le         %d         %d                %le                %le %s                 
+ "MYSEQ$START.S"     "MARKER"                             0                  0                  0                  0                  0                  0                  0                  0                  0                  0                  0          0          0                  0                  0 ""                 
+ "MYSEQ$START.E"     "MARKER"                             0                  0                  0                  0                  0                  0                  0                  0                  0                  0                  0          0          0                  0                  0 ""                 
+ "S1.S"              "RBEND"                   0.9999979167        1.000004167               0.01              0.001                  0       0.9999979167              0.015                  0                  0                  0                  0          0          0                  0                  0 ""                 
+ "S1.E"              "RBEND"                    2.000002083        1.000004167               0.01      0.01099983333                  0        1.999947917              0.005                  0                  0                  0                  0          0          0                  0                  0 ""                 
+ "MYSEQ$END.S"       "MARKER"                             6                  0                  0     -0.04499929167                  0        5.999783335              -0.01                  0                  0                  0                  0          0          0                  0                  0 ""                 
+ "MYSEQ$END.E"       "MARKER"                             6                  0                  0     -0.04499929167                  0        5.999783335              -0.01                  0                  0                  0                  0          0          0                  0                  0 ""                 

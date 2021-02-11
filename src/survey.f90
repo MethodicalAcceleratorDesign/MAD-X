@@ -317,6 +317,7 @@ subroutine locslice(spos, displ)
       displ(5) = dtheta
       displ(6) = dpsi
 
+      displ(3) = displ(3)-spos
 end subroutine locslice
 
 
