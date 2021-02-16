@@ -1,10 +1,10 @@
 @ NAME             %19s "TRACK.OBS0001.P0003"
 @ TYPE             %08s "TRACKOBS"
 @ TITLE            %25s "thick-rbend tracking test"
-@ ORIGIN           %17s "5.05.02 Darwin 64"
-@ DATE             %08s "06/11/19"
-@ TIME             %08s "10.49.18"
+@ ORIGIN           %17s "5.06.01 Darwin 64"
+@ DATE             %08s "16/02/21"
+@ TIME             %08s "17.01.55"
 *     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
 $         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
           3          0                  0                  0              1e-06                  0                  0               0.01                  0               1000
-          3          1    0.0005441867043     0.001000825921    9.945534051e-07   -9.979388596e-09   -1.668793026e-05               0.01                  0               1000
+          3          1    0.0005441854961     0.001000801413    9.946073198e-07   -9.880825719e-09   -1.668792906e-05               0.01                  0               1000
