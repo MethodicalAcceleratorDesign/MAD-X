@@ -311,7 +311,8 @@ subroutine locslice(spos, displ)
       code = node_value('mad8_type ') 
       call suelem(spos, v_el, w_el, tilt, code)
 
-      w_tot = matmul(w_el,w_al) ! Is this the right way?
+      w_tot = matmul(w_al,w_el) ! Is this the right way?
+      print *, "v_el",  v_el 
       displ(1:3) = v_al + matmul(w_tot,v_el)
       displ(4) = dphi
       displ(5) = dtheta
@@ -441,7 +442,9 @@ subroutine suelem(el, ve, we, tilt, code)
   select case (code)
 
      case (code_rbend, code_sbend) !---- RBEND, SBEND
+
         angle = node_value('angle ') * bv
+        print *, "anngllleee", angle, el
         if (abs(angle) .ge. 1d-13) then
            dx = el * (cos(angle)-one)/angle
            ds = el * sin(angle)/angle
@@ -465,18 +468,20 @@ subroutine suelem(el, ve, we, tilt, code)
         we(1,3) = - we(3,1)
         we(2,3) = - we(3,2)
         we(3,3) = costhe
+        print *, "cooos", costhe, ds
 
 
      case (code_multipole) !---- MULTIPOLE (thin, no length)
         ! Must stay compatible with SBEND (makethin!), i.e. ignore ks0l
         ! LD 2017.11.20, attempt to add angle attribute precedence,
         angle = node_value('angle ')
+        
         if (angle .eq. 0) then
           normal(0) = 0
           call get_node_vector('knl ', nn, normal)
           angle = normal(0)
         endif
-
+        print *,"multiii angle", angle
         angle = angle * bv
         cospsi = cos(tilt);  sinpsi = sin(tilt)
         costhe = cos(angle); sinthe = sin(angle)
