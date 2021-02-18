@@ -3672,7 +3672,7 @@ subroutine trclor(switch,orbit0)
      Z(:,k) = ORBIT0
   enddo
 
-  DDD(1:6) = 1d-15
+  DDD(1:6) = 1d-10
 
 ! How does it work without the code right after? i.e. A will always be singular!
 !  do k = 1, 6
