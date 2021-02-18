@@ -8540,9 +8540,9 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   ED = zero
   RD = EYE
   TD = zero
-
-  call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
-
+  if(el .ne. zero) then
+    call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
+  endif 
   !---- Read-in the parameters
   harmon = node_value('harmon ');
   bvk = node_value('other_bv ')
@@ -8687,11 +8687,12 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
       ek(ii) = ek(ii) * P(ii);
     enddo
   endif
-
-  ! Add half a drift space before and after the Crab kick
-  call tmcat1(fsec,ed,rd,td,ek,re,te,ek,re,te);
-  call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
-  call tmcat1(fsec,ek,re,te,ed,rd,td,ek,re,te);
+  if(el .ne. zero) then
+    ! Add half a drift space before and after the Crab kick when it has a length
+    call tmcat1(fsec,ed,rd,td,ek,re,te,ek,re,te);
+    call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
+    call tmcat1(fsec,ek,re,te,ed,rd,td,ek,re,te);
+  endif
 
 end SUBROUTINE tmcrab
 SUBROUTINE twcpin_print(rt,r0mat )
