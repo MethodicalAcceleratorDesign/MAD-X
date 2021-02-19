@@ -84,8 +84,8 @@
 @ PTCOMAX          %le     0.0004634515107
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "16/02/21"
-@ TIME             %08s "16.26.31"
+@ DATE             %08s "19/02/21"
+@ TIME             %08s "09.37.28"
 * NAME                                S                  X                  Y                 PT                  T               RE11               RE12               RE15               RE25               RE56 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "SEQ$START"                          0                  0                  0                  0                 -0                  1                  0                  0                  0                  0
