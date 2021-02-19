@@ -6721,23 +6721,23 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   if (angle .eq. 0) return
 
   angle = angle * node_value('other_bv ')
-  al_errors(4) = -angle
+  !al_errors(4) = -angle
   !---- Kick.
-  !ca = cos(angle)
-  !sa = sin(angle)
-  !ta = tan(angle)
+  ca = cos(angle)
+  sa = sin(angle)
+  ta = tan(angle)
 
-  !ek(4) = sa
+  ek(4) = sa
 
-  call tmali1(orbit,al_errors,beta,gamma,orbit,re)
+  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
   !---- Transfer matrix.
-  !re(3,3) = 1/ca
-  !re(4,4) =   ca
-  !re(4,6) =   sa/beta
-  !re(5,3) =  -ta/beta
+  re(3,3) = 1/ca
+  re(4,4) =   ca
+  re(4,6) =   sa/beta
+  re(5,3) =  -ta/beta
 
   !---- Track orbit.
-  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmxrot
 
@@ -6770,26 +6770,26 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   !---- Initialize.
   angle = node_value('angle ')
   if (angle .eq. 0) return
-  al_errors = 0d0
+  !al_errors = 0d0
   angle = angle * node_value('other_bv ')
-  al_errors(5) = - angle
-  call tmali1(orbit,al_errors,beta,gamma,orbit,re)
+  !al_errors(5) = - angle
+  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
 
   !---- Kick.
-  !ca = cos(angle)
-  !sa = sin(angle)
-  !ta = tan(angle)
+  ca = cos(angle)
+  sa = sin(angle)
+  ta = tan(angle)
 
-  !ek(2) = sa
+  ek(2) = sa
 
   !---- Transfer matrix.
-  !re(1,1) = 1/ca
-  !re(2,2) =   ca
-  !re(2,6) =   sa/beta
-  !re(5,1) =  -ta/beta
+  re(1,1) = 1/ca
+  re(2,2) =   ca
+  re(2,6) =   sa/beta
+  re(5,1) =  -ta/beta
 
   !---- Track orbit.
-  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmyrot
 
