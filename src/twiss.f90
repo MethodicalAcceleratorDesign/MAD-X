@@ -2045,7 +2045,6 @@ SUBROUTINE twcptk(re,orbit)
   eflag = 0
 
   call element_name(name,len(name))
-
   !---- Dispersion.
   DT = matmul(RE, DISP)
 
@@ -2269,7 +2268,7 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   double precision :: maty11, maty12, maty21, maty22
   double precision :: alfx_ini, betx_ini, tempa
   double precision :: alfy_ini, bety_ini, tempb
-  double precision :: detx, dety
+  double precision :: detx, dety, atanm12
   logical          :: error
   double precision, parameter :: eps=1d-36
   character(len=name_len) :: name
@@ -2307,10 +2306,12 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   betx =   (tempb * tempb + matx12 * matx12) / (detx*betx_ini)
   !if (abs(matx12).gt.eps) amux = amux + atan2(matx12,tempb)
   if (abs(matx12).gt.eps) then
-     amux = amux + atan2(matx12,tempb)
-
-     if (atan2(matx12,tempb) .lt. zero)then
-        if (ele_body .and. abs(atan2(matx12,tempb)) > 0.1) then
+    atanm12 = atan2(matx12,tempb)
+    if(abs(atanm12) < 3.14 .or. ele_body) then
+      amux = amux + atanm12
+    endif
+     if (atanm12 .lt. zero)then
+        if (ele_body .and. abs(atanm12) > 0.1) then
            write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in x-plane ", &
                 atan2(matx12,tempb), " in the element ", name
            call fort_warn('TWCPTK_TWISS: ', warnstr)
@@ -2332,12 +2333,15 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   bety =   (tempb * tempb + maty12 * maty12) / (detx*bety_ini)
 !  if (abs(maty12).gt.eps) amuy = amuy + atan2(maty12,tempb)
   if (abs(maty12).gt.eps) then
-     amuy = amuy + atan2(maty12,tempb)
+    atanm12 = atan2(maty12,tempb)
+    if(abs(atanm12) < 3.14 .or. ele_body) then ! If no body phase advance < 180 deg
+     amuy = amuy + atanm12
+   endif
 
      if (atan2(maty12,tempb) .lt. zero) then
-        if (ele_body .and. abs(atan2(maty12,tempb)) > 0.1 ) then
+        if (ele_body .and. abs(atanm12) > 0.1 ) then
            write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in y-plane ", &
-                atan2(maty12,tempb), " in the element ", name
+                atanm12, " in the element ", name
            call fort_warn('TWCPTK_TWISS: ', warnstr)
            ! print*, " maty12 =", maty12, " tempb = ", tempb , "maty11 * bety_ini =",  maty11 * bety_ini, &
            !      "  maty12 * alfy_ini = ",  maty12 * alfy_ini
@@ -6683,7 +6687,6 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   re(4,2) = -st
   re(4,4) = ct
 
-
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
@@ -7630,6 +7633,7 @@ SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
   orbt(4) = orb1(4) - w(3,2)
   orbt(5) = orb1(5) - s2 / beta
   orbt(6) = orb1(6)
+
   ORB2 = matmul(RM,ORBT)
 
 end SUBROUTINE tmali2
