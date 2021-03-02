@@ -1,0 +1,968 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2021.03.02 09:11:14      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+circum=3;
+
+beam;
+
+trans: translation, dx=0.1, dy=0.2;
+
+
+
+m1: MARKER;
+
+m2: MARKER;
+
+m3: MARKER;
+
+
+
+xin = 0.01;
+
+yin = 0;
+
+xpin =0;
+
+ypin = 0;
+
+
+
+!Defines the sequence where rotation is done outside the element.
+
+seq: sequence, refer=center, l=3;
+
+m1, at = 1;
+
+trans, at=1.000;
+
+m2, at = 1;
+
+m3, at = 2;
+
+endsequence;
+
+
+
+
+
+use, sequence=seq;
+
+select, flag = twiss, clear;
+
+select, flag=twiss, column=name, s, x,px, y, py, pt, t;
+
+select, flag=twiss, column=name, s, betx, bety, mux, muy, r11, r12, r21, r22, alfx, alfy;
+
+
+
+
+
+
+
+!!!######### Translation here ##########
+
+twiss, BETX=1, BETY=1, file="translation.twiss", table=madx_table;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:    -1.000000E-01  0.000000E+00 -2.000000E-01  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 3                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.1987918088                  0                 10                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                0.1      0.08164965809       0.1987918088 
+
+               dq2            betymax              dymax              dyrms 
+                 0                 10                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+               0.2       0.1632993162                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+SURVEY, SEQUENCE=seq, FILE= survey_translation.out;
+
+ptc_create_universe;
+
+Determined SECTOR NMUL MAX :  0
+ptc_create_layout, model=2, method=2, exact=true, closed_layout=false;
+
+ MAD-X Beam Parameters
+                  Energy : 0.100000E+01
+          Kinetic Energy : 0.999489E+00
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.100000E+01
+ Setting MADx with 
+     energy           1.0000000000000000     
+     method                   2
+     Num. of steps            1
+     charge           1.0000000000000000     
+  Length of machine:    3.0000000000000000     
+ The machine is a LINE
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   0.10000000000000001       0.20000000000000001        3.0000000000000000     
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=true, totalpath=false;
+
+PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
+
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+                 3           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000       0.1987918088 
+
+                q2                dq1                dq2                 qs 
+      0.1987918088           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+                 1                 10                  1                 10 
+
+         beta11min          beta11max          beta12min          beta12max 
+                 1                 10                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+                 1                 10                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 1                  1                  0                  0 
+
+          disp2min           disp2max           disp3min           disp3max 
+                 0                  0                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0                  0 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0      0.08164965809       0.1632993162                  0 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0                  0                  0                  0 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0                  0                  0                 -0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0               -0.1               -0.2                  0 
+
+           pycomin             tcomin            ptcomin 
+                 0                 -0                  0 
+write, table=ptc_table, file="twiss.ptc.translation.tfs";
+
+ptc_printframes, file="survey.ptc.translation.tfs", format=text;
+
+mad_ptc.c: pro_ptc_printframes: format is text.
+ptc_end;
+
+
+
+i = 0;
+
+while(i < 9) {
+
+	i = i + 1;
+
+	SETVARS, TABLE=ptc_table, ROW=i;
+
+	ptc_x = x;
+
+	ptc_y = y;
+
+	ptc_t = t;
+
+	SETVARS, TABLE=survey, ROW=i;
+
+	survey_x = x;
+
+	survey_y = y;
+
+	survey_z = z;
+
+
+
+	tot_x = ptc_x + survey_x;
+
+	tot_y = ptc_y + survey_y;
+
+	!tot_z = ptc_t + survey_z;
+
+
+
+	print,text="Translation";
+
+	show, tot_x;
+
+	show, tot_y;
+
+
+
+}
+
+++++++ info: i redefined
+Translation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Translation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Translation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Translation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Translation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Translation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Translation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Translation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Translation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+
+
+!!!######### X-rotation here ##########
+
+xrot: xrotation, angle=0.002;
+
+SEQEDIT, SEQUENCE=seq;
+
+REPLACE, ELEMENT=trans, BY=xrot;
+
+ENDEDIT;
+
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   1
+
+
+use, sequence=seq;
+
+twiss, BETX=1, BETY=1, file="xrotation.twiss", table=madx_table;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  3.999997E-03  1.999999E-03 -3.999195E-06  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 3                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.1987981743                  0        10.00240016                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  0                  0       0.1987981743 
+
+               dq2            betymax              dymax              dyrms 
+                 0        10.00240016     0.003999997856     0.002108183977 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.003999997332       0.0021081837                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+SURVEY, SEQUENCE=seq, FILE= survey_xrotation.out;
+
+ptc_create_universe;
+
+ptc_create_layout, model=2, method=2, exact=true, closed_layout=false;
+
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=true, totalpath=false;
+
+PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
+
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+                 3           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000       0.1987918725 
+
+                q2                dq1                dq2                 qs 
+      0.1987918725           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+                 1          10.000024                  1          10.000064 
+
+         beta11min          beta11max          beta12min          beta12max 
+                 1          10.000024                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+                 1          10.000064                  0    7.523193938e-37 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0    4.000021311e-05 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 1                  1                  0                  0 
+
+          disp2min           disp2max           disp3min           disp3max 
+                 0                  0                  0    8.673634727e-19 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0     0.001999998928                  0                  0 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0                  0     0.002108187918                  0 
+
+           pycorms             tcorms            ptcorms             xcomax 
+    0.001632992073    2.108188896e-06                  0                  0 
+
+            ycomax            pxcomax            pycomax             tcomax 
+    0.004000005333                  0     0.001999998667                 -0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0                  0                  0                  0 
+
+           pycomin             tcomin            ptcomin 
+                 0   -4.000007189e-06                  0 
+write, table=ptc_table, file="twiss.ptc.xrotation.tfs";
+
+ptc_printframes, file="survey.ptc.xrotation.tfs", format=text;
+
+mad_ptc.c: pro_ptc_printframes: format is text.
+ptc_end;
+
+i = 0;
+
+++++++ info: i redefined
+while(i < 9) {
+
+	i = i + 1;
+
+	SETVARS, TABLE=ptc_table, ROW=i;
+
+	ptc_x = x;
+
+	ptc_y = y;
+
+	ptc_t = t;
+
+	SETVARS, TABLE=survey, ROW=i;
+
+	survey_x = x;
+
+	survey_y = y;
+
+	survey_z = z;
+
+
+
+	tot_x = ptc_x + survey_x;
+
+	tot_y = ptc_y + survey_y;
+
+	!tot_z = ptc_t + survey_z;
+
+
+
+	print,text="X-rotation";
+
+	show, tot_x;
+
+	show, tot_y;
+
+
+
+}
+
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+X-rotation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+X-rotation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+X-rotation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+X-rotation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+X-rotation
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+X-rotation
+tot_x               =                  0 ;
+tot_y               =       4.000004e-09 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+X-rotation
+tot_x               =                  0 ;
+tot_y               =       4.000004e-09 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+X-rotation
+tot_x               =                  0 ;
+tot_y               =       8.000008e-09 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+X-rotation
+tot_x               =                  0 ;
+tot_y               =       8.000008e-09 ;
+
+
+!!!######### Y-rotation here ##########
+
+yrot: yrotation, angle=0.002;
+
+SEQEDIT, SEQUENCE=seq;
+
+REPLACE, ELEMENT=xrot, BY=yrot;
+
+ENDEDIT;
+
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   1
+
+
+use, sequence=seq;
+
+twiss, BETX=1, BETY=1, file="yrotation.twiss", table=madx_table;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:    -3.999997E-03 -1.999999E-03  0.000000E+00  0.000000E+00 -4.000395E-06  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 3                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.1987886255                  0        9.998800041     0.003999997856 
+
+             dxrms             xcomax             xcorms                 q2 
+    0.002108183977     0.003999997334     0.002108183702       0.1987886255 
+
+               dq2            betymax              dymax              dyrms 
+                 0        9.998800041                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+SURVEY, SEQUENCE=seq, FILE= survey_yrotation.out;
+
+ptc_create_universe;
+
+ptc_create_layout, model=2, method=2, exact=true, closed_layout=false;
+
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=true, totalpath=false;
+
+PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
+
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+                 3           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000       0.1987918725 
+
+                q2                dq1                dq2                 qs 
+      0.1987918725           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+                 1          10.000064                  1          10.000024 
+
+         beta11min          beta11max          beta12min          beta12max 
+                 1          10.000064                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0    7.523193938e-37                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+                 1          10.000024                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0    4.000021311e-05                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 1                  1   -8.673634727e-19                  0 
+
+          disp2min           disp2max           disp3min           disp3max 
+   -0.001999998928                  0                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0                  0 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0     0.002108187918                  0     0.001632992073 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0    2.108188896e-06                  0                  0 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0                  0                  0                 -0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0    -0.004000005333                  0    -0.001999998667 
+
+           pycomin             tcomin            ptcomin 
+                 0   -4.000007189e-06                  0 
+write, table=ptc_table, file="twiss.ptc.yrotation.tfs";
+
+ptc_printframes, file="survey.ptc.yrotation.tfs", format=text;
+
+mad_ptc.c: pro_ptc_printframes: format is text.
+ptc_end;
+
+i = 0;
+
+++++++ info: i redefined
+while(i < 9) {
+
+	i = i + 1;
+
+	SETVARS, TABLE=ptc_table, ROW=i;
+
+	ptc_x = x;
+
+	ptc_y = y;
+
+	ptc_t = t;
+
+	SETVARS, TABLE=madx_table, ROW=i;
+
+	madx_x = x;
+
+	madx_y = y;
+
+	SETVARS, TABLE=survey, ROW=i;
+
+	survey_x = x;
+
+	survey_y = y;
+
+	survey_z = z;
+
+
+
+	tot_x = ptc_x + survey_x;
+
+	tot_y = ptc_y + survey_y;
+
+	tot_z = ptc_t + survey_z;
+
+
+
+	print,text="Y-rotation PTC";
+
+	show, tot_x;
+
+	show, tot_y;
+
+
+
+	tot_x = madx_x + survey_x;
+
+	tot_y = madx_y + survey_y;
+
+
+
+	print,text="Y-rotation MAD-X";
+
+	show, tot_x;
+
+	show, tot_y;
+
+
+
+}
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Y-rotation PTC
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Y-rotation MAD-X
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: madx_x redefined
+++++++ info: madx_y redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+++++++ info: tot_z redefined
+Y-rotation PTC
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Y-rotation MAD-X
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: madx_x redefined
+++++++ info: madx_y redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+++++++ info: tot_z redefined
+Y-rotation PTC
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Y-rotation MAD-X
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: madx_x redefined
+++++++ info: madx_y redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+++++++ info: tot_z redefined
+Y-rotation PTC
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Y-rotation MAD-X
+tot_x               =   -8.000062439e-13 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: madx_x redefined
+++++++ info: madx_y redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+++++++ info: tot_z redefined
+Y-rotation PTC
+tot_x               =                  0 ;
+tot_y               =                  0 ;
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Y-rotation MAD-X
+tot_x               =   -8.000062439e-13 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: madx_x redefined
+++++++ info: madx_y redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+++++++ info: tot_z redefined
+Y-rotation PTC
+tot_x               =      -4.000004e-09 ;
+tot_y               =                  0 ;
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Y-rotation MAD-X
+tot_x               =   -8.000063285e-13 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: madx_x redefined
+++++++ info: madx_y redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+++++++ info: tot_z redefined
+Y-rotation PTC
+tot_x               =      -4.000004e-09 ;
+tot_y               =                  0 ;
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Y-rotation MAD-X
+tot_x               =   -8.000063285e-13 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: madx_x redefined
+++++++ info: madx_y redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+++++++ info: tot_z redefined
+Y-rotation PTC
+tot_x               =      -8.000008e-09 ;
+tot_y               =                  0 ;
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Y-rotation MAD-X
+tot_x               =   -8.000067622e-13 ;
+tot_y               =                  0 ;
+++++++ info: i redefined
+++++++ info: ptc_x redefined
+++++++ info: ptc_y redefined
+++++++ info: ptc_t redefined
+++++++ info: madx_x redefined
+++++++ info: madx_y redefined
+++++++ info: survey_x redefined
+++++++ info: survey_y redefined
+++++++ info: survey_z redefined
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+++++++ info: tot_z redefined
+Y-rotation PTC
+tot_x               =      -8.000008e-09 ;
+tot_y               =                  0 ;
+++++++ info: tot_x redefined
+++++++ info: tot_y redefined
+Y-rotation MAD-X
+tot_x               =   -8.000067622e-13 ;
+tot_y               =                  0 ;
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

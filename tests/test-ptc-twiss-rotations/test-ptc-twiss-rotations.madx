@@ -1,0 +1,147 @@
+circum=3;
+beam;
+trans: translation, dx=0.1, dy=0.2;
+
+m1: MARKER;
+m2: MARKER;
+m3: MARKER;
+
+xin = 0.01;
+yin = 0;
+xpin =0;
+ypin = 0;
+
+!Defines the sequence where rotation is done outside the element.
+seq: sequence, refer=center, l=3;
+m1, at = 1;
+trans, at=1.000;
+m2, at = 1;
+m3, at = 2;
+endsequence;
+
+
+use, sequence=seq;
+select, flag = twiss, clear;
+select, flag=twiss, column=name, s, x,px, y, py, pt, t;
+select, flag=twiss, column=name, s, betx, bety, mux, muy, r11, r12, r21, r22, alfx, alfy;
+
+
+
+!!!######### Translation here ##########
+twiss, BETX=1, BETY=1, file="translation.twiss", table=madx_table;
+SURVEY, SEQUENCE=seq, FILE= survey_translation.out;
+ptc_create_universe;
+ptc_create_layout, model=2, method=2, exact=true, closed_layout=false;
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=true, totalpath=false;
+PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
+write, table=ptc_table, file="twiss.ptc.translation.tfs";
+ptc_printframes, file="survey.ptc.translation.tfs", format=text;
+ptc_end;
+
+i = 0;
+while(i < 9) {
+	i = i + 1;
+	SETVARS, TABLE=ptc_table, ROW=i;
+	ptc_x = x;
+	ptc_y = y;
+	ptc_t = t;
+	SETVARS, TABLE=survey, ROW=i;
+	survey_x = x;
+	survey_y = y;
+	survey_z = z;
+
+	tot_x = ptc_x + survey_x;
+	tot_y = ptc_y + survey_y;
+	!tot_z = ptc_t + survey_z;
+
+	print,text="Translation";
+	show, tot_x;
+	show, tot_y;
+
+}
+
+!!!######### X-rotation here ##########
+xrot: xrotation, angle=0.002;
+SEQEDIT, SEQUENCE=seq;
+REPLACE, ELEMENT=trans, BY=xrot;
+ENDEDIT;
+
+use, sequence=seq;
+twiss, BETX=1, BETY=1, file="xrotation.twiss", table=madx_table;
+SURVEY, SEQUENCE=seq, FILE= survey_xrotation.out;
+ptc_create_universe;
+ptc_create_layout, model=2, method=2, exact=true, closed_layout=false;
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=true, totalpath=false;
+PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
+write, table=ptc_table, file="twiss.ptc.xrotation.tfs";
+ptc_printframes, file="survey.ptc.xrotation.tfs", format=text;
+ptc_end;
+i = 0;
+while(i < 9) {
+	i = i + 1;
+	SETVARS, TABLE=ptc_table, ROW=i;
+	ptc_x = x;
+	ptc_y = y;
+	ptc_t = t;
+	SETVARS, TABLE=survey, ROW=i;
+	survey_x = x;
+	survey_y = y;
+	survey_z = z;
+
+	tot_x = ptc_x + survey_x;
+	tot_y = ptc_y + survey_y;
+	!tot_z = ptc_t + survey_z;
+
+	print,text="X-rotation";
+	show, tot_x;
+	show, tot_y;
+
+}
+
+!!!######### Y-rotation here ##########
+yrot: yrotation, angle=0.002;
+SEQEDIT, SEQUENCE=seq;
+REPLACE, ELEMENT=xrot, BY=yrot;
+ENDEDIT;
+
+use, sequence=seq;
+twiss, BETX=1, BETY=1, file="yrotation.twiss", table=madx_table;
+SURVEY, SEQUENCE=seq, FILE= survey_yrotation.out;
+ptc_create_universe;
+ptc_create_layout, model=2, method=2, exact=true, closed_layout=false;
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=true, totalpath=false;
+PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
+write, table=ptc_table, file="twiss.ptc.yrotation.tfs";
+ptc_printframes, file="survey.ptc.yrotation.tfs", format=text;
+ptc_end;
+i = 0;
+while(i < 9) {
+	i = i + 1;
+	SETVARS, TABLE=ptc_table, ROW=i;
+	ptc_x = x;
+	ptc_y = y;
+	ptc_t = t;
+	SETVARS, TABLE=madx_table, ROW=i;
+	madx_x = x;
+	madx_y = y;
+	SETVARS, TABLE=survey, ROW=i;
+	survey_x = x;
+	survey_y = y;
+	survey_z = z;
+
+	tot_x = ptc_x + survey_x;
+	tot_y = ptc_y + survey_y;
+	tot_z = ptc_t + survey_z;
+
+	print,text="Y-rotation PTC";
+	show, tot_x;
+	show, tot_y;
+
+	tot_x = madx_x + survey_x;
+	tot_y = madx_y + survey_y;
+
+	print,text="Y-rotation MAD-X";
+	show, tot_x;
+	show, tot_y;
+
+}

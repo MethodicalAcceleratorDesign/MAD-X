@@ -6771,7 +6771,7 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   double precision :: al_errors(align_max)
 
   !---- Initialize.
-  angle = node_value('angle ')
+  angle = -node_value('angle ') !Note that we should have the negative angle here
   if (angle .eq. 0) return
   !al_errors = 0d0
   angle = angle * node_value('other_bv ')
