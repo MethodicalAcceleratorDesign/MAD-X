@@ -3,6 +3,9 @@
 # Runs "make tests $@", logs to "tests/tests-log.txt".
 # Returns failed tests as output.
 
+set -e
+set -o pipefail
+
 make tests "$@" 2>&1 | tee tests/tests-log.txt
 
 NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt)
