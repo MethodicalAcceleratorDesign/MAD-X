@@ -35,7 +35,7 @@ ptc_create_layout, model=2, method=2, exact=true, closed_layout=false;
 ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=true, totalpath=false;
 PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
 write, table=ptc_table, file="twiss.ptc.translation.tfs";
-ptc_printframes, file="survey.ptc.translation.tfs", format=text;
+!ptc_printframes, file="survey.ptc.translation.tfs", format=text;
 ptc_end;
 
 i = 0;
@@ -74,7 +74,7 @@ ptc_create_layout, model=2, method=2, exact=true, closed_layout=false;
 ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=true, totalpath=false;
 PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
 write, table=ptc_table, file="twiss.ptc.xrotation.tfs";
-ptc_printframes, file="survey.ptc.xrotation.tfs", format=text;
+!ptc_printframes, file="survey.ptc.xrotation.tfs", format=text;
 ptc_end;
 i = 0;
 while(i < 9) {
@@ -112,7 +112,7 @@ ptc_create_layout, model=2, method=2, exact=true, closed_layout=false;
 ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=true, totalpath=false;
 PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
 write, table=ptc_table, file="twiss.ptc.yrotation.tfs";
-ptc_printframes, file="survey.ptc.yrotation.tfs", format=text;
+!ptc_printframes, file="survey.ptc.yrotation.tfs", format=text;
 ptc_end;
 i = 0;
 while(i < 9) {

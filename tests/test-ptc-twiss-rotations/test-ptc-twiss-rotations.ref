@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.03.03 14:38:39      +
+  + Execution date: 2021.03.03 15:14:41      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=3;
 
@@ -179,9 +179,8 @@ PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
                  0                 -0                  0 
 write, table=ptc_table, file="twiss.ptc.translation.tfs";
 
-ptc_printframes, file="survey.ptc.translation.tfs", format=text;
+!ptc_printframes, file="survey.ptc.translation.tfs", format=text;
 
-mad_ptc.c: pro_ptc_printframes: format is text.
 ptc_end;
 
 
@@ -444,9 +443,8 @@ PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
                  0   -4.000007189e-06                  0 
 write, table=ptc_table, file="twiss.ptc.xrotation.tfs";
 
-ptc_printframes, file="survey.ptc.xrotation.tfs", format=text;
+!ptc_printframes, file="survey.ptc.xrotation.tfs", format=text;
 
-mad_ptc.c: pro_ptc_printframes: format is text.
 ptc_end;
 
 i = 0;
@@ -716,9 +714,8 @@ PTC_TWISS, table=ptc_table, icase=56, no=1, betx=1, bety=1, betz=1;
                  0   -4.000007189e-06                  0 
 write, table=ptc_table, file="twiss.ptc.yrotation.tfs";
 
-ptc_printframes, file="survey.ptc.yrotation.tfs", format=text;
+!ptc_printframes, file="survey.ptc.yrotation.tfs", format=text;
 
-mad_ptc.c: pro_ptc_printframes: format is text.
 ptc_end;
 
 i = 0;
