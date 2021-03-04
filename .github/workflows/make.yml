@@ -111,6 +111,10 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install dependencies
+        run: |
+          brew install gnuplot
+
       - name: Setup gcc/gfortran
         run: |
           set -ex
