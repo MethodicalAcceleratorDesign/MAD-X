@@ -113,7 +113,8 @@ jobs:
             export CC=gcc-9
           fi
           export X11=0 BLAS=1 LAPACK=1
-          pip install -e .
+          pip install -e . \
+            --global-option build_ext --global-option -lm
 
       - name: Run tests
         run: |
