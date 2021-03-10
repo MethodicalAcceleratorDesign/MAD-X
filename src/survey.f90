@@ -329,10 +329,12 @@ subroutine locslice(spos, displ,angle)
           print *, "ell", v_el(1), displ(1)  
           print *, "ell22", v_el(3), displ(3)
           tmp_x = v_al(1)-v_el(1)
-          tmp_z = spos-v_el(3)
+          tmp_z = v_al(3)-v_el(3)
 
           displ(1) = tmp_x*cos(slangle)+tmp_z*sin(slangle)
           displ(3) = tmp_z*cos(slangle)-tmp_x*sin(slangle)
+
+          !displ(5) = -(angle-slangle)
           !displ(1) = spos * (cos(slangle)-one)/slangle
           !displ(3) = 0
 
@@ -477,7 +479,6 @@ subroutine suelem(el, ve, we, tilt, code,angle)
         else
            ds = el
         endif
-        print *, "ooooel", el
         cospsi = cos(tilt);  sinpsi = sin(tilt)
         costhe = cos(angle); sinthe = sin(angle)
 
