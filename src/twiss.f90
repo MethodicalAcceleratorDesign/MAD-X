@@ -2045,7 +2045,6 @@ SUBROUTINE twcptk(re,orbit)
   eflag = 0
 
   call element_name(name,len(name))
-
   !---- Dispersion.
   DT = matmul(RE, DISP)
 
@@ -2269,7 +2268,7 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   double precision :: maty11, maty12, maty21, maty22
   double precision :: alfx_ini, betx_ini, tempa
   double precision :: alfy_ini, bety_ini, tempb
-  double precision :: detx, dety
+  double precision :: detx, dety, atanm12
   logical          :: error
   double precision, parameter :: eps=1d-36
   character(len=name_len) :: name
@@ -2307,10 +2306,12 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   betx =   (tempb * tempb + matx12 * matx12) / (detx*betx_ini)
   !if (abs(matx12).gt.eps) amux = amux + atan2(matx12,tempb)
   if (abs(matx12).gt.eps) then
-     amux = amux + atan2(matx12,tempb)
-
-     if (atan2(matx12,tempb) .lt. zero)then
-        if (ele_body .and. abs(atan2(matx12,tempb)) > 0.1) then
+    atanm12 = atan2(matx12,tempb)
+    if(abs(atanm12) < 3.14 .or. ele_body) then
+      amux = amux + atanm12
+    endif
+     if (atanm12 .lt. zero)then
+        if (ele_body .and. abs(atanm12) > 0.1) then
            write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in x-plane ", &
                 atan2(matx12,tempb), " in the element ", name
            call fort_warn('TWCPTK_TWISS: ', warnstr)
@@ -2332,12 +2333,15 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   bety =   (tempb * tempb + maty12 * maty12) / (detx*bety_ini)
 !  if (abs(maty12).gt.eps) amuy = amuy + atan2(maty12,tempb)
   if (abs(maty12).gt.eps) then
-     amuy = amuy + atan2(maty12,tempb)
+    atanm12 = atan2(maty12,tempb)
+    if(abs(atanm12) < 3.14 .or. ele_body) then ! If no body phase advance < 180 deg
+     amuy = amuy + atanm12
+   endif
 
      if (atan2(maty12,tempb) .lt. zero) then
-        if (ele_body .and. abs(atan2(maty12,tempb)) > 0.1 ) then
+        if (ele_body .and. abs(atanm12) > 0.1 ) then
            write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in y-plane ", &
-                atan2(maty12,tempb), " in the element ", name
+                atanm12, " in the element ", name
            call fort_warn('TWCPTK_TWISS: ', warnstr)
            ! print*, " maty12 =", maty12, " tempb = ", tempb , "maty11 * bety_ini =",  maty11 * bety_ini, &
            !      "  maty12 * alfy_ini = ",  maty12 * alfy_ini
@@ -6683,65 +6687,10 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   re(4,2) = -st
   re(4,4) = ct
 
-
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmsrot
-
-SUBROUTINE tmchangeref(ftrk,orbit,fmap,ek,re,te)
-  use twisslfi
-  use twissbeamfi, only : beta, gamma
-  use twiss0fi, only : align_max
-  implicit none
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     TRANSPORT map for rotation about X-axis.                         *
-  !     Treated in a purely linear way.                                  *
-  !     Input:                                                           *
-  !     ftrk      (logical) if true, track orbit.                        *
-  !     Input/output:                                                    *
-  !     orbit(6)  (double)  closed orbit.                                *
-  !     Output:                                                          *
-  !     fmap      (logical) if true, element has a map.                  *
-  !     ek(6)     (double)  kick due to element.                         *
-  !     re(6,6)   (double)  transfer matrix.                             *
-  !     te(6,6,6) (double)  second-order terms.                          *
-  !----------------------------------------------------------------------*
-  logical :: ftrk, fmap
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: al_errors(align_max)
-  double precision :: angle, ca, sa, ta
-  double precision :: node_value
-
-  !---- Initialize.
-  al_errors = 0d0
-
-  angle = node_value('angle ')
-  if (angle .eq. 0) return
-
-  angle = angle * node_value('other_bv ')
-  al_errors(4) = -angle
-  !---- Kick.
-  !ca = cos(angle)
-  !sa = sin(angle)
-  !ta = tan(angle)
-
-  !ek(4) = sa
-
-  call tmali1(orbit,al_errors,beta,gamma,orbit,re)
-  !---- Transfer matrix.
-  !re(3,3) = 1/ca
-  !re(4,4) =   ca
-  !re(4,6) =   sa/beta
-  !re(5,3) =  -ta/beta
-
-  !---- Track orbit.
-  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-
-end SUBROUTINE tmchangeref
-
-
 
 SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
@@ -6775,23 +6724,23 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   if (angle .eq. 0) return
 
   angle = angle * node_value('other_bv ')
-  al_errors(4) = -angle
+  !al_errors(4) = -angle
   !---- Kick.
-  !ca = cos(angle)
-  !sa = sin(angle)
-  !ta = tan(angle)
+  ca = cos(angle)
+  sa = sin(angle)
+  ta = tan(angle)
 
-  !ek(4) = sa
+  ek(4) = sa
 
-  call tmali1(orbit,al_errors,beta,gamma,orbit,re)
+  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
   !---- Transfer matrix.
-  !re(3,3) = 1/ca
-  !re(4,4) =   ca
-  !re(4,6) =   sa/beta
-  !re(5,3) =  -ta/beta
+  re(3,3) = 1/ca
+  re(4,4) =   ca
+  re(4,6) =   sa/beta
+  re(5,3) =  -ta/beta
 
   !---- Track orbit.
-  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmxrot
 
@@ -6824,26 +6773,26 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   !---- Initialize.
   angle = node_value('angle ')
   if (angle .eq. 0) return
-  al_errors = 0d0
+  !al_errors = 0d0
   angle = angle * node_value('other_bv ')
-  al_errors(5) = - angle
-  call tmali1(orbit,al_errors,beta,gamma,orbit,re)
+  !al_errors(5) = - angle
+  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
 
   !---- Kick.
-  !ca = cos(angle)
-  !sa = sin(angle)
-  !ta = tan(angle)
+  ca = cos(angle)
+  sa = sin(angle)
+  ta = tan(angle)
 
-  !ek(2) = sa
+  ek(2) = sa
 
   !---- Transfer matrix.
-  !re(1,1) = 1/ca
-  !re(2,2) =   ca
-  !re(2,6) =   sa/beta
-  !re(5,1) =  -ta/beta
+  re(1,1) = 1/ca
+  re(2,2) =   ca
+  re(2,6) =   sa/beta
+  re(5,1) =  -ta/beta
 
   !---- Track orbit.
-  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmyrot
 
@@ -7684,6 +7633,7 @@ SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
   orbt(4) = orb1(4) - w(3,2)
   orbt(5) = orb1(5) - s2 / beta
   orbt(6) = orb1(6)
+
   ORB2 = matmul(RM,ORBT)
 
 end SUBROUTINE tmali2
@@ -8594,9 +8544,9 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   ED = zero
   RD = EYE
   TD = zero
-
-  call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
-
+  if(el .ne. zero) then
+    call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
+  endif 
   !---- Read-in the parameters
   harmon = node_value('harmon ');
   bvk = node_value('other_bv ')
@@ -8741,11 +8691,12 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
       ek(ii) = ek(ii) * P(ii);
     enddo
   endif
-
-  ! Add half a drift space before and after the Crab kick
-  call tmcat1(fsec,ed,rd,td,ek,re,te,ek,re,te);
-  call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
-  call tmcat1(fsec,ek,re,te,ed,rd,td,ek,re,te);
+  if(el .ne. zero) then
+    ! Add half a drift space before and after the Crab kick when it has a length
+    call tmcat1(fsec,ed,rd,td,ek,re,te,ek,re,te);
+    call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
+    call tmcat1(fsec,ek,re,te,ed,rd,td,ek,re,te);
+  endif
 
 end SUBROUTINE tmcrab
 SUBROUTINE twcpin_print(rt,r0mat )

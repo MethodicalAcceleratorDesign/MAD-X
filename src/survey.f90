@@ -560,7 +560,6 @@ subroutine suelem(el, ve, we, tilt, code,angle)
        ! all straight elements and catch all; use default VE and WE
 
      end select
-     print *, "innnsum", angle
 end subroutine suelem
 
 subroutine sufill(suml, v, theta, phi, psi, globaltilt,name_add)
