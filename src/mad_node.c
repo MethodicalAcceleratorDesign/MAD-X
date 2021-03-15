@@ -324,15 +324,15 @@ node_value(const char* par)
   mycpy(lpar, par);
   if (strcmp(lpar, "l") == 0) value = current_node->length;
 /*  else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;*/
-  else if(strcmp(lpar, "dx") == 0){  
+  else if(current_node->p_elem->def->mad8_type != 36 && strcmp(lpar, "dx") == 0){
       if (current_node->perm_align->dx_expr == NULL) value = current_node->perm_align->dx_value;
       else                                            value = expression_value(current_node->perm_align->dx_expr , 2);
   }
-  else if (strcmp(lpar, "dy") == 0){  
+  else if (current_node->p_elem->def->mad8_type != 36 && strcmp(lpar, "dy") == 0){
       if (current_node->perm_align->dy_expr == NULL) value = current_node->perm_align->dy_value;
       else                                            value = expression_value(current_node->perm_align->dy_expr , 2);
   }
-  else if (strcmp(lpar, "ds") == 0){  
+  else if (current_node->p_elem->def->mad8_type != 36 && strcmp(lpar, "ds") == 0){
       if (current_node->perm_align->ds_expr == NULL) value = current_node->perm_align->ds_value;
       else                                            value = expression_value(current_node->perm_align->ds_expr , 2);
   }
