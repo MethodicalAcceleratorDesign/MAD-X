@@ -292,7 +292,7 @@ subroutine locslice(spos, displ,angle)
     double precision, intent(OUT) :: displ(6)
 
     double precision :: v_al(3), v_el(3), ve(3), w_el(3,3), w_al(3,3), w_tot(3,3), angle
-    double precision :: dphi, dpsi, dtheta, tilt, dx_ref, ds_ref, tmp_x, tmp_y, slangle
+    double precision :: dphi, dpsi, dtheta, tilt, dx_ref, ds_ref, tmp_x, tmp_y, tmp_z, slangle
 
     integer :: code
     double precision, external :: proxim, node_value, get_value
@@ -309,9 +309,10 @@ subroutine locslice(spos, displ,angle)
       dpsi   = node_value('dpsi ')
  
       call sumtrx(dtheta, dphi, dpsi, w_al)
-      slangle = angle*spos/node_value('l ')
+      
           
       code = node_value('mad8_type ') 
+
       call suelem(spos, v_el, w_el, tilt, code,angle)
 
       !w_tot = matmul(w_al, w_el) ! Is this the right way?
@@ -324,12 +325,18 @@ subroutine locslice(spos, displ,angle)
 
 
         if (abs(angle) .ge. 1d-13) then
+          slangle = angle*spos/node_value('l ')
           call suelem(spos, v_el, w_el, tilt, code,slangle)
-          call suelem(spos, v_al, w_el, tilt, code,angle)
-          print *, "ell", v_el(1), displ(1)  
-          print *, "ell22", v_el(3), displ(3)
-          tmp_x = v_al(1)-v_el(1)
-          tmp_z = v_al(3)-v_el(3)
+          
+          !call suelem(spos, v_al, w_el, tilt, code,angle)
+
+          tmp_x = displ(1)-v_el(1)
+          tmp_y = displ(2)-v_el(2)
+          tmp_z = displ(3)-v_el(3)
+          tilt = node_value('tilt ') 
+          print *, "ttttaa", tilt
+          tmp_x = tmp_x*cos(tilt)
+          tmp_y = tmp_y*sin(tilt)
 
           displ(1) = tmp_x*cos(slangle)+tmp_z*sin(slangle)
           displ(3) = tmp_z*cos(slangle)-tmp_x*sin(slangle)
@@ -481,7 +488,7 @@ subroutine suelem(el, ve, we, tilt, code,angle)
         endif
         cospsi = cos(tilt);  sinpsi = sin(tilt)
         costhe = cos(angle); sinthe = sin(angle)
-
+        print *, "ttttt", cospsi
         ve(1) = dx * cospsi
         ve(2) = dx * sinpsi
         ve(3) = ds
