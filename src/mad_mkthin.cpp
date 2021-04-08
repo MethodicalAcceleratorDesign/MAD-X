@@ -801,17 +801,8 @@ static command_parameter* par_scaled(const command_parameter* par_inp, const com
   {
     par_out=clone_command_parameter(par_inp); // start from clone of input parameter
     strcpy(par_out->name,new_par_name.c_str());
-    if (length_param->expr ) // first * l, expression or value
-    {
-      if(!par_out->expr) par_out->expr=my_get_param_expression(par_out);
-      par_out->expr = compound_expr(par_out->expr,par_out->double_value,"*",length_param->expr,length_param->double_value,1); // multiply expression with length
-    }
-    else
-    {
-      // if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " multiply par_out->double_value=" << par_out->double_value << '\n';
-      par_out->double_value *= length_param->double_value; // multiply value with length
-      // if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << "      now par_out->double_value=" << par_out->double_value << '\n';
-    }
+    if(par_out->expr||length_param->expr) par_out->expr = compound_expr(par_out->expr,par_out->double_value,"*",length_param->expr,length_param->double_value,1); // multiply parameter with length
+    else par_out->double_value*=length_param->double_value;
     if (nslices > 1) // 2nd step, divide by nslices, expression or number
     {
       if (par_out->expr) par_out->expr = compound_expr(par_out->expr,0.,"/",nullptr,nslices,1);
@@ -822,7 +813,7 @@ static command_parameter* par_scaled(const command_parameter* par_inp, const com
       par_out->double_value=my_get_expression_value(par_out->expr);
       par_out->expr=nullptr;
     }
-   }
+  }
   return par_out;
 }
 
@@ -2558,7 +2549,7 @@ void SeqElList::slice_node() // main steering, decides how to split an individua
 
   if (thick_elem) // look at the element of this node to see what to do with slicing
   {
-    current_node=work_node; // only needed for locslice, that relies
+    current_node=work_node; // only needed for locslice
     if(verbose>1) std::cout << " now see what to do with work_node=" << std::left << std::setw(MaTh::par_name_maxlen) << work_node->name <<  " depending on its base=" << std::setw(MaTh::par_name_maxlen) << work_node->base_name << std::right << '\n';
     const double eps=1.e-15; // used to check if a value is compatible with zero
     bool IsWireCollimator = ( strcmp(work_node->base_name,"collimator") == 0 && return_param_recurse("current",thick_elem) );
