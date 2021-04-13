@@ -1019,12 +1019,13 @@ subroutine getclor(orbit0, rt, tt, error)
   use math_constfi, only : zero
   implicit none
 
-  double precision :: orbit0(6), rt(6,6), tt(6,6,6)
+  double precision :: orbit0(6), rt(6,6), tt(6,6,6), eig_tol
   integer :: error
 
   double precision :: opt(fundim)
 
   RT  = EYE
   OPT = zero
-  call tmclor(orbit0, .true., .true., opt, rt, tt, error)
+  eig_tol = 1e-4
+  call tmclor(orbit0, .true., .true., eig_tol, opt, rt, tt, error)
 end subroutine getclor

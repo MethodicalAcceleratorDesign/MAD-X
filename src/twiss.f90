@@ -21,7 +21,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   integer :: i, j, ithr_on
   integer :: chrom, eflag, chrom_warn
   double precision :: orbit0(6), orbit(6), tt(6,6,6), ddisp0(6), r0mat(2,2)
-  double precision :: s0mat(6,6) ! initial sigma matrix
+  double precision :: s0mat(6,6), eig_tol ! initial sigma matrix
   character(len=48) :: charconv
   character(len=150) :: warnstr
   logical :: fast_error_func
@@ -98,6 +98,8 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   dtbyds  = get_value('probe ','dtbyds ')
   charge  = get_value('probe ','charge ')
   npart   = get_value('probe ','npart ')
+  eig_tol = get_value('twiss ','clorb_tol' )
+
 
   !---- Set fast_error_func flag to use faster error function
   !---- including tables. Thanks to late G. Erskine
@@ -121,7 +123,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      call tmsigma(s0mat) !-- from initial conditions in opt_fun0
   else
      !---- Initial values from periodic solution.
-     call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag);          if (eflag.ne.0) go to 900
+     call tmclor(orbit0,.true.,.true.,eig_tol,opt_fun0,rt,tt,eflag);          if (eflag.ne.0) go to 900
 !    LD: useless, identical to last call to tmfrst in tmclor...
 !    call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on); if (eflag.ne.0) go to 900
      call twcpin(rt,disp0,r0mat,eflag);                               if (eflag.ne.0) go to 900
@@ -242,7 +244,7 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   double precision :: orbit0(6), orbit(6), rt(6,6)
 
   integer :: eflag, ithr_on
-  double precision :: opt_fun0(fundim), tt(6,6,6)
+  double precision :: opt_fun0(fundim), tt(6,6,6), eig_tol
 
   double precision, external :: get_value
 
@@ -259,11 +261,12 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   dtbyds = get_value('probe ','dtbyds ')
   charge = get_value('probe ','charge ')
   npart  = get_value('probe ','npart ')
+  eig_tol = get_value('twiss ','clorb_tol' )
 
   ithr_on = izero
   ORBIT0 = zero
   !---- Get closed orbit and coupled transfer matrix.
-  call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
+  call tmclor(orbit0,.true.,.true.,eig_tol, opt_fun0,rt,tt,eflag)
   call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,ithr_on) ! useless?
 end SUBROUTINE tmrefo
 
@@ -510,10 +513,11 @@ SUBROUTINE twfill_ripken(opt_fun)
 
 end SUBROUTINE twfill_ripken
 
-SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
+SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   use twissbeamfi, only : deltap
   use matrices, only : EYE
   use math_constfi, only : zero, one
+  use twtapering
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -537,7 +541,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
 
   logical :: pflag
   integer :: i, k, irank, itra, thr_on, ithr_on, save_opt
-  double precision :: cotol, err
+  double precision :: cotol, err, eig_tol
   double precision :: orbit0(6), orbit(6), a(6,7), b(4,5)
 
   integer, external :: get_option
@@ -559,7 +563,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
 
   !---- Iteration for closed orbit.
   iterate: do itra = 1, itmax
-
+      orderrun = itra
      !---- Track orbit and transfer matrix.
      call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
 
@@ -607,21 +611,72 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
      endif
 
      if (err.lt.cotol) then
+        orderrun = 0
         save_opt = get_option('keeporbit ')
         call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,ithr_on)
         OPT_FUN0(9:14) = ORBIT0(1:6)
         GUESS = ORBIT0
+        call tmcheckstab(rt,eig_tol)
         return ! normal exit
      endif
 
   enddo iterate
 
+
   !---- No convergence.
+  call tmcheckstab(rt, eig_tol)
+  orderrun = 0
   print '(''Closed orbit did not converge in '', i3, '' iterations'')', itmax
   OPT_FUN0(9:14) = zero
   return
 
 end SUBROUTINE tmclor
+
+SUBROUTINE tmcheckstab(rt,tol)
+    use math_constfi, only :  one
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Check the stability of the one turn matrix                       *
+  !                                                                      *
+  !     Input:                                                           *
+  !     rt(6,6)   (double)  transfer matrix.                             *
+  !----------------------------------------------------------------------*
+  double precision :: rt(6,6) , tmp1, tmp2
+  double precision :: em(6,6), tol
+  double precision :: reval(6), aival(6) ! re and im parts for damping and tune
+  logical :: stabx, staby, stabt 
+  logical, external :: m66sta
+  character(len=150) :: warnstr
+  double precision, external :: get_value, get_variable
+
+  if (m66sta(rt)) then
+     call laseig(rt, reval, aival, em)
+     stabt = .false.
+  else
+     call ladeig(rt, reval, aival, em)
+     stabt = abs(reval(5)**2 + aival(5)**2-one) .ge. tol  .and.  &
+             abs(reval(6)**2 + aival(6)**2-one) .ge. tol
+  endif
+  stabx = abs(reval(1)**2 + aival(1)**2 - one) .ge. tol  .and.     &
+          abs(reval(2)**2 + aival(2)**2 - one) .ge. tol
+  staby = abs(reval(3)**2 + aival(3)**2 - one) .ge. tol  .and.     &
+          abs(reval(4)**2 + aival(4)**2 - one) .ge. tol
+  if (stabx .or.  staby) then
+    call fort_warn('TWCLORB: ','The one turn map might be' // & 
+      'unstable in the horizontal or the veritcal plane')
+  endif
+  if (stabt) then
+    tmp1 = reval(5)**2 + aival(5)**2
+    tmp2 = reval(6)**2 + aival(6)**2
+    
+    write (warnstr,'(a,e13.6,a,e13.6)') 'Longitudinal night be unstable (values should be one)' // &
+     'Eigenvalues time ', tmp1, " eigenvalues pt", tmp2
+ !   call fort_warn('TWCLORB: ','The one turn map might be unstable in the longitudinal plane.' // & 
+ !     'The RF-phase might be on the wrong side of the crest.')
+ call fort_warn('TWCLORB: ',warnstr)
+
+   endif 
+end SUBROUTINE tmcheckstab
 
 SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use bbfi
@@ -634,6 +689,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use math_constfi, only : zero
   use code_constfi
   use twtapering
+  use twissbeamfi, only : radiate, beta, gamma
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -655,7 +711,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision :: orbit0(6), orbit(6)
   logical :: fsec, ftrk
   double precision :: rt(6,6), tt(6,6,6)
-  integer :: eflag, kobs, save, thr_on, i
+  integer :: eflag, kobs, save, thr_on, i, tap_itter
 
   logical :: fmap, istaper
   character(len=28) :: tmptxt1, tmptxt2, tmptxt3
@@ -678,6 +734,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   111 continue
   debug = get_option('debug ')
+  
 
   !---- Initialize
   !---- corr_pick stores for both projection the last pickup used by the
@@ -694,7 +751,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      if (j .lt. 3) thr_on = 0
   endif
   istaper = get_value('twiss ','tapering ').ne.zero
-  !istaper = .true.
+  tap_itter = get_value('twiss ','tap_itter ')
+
   TT = zero
   RT = EYE
 
@@ -787,7 +845,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   endif
 
   !---- Element matrix
-  if (istaper) then
+  if (istaper .and. orderrun < tap_itter) then
+
     orbitori = orbit
 
     select case (code)
@@ -974,12 +1033,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      goto 10 ! loop over nodes
   endif
 
-
-  if(orbit(6) .gt. 1e-10 .and. istaper) then
-    endpt=endpt+orbit(6)
-    orderrun = orderrun+1
-    goto 111
-  endif
   bbd_flag=0
 
 end SUBROUTINE tmfrst
@@ -6910,7 +6963,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   use twiss_elpfi
   use twissbeamfi, only : deltap, pc, radiate
   use matrices, only : EYE
-  use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi
+  use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi, ten6m
   use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
@@ -6985,19 +7038,10 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   vrf   = rfv * ten3m / (pc * (one + deltap))
   phirf = rfl * twopi - omega * orbit(5)
 
-  istaper = get_value('twiss ','tapering ').ne.zero
-  
-  if(istaper .and. ftrk) then
-    ncav = get_ncavities()   
-    phirf = asin((sin(pi*half)*vrf - endpt/ncav)/vrf)
-    tmpphase = (phirf+omega*orbit(5))/twopi-g_elpar(r_lag)
-    call store_node_value('lagtap ', tmpphase)
-  endif
   
   c0 =   vrf * sin(phirf)
   c1 = - vrf * cos(phirf) * omega
   c2 = - vrf * sin(phirf) * omega**2 * half
-
   !---- Transfer map.
   fmap = .true.
 

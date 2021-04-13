@@ -1077,6 +1077,8 @@ const char *const_command_def =
 "eigenvector = [l, false, true], "
 "eigenfile = [s, eigenvectors, eigenvectors], "
 "tapering = [l, false, true], "
+"clorb_tol = [r, 0.0001], "
+"tap_itter = [i, 1000], "
 "notable  = [l, false, true]; "
 " "
 "match: match match 1 0 "
@@ -1107,6 +1109,7 @@ const char *const_command_def =
 "useorbit = [s, {default}, {default}], "
 "keeporbit= [s, {default}, {default}], "
 "vlength  = [l, false, true], "
+"tapering = [l, false, true], "
 "slow     = [l, false, true], "  /* makes match use the twiss table */
 "orbit    = [l, false, true]; "
 " "
