@@ -34,7 +34,6 @@ subroutine ibs
   double precision :: salxb, salyb, sbxb, sbxinv, sbyb, sbyinv, sdpxb, sdxb, sdpyb, sdyb
   double precision :: hscrpt, hscwtd, hscrpty, hscwtdy
   double precision :: s1, s2, ss2, l1, l2, ll2, const, dels, wnorm, sdum, tol
-  logical :: fbch
 
   integer, external :: get_option, double_from_table_row, restart_sequ, advance_to_pos
   double precision, external :: get_value
@@ -303,14 +302,10 @@ subroutine ibs
 
   write (*,'(5x,a,1pe13.5,4x,a,1pe13.5)')  "1/betx = ",bxinv, "1/bety = ",byinv
 
-  fbch = get_value('probe ', 'bunched ') .ne. 0
-
   !---- Output averaged values.
   tavl   = tavlc * const / s2
   tavx   = tavxc * const / s2
   tavy   = tavyc * const / s2
-
-  if(fbch .eqv. .false.) tavl = tavl * two
 
   taul   = one / tavl
   taux   = one / tavx
