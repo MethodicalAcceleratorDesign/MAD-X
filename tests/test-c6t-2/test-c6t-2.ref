@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:39:53      +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2021.03.31 13:31:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE;
 
@@ -53,6 +53,7 @@ sixtrack,split;
   ++++++++++++++++++++++++++++
 
 ++++++ info: c6t - split flag selected 
+++++++ info: c6t - long names flag selected 
 Reference radius set to : 1.000000
 ++++++ info: MADX sequence converted to c6t internal. 
 
