@@ -286,6 +286,7 @@ subroutine elementloc
 end subroutine elementloc
 
 subroutine locslice(spos, displ,angle)
+    use math_constfi, only : zero, one
     ! Purpose  :
     ! Give the correct slices locations for an element
     double precision, intent(IN) :: spos
@@ -295,10 +296,13 @@ subroutine locslice(spos, displ,angle)
     double precision :: dphi, dpsi, dtheta, tilt, dx_ref, ds_ref, tmp_x, tmp_y, tmp_z, slangle
 
     integer :: code
+    logical :: sstraight
     double precision, external :: proxim, node_value, get_value
+
 
      !**  Compute the coordinates at each point
      !call sutrak(v, w, ve, we)
+      sstraight = node_value('slice_straight ').ne.zero
 
       v_al(1) =   node_value('dx ')
       v_al(2) =   node_value('dy ')
@@ -321,39 +325,24 @@ subroutine locslice(spos, displ,angle)
       displ(4) = dphi
       displ(5) = dtheta
       displ(6) = dpsi
+      
 
+      if (sstraight) then
+        slangle = angle*spos/node_value('l ')
+        call suelem(spos, v_el, w_el, tilt, code,slangle)
+        
+        !call suelem(spos, v_al, w_el, tilt, code,angle)
 
+        tmp_x = displ(1)-v_el(1)
+        tmp_y = displ(2)-v_el(2)
+        tmp_z = displ(3)-v_el(3)
+        tmp_x = tmp_x*cos(tilt)
+        tmp_y = tmp_y*sin(tilt)
 
-        if (abs(angle) .ge. 1d-13) then
-          slangle = angle*spos/node_value('l ')
-          call suelem(spos, v_el, w_el, tilt, code,slangle)
-          
-          !call suelem(spos, v_al, w_el, tilt, code,angle)
-
-          tmp_x = displ(1)-v_el(1)
-          tmp_y = displ(2)-v_el(2)
-          tmp_z = displ(3)-v_el(3)
-          tilt = node_value('tilt ') 
-          print *, "ttttaa", tilt
-          tmp_x = tmp_x*cos(tilt)
-          tmp_y = tmp_y*sin(tilt)
-
-          displ(1) = tmp_x*cos(slangle)+tmp_z*sin(slangle)
-          displ(3) = tmp_z*cos(slangle)-tmp_x*sin(slangle)
-
-          !displ(5) = -(angle-slangle)
-          !displ(1) = spos * (cos(slangle)-one)/slangle
-          !displ(3) = 0
-
-
-
-          !displ(1) = displ(1)-v_el(1)
-          !displ(3) = displ(3)-v_el(3)
-          !displ(1) = -v_el(1)
-          !displ(3) =spos-v_el(3)
- 
-        else
-          displ(3) = displ(3)-spos
+        displ(1) = tmp_x*cos(slangle)+tmp_z*sin(slangle)
+        displ(3) = tmp_z*cos(slangle)-tmp_x*sin(slangle)
+      else
+        displ(3) = displ(3)-spos
         endif
 end subroutine locslice
 
