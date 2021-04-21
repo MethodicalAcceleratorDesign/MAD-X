@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:35:33      +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2021.04.21 17:25:32      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example of PTC_TRACK command with 6D and totalpath true
 
@@ -34,6 +34,7 @@ enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.104337E+01 Eigenvalue(6)**2 0.958433E+00                                                                                               
 
 ++++++ table: summ
 
@@ -179,8 +180,8 @@ py_co              =                  0 ;
 pt_co              =    5.501533498e-07 ;
 betarel            =       0.9720997084 ;
 
-  Number of warnings: 1
-0 in C and 1 in Fortran
+  Number of warnings: 2
+0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

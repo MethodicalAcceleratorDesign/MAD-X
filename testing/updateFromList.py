@@ -48,12 +48,12 @@ for line in Lines:
 	#	onlyfiles[i] = [mypath + onlyfiles[i]]
 
 	for f in onlyfiles:
-		if(f.endswith('.ref')):
+		if(f.endswith('.ref') and f.startswith("test-")):
 			oname = f[:-4]
 			print(oname, f)
 			if(isfile(oname)):
 				copyfile(oname, f)
-		if(f.endswith(".out")):
+		if(f.endswith(".out") and f.startswith("test-")):
 			cpname = f[:-4] + ".ref"
 			copyfile(f, cpname)
 
