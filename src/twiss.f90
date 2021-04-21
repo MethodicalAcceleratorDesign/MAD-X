@@ -646,36 +646,51 @@ SUBROUTINE tmcheckstab(rt,tol)
   double precision :: reval(6), aival(6) ! re and im parts for damping and tune
   logical :: stabx, staby, stabt 
   logical, external :: m66sta
-  character(len=150) :: warnstr
+  character(len=250) :: warnstr
   double precision, external :: get_value, get_variable
 
+  if(tol .eq. zero) tol = 1e-6
   if (m66sta(rt)) then
      call laseig(rt, reval, aival, em)
      stabt = .false.
   else
      call ladeig(rt, reval, aival, em)
-     stabt = abs(reval(5)**2 + aival(5)**2-one) .ge. tol  .and.  &
+     stabt = abs(reval(5)**2 + aival(5)**2-one) .ge. tol  .or.  &
              abs(reval(6)**2 + aival(6)**2-one) .ge. tol
   endif
-  stabx = abs(reval(1)**2 + aival(1)**2 - one) .ge. tol  .and.     &
+  stabx = abs(reval(1)**2 + aival(1)**2 - one) .ge. tol  .or.     &
           abs(reval(2)**2 + aival(2)**2 - one) .ge. tol
-  staby = abs(reval(3)**2 + aival(3)**2 - one) .ge. tol  .and.     &
+  staby = abs(reval(3)**2 + aival(3)**2 - one) .ge. tol  .or.     &
           abs(reval(4)**2 + aival(4)**2 - one) .ge. tol
-  if (stabx .or.  staby) then
-    call fort_warn('TWCLORB: ','The one turn map might be' // & 
-      'unstable in the horizontal or the veritcal plane')
+
+  if (stabx) then
+    tmp1 = reval(1)**2 + aival(1)**2
+    tmp2 = reval(2)**2 + aival(2)**2
+    
+    write (warnstr,'(a,e13.6,a,e13.6)') 'Horizontal plane might be unstable (values should be less than one)' // &
+     'Eigenvalue(1)**2 ', tmp1, " Eigenvalue(2)**2", tmp2
+
+    call fort_warn('TWCLORB: ',warnstr)
   endif
+
+  if (staby) then
+    tmp1 = reval(1)**2 + aival(1)**2-one
+    tmp2 = reval(2)**2 + aival(2)**2-one
+    
+    write (warnstr,'(a,e13.6,a,e13.6)') 'Vertical plane might be unstable (values should be less than one)' // &
+     'Eigenvalue(3)**2 ', tmp1, " Eigenvalue(4)**2", tmp2
+  call fort_warn('TWCLORB: ',warnstr)
+  endif
+  
   if (stabt) then
     tmp1 = reval(5)**2 + aival(5)**2
     tmp2 = reval(6)**2 + aival(6)**2
-    
-    write (warnstr,'(a,e13.6,a,e13.6)') 'Longitudinal night be unstable (values should be one)' // &
-     'Eigenvalues time ', tmp1, " eigenvalues pt", tmp2
- !   call fort_warn('TWCLORB: ','The one turn map might be unstable in the longitudinal plane.' // & 
- !     'The RF-phase might be on the wrong side of the crest.')
- call fort_warn('TWCLORB: ',warnstr)
+    write (warnstr,'(a,e13.6,a,e13.6)') 'Longitudinal plane might be unstable. (values should be less than one)' // &
+     'Try change lag with 0.5. Eigenvalue(5)**2 ', tmp1, " Eigenvalue(6)**2", tmp2
 
-   endif 
+  call fort_warn('TWCLORB: ',warnstr)
+endif 
+
 end SUBROUTINE tmcheckstab
 
 SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
