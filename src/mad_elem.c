@@ -169,6 +169,7 @@ check_for_perm_misalign(struct node* c_node, struct in_cmd* cmd){
   if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0)     isperm = 1;
   if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0)     isperm = 1;
   if(command_par_expr("dpsi", cmd->clone) || command_par_value("dpsi", cmd->clone)!=0)     isperm = 1;
+  if(command_par_value("slice_straight", cmd->clone)!=0)     isperm = 1;
   
   if(isperm==1){
    
