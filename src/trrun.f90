@@ -1378,7 +1378,7 @@ subroutine ttyrot(track,ktrack)
   double precision :: x, px, y, py, t, pt, pz, ptt
   double precision :: node_value
 
-  angle = node_value('angle ')
+  angle = -node_value('angle ') !Sign to be consistent with a geometrical rotation
   if (angle .eq. 0) return
 
   angle = angle * node_value('other_bv ')

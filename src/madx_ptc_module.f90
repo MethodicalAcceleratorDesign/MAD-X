@@ -1306,7 +1306,7 @@ CONTAINS
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
        PATCH_TRANS = zero
-       patch_ang(2)=node_value('angle ')
+       patch_ang(2)=-node_value('angle ')
        key%list%patchg=2
        do i=1,3
           key%list%ang(i)=patch_ang(i)
@@ -1435,6 +1435,7 @@ CONTAINS
           key%list%ang(i)=patch_ang(i)
           key%list%t(i)=patch_trans(i)
        enddo
+       key%list%ang(2)=-patch_ang(2) ! Change the sign of the y-rotation to be the geometrical angle.
     case(36) ! TRANSLATION
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
