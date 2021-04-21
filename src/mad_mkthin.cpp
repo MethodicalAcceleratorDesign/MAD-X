@@ -12,6 +12,7 @@
  2018 : Thick solenoid slicing, write bend angle to multipole if different from k0*l
  2019 : New elements from element definition, all attributes enabled
  2020 : Tapering, wire compensation
+ 2021 : Permanent misalignment
 
  */
 
@@ -146,8 +147,8 @@ public:
   ~SeqElList(); // destructor
   void Print(std::ostream &StrOut = std::cout) const;
   void slice_node(); // decides what to do : nothing, slice_node_translate, slice_node_default
-  node* current_node() const { return thick_node;} // get
-  void  current_node(node* thisnode) { work_node=thick_node=thisnode; } // set
+  node* curr_node() const { return thick_node;} // get
+  void  curr_node(node* thisnode) { work_node=thick_node=thisnode; } // set
 private:
   double simple_at_shift(const int slices, const int slice_no) const;
   double teapot_at_shift(const int slices, const int slice_no) const;
@@ -1085,14 +1086,36 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const std::
 }
 
 static void copy_perm_misalign(const node* node,struct node* this_node)
-{ // copy misalign info
-  this_node->perm_misalign=node->perm_misalign;
-  this_node->perm_align=node->perm_align;
+{
+  double start_s_old = node->at_value-(node->length/2);
+  double angle;
+  angle = element_value(node, "angle");
+  double start_s_new =  my_get_expression_value(this_node->at_expr)-(this_node->length/2);
+  double pos_in_node = start_s_new -start_s_old;
+  this_node->perm_misalign=node->perm_misalign; // copy info if perm_misalign present
   if(this_node->perm_misalign>0 && node->perm_align)
-  { //--- warn that angles are currently only copied, not converted
+  {
+    double displace_vector[7];
+    locslice_(&pos_in_node, displace_vector, &angle); // subroutine locslice(spos, displ) in  survey.f90, uses global current_node
+    this_node->perm_align = new(align_info);
+    this_node->perm_align->dx_value    =displace_vector[0];
+    this_node->perm_align->dy_value    =displace_vector[1];
+    this_node->perm_align->ds_value    =displace_vector[2];
+    this_node->perm_align->dphi_value  =displace_vector[3];
+    this_node->perm_align->dtheta_value=displace_vector[4];
+    this_node->perm_align->dpsi_value  =displace_vector[5];
+    this_node->perm_align->dx_expr     =nullptr;
+    this_node->perm_align->dy_expr     =nullptr;
+    this_node->perm_align->ds_expr     =nullptr;
+    this_node->perm_align->dtheta_expr =nullptr;
+    this_node->perm_align->dphi_expr   =nullptr;
+    this_node->perm_align->dpsi_expr   =nullptr;
+    /*
+    //--- warn that angles are currently only copied, not converted
     if(node->perm_align->dtheta_value || my_get_expression_value(node->perm_align->dtheta_expr)) warning("non-zero align_info dtheta not yet converted","just copied");
     if(node->perm_align->dphi_value   || my_get_expression_value(node->perm_align->dphi_expr)  ) warning("non-zero align_info dphi   not yet converted","just copied");
     if(node->perm_align->dpsi_value   || my_get_expression_value(node->perm_align->dpsi_expr)  ) warning("non-zero align_info dpsi   not yet converted","just copied");
+    */
   }
 }
 
@@ -2539,6 +2562,7 @@ void SeqElList::slice_node() // main steering, decides how to split an individua
 
   if (thick_elem) // look at the element of this node to see what to do with slicing
   {
+    current_node=work_node; // only needed for locslice, that relies
     if(verbose>1) std::cout << " now see what to do with work_node=" << std::left << std::setw(MaTh::par_name_maxlen) << work_node->name <<  " depending on its base=" << std::setw(MaTh::par_name_maxlen) << work_node->base_name << std::right << '\n';
     const double eps=1.e-15; // used to check if a value is compatible with zero
     bool IsWireCollimator = ( strcmp(work_node->base_name,"collimator") == 0 && return_param_recurse("current",thick_elem) );
@@ -2765,20 +2789,20 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
   else sliced_seq->crabcavities = new_el_list(100);
 
   SeqElList theSeqElList(sliced_seq_name, slice_style, sliced_seq, thick_sequ->start,this);
-  while(theSeqElList.current_node() != nullptr) // in current sequence, loop over nodes
+  while(theSeqElList.curr_node() != nullptr) // in current sequence, loop over nodes
   {
     theSeqElList.slice_node(); // decides what to do with current node :  slice_node_translate, slice_node_default or nothing
-    if (theSeqElList.current_node() == thick_sequ->end)
+    if (theSeqElList.curr_node() == thick_sequ->end)
     {
       break;
     }
-    if(theSeqElList.current_node()->p_elem!=nullptr){
-      if(strcmp(theSeqElList.current_node()->p_elem->base_type->name, "rfcavity")==0 &&
-        find_element(theSeqElList.current_node()->p_elem->name, sliced_seq->cavities) == nullptr){
-        add_to_el_list(&theSeqElList.current_node()->p_elem, 0, sliced_seq->cavities, 0);
+    if(theSeqElList.curr_node()->p_elem!=nullptr){
+      if(strcmp(theSeqElList.curr_node()->p_elem->base_type->name, "rfcavity")==0 &&
+        find_element(theSeqElList.curr_node()->p_elem->name, sliced_seq->cavities) == nullptr){
+        add_to_el_list(&theSeqElList.curr_node()->p_elem, 0, sliced_seq->cavities, 0);
       }
     }
-    theSeqElList.current_node(theSeqElList.current_node()->next); // set current_node
+    theSeqElList.curr_node(theSeqElList.curr_node()->next); // set curr_node
   }
   sliced_seq->end->next = sliced_seq->start;
 
