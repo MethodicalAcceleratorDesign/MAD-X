@@ -3,31 +3,36 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.02.11 11:36:29      +
+  + Execution date: 2021.04.21 10:09:30      +
   ++++++++++++++++++++++++++++++++++++++++++++
 beam;
 
-s1:rbend,  angle=0.01, l=1, k1=0.02 ; 
+s1:rbend,  angle=0.01, l=1, k1=0.02, slice_straight=true ; 
 
 myseq: sequence, l=6;
 
-  s1, at:=1.5, dx=0.001, dtheta=0.015;
+  s1, at:=1.5, dtheta=0.00;
 
 endsequence;
 
 
 
+x0=0.001;
+
+px0=0.001;
+
 use, sequence=myseq;
 
 select, flag=twiss, column=name,s, dx, dy, betx, bety,x , px, y;
 
-twiss, betx=1, bety=1, file="thick.dat";
+twiss, betx=1, bety=1, x=x0, px=px0, file="thick.dat";
 
 enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
   
 open line - error with deltap:   0.000000E+00
-initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     7.360407E-04  1.685871E-04  0.000000E+00  0.000000E+00 -2.343068E-07  0.000000E+00
+initial orbit vector:   1.000000E-03  1.000000E-03  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     6.777284E-03  9.501440E-04  0.000000E+00  0.000000E+00 -2.770792E-05  0.000000E+00
 
 ++++++ table: summ
 
@@ -35,13 +40,13 @@ final orbit vector:     7.360407E-04  1.685871E-04  0.000000E+00  0.000000E+00 -
                  6                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-      0.2255067288                  0        35.25112181      0.04412277401 
+        0.22550173                  0        35.25026494      0.03921379654 
 
              dxrms             xcomax             xcorms                 q2 
-     0.02799265941    0.0007360406878    0.0004663298821       0.2220041083 
+     0.02484195936     0.006777284362     0.004598346706       0.2220111623 
 
                dq2            betymax              dymax              dyrms 
-                 0         38.7955542                  0                  0 
+                 0        38.80238928                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -62,13 +67,14 @@ makethin, sequence=myseq;
 makethin: slicing sequence : myseq
 use, sequence=myseq;
 
-twiss, betx=1, bety=1, file="sliced.dat";
+twiss, betx=1, bety=1, x=x0, px=px0, file="sliced.dat";
 
 enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
   
 open line - error with deltap:   0.000000E+00
-initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     7.384931E-04  1.697214E-04  0.000000E+00  0.000000E+00 -2.080229E-07  0.000000E+00
+initial orbit vector:   1.000000E-03  1.000000E-03  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     6.702128E-03  9.334524E-04  0.000000E+00  0.000000E+00 -2.761174E-05  0.000000E+00
 
 ++++++ table: summ
 
@@ -76,13 +82,13 @@ final orbit vector:     7.384931E-04  1.697214E-04  0.000000E+00  0.000000E+00 -
                  6                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-      0.2255027229                  0         35.2508415      0.04412586642 
+      0.2255019703                  0        35.25023026      0.03928874855 
 
              dxrms             xcomax             xcorms                 q2 
-    0.006378403762    0.0007384931038    0.0001027825322       0.2220110113 
+    0.005469647012     0.006702127561     0.002634847097       0.2220105522 
 
                dq2            betymax              dymax              dyrms 
-                 0        38.80295035                  0                  0 
+                 0        38.80170234                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 

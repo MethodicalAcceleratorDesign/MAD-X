@@ -477,7 +477,7 @@ subroutine suelem(el, ve, we, tilt, code,angle)
         endif
         cospsi = cos(tilt);  sinpsi = sin(tilt)
         costhe = cos(angle); sinthe = sin(angle)
-        print *, "ttttt", cospsi
+
         ve(1) = dx * cospsi
         ve(2) = dx * sinpsi
         ve(3) = ds

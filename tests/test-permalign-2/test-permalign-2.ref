@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.14 08:19:47      +
+  + Execution date: 2021.04.20 14:58:06      +
   ++++++++++++++++++++++++++++++++++++++++++++
 a = 0.1;
 
@@ -146,6 +146,7 @@ sixtrack;
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
 
+++++++ info: c6t - long names flag selected 
 Reference radius set to : 1.000000
 ++++++ info: MADX sequence converted to c6t internal. 
 
