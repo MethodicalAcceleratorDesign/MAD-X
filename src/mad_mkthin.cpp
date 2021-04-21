@@ -1078,18 +1078,22 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const std::
 
 static void copy_perm_misalign(const node* node,struct node* this_node)
 {
-  double pos_in_node = my_get_expression_value(this_node->at_expr)- (node->at_value-node->length/2);
+  double start_s_old = node->at_value-(node->length/2);
+  double angle;
+  angle = element_value(node, "angle");
+  double start_s_new =  my_get_expression_value(this_node->at_expr)-(this_node->length/2);
+  double pos_in_node = start_s_new -start_s_old;
   this_node->perm_misalign=node->perm_misalign; // copy info if perm_misalign present
   if(this_node->perm_misalign>0 && node->perm_align)
   {
     double displace_vector[7];
-    locslice_(&pos_in_node, displace_vector); // subroutine locslice(spos, displ) in  survey.f90, uses global current_node
+    locslice_(&pos_in_node, displace_vector, &angle); // subroutine locslice(spos, displ) in  survey.f90, uses global current_node
     this_node->perm_align = new(align_info);
     this_node->perm_align->dx_value    =displace_vector[0];
     this_node->perm_align->dy_value    =displace_vector[1];
     this_node->perm_align->ds_value    =displace_vector[2];
-    this_node->perm_align->dtheta_value=displace_vector[3];
-    this_node->perm_align->dphi_value  =displace_vector[4];
+    this_node->perm_align->dphi_value  =displace_vector[3];
+    this_node->perm_align->dtheta_value=displace_vector[4];
     this_node->perm_align->dpsi_value  =displace_vector[5];
     this_node->perm_align->dx_expr     =nullptr;
     this_node->perm_align->dy_expr     =nullptr;

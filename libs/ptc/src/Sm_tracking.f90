@@ -510,7 +510,7 @@ contains
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
 
-    CALL DTILTD(C%MAG%P%TILTD,1,X)
+
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-2)
     ! The magnet frame of reference is located here implicitely before misalignments
 
@@ -519,6 +519,8 @@ contains
        ou = ALWAYS_EXACTMIS    !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
+    CALL DTILTD(C%MAG%P%TILTD,1,X)
+    
     IF(PRESENT(X_IN)) then
        CALL XMID(X_IN,X,-1)
        X_IN%POS(2)=X_IN%nst
@@ -532,12 +534,12 @@ contains
        X_IN%POS(3)=X_IN%nst
     endif
 
+    CALL DTILTD(C%MAG%P%TILTD,2,X)
     IF(C%MAG%MIS) THEN
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
-    ! The magnet frame of reference is located here implicitely before misalignments
-    CALL DTILTD(C%MAG%P%TILTD,2,X)
+
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
@@ -700,13 +702,14 @@ contains
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
 
-    CALL DTILTD(C%MAGP%P%TILTD,1,X)
-    !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-2)
+        !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-2)
     ! MISALIGNMENTS AT THE ENTRANCE
     IF(C%MAGP%MIS) THEN
        OU =ALWAYS_EXACTMIS   ! K%EXACTMIS.OR.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
+    ! Apply tilt after misalignments
+    CALL DTILTD(C%MAGP%P%TILTD,1,X)
 
     CALL TRACK(C%MAGP,X,K)
     !    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then ! new 2010
@@ -716,13 +719,16 @@ contains
 
 
 
-    ! MISALIGNMENTS AT THE EXIT
+    
+    CALL DTILTD(C%MAGP%P%TILTD,2,X)
+    ! Tilt back before misalignment   
+
     IF(C%MAGP%MIS) THEN
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
-    CALL DTILTD(C%MAGP%P%TILTD,2,X)
+    
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     !EXIT PATCH
