@@ -557,7 +557,7 @@ makestdmatchfile(char* fname, char* matchactioncommand)
   FILE* f = 0x0;
   struct madx_mpk_variable*      v = 0x0;
   int  i;
-  unsigned int anumber = abs(time(0)*rand());
+  unsigned int anumber = llabs(time(0)*rand());
   double lower, upper;
 
   if (debuglevel)  printf("I am in makestdmatchfile, file name is >%s<\n", fname);

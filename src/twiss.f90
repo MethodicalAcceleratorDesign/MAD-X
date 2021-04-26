@@ -540,7 +540,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   integer :: eflag
 
   logical :: pflag
-  integer :: i, k, irank, itra, thr_on, ithr_on, save_opt
+  integer :: i, k, irank, itra, thr_on, ithr_on, save_opt, debug
   double precision :: cotol, err, eig_tol
   double precision :: orbit0(6), orbit(6), a(6,7), b(4,5)
 
@@ -554,6 +554,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   !---- Initialize.
   ithr_on = 0
   thr_on = get_option('threader ')
+  debug = get_option('debug ')
   pflag = get_option('twiss_print ') .ne. 0
   cotol = get_variable('twiss_tol ')
   eflag = 0
@@ -616,7 +617,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
         call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,ithr_on)
         OPT_FUN0(9:14) = ORBIT0(1:6)
         GUESS = ORBIT0
-        call tmcheckstab(rt,eig_tol)
+        call tmcheckstab(rt,eig_tol, debug)
         return ! normal exit
      endif
 
@@ -624,7 +625,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
 
 
   !---- No convergence.
-  call tmcheckstab(rt, eig_tol)
+  call tmcheckstab(rt, eig_tol,debug)
   orderrun = 0
   print '(''Closed orbit did not converge in '', i3, '' iterations'')', itmax
   OPT_FUN0(9:14) = zero
@@ -632,7 +633,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
 
 end SUBROUTINE tmclor
 
-SUBROUTINE tmcheckstab(rt,tol)
+SUBROUTINE tmcheckstab(rt,tol, debug)
     use math_constfi, only :  one
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -644,7 +645,8 @@ SUBROUTINE tmcheckstab(rt,tol)
   double precision :: rt(6,6) , tmp1, tmp2
   double precision :: em(6,6), tol
   double precision :: reval(6), aival(6) ! re and im parts for damping and tune
-  logical :: stabx, staby, stabt 
+  logical :: stabx, staby, stabt
+  integer :: debug
   logical, external :: m66sta
   character(len=250) :: warnstr
   double precision, external :: get_value, get_variable
@@ -667,29 +669,30 @@ SUBROUTINE tmcheckstab(rt,tol)
     tmp1 = reval(1)**2 + aival(1)**2
     tmp2 = reval(2)**2 + aival(2)**2
     
-    write (warnstr,'(a,e13.6,a,e13.6)') 'Horizontal plane might be unstable (values should be less than one)' // &
-     'Eigenvalue(1)**2 ', tmp1, " Eigenvalue(2)**2", tmp2
-
+    write (warnstr,'(a)') 'Horizontal plane might be unstable (values should be less than one)' // &
+    ' More information with the debug flag on.'
     call fort_warn('TWCLORB: ',warnstr)
+    if(debug .ne. zero) print *, 'Eigenvalue(1)**2 ', tmp1, " Eigenvalue(2)**2", tmp2
   endif
 
   if (staby) then
-    tmp1 = reval(1)**2 + aival(1)**2-one
-    tmp2 = reval(2)**2 + aival(2)**2-one
+    tmp1 = reval(1)**2 + aival(1)**2
+    tmp2 = reval(2)**2 + aival(2)**2
     
-    write (warnstr,'(a,e13.6,a,e13.6)') 'Vertical plane might be unstable (values should be less than one)' // &
-     'Eigenvalue(3)**2 ', tmp1, " Eigenvalue(4)**2", tmp2
-  call fort_warn('TWCLORB: ',warnstr)
+    write (warnstr,'(a)') 'Vertical plane might be unstable (values should be less than one)' // &
+    ' More information with the debug flag on.'
+    call fort_warn('TWCLORB: ',warnstr)
+    if(debug .ne. zero) print *, 'Eigenvalue(3)**2 ', tmp1, " Eigenvalue(4)**2", tmp2
   endif
   
   if (stabt) then
     tmp1 = reval(5)**2 + aival(5)**2
     tmp2 = reval(6)**2 + aival(6)**2
-    write (warnstr,'(a,e13.6,a,e13.6)') 'Longitudinal plane might be unstable. (values should be less than one)' // &
-     'Try change lag with 0.5. Eigenvalue(5)**2 ', tmp1, " Eigenvalue(6)**2", tmp2
-
-  call fort_warn('TWCLORB: ',warnstr)
-endif 
+    write (warnstr,'(a)') 'Longitudinal plane might be unstable. (values should be less than one)' // &
+    ' Try change lag with 0.5. More information with the debug flag on.'
+    call fort_warn('TWCLORB: ',warnstr)
+    if(debug .ne. zero) print *, 'Eigenvalue(5)**2 ', tmp1, " Eigenvalue(6)**2", tmp2
+  endif 
 
 end SUBROUTINE tmcheckstab
 

@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.21 17:25:40      +
+  + Execution date: 2021.04.26 16:05:11      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -69,7 +69,7 @@ orbit:  -2.059069E-08  2.245009E-11  3.485269E-08  1.699968E-04  9.294858E-06  1
   
 iteration:   3 error:   1.327492E-10 deltap:   1.000000E-06
 orbit:  -2.050148E-08  3.107835E-11  3.474834E-08  1.699968E-04  9.294879E-06  1.465501E-06
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.107366E+01 Eigenvalue(6)**2 0.931390E+00                                                                                               
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
 iteration:   1 error:   1.738108E-03 deltap:   0.000000E+00
@@ -80,7 +80,7 @@ orbit:  -1.320523E-08 -2.604463E-10  2.093720E-08  1.699982E-04  9.252398E-06  1
   
 iteration:   3 error:   1.327513E-10 deltap:   0.000000E+00
 orbit:  -1.311603E-08 -2.518183E-10  2.083286E-08  1.699982E-04  9.252419E-06  1.478902E-06
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.107366E+01 Eigenvalue(6)**2 0.931390E+00                                                                                               
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
@@ -188,7 +188,7 @@ orbit:  -2.059069E-08  2.245009E-11  3.485269E-08  1.699968E-04  9.294858E-06  1
   
 iteration:   3 error:   1.327492E-10 deltap:   1.000000E-06
 orbit:  -2.050148E-08  3.107835E-11  3.474834E-08  1.699968E-04  9.294879E-06  1.465501E-06
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.107366E+01 Eigenvalue(6)**2 0.931390E+00                                                                                               
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
 iteration:   1 error:   1.738108E-03 deltap:   0.000000E+00
@@ -199,7 +199,7 @@ orbit:  -1.320523E-08 -2.604463E-10  2.093720E-08  1.699982E-04  9.252398E-06  1
   
 iteration:   3 error:   1.327513E-10 deltap:   0.000000E+00
 orbit:  -1.311603E-08 -2.518183E-10  2.083286E-08  1.699982E-04  9.252419E-06  1.478902E-06
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.107366E+01 Eigenvalue(6)**2 0.931390E+00                                                                                               
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ

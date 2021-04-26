@@ -894,7 +894,7 @@ aper_header(struct table* aper_t, struct aper_node *lim)
 {
   int i, h_length = 26; // not used, nint=1;
   double vtmp[4]; // not used, deltap_twiss;
-  char tmp[NAME_L], name[NAME_L], *stmp;
+  char tmp[NAME_L+1], name[NAME_L+1], *stmp;
 
   strncpy(name, lim->name, sizeof name);
 
