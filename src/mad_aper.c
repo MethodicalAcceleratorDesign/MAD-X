@@ -560,7 +560,7 @@ else if (!strcmp(apertype,"racetrack")) {
     // zero horizontal or vertical explosion factors, and zero radius should be allowed.
     // 2015-Mar-09  14:43:33  ghislain: change meaning of parameters: ap1 and ap2 are now full rectangle extension,
     // 2015-Mar-10  10:18:46  ghislain: change rounded corners from circular to generalized elliptical shape
-  if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 || (*ap4) < 0 || (*ap1) < (*ap3) || (*ap2) < (*ap4)) {
+  if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) <= 0 || (*ap4) < 0 || (*ap1) < (*ap3) || (*ap2) < (*ap4)) {
     if (debug)
      printf("+++ aper_build screen, racetrack parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
    return 0;
