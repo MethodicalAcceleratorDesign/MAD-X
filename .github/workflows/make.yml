@@ -135,9 +135,7 @@ jobs:
       - name: Run tests
         id: tests
         run: |
-          .github/utils/make_tests \
-          tests-to-rm="test-match-9 test-save-state" \
-          ARCH=${{ matrix.bits }}
+          .github/utils/make_tests
 
       - name: Set artifact name suffix
         if: failure() && steps.tests.outcome == 'failure'
@@ -193,7 +191,7 @@ jobs:
         run: |
           # TODO: fix test-match-10 failure and reenable
           .github/utils/make_tests \
-              tests-to-rm="test-plot test-match-10 test-match-9 test-read-write-hex" \
+              tests-to-rm="test-plot test-match-10 test-read-write-hex" \
               ARCH=${{ matrix.bits }}
 
       - name: Upload failed tests output for inspection
