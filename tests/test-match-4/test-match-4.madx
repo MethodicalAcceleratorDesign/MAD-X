@@ -1,6 +1,6 @@
 TITLE,'CELL matching with MAD-X';
 
-option,-echo,-info,-warn, debug;
+option,-echo,-info,-warn;
 
 call file="../share/ring_lattice_alt/fv9.opt";  
 call file="../share/ring_lattice_alt/fv9.seq";
