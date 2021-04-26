@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.21 17:22:25      +
+  + Execution date: 2021.04.26 10:31:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'Transferline matching with MAD-X';
 
@@ -319,7 +319,7 @@ orbit:  -2.556164E-05 -3.552748E-07  2.948751E-03 -1.098197E-04 -2.419912E-07 -1
   
 iteration:   3 error:   2.748594E-10 deltap:   0.000000E+00
 orbit:  -2.556193E-05 -3.552790E-07  2.948751E-03 -1.098197E-04 -2.419989E-07 -1.142338E-05
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.100195E+01 Eigenvalue(6)**2 0.998051E+00                                                                                               
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
 
 ++++++ table: summ
 

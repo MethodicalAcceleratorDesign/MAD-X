@@ -3,53 +3,694 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.21 17:22:26      +
+  + Execution date: 2021.04.26 10:31:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'CELL matching with MAD-X';
 
 
 
-option,-echo,-info,-warn;
+option,-echo,-info,-warn, debug;
 
 ++++++ info: kqf redefined
 ++++++ info: kqd redefined
+   in get_node_pos: name: fivecell$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: fivecell$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: seqstart, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: seqstart, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: qf.1, pos: 1.550000e+00, fact: 0.000000e+00, length: 3.100000e+00, from_name: seqstart
+   in get_node_pos: name: seqstart, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: seqstart, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+	 in get_node_pos: name: qf.1, from: 0.000000e+00			  ---> final pos: 1.550000e+00 
+   in get_node_pos: name: mscbh, pos: 3.815000e+00, fact: 0.000000e+00, length: 1.100000e+00, from_name: (null)
+	 in get_node_pos: name: mscbh, from: 0.000000e+00			  ---> final pos: 3.815000e+00 
+   in get_node_pos: name: cbh.1, pos: 4.365000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: cbh.1, from: 0.000000e+00			  ---> final pos: 4.365000e+00 
+   in get_node_pos: name: mb, pos: 1.262000e+01, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 1.262000e+01 
+   in get_node_pos: name: mb, pos: 2.828000e+01, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 2.828000e+01 
+   in get_node_pos: name: mb, pos: 4.394000e+01, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 4.394000e+01 
+   in get_node_pos: name: (null), pos: 5.501000e+01, fact: 0.000000e+00, length: 5.615000e+00, from_name: (null)
+	 in get_node_pos: name: (null), from: 0.000000e+00			  ---> final pos: 5.501000e+01 
+   in get_node_pos: name: cbv.1, pos: 5.782500e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: cbv.1, from: 0.000000e+00			  ---> final pos: 5.782500e+01 
+   in get_node_pos: name: mb, pos: 6.608000e+01, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 6.608000e+01 
+   in get_node_pos: name: mb, pos: 8.174000e+01, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 8.174000e+01 
+   in get_node_pos: name: mb, pos: 9.740000e+01, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 9.740000e+01 
+   in get_node_pos: name: m0, pos: 1.050000e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: m0, from: 0.000000e+00			  ---> final pos: 1.050000e+02 
+   in get_node_pos: name: bph, pos: 1.059200e+02, fact: 0.000000e+00, length: 3.000000e-01, from_name: seqstart
+   in get_node_pos: name: seqstart, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: seqstart, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+	 in get_node_pos: name: bph, from: 0.000000e+00			  ---> final pos: 1.059200e+02 
+   in get_node_pos: name: startend, pos: 1.069200e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: startend, from: 0.000000e+00			  ---> final pos: 1.069200e+02 
+   in get_node_pos: name: partstart, pos: 1.069200e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: partstart, from: 0.000000e+00			  ---> final pos: 1.069200e+02 
+   in get_node_pos: name: qf.2, pos: 1.084700e+02, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qf.2, from: 0.000000e+00			  ---> final pos: 1.084700e+02 
+   in get_node_pos: name: mscbh, pos: 1.107350e+02, fact: 0.000000e+00, length: 1.100000e+00, from_name: (null)
+	 in get_node_pos: name: mscbh, from: 0.000000e+00			  ---> final pos: 1.107350e+02 
+   in get_node_pos: name: cbh.2, pos: 1.112850e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: cbh.2, from: 0.000000e+00			  ---> final pos: 1.112850e+02 
+   in get_node_pos: name: mb, pos: 1.195400e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 1.195400e+02 
+   in get_node_pos: name: mb, pos: 1.352000e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 1.352000e+02 
+   in get_node_pos: name: mb, pos: 1.508600e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 1.508600e+02 
+   in get_node_pos: name: bpv, pos: 1.593800e+02, fact: 0.000000e+00, length: 3.000000e-01, from_name: (null)
+	 in get_node_pos: name: bpv, from: 0.000000e+00			  ---> final pos: 1.593800e+02 
+   in get_node_pos: name: qd.2, pos: 1.619300e+02, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.2, from: 0.000000e+00			  ---> final pos: 1.619300e+02 
+   in get_node_pos: name: mscbv, pos: 1.641950e+02, fact: 0.000000e+00, length: 1.100000e+00, from_name: (null)
+	 in get_node_pos: name: mscbv, from: 0.000000e+00			  ---> final pos: 1.641950e+02 
+   in get_node_pos: name: cbv.2, pos: 1.647450e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: cbv.2, from: 0.000000e+00			  ---> final pos: 1.647450e+02 
+   in get_node_pos: name: mb, pos: 1.730000e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 1.730000e+02 
+   in get_node_pos: name: mb, pos: 1.886600e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 1.886600e+02 
+   in get_node_pos: name: mb, pos: 2.043200e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 2.043200e+02 
+   in get_node_pos: name: bph, pos: 2.128400e+02, fact: 0.000000e+00, length: 3.000000e-01, from_name: (null)
+	 in get_node_pos: name: bph, from: 0.000000e+00			  ---> final pos: 2.128400e+02 
+   in get_node_pos: name: partend, pos: 2.138400e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: partend, from: 0.000000e+00			  ---> final pos: 2.138400e+02 
+   in get_node_pos: name: qf.3, pos: 2.153900e+02, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qf.3, from: 0.000000e+00			  ---> final pos: 2.153900e+02 
+   in get_node_pos: name: mscbh, pos: 2.176550e+02, fact: 0.000000e+00, length: 1.100000e+00, from_name: (null)
+	 in get_node_pos: name: mscbh, from: 0.000000e+00			  ---> final pos: 2.176550e+02 
+   in get_node_pos: name: cbh.3, pos: 2.182050e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: cbh.3, from: 0.000000e+00			  ---> final pos: 2.182050e+02 
+   in get_node_pos: name: mb, pos: 2.264600e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 2.264600e+02 
+   in get_node_pos: name: mb, pos: 2.421200e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 2.421200e+02 
+   in get_node_pos: name: mb, pos: 2.577800e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 2.577800e+02 
+   in get_node_pos: name: bpv, pos: 2.663000e+02, fact: 0.000000e+00, length: 3.000000e-01, from_name: (null)
+	 in get_node_pos: name: bpv, from: 0.000000e+00			  ---> final pos: 2.663000e+02 
+   in get_node_pos: name: qd.3, pos: 2.688500e+02, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.3, from: 0.000000e+00			  ---> final pos: 2.688500e+02 
+   in get_node_pos: name: mscbv, pos: 2.711150e+02, fact: 0.000000e+00, length: 1.100000e+00, from_name: (null)
+	 in get_node_pos: name: mscbv, from: 0.000000e+00			  ---> final pos: 2.711150e+02 
+   in get_node_pos: name: cbv.3, pos: 2.716650e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: cbv.3, from: 0.000000e+00			  ---> final pos: 2.716650e+02 
+   in get_node_pos: name: mb, pos: 2.799200e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 2.799200e+02 
+   in get_node_pos: name: mb, pos: 2.955800e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 2.955800e+02 
+   in get_node_pos: name: mb, pos: 3.112400e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 3.112400e+02 
+   in get_node_pos: name: bph, pos: 3.197600e+02, fact: 0.000000e+00, length: 3.000000e-01, from_name: (null)
+	 in get_node_pos: name: bph, from: 0.000000e+00			  ---> final pos: 3.197600e+02 
+   in get_node_pos: name: qf.4, pos: 3.223100e+02, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qf.4, from: 0.000000e+00			  ---> final pos: 3.223100e+02 
+   in get_node_pos: name: mscbh, pos: 3.245750e+02, fact: 0.000000e+00, length: 1.100000e+00, from_name: (null)
+	 in get_node_pos: name: mscbh, from: 0.000000e+00			  ---> final pos: 3.245750e+02 
+   in get_node_pos: name: cbh.4, pos: 3.251250e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: cbh.4, from: 0.000000e+00			  ---> final pos: 3.251250e+02 
+   in get_node_pos: name: mb, pos: 3.333800e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 3.333800e+02 
+   in get_node_pos: name: mb, pos: 3.490400e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 3.490400e+02 
+   in get_node_pos: name: mb, pos: 3.647000e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 3.647000e+02 
+   in get_node_pos: name: bpv, pos: 3.732200e+02, fact: 0.000000e+00, length: 3.000000e-01, from_name: (null)
+	 in get_node_pos: name: bpv, from: 0.000000e+00			  ---> final pos: 3.732200e+02 
+   in get_node_pos: name: qd.4, pos: 3.757700e+02, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.4, from: 0.000000e+00			  ---> final pos: 3.757700e+02 
+   in get_node_pos: name: mscbv, pos: 3.780350e+02, fact: 0.000000e+00, length: 1.100000e+00, from_name: (null)
+	 in get_node_pos: name: mscbv, from: 0.000000e+00			  ---> final pos: 3.780350e+02 
+   in get_node_pos: name: cbv.4, pos: 3.785850e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: cbv.4, from: 0.000000e+00			  ---> final pos: 3.785850e+02 
+   in get_node_pos: name: mb, pos: 3.868400e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 3.868400e+02 
+   in get_node_pos: name: mb, pos: 4.025000e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 4.025000e+02 
+   in get_node_pos: name: mb, pos: 4.181600e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 4.181600e+02 
+   in get_node_pos: name: bph, pos: 4.266800e+02, fact: 0.000000e+00, length: 3.000000e-01, from_name: (null)
+	 in get_node_pos: name: bph, from: 0.000000e+00			  ---> final pos: 4.266800e+02 
+   in get_node_pos: name: qf.5, pos: 4.292300e+02, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qf.5, from: 0.000000e+00			  ---> final pos: 4.292300e+02 
+   in get_node_pos: name: mscbh, pos: 4.314950e+02, fact: 0.000000e+00, length: 1.100000e+00, from_name: (null)
+	 in get_node_pos: name: mscbh, from: 0.000000e+00			  ---> final pos: 4.314950e+02 
+   in get_node_pos: name: cbh.5, pos: 4.320450e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: cbh.5, from: 0.000000e+00			  ---> final pos: 4.320450e+02 
+   in get_node_pos: name: mb, pos: 4.403000e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 4.403000e+02 
+   in get_node_pos: name: mb, pos: 4.559600e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 4.559600e+02 
+   in get_node_pos: name: mb, pos: 4.716200e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 4.716200e+02 
+   in get_node_pos: name: bpv, pos: 4.801400e+02, fact: 0.000000e+00, length: 3.000000e-01, from_name: (null)
+	 in get_node_pos: name: bpv, from: 0.000000e+00			  ---> final pos: 4.801400e+02 
+   in get_node_pos: name: qd.5, pos: 4.826900e+02, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.5, from: 0.000000e+00			  ---> final pos: 4.826900e+02 
+   in get_node_pos: name: mscbv, pos: 4.849550e+02, fact: 0.000000e+00, length: 1.100000e+00, from_name: (null)
+	 in get_node_pos: name: mscbv, from: 0.000000e+00			  ---> final pos: 4.849550e+02 
+   in get_node_pos: name: cbv.5, pos: 4.855050e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: cbv.5, from: 0.000000e+00			  ---> final pos: 4.855050e+02 
+   in get_node_pos: name: mb, pos: 4.937600e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 4.937600e+02 
+   in get_node_pos: name: mb, pos: 5.094200e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 5.094200e+02 
+   in get_node_pos: name: mb, pos: 5.250800e+02, fact: 0.000000e+00, length: 1.420002e+01, from_name: (null)
+	 in get_node_pos: name: mb, from: 0.000000e+00			  ---> final pos: 5.250800e+02 
+   in get_node_pos: name: bph, pos: 5.336000e+02, fact: 0.000000e+00, length: 3.000000e-01, from_name: (null)
+	 in get_node_pos: name: bph, from: 0.000000e+00			  ---> final pos: 5.336000e+02 
+   in get_node_pos: name: end_fivecell, pos: 5.346000e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: end_fivecell, from: 0.000000e+00			  ---> final pos: 5.346000e+02 
+   in get_node_pos: name: fivecell$end, pos: 5.346000e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: fivecell$end, from: 0.000000e+00			  ---> final pos: 5.346000e+02 
+
+
+TOP Expand_sequence name fivecell with length 5.346000e+02, ref_flag 0
+
+
+ Expand sub-sequence ins:1 with initial position 5.501000e+01, final position 5.501000e+01, length 5.615000e+00, ref_flag 0, refpos 'qd.1'
+
+ Entering expand_node with node->name: ins:1 and position 5.501000e+01
+   in get_node_pos: name: ins$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ins$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: qd.1, pos: 2.800000e+00, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.1, from: 0.000000e+00			  ---> final pos: 2.800000e+00 
+  elem_name ins$start at position 5.501000e+01 + get_node_pos 0.000000e+00 - get_refpos 2.800000e+00 = p->position 5.221000e+01 
+   in get_node_pos: name: bpv.1, pos: -2.550000e+00, fact: 0.000000e+00, length: 3.000000e-01, from_name: qd.1
+   in get_node_pos: name: qd.1, pos: 2.800000e+00, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.1, from: 0.000000e+00			  ---> final pos: 2.800000e+00 
+	 in get_node_pos: name: bpv.1, from: 2.800000e+00			  ---> final pos: 2.500000e-01 
+   in get_node_pos: name: qd.1, pos: 2.800000e+00, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.1, from: 0.000000e+00			  ---> final pos: 2.800000e+00 
+  elem name bpv.1 at position 5.501000e+01 + get_node_pos 2.500000e-01 - get_refpos 2.800000e+00 = p->position 5.246000e+01 
+   in get_node_pos: name: qd.1, pos: 2.800000e+00, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.1, from: 0.000000e+00			  ---> final pos: 2.800000e+00 
+   in get_node_pos: name: qd.1, pos: 2.800000e+00, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.1, from: 0.000000e+00			  ---> final pos: 2.800000e+00 
+  elem name qd.1 at position 5.501000e+01 + get_node_pos 2.800000e+00 - get_refpos 2.800000e+00 = p->position 5.501000e+01 
+   in get_node_pos: name: mscbv.1, pos: 2.265000e+00, fact: 0.000000e+00, length: 1.100000e+00, from_name: qd.1
+   in get_node_pos: name: qd.1, pos: 2.800000e+00, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.1, from: 0.000000e+00			  ---> final pos: 2.800000e+00 
+	 in get_node_pos: name: mscbv.1, from: 2.800000e+00			  ---> final pos: 5.065000e+00 
+   in get_node_pos: name: qd.1, pos: 2.800000e+00, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.1, from: 0.000000e+00			  ---> final pos: 2.800000e+00 
+  elem name mscbv.1 at position 5.501000e+01 + get_node_pos 5.065000e+00 - get_refpos 2.800000e+00 = p->position 5.727500e+01 
+   in get_node_pos: name: ins$end, pos: 5.615000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ins$end, from: 0.000000e+00			  ---> final pos: 5.615000e+00 
+   in get_node_pos: name: qd.1, pos: 2.800000e+00, fact: 0.000000e+00, length: 3.100000e+00, from_name: (null)
+	 in get_node_pos: name: qd.1, from: 0.000000e+00			  ---> final pos: 2.800000e+00 
+  elem name ins$end at position 5.501000e+01 + get_node_pos 5.615000e+00 - get_refpos 2.800000e+00 = p->position 5.782500e+01 
+
+
+inserting a drift of length 1.650000e-01 at position 3.182500e+00 
+ 
+inserting a drift of length 1.154992e+00 at position 4.942496e+00 
+ 
+inserting a drift of length 1.459985e+00 at position 2.045000e+01 
+ 
+inserting a drift of length 1.459985e+00 at position 3.611000e+01 
+ 
+inserting a drift of length 1.169992e+00 at position 5.162500e+01 
+ 
+inserting a drift of length 1.000000e-01 at position 5.226000e+01 
+ 
+inserting a drift of length 8.500000e-01 at position 5.303500e+01 
+ 
+inserting a drift of length 1.650000e-01 at position 5.664250e+01 
+ 
+inserting a drift of length 1.154992e+00 at position 5.840250e+01 
+ 
+inserting a drift of length 1.459985e+00 at position 7.391000e+01 
+ 
+inserting a drift of length 1.459985e+00 at position 8.957000e+01 
+ 
+inserting a drift of length 4.999923e-01 at position 1.047500e+02 
+ 
+inserting a drift of length 7.700000e-01 at position 1.053850e+02 
+ 
+inserting a drift of length 8.500000e-01 at position 1.064950e+02 
+ 
+inserting a drift of length 1.650000e-01 at position 1.101025e+02 
+ 
+inserting a drift of length 1.154992e+00 at position 1.118625e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 1.273700e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 1.430300e+02 
+ 
+inserting a drift of length 1.269992e+00 at position 1.585950e+02 
+ 
+inserting a drift of length 8.500000e-01 at position 1.599550e+02 
+ 
+inserting a drift of length 1.650000e-01 at position 1.635625e+02 
+ 
+inserting a drift of length 1.154992e+00 at position 1.653225e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 1.808300e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 1.964900e+02 
+ 
+inserting a drift of length 1.269992e+00 at position 2.120550e+02 
+ 
+inserting a drift of length 8.500000e-01 at position 2.134150e+02 
+ 
+inserting a drift of length 1.650000e-01 at position 2.170225e+02 
+ 
+inserting a drift of length 1.154992e+00 at position 2.187825e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 2.342900e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 2.499500e+02 
+ 
+inserting a drift of length 1.269992e+00 at position 2.655150e+02 
+ 
+inserting a drift of length 8.500000e-01 at position 2.668750e+02 
+ 
+inserting a drift of length 1.650000e-01 at position 2.704825e+02 
+ 
+inserting a drift of length 1.154992e+00 at position 2.722425e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 2.877500e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 3.034100e+02 
+ 
+inserting a drift of length 1.269992e+00 at position 3.189750e+02 
+ 
+inserting a drift of length 8.500000e-01 at position 3.203350e+02 
+ 
+inserting a drift of length 1.650000e-01 at position 3.239425e+02 
+ 
+inserting a drift of length 1.154992e+00 at position 3.257025e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 3.412100e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 3.568700e+02 
+ 
+inserting a drift of length 1.269992e+00 at position 3.724350e+02 
+ 
+inserting a drift of length 8.500000e-01 at position 3.737950e+02 
+ 
+inserting a drift of length 1.650000e-01 at position 3.774025e+02 
+ 
+inserting a drift of length 1.154992e+00 at position 3.791625e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 3.946700e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 4.103300e+02 
+ 
+inserting a drift of length 1.269992e+00 at position 4.258950e+02 
+ 
+inserting a drift of length 8.500000e-01 at position 4.272550e+02 
+ 
+inserting a drift of length 1.650000e-01 at position 4.308625e+02 
+ 
+inserting a drift of length 1.154992e+00 at position 4.326225e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 4.481300e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 4.637900e+02 
+ 
+inserting a drift of length 1.269992e+00 at position 4.793550e+02 
+ 
+inserting a drift of length 8.500000e-01 at position 4.807150e+02 
+ 
+inserting a drift of length 1.650000e-01 at position 4.843225e+02 
+ 
+inserting a drift of length 1.154992e+00 at position 4.860825e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 5.015900e+02 
+ 
+inserting a drift of length 1.459985e+00 at position 5.172500e+02 
+ 
+inserting a drift of length 1.269992e+00 at position 5.328150e+02 
+ 
+inserting a drift of length 8.500000e-01 at position 5.341750e+02 
+ 
 START MATCHING
 
 number of sequences: 1
 sequence name: fivecell
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.100198E+01 Eigenvalue(6)**2 0.998027E+00                                                                                               
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.244449891001622122
+  parameters: freq0=   0.560777789629584689, alfa=0.000461603000716532565
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.44449891e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.244449891001622122
+  parameters: freq0=   0.560777789629584689, alfa=0.000461603000716532565
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa         0.0004616030007 
+ eta           0.000457255571            gamma(tr)        46.54421267 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2    1.0019767075502362       Eigenvalue(6)**2  0.99802719211400404     
+++++++ warning: TWCPIN:  cosmux =  -0.299735E-01, cosmuy = 0.146573E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.299735E-01, cosmu2_eig = 0.146573E+00                                                                                                                                
 number of variables:    2
 user given constraints: 2
 total constraints:      2
 
 START LMDIF:
 
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.100198E+01 Eigenvalue(6)**2 0.998027E+00                                                                                               
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.244449891001622122
+  parameters: freq0=   0.560777789629584689, alfa=0.000461603000716532565
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.44449891e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.244449891001622122
+  parameters: freq0=   0.560777789629584689, alfa=0.000461603000716532565
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa         0.0004616030007 
+ eta           0.000457255571            gamma(tr)        46.54421267 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2    1.0019767075502362       Eigenvalue(6)**2  0.99802719211400404     
+++++++ warning: TWCPIN:  cosmux =  -0.299735E-01, cosmuy = 0.146573E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.299735E-01, cosmu2_eig = 0.146573E+00                                                                                                                                
 Initial Penalty Function =   0.24356070E-01
 
 
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.100198E+01 Eigenvalue(6)**2 0.998028E+00                                                                                               
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.998027E+00 Eigenvalue(6)**2 0.100198E+01                                                                                               
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.100196E+01 Eigenvalue(6)**2 0.998048E+00                                                                                               
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.244372826649315866
+  parameters: freq0=   0.560777789629584689, alfa=0.000461458848046733842
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.44372827e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.244372826649315922
+  parameters: freq0=   0.560777789629584689, alfa=0.000461458848046733951
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -5.55111512e-17 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa          0.000461458848 
+ eta          0.0004571114184            gamma(tr)        46.55148196 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2    1.0019763952881340       Eigenvalue(6)**2  0.99802750314534838     
+++++++ warning: TWCPIN:  cosmux =  -0.313768E-01, cosmuy = 0.146466E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.313768E-01, cosmu2_eig = 0.146466E+00                                                                                                                                
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.244431531097502625
+  parameters: freq0=   0.560777789629584689, alfa=0.000461568657610844017
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.44431531e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.244431531097502652
+  parameters: freq0=   0.560777789629584689, alfa=0.000461568657610844071
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -2.77555756e-17 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa         0.0004615686576 
+ eta          0.0004572212279            gamma(tr)        46.54594421 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2   0.99802725739673681       Eigenvalue(6)**2   1.0019766420091702     
+++++++ warning: TWCPIN:  cosmux =  -0.302142E-01, cosmuy = 0.144643E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.302142E-01, cosmu2_eig = 0.144643E+00                                                                                                                                
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239259362533306874
+  parameters: freq0=   0.560777789629584689, alfa=0.000451893861354658855
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.39259363e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239259362533307041
+  parameters: freq0=   0.560777789629584689, alfa= 0.00045189386135465918
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -1.66533454e-16 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa         0.0004518938614 
+ eta          0.0004475464317            gamma(tr)        47.04156689 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2    1.0019556279645438       Eigenvalue(6)**2  0.99804818905152926     
+++++++ warning: TWCPIN:  cosmux =  -0.125302E+00, cosmuy = 0.125324E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.125302E+00, cosmu2_eig = 0.125324E+00                                                                                                                                
 call:       4   Penalty function =   0.26743395E-08
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.100196E+01 Eigenvalue(6)**2 0.998048E+00                                                                                               
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.100196E+01 Eigenvalue(6)**2 0.998048E+00                                                                                               
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.998048E+00 Eigenvalue(6)**2 0.100196E+01                                                                                               
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239184700021852215
+  parameters: freq0=   0.560777789629584689, alfa=0.000451754201446569344
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.39184700e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239184700021852326
+  parameters: freq0=   0.560777789629584689, alfa=0.000451754201446569561
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -1.11022302e-16 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa         0.0004517542014 
+ eta          0.0004474067718            gamma(tr)        47.04883779 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2    1.0019553221769189       Eigenvalue(6)**2  0.99804849364673109     
+++++++ warning: TWCPIN:  cosmux =  -0.126704E+00, cosmuy = 0.125216E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.126704E+00, cosmu2_eig = 0.125216E+00                                                                                                                                
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239241831791840387
+  parameters: freq0=   0.560777789629584689, alfa=0.000451861069238585476
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.39241832e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239241831791840442
+  parameters: freq0=   0.560777789629584689, alfa=0.000451861069238585584
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -5.55111512e-17 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa         0.0004518610692 
+ eta          0.0004475136396            gamma(tr)         47.0432738 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2    1.0019555646184828       Eigenvalue(6)**2  0.99804825215054693     
+++++++ warning: TWCPIN:  cosmux =  -0.125537E+00, cosmuy = 0.123391E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.125537E+00, cosmu2_eig = 0.123391E+00                                                                                                                                
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239257747839647789
+  parameters: freq0=   0.560777789629584689, alfa=0.000451890840990574853
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.39257748e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239257747839647816
+  parameters: freq0=   0.560777789629584689, alfa=0.000451890840990574907
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -2.77555756e-17 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa          0.000451890841 
+ eta          0.0004475434113            gamma(tr)         47.0417241 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2   0.99804819568962544       Eigenvalue(6)**2   1.0019556213004517     
+++++++ warning: TWCPIN:  cosmux =  -0.125333E+00, cosmuy = 0.125333E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.125333E+00, cosmu2_eig = 0.125333E+00                                                                                                                                
 call:       7   Penalty function =   0.81289525E-17
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.998049E+00 Eigenvalue(6)**2 0.100196E+01                                                                                               
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.998048E+00 Eigenvalue(6)**2 0.100196E+01                                                                                               
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.998048E+00 Eigenvalue(6)**2 0.100196E+01                                                                                               
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239183086038181891
+  parameters: freq0=   0.560777789629584689, alfa=0.000451751182410554291
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.39183086e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239183086038181891
+  parameters: freq0=   0.560777789629584689, alfa=0.000451751182410554291
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa         0.0004517511824 
+ eta          0.0004474037527            gamma(tr)          47.048995 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2   0.99804850028295355       Eigenvalue(6)**2   1.0019553155147136     
+++++++ warning: TWCPIN:  cosmux =  -0.126735E+00, cosmuy = 0.125225E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.126735E+00, cosmu2_eig = 0.125225E+00                                                                                                                                
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239240217347345741
+  parameters: freq0=   0.560777789629584689, alfa=0.000451858049340575811
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.39240217e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239240217347345741
+  parameters: freq0=   0.560777789629584689, alfa=0.000451858049340575811
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa         0.0004518580493 
+ eta          0.0004475106197            gamma(tr)          47.043431 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2   0.99804825878756398       Eigenvalue(6)**2   1.0019555579554853     
+++++++ warning: TWCPIN:  cosmux =  -0.125568E+00, cosmuy = 0.123400E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.125568E+00, cosmu2_eig = 0.123400E+00                                                                                                                                
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239257747833296119
+  parameters: freq0=   0.560777789629584689, alfa=0.000451890840978693732
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.39257748e-01 (fix point)
+updating probe_beam for deltap=0 => ds=   -0.23925774783329623
+  parameters: freq0=   0.560777789629584689, alfa=0.000451890840978693949
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -1.11022302e-16 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa          0.000451890841 
+ eta          0.0004475434113            gamma(tr)         47.0417241 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2   0.99804819568962566       Eigenvalue(6)**2   1.0019556213004588     
+++++++ warning: TWCPIN:  cosmux =  -0.125333E+00, cosmuy = 0.125333E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.125333E+00, cosmu2_eig = 0.125333E+00                                                                                                                                
 call:      10   Penalty function =   0.19360619E-24
  ++++++++++ LMDIF ended: converged successfully
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.998048E+00 Eigenvalue(6)**2 0.100196E+01                                                                                               
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239257747833296119
+  parameters: freq0=   0.560777789629584689, alfa=0.000451890840978693732
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.39257748e-01 (fix point)
+updating probe_beam for deltap=0 => ds=   -0.23925774783329623
+  parameters: freq0=   0.560777789629584689, alfa=0.000451890840978693949
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -1.11022302e-16 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa          0.000451890841 
+ eta          0.0004475434113            gamma(tr)         47.0417241 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2   0.99804819568962566       Eigenvalue(6)**2   1.0019556213004588     
+++++++ warning: TWCPIN:  cosmux =  -0.125333E+00, cosmuy = 0.125333E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.125333E+00, cosmu2_eig = 0.125333E+00                                                                                                                                
 call:      10   Penalty function =   0.19360619E-24
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.998048E+00 Eigenvalue(6)**2 0.100196E+01                                                                                               
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239257747833296119
+  parameters: freq0=   0.560777789629584689, alfa=0.000451890840978693732
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.39257748e-01 (fix point)
+updating probe_beam for deltap=0 => ds=   -0.23925774783329623
+  parameters: freq0=   0.560777789629584689, alfa=0.000451890840978693949
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -1.11022302e-16 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa          0.000451890841 
+ eta          0.0004475434113            gamma(tr)         47.0417241 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2   0.99804819568962566       Eigenvalue(6)**2   1.0019556213004588     
+++++++ warning: TWCPIN:  cosmux =  -0.125333E+00, cosmuy = 0.125333E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.125333E+00, cosmu2_eig = 0.125333E+00                                                                                                                                
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.998048E+00 Eigenvalue(6)**2 0.100196E+01                                                                                               
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.239257747833296119
+  parameters: freq0=   0.560777789629584689, alfa=0.000451890840978693732
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -2.39257748e-01 (fix point)
+updating probe_beam for deltap=0 => ds=   -0.23925774783329623
+  parameters: freq0=   0.560777789629584689, alfa=0.000451890840978693949
+              beta=   0.999997826282794433, gamma=    479.605016155253338, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = -1.11022302e-16 (fix point)
+ 
+ Global parameters for protons, radiate = F:
+
+ C                      534.6 m          f0              0.5607777896 MHz
+ T0               1.783237529 musecs     alfa          0.000451890841 
+ eta          0.0004475434113            gamma(tr)         47.0417241 
+ Bcurrent      0.009433862743 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
+ Eigenvalue(5)**2   0.99804819568962566       Eigenvalue(6)**2   1.0019556213004588     
+++++++ warning: TWCPIN:  cosmux =  -0.125333E+00, cosmuy = 0.125333E+00                                                                                                                                      
+++++++ warning: TWCPIN:  cosmu1_eig =-0.125333E+00, cosmu2_eig = 0.125333E+00                                                                                                                                
 fivecell$end:1             mux          4     1.27000000E+00     1.27000000E+00     3.15544362E-28
 fivecell$end:1             muy          4     1.77000000E+00     1.77000000E+00     1.93290643E-25
 
@@ -71,8 +712,8 @@ VARIABLE "TAR" SET TO   1.93606188e-25
 kqf                =     0.009138327024 ;
 kqd                =      -0.0109177935 ;
 
-  Number of warnings: 14
-0 in C and 14 in Fortran
+  Number of warnings: 42
+0 in C and 42 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

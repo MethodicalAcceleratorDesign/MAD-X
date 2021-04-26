@@ -1829,7 +1829,7 @@ subroutine ttcorr(el,track,ktrack,turn, code)
   integer :: ktrack, turn
 
   integer :: i, n_ferr, code, bvk, sinkick
-  double precision :: bi2gi2, bil2, curv, dpx, dpy, pt, px, py, rfac, rpt
+  double precision :: curv, dpx, dpy, pt, px, py, rfac, rpt
   double precision :: rpx, rpy, xkick, ykick, div, temp
   double precision :: f_errors(0:maxferr), field(2)
   double precision :: dpxx, dpyy
@@ -1837,7 +1837,7 @@ subroutine ttcorr(el,track,ktrack,turn, code)
   double precision :: beta_sqr, f_damp_t
 
   integer :: node_fd_errors, get_option
-  double precision :: get_variable, get_value, node_value
+  double precision :: get_variable, get_value, node_value, elrad
   double precision :: external, get_tt_attrib
 
   !---- Initialize.
@@ -1867,8 +1867,10 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   if (el .eq. zero)  then
      div = one
+     elrad = node_value('lrad ')
   else
      div = el
+     elrad = el
   endif
 
   FIELD(1:2) = zero
@@ -1911,15 +1913,15 @@ subroutine ttcorr(el,track,ktrack,turn, code)
   dpxx = xkick
   dpyy = ykick
 
-  bil2 = el / (two * betas)
-  bi2gi2 = one / (betas * gammas) ** 2
+  !bil2 = el / (two * betas)
+  !bi2gi2 = one / (betas * gammas) ** 2
 
   !---- Half radiation effects at entrance.
-  if (radiate  .and.  el .ne. 0) then
+  if (radiate  .and.  elrad .ne. 0) then
      if (damp .and. quantum) then
-        curv = sqrt(dpx**2 + dpy**2) / el
+        curv = sqrt(dpx**2 + dpy**2) / elrad
      else
-        rfac = arad * (betas * gammas)**3 * (dpx**2 + dpy**2) / (three * el)
+        rfac = arad * (betas * gammas)**3 * (dpx**2 + dpy**2) / (three * elrad)
      endif
 
      if (damp) then !---- Full damping.
@@ -1927,7 +1929,7 @@ subroutine ttcorr(el,track,ktrack,turn, code)
            px = track(2,i)
            py = track(4,i)
            pt = track(6,i)
-           if (quantum) call trphot(el,curv,rfac,pt)
+           if (quantum) call trphot(elrad,curv,rfac,pt)
            beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            track(2,i) = px * f_damp_t;
@@ -2010,11 +2012,11 @@ subroutine ttcorr(el,track,ktrack,turn, code)
   endif
   !---- Half radiation effects at exit.
   !     If not random, use same RFAC as at entrance.
-  if (radiate  .and.  el .ne. 0) then
+  if (radiate  .and.  elrad .ne. 0) then
      if (damp) then !---- Full damping.
         do i = 1, ktrack
            pt = track(6,i)
-           if (quantum) call trphot(el,curv,rfac,pt)
+           if (quantum) call trphot(elrad,curv,rfac,pt)
            beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            track(2,i) = track(2,i) * f_damp_t;
@@ -3617,7 +3619,7 @@ subroutine trupdate(turn)
 end subroutine trupdate
 
 subroutine trclor(switch,orbit0)
-  use twiss0fi
+  use twiss0fi  
   use name_lenfi
   use trackfi
   use matrices, only : EYE
@@ -4655,8 +4657,8 @@ subroutine trphot(el,curv,rfac,pt)
   ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
   sumxi = zero
   if (amean.gt.3d-1) then
-     print *,"More than 0.3 photons emitted in element."
-     print *,"You might want to consider increasing the number of slices to reduce this number."
+    call fort_warn('TWCPGO: ','More than 0.3 photons emitted in element. '// &
+                         'You might want to consider increasing the number of slices to reduce this number.')
   endif
 
   if (amean .gt. zero) then

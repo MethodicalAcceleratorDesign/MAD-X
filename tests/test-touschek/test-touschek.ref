@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.21 17:25:37      +
+  + Execution date: 2021.04.26 10:35:10      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -info, warn, -echo;
 
@@ -11,11 +11,11 @@ enter Twiss module
   
 iteration:   1 error:   2.781148E-08 deltap:   1.000000E-06
 orbit:   3.343274E-09  1.007120E-11  0.000000E+00  0.000000E+00  7.743663E-09 -6.101698E-10
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.106643E+01 Eigenvalue(6)**2 0.937704E+00                                                                                               
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.937704E+00 Eigenvalue(6)**2 0.106643E+01                                                                                               
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
 
 ++++++ table: summ
 
@@ -75,11 +75,11 @@ enter Twiss module
   
 iteration:   1 error:   2.781148E-08 deltap:   1.000000E-06
 orbit:   3.343274E-09  1.007120E-11  0.000000E+00  0.000000E+00  7.743663E-09 -6.101698E-10
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.106643E+01 Eigenvalue(6)**2 0.937704E+00                                                                                               
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. Eigenvalue(5)**2  0.937704E+00 Eigenvalue(6)**2 0.106643E+01                                                                                               
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one)Try change lag with 0.5. More information with the debug flag on                                                                                                                    
 
 ++++++ table: summ
 
