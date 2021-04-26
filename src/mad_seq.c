@@ -14,7 +14,7 @@ make_sequ_node(struct sequence* sequ, int occ_cnt)
 }
 
 
-
+/*
 static struct sequence_list*
 delete_sequence_list(struct sequence_list* sql)
 {
@@ -28,6 +28,7 @@ delete_sequence_list(struct sequence_list* sql)
   myfree(rout_name, sql);
   return NULL;
 }
+*/
 
 static void
 dump_exp_sequ(struct sequence* sequ, int level)
@@ -1672,7 +1673,7 @@ add_drifts(struct node* c_node, struct node* end,struct sequence* sequ)
   int cnt;
   int implicit_drift_count = 0;
 
-  char buf[256];
+  char buf[512];
 
   int debug;
   debug = get_option("debug");

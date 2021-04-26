@@ -94,13 +94,13 @@ fill_twiss_header(struct table* t)
 {
   int i, h_length = 40; /* change adding header lines ! */
   struct table* s;
-  char tmp[NAME_L];
+  char tmp[NAME_L+1];
 
   if (t == NULL) return;
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
 
-  strncpy(tmp, t->org_sequ->name, NAME_L);
+  strncpy(tmp, t->org_sequ->name, sizeof tmp);
   table_add_header(t, "@ SEQUENCE         %%%02ds \"%s\"", strlen(tmp),stoupper(tmp));
   i = get_string("beam", "particle", tmp);
   table_add_header(t, "@ PARTICLE         %%%02ds \"%s\"", i, stoupper(tmp));
