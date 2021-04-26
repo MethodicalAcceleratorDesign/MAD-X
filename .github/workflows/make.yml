@@ -135,10 +135,10 @@ jobs:
       - name: Run tests
         id: tests
         run: |
-          .github/utils/make_tests${{
-          'tests-to-rm="test-match-9 test-save-state"'
-            || ''
-          }}
+          .github/utils/make_tests \
+          tests-to-rm="test-match-9 test-save-state" \
+          ARCH=${{ matrix.bits }}
+
       - name: Set artifact name suffix
         if: failure() && steps.tests.outcome == 'failure'
         id: jobname
