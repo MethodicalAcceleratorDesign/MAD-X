@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.26 13:16:46      +
+  + Execution date: 2021.04.28 13:17:02      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---;
 
@@ -118,7 +118,7 @@ enter TRACK module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 
 Full 6D closed orbit search.
 Initial value of 6-D closed orbit from Twiss: 

@@ -634,7 +634,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
 end SUBROUTINE tmclor
 
 SUBROUTINE tmcheckstab(rt,tol, debug)
-    use math_constfi, only :  one
+    use math_constfi, only :  one, zero
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Check the stability of the one turn matrix                       *
@@ -669,7 +669,7 @@ SUBROUTINE tmcheckstab(rt,tol, debug)
     tmp1 = reval(1)**2 + aival(1)**2
     tmp2 = reval(2)**2 + aival(2)**2
     
-    write (warnstr,'(a)') 'Horizontal plane might be unstable (values should be less than one)' // &
+    write (warnstr,'(a)') 'Horizontal plane might be unstable' // &
     ' More information with the debug flag on.'
     call fort_warn('TWCLORB: ',warnstr)
     if(debug .ne. zero) print *, 'Eigenvalue(1)**2 ', tmp1, " Eigenvalue(2)**2", tmp2
@@ -679,7 +679,7 @@ SUBROUTINE tmcheckstab(rt,tol, debug)
     tmp1 = reval(1)**2 + aival(1)**2
     tmp2 = reval(2)**2 + aival(2)**2
     
-    write (warnstr,'(a)') 'Vertical plane might be unstable (values should be less than one)' // &
+    write (warnstr,'(a)') 'Vertical plane might be unstable' // &
     ' More information with the debug flag on.'
     call fort_warn('TWCLORB: ',warnstr)
     if(debug .ne. zero) print *, 'Eigenvalue(3)**2 ', tmp1, " Eigenvalue(4)**2", tmp2
@@ -688,7 +688,7 @@ SUBROUTINE tmcheckstab(rt,tol, debug)
   if (stabt) then
     tmp1 = reval(5)**2 + aival(5)**2
     tmp2 = reval(6)**2 + aival(6)**2
-    write (warnstr,'(a)') 'Longitudinal plane might be unstable. (values should be less than one)' // &
+    write (warnstr,'(a)') 'Longitudinal plane might be unstable.' // &
     ' Try change lag with 0.5. More information with the debug flag on.'
     call fort_warn('TWCLORB: ',warnstr)
     if(debug .ne. zero) print *, 'Eigenvalue(5)**2 ', tmp1, " Eigenvalue(6)**2", tmp2

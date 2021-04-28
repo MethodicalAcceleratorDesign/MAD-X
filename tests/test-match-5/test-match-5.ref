@@ -3,7 +3,7 @@
   +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.26 13:18:39      +
+  + Execution date: 2021.04.28 13:18:55      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'Global tune matching with MAD-X';
 
@@ -37,7 +37,7 @@ START MATCHING
 
 number of sequences: 1
 sequence name: fivecell
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 global,sequence=fivecell,Q1=1.27;
 
 global,sequence=fivecell,Q2=1.30;
@@ -54,38 +54,38 @@ total constraints:      2
 
 START LMDIF:
 
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 Initial Penalty Function =   0.22435097E+02
 
 
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 call:       4   Penalty function =   0.42285798E+00
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 call:       7   Penalty function =   0.27630545E-04
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 call:      10   Penalty function =   0.25761515E-12
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 call:      13   Penalty function =   0.90368947E-23
  ++++++++++ LMDIF ended: converged successfully
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 call:      13   Penalty function =   0.90368947E-23
 endmatch;
 
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCLORB:  Longitudinal plane might be unstable. (values should be less than one) Try change lag with 0.5. More information with the debug flag on.                                                                                                                  
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 Global constraint:         q1           4     1.27000000E+00     1.27000000E+00     5.50013545E-25
 Global constraint:         q2           4     1.30000000E+00     1.30000000E+00     8.48688116E-24
 
