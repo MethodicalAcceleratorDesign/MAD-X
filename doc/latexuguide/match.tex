@@ -122,7 +122,7 @@ by a \texttt{MATCH} command taking one of the following forms:
 \madbox{
 MATCH, \=SEQUENCE= 'name1', 'name2', \ldots , 'name-n',\\
        \>BETA0= 'beta01', 'beta02', \ldots , 'beta0n', \\
-       \>SLOW=logical;
+       \>SLOW=logical, TAPERING=logical;
 }
 
 or
@@ -133,7 +133,7 @@ MATCH, \=SEQUENCE='seqname', \\
        \>BETY=real, ALFY=real, MUY=real, \\
        \>X=real, PX=real, Y=real, PY=real, \\
        \>DX=real, DY=real, DPX=real, DPY=real, \\
-       \>DELTAP=real, SLOW=logical;
+       \>DELTAP=real, SLOW=logical, TAPERING=logical;
 }
 
 In the second mode, called insertion matching, the matching routine is
