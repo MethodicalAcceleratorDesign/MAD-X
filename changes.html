@@ -13,19 +13,23 @@
 <hr class="h1">
 <!-- -------- -->
   
-<h3>MAD-X release 5.06.02 (2021.03.15)</h3>
+<h3>MAD-X release 5.06.02 (2021.04.29)</h3>
 <ul>
 <li> Enable to save and load sequences with hexadecimal numbers. In this way the exact same numbers are obtained
      after a save and load of for example a sequence. 
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/954">#954</a>. (Tobias, J.S. Berg)
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/954">#954</a>. (Tobias)
 <li> Translations and rotations are transported to PTC. 
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/957">#957</a>. (Tobias)
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/957">#957</a>. (Tobias, Laurent, J.S. Berg)
 <li> Voltage from crab cavities were included in total voltage exported to SixTrack. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/965">#965</a>. (Tobias)
 <li> Possible to load a sequence and plot without any active sequence. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/967">#967</a>. (Tobias)
 <li> Use Make 4.3 to build MAD-X. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/969">#969</a>. (Laurent)
+<li> Too long sequence names got corrupted before now it is prevented. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/971">#971</a>. (Tobias)
+<li> Lost particles in PTC caused wrong indexing resulting in additional particle beeing lost. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/972">#972</a>. (Tobias, Piotr)         
 <li> Crabcavity with 0 length were ignored by MAD-X. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/986">#986</a>. (Tobias)
 <li> Inconsitent use of beta and beta0 in TRACK. 
@@ -38,7 +42,16 @@
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/973">#973</a>. (Tobias)
 <li> Improved step size to find closed orbit in TRACK. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/990">#990</a>. (Tobias)
-
+<li> The Y-rotation is now also the geometical rotation direction. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/993">#993</a>. (Tobias)
+<li> Long names and more digits are now default in the SixTrack conversion. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/999">#999</a>. (Tobias)
+<li> A bug with makethin with solenoid and expression was fixed. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1002">#1002</a>. (Helmut)
+<li> Tapering of the phase removed, added to matching and a warning for unstable closed orbit in TWISS is added. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1006">#1006</a>. (Tobias)
+<li> Allowing the 3 parameter to be 0 in the definition of the RACETRACK. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1006">#1007</a>. (Tobias)
 </ul>
   
 
