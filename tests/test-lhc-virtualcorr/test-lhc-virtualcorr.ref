@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.00  (64 bit, Linux)       +
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.08.13               +
-  + Execution date: 2020.08.12 14:26:05      +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2021.04.28 21:57:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Links definitions
 
@@ -351,9 +351,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.00 Linux 64"
-@ DATE             %08s "12/08/20"
-@ TIME             %08s "14.26.12"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "28/04/21"
+@ TIME             %08s "21.57.42"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP5"                      6664.568433        11.00260699        11.00650363     0.002850892684    0.0007548514235    0.0004950767763   -2.680921442e-05        15.59181943        14.29786066
@@ -431,9 +431,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.00 Linux 64"
-@ DATE             %08s "12/08/20"
-@ TIME             %08s "14.26.13"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "28/04/21"
+@ TIME             %08s "21.57.44"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP1"                                0        11.00474119        11.00406663    -0.003641817309   -0.0006151400488    0.0005597189687   -2.942489079e-05                  0                  0
@@ -522,6 +522,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_6            synch_8             nflips 
                  0                  0                  0 
+++++++ warning: Cannot save an empty error table ignored
 Want to make named table: my_target
 enter Twiss module
   
@@ -3833,8 +3834,8 @@ Determined SECTOR NMUL MAX :  0
        ACCELERATE  =  FALSE
  Closed orbit:   -1.2343310889072883E-005   1.2345069138660401E-006   5.5792562206558433E-006  -5.5000387849725801E-008   0.0000000000000000     
 
-  Number of warnings: 271
-234 in C and 37 in Fortran
+  Number of warnings: 272
+235 in C and 37 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
