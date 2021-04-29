@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 21:53:24      +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2021.04.28 21:48:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2009
 
@@ -503,9 +503,9 @@ synch_6 synch_8 nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.53.42"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "28/04/21"
+@ TIME             %08s "21.49.18"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.5684327563 6.00000857580692 6.00000000016412 4.7183992894761e-06 1.18943709464912e-11 2.51017694686269e-07 5.87323269866069e-08 15.0983408225299 14.5331268901972
@@ -583,9 +583,9 @@ synch_6 synch_8 nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.53.43"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "28/04/21"
+@ TIME             %08s "21.49.19"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.8731672437 5.99997370066488 5.99999999981848 -3.57164062478269e-06 -4.98715163136442e-12 1.84950996688772e-07 -1.16397080770831e-08 15.1373644428132 14.5337976415106
@@ -663,9 +663,9 @@ synch_6 synch_8 nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.53.45"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "28/04/21"
+@ TIME             %08s "21.49.21"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.5684327563 6.8940544701245e-08 0.0019999810501769 0.000295003163426264 -3.67961959238216e-09
@@ -746,9 +746,9 @@ synch_6 synch_8 nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.53.47"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "28/04/21"
+@ TIME             %08s "21.49.22"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.8731672437 1.20764185699033e-07 -0.00200462302084927 -0.000294999055610351 -1.95142007206673e-07
@@ -1095,9 +1095,9 @@ synch_6 synch_8 nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.54.02"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "28/04/21"
+@ TIME             %08s "21.49.33"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6589.76797484384 "BBMK_PAR.L5B1_20"  232.152821909539 444.40605255872 0.119855803302629 -3.37079020790944 14.8578859657367 14.2797662852504 -0.00847570838825121 -2.11125877351268e-05 -0.000102596725854685 -2.6179531131159e-07
@@ -1253,9 +1253,9 @@ synch_6 synch_8 nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.54.04"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "28/04/21"
+@ TIME             %08s "21.49.35"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6590.07270933124 "BBMK_PAR.L5B2_20"  444.408065834102 232.153020272438 -3.370802095134 0.119860761280512 14.8840032844189 14.2933420228492 0.0128526464399329 -0.00109523043599441 0.000159367975721061 -1.32579168031851e-05
@@ -1411,9 +1411,9 @@ synch_6 synch_8 nflips
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.54.05"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "28/04/21"
+@ TIME             %08s "21.49.36"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6664.4514327563 "BB_HO.L5B1_5"      6.00229117764779 6.00228150046523 0.019504690537403 0.0194999999099732 15.0952376991283 14.5300237620878 -3.45149998584371e-05 0.00199999999990648 0.000295000000018246 2.44750267517919e-14

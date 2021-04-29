@@ -228,14 +228,14 @@ aper_adj_quad(double angle, double x, double y, double* xquad, double* yquad)
 }
 
 static void
-aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat,
+aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat_x, double bbeat_y,
  double halox[], double haloy[], int halolength, double haloxsi[], double haloysi[])
 {
   int j;
 
   for (j=0; j <= halolength + 1; j++) {
-    haloxsi[j] = halox[j] * bbeat * sqrt(ex*betx);
-    haloysi[j] = haloy[j] * bbeat * sqrt(ey*bety);
+    haloxsi[j] = halox[j] * bbeat_x * sqrt(ex*betx);
+    haloysi[j] = haloy[j] * bbeat_y * sqrt(ey*bety);
   }
 }
 
@@ -1307,7 +1307,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double on_ap=1, on_elem=0;
   double ex, ey;
   double dqf, betaqfx, dp, dparx, dpary;
-  double cor, bbeat, nco, halo[4], interval, spec, notsimple;
+  double cor, bbeat, nco, halo[4], interval, spec, notsimple, bbeat_x, bbeat_y;
   double s=0, x=0, y=0, px=0, py=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, length, pt_ele; // nr not used
   double xeff=0,yeff=0;
   double n1x_m, n1y_m;
@@ -1378,6 +1378,14 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   cmd_refnode = command_par_string("refnode", this_cmd->clone);
 
+  if (bbeat==0) {
+    bbeat_x = command_par_value("bbeat_x", this_cmd->clone);
+    bbeat_y = command_par_value("bbeat_y", this_cmd->clone);
+  }
+  else {
+    bbeat_x = bbeat;
+    bbeat_y = bbeat;
+  }
   /* calculate delta angle */
   dangle = twopi/(nco*4);
 
@@ -1432,7 +1440,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   
   // LD: shift further results by one step (?) and finish outside the table
   //  (*tw_cnt)++;
-  aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
+  aper_adj_halo_si(ex, ey, betx, bety, bbeat_x, bbeat_y, halox, haloy, halolength, haloxsi, haloysi);
 
   /* calculate initial normal+parasitic disp. */
   /* modified 27feb08 BJ */
@@ -1523,7 +1531,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       parxd = dparx * sqrt(betx/betaqfx) * dqf;
       paryd = dpary * sqrt(bety/betaqfx) * dqf;
 
-      aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
+      aper_adj_halo_si(ex, ey, betx, bety, bbeat_x,bbeat_y, halox, haloy, halolength, haloxsi, haloysi);
 
      /*do survey to have ready init for next node */
       if (do_survey) {
@@ -1609,7 +1617,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
             jslice, s, betx, bety, dx, dy);
 
             s_curr = s_start + s;
-          aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
+          aper_adj_halo_si(ex, ey, betx, bety, bbeat_x, bbeat_y, halox, haloy, halolength, haloxsi, haloysi);
 
           /* calculate normal+parasitic disp.*/
           /* modified 27feb08 BJ */
@@ -1652,10 +1660,10 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         dispdesx = dx*dp; //Design dispersion   
         dispdesy = dy*dp; 
 
-        dispparax = bbeat*(parxd*(fabs(lim_pt->deltap_twiss/beta0 + pt_ele)+dp))
-        +(bbeat-1)*fabs(dx*dp); //Parasitic disperison 
-        dispparay = bbeat*(paryd*(fabs(lim_pt->deltap_twiss/beta0 + pt_ele)+dp))
-        +(bbeat-1)*fabs(dy*dp);
+        dispparax = bbeat_x*(parxd*(fabs(lim_pt->deltap_twiss/beta0 + pt_ele)+dp))
+        +(bbeat_x-1)*fabs(dx*dp); //Parasitic disperison 
+        dispparay = bbeat_y*(paryd*(fabs(lim_pt->deltap_twiss/beta0 + pt_ele)+dp))
+        +(bbeat_y-1)*fabs(dy*dp);
 
         if(notsimple){
           nchecks = 8; //Extra checks 
@@ -1729,8 +1737,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
       	if (debug) printf("\n Found ratio: %f n1: %f \n",ratio,n1);
 
-        n1x_m = n1 * bbeat * sqrt(betx*ex);
-        n1y_m = n1 * bbeat * sqrt(bety*ey);
+        n1x_m = n1 * bbeat_x * sqrt(betx*ex);
+        n1y_m = n1 * bbeat_y * sqrt(bety*ey);
 
       	/* Change below, BJ 23oct2008                              */
       	/* test block 'if (n1 < node_n1)' included in test block   */
