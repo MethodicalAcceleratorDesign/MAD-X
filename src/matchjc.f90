@@ -561,7 +561,7 @@
 !      integer double_from_table_row
       double precision value,c_min,c_max,weight,val
       character*(name_len) namevar,name,node_name
-      integer next_vary,slope
+      integer next_vary,slope, real_node_l
       double precision step,opt
       integer oldpos,nnode,mtputconsname,void
 
@@ -579,7 +579,7 @@
             j=advance_to_pos('twiss ',pos)
  20         continue
             i=next_constraint(name,name_len,type,value,c_min,c_max,weight, &
-     &                        pos,val,node_name,name_len)
+     &                        pos,val,node_name,name_len, real_node_l)
             if(i.ne.0)  then
               if (pos.ne.oldpos) then
                 nnode=nnode+1

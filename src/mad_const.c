@@ -191,13 +191,18 @@ fill_constraint_list(int type /* 1 node, 2 global */,
 int
 next_constraint(char* name, int* name_l, int* type, double* value,
                 double* c_min, double* c_max, double* weight,
-                int* pos, double* val, char* node_name, int* nn_len)
+                int* pos, double* val, char* node_name, int* nn_len, int* nn_real_l)
   /* returns the parameters of the next constraint; 0 = none, else count */
   // NOTE: does NOT set `val` for match2: match2 seems to invoke this function
   // only via `jacob_print` where `val` is not needed.
 {
   struct constraint* c_c;
   char s, takenextmacro, nomore; /* RDM fork */
+  *nn_real_l = strlen(node_name);
+  char a =node_name[*nn_real_l];
+  if(a>0)
+  printf("kkkknode_name %s %d \n", node_name, (int)a);
+  //node_name[*nn_real_l-1] = '\0';
 
   /* RDM fork */
   if (match_is_on==2) {

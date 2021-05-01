@@ -31,7 +31,7 @@
       parameter(eps = 1.0d-10,eps2 = 1.0d-1,stplim = 2.0d-1)
       parameter(vmax=1.e+20,vmin=-1.e+20)
       character*(name_len) name
-
+      character tmp_c
       psum=get_option('match_summary ') .ne. 0
  1    continue
       j = next_vary(name,name_len,c_min,c_max,step,slope,opt)
@@ -108,10 +108,13 @@
       logical fprt,local,psum, slow_match
       integer ncon,next_constraint,next_global,i,j,pos,type,                &
      &flag,get_option,restart_sequ,advance_to_pos,double_from_table_row,    &
-     &string_from_table_row
+     &string_from_table_row, real_node_l
       double precision fsum,fvect(*),val,valhg,c_min,c_max,weight,f_val
-      character*(name_len) name, node_name
-      integer n_pos, next_constr_namepos, advance_node
+      !character*(name_len) name, node_name
+      character(len=name_len) name, node_name
+      character (len=name_len) estring
+      character tmp_c
+      integer n_pos, next_constr_namepos, advance_node, nn
       local=get_option('match_local ') .ne. 0
       fprt=get_option('match_print ') .ne. 0
       psum=get_option('match_summary ') .ne. 0
@@ -119,11 +122,13 @@
       if (local) then
         j=restart_sequ()
         pos=1
+
         do while (j .gt. 0)
           if (slow_match) j=advance_to_pos('twiss ',pos) ! (expensive) NOP?
           do while (next_constraint(                                    &
      &                  name,name_len,type, valhg,c_min,c_max,weight,   &
-     &                  pos,val,node_name,name_len).ne.0)
+     &                  pos,val,node_name,name_len, real_node_l).ne.0)
+
             select case(type)
               case(1); f_val=weight*dim(c_min,val)
               case(2); f_val=weight*dim(val,c_max)
@@ -142,11 +147,22 @@
               end select
             endif
             if(psum) then
+              estring = ' '
+                nn = 0
+                do i=1, real_node_l
+                tmp_c = node_name(i:i)
+
+                if(iachar(tmp_c) .ne. 0) then
+                  nn=nn+1
+                  estring(nn:nn) = node_name(i:i)
+                endif
+               enddo
               select case(type)
-                case(4); write(*,830) node_name,name,type,valhg,val,f_val**2
-                case(2); write(*,830) node_name,name,type,c_max,val,f_val**2
-                case(1); write(*,830) node_name,name,type,c_min,val,f_val**2
-                case(3); write(*,832) node_name,name,type,c_min,c_max,val,f_val**2
+
+                case(4); write(*,830) estring,name,type,valhg,val,f_val**2
+                case(2); write(*,830) estring,name,type,c_max,val,f_val**2
+                case(1); write(*,830) estring,name,type,c_min,val,f_val**2
+                case(3); write(*,832) estring,name,type,c_min,c_max,val,f_val**2
               end select
             endif
           end do
