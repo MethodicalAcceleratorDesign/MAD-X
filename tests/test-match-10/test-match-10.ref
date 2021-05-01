@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:27:11      +
+  + Release   date: 2020.30.04               +
+  + Execution date: 2021.05.01 19:01:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'TRANSLINE_2+4 type';
 
@@ -152,27 +152,27 @@ total constraints:      138
 START JACOBIAN:
 
  JACOBIAN Strategy =           3
-Initial Penalty Function =   0.5290989632304520E+01
+Initial Penalty Function =   0.5290989631777521E+01
 
 
  Solve system with           25 con,          12 var
- Rank            12   Condition number    3390250.1220847168     
+ Rank            12   Condition number    3390249.0660607163     
  exclude parameter:kq15                                            hit minimum
  exclude parameter:kb22                                            hit minimum
-reset parameter: kq15                    from -0.16922634E+02  to -0.14999998E+02
-reset parameter: kb22                    from -0.27171773E+01  to -0.24999980E+01
- Step length   0.56498404112919431     
+reset parameter: kq15                    from -0.16922900E+02  to -0.14999998E+02
+reset parameter: kb22                    from -0.27171671E+01  to -0.24999980E+01
+ Step length   0.56499462743447382     
  Bisec iteration            1
-call:     2 Dx =   0.59374851E+00  Penalty function =  0.6255114776346503E+11
+call:     2 Dx =   0.59375927E+00  Penalty function =  0.6256713888684251E+11
  Solve system with           49 con,          12 var
- Rank            12   Condition number    15221.897347088507     
+ Rank            12   Condition number    15222.661013526684     
  exclude parameter:kb11                                            hit maximum
-reset parameter: kb11                    from  0.53941732E+01  to  0.24999980E+01
- Step length   0.50422854135909645     
+reset parameter: kb11                    from  0.53937260E+01  to  0.24999980E+01
+ Step length   0.50419788932779508     
  Bisec iteration            1
-call:     3 Dx =   0.56950511E+00  Penalty function =  0.2183687886723155E+10
+call:     3 Dx =   0.56946014E+00  Penalty function =  0.2182151698752954E+10
  Solve system with           39 con,          12 var
- Rank            12   Condition number    9305.9714283722005     
+ Rank            12   Condition number    9303.9835032292831     
  exclude parameter:kq11                                            hit maximum
  exclude parameter:kq12                                            hit minimum
  exclude parameter:kq13                                            hit maximum
@@ -180,752 +180,752 @@ call:     3 Dx =   0.56950511E+00  Penalty function =  0.2183687886723155E+10
  exclude parameter:kq16                                            hit maximum
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kq11                    from  0.28067976E+02  to  0.14999998E+02
-reset parameter: kq12                    from -0.47745068E+02  to -0.14999998E+02
-reset parameter: kq13                    from  0.84970827E+02  to  0.14999998E+02
-reset parameter: kq15                    from -0.31624937E+02  to -0.14999998E+02
-reset parameter: kq16                    from  0.47618805E+02  to  0.14999998E+02
-reset parameter: kb11                    from  0.53427637E+02  to  0.24999980E+01
-reset parameter: kb12                    from -0.64891021E+02  to -0.24999980E+01
- Step length    2.9434487131087828     
+reset parameter: kq11                    from  0.28069274E+02  to  0.14999998E+02
+reset parameter: kq12                    from -0.47747110E+02  to -0.14999998E+02
+reset parameter: kq13                    from  0.84969941E+02  to  0.14999998E+02
+reset parameter: kq15                    from -0.31627459E+02  to -0.14999998E+02
+reset parameter: kq16                    from  0.47621783E+02  to  0.14999998E+02
+reset parameter: kb11                    from  0.53431862E+02  to  0.24999980E+01
+reset parameter: kb12                    from -0.64891379E+02  to -0.24999980E+01
+ Step length    2.9434947924077162     
  Bisec iteration            1
-call:     4 Dx =   0.45028869E+01  Penalty function =  0.7197095837395894E+14
+call:     4 Dx =   0.45029694E+01  Penalty function =  0.7196038907859341E+14
  Solve system with           65 con,          12 var
- Rank            12   Condition number    15122.163244521576     
+ Rank            12   Condition number    15122.386063073940     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.29496134E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27386487E+01  to -0.24999980E+01
- Step length   0.32157950136817515     
-call:     5 Dx =   0.32157950E+00  Penalty function =  0.9266530898723789E+13
+reset parameter: kb11                    from  0.29496891E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27387342E+01  to -0.24999980E+01
+ Step length   0.32157082140477977     
+call:     5 Dx =   0.32157082E+00  Penalty function =  0.9266301745679293E+13
  Solve system with           65 con,          12 var
- Rank            12   Condition number    4543.3108885344873     
+ Rank            12   Condition number    4543.4412549463168     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27723108E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.29544818E+01  to -0.24999980E+01
- Step length   0.11423596624860188     
-call:     6 Dx =   0.11423597E+00  Penalty function =  0.4349823584066256E+13
+reset parameter: kb11                    from  0.27723293E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.29545357E+01  to -0.24999980E+01
+ Step length   0.11423883650439411     
+call:     6 Dx =   0.11423884E+00  Penalty function =  0.4350298612145006E+13
  Solve system with           67 con,          12 var
- Rank            12   Condition number    2441.7315428125285     
+ Rank            12   Condition number    2441.6921422095020     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27958066E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.29181010E+01  to -0.24999980E+01
- Step length    7.3593537515865115E-002
-call:     7 Dx =   0.73593538E-01  Penalty function =  0.1813554153780013E+13
+reset parameter: kb11                    from  0.27957911E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.29180655E+01  to -0.24999980E+01
+ Step length    7.3583352355480330E-002
+call:     7 Dx =   0.73583352E-01  Penalty function =  0.1813613812423460E+13
  Solve system with           68 con,          12 var
- Rank            12   Condition number    1540.4741421763517     
+ Rank            12   Condition number    1540.5249220243497     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.28004447E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.29049403E+01  to -0.24999980E+01
- Step length    5.1271043253369321E-002
-call:     8 Dx =   0.51271043E-01  Penalty function =  0.6460130670853474E+12
+reset parameter: kb11                    from  0.28004442E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.29049362E+01  to -0.24999980E+01
+ Step length    5.1271618922664061E-002
+call:     8 Dx =   0.51271619E-01  Penalty function =  0.6460406589492009E+12
  Solve system with           66 con,          12 var
- Rank            12   Condition number    977.22251270981542     
+ Rank            12   Condition number    977.26769856118403     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27974132E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.28906500E+01  to -0.24999980E+01
- Step length    6.1755812683878565E-002
-call:     9 Dx =   0.61755813E-01  Penalty function =  0.2087031788378420E+12
+reset parameter: kb11                    from  0.27974134E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.28906486E+01  to -0.24999980E+01
+ Step length    6.1751538939885997E-002
+call:     9 Dx =   0.61751539E-01  Penalty function =  0.2087130774890001E+12
  Solve system with           65 con,          12 var
- Rank            12   Condition number    683.52872189484481     
+ Rank            12   Condition number    683.52214989595359     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27852596E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.28581892E+01  to -0.24999980E+01
- Step length    6.5601442013295902E-002
-call:    10 Dx =   0.65601442E-01  Penalty function =  0.6080635195845783E+11
+reset parameter: kb11                    from  0.27852599E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.28581879E+01  to -0.24999980E+01
+ Step length    6.5597295597836003E-002
+call:    10 Dx =   0.65597296E-01  Penalty function =  0.6080919317723709E+11
  Solve system with           65 con,          12 var
- Rank            12   Condition number    600.60442503773470     
+ Rank            12   Condition number    600.59233878199211     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27668277E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.28048080E+01  to -0.24999980E+01
- Step length    8.3458740449476210E-002
-call:    11 Dx =   0.83458740E-01  Penalty function =  0.1671357500281769E+11
+reset parameter: kb11                    from  0.27668280E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.28048074E+01  to -0.24999980E+01
+ Step length    8.3453876801105595E-002
+call:    11 Dx =   0.83453877E-01  Penalty function =  0.1671414606878867E+11
  Solve system with           72 con,          12 var
- Rank            12   Condition number    306.72819851116674     
+ Rank            12   Condition number    306.72971653305837     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27842767E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.28522501E+01  to -0.24999980E+01
- Step length    6.5168293003143557E-002
-call:    12 Dx =   0.65168293E-01  Penalty function =  0.5595651772781924E+10
+reset parameter: kb11                    from  0.27842764E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.28522483E+01  to -0.24999980E+01
+ Step length    6.5160283238633487E-002
+call:    12 Dx =   0.65160283E-01  Penalty function =  0.5595752369217652E+10
  Solve system with           74 con,          12 var
- Rank            12   Condition number    211.67052979272805     
+ Rank            12   Condition number    211.66785513825118     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27795195E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.28361893E+01  to -0.24999980E+01
- Step length    5.6294173924815151E-002
-call:    13 Dx =   0.56294174E-01  Penalty function =  0.3207032586067820E+10
+reset parameter: kb11                    from  0.27795194E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.28361882E+01  to -0.24999980E+01
+ Step length    5.6295362062422576E-002
+call:    13 Dx =   0.56295362E-01  Penalty function =  0.3207056955346334E+10
  Solve system with           70 con,          12 var
- Rank            12   Condition number    196.36865237284914     
+ Rank            12   Condition number    196.36730041375358     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27753424E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.28203456E+01  to -0.24999980E+01
- Step length    6.2481767534192947E-002
-call:    14 Dx =   0.62481768E-01  Penalty function =  0.2748593455854809E+10
+reset parameter: kb11                    from  0.27753425E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.28203445E+01  to -0.24999980E+01
+ Step length    6.2482006583872138E-002
+call:    14 Dx =   0.62482007E-01  Penalty function =  0.2748590400859901E+10
  Solve system with           67 con,          12 var
- Rank            12   Condition number    201.49391190955083     
+ Rank            12   Condition number    201.49334804913693     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
 reset parameter: kb11                    from  0.27723875E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.28049422E+01  to -0.24999980E+01
- Step length    4.8130323511161567E-002
-call:    15 Dx =   0.48130324E-01  Penalty function =  0.2553205066009120E+10
+reset parameter: kb12                    from -0.28049412E+01  to -0.24999980E+01
+ Step length    4.8130221236268471E-002
+call:    15 Dx =   0.48130221E-01  Penalty function =  0.2553197050620012E+10
  Solve system with           69 con,          12 var
- Rank            12   Condition number    190.97338257430209     
+ Rank            12   Condition number    190.97319363630859     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27667625E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27920477E+01  to -0.24999980E+01
- Step length   0.11530558139246865     
+reset parameter: kb11                    from  0.27667623E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27920463E+01  to -0.24999980E+01
+ Step length   0.11530548219344526     
  Bisec iteration            1
-call:    16 Dx =   0.11441476E+00  Penalty function =  0.2525581894702442E+10
+call:    16 Dx =   0.11441464E+00  Penalty function =  0.2525568423192008E+10
  Solve system with           68 con,          12 var
- Rank            12   Condition number    208.76839703830964     
+ Rank            12   Condition number    208.76828633912459     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27651923E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27860806E+01  to -0.24999980E+01
- Step length   0.10187111250646513     
-call:    17 Dx =   0.10187111E+00  Penalty function =  0.2457432437154445E+10
+reset parameter: kb11                    from  0.27651921E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27860794E+01  to -0.24999980E+01
+ Step length   0.10187110072026979     
+call:    17 Dx =   0.10187110E+00  Penalty function =  0.2457412319616688E+10
  Solve system with           65 con,          12 var
- Rank            12   Condition number    452.24018849202758     
+ Rank            12   Condition number    452.22177320090373     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb22                                            hit minimum
  exclude parameter:kb23                                            hit maximum
-reset parameter: kb11                    from  0.27499661E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27535628E+01  to -0.24999980E+01
-reset parameter: kb22                    from -0.71529145E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.27994109E+01  to  0.24999980E+01
- Step length   0.11055381610343383     
+reset parameter: kb11                    from  0.27499665E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27535630E+01  to -0.24999980E+01
+reset parameter: kb22                    from -0.71526382E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.27993879E+01  to  0.24999980E+01
+ Step length   0.11055294496566022     
  Bisec iteration            1
-call:    18 Dx =   0.10994686E+00  Penalty function =  0.9540061616989908E+10
+call:    18 Dx =   0.10994600E+00  Penalty function =  0.9539410620854061E+10
  Solve system with           74 con,          12 var
- Rank            12   Condition number    569.98629255384924     
+ Rank            12   Condition number    569.97334862340222     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
-reset parameter: kb11                    from  0.27597687E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27635170E+01  to -0.24999980E+01
- Step length    7.1123446133189563E-002
-call:    19 Dx =   0.71123446E-01  Penalty function =  0.5464652254261160E+10
+reset parameter: kb11                    from  0.27597686E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27635166E+01  to -0.24999980E+01
+ Step length    7.1123914146297512E-002
+call:    19 Dx =   0.71123914E-01  Penalty function =  0.5464489841252994E+10
  Solve system with           80 con,          12 var
- Rank            12   Condition number    486.86829228625004     
+ Rank            12   Condition number    486.86237218875419     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27513336E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27660039E+01  to -0.24999980E+01
-reset parameter: kb24                    from -0.28225957E+01  to -0.24999980E+01
- Step length    7.9075231881467090E-002
+reset parameter: kb11                    from  0.27513337E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27660040E+01  to -0.24999980E+01
+reset parameter: kb24                    from -0.28225858E+01  to -0.24999980E+01
+ Step length    7.9075431344800690E-002
  Bisec iteration            1
-call:    20 Dx =   0.78905070E-01  Penalty function =  0.8867221386356016E+10
+call:    20 Dx =   0.78905265E-01  Penalty function =  0.8866932287183466E+10
  Solve system with           82 con,          12 var
- Rank            12   Condition number    591.37714436559725     
+ Rank            12   Condition number    591.36864687059165     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27517825E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27626452E+01  to -0.24999980E+01
-reset parameter: kb24                    from -0.29362285E+01  to -0.24999980E+01
- Step length    7.7237852766363579E-002
+reset parameter: kb11                    from  0.27517826E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27626454E+01  to -0.24999980E+01
+reset parameter: kb24                    from -0.29362139E+01  to -0.24999980E+01
+ Step length    7.7238057658817874E-002
  Bisec iteration            1
-call:    21 Dx =   0.77217890E-01  Penalty function =  0.1459738283600766E+11
+call:    21 Dx =   0.77218092E-01  Penalty function =  0.1459679468309219E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    709.34148106240139     
+ Rank            12   Condition number    709.32956925294570     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27514377E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27577188E+01  to -0.24999980E+01
-reset parameter: kb24                    from -0.30138298E+01  to -0.24999980E+01
- Step length    7.3346042691716226E-002
+reset parameter: kb11                    from  0.27514378E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27577191E+01  to -0.24999980E+01
+reset parameter: kb24                    from -0.30138166E+01  to -0.24999980E+01
+ Step length    7.3346336788765273E-002
  Bisec iteration            1
-call:    22 Dx =   0.73428031E-01  Penalty function =  0.2221156801746323E+11
+call:    22 Dx =   0.73428324E-01  Penalty function =  0.2221059287521335E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    818.78540078482956     
- exclude parameter:kb11                                            hit maximum
- exclude parameter:kb12                                            hit minimum
- exclude parameter:kb23                                            hit maximum
- exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27499269E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27509881E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25000788E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30085249E+01  to -0.24999980E+01
- Step length    6.7852436294127627E-002
- Bisec iteration            1
-call:    23 Dx =   0.67983962E-01  Penalty function =  0.2923568103635574E+11
- Solve system with           83 con,          12 var
- Rank            12   Condition number    889.48202108613680     
+ Rank            12   Condition number    818.77113301857014     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27476041E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27443928E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25013276E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.29871419E+01  to -0.24999980E+01
- Step length    6.0851628905968506E-002
+reset parameter: kb11                    from  0.27499270E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27509884E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25000741E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30085122E+01  to -0.24999980E+01
+ Step length    6.7852766226343703E-002
  Bisec iteration            1
-call:    24 Dx =   0.60985615E-01  Penalty function =  0.3426197480030708E+11
+call:    23 Dx =   0.67984294E-01  Penalty function =  0.2923503426714819E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    920.56811225128661     
+ Rank            12   Condition number    889.47413919598330     
+ exclude parameter:kb11                                            hit maximum
+ exclude parameter:kb12                                            hit minimum
+ exclude parameter:kb23                                            hit maximum
+ exclude parameter:kb24                                            hit minimum
+reset parameter: kb11                    from  0.27476042E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27443931E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25013240E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.29871294E+01  to -0.24999980E+01
+ Step length    6.0851942508190690E-002
+ Bisec iteration            1
+call:    24 Dx =   0.60985932E-01  Penalty function =  0.3426159280687182E+11
+ Solve system with           83 con,          12 var
+ Rank            12   Condition number    920.56385952658206     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27453117E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27384919E+01  to -0.24999980E+01
-reset parameter: kb24                    from -0.29691150E+01  to -0.24999980E+01
- Step length    5.2779046243649805E-002
+reset parameter: kb11                    from  0.27453118E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27384921E+01  to -0.24999980E+01
+reset parameter: kb24                    from -0.29691019E+01  to -0.24999980E+01
+ Step length    5.2779379736338339E-002
  Bisec iteration            1
-call:    25 Dx =   0.52889927E-01  Penalty function =  0.3770979601711174E+11
+call:    25 Dx =   0.52890263E-01  Penalty function =  0.3770898257900536E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    928.10820426457099     
+ Rank            12   Condition number    928.10044669800607     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27436449E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27338521E+01  to -0.24999980E+01
-reset parameter: kb24                    from -0.29584300E+01  to -0.24999980E+01
- Step length    4.4460211344792180E-002
+reset parameter: kb12                    from -0.27338523E+01  to -0.24999980E+01
+reset parameter: kb24                    from -0.29584170E+01  to -0.24999980E+01
+ Step length    4.4460534633166578E-002
  Bisec iteration            1
-call:    26 Dx =   0.44540928E-01  Penalty function =  0.3978746708505203E+11
+call:    26 Dx =   0.44541253E-01  Penalty function =  0.3978630275387562E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    921.40520424125350     
+ Rank            12   Condition number    921.39493025116997     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27426227E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27306345E+01  to -0.24999980E+01
-reset parameter: kb24                    from -0.29549497E+01  to -0.24999980E+01
- Step length    3.6909619122714281E-002
+reset parameter: kb12                    from -0.27306347E+01  to -0.24999980E+01
+reset parameter: kb24                    from -0.29549366E+01  to -0.24999980E+01
+ Step length    3.6909890141440520E-002
  Bisec iteration            1
-call:    27 Dx =   0.36964110E-01  Penalty function =  0.4107378493673604E+11
+call:    27 Dx =   0.36964382E-01  Penalty function =  0.4107233583941795E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    909.88563387045951     
+ Rank            12   Condition number    909.87348769920766     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27420870E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27285791E+01  to -0.24999980E+01
-reset parameter: kb24                    from -0.29569144E+01  to -0.24999980E+01
- Step length    3.0807313318019874E-002
+reset parameter: kb12                    from -0.27285793E+01  to -0.24999980E+01
+reset parameter: kb24                    from -0.29569009E+01  to -0.24999980E+01
+ Step length    3.0807516651861142E-002
  Bisec iteration            1
-call:    28 Dx =   0.30843199E-01  Penalty function =  0.4201781470456907E+11
+call:    28 Dx =   0.30843402E-01  Penalty function =  0.4201612551572260E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    899.02107484753674     
+ Rank            12   Condition number    899.00746600886202     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27418426E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27272999E+01  to -0.24999980E+01
-reset parameter: kb24                    from -0.29625554E+01  to -0.24999980E+01
- Step length    2.6337473953775451E-002
+reset parameter: kb11                    from  0.27418425E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27273000E+01  to -0.24999980E+01
+reset parameter: kb24                    from -0.29625416E+01  to -0.24999980E+01
+ Step length    2.6337614119621253E-002
  Bisec iteration            1
-call:    29 Dx =   0.26361456E-01  Penalty function =  0.4290118531552418E+11
+call:    29 Dx =   0.26361597E-01  Penalty function =  0.4289928208181207E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    891.25596873057134     
+ Rank            12   Condition number    891.24115574361053     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27417482E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27264828E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25006916E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.29705712E+01  to -0.24999980E+01
- Step length    2.3314033723441100E-002
+reset parameter: kb11                    from  0.27417481E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27264829E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25006865E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.29705569E+01  to -0.24999980E+01
+ Step length    2.3314123370620499E-002
  Bisec iteration            1
-call:    30 Dx =   0.23330628E-01  Penalty function =  0.4372419515529329E+11
+call:    30 Dx =   0.23330719E-01  Penalty function =  0.4372324446361084E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    886.19724820673389     
+ Rank            12   Condition number    886.18956975065214     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27417141E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27259313E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25030045E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.29802789E+01  to -0.24999980E+01
- Step length    2.1395387990136884E-002
+reset parameter: kb12                    from -0.27259314E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25030002E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.29802630E+01  to -0.24999980E+01
+ Step length    2.1395479181370275E-002
  Bisec iteration            1
-call:    31 Dx =   0.21407192E-01  Penalty function =  0.4423091964203255E+11
+call:    31 Dx =   0.21407284E-01  Penalty function =  0.4423044820847601E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    881.53323678967956     
+ Rank            12   Condition number    881.52888357635572     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27416887E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27255402E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25054078E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.29914347E+01  to -0.24999980E+01
- Step length    2.0223143360718454E-002
+reset parameter: kb12                    from -0.27255403E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25054040E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.29914181E+01  to -0.24999980E+01
+ Step length    2.0223213082777670E-002
  Bisec iteration            1
-call:    32 Dx =   0.20231638E-01  Penalty function =  0.4454859255972712E+11
+call:    32 Dx =   0.20231709E-01  Penalty function =  0.4454835145750263E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    877.73840872651226     
+ Rank            12   Condition number    877.73552202547091     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27416762E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27252503E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25078765E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30034365E+01  to -0.24999980E+01
- Step length    1.9531722377347915E-002
+reset parameter: kb11                    from  0.27416763E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27252504E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25078729E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30034197E+01  to -0.24999980E+01
+ Step length    1.9531768312717000E-002
  Bisec iteration            1
-call:    33 Dx =   0.19537885E-01  Penalty function =  0.4475486736963841E+11
+call:    33 Dx =   0.19537931E-01  Penalty function =  0.4475472884279845E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    874.91056828559044     
+ Rank            12   Condition number    874.90826297519266     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27416763E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27250279E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25103725E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30158374E+01  to -0.24999980E+01
- Step length    1.9134065262105093E-002
+reset parameter: kb23                    from  0.25103691E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30158208E+01  to -0.24999980E+01
+ Step length    1.9134092550273398E-002
  Bisec iteration            1
-call:    34 Dx =   0.19138546E-01  Penalty function =  0.4489750210571254E+11
+call:    34 Dx =   0.19138574E-01  Penalty function =  0.4489740233103371E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    872.98717511695281     
+ Rank            12   Condition number    872.98504859239233     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27416866E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27248529E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25128539E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30282876E+01  to -0.24999980E+01
- Step length    1.8909621605857206E-002
+reset parameter: kb11                    from  0.27416865E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27248530E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25128507E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30282716E+01  to -0.24999980E+01
+ Step length    1.8909636421495235E-002
  Bisec iteration            1
-call:    35 Dx =   0.18912871E-01  Penalty function =  0.4500589722191194E+11
+call:    35 Dx =   0.18912886E-01  Penalty function =  0.4500580565989046E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    871.84549064132648     
+ Rank            12   Condition number    871.84337686081642     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27417043E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27247125E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25152802E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30405053E+01  to -0.24999980E+01
- Step length    1.8784898986438991E-002
+reset parameter: kb12                    from -0.27247126E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25152771E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30404899E+01  to -0.24999980E+01
+ Step length    1.8784906188373821E-002
  Bisec iteration            1
-call:    36 Dx =   0.18787239E-01  Penalty function =  0.4509790583908447E+11
+call:    36 Dx =   0.18787246E-01  Penalty function =  0.4509780913499038E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    871.34777360204771     
+ Rank            12   Condition number    871.34562156870641     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27417268E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27245981E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25176146E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30522631E+01  to -0.24999980E+01
- Step length    1.8716588556862250E-002
+reset parameter: kb23                    from  0.25176116E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30522486E+01  to -0.24999980E+01
+ Step length    1.8716591527846906E-002
  Bisec iteration            1
-call:    37 Dx =   0.18718258E-01  Penalty function =  0.4518395919342665E+11
+call:    37 Dx =   0.18718261E-01  Penalty function =  0.4518385277199760E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    871.36097428102892     
+ Rank            12   Condition number    871.35878632044955     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27417518E+01  to  0.24999980E+01
+reset parameter: kb11                    from  0.27417517E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27245036E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25198264E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30633842E+01  to -0.24999980E+01
- Step length    1.8679709618841217E-002
+reset parameter: kb23                    from  0.25198237E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30633708E+01  to -0.24999980E+01
+ Step length    1.8679710454977450E-002
  Bisec iteration            1
-call:    38 Dx =   0.18680886E-01  Penalty function =  0.4526966046672186E+11
+call:    38 Dx =   0.18680887E-01  Penalty function =  0.4526954416227651E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    871.76477968137567     
+ Rank            12   Condition number    871.76258134804937     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27417773E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27244246E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25218922E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30737405E+01  to -0.24999980E+01
- Step length    1.8660073018159772E-002
+reset parameter: kb23                    from  0.25218897E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30737281E+01  to -0.24999980E+01
+ Step length    1.8660072941261208E-002
  Bisec iteration            1
-call:    39 Dx =   0.18660891E-01  Penalty function =  0.4535748440852816E+11
+call:    39 Dx =   0.18660891E-01  Penalty function =  0.4535736016713262E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    872.45442051531916     
+ Rank            12   Condition number    872.45224505059218     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27418021E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27243580E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25237962E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30832499E+01  to -0.24999980E+01
- Step length    1.8649728754389576E-002
+reset parameter: kb12                    from -0.27243581E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25237939E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30832386E+01  to -0.24999980E+01
+ Step length    1.8649728416549952E-002
  Bisec iteration            1
-call:    40 Dx =   0.18650288E-01  Penalty function =  0.4544793297453355E+11
+call:    40 Dx =   0.18650288E-01  Penalty function =  0.4544780361299757E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    873.34114189950083     
+ Rank            12   Condition number    873.33902212463408     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27418253E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27243015E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25255302E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30918728E+01  to -0.24999980E+01
- Step length    1.8644288319722015E-002
+reset parameter: kb23                    from  0.25255281E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30918627E+01  to -0.24999980E+01
+ Step length    1.8644288033702373E-002
  Bisec iteration            1
-call:    41 Dx =   0.18644665E-01  Penalty function =  0.4554034013916905E+11
+call:    41 Dx =   0.18644665E-01  Penalty function =  0.4554020867175331E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    874.35160586880249     
+ Rank            12   Condition number    874.34957054224128     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27418462E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27242532E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25270925E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.30996063E+01  to -0.24999980E+01
- Step length    1.8641372569582121E-002
+reset parameter: kb12                    from -0.27242533E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25270907E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.30995973E+01  to -0.24999980E+01
+ Step length    1.8641372449958928E-002
  Bisec iteration            1
-call:    42 Dx =   0.18641622E-01  Penalty function =  0.4563343484770385E+11
+call:    42 Dx =   0.18641622E-01  Penalty function =  0.4563330410933770E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    875.42676990200403     
+ Rank            12   Condition number    875.42484201425430     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27418647E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27242119E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25284872E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31064763E+01  to -0.24999980E+01
- Step length    1.8639720807814363E-002
+reset parameter: kb23                    from  0.25284856E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31064683E+01  to -0.24999980E+01
+ Step length    1.8639720869491044E-002
  Bisec iteration            1
-call:    43 Dx =   0.18639882E-01  Penalty function =  0.4572572718298939E+11
+call:    43 Dx =   0.18639882E-01  Penalty function =  0.4572559962672532E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    876.52047564986788     
+ Rank            12   Condition number    876.51867189498796     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27418806E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27241764E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25297224E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31125302E+01  to -0.24999980E+01
- Step length    1.8638684243152095E-002
+reset parameter: kb23                    from  0.25297210E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31125232E+01  to -0.24999980E+01
+ Step length    1.8638684460438981E-002
  Bisec iteration            1
-call:    44 Dx =   0.18638787E-01  Penalty function =  0.4581576085517955E+11
+call:    44 Dx =   0.18638787E-01  Penalty function =  0.4581563846792196E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    877.59787546696271     
+ Rank            12   Condition number    877.59620643190851     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27418941E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27241458E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25308090E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31178292E+01  to -0.24999980E+01
- Step length    1.8637941429296728E-002
+reset parameter: kb11                    from  0.27418940E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27241459E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25308077E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31178231E+01  to -0.24999980E+01
+ Step length    1.8637941753929077E-002
  Bisec iteration            1
-call:    45 Dx =   0.18638005E-01  Penalty function =  0.4590226433437845E+11
+call:    45 Dx =   0.18638005E-01  Penalty function =  0.4590214860758150E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    878.63379108434322     
+ Rank            12   Condition number    878.63226170703865     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419053E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27241196E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25317595E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31224420E+01  to -0.24999980E+01
- Step length    1.8637340941733777E-002
+reset parameter: kb23                    from  0.25317584E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31224367E+01  to -0.24999980E+01
+ Step length    1.8637341332566035E-002
  Bisec iteration            1
-call:    46 Dx =   0.18637380E-01  Penalty function =  0.4598422693557082E+11
+call:    46 Dx =   0.18637380E-01  Penalty function =  0.4598411889070057E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    879.61108451123459     
+ Rank            12   Condition number    879.60969539910673     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419145E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27240969E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25325873E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31264400E+01  to -0.24999980E+01
- Step length    1.8636816275817210E-002
+reset parameter: kb23                    from  0.25325864E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31264354E+01  to -0.24999980E+01
+ Step length    1.8636816696249645E-002
  Bisec iteration            1
-call:    47 Dx =   0.18636839E-01  Penalty function =  0.4606092201898094E+11
+call:    47 Dx =   0.18636840E-01  Penalty function =  0.4606082226204990E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    880.51911390247346     
+ Rank            12   Condition number    880.51786187936750     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
-reset parameter: kb11                    from  0.27419221E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27240774E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25333056E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31298930E+01  to -0.24999980E+01
- Step length    1.8636341090206572E-002
+reset parameter: kb11                    from  0.27419220E+01  to  0.24999980E+01
+reset parameter: kb12                    from -0.27240775E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25333047E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31298891E+01  to -0.24999980E+01
+ Step length    1.8636341517146698E-002
  Bisec iteration            1
-call:    48 Dx =   0.18636354E-01  Penalty function =  0.4613189552310784E+11
+call:    48 Dx =   0.18636355E-01  Penalty function =  0.4613180430962463E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    881.35232761810789     
+ Rank            12   Condition number    881.35120679815122     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419281E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27240607E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25339270E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31328674E+01  to -0.24999980E+01
- Step length    1.8635906541324108E-002
+reset parameter: kb23                    from  0.25339262E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31328640E+01  to -0.24999980E+01
+ Step length    1.8635906952571491E-002
  Bisec iteration            1
-call:    49 Dx =   0.18635914E-01  Penalty function =  0.4619693420470578E+11
+call:    49 Dx =   0.18635914E-01  Penalty function =  0.4619685150593703E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    882.10903146402325     
+ Rank            12   Condition number    882.10803402921374     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419330E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27240463E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25344633E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31354243E+01  to -0.24999980E+01
- Step length    1.8635510346009892E-002
+reset parameter: kb23                    from  0.25344627E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31354214E+01  to -0.24999980E+01
+ Step length    1.8635510733893905E-002
  Bisec iteration            1
-call:    50 Dx =   0.18635514E-01  Penalty function =  0.4625602421922543E+11
+call:    50 Dx =   0.18635515E-01  Penalty function =  0.4625594979096333E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    882.79034395585722     
+ Rank            12   Condition number    882.78946089680483     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419368E+01  to  0.24999980E+01
-reset parameter: kb12                    from -0.27240338E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25349254E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31376190E+01  to -0.24999980E+01
- Step length    1.8635151946194774E-002
+reset parameter: kb12                    from -0.27240339E+01  to -0.24999980E+01
+reset parameter: kb23                    from  0.25349248E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31376165E+01  to -0.24999980E+01
+ Step length    1.8635152302923924E-002
  Bisec iteration            1
-call:    51 Dx =   0.18635154E-01  Penalty function =  0.4630930743184769E+11
+call:    51 Dx =   0.18635155E-01  Penalty function =  0.4630924087692250E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    883.39933892884017     
+ Rank            12   Condition number    883.39856070790495     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419399E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27240232E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25353229E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31395007E+01  to -0.24999980E+01
- Step length    1.8634830604211953E-002
+reset parameter: kb23                    from  0.25353225E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31394986E+01  to -0.24999980E+01
+ Step length    1.8634830925986941E-002
  Bisec iteration            1
-call:    52 Dx =   0.18634832E-01  Penalty function =  0.4635704008563576E+11
+call:    52 Dx =   0.18634832E-01  Penalty function =  0.4635698090249860E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    883.94036350505769     
+ Rank            12   Condition number    883.93968036128911     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419423E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27240140E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25356646E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31411128E+01  to -0.24999980E+01
- Step length    1.8634544872136855E-002
+reset parameter: kb23                    from  0.25356642E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31411110E+01  to -0.24999980E+01
+ Step length    1.8634545161988699E-002
  Bisec iteration            1
-call:    53 Dx =   0.18634546E-01  Penalty function =  0.4639955640083691E+11
+call:    53 Dx =   0.18634546E-01  Penalty function =  0.4639950403016895E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    884.41851036097694     
+ Rank            12   Condition number    884.41791268265706     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419442E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27240061E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25359579E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31424932E+01  to -0.24999980E+01
- Step length    1.8634292631112253E-002
+reset parameter: kb23                    from  0.25359576E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31424916E+01  to -0.24999980E+01
+ Step length    1.8634292889117176E-002
  Bisec iteration            1
-call:    54 Dx =   0.18634293E-01  Penalty function =  0.4643723821987997E+11
+call:    54 Dx =   0.18634293E-01  Penalty function =  0.4643719207220540E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    884.83922261526209     
+ Rank            12   Condition number    884.83870133224605     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419457E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239994E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25362097E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31436747E+01  to -0.24999980E+01
- Step length    1.8634071288972289E-002
+reset parameter: kb23                    from  0.25362094E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31436733E+01  to -0.24999980E+01
+ Step length    1.8634071517157739E-002
  Bisec iteration            1
-call:    55 Dx =   0.18634072E-01  Penalty function =  0.4647049079610896E+11
+call:    55 Dx =   0.18634072E-01  Penalty function =  0.4647045028251305E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    885.20800766718605     
+ Rank            12   Condition number    885.20755411279151     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419468E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239936E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25364256E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31446858E+01  to -0.24999980E+01
- Step length    1.8633878014563041E-002
+reset parameter: kb23                    from  0.25364254E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31446846E+01  to -0.24999980E+01
+ Step length    1.8633878211556893E-002
  Bisec iteration            1
-call:    56 Dx =   0.18633878E-01  Penalty function =  0.4649972431986477E+11
+call:    56 Dx =   0.18633879E-01  Penalty function =  0.4649968886494466E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    885.53023749702129     
+ Rank            12   Condition number    885.52984372122557     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419477E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239886E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25366107E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31455509E+01  to -0.24999980E+01
- Step length    1.8633709919696088E-002
+reset parameter: kb23                    from  0.25366105E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31455499E+01  to -0.24999980E+01
+ Step length    1.8633710094110925E-002
  Bisec iteration            1
-call:    57 Dx =   0.18633710E-01  Penalty function =  0.4652534041847560E+11
+call:    57 Dx =   0.18633710E-01  Penalty function =  0.4652530947760683E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    885.81101749752850     
+ Rank            12   Condition number    885.81067630554503     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419485E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239843E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25367694E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31462912E+01  to -0.24999980E+01
- Step length    1.8633564201998611E-002
+reset parameter: kb23                    from  0.25367692E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31462903E+01  to -0.24999980E+01
+ Step length    1.8633564356307364E-002
  Bisec iteration            1
-call:    58 Dx =   0.18633564E-01  Penalty function =  0.4654772281260978E+11
+call:    58 Dx =   0.18633565E-01  Penalty function =  0.4654769587851052E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    886.05510591280540     
+ Rank            12   Condition number    886.05481075940486     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419490E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239806E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25369054E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31469245E+01  to -0.24999980E+01
- Step length    1.8633438212338690E-002
+reset parameter: kb23                    from  0.25369052E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31469238E+01  to -0.24999980E+01
+ Step length    1.8633438345128168E-002
  Bisec iteration            1
-call:    59 Dx =   0.18633438E-01  Penalty function =  0.4656723128297509E+11
+call:    59 Dx =   0.18633439E-01  Penalty function =  0.4656720788498213E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    886.26687178430006     
+ Rank            12   Condition number    886.26661690522951     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419495E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239775E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25370219E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31474664E+01  to -0.24999980E+01
- Step length    1.8633329506795089E-002
+reset parameter: kb23                    from  0.25370218E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31474658E+01  to -0.24999980E+01
+ Step length    1.8633329623945451E-002
  Bisec iteration            1
-call:    60 Dx =   0.18633330E-01  Penalty function =  0.4658419820449891E+11
+call:    60 Dx =   0.18633330E-01  Penalty function =  0.4658417791649674E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    886.45027938695000     
+ Rank            12   Condition number    886.45005949623226     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419498E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239748E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25371217E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31479302E+01  to -0.24999980E+01
- Step length    1.8633235889502039E-002
+reset parameter: kb23                    from  0.25371216E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31479296E+01  to -0.24999980E+01
+ Step length    1.8633235986312092E-002
  Bisec iteration            1
-call:    61 Dx =   0.18633236E-01  Penalty function =  0.4659892701945836E+11
+call:    61 Dx =   0.18633236E-01  Penalty function =  0.4659890945438950E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    886.60889230531347     
+ Rank            12   Condition number    886.60870275121204     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419501E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239725E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25372072E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31483270E+01  to -0.24999980E+01
- Step length    1.8633155375654523E-002
+reset parameter: kb23                    from  0.25372071E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31483265E+01  to -0.24999980E+01
+ Step length    1.8633155458980463E-002
  Bisec iteration            1
-call:    62 Dx =   0.18633155E-01  Penalty function =  0.4661169208071642E+11
+call:    62 Dx =   0.18633155E-01  Penalty function =  0.4661167689334452E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    886.74588914472270     
+ Rank            12   Condition number    886.74572583282554     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419504E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239705E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25372804E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31486665E+01  to -0.24999980E+01
- Step length    1.8633086212789623E-002
+reset parameter: kb23                    from  0.25372803E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31486661E+01  to -0.24999980E+01
+ Step length    1.8633086286883333E-002
  Bisec iteration            1
-call:    63 Dx =   0.18633086E-01  Penalty function =  0.4662273947421345E+11
+call:    63 Dx =   0.18633086E-01  Penalty function =  0.4662272636027510E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    886.86408715322784     
+ Rank            12   Condition number    886.86394673929362     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419506E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239688E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25373432E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31489571E+01  to -0.24999980E+01
- Step length    1.8633026864425306E-002
+reset parameter: kb23                    from  0.25373431E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31489568E+01  to -0.24999980E+01
+ Step length    1.8633026926427699E-002
  Bisec iteration            1
-call:    64 Dx =   0.18633027E-01  Penalty function =  0.4663228847998170E+11
+call:    64 Dx =   0.18633027E-01  Penalty function =  0.4663227716607055E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    886.96597098886593     
+ Rank            12   Condition number    886.96585015190817     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419507E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239673E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25373969E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31492059E+01  to -0.24999980E+01
- Step length    1.8632975978903763E-002
+reset parameter: kb23                    from  0.25373968E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31492056E+01  to -0.24999980E+01
+ Step length    1.8632976032343953E-002
  Bisec iteration            1
-call:    65 Dx =   0.18632976E-01  Penalty function =  0.4664053340123233E+11
+call:    65 Dx =   0.18632976E-01  Penalty function =  0.4664052365052776E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.05372192171126     
+ Rank            12   Condition number    887.05361803344613     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419508E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239661E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25374429E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31494188E+01  to -0.24999980E+01
- Step length    1.8632932374329537E-002
+reset parameter: kb23                    from  0.25374428E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31494185E+01  to -0.24999980E+01
+ Step length    1.8632932421670970E-002
  Bisec iteration            1
-call:    66 Dx =   0.18632932E-01  Penalty function =  0.4664764561341312E+11
+call:    66 Dx =   0.18632932E-01  Penalty function =  0.4664763721797964E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.12924808504374     
+ Rank            12   Condition number    887.12915885496056     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419509E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239650E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25374823E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31496010E+01  to -0.24999980E+01
- Step length    1.8632895034829639E-002
+reset parameter: kb23                    from  0.25374822E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31496008E+01  to -0.24999980E+01
+ Step length    1.8632895076071677E-002
  Bisec iteration            1
-call:    67 Dx =   0.18632895E-01  Penalty function =  0.4665377567288245E+11
+call:    67 Dx =   0.18632895E-01  Penalty function =  0.4665376844827399E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.19421384825489     
+ Rank            12   Condition number    887.19413726945049     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -933,12 +933,12 @@ call:    67 Dx =   0.18632895E-01  Penalty function =  0.4665377567288245E+11
 reset parameter: kb11                    from  0.27419510E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239641E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25375160E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31497570E+01  to -0.24999980E+01
- Step length    1.8632863075332722E-002
+reset parameter: kb24                    from -0.31497568E+01  to -0.24999980E+01
+ Step length    1.8632863112056027E-002
  Bisec iteration            1
-call:    68 Dx =   0.18632863E-01  Penalty function =  0.4665905539917543E+11
+call:    68 Dx =   0.18632863E-01  Penalty function =  0.4665904918595388E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.25006719973408     
+ Rank            12   Condition number    887.25000148907350     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -946,25 +946,25 @@ call:    68 Dx =   0.18632863E-01  Penalty function =  0.4665905539917543E+11
 reset parameter: kb11                    from  0.27419511E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239633E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25375449E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31498905E+01  to -0.24999980E+01
- Step length    1.8632835731550893E-002
+reset parameter: kb24                    from -0.31498904E+01  to -0.24999980E+01
+ Step length    1.8632835760024020E-002
  Bisec iteration            1
-call:    69 Dx =   0.18632835E-01  Penalty function =  0.4666359987496552E+11
+call:    69 Dx =   0.18632835E-01  Penalty function =  0.4666359453307985E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.29806488973213     
+ Rank            12   Condition number    887.29800840508426     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
  exclude parameter:kb24                                            hit minimum
 reset parameter: kb11                    from  0.27419512E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239627E+01  to -0.24999980E+01
-reset parameter: kb23                    from  0.25375697E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31500049E+01  to -0.24999980E+01
- Step length    1.8632812342779595E-002
+reset parameter: kb23                    from  0.25375696E+01  to  0.24999980E+01
+reset parameter: kb24                    from -0.31500047E+01  to -0.24999980E+01
+ Step length    1.8632812369290028E-002
  Bisec iteration            1
-call:    70 Dx =   0.18632812E-01  Penalty function =  0.4666750932503470E+11
+call:    70 Dx =   0.18632812E-01  Penalty function =  0.4666750473462325E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.33929580227687     
+ Rank            12   Condition number    887.33924745335321     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -972,12 +972,12 @@ call:    70 Dx =   0.18632812E-01  Penalty function =  0.4666750932503470E+11
 reset parameter: kb11                    from  0.27419512E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239621E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25375908E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31501027E+01  to -0.24999980E+01
- Step length    1.8632792343708220E-002
+reset parameter: kb24                    from -0.31501026E+01  to -0.24999980E+01
+ Step length    1.8632792367592053E-002
  Bisec iteration            1
-call:    71 Dx =   0.18632792E-01  Penalty function =  0.4667087085282449E+11
+call:    71 Dx =   0.18632792E-01  Penalty function =  0.4667086691122425E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.37470225890524     
+ Rank            12   Condition number    887.37466084263372     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -985,12 +985,12 @@ call:    71 Dx =   0.18632792E-01  Penalty function =  0.4667087085282449E+11
 reset parameter: kb11                    from  0.27419512E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239616E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376090E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31501865E+01  to -0.24999980E+01
- Step length    1.8632775247560462E-002
+reset parameter: kb24                    from -0.31501864E+01  to -0.24999980E+01
+ Step length    1.8632775266466211E-002
  Bisec iteration            1
-call:    72 Dx =   0.18632775E-01  Penalty function =  0.4667376001924593E+11
+call:    72 Dx =   0.18632775E-01  Penalty function =  0.4667375663546929E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.40509816730810     
+ Rank            12   Condition number    887.40506262431211     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -998,12 +998,12 @@ call:    72 Dx =   0.18632775E-01  Penalty function =  0.4667376001924593E+11
 reset parameter: kb11                    from  0.27419513E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239612E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376245E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31502583E+01  to -0.24999980E+01
- Step length    1.8632760633384676E-002
+reset parameter: kb24                    from -0.31502582E+01  to -0.24999980E+01
+ Step length    1.8632760648189549E-002
  Bisec iteration            1
-call:    73 Dx =   0.18632760E-01  Penalty function =  0.4667624226914482E+11
+call:    73 Dx =   0.18632760E-01  Penalty function =  0.4667623936205122E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.43118599549041     
+ Rank            12   Condition number    887.43115555242639     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1011,12 +1011,12 @@ call:    73 Dx =   0.18632760E-01  Penalty function =  0.4667624226914482E+11
 reset parameter: kb11                    from  0.27419513E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239608E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376378E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31503197E+01  to -0.24999980E+01
- Step length    1.8632748142464125E-002
+reset parameter: kb24                    from -0.31503196E+01  to -0.24999980E+01
+ Step length    1.8632748158615691E-002
  Bisec iteration            1
-call:    74 Dx =   0.18632748E-01  Penalty function =  0.4667837420565401E+11
+call:    74 Dx =   0.18632748E-01  Penalty function =  0.4667837171218444E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.45357139589998     
+ Rank            12   Condition number    887.45354532867066     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1024,12 +1024,12 @@ call:    74 Dx =   0.18632748E-01  Penalty function =  0.4667837420565401E+11
 reset parameter: kb11                    from  0.27419513E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239605E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376492E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31503723E+01  to -0.24999980E+01
- Step length    1.8632737469905729E-002
+reset parameter: kb24                    from -0.31503722E+01  to -0.24999980E+01
+ Step length    1.8632737480946186E-002
  Bisec iteration            1
-call:    75 Dx =   0.18632737E-01  Penalty function =  0.4668020473391837E+11
+call:    75 Dx =   0.18632737E-01  Penalty function =  0.4668020259459732E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.47277609027151     
+ Rank            12   Condition number    887.47275369900603     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1037,12 +1037,12 @@ call:    75 Dx =   0.18632737E-01  Penalty function =  0.4668020473391837E+11
 reset parameter: kb11                    from  0.27419514E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239602E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376590E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31504173E+01  to -0.24999980E+01
- Step length    1.8632728350105796E-002
+reset parameter: kb24                    from -0.31504172E+01  to -0.24999980E+01
+ Step length    1.8632728359588440E-002
  Bisec iteration            1
-call:    76 Dx =   0.18632728E-01  Penalty function =  0.4668177606074992E+11
+call:    76 Dx =   0.18632728E-01  Penalty function =  0.4668177422521471E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.48924918793682     
+ Rank            12   Condition number    887.48923000987725     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1051,11 +1051,11 @@ reset parameter: kb11                    from  0.27419514E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239600E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376673E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31504558E+01  to -0.24999980E+01
- Step length    1.8632720555699509E-002
+ Step length    1.8632720562988040E-002
  Bisec iteration            1
-call:    77 Dx =   0.18632720E-01  Penalty function =  0.4668312457915313E+11
+call:    77 Dx =   0.18632720E-01  Penalty function =  0.4668312300578931E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.50337715027013     
+ Rank            12   Condition number    887.50336070304729     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1063,12 +1063,12 @@ call:    77 Dx =   0.18632720E-01  Penalty function =  0.4668312457915313E+11
 reset parameter: kb11                    from  0.27419514E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239598E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376745E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31504889E+01  to -0.24999980E+01
- Step length    1.8632713896516703E-002
+reset parameter: kb24                    from -0.31504888E+01  to -0.24999980E+01
+ Step length    1.8632713904692476E-002
  Bisec iteration            1
-call:    78 Dx =   0.18632714E-01  Penalty function =  0.4668428164860670E+11
+call:    78 Dx =   0.18632714E-01  Penalty function =  0.4668428030040140E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.51549225774590     
+ Rank            12   Condition number    887.51547803736844     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1077,11 +1077,11 @@ reset parameter: kb11                    from  0.27419514E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239596E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376806E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31505171E+01  to -0.24999980E+01
- Step length    1.8632708206184439E-002
+ Step length    1.8632708212797538E-002
  Bisec iteration            1
-call:    79 Dx =   0.18632708E-01  Penalty function =  0.4668527426978014E+11
+call:    79 Dx =   0.18632708E-01  Penalty function =  0.4668527311445940E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.52587996480770     
+ Rank            12   Condition number    887.52586779725459     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1090,11 +1090,11 @@ reset parameter: kb11                    from  0.27419514E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239595E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376859E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31505413E+01  to -0.24999980E+01
- Step length    1.8632703347508644E-002
+ Step length    1.8632703350160113E-002
  Bisec iteration            1
-call:    80 Dx =   0.18632703E-01  Penalty function =  0.4668612567985069E+11
+call:    80 Dx =   0.18632703E-01  Penalty function =  0.4668612468782577E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.53478564507577     
+ Rank            12   Condition number    887.53477522859680     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1103,11 +1103,11 @@ reset parameter: kb11                    from  0.27419514E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239594E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376904E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31505620E+01  to -0.24999980E+01
- Step length    1.8632699193043455E-002
+ Step length    1.8632699195562982E-002
  Bisec iteration            1
-call:    81 Dx =   0.18632699E-01  Penalty function =  0.4668685585942736E+11
+call:    81 Dx =   0.18632699E-01  Penalty function =  0.4668685500863389E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.54242012430575     
+ Rank            12   Condition number    887.54241113846592     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1116,11 +1116,11 @@ reset parameter: kb11                    from  0.27419514E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239593E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376942E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31505798E+01  to -0.24999980E+01
- Step length    1.8632695643186391E-002
+ Step length    1.8632695647608135E-002
  Bisec iteration            1
-call:    82 Dx =   0.18632696E-01  Penalty function =  0.4668748199210692E+11
+call:    82 Dx =   0.18632696E-01  Penalty function =  0.4668748126299352E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.54896424729759     
+ Rank            12   Condition number    887.54895660147383     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1129,11 +1129,11 @@ reset parameter: kb11                    from  0.27419514E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239592E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25376975E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31505950E+01  to -0.24999980E+01
- Step length    1.8632692610998817E-002
+ Step length    1.8632692614528313E-002
  Bisec iteration            1
-call:    83 Dx =   0.18632692E-01  Penalty function =  0.4668801884083466E+11
+call:    83 Dx =   0.18632693E-01  Penalty function =  0.4668801821658645E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.55457331388038     
+ Rank            12   Condition number    887.55456674968275     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1142,11 +1142,11 @@ reset parameter: kb11                    from  0.27419514E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239591E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377003E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506080E+01  to -0.24999980E+01
- Step length    1.8632690019240963E-002
+ Step length    1.8632690022739994E-002
  Bisec iteration            1
-call:    84 Dx =   0.18632690E-01  Penalty function =  0.4668847909103622E+11
+call:    84 Dx =   0.18632690E-01  Penalty function =  0.4668847855664127E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.55938059779191     
+ Rank            12   Condition number    887.55937504392205     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1155,11 +1155,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239590E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377027E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506191E+01  to -0.24999980E+01
- Step length    1.8632687805889971E-002
+ Step length    1.8632687807549529E-002
  Bisec iteration            1
-call:    85 Dx =   0.18632688E-01  Penalty function =  0.4668887363512882E+11
+call:    85 Dx =   0.18632688E-01  Penalty function =  0.4668887317548019E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.56350053352821     
+ Rank            12   Condition number    887.56349576851574     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1167,12 +1167,12 @@ call:    85 Dx =   0.18632688E-01  Penalty function =  0.4668887363512882E+11
 reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239590E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377048E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31506287E+01  to -0.24999980E+01
- Step length    1.8632685912746305E-002
+reset parameter: kb24                    from -0.31506286E+01  to -0.24999980E+01
+ Step length    1.8632685914070531E-002
  Bisec iteration            1
-call:    86 Dx =   0.18632686E-01  Penalty function =  0.4668921182328581E+11
+call:    86 Dx =   0.18632686E-01  Penalty function =  0.4668921142934845E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.56703111615161     
+ Rank            12   Condition number    887.56702692334579     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1181,11 +1181,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239589E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377066E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506368E+01  to -0.24999980E+01
- Step length    1.8632684295888161E-002
+ Step length    1.8632684296057529E-002
  Bisec iteration            1
-call:    87 Dx =   0.18632684E-01  Penalty function =  0.4668950168441921E+11
+call:    87 Dx =   0.18632684E-01  Penalty function =  0.4668950134605960E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.57005654653869     
+ Rank            12   Condition number    887.57005299834032     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1194,11 +1194,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239589E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377081E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506438E+01  to -0.24999980E+01
- Step length    1.8632682911589888E-002
+ Step length    1.8632682914564030E-002
  Bisec iteration            1
-call:    88 Dx =   0.18632683E-01  Penalty function =  0.4668975010645103E+11
+call:    88 Dx =   0.18632683E-01  Penalty function =  0.4668974981711061E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.57264890981219     
+ Rank            12   Condition number    887.57264587239115     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1207,11 +1207,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239589E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377094E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506498E+01  to -0.24999980E+01
- Step length    1.8632681729930628E-002
+ Step length    1.8632681732938531E-002
  Bisec iteration            1
-call:    89 Dx =   0.18632682E-01  Penalty function =  0.4668996300099910E+11
+call:    89 Dx =   0.18632682E-01  Penalty function =  0.4668996275298770E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.57487017074232     
+ Rank            12   Condition number    887.57486757721870     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1220,11 +1220,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239588E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377105E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506549E+01  to -0.24999980E+01
- Step length    1.8632680719732762E-002
+ Step length    1.8632680722089890E-002
  Bisec iteration            1
-call:    90 Dx =   0.18632681E-01  Penalty function =  0.4669014543638668E+11
+call:    90 Dx =   0.18632681E-01  Penalty function =  0.4669014522571452E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.57677333029733     
+ Rank            12   Condition number    887.57677114545652     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1233,11 +1233,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239588E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377115E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506593E+01  to -0.24999980E+01
- Step length    1.8632679857460189E-002
+ Step length    1.8632679856754136E-002
  Bisec iteration            1
-call:    91 Dx =   0.18632680E-01  Penalty function =  0.4669030176391711E+11
+call:    91 Dx =   0.18632680E-01  Penalty function =  0.4669030158377527E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.57840391747516     
+ Rank            12   Condition number    887.57840205692582     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1246,11 +1246,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239588E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377123E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506631E+01  to -0.24999980E+01
- Step length    1.8632679118632933E-002
+ Step length    1.8632679117836733E-002
  Bisec iteration            1
-call:    92 Dx =   0.18632679E-01  Penalty function =  0.4669043571412799E+11
+call:    92 Dx =   0.18632679E-01  Penalty function =  0.4669043555881087E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.57980085512497     
+ Rank            12   Condition number    887.57979924035158     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1259,11 +1259,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239588E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377130E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506663E+01  to -0.24999980E+01
- Step length    1.8632678487526286E-002
+ Step length    1.8632678487797316E-002
  Bisec iteration            1
-call:    93 Dx =   0.18632678E-01  Penalty function =  0.4669055048418605E+11
+call:    93 Dx =   0.18632678E-01  Penalty function =  0.4669055034987029E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.58099772594744     
+ Rank            12   Condition number    887.58099628888397     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1271,12 +1271,12 @@ call:    93 Dx =   0.18632678E-01  Penalty function =  0.4669055048418605E+11
 reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+01
 reset parameter: kb12                    from -0.27239588E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377136E+01  to  0.24999980E+01
-reset parameter: kb24                    from -0.31506691E+01  to -0.24999980E+01
- Step length    1.8632677947828986E-002
+reset parameter: kb24                    from -0.31506690E+01  to -0.24999980E+01
+ Step length    1.8632677948949905E-002
  Bisec iteration            1
-call:    94 Dx =   0.18632678E-01  Penalty function =  0.4669064881601077E+11
+call:    94 Dx =   0.18632678E-01  Penalty function =  0.4669064870068536E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.58202300512960     
+ Rank            12   Condition number    887.58202177860903     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1285,11 +1285,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239587E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377141E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506714E+01  to -0.24999980E+01
- Step length    1.8632677486953707E-002
+ Step length    1.8632677486036971E-002
  Bisec iteration            1
-call:    95 Dx =   0.18632677E-01  Penalty function =  0.4669073306167406E+11
+call:    95 Dx =   0.18632677E-01  Penalty function =  0.4669073296235062E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.58290132901948     
+ Rank            12   Condition number    887.58290025673762     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1298,11 +1298,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239587E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377145E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506734E+01  to -0.24999980E+01
- Step length    1.8632677090134699E-002
+ Step length    1.8632677094704571E-002
  Bisec iteration            1
-call:    96 Dx =   0.18632677E-01  Penalty function =  0.4669080523553255E+11
+call:    96 Dx =   0.18632677E-01  Penalty function =  0.4669080515267533E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.58365379812437     
+ Rank            12   Condition number    887.58365293801432     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1311,11 +1311,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239587E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377149E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506752E+01  to -0.24999980E+01
- Step length    1.8632676754353567E-002
+ Step length    1.8632676753246192E-002
  Bisec iteration            1
-call:    97 Dx =   0.18632677E-01  Penalty function =  0.4669086706651016E+11
+call:    97 Dx =   0.18632677E-01  Penalty function =  0.4669086699505948E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.58429830566320     
+ Rank            12   Condition number    887.58429754689632     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1324,11 +1324,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239587E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377152E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506766E+01  to -0.24999980E+01
- Step length    1.8632676466873541E-002
+ Step length    1.8632676468352524E-002
  Bisec iteration            1
-call:    98 Dx =   0.18632676E-01  Penalty function =  0.4669092003543947E+11
+call:    98 Dx =   0.18632676E-01  Penalty function =  0.4669091997428403E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.58485041764391     
+ Rank            12   Condition number    887.58484978839999     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1337,11 +1337,11 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239587E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377155E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506779E+01  to -0.24999980E+01
- Step length    1.8632676219011327E-002
+ Step length    1.8632676219520496E-002
  Bisec iteration            1
-call:    99 Dx =   0.18632676E-01  Penalty function =  0.4669096540966084E+11
+call:    99 Dx =   0.18632676E-01  Penalty function =  0.4669096535692347E+11
  Solve system with           83 con,          12 var
- Rank            12   Condition number    887.58532333128028     
+ Rank            12   Condition number    887.58532285633839     
  exclude parameter:kb11                                            hit maximum
  exclude parameter:kb12                                            hit minimum
  exclude parameter:kb23                                            hit maximum
@@ -1350,9 +1350,9 @@ reset parameter: kb11                    from  0.27419515E+01  to  0.24999980E+0
 reset parameter: kb12                    from -0.27239587E+01  to -0.24999980E+01
 reset parameter: kb23                    from  0.25377157E+01  to  0.24999980E+01
 reset parameter: kb24                    from -0.31506790E+01  to -0.24999980E+01
- Step length    1.8632676009103084E-002
+ Step length    1.8632676007857975E-002
  Bisec iteration            1
-call:   100 Dx =   0.18632676E-01  Penalty function =  0.4669100427908703E+11
+call:   100 Dx =   0.18632676E-01  Penalty function =  0.4669100423304155E+11
  ++++++++++ JACOBIAN ended: call limit
  Final difference norm:   0.0000000000000000     
 
@@ -1360,144 +1360,144 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-trans$start:1    3.่ม     betx         2     1.00000000E+01     6.00000000E+00     0.00000000E+00
-trans$start:1    3.่ม     bety         2     1.00000000E+01     3.00000000E+00     0.00000000E+00
-d00:1 start:1    3.่ม     betx         2     1.00000000E+01     6.00000000E+00     0.00000000E+00
-d00:1 start:1    3.่ม     bety         2     1.00000000E+01     3.00000000E+00     0.00000000E+00
-d17:1 start:1    3.่ม     betx         2     1.00000000E+01     6.01041667E+00     0.00000000E+00
-d17:1 start:1    3.่ม     bety         2     1.00000000E+01     3.02083333E+00     0.00000000E+00
-q11:1 start:1    3.่ม     betx         2     1.00000000E+01     4.59053914E+00     0.00000000E+00
-q11:1 start:1    3.่ม     bety         2     1.00000000E+01     3.93642284E+00     0.00000000E+00
-d10:1 start:1    3.่ม     betx         2     1.00000000E+01     3.38287926E+00     0.00000000E+00
-d10:1 start:1    3.่ม     bety         2     1.00000000E+01     4.97703717E+00     0.00000000E+00
-d20:1 start:1    3.่ม     betx         2     1.00000000E+01     3.16403333E+00     0.00000000E+00
-d20:1 start:1    3.่ม     bety         2     1.00000000E+01     5.20033090E+00     0.00000000E+00
-d10:2 start:1    3.่ม     betx         2     1.00000000E+01     2.18323384E+00     0.00000000E+00
-d10:2 start:1    3.่ม     bety         2     1.00000000E+01     6.39265386E+00     0.00000000E+00
-d10:3 start:1    3.่ม     betx         2     1.00000000E+01     1.39148469E+00     0.00000000E+00
-d10:3 start:1    3.่ม     bety         2     1.00000000E+01     7.71140066E+00     0.00000000E+00
-d20:2 start:1    3.่ม     betx         2     1.00000000E+01     1.25582090E+00     0.00000000E+00
-d20:2 start:1    3.่ม     bety         2     1.00000000E+01     7.99032089E+00     0.00000000E+00
-q12:1 start:1    3.่ม     betx         2     1.00000000E+01     4.91520364E-01     0.00000000E+00
-q12:1 start:1    3.่ม     bety         2     1.00000000E+01     8.32226355E+00     0.00000000E+00
-d15:1 start:1    3.่ม     betx         2     1.00000000E+01     2.82596184E-01     0.00000000E+00
-d15:1 start:1    3.่ม     bety         2     1.00000000E+01     5.33767909E+00     0.00000000E+00
-d20:3 start:1    3.่ม     betx         2     1.00000000E+01     2.92265532E-01     0.00000000E+00
-d20:3 start:1    3.่ม     bety         2     1.00000000E+01     5.16313708E+00     0.00000000E+00
-d20:4 start:1    3.่ม     betx         2     1.00000000E+01     3.04884582E-01     0.00000000E+00
-d20:4 start:1    3.่ม     bety         2     1.00000000E+01     4.99164886E+00     0.00000000E+00
-d20:5 start:1    3.่ม     betx         2     1.00000000E+01     3.20453336E-01     0.00000000E+00
-d20:5 start:1    3.่ม     bety         2     1.00000000E+01     4.82321442E+00     0.00000000E+00
-b11:1 start:1    3.่ม     betx         2     1.00000000E+01     3.05402929E+00     0.00000000E+00
-b11:1 start:1    3.่ม     bety         2     1.00000000E+01     3.86339231E-01     0.00000000E+00
-b12:1 start:1    3.่ม     betx         2     1.00000000E+01     2.87355397E+00     0.00000000E+00
-b12:1 start:1    3.่ม     bety         2     1.00000000E+01     2.59814653E+00     0.00000000E+00
-d15:2 start:1    3.่ม     betx         2     1.00000000E+01     1.24928306E+00     0.00000000E+00
-d15:2 start:1    3.่ม     bety         2     1.00000000E+01     6.71443334E+00     0.00000000E+00
-d10:4 start:1    3.่ม     betx         2     1.00000000E+01     8.77300558E-01     0.00000000E+00
-d10:4 start:1    3.่ม     bety         2     1.00000000E+01     8.52239282E+00     0.00000000E+00
-q13:1 start:1    3.่ม     betx         2     1.00000000E+01     6.33363315E-01     0.00000000E+00
-q13:1 start:1    3.่ม     bety         2     1.00000000E+01     8.66111216E+00     0.00000000E+00
-pstn1:1 art:1    3.่ม     betx         2     1.00000000E+01     6.33363315E-01     0.00000000E+00
-pstn1:1 art:1    3.่ม     bety         2     1.00000000E+01     8.66111216E+00     0.00000000E+00
-d12:1 1 art:1    3.่ม     betx         2     1.00000000E+01     8.06137937E-01     0.00000000E+00
-d12:1 1 art:1    3.่ม     bety         2     1.00000000E+01     5.44285097E+00     0.00000000E+00
-d13:1 1 art:1    3.่ม     betx         2     1.00000000E+01     1.02434836E+00     0.00000000E+00
-d13:1 1 art:1    3.่ม     bety         2     1.00000000E+01     3.52516022E+00     0.00000000E+00
-q14:1 1 art:1    3.่ม     betx         2     1.00000000E+01     8.32232226E-01     0.00000000E+00
-q14:1 1 art:1    3.่ม     bety         2     1.00000000E+01     3.13262367E+00     0.00000000E+00
-d17:2 1 art:1    3.่ม     betx         2     1.00000000E+01     2.92458490E-01     0.00000000E+00
-d17:2 1 art:1    3.่ม     bety         2     1.00000000E+01     5.06210126E+00     0.00000000E+00
-d13:2 1 art:1    3.่ม     betx         2     1.00000000E+01     2.31691337E-01     0.00000000E+00
-d13:2 1 art:1    3.่ม     bety         2     1.00000000E+01     6.45604413E+00     0.00000000E+00
-q15:1 1 art:1    3.่ม     betx         2     1.00000000E+01     5.49053659E-01     0.00000000E+00
-q15:1 1 art:1    3.่ม     bety         2     1.00000000E+01     6.69907542E+00     0.00000000E+00
-d12:2 1 art:1    3.่ม     betx         2     1.00000000E+01     1.44640284E+00     0.00000000E+00
-d12:2 1 art:1    3.่ม     bety         2     1.00000000E+01     5.25894865E+00     0.00000000E+00
-d13:3 1 art:1    3.่ม     betx         2     1.00000000E+01     2.45884967E+00     0.00000000E+00
-d13:3 1 art:1    3.่ม     bety         2     1.00000000E+01     4.30193499E+00     0.00000000E+00
-q16:1 1 art:1    3.่ม     betx         2     1.00000000E+01     4.28723561E+00     0.00000000E+00
-q16:1 1 art:1    3.่ม     bety         2     1.00000000E+01     3.16459371E+00     0.00000000E+00
-pstn3:1 art:1    3.่ม     betx         2     1.00000000E+01     4.28723561E+00     0.00000000E+00
-pstn3:1 art:1    3.่ม     bety         2     1.00000000E+01     3.16459371E+00     0.00000000E+00
-m1:1 :1 art:1    3.่ม     betx         2     1.00000000E+01     4.28723561E+00     0.00000000E+00
-m1:1 :1 art:1    3.่ม     bety         2     1.00000000E+01     3.16459371E+00     0.00000000E+00
-m1:1 :1 art:1    3.่ม     mvar1        2     1.00000000E-02     2.53591274E-03     0.00000000E+00
-m1:1 :1 art:1    3.่ม     mvar2        2     2.00000000E-03     3.08119800E-03     1.16898912E+00
-d15:3 1 art:1    3.่ม     betx         2     1.00000000E+01     8.08136760E+00     0.00000000E+00
-d15:3 1 art:1    3.่ม     bety         2     1.00000000E+01     1.79880393E+00     0.00000000E+00
-d15:3 1 art:1    3.่ม     mvar1        2     1.00000000E-02     3.48167365E-03     0.00000000E+00
-d15:3 1 art:1    3.่ม     mvar2        2     2.00000000E-03     2.32301782E-03     1.04340513E-01
-d10:5 1 art:1    3.่ม     betx         2     1.00000000E+01     9.61790459E+00     0.00000000E+00
-d10:5 1 art:1    3.่ม     bety         2     1.00000000E+01     1.44553375E+00     0.00000000E+00
-d10:5 1 art:1    3.่ม     mvar1        2     1.00000000E-02     3.79827025E-03     0.00000000E+00
-d10:5 1 art:1    3.่ม     mvar2        2     2.00000000E-03     2.08245078E-03     6.79813066E-03
-b21:1 1 art:1    3.่ม     betx         2     1.00000000E+01     4.27247640E+00     0.00000000E+00
-b21:1 1 art:1    3.่ม     bety         2     1.00000000E+01     1.49432981E+00     0.00000000E+00
-b21:1 1 art:1    3.่ม     mvar1        2     1.00000000E-02     2.53154392E-03     0.00000000E+00
-b21:1 1 art:1    3.่ม     mvar2        2     2.00000000E-03     2.11730712E-03     1.37609595E-02
-m2:1  1 art:1    3.่ม     betx         2     1.00000000E+01     4.27247640E+00     0.00000000E+00
-m2:1  1 art:1    3.่ม     bety         2     1.00000000E+01     1.49432981E+00     0.00000000E+00
-m2:1  1 art:1    3.่ม     mvar1        2     1.00000000E-02     2.53154392E-03     0.00000000E+00
-m2:1  1 art:1    3.่ม     mvar2        2     2.00000000E-03     2.11730712E-03     1.37609595E-02
-d1:1  1 art:1    3.่ม     betx         2     1.00000000E+01     4.18227370E+00     0.00000000E+00
-d1:1  1 art:1    3.่ม     bety         2     1.00000000E+01     1.51156510E+00     0.00000000E+00
-d1:1  1 art:1    3.่ม     mvar1        2     1.00000000E-02     2.50467773E-03     0.00000000E+00
-d1:1  1 art:1    3.่ม     mvar2        2     2.00000000E-03     2.12948240E-03     1.67656929E-02
-b22:1 1 art:1    3.่ม     betx         2     1.00000000E+01     2.62078560E+00     0.00000000E+00
-b22:1 1 art:1    3.่ม     bety         2     1.00000000E+01     1.87642557E+00     0.00000000E+00
-b22:1 1 art:1    3.่ม     mvar1        2     1.00000000E-02     1.98271995E-03     0.00000000E+00
-b22:1 1 art:1    3.่ม     mvar2        2     2.00000000E-03     2.37260969E-03     1.38837978E-01
-m3:1  1 art:1    3.่ม     betx         2     1.00000000E+01     2.62078560E+00     0.00000000E+00
-m3:1  1 art:1    3.่ม     bety         2     1.00000000E+01     1.87642557E+00     0.00000000E+00
-m3:1  1 art:1    3.่ม     mvar1        2     1.00000000E-02     1.98271995E-03     0.00000000E+00
-m3:1  1 art:1    3.่ม     mvar2        2     2.00000000E-03     2.37260969E-03     1.38837978E-01
-d1:2  1 art:1    3.่ม     betx         2     1.00000000E+01     2.68738579E+00     0.00000000E+00
-d1:2  1 art:1    3.่ม     bety         2     1.00000000E+01     1.86043046E+00     0.00000000E+00
-d1:2  1 art:1    3.่ม     mvar1        2     1.00000000E-02     2.00775464E-03     0.00000000E+00
-d1:2  1 art:1    3.่ม     mvar2        2     2.00000000E-03     2.36247569E-03     1.31388625E-01
-pstn:1  art:1    3.่ม     betx         2     1.00000000E+01     2.68738579E+00     0.00000000E+00
-pstn:1  art:1    3.่ม     bety         2     1.00000000E+01     1.86043046E+00     0.00000000E+00
-pstn:1  art:1    3.่ม     mvar1        2     1.00000000E-02     2.00775464E-03     0.00000000E+00
-pstn:1  art:1    3.่ม     mvar2        2     2.00000000E-03     2.36247569E-03     1.31388625E-01
-b23:1   art:1    3.่ม     betx         2     1.00000000E+01     9.99997710E+00     0.00000000E+00
-b23:1   art:1    3.่ม     bety         2     1.00000000E+01     1.85556523E+00     0.00000000E+00
-b23:1   art:1    3.่ม     mvar1        2     1.00000000E-02     3.87297891E-03     0.00000000E+00
-b23:1   art:1    3.่ม     mvar2        2     2.00000000E-03     2.35938460E-03     1.29157289E-01
-m4:1    art:1    3.่ม     betx         2     1.00000000E+01     9.99997710E+00     0.00000000E+00
-m4:1    art:1    3.่ม     bety         2     1.00000000E+01     1.85556523E+00     0.00000000E+00
-m4:1    art:1    3.่ม     mvar1        2     1.00000000E-02     3.87297891E-03     0.00000000E+00
-m4:1    art:1    3.่ม     mvar2        2     2.00000000E-03     2.35938460E-03     1.29157289E-01
-d1:3    art:1    3.่ม     betx         2     1.00000000E+01     9.95680659E+00     0.00000000E+00
-d1:3    art:1    3.่ม     bety         2     1.00000000E+01     1.87148619E+00     0.00000000E+00
-d1:3    art:1    3.่ม     mvar1        2     1.00000000E-02     3.86460993E-03     0.00000000E+00
-d1:3    art:1    3.่ม     mvar2        2     2.00000000E-03     2.36948487E-03     1.36519071E-01
-b24:1   art:1    3.่ม     betx         2     1.00000000E+01     6.24000039E+00     0.00000000E+00
-b24:1   art:1    3.่ม     bety         2     1.00000000E+01     3.47999036E+00     0.00000000E+00
-b24:1   art:1    3.่ม     mvar1        2     1.00000000E-02     3.05941180E-03     0.00000000E+00
-b24:1   art:1    3.่ม     mvar2        2     2.00000000E-03     3.23109441E-03     1.51559344E+00
-m5:1    art:1    3.่ม     betx         2     1.00000000E+01     6.24000039E+00     0.00000000E+00
-m5:1    art:1    3.่ม     bety         2     1.00000000E+01     3.47999036E+00     0.00000000E+00
-m5:1    art:1    3.่ม     mvar1        2     1.00000000E-02     3.05941180E-03     0.00000000E+00
-m5:1    art:1    3.่ม     mvar2        2     2.00000000E-03     3.23109441E-03     1.51559344E+00
-d12:3   art:1    3.่ม     betx         2     1.00000000E+01     6.16666701E+00     0.00000000E+00
-d12:3   art:1    3.่ม     bety         2     1.00000000E+01     3.33332511E+00     0.00000000E+00
-d16:1   art:1    3.่ม     betx         2     1.00000000E+01     6.00000006E+00     0.00000000E+00
-d16:1   art:1    3.่ม     bety         2     1.00000000E+01     2.99999899E+00     0.00000000E+00
-pstn2:1 art:1    3.่ม     betx         4     6.00000000E+00     6.00000006E+00     3.67247881E-09
-pstn2:1 art:1    3.่ม     bety         4     3.00000000E+00     2.99999899E+00     1.02648704E-06
-pstn2:1 art:1    3.่ม     mux          4     1.50000000E+00     1.50000718E+00     5.15650613E-05
-pstn2:1 art:1    3.่ม     muy          4     1.00000000E+00     1.00000586E+00     3.43967373E-05
-pstn2:1 art:1    3.่ม     alfx         4     0.00000000E+00     1.40282881E-07     1.96792867E-08
-pstn2:1 art:1    3.่ม     alfy         4     0.00000000E+00    -3.66213549E-06     1.34112364E-05
-pstn2:1 art:1    3.่ม     dx           4     0.00000000E+00     1.31808830E-07     1.73735676E-08
-pstn2:1 art:1    3.่ม     dpx          4     0.00000000E+00    -2.66968476E-07     7.12721673E-08
-d16:2 1 art:1    3.่ม     betx         2     1.00000000E+01     6.16666645E+00     0.00000000E+00
-d16:2 1 art:1    3.่ม     bety         2     1.00000000E+01     3.33333976E+00     0.00000000E+00
-d12:4 1 art:1    3.่ม     betx         2     1.00000000E+01     6.23999972E+00     0.00000000E+00
-d12:4 1 art:1    3.่ม     bety         2     1.00000000E+01     3.48000794E+00     0.00000000E+00
-trans$end:1 1    3.่ม     betx         2     1.00000000E+01     6.23999972E+00     0.00000000E+00
-trans$end:1 1    3.่ม     bety         2     1.00000000E+01     3.48000794E+00     0.00000000E+00
+trans$s                    betx         2     1.00000000E+01     6.00000000E+00     0.00000000E+00
+trans$start:1              bety         2     1.00000000E+01     3.00000000E+00     0.00000000E+00
+d00:1start:1               betx         2     1.00000000E+01     6.00000000E+00     0.00000000E+00
+d00:1                      bety         2     1.00000000E+01     3.00000000E+00     0.00000000E+00
+d17:1                      betx         2     1.00000000E+01     6.01041667E+00     0.00000000E+00
+d17:1                      bety         2     1.00000000E+01     3.02083333E+00     0.00000000E+00
+q11:1                      betx         2     1.00000000E+01     4.59053914E+00     0.00000000E+00
+q11:1                      bety         2     1.00000000E+01     3.93642284E+00     0.00000000E+00
+d10:1                      betx         2     1.00000000E+01     3.38287926E+00     0.00000000E+00
+d10:1                      bety         2     1.00000000E+01     4.97703717E+00     0.00000000E+00
+d20:1                      betx         2     1.00000000E+01     3.16403333E+00     0.00000000E+00
+d20:1                      bety         2     1.00000000E+01     5.20033090E+00     0.00000000E+00
+d10:2                      betx         2     1.00000000E+01     2.18323384E+00     0.00000000E+00
+d10:2                      bety         2     1.00000000E+01     6.39265386E+00     0.00000000E+00
+d10:3                      betx         2     1.00000000E+01     1.39148469E+00     0.00000000E+00
+d10:3                      bety         2     1.00000000E+01     7.71140066E+00     0.00000000E+00
+d20:2                      betx         2     1.00000000E+01     1.25582090E+00     0.00000000E+00
+d20:2                      bety         2     1.00000000E+01     7.99032089E+00     0.00000000E+00
+q12:1                      betx         2     1.00000000E+01     4.91520364E-01     0.00000000E+00
+q12:1                      bety         2     1.00000000E+01     8.32226355E+00     0.00000000E+00
+d15:1                      betx         2     1.00000000E+01     2.82596184E-01     0.00000000E+00
+d15:1                      bety         2     1.00000000E+01     5.33767909E+00     0.00000000E+00
+d20:3                      betx         2     1.00000000E+01     2.92265532E-01     0.00000000E+00
+d20:3                      bety         2     1.00000000E+01     5.16313708E+00     0.00000000E+00
+d20:4                      betx         2     1.00000000E+01     3.04884582E-01     0.00000000E+00
+d20:4                      bety         2     1.00000000E+01     4.99164886E+00     0.00000000E+00
+d20:5                      betx         2     1.00000000E+01     3.20453336E-01     0.00000000E+00
+d20:5                      bety         2     1.00000000E+01     4.82321442E+00     0.00000000E+00
+b11:1                      betx         2     1.00000000E+01     3.05402929E+00     0.00000000E+00
+b11:1                      bety         2     1.00000000E+01     3.86339231E-01     0.00000000E+00
+b12:1                      betx         2     1.00000000E+01     2.87355397E+00     0.00000000E+00
+b12:1                      bety         2     1.00000000E+01     2.59814653E+00     0.00000000E+00
+d15:2                      betx         2     1.00000000E+01     1.24928306E+00     0.00000000E+00
+d15:2                      bety         2     1.00000000E+01     6.71443334E+00     0.00000000E+00
+d10:4                      betx         2     1.00000000E+01     8.77300558E-01     0.00000000E+00
+d10:4                      bety         2     1.00000000E+01     8.52239283E+00     0.00000000E+00
+q13:1                      betx         2     1.00000000E+01     6.33363315E-01     0.00000000E+00
+q13:1                      bety         2     1.00000000E+01     8.66111216E+00     0.00000000E+00
+pstn1                      betx         2     1.00000000E+01     6.33363315E-01     0.00000000E+00
+pstn1:1                    bety         2     1.00000000E+01     8.66111216E+00     0.00000000E+00
+d12:11                     betx         2     1.00000000E+01     8.06137937E-01     0.00000000E+00
+d12:1                      bety         2     1.00000000E+01     5.44285097E+00     0.00000000E+00
+d13:1                      betx         2     1.00000000E+01     1.02434836E+00     0.00000000E+00
+d13:1                      bety         2     1.00000000E+01     3.52516022E+00     0.00000000E+00
+q14:1                      betx         2     1.00000000E+01     8.32232226E-01     0.00000000E+00
+q14:1                      bety         2     1.00000000E+01     3.13262367E+00     0.00000000E+00
+d17:2                      betx         2     1.00000000E+01     2.92458490E-01     0.00000000E+00
+d17:2                      bety         2     1.00000000E+01     5.06210126E+00     0.00000000E+00
+d13:2                      betx         2     1.00000000E+01     2.31691337E-01     0.00000000E+00
+d13:2                      bety         2     1.00000000E+01     6.45604414E+00     0.00000000E+00
+q15:1                      betx         2     1.00000000E+01     5.49053659E-01     0.00000000E+00
+q15:1                      bety         2     1.00000000E+01     6.69907543E+00     0.00000000E+00
+d12:2                      betx         2     1.00000000E+01     1.44640284E+00     0.00000000E+00
+d12:2                      bety         2     1.00000000E+01     5.25894865E+00     0.00000000E+00
+d13:3                      betx         2     1.00000000E+01     2.45884967E+00     0.00000000E+00
+d13:3                      bety         2     1.00000000E+01     4.30193500E+00     0.00000000E+00
+q16:1                      betx         2     1.00000000E+01     4.28723561E+00     0.00000000E+00
+q16:1                      bety         2     1.00000000E+01     3.16459372E+00     0.00000000E+00
+pstn3                      betx         2     1.00000000E+01     4.28723561E+00     0.00000000E+00
+pstn3:1                    bety         2     1.00000000E+01     3.16459372E+00     0.00000000E+00
+m1:1:1                     betx         2     1.00000000E+01     4.28723561E+00     0.00000000E+00
+m1:1                       bety         2     1.00000000E+01     3.16459372E+00     0.00000000E+00
+m1:1                       mvar1        2     1.00000000E-02     2.53591274E-03     0.00000000E+00
+m1:1                       mvar2        2     2.00000000E-03     3.08119800E-03     1.16898913E+00
+d15:                       betx         2     1.00000000E+01     8.08136761E+00     0.00000000E+00
+d15:3                      bety         2     1.00000000E+01     1.79880393E+00     0.00000000E+00
+d15:3                      mvar1        2     1.00000000E-02     3.48167365E-03     0.00000000E+00
+d15:3                      mvar2        2     2.00000000E-03     2.32301782E-03     1.04340513E-01
+d10:5                      betx         2     1.00000000E+01     9.61790459E+00     0.00000000E+00
+d10:5                      bety         2     1.00000000E+01     1.44553375E+00     0.00000000E+00
+d10:5                      mvar1        2     1.00000000E-02     3.79827025E-03     0.00000000E+00
+d10:5                      mvar2        2     2.00000000E-03     2.08245078E-03     6.79813078E-03
+b21:1                      betx         2     1.00000000E+01     4.27247640E+00     0.00000000E+00
+b21:1                      bety         2     1.00000000E+01     1.49432981E+00     0.00000000E+00
+b21:1                      mvar1        2     1.00000000E-02     2.53154392E-03     0.00000000E+00
+b21:1                      mvar2        2     2.00000000E-03     2.11730712E-03     1.37609595E-02
+m2:1                       betx         2     1.00000000E+01     4.27247640E+00     0.00000000E+00
+m2:1                       bety         2     1.00000000E+01     1.49432981E+00     0.00000000E+00
+m2:1                       mvar1        2     1.00000000E-02     2.53154392E-03     0.00000000E+00
+m2:1                       mvar2        2     2.00000000E-03     2.11730712E-03     1.37609595E-02
+d1:1                       betx         2     1.00000000E+01     4.18227370E+00     0.00000000E+00
+d1:1                       bety         2     1.00000000E+01     1.51156510E+00     0.00000000E+00
+d1:1                       mvar1        2     1.00000000E-02     2.50467773E-03     0.00000000E+00
+d1:1                       mvar2        2     2.00000000E-03     2.12948240E-03     1.67656928E-02
+b22:                       betx         2     1.00000000E+01     2.62078560E+00     0.00000000E+00
+b22:1                      bety         2     1.00000000E+01     1.87642557E+00     0.00000000E+00
+b22:1                      mvar1        2     1.00000000E-02     1.98271995E-03     0.00000000E+00
+b22:1                      mvar2        2     2.00000000E-03     2.37260968E-03     1.38837977E-01
+m3:1                       betx         2     1.00000000E+01     2.62078560E+00     0.00000000E+00
+m3:1                       bety         2     1.00000000E+01     1.87642557E+00     0.00000000E+00
+m3:1                       mvar1        2     1.00000000E-02     1.98271995E-03     0.00000000E+00
+m3:1                       mvar2        2     2.00000000E-03     2.37260968E-03     1.38837977E-01
+d1:2                       betx         2     1.00000000E+01     2.68738579E+00     0.00000000E+00
+d1:2                       bety         2     1.00000000E+01     1.86043046E+00     0.00000000E+00
+d1:2                       mvar1        2     1.00000000E-02     2.00775464E-03     0.00000000E+00
+d1:2                       mvar2        2     2.00000000E-03     2.36247569E-03     1.31388625E-01
+pstn                       betx         2     1.00000000E+01     2.68738579E+00     0.00000000E+00
+pstn:1                     bety         2     1.00000000E+01     1.86043046E+00     0.00000000E+00
+pstn:1                     mvar1        2     1.00000000E-02     2.00775464E-03     0.00000000E+00
+pstn:1                     mvar2        2     2.00000000E-03     2.36247569E-03     1.31388625E-01
+b23:1                      betx         2     1.00000000E+01     9.99997710E+00     0.00000000E+00
+b23:1                      bety         2     1.00000000E+01     1.85556523E+00     0.00000000E+00
+b23:1                      mvar1        2     1.00000000E-02     3.87297891E-03     0.00000000E+00
+b23:1                      mvar2        2     2.00000000E-03     2.35938460E-03     1.29157288E-01
+m4:1                       betx         2     1.00000000E+01     9.99997710E+00     0.00000000E+00
+m4:1                       bety         2     1.00000000E+01     1.85556523E+00     0.00000000E+00
+m4:1                       mvar1        2     1.00000000E-02     3.87297891E-03     0.00000000E+00
+m4:1                       mvar2        2     2.00000000E-03     2.35938460E-03     1.29157288E-01
+d1:3                       betx         2     1.00000000E+01     9.95680659E+00     0.00000000E+00
+d1:3                       bety         2     1.00000000E+01     1.87148619E+00     0.00000000E+00
+d1:3                       mvar1        2     1.00000000E-02     3.86460993E-03     0.00000000E+00
+d1:3                       mvar2        2     2.00000000E-03     2.36948487E-03     1.36519070E-01
+b24:                       betx         2     1.00000000E+01     6.24000039E+00     0.00000000E+00
+b24:1                      bety         2     1.00000000E+01     3.47999036E+00     0.00000000E+00
+b24:1                      mvar1        2     1.00000000E-02     3.05941180E-03     0.00000000E+00
+b24:1                      mvar2        2     2.00000000E-03     3.23109441E-03     1.51559344E+00
+m5:1                       betx         2     1.00000000E+01     6.24000039E+00     0.00000000E+00
+m5:1                       bety         2     1.00000000E+01     3.47999036E+00     0.00000000E+00
+m5:1                       mvar1        2     1.00000000E-02     3.05941180E-03     0.00000000E+00
+m5:1                       mvar2        2     2.00000000E-03     3.23109441E-03     1.51559344E+00
+d12:                       betx         2     1.00000000E+01     6.16666701E+00     0.00000000E+00
+d12:3                      bety         2     1.00000000E+01     3.33332511E+00     0.00000000E+00
+d16:1                      betx         2     1.00000000E+01     6.00000006E+00     0.00000000E+00
+d16:1                      bety         2     1.00000000E+01     2.99999899E+00     0.00000000E+00
+pstn2                      betx         4     6.00000000E+00     6.00000006E+00     3.67247428E-09
+pstn2:1                    bety         4     3.00000000E+00     2.99999899E+00     1.02648700E-06
+pstn2:1                    mux          4     1.50000000E+00     1.50000718E+00     5.15650048E-05
+pstn2:1                    muy          4     1.00000000E+00     1.00000586E+00     3.43967331E-05
+pstn2:1                    alfx         4     0.00000000E+00     1.40282684E-07     1.96792314E-08
+pstn2:1                    alfy         4     0.00000000E+00    -3.66213550E-06     1.34112364E-05
+pstn2:1                    dx           4     0.00000000E+00     1.31808788E-07     1.73735566E-08
+pstn2:1                    dpx          4     0.00000000E+00    -2.66968453E-07     7.12721551E-08
+d16:21                     betx         2     1.00000000E+01     6.16666645E+00     0.00000000E+00
+d16:2                      bety         2     1.00000000E+01     3.33333976E+00     0.00000000E+00
+d12:4                      betx         2     1.00000000E+01     6.23999972E+00     0.00000000E+00
+d12:4                      bety         2     1.00000000E+01     3.48000794E+00     0.00000000E+00
+trans                      betx         2     1.00000000E+01     6.23999972E+00     0.00000000E+00
+trans$end:1                bety         2     1.00000000E+01     3.48000794E+00     0.00000000E+00
 
 
 Final Penalty Function =   5.29098963e+00
@@ -1540,13 +1540,13 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
             11.715                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-       1.531423661        1.936237017        9.999977097        3.523221099 
+       1.531423661        1.936237019        9.999977099        3.523221099 
 
              dxrms             xcomax             xcorms                 q2 
        1.404861615                  0                  0        1.060565274 
 
                dq2            betymax              dymax              dyrms 
-     -0.8893886746        8.661112155                  0                  0 
+     -0.8893886754        8.661112161                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        2.978422494 
