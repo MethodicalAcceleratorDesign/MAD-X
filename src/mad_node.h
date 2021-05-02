@@ -91,6 +91,7 @@ struct node* expand_node(struct node*, struct sequence* top, struct sequence* se
 void         dump_node(struct node*);
 int          advance_node(void);
 void         node_name(char* name, int* l);
+void         node_name_f_lower(char* name, int* l);
 double       node_value(const char* par);
 
 struct node_list* new_node_list(int length);

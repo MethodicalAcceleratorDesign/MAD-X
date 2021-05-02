@@ -700,6 +700,14 @@ node_name(char* name, int* l)
   strfcpy(name, current_node->name, *l);
   stoupper(name);
 }
+void
+node_name_f_lower(char* name, int* l)
+  /* returns current node name in Fortran format */
+  /* l is max. allowed length in name */
+{
+  strfcpy(name, current_node->name, *l);
+}
+
 
 int
 get_node_count(struct node* node)

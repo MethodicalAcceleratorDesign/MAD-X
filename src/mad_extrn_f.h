@@ -76,6 +76,8 @@
 #define advance_to_pos advance_to_pos_
 #define current_node_name current_node_name_
 #define node_name node_name_
+#define node_name node_name_
+#define node_name_f_lower node_name_f_lower_
 #define node_string node_string_
 #define node_value node_value_ // **
 #define retreat_node retreat_node_
