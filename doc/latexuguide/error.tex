@@ -38,8 +38,11 @@ WARNING: if errors are to be applied to a thin sequence produced by \hyperref[ch
 %  Changed by: Werner Herr, 02-Sep-2002 
 %  Changed by: Hans Grote, 25-Sep-2002 
 
-\section{EALIGN: Alignment Errors} %EALIGN: Define Misalignments} 
+\section{EALIGN: Alignment Errors and permanent misalignments} %EALIGN: Define Misalignments} 
 \label{sec:ealign}
+
+There are two ways of introducing misalignments in MAD-X.
+\subsection{EALIGN}
 
 Alignment errors are defined by the \texttt{EALIGN} command. 
 The misalignments refer to the
@@ -91,7 +94,14 @@ for elements selected by the
 	\label{F-XYDISP}
 \end{figure}
 
-
+\subsection{Permanent Misalignments}
+The second way of introducing misalignments in MAD-X is
+to define them directly in the creation of a sequence. The name 
+and effect of the orientation is the same as for the \texttt{EALIGN}. 
+In case EALIGN and permanent misalignment are used togheter the values 
+are added togheter component by component. The effect of the permanent misalignment
+is ignored by SURVEY by default but by adding the \text{PERM\_ALIGN\_SURVEY} the 
+start and end location of each element is given. 
 %% \begin{figure}[ht]
 %% \centering
 %% \setlength{\unitlength}{1pt}
