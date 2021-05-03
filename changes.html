@@ -15,8 +15,7 @@
   
 <h3>MAD-X release 5.07.01 (2021.05.03)</h3>
 <ul>
-<li> Enable to save and load sequences with hexadecimal numbers. In this way the exact same numbers are obtained
-     after a save and load of, for example a sequence. 
+<li> Enable to save and load sequences with double precision floating point numbers in a hexadecimal format. In this way the exact same values are obtained after a saving and then loading a sequence. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/954">#954</a>. (Tobias)
 <li> Translations and rotations are transported to PTC. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/957">#957</a>. (Tobias, Laurent, J.S. Berg)
@@ -28,7 +27,7 @@
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/969">#969</a>. (Laurent)
 <li> Too long sequence names got corrupted before now it is prevented. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/971">#971</a>. (Tobias)
-<li> Lost particles in PTC caused wrong indexing resulting in additional particle beeing lost. 
+<li> Lost particles in PTC caused wrong indexing resulting in wrong coordinates for lost particles (when more than 1). 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/972">#972</a>. (Tobias, Piotr)         
 <li> Crabcavity with 0 length were ignored by MAD-X. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/986">#986</a>. (Tobias)
@@ -42,8 +41,6 @@
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/973">#973</a>. (Tobias)
 <li> Improved step size to find closed orbit in TRACK. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/990">#990</a>. (Tobias)
-<li> The Y-rotation is now also the geometical rotation direction. 
-     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/993">#993</a>. (Tobias)
 <li> Long names and more digits are now default in the SixTrack conversion. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/999">#999</a>. (Tobias)
 <li> A bug with makethin with solenoid and expression was fixed. 
