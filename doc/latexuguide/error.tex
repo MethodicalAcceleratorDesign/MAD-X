@@ -103,13 +103,14 @@ are added togheter component by component. The effect of the permanent misalignm
 is ignored by SURVEY by default but by adding the \text{PERM\_ALIGN\_SURVEY} the 
 start and end location of each element is given. The permanent misalignemnt need to 
 be defined in the creation of the sequence. An example is given below:
-\begin{verbatim}
-a=0.06;
-q1:quadrupole, l=1, k1=0.01;
-myseq: sequence, l=10;
-q1, at=5, dtheta=0.1, dphi=0.2, dpsi=0.3, dx=0.04, dy=0.05, ds:=a;
-endsequence;
-\end{verbatim}
+\textbf{Examples:}
+\madxmp{
+a=0.06; \\
+q1:quadrupole, l=1, k1=0.01; \\
+myseq: sequence, l=10; \\
+q1, at=5, dtheta=0.1, dphi=0.2, dpsi=0.3, dx=0.04, dy=0.05, ds:=a; \\
+endsequence; \\
+}
 It is also possible to defined the permanet misalignments using defered expresions.
 %% \begin{figure}[ht]
 %% \centering
