@@ -3860,7 +3860,7 @@ subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
   double precision :: l_phy(0:maxferr)
   integer :: i, j, wire_flagco, nn, ibeco
   double precision :: dx, dy, embl, l, cur, dxi, dyi, chi, nnorm, xi, yi, RTWO, pc
-  double precision :: wire_clo_x, wire_clo_y
+  double precision :: wire_clo_x, wire_clo_y,x,y,ltot,Ntot
   ! WIRE basd on the SixTrack implementation
   double precision, external :: node_value, get_value, get_closed_orb_node
   external ::set_closed_orb_node
@@ -3924,7 +3924,6 @@ do i = 0, nn-1
     if(ibeco == 0) then
       ! 3 apply wire kick
       RTWO = xi**2+yi**2
-      print *, "rrrr", RTWO, cur, nnorm, embl, l
       re(2,1) = Ntot*(yi**2-x**2)/RTWO**2
       re(2,3) = -Ntot*(2*x*y)/RTWO**2
       

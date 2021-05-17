@@ -401,7 +401,7 @@ double get_closed_orb_node(int *index){
 void set_closed_orb_node(int *index, double *pos){
   if(current_node->closed_orbit==NULL){
     current_node->closed_orbit = new_double_array(6);
-  }  printf("aaaaaaaaaaaaaaaaaaaa %d %f \n", *index, *pos);
+  }
   current_node->closed_orbit->a[*index-1] = *pos; // -1 since it is callled from FORTRAN
 }
 
