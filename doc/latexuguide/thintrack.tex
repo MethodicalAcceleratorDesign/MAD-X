@@ -265,6 +265,8 @@ A \texttt{SEED} value is an integer in the range [0...999999999] (default:
 
   \ttitem{UPDATE} flag to trigger parameter update per turn. \\  
   (Default:~false) \\
+  \textbf{Note} that \ttitem{tr\$macro} needs to be defined even if only the access
+  to the turn number \texttt{tr\$turni} is used.
   Specifying \texttt{UPDATE=true} gives access to the following additions:   
   \begin{madlist}
     \ttitem{tr\$turni} this special variable contains the turn number;

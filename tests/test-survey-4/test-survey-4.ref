@@ -1,0 +1,51 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2021.01.22 15:45:52      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+a = 0.1;
+
+q1:quadrupole, l=1, k1=0.01;
+
+
+
+f =0.0;
+
+
+
+myseq: sequence, l=10;
+
+q1, at = 3,dx:=f;
+
+m1:quadrupole, at = 3.5;
+
+qm:quadrupole, at = 4.0001,dx:=f, l=1;	
+
+qt:quadrupole, at = 6.0001,dtheta:=pi/4, l=1;	
+
+q1, at =8, dy:=-f;	
+
+endsequence;
+
+
+
+f=0.1;
+
+++++++ info: f redefined
+beam;
+
+
+
+use, sequence=myseq;
+
+survey, file="survey";
+
+survey, file="survey_location.tfs", perm_align_survey;
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

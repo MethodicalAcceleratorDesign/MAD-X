@@ -344,7 +344,7 @@ static void mod_octupole(struct c6t_element*);
 static void mod_quadrupole(struct c6t_element*);
 static void mod_rbend(struct c6t_element*);
 static void mod_rfcavity(struct c6t_element*);
-static void mod_crabcavity(struct c6t_element*);
+// static void mod_crabcavity(struct c6t_element*);
 // static void mod_dipedge(struct c6t_element*); // not defined
 // static void mod_solenoid(struct c6t_element*); // not defined
 // static void mod_hacdipole(struct c6t_element*); // not defined
@@ -2234,12 +2234,6 @@ mod_rfcavity(struct c6t_element* p)
 }
 
 static void
-mod_crabcavity(struct c6t_element* p)
-{
-  total_voltage += p->value[1];  /* accumulate voltage */
-}
-
-static void
 mod_sextupole(struct c6t_element* p)
 {
   supp_small_comp(p);
@@ -2462,7 +2456,6 @@ pro_elem(struct node* cnode,  int ncombined)
   else if (strcmp(cnode->base_name, "quadrupole") == 0)  mod_quadrupole(current_element);
   else if (strcmp(cnode->base_name, "sextupole") == 0)   mod_sextupole(current_element);
   else if (strcmp(cnode->base_name, "rfcavity") == 0)    mod_rfcavity(current_element);
-  else if (strcmp(cnode->base_name, "crabcavity") == 0)  mod_crabcavity(current_element);
   else if (strcmp(cnode->base_name, "rfmultipole") == 0) mod_rfmultipole(current_element);
 
   if (strstr(cnode->base_name, "kicker") || strstr(cnode->base_name, "tkicker"))
@@ -2516,13 +2509,31 @@ pro_elem(struct node* cnode,  int ncombined)
       } 
   }
 
-  if (cnode->p_al_err) {
+  if (cnode->p_al_err || cnode->perm_misalign==1) {
     align_cnt++;
-    current_element->na_err = cnode->p_al_err->curr;
+    current_element->na_err = ALIGN_MAX;
     current_element->p_al_err = make_obj("ALDUM",0,ALIGN_MAX,0,0);
-    current_element->p_al_err->c_dble = cnode->p_al_err->curr;
-    for (i=0;i<cnode->p_al_err->curr;i++)
-      current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
+    current_element->p_al_err->c_dble = ALIGN_MAX;
+    if(cnode->p_al_err){
+      for (i=0;i<cnode->p_al_err->curr;i++)
+        current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
+    }
+    if(cnode->perm_misalign==1){
+      double value;
+
+      if (cnode->perm_align->dx_expr == NULL) value = cnode->perm_align->dx_value;
+      else                                            value = expression_value(cnode->perm_align->dx_expr , 2);
+      current_element->p_al_err->a_dble[0] = current_element->p_al_err->a_dble[0] + value;
+
+      if (cnode->perm_align->dy_expr == NULL) value = cnode->perm_align->dy_value;
+      else                                            value = expression_value(cnode->perm_align->dy_expr , 2);
+      current_element->p_al_err->a_dble[1] = current_element->p_al_err->a_dble[1] + value;
+
+      if (cnode->perm_align->dpsi_expr == NULL) value = cnode->perm_align->dpsi_value;
+      else                                             value = expression_value(cnode->perm_align->dpsi_expr , 2);
+      current_element->p_al_err->a_dble[5] = current_element->p_al_err->a_dble[5] + value;    
+     
+    }
   }
 
   /* if we have a tilt set the flag */

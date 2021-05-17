@@ -1,0 +1,58 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "MYSEQ"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le       0.00051099895
+@ CHARGE           %le                   1
+@ ENERGY           %le                   1
+@ PC               %le        0.9999998694
+@ GAMMA            %le         1956.951184
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     1.601067819e-11
+@ SIGE             %le               0.001
+@ SIGT             %le                   1
+@ NPART            %le                   1
+@ EX               %le                   1
+@ EY               %le                   1
+@ ET               %le               0.001
+@ BV_FLAG          %le                   1
+@ LENGTH           %le                   3
+@ ALFA             %le                   0
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le                   0
+@ Q1               %le        0.2076218785
+@ Q2               %le        0.1908832196
+@ DQ1              %le                   0
+@ DQ2              %le                   0
+@ DXMAX            %le      0.008112740131
+@ DYMAX            %le       0.01532164488
+@ XCOMAX           %le      0.008156298203
+@ YCOMAX           %le       0.01525083841
+@ BETXMAX          %le          8.80000099
+@ BETYMAX          %le         11.35129585
+@ XCORMS           %le      0.003663132268
+@ YCORMS           %le      0.006828385719
+@ DXRMS            %le      0.003643659029
+@ DYRMS            %le      0.006860038993
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "03/02/21"
+@ TIME             %08s "14.40.28"
+* NAME                                S                  X                 PX                  Y                 PY 
+$ %s                                %le                %le                %le                %le                %le 
+ "MYSEQ$START"                        0                  0                  0                  0                  0
+ "DRIFT_0"                         0.15                  0                  0                  0                  0
+ "Q1"                              0.25    4.999583347e-06    9.998333417e-05                  0                  0
+ "DRIFT_1"                         0.45    2.499625018e-05    9.998333417e-05                  0                  0
+ "Q2"                              0.55     3.49945836e-05    9.998333417e-05                  0                  0
+ "Q3"                              0.65     0.000209894194     0.003397134331                  0                  0
+ "Q3"                              0.75    0.0005491230333     0.003385746226   -0.0003300825083    -0.006603300495
+ "Q3"                              0.85    0.0008874194456     0.003380873841   -0.0009916735106    -0.006632169721
+ "DRIFT_2"                            3     0.008156298203     0.003380873841     -0.01525083841    -0.006632169721
+ "MYSEQ$END"                          3     0.008156298203     0.003380873841     -0.01525083841    -0.006632169721

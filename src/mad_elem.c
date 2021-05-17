@@ -159,6 +159,37 @@ export_el_par_8(struct command_parameter* par, char* string)
       }
   }
 }
+int
+check_for_perm_misalign(struct node* c_node, struct in_cmd* cmd){
+  int isperm = 0;
+  if(command_par_expr("dx", cmd->clone) || command_par_value("dx", cmd->clone)!=0)         isperm = 1;
+  if(command_par_expr("dy", cmd->clone) || command_par_value("dy", cmd->clone)!=0)         isperm = 1;
+  if(command_par_expr("ds", cmd->clone) || command_par_value("ds", cmd->clone)!=0)         isperm = 1;
+  if(command_par_expr("dtheta", cmd->clone) || command_par_value("dtheta", cmd->clone)!=0) isperm = 1;
+  if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0)     isperm = 1;
+  if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0)     isperm = 1;
+  if(command_par_expr("dpsi", cmd->clone) || command_par_value("dpsi", cmd->clone)!=0)     isperm = 1;
+  if(command_par_value("slice_straight", cmd->clone)!=0)     isperm = 1;
+  
+  if(isperm==1){
+   
+    c_node->perm_align->dx_value     = command_par_value("dx", cmd->clone);
+    c_node->perm_align->dx_expr      = command_par_expr("dx", cmd->clone);
+    c_node->perm_align->dy_value     = command_par_value("dy", cmd->clone);
+    c_node->perm_align->dy_expr      = command_par_expr("dy", cmd->clone);
+    c_node->perm_align->ds_value     = command_par_value("ds", cmd->clone);
+    c_node->perm_align->ds_expr      = command_par_expr("ds", cmd->clone);
+    c_node->perm_align->dtheta_value = command_par_value("dtheta", cmd->clone);
+    c_node->perm_align->dtheta_expr  = command_par_expr("dtheta", cmd->clone);
+    c_node->perm_align->dphi_value   = command_par_value("dphi", cmd->clone);
+    c_node->perm_align->dphi_expr    = command_par_expr("dphi", cmd->clone);
+    c_node->perm_align->dpsi_value   = command_par_value("dpsi", cmd->clone);
+    c_node->perm_align->dpsi_expr    = command_par_expr("dpsi", cmd->clone);
+    
+  }
+  
+  return isperm;
+}
 
 static void
 enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupdating)
@@ -181,13 +212,14 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag, int isupda
   else k = ++occ_list->inform[i];
   make_elem_node(el, k);
   current_node->at_value = at;
+  current_node->perm_misalign = check_for_perm_misalign(current_node, cmd);
   current_node->at_expr = command_par_expr("at", cmd->clone);
   const char* from = command_par_string_user("from", cmd->clone);
   if (from){
     current_node->from_name = permbuff(from);
     nupdates = 2;
   }
-    if (isupdating==0) check_for_update_in_seq(el, cmd->clone, nupdates);
+    if (isupdating==0 && current_node->perm_misalign==0) check_for_update_in_seq(el, cmd->clone, nupdates);
 }
 
 static int
@@ -271,7 +303,7 @@ make_element(const char* name, const char* parent, struct command* def, int flag
     el->length = el_par_value("l", el);
     set_aperture_element(el, def);
   }
-  
+
   add_to_el_list(&el, def->mad8_type, element_list, flag);
   return el;
 }
@@ -279,11 +311,11 @@ void set_aperture_element(struct element *el, struct command* def){
   char *type;
 //enum en_apertype{circle, ellipse, rectangle, lhcscreen, rectcircle, rectellipse, racetrack, octagon};
   type = command_par_string("apertype", def);
-  el->aper->custom_inter = 0; 
+  el->aper->custom_inter = 0;
   if(type!=NULL){
     if(strcmp(type,"circle")==0){
-      
-      double vector [4]; 
+
+      double vector [4];
       element_vector(el,"aperture", vector);
       if(vector[0] > ten_m_12)
         el->aper->apertype = circle;
@@ -319,7 +351,7 @@ void set_aperture_element(struct element *el, struct command* def){
           lines++;
         }
       }
-      
+
       el->aper->xlist = mycalloc("aperlist", lines+1, sizeof *el->aper->xlist);
       el->aper->ylist = mycalloc("aperlist", lines+1, sizeof *el->aper->ylist);
       rewind(fp);
@@ -327,9 +359,9 @@ void set_aperture_element(struct element *el, struct command* def){
       while (2==fscanf(fp, "%lf %lf", &el->aper->xlist[i], &el->aper->ylist[i])) i++;
       /* closing the shape: a last point is inserted in table
      with coordinates equal to those of the first point */
-    el->aper->length = i; // this minus 1 has to be there because of how the algorithm is done.  
+    el->aper->length = i; // this minus 1 has to be there because of how the algorithm is done.
     el->aper->xlist[i]=el->aper->xlist[0];
-    el->aper->ylist[i]=el->aper->ylist[0];   
+    el->aper->ylist[i]=el->aper->ylist[0];
     fclose(fp);
     }
   }
@@ -344,7 +376,7 @@ void set_aperture_element(struct element *el, struct command* def){
     tmpx[i] = -999;
     tmpy[i] = -999;
   }
-  
+
   int lx = element_vector(el, "aper_vx", tmpx);
   int ly = element_vector(el, "aper_vy", tmpy);
   int tmp_l=MAXARRAY+1;
@@ -352,7 +384,7 @@ void set_aperture_element(struct element *el, struct command* def){
     for(int i=0;i<MAXARRAY;i++){
       if(tmpx[i]==-999 && tmpy[i]==-999){
         tmp_l = i;
-        break; 
+        break;
       }
     }
 
@@ -371,10 +403,10 @@ void set_aperture_element(struct element *el, struct command* def){
       //printf("2nd last %f, and last %f %d", el->aper->xlist[tmp_l-2], el->aper->xlist[tmp_l-1], tmp_l);
 
 
-      el->aper->length = tmp_l; // minus 1 or not ?? has to be there because of how the algorithm is done.  
+      el->aper->length = tmp_l; // minus 1 or not ?? has to be there because of how the algorithm is done.
       el->aper->xlist[tmp_l]=el->aper->xlist[0];
       el->aper->ylist[tmp_l]=el->aper->ylist[0];
-      if(el->aper->apertype==notdefined){ //If no other aperture is defined then a 10 meter rectangle is set! 
+      if(el->aper->apertype==notdefined){ //If no other aperture is defined then a 10 meter rectangle is set!
         el->aper->apertype=custom_inter; // sets it to a rcircle so the check is still done
       }
     }
@@ -388,8 +420,8 @@ void update_node_aperture(void){
   type = command_par_string("apertype", current_node->p_elem->def);
   if(type!=NULL && current_node->p_elem->aper->apertype!=custom_inter){
     if(strcmp(type,"circle")==0){
-      
-      double vector [4]; 
+
+      double vector [4];
       element_vector(current_node->p_elem,"aperture", vector);
       if(vector[0] > ten_m_12)
         current_node->p_elem->aper->apertype = circle;
@@ -419,7 +451,7 @@ void update_node_aperture(void){
 
     element_vector(current_node->p_elem, "aper_vx", current_node->p_elem->aper->xlist);
     element_vector(current_node->p_elem, "aper_vy", current_node->p_elem->aper->ylist);
-    
+
   }
 }
 
@@ -892,6 +924,9 @@ enter_element(struct in_cmd* cmd)
   {
     cmd->cmd_def = parent->def;
     cmd->clone = clone_command(cmd->cmd_def);
+
+    if(strlen(toks[0])>45) fatal_error("String is too long", toks[0]);
+
     strcpy(cmd->clone->name, toks[0]);
     scan_in_cmd(cmd);
     if (k == 0 || strcmp(toks[0], toks[2]) == 0) {
@@ -948,7 +983,7 @@ check_for_update_in_seq(struct element* el, struct command* update, int nupdates
     {
       cupdate++;
       if(cupdate>nupdates)
-        fatal_error("Not possible to update attribute for element in sequence definition: ", el->name );
+        warning("Not possible to update attribute for element in sequence definition: ", el->name);
     }
   }
 }

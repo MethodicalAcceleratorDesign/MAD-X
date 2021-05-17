@@ -76,6 +76,8 @@
 #define advance_to_pos advance_to_pos_
 #define current_node_name current_node_name_
 #define node_name node_name_
+#define node_name node_name_
+#define node_name_f_lower node_name_f_lower_
 #define node_string node_string_
 #define node_value node_value_ // **
 #define retreat_node retreat_node_
@@ -86,6 +88,8 @@
 #define inside_userdefined_geometry inside_userdefined_geometry_
 #define get_userdefined_geometry get_userdefined_geometry_
 #define get_userdefined_geometry_len get_userdefined_geometry_len_
+#define is_permalign is_permalign_
+
 
 #define node_aperture_vector node_aperture_vector_
 #define node_aperture_offset node_aperture_offset_
@@ -163,6 +167,7 @@
 #define sector_out sector_out_
 #define table_length table_length_
 #define table_range table_range_
+#define name_to_table_curr name_to_table_curr_
 
 // from mad_track.c
 #define deletetrackstrarpositions deletetrackstrarpositions_
@@ -277,7 +282,9 @@ void soddin_(F_INTEGER ierr);
 
 // from survey.f90
 void survey_(void);
+void elementloc_(void);
 void survtest_(void);
+void locslice_(F_DOUBLE, F_DOUBLE, F_DOUBLE);
 
 // from toucheck.f90
 void touschek_(void);

@@ -1,0 +1,27 @@
+a = 0.1;
+
+myseq: sequence, l=10;
+q1:quadrupole,  at=5, l=1, k1=0.01, dtheta=0.1,dphi=0.2, dpsi=0.3, dx=0.04, dy=0.05, ds=0.06;
+!q1:quadrupole,  at=5, l=1, k1=0.01;
+endsequence;
+beam;
+use, sequence=myseq;
+
+select, flag=error, class=quadrupole;
+ealign, dtheta=-0.1,dphi=-0.2, dpsi=-0.3, dx=-0.04, dy=-0.05, ds=-0.06;
+select,flag=twiss, column=name,s, x,y;
+twiss, file="twiss.madx.tfs", betx=1, bety=1;
+
+track, onepass, file="withperm",dump;
+start;
+run, turns= 1;
+endtrack;
+
+ptc_create_universe;                                                                                                    
+ptc_create_layout,model=1, method=2, nst=2, exact=true;
+ptc_align;
+ptc_setswitch, debuglevel=0, fringe=false,  time=false, totalpath=false, exact_mis=false;                                                
+PTC_TWISS, table=twiss, icase=5, no=5, betx=1, bety=2, betz=10, x=xin, y=yin, t=tin, pt=ptin,px=pxin, py=pyin ;
+
+
+write, table=twiss, file="twiss.ptc.tfs";                                                                                                                       

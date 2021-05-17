@@ -1,0 +1,185 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2021.01.22 09:35:59      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+a = 0.1;
+
+
+
+myseq: sequence, l=10;
+
+q1:quadrupole,  at=5, l=1, k1=0.01, dtheta=0.1,dphi=0.2, dpsi=0.3, dx=0.04, dy=0.05, ds=0.06;
+
+!q1:quadrupole,  at=5, l=1, k1=0.01;
+
+endsequence;
+
+beam;
+
+use, sequence=myseq;
+
+
+
+select, flag=error, class=quadrupole;
+
+ealign, dtheta=-0.1,dphi=-0.2, dpsi=-0.3, dx=-0.04, dy=-0.05, ds=-0.06;
+
+Assigned alignment errors to 1 elements
+select,flag=twiss, column=name,s, x,y;
+
+twiss, file="twiss.madx.tfs", betx=1, bety=1;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                10                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2345420174                  0        95.98872702                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  0                  0       0.2337510584 
+
+               dq2            betymax              dymax              dyrms 
+                 0        106.1557915                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+
+
+track, onepass, file="withperm",dump;
+
+enter TRACK module
+one pass is on
+start;
+
+run, turns= 1;
+
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0                  0                  0 
+         1          1                  0                  0 
+
+                 y                 py                  t                 pt 
+                 0                  0                  0                  0 
+                 0                  0                  0                  0 
+
+                 s                  e 
+                 0                  0 
+                10                  0 
+endtrack;
+
+exit TRACK module
+
+
+
+ptc_create_universe;                                                                                                    
+
+Determined SECTOR NMUL MAX :  0
+ptc_create_layout,model=1, method=2, nst=2, exact=true;
+
+ MAD-X Beam Parameters
+                  Energy : 0.100000E+01
+          Kinetic Energy : 0.999489E+00
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.100000E+01
+ Setting MADx with 
+     energy           1.0000000000000000     
+     method                   2
+     Num. of steps            2
+     charge           1.0000000000000000     
+  Length of machine:    10.000000000000000     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        10.000000000000000     
+ptc_align;
+
+ptc_setswitch, debuglevel=0, fringe=false,  time=false, totalpath=false, exact_mis=false;                                                
+
+PTC_TWISS, table=twiss, icase=5, no=5, betx=1, bety=2, betz=10, x=xin, y=yin, t=tin, pt=ptin,px=pxin, py=pyin ;
+
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+                10           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000       0.2345418611 
+
+                q2                dq1                dq2                 qs 
+      0.2178349039           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+                 1        95.98280075                  2        54.73298401 
+
+         beta11min          beta11max          beta12min          beta12max 
+                 1        95.98280075                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+                 2        54.73298401                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 0                  0                  0                  0 
+
+          disp2min           disp2max           disp3min           disp3max 
+                 0                  0                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0                  0 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0                  0                  0                  0 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0                  0                  0                  0 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0                  0                  0                 -0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0                  0                  0                  0 
+
+           pycomin             tcomin            ptcomin 
+                 0                 -0                  0 
+
+
+
+
+write, table=twiss, file="twiss.ptc.tfs";                                                                                                                       
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

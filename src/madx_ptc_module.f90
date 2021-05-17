@@ -1306,7 +1306,7 @@ CONTAINS
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
        PATCH_TRANS = zero
-       patch_ang(2)=node_value('angle ')
+       patch_ang(2)=-node_value('angle ')
        key%list%patchg=2
        do i=1,3
           key%list%ang(i)=patch_ang(i)
@@ -1435,6 +1435,7 @@ CONTAINS
           key%list%ang(i)=patch_ang(i)
           key%list%t(i)=patch_trans(i)
        enddo
+       key%list%ang(2)=-patch_ang(2) ! Change the sign of the y-rotation to be the geometrical angle.
     case(36) ! TRANSLATION
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
@@ -2127,19 +2128,32 @@ CONTAINS
     use twiss0fi
     implicit none
     integer j,n_align,node_al_errors
-    integer restart_sequ,advance_node
+    integer restart_sequ,advance_node, n_perm_align
     real(dp) al_errors(align_max)
     type(fibre), pointer :: f
+    REAL(KIND(1d0)) :: node_value   !/*returns value for parameter par of current element */
+    integer, external       :: is_permalign
     !---------------------------------------------------------------
-
 
     j=restart_sequ()
     j=0
     f=>my_ring%start
 10  continue
-
+   
     j=j+1
+    al_errors = 0
     n_align = node_al_errors(al_errors)
+    n_perm_align = is_permalign()
+    if (n_perm_align .ne. 0) then
+      al_errors(1) = al_errors(1) + node_value('dx ')
+      al_errors(2) = al_errors(2) + node_value('dy ')
+      al_errors(3) = al_errors(3) + node_value('ds ')
+      al_errors(5) = al_errors(5) + node_value('dtheta ')
+      al_errors(4) = al_errors(4) + node_value('dphi ')
+      al_errors(6) = al_errors(6) + node_value('dpsi ')
+      n_align = 1
+    endif
+
     if (n_align.ne.0)  then
       if (getdebug() > 3) then
         write(6,*) " ----------------------------------------------- "
@@ -2164,8 +2178,6 @@ CONTAINS
 
 
       if (getdebug() > 3) then
-
-        write(6,*) " vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv "
         call print_elframes(f)
       endif
 

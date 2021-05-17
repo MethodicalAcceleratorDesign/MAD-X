@@ -16,7 +16,7 @@ coordinates in a particular system, the initial coordinates and angles
 can be specified. 
 
 \madbox{
-SURVEY, \=SEQUENCE=string, FILE= string, \\
+SURVEY, \=SEQUENCE=string, FILE= string, PERM\_ALIGN\_SURVEY= logical\\
         \>X0=real, Y0=real, Z0=real, \\
         \>THETA0=real, PHI0=real, PSI0=real;}
 
@@ -26,6 +26,9 @@ The \texttt{SURVEY} command has the following attributes:
   last sequence expanded with the \texttt{USE} command will be surveyed.  
   \ttitem{FILE}  the name of external file to which the results are
   written.\\ (Default:~survey)
+  \ttitem{PERM\_ALIGN\_SURVEY}  If TRUE the output includes the permanent misalignments
+  and the start of each element ends with a .ENT and the exit of each element with .EXI.
+  \\ (Default:~FALSE)
   \ttitem{X0, Y0, Z0} the initial horizontal, vertical and longitudinal
   coordinates in meters.\\ (Default: 0.0, 0.0, 0.0) 
   \ttitem{THETA0, PHI0, PSI0} the initial horizontal and vertical angles

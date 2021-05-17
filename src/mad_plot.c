@@ -133,6 +133,7 @@ exec_plot(struct in_cmd* cmd)
   struct table* p_table = NULL;
   const char *table_name = NULL, *file_name = NULL;
   char *last_twiss_table, *trackfile;
+  struct command* tmp_command;
   char track_file_name[NAME_L], ps_file_name[NAME_L];
   char plot_title[TITLE_SIZE], version[TITLE_SIZE];
   FILE *gpu;
@@ -142,7 +143,13 @@ exec_plot(struct in_cmd* cmd)
 
   /* use correct beam for sequence to be plotted - HG 031127 */
   struct command* keep_beam = current_beam;
-  if (attach_beam(current_sequ) == 0)
+  tmp_command = clone_command(this_cmd->clone);
+  if (attach_beam(current_sequ) == 0){
+    char mychar [100] = "resbeam; neverusedsequencename632:sequence, l=10; q1:quadrupole, at=1; endsequence;";
+    pro_input(mychar);
+    this_cmd->clone = clone_command(tmp_command);
+  }
+    if (attach_beam(current_sequ) == 0)      
     fatal_error("PLOT - sequence without beam:", current_sequ->name);
   /* end part1 of HG 031127 */
 

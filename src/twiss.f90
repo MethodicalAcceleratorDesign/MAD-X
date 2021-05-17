@@ -21,7 +21,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   integer :: i, j, ithr_on
   integer :: chrom, eflag, chrom_warn
   double precision :: orbit0(6), orbit(6), tt(6,6,6), ddisp0(6), r0mat(2,2)
-  double precision :: s0mat(6,6) ! initial sigma matrix
+  double precision :: s0mat(6,6), eig_tol ! initial sigma matrix
   character(len=48) :: charconv
   character(len=150) :: warnstr
   logical :: fast_error_func
@@ -98,6 +98,8 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   dtbyds  = get_value('probe ','dtbyds ')
   charge  = get_value('probe ','charge ')
   npart   = get_value('probe ','npart ')
+  eig_tol = get_value('twiss ','clorb_tol' )
+
 
   !---- Set fast_error_func flag to use faster error function
   !---- including tables. Thanks to late G. Erskine
@@ -121,7 +123,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      call tmsigma(s0mat) !-- from initial conditions in opt_fun0
   else
      !---- Initial values from periodic solution.
-     call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag);          if (eflag.ne.0) go to 900
+     call tmclor(orbit0,.true.,.true.,eig_tol,opt_fun0,rt,tt,eflag);          if (eflag.ne.0) go to 900
 !    LD: useless, identical to last call to tmfrst in tmclor...
 !    call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on); if (eflag.ne.0) go to 900
      call twcpin(rt,disp0,r0mat,eflag);                               if (eflag.ne.0) go to 900
@@ -242,7 +244,7 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   double precision :: orbit0(6), orbit(6), rt(6,6)
 
   integer :: eflag, ithr_on
-  double precision :: opt_fun0(fundim), tt(6,6,6)
+  double precision :: opt_fun0(fundim), tt(6,6,6), eig_tol
 
   double precision, external :: get_value
 
@@ -259,11 +261,12 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   dtbyds = get_value('probe ','dtbyds ')
   charge = get_value('probe ','charge ')
   npart  = get_value('probe ','npart ')
+  eig_tol = get_value('twiss ','clorb_tol' )
 
   ithr_on = izero
   ORBIT0 = zero
   !---- Get closed orbit and coupled transfer matrix.
-  call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
+  call tmclor(orbit0,.true.,.true.,eig_tol, opt_fun0,rt,tt,eflag)
   call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,ithr_on) ! useless?
 end SUBROUTINE tmrefo
 
@@ -510,10 +513,11 @@ SUBROUTINE twfill_ripken(opt_fun)
 
 end SUBROUTINE twfill_ripken
 
-SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
+SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   use twissbeamfi, only : deltap
   use matrices, only : EYE
   use math_constfi, only : zero, one
+  use twtapering
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -536,8 +540,8 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   integer :: eflag
 
   logical :: pflag
-  integer :: i, k, irank, itra, thr_on, ithr_on, save_opt
-  double precision :: cotol, err
+  integer :: i, k, irank, itra, thr_on, ithr_on, save_opt, debug
+  double precision :: cotol, err, eig_tol
   double precision :: orbit0(6), orbit(6), a(6,7), b(4,5)
 
   integer, external :: get_option
@@ -550,6 +554,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   !---- Initialize.
   ithr_on = 0
   thr_on = get_option('threader ')
+  debug = get_option('debug ')
   pflag = get_option('twiss_print ') .ne. 0
   cotol = get_variable('twiss_tol ')
   eflag = 0
@@ -559,7 +564,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
 
   !---- Iteration for closed orbit.
   iterate: do itra = 1, itmax
-
+      orderrun = itra
      !---- Track orbit and transfer matrix.
      call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
 
@@ -607,21 +612,89 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
      endif
 
      if (err.lt.cotol) then
+        orderrun = 0
         save_opt = get_option('keeporbit ')
         call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,ithr_on)
         OPT_FUN0(9:14) = ORBIT0(1:6)
         GUESS = ORBIT0
+        call tmcheckstab(rt,eig_tol, debug)
         return ! normal exit
      endif
 
   enddo iterate
 
+
   !---- No convergence.
+  call tmcheckstab(rt, eig_tol,debug)
+  orderrun = 0
   print '(''Closed orbit did not converge in '', i3, '' iterations'')', itmax
   OPT_FUN0(9:14) = zero
   return
 
 end SUBROUTINE tmclor
+
+SUBROUTINE tmcheckstab(rt,tol, debug)
+    use math_constfi, only :  one, zero
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Check the stability of the one turn matrix                       *
+  !                                                                      *
+  !     Input:                                                           *
+  !     rt(6,6)   (double)  transfer matrix.                             *
+  !----------------------------------------------------------------------*
+  double precision :: rt(6,6) , tmp1, tmp2
+  double precision :: em(6,6), tol
+  double precision :: reval(6), aival(6) ! re and im parts for damping and tune
+  logical :: stabx, staby, stabt
+  integer :: debug
+  logical, external :: m66sta
+  character(len=250) :: warnstr
+  double precision, external :: get_value, get_variable
+
+  if(tol .eq. zero) tol = 1e-6
+  if (m66sta(rt)) then
+     call laseig(rt, reval, aival, em)
+     stabt = .false.
+  else
+     call ladeig(rt, reval, aival, em)
+     stabt = abs(reval(5)**2 + aival(5)**2-one) .ge. tol  .or.  &
+             abs(reval(6)**2 + aival(6)**2-one) .ge. tol
+  endif
+  stabx = abs(reval(1)**2 + aival(1)**2 - one) .ge. tol  .or.     &
+          abs(reval(2)**2 + aival(2)**2 - one) .ge. tol
+  staby = abs(reval(3)**2 + aival(3)**2 - one) .ge. tol  .or.     &
+          abs(reval(4)**2 + aival(4)**2 - one) .ge. tol
+
+  if (stabx) then
+    tmp1 = reval(1)**2 + aival(1)**2
+    tmp2 = reval(2)**2 + aival(2)**2
+    
+    write (warnstr,'(a)') 'Horizontal plane might be unstable' // &
+    ' More information with the debug flag on.'
+    call fort_warn('TWCLORB: ',warnstr)
+    if(debug .ne. zero) print *, 'Eigenvalue(1)**2 ', tmp1, " Eigenvalue(2)**2", tmp2
+  endif
+
+  if (staby) then
+    tmp1 = reval(1)**2 + aival(1)**2
+    tmp2 = reval(2)**2 + aival(2)**2
+    
+    write (warnstr,'(a)') 'Vertical plane might be unstable' // &
+    ' More information with the debug flag on.'
+    call fort_warn('TWCLORB: ',warnstr)
+    if(debug .ne. zero) print *, 'Eigenvalue(3)**2 ', tmp1, " Eigenvalue(4)**2", tmp2
+  endif
+  
+  if (stabt) then
+    tmp1 = reval(5)**2 + aival(5)**2
+    tmp2 = reval(6)**2 + aival(6)**2
+    write (warnstr,'(a)') 'Longitudinal plane might be unstable.' // &
+    ' Try change lag with 0.5. More information with the debug flag on.'
+    call fort_warn('TWCLORB: ',warnstr)
+    if(debug .ne. zero) print *, 'Eigenvalue(5)**2 ', tmp1, " Eigenvalue(6)**2", tmp2
+  endif 
+
+end SUBROUTINE tmcheckstab
 
 SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use bbfi
@@ -634,6 +707,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use math_constfi, only : zero
   use code_constfi
   use twtapering
+  use twissbeamfi, only : radiate, beta, gamma
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -655,14 +729,14 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision :: orbit0(6), orbit(6)
   logical :: fsec, ftrk
   double precision :: rt(6,6), tt(6,6,6)
-  integer :: eflag, kobs, save, thr_on, i
+  integer :: eflag, kobs, save, thr_on, i, tap_itter
 
   logical :: fmap, istaper
   character(len=28) :: tmptxt1, tmptxt2, tmptxt3
   character(len=150) :: warnstr
   character(len=name_len) :: c_name(2), p_name, el_name
   character(len=2) :: ptxt(2)=(/'x-','y-'/)
-  integer :: j, code, n_align, nobs, node, old, poc_cnt, debug
+  integer :: j, code, n_align, nobs, node, old, poc_cnt, debug, n_perm_align
   integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
   double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6), orbitori(6)
   double precision :: al_errors(align_max), dptemp
@@ -671,13 +745,14 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
 
-  integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
+  integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option, is_permalign
   double precision, external :: node_value, get_value
   double precision, parameter :: orb_limit=1d1
   integer, parameter :: max_rep=100
 
   111 continue
   debug = get_option('debug ')
+  
 
   !---- Initialize
   !---- corr_pick stores for both projection the last pickup used by the
@@ -694,7 +769,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      if (j .lt. 3) thr_on = 0
   endif
   istaper = get_value('twiss ','tapering ').ne.zero
-  !istaper = .true.
+  tap_itter = get_value('twiss ','tap_itter ')
+
   TT = zero
   RT = EYE
 
@@ -752,12 +828,24 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      end select
   endif
 
-  !---- Element length.
+  !---- Element length.t
   el = node_value('l ')
 
   nobs = node_value('obs_point ')
-
+  al_errors = 0 
   n_align = node_al_errors(al_errors)
+  n_perm_align = is_permalign()
+  
+  if (n_perm_align .ne. 0) then
+    al_errors(1) = al_errors(1) + node_value('dx ')
+    al_errors(2) = al_errors(2) + node_value('dy ')
+    al_errors(3) = al_errors(3) + node_value('ds ')
+    al_errors(4) = al_errors(4) + node_value('dphi ')
+    al_errors(5) = al_errors(5) + node_value('dtheta ')
+    al_errors(6) = al_errors(6) + node_value('dpsi ')
+    n_align = 1
+  endif
+
   if (n_align .ne. 0)  then
     ORBIT2 = ORBIT
     call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
@@ -775,7 +863,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   endif
 
   !---- Element matrix
-  if (istaper) then
+  if (istaper .and. orderrun < tap_itter) then
+
     orbitori = orbit
 
     select case (code)
@@ -962,12 +1051,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      goto 10 ! loop over nodes
   endif
 
-
-  if(orbit(6) .gt. 1e-10 .and. istaper) then
-    endpt=endpt+orbit(6)
-    orderrun = orderrun+1
-    goto 111
-  endif
   bbd_flag=0
 
 end SUBROUTINE tmfrst
@@ -1808,7 +1891,8 @@ subroutine track_one_element(el, fexit, contrib_rms)
   double precision, intent(in) :: el
   logical :: fexit
   logical :: contrib_rms
-
+  integer n_perm_align
+  integer, external :: is_permalign
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
 !  if (code .eq. code_tkicker)     code = code_kicker
@@ -1825,7 +1909,20 @@ subroutine track_one_element(el, fexit, contrib_rms)
   opt_fun(72) = g_elpar(g_calib)
   opt_fun(73) = g_elpar(g_polarity)
 
+  al_errors = 0
   n_align = node_al_errors(al_errors)
+  n_perm_align = is_permalign()
+  
+  if (n_perm_align .ne. 0) then
+    al_errors(1) = al_errors(1) + node_value('dx ')
+    al_errors(2) = al_errors(2) + node_value('dy ')
+    al_errors(3) = al_errors(3) + node_value('ds ')
+    al_errors(5) = al_errors(5) + node_value('dtheta ')
+    al_errors(4) = al_errors(4) + node_value('dphi ')
+    al_errors(6) = al_errors(6) + node_value('dpsi ')
+    n_align = 1
+  endif
+
   if (n_align .ne. 0)  then
      !print*, "coupl1: Element = "
      ele_body = .false.
@@ -2019,7 +2116,6 @@ SUBROUTINE twcptk(re,orbit)
   eflag = 0
 
   call element_name(name,len(name))
-
   !---- Dispersion.
   DT = matmul(RE, DISP)
 
@@ -2243,7 +2339,7 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   double precision :: maty11, maty12, maty21, maty22
   double precision :: alfx_ini, betx_ini, tempa
   double precision :: alfy_ini, bety_ini, tempb
-  double precision :: detx, dety
+  double precision :: detx, dety, atanm12
   logical          :: error
   double precision, parameter :: eps=1d-36
   character(len=name_len) :: name
@@ -2281,10 +2377,12 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   betx =   (tempb * tempb + matx12 * matx12) / (detx*betx_ini)
   !if (abs(matx12).gt.eps) amux = amux + atan2(matx12,tempb)
   if (abs(matx12).gt.eps) then
-     amux = amux + atan2(matx12,tempb)
-
-     if (atan2(matx12,tempb) .lt. zero)then
-        if (ele_body .and. abs(atan2(matx12,tempb)) > 0.1) then
+    atanm12 = atan2(matx12,tempb)
+    if(abs(atanm12) < 3.14 .or. ele_body) then
+      amux = amux + atanm12
+    endif
+     if (atanm12 .lt. zero)then
+        if (ele_body .and. abs(atanm12) > 0.1) then
            write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in x-plane ", &
                 atan2(matx12,tempb), " in the element ", name
            call fort_warn('TWCPTK_TWISS: ', warnstr)
@@ -2306,12 +2404,15 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   bety =   (tempb * tempb + maty12 * maty12) / (detx*bety_ini)
 !  if (abs(maty12).gt.eps) amuy = amuy + atan2(maty12,tempb)
   if (abs(maty12).gt.eps) then
-     amuy = amuy + atan2(maty12,tempb)
+    atanm12 = atan2(maty12,tempb)
+    if(abs(atanm12) < 3.14 .or. ele_body) then ! If no body phase advance < 180 deg
+     amuy = amuy + atanm12
+   endif
 
      if (atan2(maty12,tempb) .lt. zero) then
-        if (ele_body .and. abs(atan2(maty12,tempb)) > 0.1 ) then
+        if (ele_body .and. abs(atanm12) > 0.1 ) then
            write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in y-plane ", &
-                atan2(maty12,tempb), " in the element ", name
+                atanm12, " in the element ", name
            call fort_warn('TWCPTK_TWISS: ', warnstr)
            ! print*, " maty12 =", maty12, " tempb = ", tempb , "maty11 * bety_ini =",  maty11 * bety_ini, &
            !      "  maty12 * alfy_ini = ",  maty12 * alfy_ini
@@ -2990,6 +3091,8 @@ contains
 
 subroutine track_one_element(el, fexit)
   double precision, intent(in) :: el
+  integer n_perm_align
+  integer, external :: is_permalign
   logical :: fexit
 
   code = node_value('mad8_type ')
@@ -2998,6 +3101,19 @@ subroutine track_one_element(el, fexit)
 
   !---- Physical element.
   n_align = node_al_errors(al_errors)
+  n_perm_align = is_permalign()
+  
+  if (n_perm_align .ne. 0) then
+    al_errors(1) = node_value('dx ')
+    al_errors(2) = node_value('dy ')
+    al_errors(3) = node_value('ds ')
+    al_errors(5) = node_value('dtheta ')
+    al_errors(4) = node_value('dphi ')
+    al_errors(6) = node_value('dpsi ')
+    n_align = 1
+    print * ,"gggg", al_errors
+  endif
+
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
@@ -6762,14 +6878,15 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   re(4,2) = -st
   re(4,4) = ct
 
-
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmsrot
+
 SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
-  use twissbeamfi, only : beta
+  use twissbeamfi, only : beta, gamma
+  use twiss0fi, only : align_max
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6787,16 +6904,18 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   !----------------------------------------------------------------------*
   logical :: ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-
+  double precision :: al_errors(align_max)
   double precision :: angle, ca, sa, ta
   double precision :: node_value
 
   !---- Initialize.
+  al_errors = 0d0
+
   angle = node_value('angle ')
   if (angle .eq. 0) return
 
   angle = angle * node_value('other_bv ')
-
+  !al_errors(4) = -angle
   !---- Kick.
   ca = cos(angle)
   sa = sin(angle)
@@ -6804,6 +6923,7 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
 
   ek(4) = sa
 
+  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
   !---- Transfer matrix.
   re(3,3) = 1/ca
   re(4,4) =   ca
@@ -6817,7 +6937,8 @@ end SUBROUTINE tmxrot
 
 SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
-  use twissbeamfi, only : beta
+  use twissbeamfi, only : beta, gamma
+  use twiss0fi, only : align_max
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6838,12 +6959,15 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
   double precision :: angle, ca, sa, ta
   double precision :: node_value
+  double precision :: al_errors(align_max)
 
   !---- Initialize.
-  angle = node_value('angle ')
+  angle = -node_value('angle ') !Note that we should have the negative angle here
   if (angle .eq. 0) return
-
+  !al_errors = 0d0
   angle = angle * node_value('other_bv ')
+  !al_errors(5) = - angle
+  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
 
   !---- Kick.
   ca = cos(angle)
@@ -6977,7 +7101,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   use twiss_elpfi
   use twissbeamfi, only : deltap, pc, radiate
   use matrices, only : EYE
-  use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi
+  use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi, ten6m
   use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
@@ -7052,19 +7176,10 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   vrf   = rfv * ten3m / (pc * (one + deltap))
   phirf = rfl * twopi - omega * orbit(5)
 
-  istaper = get_value('twiss ','tapering ').ne.zero
-  
-  if(istaper .and. ftrk) then
-    ncav = get_ncavities()   
-    phirf = asin((sin(pi*half)*vrf - endpt/ncav)/vrf)
-    tmpphase = (phirf+omega*orbit(5))/twopi-g_elpar(r_lag)
-    call store_node_value('lagtap ', tmpphase)
-  endif
   
   c0 =   vrf * sin(phirf)
   c1 = - vrf * cos(phirf) * omega
   c2 = - vrf * sin(phirf) * omega**2 * half
-
   !---- Transfer map.
   fmap = .true.
 
@@ -7640,7 +7755,10 @@ SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
   double precision, intent(OUT) :: orb2(6), rm(6,6)
 
   double precision :: orbt(6), v(3), ve(3), w(3,3), we(3,3)
-  double precision :: ds, dx, dy, the, phi, psi, s2, tilt
+  double precision :: ds, dx, dy, the, phi, psi, s2, tilt, angle
+
+  integer :: code
+  double precision, external :: node_value
 
   !---- Misalignment rotation matrix w.r.t. entrance system.
   dx  = errors(1)
@@ -7653,7 +7771,9 @@ SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
   call sumtrx(the, phi, psi, w)
 
   !---- VE and WE represent the change of reference.
-  call suelem(el, ve, we, tilt)
+  code = node_value('mad8_type ')
+  angle = node_value('angle ')
+  call suelem(el, ve, we, tilt, code, angle)
 
   !---- Misalignment displacements at exit w.r.t. entrance system.
   v(1) = dx + w(1,1)*ve(1)+w(1,2)*ve(2)+w(1,3)*ve(3)-ve(1)
@@ -7696,6 +7816,7 @@ SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
   orbt(4) = orb1(4) - w(3,2)
   orbt(5) = orb1(5) - s2 / beta
   orbt(6) = orb1(6)
+
   ORB2 = matmul(RM,ORBT)
 
 end SUBROUTINE tmali2
@@ -7910,7 +8031,6 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   !     No radiation effects as it is a pure thin lens with no lrad
   call tmfrng(.false.,h,zero,e1,zero,zero,corr,rw,tw)
   call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-
   !---- Apply tilt.
   if (tilt .ne. zero) then
      call tmtilt(.false.,tilt,ek,re,te)
@@ -8607,9 +8727,9 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   ED = zero
   RD = EYE
   TD = zero
-
-  call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
-
+  if(el .ne. zero) then
+    call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
+  endif 
   !---- Read-in the parameters
   harmon = node_value('harmon ');
   bvk = node_value('other_bv ')
@@ -8754,11 +8874,12 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
       ek(ii) = ek(ii) * P(ii);
     enddo
   endif
-
-  ! Add half a drift space before and after the Crab kick
-  call tmcat1(fsec,ed,rd,td,ek,re,te,ek,re,te);
-  call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
-  call tmcat1(fsec,ek,re,te,ed,rd,td,ek,re,te);
+  if(el .ne. zero) then
+    ! Add half a drift space before and after the Crab kick when it has a length
+    call tmcat1(fsec,ed,rd,td,ek,re,te,ek,re,te);
+    call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
+    call tmcat1(fsec,ek,re,te,ed,rd,td,ek,re,te);
+  endif
 
 end SUBROUTINE tmcrab
 SUBROUTINE twcpin_print(rt,r0mat )

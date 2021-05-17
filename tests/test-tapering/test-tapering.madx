@@ -2,7 +2,7 @@
 ! title,"FCC-ee";
 ! 		  
 !--------------------------------------------------------------
-
+	option, -echo;
 	pbeam :=   182.5;
 	Ebeam := sqrt( pbeam^2 + emass^2 );
 
@@ -14,16 +14,35 @@
 ! FCC-ee Optics: prepare bare twiss contents
 !--------------------------------------------------------------
    
-    beam, particle = electron, energy=Ebeam, radiate=true;
+    beam, particle = electron, energy=Ebeam, radiate=false;
     
     use, sequence=L000013;
+
+
+    !select, flag=twiss, clear;
+    !select,flag=twiss, class=quadrupole,column=name,s,betx,bety,x,px,y,py,t,pt,angle,L,K1L,K2L,VOLT,LAG,FREQ;
+    !select,flag=twiss, pattern=IP,column=name,s,betx,bety,x,px,y,py,t,pt,angle,L,K1L,K2L,VOLT,LAG,FREQ;	
+	SAVEBETA, LABEL=B.IP, PLACE=#s, SEQUENCE=L000013;
+	LAGCA1 = 0.5 ;
+	LAGCA2 = 0.5;
+
+	twiss, file = "twiss_bare.twiss";
+
 	
     select, flag=twiss, clear;
     select,flag=twiss,column=name,s,betx,bety,ALFX,ALFY,MUX,MUY,dx,dy,x,px,y,py,t,pt;
 	
-	
+
+	beam, radiate=true;
+	MATCH, sequence=L000013, BETA0 = B.IP, tapering;
+	VARY, NAME=LAGCA1, step=1.0E-7;
+	VARY, NAME=LAGCA2, step=1.0E-7;
+	CONSTRAINT, SEQUENCE=L000013, RANGE=#e, PT=0.0;
+	jacobian,TOLERANCE=1.0E-16, CALLS=3000;
+	ENDMATCH;
 	
     twiss, file = "fcc_radiate.twiss", tapering;
-    save, sequence=L000013, file="taper2.seq";
+	save, sequence=L000013, file="taper2.seq";
+    
     stop;
 	
