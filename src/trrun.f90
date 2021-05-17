@@ -3656,7 +3656,7 @@ subroutine trclor(switch,orbit0)
   double precision :: last_pos(6), last_orbit(6,1), maxaper(6)
   character(len=12) :: char_a
 
-  integer, parameter :: itmax=20
+  integer, parameter :: itmax=10
 
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors, is_permalign
   double precision, external :: node_value, get_value, get_variable, get_length
