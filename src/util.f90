@@ -386,6 +386,14 @@ module twissotmfi
   double precision :: srmat(6,6)=0.d0, stmat(6,6,6)=0.d0
 end module twissotmfi
 
+module twissdqmin
+  use math_constfi, only : zero
+  implicit none
+  public
+  double precision :: dqmin_rdt=zero, dqmin_det=zero
+  integer ::  dqmin_rdt_c=0, dqmin_det_c=0
+end module twissdqmin
+
 module twissbeamfi
   use math_constfi, only : zero
   implicit none
