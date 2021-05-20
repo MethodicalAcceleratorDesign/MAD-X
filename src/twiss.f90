@@ -2201,10 +2201,20 @@ SUBROUTINE twcptk(re,orbit)
   amux_ini = amux
   amuy_ini = amuy
 
+  if (rmatrix) then
+     RW = matmul(RE,RW)
+     if (get_option('twiss_inval ') .ne. 0) then
+        RC = RW
+     else
+        RWI = matmul(JMATT, matmul(transpose(RW),JMAT)) ! invert symplectic matrix
+        RC = matmul(RW,matmul(ROTM,RWI))
+     endif
+  endif
+
   if(mode_flip) then
-     call twcptk_twiss(f, e, cp_error)
+     call twcptk_twiss(f, e, RW(1:2,3:4), RW(3:4,1:2), cp_error)
   else
-     call twcptk_twiss(e, f, cp_error)
+     call twcptk_twiss(e, f, RW(1:2,3:4), RW(3:4,1:2), cp_error)
   endif
 
   if (cp_error) then
@@ -2292,15 +2302,7 @@ SUBROUTINE twcptk(re,orbit)
      ! endif
 
   !---- Cumulative R matrix and one-turn map at element location.
-  if (rmatrix) then
-     RW = matmul(RE,RW)
-     if (get_option('twiss_inval ') .ne. 0) then
-        RC = RW
-     else
-        RWI = matmul(JMATT, matmul(transpose(RW),JMAT)) ! invert symplectic matrix
-        RC = matmul(RW,matmul(ROTM,RWI))
-     endif
-  endif
+
 
      DISP(1:4) = DT(1:4)
      disp(5) = zero
@@ -2315,13 +2317,16 @@ SUBROUTINE twcptk(re,orbit)
   endif
 
 end SUBROUTINE twcptk
-SUBROUTINE twcptk_twiss(matx, maty, error)
+
+SUBROUTINE twcptk_twiss(matx, maty, B, C, error)
   use twiss0fi
   use twisslfi
   use twisscfi
   use twissotmfi
-  use math_constfi, only : zero, twopi
+  use math_constfi, only : zero, twopi,pi
   use name_lenfi
+  use twissdqmin
+  use matrices, only : JMAT, JMATT, SMAT, SMATT
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2334,8 +2339,9 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   !     maty(2,2)  (double)   Y-plane matrix of block-diagonal           *
   !----------------------------------------------------------------------*
 
-  double precision :: matx(2,2), maty(2,2)
-  double precision :: matx11, matx12, matx21, matx22
+  double precision :: matx(2,2), maty(2,2), B(2,2), C(2,2)
+  double precision :: C_PLUS_BBAR(2,2), BBAR(2,2)
+  double precision :: matx11, matx12, matx21, matx22, DET_C_PLUS_BBAR
   double precision :: maty11, maty12, maty21, maty22
   double precision :: alfx_ini, betx_ini, tempa
   double precision :: alfy_ini, bety_ini, tempb
@@ -2358,7 +2364,6 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   if (dety == 0) return
   betx_ini = betx ; alfx_ini = alfx ;
   bety_ini = bety ; alfy_ini = alfy ;
-
 
   matx11 = matx(1,1)
   matx12 = matx(1,2)
@@ -2421,8 +2426,21 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
         endif
      endif
   endif
-
+  !BBAR  = matmul(SMAT, matmul(transpose(B),SMATT))
+  C_PLUS_BBAR(1,1) = C(1,1)+B(2,2)
+  C_PLUS_BBAR(1,2) = C(1,2)-B(1,2)
+  C_PLUS_BBAR(2,1) = C(2,1)-B(2,1)
+  C_PLUS_BBAR(2,2) = C(2,2)+B(1,1)
+  DET_C_PLUS_BBAR = (C_PLUS_BBAR(1,1) * C_PLUS_BBAR(2,2) - C_PLUS_BBAR(1,2) * C_PLUS_BBAR(2,1))
+  
+  if(amux .gt. zero .and. amuy .gt. zero .and. DET_C_PLUS_BBAR .gt. zero ) then
+    dqmin_det = dqmin_det + sqrt(DET_C_PLUS_BBAR)
+    dqmin_det_c = dqmin_det_c + 1
+  endif
+    
   error = .false.
+
+
 END SUBROUTINE twcptk_twiss
 
 SUBROUTINE tmsigma(s0mat)
@@ -3111,7 +3129,6 @@ subroutine track_one_element(el, fexit)
     al_errors(4) = node_value('dphi ')
     al_errors(6) = node_value('dpsi ')
     n_align = 1
-    print * ,"gggg", al_errors
   endif
 
   if (n_align .ne. 0)  then
@@ -3347,8 +3364,9 @@ end SUBROUTINE twbttk
 SUBROUTINE tw_summ(rt,tt)
   use twiss0fi
   use twisscfi
+  use twissdqmin
   use twissbeamfi, only : deltap, beta, gamma
-  use math_constfi, only : zero, one, two, twopi
+  use math_constfi, only : zero, one, two, twopi, pi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3477,7 +3495,7 @@ SUBROUTINE tw_summ(rt,tt)
   !     call fort_warn('Chromaticity calculation wrong due to coupling, ',&
   !                    'use chrom option or manual calculation')
   ! endif
-
+  print *, "cmiiiinnnnn", (dqmin_det/(dqmin_det_c))/(pi*(sin(twopi*qx)+twopi*sin(qy)))
   !---- Fill summary table
   call double_to_table_curr('summ ','length ' ,suml)
   call double_to_table_curr('summ ','orbit5 ' ,orbit5)
