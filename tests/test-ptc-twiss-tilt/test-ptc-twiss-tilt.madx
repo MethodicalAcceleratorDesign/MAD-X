@@ -1,27 +1,54 @@
 
-FASER : SEQUENCE, L = 10;
-b1:quadrupole, k1=0.2, at=5,l=1,TILT=1.0*pi/4;
+s1 : SEQUENCE, L = 10;
+b1:sbend, k1=0, angle=1, at=5,l=1,TILT=0;
 endsequence;
 
 beam;
-use, sequence=faser;
-x0=0.00;
+use, sequence=s1;
+
 eoption, add=true;
 select, flag=error, clear=true;
 select, flag=error, class=b1;
 ealign, dx= 0.001, dy= 0.00, ds=0.00,dphi=0.00, dtheta=0.00, dpsi=0.00;
 
-select, flag=twiss, column=name,s,x,px,y, py;
-twiss, betx=1, bety=1, x=x0, file="twiss.madx.simple";
+select, flag=twiss, column=name,s,x,px,y, py, betx, bety;
+twiss, betx=1, bety=1, x=x0,y=y0, file="madx_notilt.tfs";
 
-select, flag=ptc_twiss, column=name,s,x,px,y, py;
+select, flag=ptc_twiss, column=name,s,x,px,y, py, beta11, beta22;
 ptc_create_universe;
-ptc_create_layout, model=1, method=6,nst=1, exact;
+ptc_create_layout, model=3, method=6,nst=10, exact=true;
 ptc_align;
 ptc_start, x=x0;
 !ptc_observe, place=b1;
-ptc_track, icase=6, element_by_element, dump, file="track.simple", ffile=1,  maxaper={100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
-ptc_twiss, file="twiss.ptc.simple",betx=1,bety=1,betz=1, x=x0;
+!ptc_track, icase=6, element_by_element, dump, file="track.simple", ffile=1,  maxaper={100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
+ptc_twiss, file="ptc_notilt.tfs",betx=1,bety=1,betz=1, x=x0,y=y0;
 ptc_track_end;
-
 ptc_end;
+
+
+!!SEQUENCE2!!!!
+
+s2 : SEQUENCE, L = 10;
+b2:sbend, k1=0, angle=1, at=5,l=1,TILT=pi/2;
+endsequence;
+
+use, sequence=s2;
+eoption, add=true;
+select, flag=error, clear=true;
+select, flag=error, class=b2;
+ealign, dx= -0.00, dy= 0.001, ds=0.00,dphi=0.00, dtheta=0.00, dpsi=0.00;
+
+
+select, flag=twiss, column=name,s,x,px,y, py, betx, bety;
+twiss, betx=1, bety=1, x=x0,y=y0, file="madx_tilt.tfs";
+
+select, flag=ptc_twiss, column=name,s,x,px,y, py, beta11, beta22;
+ptc_create_universe;
+ptc_create_layout, model=3, method=6,nst=10, exact=true;
+ptc_align;
+ptc_start, x=x0;
+!ptc_observe, place=b1;
+!ptc_track, icase=6, element_by_element, dump, file="ot.simple", ffile=1,  maxaper={100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
+ptc_twiss, file="ptc_tilt.tfs",betx=1,bety=1,betz=1, x=x0,y=y0;
+ptc_track_end;
+ptc_end
