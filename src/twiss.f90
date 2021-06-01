@@ -1155,6 +1155,7 @@ end SUBROUTINE tmthrd
 SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   use twiss0fi
   use twisscfi
+  use twissdqmin
   use twissbeamfi, only : deltap
   use matrices, only : EYE, SMAT, symp_thrd
   use math_constfi, only : zero, one, two, quarter
@@ -1191,6 +1192,11 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   logical, external :: m66sta
   character(len=180):: warnstr
 
+  dqmin_rdt=zero
+  dqmin_det=zero
+  dqmin_rdt_c=0
+  dqmin_det_c=0
+  
   !--- initialize deltap because twcpin can be called directly from mad_emit
   deltap = get_value('probe ','deltap ')
 
@@ -2212,9 +2218,9 @@ SUBROUTINE twcptk(re,orbit)
   endif
 
   if(mode_flip) then
-     call twcptk_twiss(f, e, RW(1:2,3:4), RW(3:4,1:2), RMAT, cp_error)
+     call twcptk_twiss(f, e, RMAT, cp_error)
   else
-     call twcptk_twiss(e, f, RW(1:2,3:4), RW(3:4,1:2), RMAT, cp_error)
+     call twcptk_twiss(e, f, RMAT, cp_error)
   endif
 
   if (cp_error) then
@@ -2318,7 +2324,7 @@ SUBROUTINE twcptk(re,orbit)
 
 end SUBROUTINE twcptk
 
-SUBROUTINE twcptk_twiss(matx, maty, B, C, R, error)
+SUBROUTINE twcptk_twiss(matx, maty, R, error)
   use twiss0fi
   use twisslfi
   use twisscfi
@@ -2339,7 +2345,7 @@ SUBROUTINE twcptk_twiss(matx, maty, B, C, R, error)
   !     maty(2,2)  (double)   Y-plane matrix of block-diagonal           *
   !----------------------------------------------------------------------*
 
-  double precision :: matx(2,2), maty(2,2), B(2,2), C(2,2), J2(2,2),invGb(2,2)
+  double precision :: matx(2,2), maty(2,2), Ctmp(2,2), J2(2,2),invGb(2,2)
   double precision :: C_PLUS_BBAR(2,2), BBAR(2,2), R(2,2), Ga(2,2), Gb(2,2)
   double precision :: matx11, matx12, matx21, matx22, DET_C_PLUS_BBAR
   double precision :: maty11, maty12, maty21, maty22, gamma, detc, detinv, detr
@@ -2427,69 +2433,45 @@ SUBROUTINE twcptk_twiss(matx, maty, B, C, R, error)
         endif
      endif
   endif
-  !BBAR  = matmul(SMAT, matmul(transpose(B),SMATT))
-  C_PLUS_BBAR(1,1) = C(1,1)+B(2,2)
-  C_PLUS_BBAR(1,2) = C(1,2)-B(1,2)
-  C_PLUS_BBAR(2,1) = C(2,1)-B(2,1)
-  C_PLUS_BBAR(2,2) = C(2,2)+B(1,1)
-  DET_C_PLUS_BBAR = (C_PLUS_BBAR(1,1) * C_PLUS_BBAR(2,2) - C_PLUS_BBAR(1,2) * C_PLUS_BBAR(2,1))
   
-  if(amux .gt. zero .and. amuy .gt. zero .and. DET_C_PLUS_BBAR .gt. zero ) then
-    dqmin_det = dqmin_det + sqrt(DET_C_PLUS_BBAR)
-    dqmin_det_c = dqmin_det_c + 1
-  endif
-
 
         DETR = (R(1,1) * R(2,2) - R(1,2) * R(2,1))
         J2 = JMAT(1:2,1:2)
-        C  = matmul(-J2, matmul(transpose(R), J2))
-        C  = (one/sqrt(one+DETR))*C
-        !g11 = one / numpy.sqrt(BETX[j])
-        !g12 = 0
-        !g21 = ALFX[j] / numpy.sqrt(BETX[j])
-        !g22 = numpy.sqrt(BETX[j])
-        !Ga = numpy.reshape(numpy.array([g11, g12, g21, g22]), (2, 2))
-        !   DBAR = matmul(SMAT, matmul(transpose(D),SMATT))
+        Ctmp  = matmul(-J2, matmul(transpose(R), J2))
+        Ctmp  = (one/sqrt(one+DETR))*Ctmp
 
-        !J = numpy.reshape(numpy.array([0, 1, -1, 0]), (2, 2))
-        !for j in range(0, len(S)):
-            !R = numpy.array([[R11[j], R12[j]], [R21[j], R22[j]]])
-            
-            !C = matrixmultiply(-J, matrixmultiply(numpy.transpose(R), J))
-            !C = (1 / numpy.sqrt(1 + determinant(R))) * C
+         Ga(1,1) = one / sqrt(betx)
+         Ga(1,2) = 0
+         Ga(2,1) = alfx / sqrt(betx)
+         Ga(2,2) = sqrt(betx)
 
-            Ga(1,1) = one / sqrt(betx)
-            Ga(1,2) = 0
-            Ga(2,1) = alfx / sqrt(betx)
-            Ga(2,2) = sqrt(betx)
+         Gb(1,1) = one / sqrt(bety)
+         Gb(1,2) = 0
+         Gb(2,1) = alfy / sqrt(bety)
+         Gb(2,2) = sqrt(bety)
 
-            !Ga = numpy.reshape(numpy.array([g11, g12, g21, g22]), (2, 2))
+         detinv = one/(Gb(1,1)*Gb(2,2) - Gb(1,2)*Gb(2,1))
 
-            Gb(1,1) = one / sqrt(bety)
-            Gb(1,2) = 0
-            Gb(2,1) = alfy / sqrt(bety)
-            Gb(2,2) = sqrt(bety)
+         ! Calculate the inverse of the matrix
+         invGb(1,1) = +detinv * Gb(2,2)
+         invGb(2,1) = -detinv * Gb(2,1)
+         invGb(1,2) = -detinv * Gb(1,2)
+         invGb(2,2) = +detinv * Gb(1,1)
+         !Gb = numpy.reshape(numpy.array([g11, g12, g21, g22]), (2, 2))
+         Ctmp = matmul(Ga, matmul(Ctmp, invGb))
+         detc = (Ctmp(1,1) * Ctmp(2,2) - Ctmp(1,2) * Ctmp(2,1))
+         gamma = sqrt(1 - detc)
+         f1001 = complex((Ctmp(1,2) - Ctmp(2,1)), Ctmp(1,1) + Ctmp(2,2))/ 4d0 / gamma
+         if (abs(f1001) .gt. eps) then
+           dqmin_rdt = dqmin_rdt + f1001*exp(-(complex(0,amuy)-complex(0,amux))) 
+           dqmin_rdt_c = dqmin_rdt_c + 1
+         endif 
 
-            detinv = one/(Gb(1,1)*Gb(2,2) - Gb(1,2)*Gb(2,1))
-
-            ! Calculate the inverse of the matrix
-            invGb(1,1) = +detinv * Gb(2,2)
-            invGb(2,1) = -detinv * Gb(2,1)
-            invGb(1,2) = -detinv * Gb(1,2)
-            invGb(2,2) = +detinv * Gb(1,1)
-            !Gb = numpy.reshape(numpy.array([g11, g12, g21, g22]), (2, 2))
-            C = matmul(Ga, matmul(C, invGb))
-            detc = (C(1,1) * C(2,2) - C(1,2) * C(2,1))
-            gamma = sqrt(1 - detc)
-            !self.gamma.append(gamma)
-            !C = numpy.ravel(C)
-            !self.C.append(C)
-            f1001 = complex((C(1,2) - C(2,1)), C(1,1) + C(2,2))/ 2d0 / gamma
-            if (abs(f1001) .gt. eps) then
-              dqmin_rdt = dqmin_rdt + abs(f1001) 
-              dqmin_rdt_c = dqmin_rdt_c + 1
-            endif 
-
+  if(detc .gt. zero ) then
+    !dqmin_det = dqmin_det + sqrt(DET_C_PLUS_BBAR)
+    dqmin_det = dqmin_det + gamma*sqrt(detc)
+    dqmin_det_c = dqmin_det_c + 1
+  endif
       
 
   error = .false.
@@ -3549,9 +3531,10 @@ SUBROUTINE tw_summ(rt,tt)
   !     call fort_warn('Chromaticity calculation wrong due to coupling, ',&
   !                    'use chrom option or manual calculation')
   ! endif
-  print *, "cmiiiinn DET", (dqmin_det/(dqmin_det_c))/(pi*(sin(twopi*(qx-floor(qx)))+sin(twopi*(qy-floor(qy)))))
-  print * ,"dq", (qx-floor(qx))-(qy-floor(qy))
-  print *, "cminnn RDT", 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(dqmin_rdt/dqmin_rdt_c)
+  !print *, "cmiiiinn DET", 2d0*(cos(twopi*qx)-cos(twopi*qy)) &
+  !*(dqmin_det/(dqmin_det_c))/(pi*(sin(twopi*(qx-floor(qx)))+sin(twopi*(qy-floor(qy)))))
+  !print * ,"dq", (qx-floor(qx))-(qy-floor(qy))
+  !print *, "cminnn RDT", 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(abs(dqmin_rdt)/dqmin_rdt_c)
   !---- Fill summary table
   call double_to_table_curr('summ ','length ' ,suml)
   call double_to_table_curr('summ ','orbit5 ' ,orbit5)

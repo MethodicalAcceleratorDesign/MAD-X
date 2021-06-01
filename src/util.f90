@@ -390,8 +390,9 @@ module twissdqmin
   use math_constfi, only : zero
   implicit none
   public
-  double precision :: dqmin_rdt=zero, dqmin_det=zero
-  integer ::  dqmin_rdt_c=0, dqmin_det_c=0
+  double precision :: dqmin_det=zero
+  integer ::  dqmin_rdt_c=0, dqmin_det_c=0 
+  double complex :: dqmin_rdt = zero
 end module twissdqmin
 
 module twissbeamfi
