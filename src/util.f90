@@ -376,6 +376,7 @@ module twisscfi
   double precision :: synch_1=0.d0, synch_2=0.d0, synch_3=0.d0, synch_4=0.d0, synch_5=0.d0
   double precision :: synch_6=0.d0, synch_7=0.d0, synch_8=0.d0
   double precision :: gammacp=1.d0
+  double precision :: dqmin1=0.d0, dqmin2=0.d0
   integer :: nmode_flip=0
 end module twisscfi
 

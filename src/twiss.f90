@@ -2468,7 +2468,6 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error)
          endif 
 
   if(detc .gt. zero ) then
-    !dqmin_det = dqmin_det + sqrt(DET_C_PLUS_BBAR)
     dqmin_det = dqmin_det + gamma*sqrt(detc)
     dqmin_det_c = dqmin_det_c + 1
   endif
@@ -3531,10 +3530,10 @@ SUBROUTINE tw_summ(rt,tt)
   !     call fort_warn('Chromaticity calculation wrong due to coupling, ',&
   !                    'use chrom option or manual calculation')
   ! endif
-  !print *, "cmiiiinn DET", 2d0*(cos(twopi*qx)-cos(twopi*qy)) &
-  !*(dqmin_det/(dqmin_det_c))/(pi*(sin(twopi*(qx-floor(qx)))+sin(twopi*(qy-floor(qy)))))
+  dqmin1 = 2d0*(cos(twopi*qx)-cos(twopi*qy)) &
+  *(dqmin_det/(dqmin_det_c))/(pi*(sin(twopi*(qx-floor(qx)))+sin(twopi*(qy-floor(qy)))))
   !print * ,"dq", (qx-floor(qx))-(qy-floor(qy))
-  !print *, "cminnn RDT", 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(abs(dqmin_rdt)/dqmin_rdt_c)
+  dqmin2 = 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(abs(dqmin_rdt)/dqmin_rdt_c)
   !---- Fill summary table
   call double_to_table_curr('summ ','length ' ,suml)
   call double_to_table_curr('summ ','orbit5 ' ,orbit5)
@@ -3562,6 +3561,9 @@ SUBROUTINE tw_summ(rt,tt)
   call double_to_table_curr('summ ','synch_5 ' ,synch_5)
   call double_to_table_curr('summ ','synch_6 ' ,synch_6)
   call double_to_table_curr('summ ','synch_8 ' ,synch_8)
+  call double_to_table_curr('summ ','dqmin1 ' ,dqmin1)
+  call double_to_table_curr('summ ','dqmin2 ' ,dqmin2)
+
 
 end SUBROUTINE tw_summ
 
