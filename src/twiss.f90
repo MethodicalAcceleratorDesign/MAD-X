@@ -3532,7 +3532,7 @@ SUBROUTINE tw_summ(rt,tt)
   ! endif
   dqmin1 = 2d0*(cos(twopi*qx)-cos(twopi*qy)) &
   *(dqmin_det/(dqmin_det_c))/(pi*(sin(twopi*(qx-floor(qx)))+sin(twopi*(qy-floor(qy)))))
-  !print * ,"dq", (qx-floor(qx))-(qy-floor(qy))
+   
   dqmin2 = 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(abs(dqmin_rdt)/dqmin_rdt_c)
   !---- Fill summary table
   call double_to_table_curr('summ ','length ' ,suml)
