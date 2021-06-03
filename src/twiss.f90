@@ -3559,6 +3559,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
   el = node_value('l ')
 
   !---- Select element type.
+  
   select case (code)
 
      case (code_drift, code_hmonitor:code_rcollimator, code_instrument, code_twcavity, &
@@ -3619,7 +3620,6 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
      case (code_wire)
         call tmwire(ftrk,orbit,fmap,ek,re,te)
-        ! nothing for now...
 
      case (code_dipedge)
         call tmdpdg(ftrk,orbit,fmap,ek,re,te)
@@ -3647,7 +3647,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         ! nil (23, 28, 34)
 
      end select
-
+     
 end SUBROUTINE tmmap
 
 SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
@@ -3837,6 +3837,8 @@ subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
   use trackfi
   use math_constfi, only : zero, one, two, four
   use phys_constfi, only : clight
+  use matrices, only: EYE
+  use twissbeamfi, only : deltap
   implicit none
     !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3855,14 +3857,16 @@ subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
   logical :: ftrk, fmap, fcentre
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6), el, dl
+  double precision :: orbit(6), ek(6), re(6,6), re_t(6,6), te(6,6,6), te_t(6,6,6), el, dl
   double precision :: xma(0:maxmul), yma(0:maxmul), current(0:maxmul), l_int(0:maxmul)
   double precision :: l_phy(0:maxferr)
   integer :: i, j, wire_flagco, nn, ibeco
-  double precision :: dx, dy, embl, l, cur, dxi, dyi, chi, nnorm, xi, yi, RTWO, pc
-  double precision :: wire_clo_x, wire_clo_y,x,y,ltot,Ntot
+  double precision :: dx, dy, Lint, l, cur, dxi, dyi, chi, nnorm, RTWO, pc,N
+  double precision :: wire_clo_x, wire_clo_y,x,y,Ntot
+  logical :: bborbit
   ! WIRE basd on the SixTrack implementation
   double precision, external :: node_value, get_value, get_closed_orb_node
+  integer, external :: get_option
   external ::set_closed_orb_node
 
   call get_node_vector('xma ', nn, xma)
@@ -3871,83 +3875,43 @@ subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
   call get_node_vector('l_int ', nn, l_int)
   call get_node_vector('l_phy ', nn, l_phy)
 
-
+  bborbit = get_option('bborbit ') .ne. 0
   pc = get_value('probe ','pc ')
-  wire_flagco = node_value('closed_orbit ')
-!  if(isFirst) then
-!    call set_closed_orb_node(1, track(1,1));
-!    call set_closed_orb_node(3, track(3,1));
-!  endif
-  wire_clo_x = 0 ! get_closed_orb_node(1)
-  wire_clo_y = 0 ! get_closed_orb_node(3)
- !! dx = get_closed_orb_node(i)
+  re = EYE
+  te = zero
+
+  fmap = .true.
   
-  ibeco = 0
-
-
-
-do i = 0, nn-1
-  dx   = xma(i) ! displacement x [m]
-  dy   = yma(i) ! displacement y [mm]
-  embl = l_int(i)  ! integrated length [m]
-  l    = l_phy(i) ! physical length [m]
-  cur  = current(i)
-
-  if(wire_flagco == 1) then
-    dxi = wire_clo_x
-    dyi = wire_clo_y
-  else if(wire_flagco == -1) then
-    dxi = dx
-    dyi = dy
-  else
-    print *, "HAS TO BE 1 or -1"
-  end if
-
-
-    ! 1 shift
-    if(wire_flagco == 1) then
-      xi = orbit(1)+dx ! [m]
-      yi = orbit(3)+dy ! [m]
-    else if(wire_flagco == -1) then
-      xi = orbit(1)+( dx-wire_clo_x) ! [m]
-      yi = orbit(3)+( dy-wire_clo_y) ! [m]
-    end if
-
-    ! x'-> px; y'->py
-    ! TRACK(2,j) = TRACK(2,j)*(one + dpsv(j))/mtc(j)
-    ! TRACK(4,j) = TRACK(4,j)*(one + dpsv(j))/mtc(j)
-    
+  do i = 0, nn-1
+     re_t = EYE
+     te_t = zero
+     dx   = xma(i) ! displacement x [m]
+     dy   = yma(i) ! displacement y [mm]
+     Lint = l_int(i)  ! integrated length [m]
+     l    = l_phy(i) ! physical length [m]
+     cur  = current(i)
+     print *, "currrrr", current(i)
+     x = orbit(1)+dx ! [m]
+     y = orbit(3)+dy ! [m]
+         
     chi = pc*1e9/clight
-    NNORM=1e-7/chi
-    ltot = (embl+L)+abs(embl-L) 
-    Ntot = NNORM*CUR*ltot
-    if(ibeco == 0) then
-      ! 3 apply wire kick
-      RTWO = xi**2+yi**2
-      re(2,1) = Ntot*(yi**2-x**2)/RTWO**2
-      re(2,3) = -Ntot*(2*x*y)/RTWO**2
-      
-      re(4,3) = Ntot*(x**2-yi**2)/RTWO**2
-      re(4,1) = -Ntot*(2*x*y)/RTWO**2
-      
-      !TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-      !TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+    NNORM=1e-7/chi 
+    N = NNORM*CUR/(one+deltap)
 
-    else if(ibeco == 1) then
+   RTWO = x**2+y**2
+   re_t(2,1) = two*N*x**2*(L + Lint - Abs(L - Lint))/(RTWO)**2 - N*(L + Lint - Abs(L - Lint))/(RTWO)
+   re_t(2,3) = two*N*x*y*(L + Lint - Abs(L - Lint))/(RTWO)**2
+   re_t(4,1) = two*N*x*y*(L + Lint - Abs(L - Lint))/(RTWO)**2
+   re_t(4,3) = two*N*y**2*(L + Lint - Abs(L - Lint))/(RTWO)**2 - N*(L + Lint - Abs(L - Lint))/(RTWO)
 
-      ! 3 apply wire kick
-      !RTWO = xi**2+yi**2
-      !TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-      !TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+   call tmcat(.true.,re_t,te_t,re,te,re,te) ! At the moment there is no second order
 
-      ! subtract closed orbit kick
-      ! wire kick is negative px -> px - wirekick - (-closed orbit kick)
-      !RTWO = dxi**2+dyi**2
-      !TRACK(2,j) = TRACK(2,j)+(((CUR*NNORM)*dxi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-      !TRACK(4,j) = TRACK(4,j)+(((CUR*NNORM)*dyi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+   if(bborbit) then
+      orbit(2) = orbit(2)-(((CUR*NNORM)*x)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
+      orbit(4) = orbit(4)-(((CUR*NNORM)*y)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
+   endif
+enddo
 
-    end if
-end do
 end subroutine
 
 SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
