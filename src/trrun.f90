@@ -3896,14 +3896,16 @@ subroutine ttwire(track, ktrack, isFirst)
   implicit none
   double precision :: track(6,*)
   integer :: ktrack
-  logical :: isFirst
+  logical :: isFirst, bborbit
   double precision :: xma(0:maxmul), yma(0:maxmul), current(0:maxmul), l_int(0:maxmul)
   double precision :: l_phy(0:maxferr)
   integer :: i, j, wire_flagco, nn, ibeco
   double precision :: dx, dy, embl, l, cur, dxi, dyi, chi, nnorm, xi, yi, RTWO, pc
-  double precision :: wire_clo_x, wire_clo_y
+  double precision :: closed_orb_kick_px, closed_orb_kick_py
+
   ! WIRE basd on the SixTrack implementation
   double precision, external :: node_value, get_value, get_closed_orb_node
+  integer, external :: get_option
   external ::set_closed_orb_node
 
   call get_node_vector('xma ', nn, xma)
@@ -3912,20 +3914,17 @@ subroutine ttwire(track, ktrack, isFirst)
   call get_node_vector('l_int ', nn, l_int)
   call get_node_vector('l_phy ', nn, l_phy)
 
-
   pc = get_value('probe ','pc ')
-  wire_flagco = node_value('closed_orbit ')
-  if(isFirst) then
-    call set_closed_orb_node(1, track(1,1));
-    call set_closed_orb_node(3, track(3,1));
+  bborbit = get_option('bborbit ') .ne. 0
+
+  if(bborbit) then
+      closed_orb_kick_px = zero
+      closed_orb_kick_py = zero
+  else
+      closed_orb_kick_px = get_closed_orb_node(2)
+      closed_orb_kick_py = get_closed_orb_node(4)
   endif
-  wire_clo_x = get_closed_orb_node(1)
-  wire_clo_y = get_closed_orb_node(3)
- !! dx = get_closed_orb_node(i)
-  
-  ibeco = 0
-
-
+ 
 
 do i = 0, nn-1
   dx   = xma(i) ! displacement x [m]
@@ -3933,58 +3932,20 @@ do i = 0, nn-1
   embl = l_int(i)  ! integrated length [m]
   l    = l_phy(i) ! physical length [m]
   cur  = current(i)
-
-  if(wire_flagco == 1) then
-    dxi = wire_clo_x
-    dyi = wire_clo_y
-  else if(wire_flagco == -1) then
-    dxi = dx
-    dyi = dy
-  else
-    print *, "HAS TO BE 1 or -1"
-  end if
+  chi = pc*1e9/clight
+  NNORM=1e-7/chi
 
   do j=1,ktrack
+    xi = (TRACK(1,j)+dx) ! [m]
+    yi = (TRACK(3,j)+dy) ! [m]
 
-    ! 1 shift
-    if(wire_flagco == 1) then
-      xi = (TRACK(1,j)+dx) ! [m]
-      yi = (TRACK(3,j)+dy) ! [m]
-    else if(wire_flagco == -1) then
-      xi = TRACK(1,j)+( dx-wire_clo_x) ! [m]
-      yi = TRACK(3,j)+( dy-wire_clo_y) ! [m]
-    end if
 
-    ! x'-> px; y'->py
-    ! TRACK(2,j) = TRACK(2,j)*(one + dpsv(j))/mtc(j)
-    ! TRACK(4,j) = TRACK(4,j)*(one + dpsv(j))/mtc(j)
-    
-    chi = pc*1e9/clight
-    NNORM=1e-7/chi
-    print *, "nnnn", NNORM
    
-    if(ibeco == 0) then
-      ! 3 apply wire kick
-      RTWO = xi**2+yi**2
-      print *, "rrrr", RTWO, cur, nnorm, embl, l
-      TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-      TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-
-    else if(ibeco == 1) then
-
-      ! 3 apply wire kick
-      RTWO = xi**2+yi**2
-      TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-      TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-
-      ! subtract closed orbit kick
-      ! wire kick is negative px -> px - wirekick - (-closed orbit kick)
-      RTWO = dxi**2+dyi**2
-      TRACK(2,j) = TRACK(2,j)+(((CUR*NNORM)*dxi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-      TRACK(4,j) = TRACK(4,j)+(((CUR*NNORM)*dyi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-
-    end if
-  end do
+    ! 3 apply wire kick
+    RTWO = xi**2+yi**2
+    TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+    TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+end do
 end do
 
 

@@ -3864,7 +3864,7 @@ subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: l_phy(0:maxferr)
   integer :: i, j, wire_flagco, nn, ibeco
   double precision :: dx, dy, Lint, l, cur, dxi, dyi, chi, nnorm, RTWO, pc,N
-  double precision :: wire_clo_x, wire_clo_y,x,y,Ntot 
+  double precision :: wire_clo_x, wire_clo_y,x,y,Ntot, closed_px, closed_py
   logical :: bborbit
   ! WIRE basd on the SixTrack implementation
   double precision, external :: node_value, get_value, get_closed_orb_node
@@ -3889,6 +3889,8 @@ subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
   pc = get_value('probe ','pc ')
   re = EYE
   te = zero
+  closed_px = zero
+  closed_py = zero
   if(el .gt. 1e-6) then
       call tmdrf(fsec,ftrk,orbit,fmap,el/two,ek,re,te) ! Call drift for half of the lentgh
   endif
@@ -3920,7 +3922,11 @@ subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
    if(bborbit) then
       orbit(2) = orbit(2)-(((CUR*NNORM)*x)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
       orbit(4) = orbit(4)-(((CUR*NNORM)*y)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
+   else
+      closed_px  = closed_px -(((CUR*NNORM)*x)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
+      closed_py  = closed_py -(((CUR*NNORM)*y)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
    endif
+
 enddo
 
 
