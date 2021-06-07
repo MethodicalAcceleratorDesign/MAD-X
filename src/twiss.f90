@@ -3563,7 +3563,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
   select case (code)
 
      case (code_drift, code_hmonitor:code_rcollimator, code_instrument, code_twcavity, &
-        code_slmonitor:code_imonitor, code_placeholder, code_collimator)
+        code_slmonitor:code_imonitor, code_placeholder)
         !---- Drift space, monitors and derivatives, collimators, instrument
         call tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
@@ -3619,7 +3619,10 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         ! nothing on purpose!
 
      case (code_wire)
-        call tmwire(ftrk,orbit,fmap,ek,re,te)
+        call tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
+     
+     case (code_collimator)
+        call tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
      case (code_dipedge)
         call tmdpdg(ftrk,orbit,fmap,ek,re,te)
@@ -3832,7 +3835,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
 
 end SUBROUTINE tmbend
 
-subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
+subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use trackfi
   use math_constfi, only : zero, one, two, four
@@ -3847,7 +3850,6 @@ subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
   !     ftrk      (logical) if true, track orbit.                        *
   !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
   !     el        (double)  element length.                              *
-  !     dl        (double)  slice length.                                *
   !     Input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     Output:                                                          *
@@ -3856,31 +3858,41 @@ subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: ftrk, fmap, fcentre
+  logical :: fsec, ftrk, fmap, fcentre
   double precision :: orbit(6), ek(6), re(6,6), re_t(6,6), te(6,6,6), te_t(6,6,6), el, dl
   double precision :: xma(0:maxmul), yma(0:maxmul), current(0:maxmul), l_int(0:maxmul)
   double precision :: l_phy(0:maxferr)
   integer :: i, j, wire_flagco, nn, ibeco
   double precision :: dx, dy, Lint, l, cur, dxi, dyi, chi, nnorm, RTWO, pc,N
-  double precision :: wire_clo_x, wire_clo_y,x,y,Ntot
+  double precision :: wire_clo_x, wire_clo_y,x,y,Ntot 
   logical :: bborbit
   ! WIRE basd on the SixTrack implementation
   double precision, external :: node_value, get_value, get_closed_orb_node
   integer, external :: get_option
   external ::set_closed_orb_node
 
+  call get_node_vector('l_phy ', nn, l_phy)
+  if(l_phy(0) < 1e-12) then ! If it is a normal comlimator simply use the drift 
+     call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+   return
+  endif
+  
+  
+
   call get_node_vector('xma ', nn, xma)
   call get_node_vector('yma ', nn, yma)
   call get_node_vector('current ', nn, current)
   call get_node_vector('l_int ', nn, l_int)
-  call get_node_vector('l_phy ', nn, l_phy)
-
+  
+  fmap = .true.
   bborbit = get_option('bborbit ') .ne. 0
   pc = get_value('probe ','pc ')
   re = EYE
   te = zero
+  if(el .gt. 1e-6) then
+      call tmdrf(fsec,ftrk,orbit,fmap,el/two,ek,re,te) ! Call drift for half of the lentgh
+  endif
 
-  fmap = .true.
   
   do i = 0, nn-1
      re_t = EYE
@@ -3890,7 +3902,6 @@ subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
      Lint = l_int(i)  ! integrated length [m]
      l    = l_phy(i) ! physical length [m]
      cur  = current(i)
-     print *, "currrrr", current(i)
      x = orbit(1)+dx ! [m]
      y = orbit(3)+dy ! [m]
          
@@ -3904,7 +3915,7 @@ subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
    re_t(4,1) = two*N*x*y*(L + Lint - Abs(L - Lint))/(RTWO)**2
    re_t(4,3) = two*N*y**2*(L + Lint - Abs(L - Lint))/(RTWO)**2 - N*(L + Lint - Abs(L - Lint))/(RTWO)
 
-   call tmcat(.true.,re_t,te_t,re,te,re,te) ! At the moment there is no second order
+   call tmcat(fsec,re_t,te_t,re,te,re,te) ! At the moment there is no second order
 
    if(bborbit) then
       orbit(2) = orbit(2)-(((CUR*NNORM)*x)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
@@ -3912,6 +3923,14 @@ subroutine tmwire(ftrk,orbit,fmap,ek,re,te)
    endif
 enddo
 
+
+if(el .gt. 1e-6) then
+   re_t = EYE
+   te_t = zero
+   call tmdrf(fsec,ftrk,orbit,fmap,el/two,ek,re_t,te_t) ! Call drift for half of the lentgh
+   call tmcat(fsec,re_t,te_t,re,te,re,te) ! At the moment there is no second order
+endif
+print *, "reee", re(2,1)
 end subroutine
 
 SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
