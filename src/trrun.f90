@@ -3917,20 +3917,11 @@ subroutine ttwire(track, ktrack, isFirst)
   pc = get_value('probe ','pc ')
   bborbit = get_option('bborbit ') .ne. 0
 
-  if(bborbit) then
-      closed_orb_kick_px = zero
-      closed_orb_kick_py = zero
-  else
-      closed_orb_kick_px = get_closed_orb_node(2)
-      closed_orb_kick_py = get_closed_orb_node(4)
-  endif
- 
-
 do i = 0, nn-1
   dx   = xma(i) ! displacement x [m]
   dy   = yma(i) ! displacement y [mm]
   embl = l_int(i)  ! integrated length [m]
-  l    = l_phy(i) ! physical length [m]
+  L    = l_phy(i) ! physical length [m]
   cur  = current(i)
   chi = pc*1e9/clight
   NNORM=1e-7/chi
@@ -3939,15 +3930,24 @@ do i = 0, nn-1
     xi = (TRACK(1,j)+dx) ! [m]
     yi = (TRACK(3,j)+dy) ! [m]
 
-
-   
     ! 3 apply wire kick
     RTWO = xi**2+yi**2
+
     TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-    TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
-end do
+    TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO  
+    
+  end do
 end do
 
+
+  if(.not. bborbit) then
+      closed_orb_kick_px = get_closed_orb_node(2)
+      closed_orb_kick_py = get_closed_orb_node(4)
+      do j=1,ktrack
+         TRACK(2,j) = TRACK(2,j) - closed_orb_kick_px
+         TRACK(4,j) = TRACK(4,j) - closed_orb_kick_py
+      enddo 
+endif
 
 end subroutine ttwire
 !FIXME Unused dummy argument 'turn'

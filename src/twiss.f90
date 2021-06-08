@@ -3876,8 +3876,6 @@ subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
      call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
    return
   endif
-  
-  
 
   call get_node_vector('xma ', nn, xma)
   call get_node_vector('yma ', nn, yma)
@@ -3929,6 +3927,8 @@ subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
 enddo
 
+   call set_closed_orb_node(2, closed_px)
+   call set_closed_orb_node(4, closed_py)
 
 if(el .gt. 1e-6) then
    re_t = EYE
@@ -3936,7 +3936,6 @@ if(el .gt. 1e-6) then
    call tmdrf(fsec,ftrk,orbit,fmap,el/two,ek,re_t,te_t) ! Call drift for half of the lentgh
    call tmcat(fsec,re_t,te_t,re,te,re,te) ! At the moment there is no second order
 endif
-print *, "reee", re(2,1)
 end subroutine
 
 SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
