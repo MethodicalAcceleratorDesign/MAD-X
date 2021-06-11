@@ -1563,6 +1563,8 @@ CONTAINS !----------------------------------------------------------------------
     TOTALPATH_FLAG=k%TOTALPATH
     k%TOTALPATH=el%CAVITY_TOTALPATH
 
+
+
     SELECT CASE(EL%P%METHOD)
     CASE(2)
        DH=EL%L/2.0_dp/EL%P%NST
