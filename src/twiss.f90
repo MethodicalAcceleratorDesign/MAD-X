@@ -3618,10 +3618,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
         ! nothing on purpose!
 
-     case (code_wire)
-        call tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
-     
-     case (code_collimator)
+     case (code_wire,code_collimator)
         call tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
      case (code_dipedge)
@@ -3861,9 +3858,9 @@ subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
   logical :: fsec, ftrk, fmap, fcentre
   double precision :: orbit(6), ek(6), re(6,6), re_t(6,6), te(6,6,6), te_t(6,6,6), el, dl
   double precision :: xma(0:maxmul), yma(0:maxmul), current(0:maxmul), l_int(0:maxmul)
-  double precision :: l_phy(0:maxferr)
+  double precision :: l_phy(0:maxferr), Ldiff, Lsum
   integer :: i, j, wire_flagco, nn, ibeco
-  double precision :: dx, dy, Lint, l, cur, dxi, dyi, chi, nnorm, RTWO, pc,N
+  double precision :: dx, dy, Lint, l, cur, dxi, dyi, chi, nnorm, R,Leff, pc,N
   double precision :: wire_clo_x, wire_clo_y,x,y,Ntot, closed_px, closed_py
   logical :: bborbit
   ! WIRE basd on the SixTrack implementation
@@ -3895,34 +3892,55 @@ subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   
   do i = 0, nn-1
-     re_t = EYE
-     te_t = zero
-     dx   = xma(i) ! displacement x [m]
-     dy   = yma(i) ! displacement y [mm]
-     Lint = l_int(i)  ! integrated length [m]
-     l    = l_phy(i) ! physical length [m]
-     cur  = current(i)
-     x = orbit(1)+dx ! [m]
-     y = orbit(3)+dy ! [m]
-         
-    chi = pc*1e9/clight
-    NNORM=1e-7/chi 
-    N = NNORM*CUR/(one+deltap)
+   re_t = EYE
+   te_t = zero
+   dx   = xma(i) ! displacement x [m]
+   dy   = yma(i) ! displacement y [mm]
+   Lint = l_int(i)  ! integrated length [m]
+   l    = l_phy(i) ! physical length [m]
+   cur  = current(i)
+   x = orbit(1)+dx ! [m]
+   y = orbit(3)+dy ! [m]
+      
+   chi = pc*1e9/clight
+   NNORM=1e-7/chi 
+   N = NNORM*CUR/(one+deltap)
+   R = x**2+y**2
+   Leff = (L + Lint - Abs(L - Lint))
+   Ldiff = (-L + Lint)**2
+   Lsum = (L + Lint)**2
 
-   RTWO = x**2+y**2
-   re_t(2,1) = two*N*x**2*(L + Lint - Abs(L - Lint))/(RTWO)**2 - N*(L + Lint - Abs(L - Lint))/(RTWO)
-   re_t(2,3) = two*N*x*y*(L + Lint - Abs(L - Lint))/(RTWO)**2
-   re_t(4,1) = two*N*x*y*(L + Lint - Abs(L - Lint))/(RTWO)**2
-   re_t(4,3) = two*N*y**2*(L + Lint - Abs(L - Lint))/(RTWO)**2 - N*(L + Lint - Abs(L - Lint))/(RTWO)
+   re(2,1) = 2*N*x**2*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 &
+   - N*x*(4*x/sqrt(4d0*R + Lsum) - 4*x/sqrt(4d0*R + Ldiff))/R -&
+    N*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R
+
+   re(2,3) = 2*N*x*y*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2  &
+   - N*x*(4*y/sqrt(4d0*R + Lsum) - 4*y/sqrt(4d0*R + Ldiff))/R
+
+   re(4,1) = 2*N*x*y*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 - &
+    N*y*(4*x/sqrt(4d0*R + Lsum) - 4*x/sqrt(4d0*R + Ldiff))/R
+
+   re(4,3) = 2*N*y**2*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 -&
+   N*y*(4*y/sqrt(4d0*R + Lsum) - 4*y/sqrt(4d0*R + Ldiff))/R -  &
+   N*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R
+
+   te(2,1,1) = -8*N*x**3*Leff/R**3 + 6*N*x*Leff/R**2
+   te(2,1,3) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
+   te(2,3,1) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
+   te(2,3,3) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
+   te(4,1,1) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
+   te(4,1,3) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
+   te(4,3,1) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
+   te(4,3,3) = -8*N*y**3*Leff/R**3 + 6*N*y*Leff/R**2
 
    call tmcat(fsec,re_t,te_t,re,te,re,te) ! At the moment there is no second order
 
    if(bborbit) then
-      orbit(2) = orbit(2)-(((CUR*NNORM)*x)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
-      orbit(4) = orbit(4)-(((CUR*NNORM)*y)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
+      orbit(2) = orbit(2)-(((CUR*NNORM)*x)*(sqrt((Lint+L)**2+four*R)-sqrt((Lint-L)**2+four*R)))/R
+      orbit(4) = orbit(4)-(((CUR*NNORM)*y)*(sqrt((Lint+L)**2+four*R)-sqrt((Lint-L)**2+four*R)))/R
    else
-      closed_px  = closed_px -(((CUR*NNORM)*x)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
-      closed_py  = closed_py -(((CUR*NNORM)*y)*(sqrt((Lint+L)**2+four*RTWO)-sqrt((Lint-L)**2+four*RTWO)))/RTWO
+      closed_px  = closed_px -(((CUR*NNORM)*x)*(sqrt((Lint+L)**2+four*R)-sqrt((Lint-L)**2+four*R)))/R
+      closed_py  = closed_py -(((CUR*NNORM)*y)*(sqrt((Lint+L)**2+four*R)-sqrt((Lint-L)**2+four*R)))/R
    endif
 
 enddo

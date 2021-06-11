@@ -732,7 +732,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
       call ttchangep0(track,ktrack)
 
     case (code_hmonitor:code_rcollimator, code_instrument, &
-        code_slmonitor:code_imonitor, code_placeholder, code_collimator)
+        code_slmonitor:code_imonitor, code_placeholder)
         if(el .gt. 0) call ttdrf(el,track,ktrack)
     case default ! The rest: do nothing
 
