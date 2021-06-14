@@ -2463,7 +2463,8 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error)
          gamma = sqrt(1 - detc)
          f1001 = complex((Ctmp(1,2) - Ctmp(2,1)), Ctmp(1,1) + Ctmp(2,2))/ 4d0 / gamma
          if (abs(f1001) .gt. eps) then
-           dqmin_rdt = dqmin_rdt + f1001*exp(-(complex(0,amuy)-complex(0,amux))) 
+           dqmin_rdt = dqmin_rdt + f1001*exp(-(complex(0,amuy)-complex(0,amux))) &
+           / (one + 4d0* abs(f1001)**2)
            dqmin_rdt_c = dqmin_rdt_c + 1
          endif 
 
