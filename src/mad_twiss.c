@@ -146,8 +146,7 @@ fill_twiss_header(struct table* t)
     table_add_header(t, "@ SYNCH_3          %%le  %F", col_data(s, "synch_3")[0]);
     table_add_header(t, "@ SYNCH_4          %%le  %F", col_data(s, "synch_4")[0]);
     table_add_header(t, "@ SYNCH_5          %%le  %F", col_data(s, "synch_5")[0]);
-    table_add_header(t, "@ DQMIN1           %%le  %F", col_data(s, "dqmin1")[0]);
-    table_add_header(t, "@ DQMIN2           %%le  %F", col_data(s, "dqmin2")[0]);    
+    table_add_header(t, "@ DQMIN            %%le  %F", col_data(s, "dqmin")[0]);    
   }
 }
 

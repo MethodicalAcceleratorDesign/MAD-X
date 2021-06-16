@@ -3562,8 +3562,7 @@ SUBROUTINE tw_summ(rt,tt)
   call double_to_table_curr('summ ','synch_5 ' ,synch_5)
   call double_to_table_curr('summ ','synch_6 ' ,synch_6)
   call double_to_table_curr('summ ','synch_8 ' ,synch_8)
-  call double_to_table_curr('summ ','dqmin1 ' ,dqmin1)
-  call double_to_table_curr('summ ','dqmin2 ' ,dqmin2)
+  call double_to_table_curr('summ ','dqmin ' ,dqmin2)
 
 
 end SUBROUTINE tw_summ
