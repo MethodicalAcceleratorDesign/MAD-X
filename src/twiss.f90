@@ -1196,6 +1196,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   dqmin_det=zero
   dqmin_rdt_c=0
   dqmin_det_c=0
+  diff_bigger_sum = 0
   
   !--- initialize deltap because twcpin can be called directly from mad_emit
   deltap = get_value('probe ','deltap ')
@@ -3418,7 +3419,7 @@ SUBROUTINE tw_summ(rt,tt)
   integer :: i
   double precision :: sd, detl, f, tb, t2
   double precision :: disp0(6), frt(6,6), frtp(6,6), rtp(6,6)
-  double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5
+  double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5, dqmin_ph
   double precision, parameter :: eps=1d-16, diff_cos=5d-5
   character(len=150) :: warnstr
 
@@ -3535,10 +3536,10 @@ SUBROUTINE tw_summ(rt,tt)
   ! endif
   
   dqmin2 = 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(abs(dqmin_rdt)/dqmin_rdt_c)
+  dqmin_ph = atan2(aimag(dqmin_rdt), real(dqmin_rdt))
   if(diff_bigger_sum .gt. 0) then
-   write (warnstr,'(a,e13.6,a,e13.6)') "cosmuy  =  ", cosmuy, ", cos(amuy) = ", cos(amuy)
-         write (warnstr, '(a, i3, a)') "The f1010 is bigger than the f1001 in: ", diff_bigger_sum, &
-        "locations. The Dqmin estimate might be inaccurate "
+         write (warnstr, '(a, i8, a i8)') "The f1010 is bigger than the f1001 in: ", diff_bigger_sum, &
+        " locations. The Dqmin estimate might be inaccurate out of ", dqmin_rdt_c
         call fort_warn('TWCPTK: ', warnstr)
   endif
   !---- Fill summary table
@@ -3569,6 +3570,7 @@ SUBROUTINE tw_summ(rt,tt)
   call double_to_table_curr('summ ','synch_6 ' ,synch_6)
   call double_to_table_curr('summ ','synch_8 ' ,synch_8)
   call double_to_table_curr('summ ','dqmin ' ,dqmin2)
+  call double_to_table_curr('summ ','dqmin_phase ' ,dqmin_ph)
 
 
 end SUBROUTINE tw_summ
