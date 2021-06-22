@@ -2354,7 +2354,7 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error)
   double precision :: detx, dety, atanm12
   logical          :: error
   double precision, parameter :: eps=1d-36
-  complex f1001
+  complex f1001, f1010
   character(len=name_len) :: name
   character(len=180)      :: warnstr
   alfx_ini=zero; betx_ini=zero
@@ -2462,17 +2462,19 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error)
          detc = (Ctmp(1,1) * Ctmp(2,2) - Ctmp(1,2) * Ctmp(2,1))
          gamma = sqrt(1 - detc)
          f1001 = complex((Ctmp(1,2) - Ctmp(2,1)), Ctmp(1,1) + Ctmp(2,2))/ 4d0 / gamma
+         f1010 = complex((-Ctmp(1,2) - Ctmp(2,1)), Ctmp(1,1) - Ctmp(2,2))/ 4d0 / gamma
+         !self.f1001.append(((C[0] + C[3]) * 1j + (C[1] - C[2])) / 4 / gamma)
+         !self.f1010.append(((C[0] - C[3]) * 1j + (-C[1] - C[2])) / 4 / gamma)
+         
          if (abs(f1001) .gt. eps) then
            dqmin_rdt = dqmin_rdt + f1001*exp(-(complex(0,amuy)-complex(0,amux))) &
            / (one + 4d0* abs(f1001)**2)
            dqmin_rdt_c = dqmin_rdt_c + 1
-         endif 
-
-  if(detc .gt. zero ) then
-    dqmin_det = dqmin_det + gamma*sqrt(detc)
-    dqmin_det_c = dqmin_det_c + 1
-  endif
-      
+         endif
+         if(abs(f1010) > abs(f1001)) then
+            diff_bigger_sum = diff_bigger_sum+1
+         endif
+     
 
   error = .false.
 
@@ -3531,10 +3533,14 @@ SUBROUTINE tw_summ(rt,tt)
   !     call fort_warn('Chromaticity calculation wrong due to coupling, ',&
   !                    'use chrom option or manual calculation')
   ! endif
-  dqmin1 = 2d0*(cos(twopi*qx)-cos(twopi*qy)) &
-  *(dqmin_det/(dqmin_det_c))/(pi*(sin(twopi*(qx-floor(qx)))+sin(twopi*(qy-floor(qy)))))
-   
+  
   dqmin2 = 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(abs(dqmin_rdt)/dqmin_rdt_c)
+  if(diff_bigger_sum .gt. 0) then
+   write (warnstr,'(a,e13.6,a,e13.6)') "cosmuy  =  ", cosmuy, ", cos(amuy) = ", cos(amuy)
+         write (warnstr, '(a, i3, a)') "The f1010 is bigger than the f1001 in: ", diff_bigger_sum, &
+        "locations. The Dqmin estimate might be inaccurate "
+        call fort_warn('TWCPTK: ', warnstr)
+  endif
   !---- Fill summary table
   call double_to_table_curr('summ ','length ' ,suml)
   call double_to_table_curr('summ ','orbit5 ' ,orbit5)
@@ -7666,7 +7672,6 @@ SUBROUTINE tmali1(orb1, errors, beta, gamma, orb2, rm)
   orb2(4) = orbt(4) + w(3,2)
   orb2(5) = orbt(5) - s2 / beta
   orb2(6) = orbt(6)
-
 
 end SUBROUTINE tmali1
 
