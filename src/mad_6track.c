@@ -3456,20 +3456,23 @@ write_f3_mult(struct c6t_element* el)
         {
           if (eln->p_fd_err->a_dble[i] != zero)
           {
-            i_max = i; error_matrix[i] = 1.;
+            if (i > i_max){ i_max = i;}
+            error_matrix[i] = 1.;
           }
         }
       }
     }
   }
+  fprintf(f3,"i_max %d %g\n", i_max, error_matrix[i_max]);
   if (mult_auto_off)
   {
     i_max = max_mult_ord * 2;
   }
   else
   {
-    if (++i_max > 0)  i_max += i_max%2;
+    if (++i_max > 0)  i_max += i_max%2 ;
   }
+  fprintf(f3,"imax mod %d\n", i_max);
   for (i = 0; i < i_max; i++)
   {
     fprintf(f3,"%4.0f.%4.0f.", 0., error_matrix[i]);
