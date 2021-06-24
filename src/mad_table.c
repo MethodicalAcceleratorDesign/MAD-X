@@ -2128,6 +2128,8 @@ vector_to_table_curr(const char* table, const char* name, const double* vals, co
 
 int 
 name_to_table_curr(const char* table, int* ending){
+  if(*ending==0) return string_to_table_curr(table,"name", current_node->name);
+
   char tmp[strlen(current_node->p_elem->name)+3];
   strcpy(tmp, current_node->p_elem->name);
   if(*ending ==1) strcat(tmp, ".ENT");
