@@ -3456,7 +3456,8 @@ write_f3_mult(struct c6t_element* el)
         {
           if (eln->p_fd_err->a_dble[i] != zero)
           {
-            i_max = i; error_matrix[i] = 1.;
+            if (i > i_max){ i_max = i;}
+            error_matrix[i] = 1.;
           }
         }
       }
