@@ -2472,7 +2472,7 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error)
            / (one + 4d0* abs(f1001)**2)
            dqmin_rdt_c = dqmin_rdt_c + 1
          endif
-         if(abs(f1010) > abs(f1001)) then
+         if(abs(f1010) > abs(f1001) .and. abs(f1001) .gt. 1e-6) then
             diff_bigger_sum = diff_bigger_sum+1
          endif
      
