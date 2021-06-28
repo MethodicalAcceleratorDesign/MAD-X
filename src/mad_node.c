@@ -926,7 +926,6 @@ replace_one(struct node* node, struct element* el)
   strcpy(node->name, compound(el->name, k));
   add_to_node_list(node, 0, edit_sequ->nodes);
   node->p_elem = el;
-
   node->base_name = el->base_type->name;
   //strcpy(node->base_name, el->base_type->name);
   node->length = el->length;

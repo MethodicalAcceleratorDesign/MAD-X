@@ -1085,7 +1085,10 @@ add_to_el_list( /* adds element to alphabetic element list */
           p_node = sequences->sequs[j]->start;
           while (p_node && p_node != sequences->sequs[j]->end)
           {
-            if (p_node->p_elem == ell->elem[pos]) p_node->p_elem = *el;
+            if (p_node->p_elem == ell->elem[pos]) {
+              p_node->p_elem = *el;
+              p_node->base_name = (*el)->base_type->name;
+            }
             p_node = p_node->next;
           }
           if (strcmp((*el)->base_type->name, "rfcavity") == 0 &&
