@@ -391,7 +391,7 @@ module twissdqmin
   use math_constfi, only : zero
   implicit none
   public
-  double precision :: dqmin_det=zero
+  double precision :: dqmin_det=zero, prev_pos_s = zero, tot_int_length=zero, delta_tune_dqmin = zero
   integer ::  dqmin_rdt_c=0, dqmin_det_c=0, diff_bigger_sum = 0;
   double complex :: dqmin_rdt = zero
 end module twissdqmin

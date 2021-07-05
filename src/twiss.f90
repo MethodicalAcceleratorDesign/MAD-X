@@ -1158,7 +1158,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   use twissdqmin
   use twissbeamfi, only : deltap
   use matrices, only : EYE, SMAT, symp_thrd
-  use math_constfi, only : zero, one, two, quarter
+  use math_constfi, only : zero, one, two, quarter,twopi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1312,9 +1312,8 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   !---- Find eigenvectors at initial position.
   reval = zero
   aival = zero
-
-
-  if (get_option('debug ') .ne. 0) then
+  delta_tune_dqmin = acos(cosmux) - acos(cosmuy) 
+  if (get_option('debug ') .ne. 0) then 
     call laseig(r_eig, reval, aival, em)
     cosmu1_eig = ( reval(1)+ aival(1) + reval(2) + aival(2) )/ 2
     cosmu2_eig = ( reval(3)+ aival(3) + reval(4) + aival(4) )/ 2
@@ -1333,7 +1332,8 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
         write (warnstr,'(a,e13.6, a, e13.6)') "cosmuy-cosmu1_eig =", cosmuy-cosmu1_eig, "cosmuy-cosmu2_eig =", cosmuy-cosmu2_eig
         call fort_warn('TWCPIN: ', warnstr)
     endif
-  endif
+   endif
+
 
   ! call twcpin_print(rt,r0mat)
 
@@ -1935,7 +1935,7 @@ subroutine track_one_element(el, fexit, contrib_rms)
      ele_body = .false.
      orbit2 = orbit
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
-     call twcptk(re,orbit)
+     call twcptk(re,orbit,currpos)
      if (sectormap) SRMAT = matmul(RE,SRMAT)
   endif
 
@@ -1944,7 +1944,7 @@ subroutine track_one_element(el, fexit, contrib_rms)
 
     call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
 
-    if (fmap) call twcptk(re,orbit)
+    if (fmap) call twcptk(re,orbit,currpos)
 
     call save_opt_fun()
     call twprep(save,1,opt_fun,currpos+el/two,i)
@@ -1956,7 +1956,7 @@ subroutine track_one_element(el, fexit, contrib_rms)
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.false.,el)
 
   if (fmap) then
-     call twcptk(re,orbit)
+     call twcptk(re,orbit,currpos)
      !print*, "couplfmap: Element = ", el_name
      if (sectormap) call tmcat(.true.,re,te,srmat,stmat,srmat,stmat)
   endif
@@ -1966,7 +1966,7 @@ subroutine track_one_element(el, fexit, contrib_rms)
      ele_body = .false.
      orbit2 = orbit
      call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
-     call twcptk(re,orbit)
+     call twcptk(re,orbit,currpos)
      if (sectormap) SRMAT = matmul(RE,SRMAT)
   endif
 
@@ -2073,7 +2073,7 @@ end subroutine save_opt_fun
 
 end SUBROUTINE twcpgo
 
-SUBROUTINE twcptk(re,orbit)
+SUBROUTINE twcptk(re,orbit, currpos)
   use twiss0fi
   use twisslfi
   use twisscfi
@@ -2101,7 +2101,7 @@ SUBROUTINE twcptk(re,orbit)
   double precision :: rmat_bar(2,2), ebar(2,2), fbar(2,2), hmat(2,2)
   double precision :: edet, fdet, tempa, tempb, det
   double precision :: alfx_ini, betx_ini, amux_ini
-  double precision :: alfy_ini, bety_ini, amuy_ini
+  double precision :: alfy_ini, bety_ini, amuy_ini,currpos
   character(len=name_len) :: name
   character(len=200)      :: warnstr
 
@@ -2219,9 +2219,9 @@ SUBROUTINE twcptk(re,orbit)
   endif
 
   if(mode_flip) then
-     call twcptk_twiss(f, e, RMAT, cp_error)
+     call twcptk_twiss(f, e, RMAT, cp_error, currpos)
   else
-     call twcptk_twiss(e, f, RMAT, cp_error)
+     call twcptk_twiss(e, f, RMAT, cp_error, currpos)
   endif
 
   if (cp_error) then
@@ -2325,7 +2325,7 @@ SUBROUTINE twcptk(re,orbit)
 
 end SUBROUTINE twcptk
 
-SUBROUTINE twcptk_twiss(matx, maty, R, error)
+SUBROUTINE twcptk_twiss(matx, maty, R, error, currpos)
   use twiss0fi
   use twisslfi
   use twisscfi
@@ -2352,7 +2352,7 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error)
   double precision :: maty11, maty12, maty21, maty22, gamma, detc, detinv, detr
   double precision :: alfx_ini, betx_ini, tempa
   double precision :: alfy_ini, bety_ini, tempb
-  double precision :: detx, dety, atanm12
+  double precision :: detx, dety, atanm12, currpos, deltas
   logical          :: error
   double precision, parameter :: eps=1d-36
   complex f1001, f1010
@@ -2468,9 +2468,12 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error)
          !self.f1010.append(((C[0] - C[3]) * 1j + (-C[1] - C[2])) / 4 / gamma)
          
          if (abs(f1001) .gt. eps) then
-           dqmin_rdt = dqmin_rdt + f1001*exp(-(complex(0,amuy)-complex(0,amux))) &
+           deltas = currpos - prev_pos_s
+           dqmin_rdt = dqmin_rdt + deltas * f1001*exp(-(complex(0,amuy)-complex(0,amux))+complex(0,delta_tune_dqmin*currpos)) &
            / (one + 4d0* abs(f1001)**2)
            dqmin_rdt_c = dqmin_rdt_c + 1
+           prev_pos_s = currpos
+           tot_int_length = tot_int_length + deltas
          endif
          if(abs(f1010) > abs(f1001) .and. abs(f1001) .gt. 1e-6) then
             diff_bigger_sum = diff_bigger_sum+1
@@ -3535,11 +3538,11 @@ SUBROUTINE tw_summ(rt,tt)
   !                    'use chrom option or manual calculation')
   ! endif
   
-  dqmin2 = 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(abs(dqmin_rdt)/dqmin_rdt_c)
+  dqmin2 = 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(abs(dqmin_rdt)/tot_int_length)
   dqmin_ph = atan2(aimag(dqmin_rdt), real(dqmin_rdt))
   if(diff_bigger_sum .gt. 0) then
-         write (warnstr, '(a, i8, a i8)') "The f1010 is bigger than the f1001 in: ", diff_bigger_sum, &
-        " locations. The Dqmin estimate might be inaccurate out of ", dqmin_rdt_c
+         write (warnstr, '(a, I0, a, I0, a)') "The f1010 is bigger than the f1001 in: ", diff_bigger_sum, &
+        " location, out of ", dqmin_rdt_c,  " in total. The Dqmin estimate might be inaccurate."
         call fort_warn('TWCPTK: ', warnstr)
   endif
   !---- Fill summary table
