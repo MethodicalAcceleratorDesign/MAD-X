@@ -5924,7 +5924,18 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   endif
 
   call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
-  if (fcentre) return
+  if (fcentre) then
+     if (tilt .ne. zero)  then
+        !---  rotate orbit at exit
+        tmp = orbit(1)
+        orbit(1) = ct * tmp - st * orbit(3)
+        orbit(3) = ct * orbit(3) + st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp - st * orbit(4)
+        orbit(4) = ct * orbit(4) + st * tmp
+     endif
+     return
+  endif
 
   !---- Half radiation effect at exit.
   if (radiate .and. ftrk) then
@@ -6131,7 +6142,19 @@ SUBROUTINE tmsep(fsec,ftrk,fcentre,orbit,fmap,dl,ek,re,te)
   ekick  = efield * ten3m * charge / (pc * (one + deltap))
 
   call spbody(fsec,ftrk,tilt,ekick,orbit,dl,ek,re,te)
-  if (fcentre) return
+  if (fcentre)  then
+     if (tilt .ne. zero)  then
+        !---  rotate orbit at exit
+        tmp = orbit(1)
+        orbit(1) = ct * tmp - st * orbit(3)
+        orbit(3) = ct * orbit(3) + st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp - st * orbit(4)
+        orbit(4) = ct * orbit(4) + st * tmp
+     endif
+
+     return
+   endif
 
   if (tilt .ne. zero)  then
      !---  rotate orbit at exit
@@ -6337,7 +6360,18 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   endif
 
   call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
-  if (fcentre) return
+  if (fcentre)  then
+     if (tilt .ne. zero)  then
+        !---  rotate orbit at exit
+        tmp = orbit(1)
+        orbit(1) = ct * tmp - st * orbit(3)
+        orbit(3) = ct * orbit(3) + st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp - st * orbit(4)
+        orbit(4) = ct * orbit(4) + st * tmp
+     endif
+     return
+   endif
 
   !---- Half radiation effects at exit.
   if (ftrk) then
