@@ -392,9 +392,19 @@ void set_tt_multipoles(int *maxmul){
   for(int i=0;i<tmp_s;i++){
     current_node->p_elem->multip->ksl[i] = tmp_sv[i];
   }
-
-
 }
+double get_closed_orb_node(int *index){
+    if(current_node->closed_orbit==NULL) return 0;
+  return current_node->closed_orbit->a[*index-1]; // -1 since it is callled from FORTRAN
+}
+
+void set_closed_orb_node(int *index, double *pos){
+  if(current_node->closed_orbit==NULL){
+    current_node->closed_orbit = new_double_array(6);
+  }
+  current_node->closed_orbit->a[*index-1] = *pos; // -1 since it is callled from FORTRAN
+}
+
 
 void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl){
     nn[0]=current_node->p_elem->multip->nn;

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.03.31 13:31:40      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.06.11 17:32:15      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -60,13 +60,13 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
                 20                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-      0.2420488744                  0                401                  0 
+       0.243391754                  0        479.9189675                  0 
 
              dxrms             xcomax             xcorms                 q2 
-                 0                  0                  0       0.2420488744 
+                 0                  0                  0       0.2409281096 
 
                dq2            betymax              dymax              dyrms 
-                 0                401                  0                  0 
+                 0        332.6720398                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
