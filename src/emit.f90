@@ -499,7 +499,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
            n    = 2
            twon = four
         case (code_octupole)   !---- Octupole
-           sk3 = bvk * node_value('k2 ')
+           sk3 = bvk * node_value('k3 ')
            str  = sk3 / six
            n    = 3
            twon = six
