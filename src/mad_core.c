@@ -26,9 +26,9 @@ mad_init_c(void)
     in->input_files[0] = stdin;
   }
   if(mad_argc > 1){
-    char tmp21[100];
-    strcpy(tmp21,mad_argv[1]);
-    strcpy(rel_path_dir, dirname(tmp21));
+    char tmp_dir[100];
+    mycpy(tmp_dir,mad_argv[1]);
+    mycpy(rel_path_dir, dirname(tmp_dir));
   }
 
   interactive = intrac();
