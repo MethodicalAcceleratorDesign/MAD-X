@@ -11,6 +11,7 @@
 int     mad_argc = 0;
 char**  mad_argv = NULL;
 void*   mad_stck = NULL;
+char rel_path_dir[100];
 
 #ifdef _GFORTRAN
 #define _POSIX_C_SOURCE 200112L

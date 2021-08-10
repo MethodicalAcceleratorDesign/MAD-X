@@ -49,8 +49,17 @@ down_unit(char* file_name)
   /* makes a called file the current input unit */
 {
   FILE* new;
-  file_name = str2path(file_name);
-  
+  if (get_option("rel_path_main_file") == 1){
+    char tmp[100] ; 
+    strcpy(tmp, rel_path_dir);
+    strcat(tmp, "/");
+    strcat(tmp, file_name);
+    file_name = str2path(tmp);  
+  }
+  else {
+    file_name = str2path(file_name);
+  }
+
   if ((new = fopen(file_name, "r")) == NULL)
   {
     if (interactive) warning("cannot open input file:", file_name);
