@@ -78,8 +78,9 @@ contains
 
      doneit=my_true
      call ring_l(mylat,doneit)
-
-     call survey(mylat)
+     call line_l(mylat,doneit)
+     mylat%closed=.false.
+   !  call survey(mylat)
      call MAKE_NODE_LAYOUT( mylat)     
     endif
   end subroutine create_fibre_append
@@ -1072,7 +1073,7 @@ M%B_L=M%B_T
     case(kind10)
        WRITE(MF,*) el%tp10%DRIFTKICK,  " driftkick "
     case(kind16,kind20)
-       WRITE(MF,*) el%k16%DRIFTKICK,el%k16%LIKEMAD, " driftkick,likemad"
+       WRITE(MF,*) el%k16%DRIFTKICK, " driftkick"
     case(kind18)
 !       WRITE(MF,*) " RCOLLIMATOR HAS AN INTRINSIC APERTURE "
 !       CALL print_aperture(EL%RCOL18%A,mf)
@@ -1167,7 +1168,7 @@ M%B_L=M%B_T
        read(MF,*) el%tp10%DRIFTKICK
     case(kind16,kind20)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
-       read(MF,*) el%k16%DRIFTKICK,el%k16%LIKEMAD
+       read(MF,*) el%k16%DRIFTKICK !  !el%k16%LIKEMAD
     case(kind18)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
   !     READ(MF,*) LINE
@@ -2675,7 +2676,7 @@ surv=my_true
    read(mf,*) se2,se1
      call input_sector(se2,se1)
 call make_states(my_false)
-call set_mad(energy=2.0d0)
+call set_mad(energy=2.0e0_dp)
 
 
    
@@ -2817,8 +2818,6 @@ enddo
  if(present(arpent)) surv=arpent
 
    if(surv) then
-
-
      call survey(r)
    endif
 
@@ -2937,6 +2936,7 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  patch0%ENERGY=f%ENERGY
  patch0%TIME=f%TIME
  patch0%geometry=f%patch
+ patch0%track=f%track
 
     if(present(mf)) then
      write(mf,NML=patchname)
@@ -2955,6 +2955,7 @@ f%B_X2= patch0%B_X2
  f%B_D=patch0%B_D
  f%A_ANG=patch0%A_ANG
  f%B_ANG=patch0%B_ANG
+ f%track=patch0%track
  f%A_T=patch0%A_T
  f%B_T=patch0%B_T
  f%A_L=patch0%A_L
@@ -3510,10 +3511,13 @@ if(present(dir)) then
 if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
 
 
- tcav0%PSI_DPHAS_DVDS(1)=F%cav21%psi
- tcav0%PSI_DPHAS_DVDS(2)=F%cav21%dphas
- tcav0%PSI_DPHAS_DVDS(3)=F%cav21%dvds
+ tcav0%PSI_DPHAS_DVDS_phase0(1)=F%cav21%psi
+ tcav0%PSI_DPHAS_DVDS_phase0(2)=F%cav21%dphas
+ tcav0%PSI_DPHAS_DVDS_phase0(3)=F%cav21%dvds
+ tcav0%PSI_DPHAS_DVDS_phase0(4)=F%cav21%phase0
  tcav0%always_on=F%cav21%always_on
+ tcav0%implicit=F%cav21%implicit
+
     if(present(mf)) then
      write(mf,NML=tCAVname)
     endif   
@@ -3523,10 +3527,13 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
      read(mf,NML=tCAVname)
     endif   
 
- F%cav21%psi=tcav0%PSI_DPHAS_DVDS(1)
- F%cav21%dphas=tcav0%PSI_DPHAS_DVDS(2)
- F%cav21%dvds=tcav0%PSI_DPHAS_DVDS(3)
+ F%cav21%psi=tcav0%PSI_DPHAS_DVDS_phase0(1)
+ F%cav21%dphas=tcav0%PSI_DPHAS_DVDS_phase0(2)
+ F%cav21%dvds=tcav0%PSI_DPHAS_DVDS_phase0(3)
+ F%cav21%phase0=tcav0%PSI_DPHAS_DVDS_phase0(4)
  F%cav21%always_on=tcav0%always_on
+ F%cav21%implicit=tcav0%implicit
+
 endif
 
 endif
@@ -3742,7 +3749,7 @@ if(present(dir)) then
 if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  
  k160%DRIFTKICK=F%k16%DRIFTKICK
- k160%LIKEMAD=F%k16%LIKEMAD
+ k160%LIKEMAD=.true.  !F%k16%LIKEMAD
      if(present(mf)) then
      write(mf,NML=k160name)
     endif   
@@ -3751,8 +3758,8 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
     if(present(mf)) then
      read(mf,NML=k160name)
     endif   
- F%k16%DRIFTKICK=k160%DRIFTKICK
- F%k16%LIKEMAD=k160%LIKEMAD
+ !F%k16%DRIFTKICK=k160%DRIFTKICK
+! F%k16%LIKEMAD=k160%LIKEMAD
 endif
 endif
 end subroutine k16_k160
@@ -4223,6 +4230,7 @@ implicit none
      patch0%ENERGY=0
      patch0%TIME=0
      patch0%GEOMETRY=0
+     patch0%track=.true.
 
 end subroutine zero_patch0
 

@@ -11,7 +11,7 @@ module tpsalie
   private DABSMAP,EQUALMAP,EQUALVEC    !,EQUALMAPVEC,EQUALVECMAP
   private EQUALvecpb,EQUALpbpb,EQUALpbvec,EQUALpbda,EQUALdapb,CUTORDER,CUTORDERPB,CUTORDERVEC
   private GETORDERVEC,GETORDERMAP,GETORDERPB,concator,pushtree,concat,pushmatrixr,push1polslow
-  private pushmap
+  private pushmap,checksympo
   private trxflow,trxpb,trxtaylor !,DMULMAPsc,MULMAPsc,IMULMAPsc,DMULVECsc,MULVECsc,IMULVECsc
   !  private DMULpbsc,MULpbsc,IMULpbsc
   private scDMULMAP,scMULMAP,scIMULMAP !,scDMULVEC,scMULVEC,scIMULVEC,scDMULpb,scMULpb,scIMULpb
@@ -178,6 +178,9 @@ module tpsalie
      MODULE PROCEDURE DAPRINTpb
   END INTERFACE
 
+    INTERFACE checksymp
+     MODULE PROCEDURE checksympo
+  end INTERFACE checksymp
 
   INTERFACE print_for_bmad
      MODULE PROCEDURE print_for_bmad_parsem
@@ -279,6 +282,17 @@ module tpsalie
 
 
 contains
+
+ subroutine set_2(NO1,ND21,ND1,NDPT1,NV1,np1)
+ implicit none
+ integer np1,NO1,ND1,ND21,NDPT1,NV1
+  np=np1
+  NO=no1
+  ND=nd1
+  ND2=nd21
+  NDPT=ndpt1
+  NV=nv1
+  end subroutine set_2
   ! new Poisson stuff
   FUNCTION mul_PBf_t( S1, S2 )   ! Computes  s1 s2
     implicit none
@@ -795,7 +809,7 @@ contains
      if(present(ref0)) then
  !  adding orbit for bmad
        do i=1,nd2
-        idf%v(i)=(1.d0.mono.i)-ref0(i)
+        idf%v(i)=(1.0_dp.mono.i)-ref0(i)
        enddo
        do i=1,nd2
         t%v(i)=t%v(i)-(t%v(i).sub.'0')
@@ -2804,7 +2818,7 @@ concat=t2
 
   END FUNCTION POWMAP_INV
 
-  subroutine checksymp(s1,norm,orthogonal)
+  subroutine checksympo(s1,norm,orthogonal)
     implicit none
     TYPE (damap) s1
     real(dp)  norm1,mat(8,8),xj(8,8)
@@ -2849,7 +2863,7 @@ concat=t2
     if(lielib_print(9)==1.or.nn) write(6,'(a29,(1x,E15.8))')"deviation from symplecticity ", norm1
     if(present(norm)) norm=abs(norm1)
 
-  end subroutine checksymp
+  end subroutine checksympo
 
 
   subroutine checkmap(s1)
