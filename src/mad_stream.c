@@ -49,7 +49,7 @@ down_unit(char* file_name)
   /* makes a called file the current input unit */
 {
   FILE* new;
-  if (get_option("rel_path_main_file") == 1){
+  if (get_option("rel_path_main_file") == 1 && mad_argc > 1){
     char tmp[100] ; 
     strcpy(tmp, rel_path_dir);
     strcat(tmp, "/");

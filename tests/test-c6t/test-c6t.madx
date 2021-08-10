@@ -1,7 +1,7 @@
 ! Tracking test for 6-D closed orbit search with LHC thin seq V6.501
 ! tstTrack_6D_orbit_LHC.madx, Yipeng SUN, 01-12-2008
 
-option, -echo,-warn,-info;
+option, -echo,-warn,-info, rel_path_main_file;
 vrf400= 8.0;
 
 ! ---------- sequence
