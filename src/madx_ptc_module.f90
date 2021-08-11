@@ -2298,7 +2298,7 @@ CONTAINS
   end subroutine misalign_thindipole
 
   !_____________________________________________________
-   subroutine misalign_element(f,al_errors)
+  subroutine misalign_element(f,al_errors)
      use twiss0fi, only: align_max
      TYPE(FIBRE),target,INTENT(INOUT):: f
      REAL(DP),INTENT(IN) :: al_errors(align_max)
@@ -2320,7 +2320,7 @@ CONTAINS
        mis(1:3)=al_errors(1:3)
        CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.true.)
 
-   end subroutine misalign_element
+  end subroutine misalign_element
   !_________________________________________________________________
 
   subroutine ptc_dumpmaps()
