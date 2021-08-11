@@ -2298,25 +2298,29 @@ CONTAINS
   end subroutine misalign_thindipole
 
   !_____________________________________________________
-  subroutine misalign_element(f,al_errors)
-    use twiss0fi, only: align_max
-    TYPE(FIBRE),target,INTENT(INOUT):: f
-    REAL(DP),INTENT(IN) :: al_errors(align_max)
-    REAL(DP)             :: mis(align_max), omegat(3), basist(3,3)
+   subroutine misalign_element(f,al_errors)
+     use twiss0fi, only: align_max
+     TYPE(FIBRE),target,INTENT(INOUT):: f
+     REAL(DP),INTENT(IN) :: al_errors(align_max)
+     REAL(DP)             :: mis(align_max), omegat(3), basist(3,3)
 
-      mis=0
-      mis(4:6)=al_errors(4:6)
-      mis(4:5)=-mis(4:5)
+       mis=0
+       mis(4:6)=al_errors(4:6)
+       mis(4:5)=-mis(4:5)
 
-      OMEGAT=f%mag%p%f%a
-      basist=f%mag%p%f%ent
-      CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.false.) ! false to remove previous alignment
+       !OMEGAT=f%mag%p%f%a
+       !basist=f%mag%p%f%ent
 
-      mis=0
-      mis(1:3)=al_errors(1:3)
-      CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.true.)
+       OMEGAT=f%chart%f%a
+       basist=f%chart%f%ent
 
-  end subroutine misalign_element
+       CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.false.) ! false to remove previous alignment
+
+       mis=0
+       mis(1:3)=al_errors(1:3)
+       CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.true.)
+
+   end subroutine misalign_element
   !_________________________________________________________________
 
   subroutine ptc_dumpmaps()
