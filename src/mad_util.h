@@ -4,7 +4,7 @@
 // functions
 
 int intrac(void);
-
+FILE *fopen_mad(const char *file_name, const char *mode_of_operation);
 // inliners
 
 static inline int
