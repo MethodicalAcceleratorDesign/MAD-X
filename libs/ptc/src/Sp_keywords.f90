@@ -209,8 +209,9 @@ contains
     CASE("TRUERBEND     ")
        if(sixtrack_compatible) stop 2
 
-       e1_true= KEY%LIST%b0/2.0_dp+ KEY%LIST%t1
-       BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=e1_true,list=KEY%LIST)
+       !e1_true= KEY%LIST%b0/2.0_dp+ KEY%LIST%t1
+       !BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=e1_true,list=KEY%LIST)
+       BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,list=KEY%LIST)
 
     CASE("WEDGRBEND     ")
        if(sixtrack_compatible) stop 3
