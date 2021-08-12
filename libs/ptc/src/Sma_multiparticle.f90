@@ -637,17 +637,15 @@ CONTAINS
       endif
     ENDIF
 
-
+    CALL DTILTD(C%MAG%P%TILTD,1,X)
+    ! The magnet frame of reference is located here implicitely before misalignments
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
     IF(C%MAG%MIS) THEN
        ou = ALWAYS_EXACTMIS  !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
-
-    ! Apply the tilt after the misalignments
-    CALL DTILTD(C%MAG%P%TILTD,1,X)
-
+ 
   END SUBROUTINE TRACK_FIBRE_FRONTR
 
   SUBROUTINE TRACK_FIBRE_FRONTP(C,X,K)
@@ -726,15 +724,14 @@ CONTAINS
       endif
     ENDIF
 
-
+    CALL DTILTD(C%MAGP%P%TILTD,1,X)
+    ! The magnet frame of reference is located here implicitely before misalignments
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
     IF(C%MAGP%MIS) THEN
        ou = ALWAYS_EXACTMIS   !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
-    !Apply after the misalignments T.Persson
-    CALL DTILTD(C%MAGP%P%TILTD,1,X)
 
  
   END SUBROUTINE TRACK_FIBRE_FRONTP
@@ -761,15 +758,14 @@ CONTAINS
        PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
 
-    
-    ! First tilt back T.Persson
-    CALL DTILTD(C%MAG%P%TILTD,2,X)
-        IF(C%MAG%MIS) THEN
+ 
+    IF(C%MAG%MIS) THEN
        ou = ALWAYS_EXACTMIS  !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
-      
- 
+    ! The magnet frame of reference is located here implicitely before misalignments
+    CALL DTILTD(C%MAG%P%TILTD,2,X)
+
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
       if(K%time) then
        X(6)=X(6)-C%PATCH%b_T   !/c%beta0
@@ -845,16 +841,14 @@ ENDIF
        PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
 
-    ! First tilt back T. Persson
-    CALL DTILTD(C%MAGP%P%TILTD,2,X)
-
     IF(C%MAGP%MIS) THEN
        ou = ALWAYS_EXACTMIS   !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
 
     
-
+    ! The magnet frame of reference is located here implicitely before misalignments
+    CALL DTILTD(C%MAGP%P%TILTD,2,X)
 
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
       if(K%time) then
