@@ -314,7 +314,6 @@ const char *const_command_def =
 "fdstep = [r, 0], " /* ld 07.2020, finite difference step for JACOBIAN and LMDIF */
   /* BB and SPCH related options */
 "bborbit          = [l, false, true], " /* frs */
-"ibeco            = [l, false, true], " 
 "bb_ultra_relati  = [l, false, true], " /* frs */
 "bb_sxy_update    = [l, false, true], " /* frs */
 "emittance_update = [l, true,  true], " /* frs */
