@@ -971,6 +971,16 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
        ' '/' beta(max) [m]',t30,'x',t42,2e20.8/t30,'y',t42,2e20.8/       &
        ' '/' gamma(max) [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8)
 
+  call string_to_table_curr('emit ', 'name ', 'test1 ')
+  call double_to_table_curr('emit ', 'mode1 ',bstar(1,1) )
+  call double_to_table_curr('emit ', 'mode2 ',bstar(1,2) )
+ call augment_count('emit ')
+!s  call string_to_table_curr('emit ', 'name ', 'gamma*[m] ')
+  call double_to_table_curr('emit ', 'mode1 ',gmax(1,1) )
+  call double_to_table_curr('emit ', 'mode2 ',gmax(1,2) )
+  call augment_count('emit ')
+!
+
 end subroutine emsumm
 
 subroutine emce2i(stabt, em, ex, ey, et, sigma)

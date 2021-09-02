@@ -118,7 +118,16 @@ const char* const survey_table_cols[] =
   /*==*/
   " "  /* blank terminates */
 };
-
+const char* const emit_table_cols[] =
+{
+  "name", "mode1", "mode2", "mode3",
+  /*==*/
+  " "  /* blank terminates */
+};
+const int emit_table_types[] =
+{
+  3, 2, 2, 2
+};
 
 
 const int efield_table_types[] =

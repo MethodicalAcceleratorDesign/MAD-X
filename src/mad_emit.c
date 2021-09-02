@@ -15,6 +15,10 @@ pro_emit(struct in_cmd* cmd)
   int debug = get_option("debug");
 
   fprintf(prt_file, "enter EMIT module\n");
+  emit_table = make_table("emit", "emit", emit_table_cols,
+                            emit_table_types, 50);
+  add_to_table_list(emit_table, table_register);
+
 
   if (current_sequ == NULL || current_sequ->ex_start == NULL) {
     warning("sequence not active,", "EMIT ignored");
@@ -72,7 +76,7 @@ pro_emit(struct in_cmd* cmd)
 
     print_rfc();
   }
-
+  out_table("emit", emit_table, "outemit.tfs");
   probe_beam = delete_command(probe_beam);
   set_option("twiss_print", &keep);
 }

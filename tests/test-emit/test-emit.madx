@@ -8,5 +8,6 @@ Show, beam%Machine;
 Emit, DELTAP=0.0 ;
 Show, beam%Machine;
 
+write, table=emit, "myemit.tfs";
 Stop;
 
