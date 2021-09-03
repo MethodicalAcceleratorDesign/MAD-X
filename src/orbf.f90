@@ -1,6 +1,7 @@
 subroutine micit(a, conm, xin, cin, res, nx, rms, im, ic, iter, ny, ax, cinx, &
                  xinx, resx, rho, ptop, rmss, xrms, xptp, xiter, ifail)
     use math_constfi, only : zero
+    use io_units, only : orbfout
     implicit none
     ! ****************************************************
     !                                                    *
@@ -44,10 +45,10 @@ subroutine micit(a, conm, xin, cin, res, nx, rms, im, ic, iter, ny, ax, cinx, &
        iter = 0
        ifail = -2
     else
-       open(61,file='fort.61')
+       open(unit=orbfout,file='fort.61')
        call htls(ax, conm, xinx, im, ic, cinx, ny, resx, rms, 3, & 
                  iter, rho, ptop, rmss, xrms, xptp, xiter, ifail)
-       close(61)
+       close(unit=orbfout)
     endif
 
     CIN(:ic) = CINX(:ic)

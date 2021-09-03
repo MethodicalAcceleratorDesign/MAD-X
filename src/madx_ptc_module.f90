@@ -256,6 +256,7 @@ CONTAINS
     use twtrrfi
     use twiss0fi
     use name_lenfi
+    use code_constfi
     implicit none
     logical(lp) particle,doneit,isclosedlayout
     integer i,j,k,code,nt,icount,nn,ns,nd,mg,napoffset,get_string
@@ -781,14 +782,11 @@ CONTAINS
 
 
     select case(code)
-    case(0,25)
+
+    case(0, code_marker, code_beambeam) ! case(0,25,22)
        key%magnet="marker"
-    case(4)
-       call aafail('ptc_input:','PTC does not accept matrix elements. Program stops.')
-    case(22)
-       key%magnet="marker"
-    !case(1,11)
-    case(1,20,21,44)
+
+    case(code_drift, code_rcollimator, code_ecollimator, code_collimator) ! case(1,20,21,44)
        key%magnet="drift"
        CALL CONTEXT(key%list%name)
 
@@ -799,7 +797,27 @@ CONTAINS
           endif
        enddo
        ! end etienne Helical
-    case(2) ! PTC accepts mults
+
+       !  2015-Mar-05  13:13:35  ghislain: Warning !
+       !                         ecollimator and rcollimator replaced by collimator in MAD-X, with code 44
+       !  case(20)
+       !     key%magnet="ecollimator"
+       !     key%list%x_col=node_value('xsize ')
+       !     key%list%y_col=node_value('ysize ')
+       !     key%tiltd=node_value('tilt ')
+       !  case(21)
+       !     key%magnet="rcollimator"
+       !     key%list%x_col=node_value('xsize ')
+       !     key%list%y_col=node_value('ysize ')
+       !     key%tiltd=node_value('tilt ')
+
+       !case(20,21,44)
+       !        key%magnet="madcollimator"
+       !        key%list%x_col=1e3
+       !        key%list%y_col=1e3
+       !        key%tiltd=node_value('tilt ')
+      
+    case(code_rbend) ! case(2) ! PTC accepts mults
        if(l.eq.zero) then
           key%magnet="marker"
           goto 100
@@ -809,11 +827,13 @@ CONTAINS
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+tempdp*l)
-
+       ! key%list%b0=bvk*(node_value('angle ')+tempdp*l)
+       key%list%b0=bvk*(node_value('angle ')+tempdp*l) ! * (1 + node_value('ktap '))
+       
        !       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
        !       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
 
+       ! Ghislain: do we need to taper the multipole components with (1+node_value('ktap ')) ? 
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
        key%list%k(4)=node_value('k3 ')+ key%list%k(4)
@@ -886,8 +906,8 @@ CONTAINS
              call augment_count('errors_dipole ')
           endif
        endif
-    case(3) ! PTC accepts mults watch out sector_nmul defaulted to 22
-
+       
+    case(code_sbend) ! case(3) ! PTC accepts mults watch out sector_nmul defaulted to 22
        if (getdebug()>2) print*,"Translating SBEND"
        if(l.eq.zero) then
           if (getdebug()>2) print*,"Length zero -> translating as MARKER"
@@ -910,8 +930,9 @@ CONTAINS
        endif
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+ tempdp*l)
+       key%list%b0=bvk*(node_value('angle ')+ tempdp*l) ! * (1 + node_value('ktap '))
 
+       ! Ghislain  tag for tapering addition *(1+node_value('ktap '))
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
        key%list%k(4)=node_value('k3 ')+ key%list%k(4)
@@ -965,7 +986,7 @@ CONTAINS
          print*,"H2=", key%list%h2
        endif
 
-    case(5)
+    case(code_quadrupole) ! case(5)
        key%magnet="quadrupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
@@ -974,11 +995,11 @@ CONTAINS
        ! summs of multipoles and errors
 
 ! LD: 19.06.2019
-       sk0=node_value('k0 ')
-
+       sk0=node_value('k0 ') ! * (1 + node_value('ktap '))
+       
        ! quadrupole components
-       sk1= node_value('k1 ')+node_value('k1tap ')
-       sk1s=node_value('k1s ')
+       sk1= node_value('k1 ')  * (1 + node_value('ktap '))
+       sk1s=node_value('k1s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
        dum1=key%list%k(2)-normal_0123(1)
        dum2=key%list%ks(2)-skew_0123(1)
@@ -1018,14 +1039,14 @@ CONTAINS
 ! LD: 19.06.2019
        key%list%k(1)=key%list%k(1)+bvk*sk0
 
-    case(6)
+    case(code_sextupole) ! case(6)
        key%magnet="sextupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        ! sextupole components
-       sk2= node_value('k2 ') + node_value('k2tap ')
-       sk2s=node_value('k2s ')
+       sk2= node_value('k2 ')  * (1 + node_value('ktap '))
+       sk2s=node_value('k2s ') * (1 + node_value('ktap ')) 
        tilt=node_value('tilt ')
        dum1=key%list%k(3)-normal_0123(2)
        dum2=key%list%ks(3)-skew_0123(2)
@@ -1059,7 +1080,7 @@ CONTAINS
           endif
        endif
 
-    case(7)
+    case(code_octupole) ! case(7)
        key%magnet="octupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
@@ -1087,7 +1108,7 @@ CONTAINS
 
        !================================================================
 
-    case(8)
+    case(code_multipole) ! case(8)
        if (getdebug()>2) print*,"Translating MULTIPOLE"
        key%magnet="multipole"
        !---- Multipole components.
@@ -1180,7 +1201,7 @@ CONTAINS
        endif
 
 
-    case(9) ! PTC accepts mults
+    case(code_solenoid) ! case(9) ! PTC accepts mults
        key%magnet="solenoid"
        ks=node_value('ks ')
        if(l.ne.zero) then
@@ -1200,7 +1221,7 @@ CONTAINS
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
-    case(10)
+    case(code_rfcavity) ! case(10)
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -1231,12 +1252,6 @@ CONTAINS
        !     print*,"RF Cavity with zero voltage or frequency"
        !  endif
        endif
-
-       !  case(11)
-       !     key%magnet="elseparator"
-       !     key%list%volt=node_value('ex ')
-       !     key%list%lag=atan2(node_value('ey '),node_value('ex '))
-       !     key%tiltd=node_value('tilt ')
 
        m_u%end%HARMONIC_NUMBER=node_value('harmon ')   ! etienne_harmon
        no_cavity_totalpath=node_value('no_cavity_totalpath ').ne.0
@@ -1279,7 +1294,7 @@ CONTAINS
 !                                    " harm: ", key%list%harmon, &
 !                                    " freq: ", key%list%freq0
 
-    case(11) ! LD: 04.07.2019
+    case(code_elseparator) ! case(11) ! LD: 04.07.2019
       key%magnet="elseparator"
       ex = node_value('ex ')
       ey = node_value('ey ')
@@ -1288,9 +1303,9 @@ CONTAINS
         ey = ey + node_value('ey_l ')/l
       endif
       key%list%volt=sqrt(ex**2 + ey**2)
-      key%list%lag=atan2(ey,ex)
-
-    case(12)
+      key%list%lag=atan2(ey,ex)      
+      
+    case(code_srotation) ! case(12)
        ! actually our SROT element
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
@@ -1301,7 +1316,19 @@ CONTAINS
           key%list%ang(i)=patch_ang(i)
           key%list%t(i)=patch_trans(i)
        enddo
-    case(13)
+
+    case(code_xrotation) ! case(34) ! XROTATION
+       key%magnet="CHANGEREF"
+       PATCH_ANG = zero
+       PATCH_TRANS = zero
+       patch_ang(1)=node_value('angle ')
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
+
+    case(code_yrotation) ! case(13)
        ! actually our YROT element
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
@@ -1312,7 +1339,33 @@ CONTAINS
           key%list%ang(i)=patch_ang(i)
           key%list%t(i)=patch_trans(i)
        enddo
-    case(14,15,16) ! PTC accepts mults
+
+    case(code_changeref) ! case(35)
+       key%magnet="CHANGEREF"
+       PATCH_ANG = zero
+       PATCH_TRANS = zero
+       call get_node_vector('patch_ang ',3,patch_ang)
+       call get_node_vector('patch_trans ',3,patch_trans)
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
+       key%list%ang(2)=-patch_ang(2) ! Change the sign of the y-rotation to be the geometrical angle.
+
+    case(code_translation) ! case(36) ! TRANSLATION
+       key%magnet="CHANGEREF"
+       PATCH_ANG = zero
+       patch_trans(1)=node_value('dx ')
+       patch_trans(2)=node_value('dy ')
+       patch_trans(3)=node_value('ds ')
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
+
+    case(code_hkicker, code_kicker, code_vkicker) ! case(14,15,16) ! PTC accepts mults
        ! kickers (corrector magnets)
        F_ERRORS = zero
        n_ferr = node_fd_errors(f_errors)
@@ -1355,30 +1408,18 @@ CONTAINS
           endif
        endif
        key%tiltd=node_value('tilt ')
-    case(17)
+
+    case(code_hmonitor) ! case(17)
        key%magnet="hmonitor"
-    case(18)
+
+    case(code_monitor) ! case(18)
        key%magnet="monitor"
-    case(19)
+
+    case(code_vmonitor) ! case(19)
        key%magnet="vmonitor"
-       !  2015-Mar-05  13:13:35  ghislain: Warning !
-       !                         ecollimator and rcollimator replaced by collimator in MAD-X, with code 44
-       !  case(20)
-       !     key%magnet="ecollimator"
-       !     key%list%x_col=node_value('xsize ')
-       !     key%list%y_col=node_value('ysize ')
-       !     key%tiltd=node_value('tilt ')
-       !  case(21)
-       !     key%magnet="rcollimator"
-       !     key%list%x_col=node_value('xsize ')
-       !     key%list%y_col=node_value('ysize ')
-       !     key%tiltd=node_value('tilt ')
-    !case(20,21,44)
-    !        key%magnet="madcollimator"
-    !        key%list%x_col=1e3
-    !        key%list%y_col=1e3
-    !        key%tiltd=node_value('tilt ')
-    case(33)
+
+
+    case(code_dipedge) ! case(33)
        !---- This is the dipedge element
        edge= node_value('e1 ')
        hgap= node_value('hgap ')
@@ -1396,10 +1437,12 @@ CONTAINS
        else
           key%magnet="marker"
        endif
-    case(24)
+
+    case(code_instrument) ! case(24)
        key%magnet="instrument"
        key%tiltd=node_value('tilt ')
-    case(27)
+
+    case(code_twcavity) ! case(27)
        key%magnet="twcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -1414,40 +1457,9 @@ CONTAINS
        key%list%psi=node_value("psi ")
        key%list%harmon=one
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
-    case(34) ! XROTATION
-       key%magnet="CHANGEREF"
-       PATCH_ANG = zero
-       PATCH_TRANS = zero
-       patch_ang(1)=node_value('angle ')
-       key%list%patchg=2
-       do i=1,3
-          key%list%ang(i)=patch_ang(i)
-          key%list%t(i)=patch_trans(i)
-       enddo
-    case(35)
-       key%magnet="CHANGEREF"
-       PATCH_ANG = zero
-       PATCH_TRANS = zero
-       call get_node_vector('patch_ang ',3,patch_ang)
-       call get_node_vector('patch_trans ',3,patch_trans)
-       key%list%patchg=2
-       do i=1,3
-          key%list%ang(i)=patch_ang(i)
-          key%list%t(i)=patch_trans(i)
-       enddo
-       key%list%ang(2)=-patch_ang(2) ! Change the sign of the y-rotation to be the geometrical angle.
-    case(36) ! TRANSLATION
-       key%magnet="CHANGEREF"
-       PATCH_ANG = zero
-       patch_trans(1)=node_value('dx ')
-       patch_trans(2)=node_value('dy ')
-       patch_trans(3)=node_value('ds ')
-       key%list%patchg=2
-       do i=1,3
-          key%list%ang(i)=patch_ang(i)
-          key%list%t(i)=patch_trans(i)
-       enddo
-    case(37)!CRAB ??
+
+
+    case(code_crabcavity) ! case(37)
        key%magnet="rfcavity"
        key%list%volt=zero
        do i=1,NMAX
@@ -1476,8 +1488,7 @@ CONTAINS
 
     !RFMULTIPOLE, crab also falls here, but is made with special case where volt defines BN(1)
 
-    case(40)
-
+    case(code_hacdipole) ! case(40)
        key%magnet="hkicker"
        do i=1,NMAX
           key%list%k(i)=zero
@@ -1514,8 +1525,7 @@ CONTAINS
         endif
 
 
-    case(41)
-
+    case(code_vacdipole) ! case(41)
        key%magnet="vkicker"
        do i=1,NMAX
           key%list%k(i)=zero
@@ -1551,7 +1561,7 @@ CONTAINS
         endif
 
 
-    case(43)
+    case(code_rfmultipole) ! case(43)
        key%magnet="rfcavity" ! RFMULTIPOLE
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -1657,11 +1667,15 @@ CONTAINS
 !                                    " freq: ", key%list%freq0
 
 
+    case(code_matrix) ! case(4)
+       call aafail('ptc_input:','PTC does not accept matrix elements. Program stops.')
 
     case default
        print*,"Element: ",name, "of type ",code," not implemented in PTC"
        call aafail('ptc_input:','Element not implemented in PTC. Program stops')
+
     end select
+
 100 continue
 
     !apply BVK f;ag
@@ -3423,8 +3437,8 @@ CONTAINS
     if(code.eq.5) then
        ! quadrupole components code =  5
        k=2
-       sk= node_value('k1 ')
-       sks=node_value('k1s ')
+       sk= node_value('k1 ')  * (1 + node_value('ktap '))
+       sks=node_value('k1s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
        b(k)=sk
 ! LD: 19.06.2019
@@ -3437,8 +3451,8 @@ CONTAINS
     elseif(code.eq.6) then
        ! sextupole components code = 6
        k=3
-       sk= node_value('k2 ')+node_value('k2tap ')
-       sks=node_value('k2s ')
+       sk= node_value('k2 ')  * (1 + node_value('ktap '))
+       sks=node_value('k2s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
        b(k)=sk
 ! LD: 19.06.2019

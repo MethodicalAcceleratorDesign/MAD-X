@@ -19,19 +19,16 @@ Edwards and Teng\cite{edwards1973}.
 For the uncoupled cases they reduce to the C and S functions. 
 
 \madbox{
-TWISS, \=SEQUENCE=seqname, LINE=linename, RANGE=range,  \\
+TWISS, \=SEQUENCE=seqname, LINE=linename, RANGE=range,\\
        \>DELTAP=real\{,real\}||initial:final:step,\\
-       \>CHROM=logical,\\
-       \>CENTRE=logical, TOLERANCE=real, \\
-       \>FILE=filename, \\
-       \>TABLE=tabname, NOTABLE=logical,\\
-       \>RMATRIX=logical, SECTORMAP=logical, \\
-       \>SECTORTABLE=tabname, SECTORFILE=filename,\\
-       \>SECTORPURE=logical,\\
+       \>CHROM=logical, RMATRIX=logical, TAPERING=logical,\\
+       \>CENTRE=logical, TOLERANCE=real,\\
+       \>FILE=filename, TABLE=tabname, NOTABLE=logical,\\
+       \>SECTORMAP=logical, SECTORTABLE=tabname,\\
+       \>SECTORFILE=filename, SECTORPURE=logical,\\
        \>EIGENVECTOR=tabname, EIGENFILE=filename,\\
        \>KEEPORBIT=name, USEORBIT=name,\\
-       \>COUPLE=logical,\\
-       \>RIPKEN=logical, TAPERING=logical \\;
+       \>COUPLE=logical, RIPKEN=logical;\\
 }
 
 The  attributes of the \texttt{TWISS} command are: 
@@ -190,10 +187,13 @@ The  attributes of the \texttt{TWISS} command are:
   the parameters \texttt{betx, bety, alfx, alfy, \\ gamax, gamay, R11, R12,
     R21} and \texttt{R22} as input.
 
-  \ttitem{TAPERING} Adjust the strength of the quadrupoles and sextupoles
-  in order to compensate for the offset in energy. The phase of the RF is
-  also adjusted in order to find a closed 6D orbit. The change of the 
-  attributes are stored in k1tap, k2tap etc.  
+  \ttitem{TAPERING} Adjust the strengths of the quadrupoles and sextupoles
+  in order to compensate for the offset in energy. This flag triggers a
+  call to the \hyperref[chap:taper]{\texttt{TAPER}} command with default
+  parameters and no output file. 
+  %% The phase of the RF is
+  %% also adjusted in order to find a closed 6D orbit. The change of the 
+  %% attributes are stored in k1tap, k2tap etc.  
 
 \end{madlist}
 
