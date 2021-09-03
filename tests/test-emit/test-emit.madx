@@ -8,6 +8,8 @@ Show, beam%Machine;
 Emit, DELTAP=0.0 ;
 Show, beam%Machine;
 
-write, table=emit, "myemit.tfs";
+write, table=emit, file="out.tfs" ;
+write, table=summ, file="twisssum.tfs" ;
+write, table=emitsumm, file="emitsum.tfs" ;
 Stop;
 

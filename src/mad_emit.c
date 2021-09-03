@@ -19,6 +19,10 @@ pro_emit(struct in_cmd* cmd)
                             emit_table_types, 50);
   add_to_table_list(emit_table, table_register);
 
+  emitsumm_table = make_table("emitsumm", "emitsumm", emitsumm_table_cols,
+                            emitsumm_table_types, 20);
+  add_to_table_list(emitsumm_table, table_register);
+
 
   if (current_sequ == NULL || current_sequ->ex_start == NULL) {
     warning("sequence not active,", "EMIT ignored");
@@ -54,21 +58,32 @@ pro_emit(struct in_cmd* cmd)
     current_node = current_sequ->ex_start;
     emit_(&e_deltap, &e_tol, orbit0, disp0, oneturnmat, &u0, emit_v, nemit_v,
           bmax, gmax, dismax, tunes, sig_v, pdamp, &updatebeam);
+    
+    double_to_table_curr("emitsumm", "ex",  &emit_v[0]);
+    double_to_table_curr("emitsumm", "exn", &nemit_v[0]);
+    double_to_table_curr("emitsumm", "ey",  &emit_v[1]);
+    double_to_table_curr("emitsumm", "eyn", &nemit_v[1]);
+    double_to_table_curr("emitsumm", "et",  &emit_v[2]);
+    double_to_table_curr("emitsumm", "sigt",&sig_v[2]);
+    double_to_table_curr("emitsumm", "sige",&sig_v[3]);
+    double_to_table_curr("emitsumm", "u0",  &u0);
+    double_to_table_curr("emitsumm", "qs",  &tunes[2]);
+    augment_count("emitsumm");
 
     if (e_deltap != zero) { 
       sprintf(tmp, v_format("%F"), e_deltap);
       warning("EMIT: beam not updated, non-zero deltap: ", tmp);
     }
     else if (updatebeam) {      
-      store_comm_par_value("ex", emit_v[0], current_beam);
+      store_comm_par_value("ex",  emit_v[0], current_beam);
       store_comm_par_value("exn", nemit_v[0], current_beam);
-      store_comm_par_value("ey", emit_v[1], current_beam);
+      store_comm_par_value("ey",  emit_v[1], current_beam);
       store_comm_par_value("eyn", nemit_v[1], current_beam);
-      store_comm_par_value("et", emit_v[2], current_beam);
-      store_comm_par_value("sigt", sig_v[2], current_beam);
-      store_comm_par_value("sige", sig_v[3], current_beam);
-      store_comm_par_value("u0", u0, current_beam);
-      store_comm_par_value("qs", tunes[2], current_beam);
+      store_comm_par_value("et",  emit_v[2], current_beam);
+      store_comm_par_value("sigt",sig_v[2], current_beam);
+      store_comm_par_value("sige",sig_v[3], current_beam);
+      store_comm_par_value("u0",  u0, current_beam);
+      store_comm_par_value("qs",  tunes[2], current_beam);
       store_comm_par_vector("pdamp", pdamp, current_beam);
       printf("\n EMIT: beam parameters have been updated.\n"); 
     }
@@ -76,7 +91,6 @@ pro_emit(struct in_cmd* cmd)
 
     print_rfc();
   }
-  out_table("emit", emit_table, "outemit.tfs");
   probe_beam = delete_command(probe_beam);
   set_option("twiss_print", &keep);
 }

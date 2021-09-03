@@ -133,6 +133,7 @@ struct table* errors_read; /* table needed for IO of errors with PTC */
 struct table* survey_table;       /* current survey table */
 
 struct table* emit_table;         /* current emit table */
+struct table* emitsumm_table;         /* current emit table */
 struct table* corr_table;         /* corrector table after orbit correction */
 struct table* corr_table1;        /* corrector table after orbit correction, beam 1 for two rings */
 struct table* corr_table2;        /* corrector table after orbit correction, beam 2 for two rings */
