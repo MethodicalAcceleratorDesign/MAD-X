@@ -100,12 +100,9 @@ subroutine taperreset(error)
 
   select case (code)
      
-  case (code_rbend, code_sbend)
-     call store_node_value('k0 ', 0.d0)
-     
-  case (code_quadrupole, code_sextupole)
+  case (code_rbend, code_sbend, code_quadrupole, code_sextupole)
      call store_node_value('ktap ', 0.d0)
-     
+          
   end select
   
   if (advance_node().ne.0) then

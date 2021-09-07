@@ -426,35 +426,35 @@ module twiss_elpfi
   public
   !---fixed positions for element parameters
   double precision :: g_elpar(50)=0.d0
-  ! 2021-07-09 Ghislain Roy: added parameters x_max so that el_par_vector can be called with x_max-1 as first argument
+  ! 2021-07-09 Ghislain Roy: added parameters x_max so that el_par_vector can be called with x_max as first argument
   ! Always add parameters before the x_max which must stay as last one in list.
   !-general
-  integer, parameter :: g_el=2, g_kmax=3, g_kmin=4, g_calib=5, g_polarity=6, g_max=7
+  integer, parameter :: g_el=2, g_kmax=3, g_kmin=4, g_calib=5, g_polarity=6, g_max=6
   !-bend
   integer, parameter :: b_angle=7, b_tilt=8, b_k0=9, b_k0s=10
   integer, parameter :: b_k1=11, b_k1s=12, b_e1=13 , b_e2=14, b_k2=15
   integer, parameter :: b_k2s=16, b_h1=17, b_h2=18, b_hgap=19
-  integer, parameter :: b_fint=20, b_fintx=21, b_k3=22, b_k3s=23, b_ktap=24, b_max=25
+  integer, parameter :: b_fint=20, b_fintx=21, b_k3=22, b_k3s=23, b_ktap=24, b_max=24
   !-quad
-  integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9, q_ktap=10, q_max=11
+  integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9, q_ktap=10, q_max=10
   !-sext
-  integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9, s_ktap=10, s_max=11
+  integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9, s_ktap=10, s_max=10
   !-oct
-  integer, parameter :: o_tilt=7, o_k3=8, o_k3s=9, o_max=10
+  integer, parameter :: o_tilt=7, o_k3=8, o_k3s=9, o_max=9
   !-mult
-  integer, parameter :: m_tilt=7, m_lrad=8, m_max=9
+  integer, parameter :: m_tilt=7, m_lrad=8, m_max=8
   !-sol
-  integer, parameter :: so_lrad=7, so_ks=8, so_ksi=9, so_max=10
+  integer, parameter :: so_lrad=7, so_ks=8, so_ksi=9, so_max=9
   !-rfc
-  integer, parameter :: r_volt=7, r_lag=8, r_freq=9, r_lagt=10, r_max=11
+  integer, parameter :: r_volt=7, r_lag=8, r_freq=9, r_lagt=10, r_max=10
   !-elsep
-  integer, parameter :: e_tilt=7, e_ex=8, e_ey=9, e_max=10
+  integer, parameter :: e_tilt=7, e_ex=8, e_ey=9, e_max=9
   !-hkick
-  integer, parameter :: h_tilt=7, h_lrad=8, h_kick=9, h_hkick=10, h_chkick=11, h_max=12
+  integer, parameter :: h_tilt=7, h_lrad=8, h_kick=9, h_hkick=10, h_chkick=11, h_max=11
   !-vkick
-  integer, parameter :: v_tilt=7, v_lrad=8, v_kick=9, v_vkick=10, v_cvkick=11, v_max=12
+  integer, parameter :: v_tilt=7, v_lrad=8, v_kick=9, v_vkick=10, v_cvkick=11, v_max=11
   !-kick
-  integer, parameter :: k_tilt=7, k_lrad=8, k_hkick=9, k_vkick=10, k_chkick=11, k_cvkick=12, k_max=13
+  integer, parameter :: k_tilt=7, k_lrad=8, k_hkick=9, k_vkick=10, k_chkick=11, k_cvkick=12, k_max=12
 end module twiss_elpfi
 
 module emitfi

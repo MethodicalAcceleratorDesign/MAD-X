@@ -827,13 +827,11 @@ CONTAINS
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       ! key%list%b0=bvk*(node_value('angle ')+tempdp*l)
-       key%list%b0=bvk*(node_value('angle ')+tempdp*l) ! * (1 + node_value('ktap '))
+       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1+node_value('ktap '))
        
        !       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
        !       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
 
-       ! Ghislain: do we need to taper the multipole components with (1+node_value('ktap ')) ? 
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
        key%list%k(4)=node_value('k3 ')+ key%list%k(4)
@@ -930,9 +928,8 @@ CONTAINS
        endif
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+ tempdp*l) ! * (1 + node_value('ktap '))
+       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1+node_value('ktap '))
 
-       ! Ghislain  tag for tapering addition *(1+node_value('ktap '))
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
        key%list%k(4)=node_value('k3 ')+ key%list%k(4)
@@ -995,7 +992,7 @@ CONTAINS
        ! summs of multipoles and errors
 
 ! LD: 19.06.2019
-       sk0=node_value('k0 ') ! * (1 + node_value('ktap '))
+       sk0=node_value('k0 ') 
        
        ! quadrupole components
        sk1= node_value('k1 ')  * (1 + node_value('ktap '))
@@ -3433,7 +3430,9 @@ CONTAINS
     a(:)=zero
 
     code=node_value('mad8_type ')
+
     if(code.ne.5.and.code.ne.6) goto 100
+
     if(code.eq.5) then
        ! quadrupole components code =  5
        k=2
@@ -3448,6 +3447,7 @@ CONTAINS
           b(k)=sqrt(sk**2+sks**2)/abs(sk)*sk
           ! bug: sks not updated
        endif
+
     elseif(code.eq.6) then
        ! sextupole components code = 6
        k=3

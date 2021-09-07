@@ -59,8 +59,8 @@ pro_taper(struct in_cmd* cmd)
     if (get_option("info")) { 
       fprintf(prt_file, " Found initial orbit vector from COGUESS values. \n");
     }
-  }
-
+  }  
+  
   taperreset_(&error); /* start from bare sequence for adjust_probe */
   adjust_beam();
   probe_beam = clone_command(current_beam);
