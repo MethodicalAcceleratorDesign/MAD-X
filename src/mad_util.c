@@ -15,7 +15,3 @@ intrac(void)
   fstat(0, &stats);
   return (in->input_files[0] == stdin && S_ISFIFO(stats.st_mode)) || isatty(0);
 }
-
-FILE *fopen_mad(const char *file_name, const char *mode_of_operation){
-  return fopen(file_name, mode_of_operation);
-}

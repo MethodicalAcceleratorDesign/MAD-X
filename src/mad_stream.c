@@ -49,17 +49,8 @@ down_unit(char* file_name)
   /* makes a called file the current input unit */
 {
   FILE* new;
-  if (get_option("rel_path_main_file") == 1 && mad_argc > 1){
-    char tmp[100] ; 
-    mycpy(tmp, rel_path_dir);
-    strcat(tmp, "/"); // This works for windows and linux due to the change later in str2path
-    strcat(tmp, file_name);
-    file_name = str2path(tmp);  
-  }
-  else {
-    file_name = str2path(file_name);
-  }
-
+  file_name = str2path(file_name);
+  
   if ((new = fopen(file_name, "r")) == NULL)
   {
     if (interactive) warning("cannot open input file:", file_name);

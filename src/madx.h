@@ -18,7 +18,6 @@
 #include <math.h>
 #include <time.h>
 #include <sys/stat.h>
-#include <libgen.h>
 
 // defines
 
