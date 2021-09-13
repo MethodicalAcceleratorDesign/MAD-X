@@ -6,7 +6,8 @@ implicit none
   public DEFAULT0,TOTALPATH0 ,TIME0,ONLY_4d0,DELTA0,SPIN0,MODULATION0,only_2d0   ,nrmax_zhe
   public RADIATION0, NOCAVITY0, FRINGE0 ,STOCHASTIC0,ENVELOPE0,gaussian_seed_zhe,nrmax_used_zhe,alloc_bunch,kill_bunch
   PUBLIC track_TREE_probe_complex_ji,track_TREE_probe_complex_ji_symp,TRACK_TREE_PROBE_COMPLEX_JI_VEC
- public file_zhe,number_zhe_maps,get_seed,set_seed
+ public file_zhe,number_zhe_maps,get_seed,set_seed,ALLOC_TREE,track_TREE_probe_complex_zhe_no_orbital
+public track_TREE_probe_complex_zhe_no_orbital_quaternion
  character(255) ::    file_zhe="zhe"
   integer ::  number_zhe_maps = 1
   public use_ji
@@ -810,7 +811,7 @@ endif
     call track_TREE_G_complex(T(1),X(1:6))
  else
     do i=1,3
-     x(2*i-1)=0.d0   ! use non symplectic as approximation
+     x(2*i-1)=0.0_dp   ! use non symplectic as approximation
     enddo
   endif
 !!! symplectic here!! symplectic here
@@ -1167,7 +1168,7 @@ if(no1>1.and.(.not.as_is0)) then
 
  !else
     do i=1,3
-     x(2*i-1)=0.d0   ! use non symplectic as approximation
+     x(2*i-1)=0.0_dp   ! use non symplectic as approximation
     enddo
  ! endif
 !!! symplectic here!! symplectic here
@@ -1351,6 +1352,259 @@ endif
     enddo
 
   end SUBROUTINE track_TREE_probe_complex_zhe
+
+
+!!!! track_TREE_probe_complex_zhe without orbital
+
+
+  SUBROUTINE track_TREE_probe_complex_zhe_no_orbital(T,xs,spin,stoch)
+!    use da_arrays
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT),target, INTENT(INout) :: T(3)
+ 
+    type(probe) xs
+    real(dp) x(size_tree),x0(size_tree),s0(3,3),r(3,3),dx6,beta  
+    real(dp) norm,x0_begin(size_tree),xr(6)  !,normb,normbb 
+    integer i,j,k,ier,is
+    logical, optional  :: spin,stoch  !,rad!,linear
+    logical  spin0,stoch0,doit !,rad0
+ !   integer no1
+    type(quaternion) qu
+    spin0=.true.
+    stoch0=.true.
+    !rad0=.true.
+   ! no1=t(1)%no
+!    if(present(linear)) then
+!     if(linear) no1=1
+ !   endif
+    if(present(spin)) spin0=spin
+    if(present(stoch)) stoch0=stoch
+!    if(present(rad)) rad0=rad
+
+ 
+    doit= stoch0
+!    doit=rad0.or.stoch0
+    x=0
+    x0=0
+!    nrmax=1000
+   check_stable_zhe=.true.
+       xs%u=.false.
+!!!! put stochastic kick in front per Sagan
+ if(stoch0) then 
+
+    do i=1,6
+      x(i)=xs%x(i)-t(1)%fix0(i)
+    enddo
+
+    xr=0.0_dp
+  do i=1,6
+    xr(i)=GRNF_zhe()*t(2)%fix0(i)  
+  enddo
+    xr(1:6)=matmul(t(2)%rad,xr)
+
+    x=x+xr(1:6)
+
+    do i=1,6
+      xs%x(i)=x(i)+t(1)%fix0(i)
+    enddo
+ endif
+!!!!!!!!!!!!!!!!!!!
+    x=0.e0_dp
+    x0=0.e0_dp
+x0_begin=0.0_dp
+    do i=1,6
+      x(i)=xs%x(i)
+      x0(i)=xs%x(i)
+      x0_begin(i)=xs%x(i)
+    enddo
+!      x0(1:6)=x(1:6)
+   !   x(7:12)=x(1:6)  remove4/9/2018
+
+
+if(doit) then
+
+     do i=1,6
+      x(i)=x(i)-t(1)%fix0(i)
+      x0(i)=x0(i)-t(1)%fix0(i)
+      x0_begin(i)=x0_begin(i)-t(1)%fix0(i)
+     enddo
+else
+     do i=1,6
+      x(i)=x(i)-t(3)%fix0(i)
+      x0(i)=x0(i)-t(3)%fix0(i)
+      x0_begin(i)=x0_begin(i)-t(3)%fix0(i)
+     enddo
+endif
+      x(7:12)=x(1:6)
+      x0_begin(7:12)= x0_begin(1:6)
+
+
+!  if(rad0)   call track_TREE_G_complex(T(1),X(1:6))
+
+
+      x0(1:6)=x(1:6)
+      x(7:12)=x(1:6)
+
+
+!if(jumpnot) then
+    if(spin0) then  ! spin
+
+     if(xs%use_q) then
+    call track_TREE_G_complex(T(2),x0_begin(7:15))
+
+       do k=0,3
+         qu%x(k)=x0_begin(7+k)
+       enddo 
+ 
+       xs%q=qu*xs%q
+       xs%q%x=xs%q%x/sqrt(xs%q%x(1)**2+xs%q%x(2)**2+xs%q%x(3)**2+xs%q%x(0)**2)
+     else
+    call track_TREE_G_complex(T(2),x0_begin(7:15))
+
+    s0=0.0e0_dp
+ 
+    do i=1,3
+    do j=1,3
+     r(i,j)=x0_begin(ind_spin(i,j))
+    enddo
+    enddo
+
+    call orthonormaliser(r)
+    
+    do k=1,3
+     s0(k,1:3)=0.0e0_dp
+     do i=1,3
+     do j=1,3
+        s0(k,i)=r(i,j)*xs%s(k)%x(j)+s0(k,i)
+     enddo
+    enddo
+    enddo
+
+    do k=1,3
+     do j=1,3
+       xs%s(k)%x(j)=s0(k,j)
+     enddo
+    enddo 
+     endif  
+
+    endif ! spin
+
+
+
+
+if(doit) then
+
+ 
+         do i=1,6
+           x(i)=x(i)+t(1)%fix(i)
+         enddo
+else
+ 
+         do i=1,6
+           x(i)=x(i)+t(3)%fix(i)
+         enddo
+endif
+
+
+
+
+    do i=1,6
+      xs%x(i)=x(i)
+    enddo
+
+  end SUBROUTINE track_TREE_probe_complex_zhe_no_orbital
+
+  SUBROUTINE track_TREE_probe_complex_zhe_no_orbital_quaternion(T,xs)
+!    use da_arrays
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT),target, INTENT(INout) :: T(3)
+ 
+    type(probe) xs
+    real(dp) x(size_tree),x0(size_tree),s0(3,3),r(3,3),dx6,beta  
+    real(dp) norm,x0_begin(size_tree),xr(6)  !,normb,normbb 
+    integer i,j,k,ier,is
+   !,rad!,linear
+
+    type(quaternion) qu
+ 
+
+
+!    doit=rad0.or.stoch0
+    x=0
+    x0=0
+!    nrmax=1000
+   check_stable_zhe=.true.
+       xs%u=.false.
+!!!! put stochastic kick in front per Sagan
+ 
+    do i=1,6
+      x(i)=xs%x(i)-t(1)%fix0(i)
+    enddo
+
+    xr=0.0_dp
+  do i=1,6
+    xr(i)=GRNF_zhe()*t(2)%fix0(i)  
+  enddo
+    xr(1:6)=matmul(t(2)%rad,xr)
+
+    x=x+xr(1:6)
+
+    do i=1,6
+      xs%x(i)=x(i)+t(1)%fix0(i)
+    enddo
+ 
+!!!!!!!!!!!!!!!!!!!
+    x=0.e0_dp
+    x0=0.e0_dp
+x0_begin=0.0_dp
+    do i=1,6
+      x(i)=xs%x(i)
+      x0(i)=xs%x(i)
+      x0_begin(i)=xs%x(i)
+    enddo
+!      x0(1:6)=x(1:6)
+   !   x(7:12)=x(1:6)  remove4/9/2018
+
+
+ 
+
+     do i=1,6
+      x(i)=x(i)-t(1)%fix0(i)
+      x0(i)=x0(i)-t(1)%fix0(i)
+      x0_begin(i)=x0_begin(i)-t(1)%fix0(i)
+     enddo
+ 
+      x(7:12)=x(1:6)
+      x0_begin(7:12)= x0_begin(1:6)
+
+
+!  if(rad0)   call track_TREE_G_complex(T(1),X(1:6))
+
+
+      x0(1:6)=x(1:6)
+      x(7:12)=x(1:6)
+
+
+ 
+    call track_TREE_G_complex(T(2),x0_begin(7:15))
+
+       do k=0,3
+         qu%x(k)=x0_begin(7+k)
+       enddo 
+ 
+       xs%q=qu*xs%q
+       xs%q%x=xs%q%x/sqrt(xs%q%x(1)**2+xs%q%x(2)**2+xs%q%x(3)**2+xs%q%x(0)**2)
+     
+
+ 
+         do i=1,6
+           xs%x(i)=x(i)+t(1)%fix(i)
+         enddo
+ 
+
+
+  end SUBROUTINE track_TREE_probe_complex_zhe_no_orbital_quaternion
+
 
   SUBROUTINE track_TREE_probe_complex_ji_symp(T,xs)
 !    use da_arrays

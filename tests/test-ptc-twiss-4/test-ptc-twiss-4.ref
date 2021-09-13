@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2019.12.18 10:53:56      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.09.12 19:20:14      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test case for coupling calculations
 
@@ -248,7 +248,7 @@ ptc_create_layout,model=2,method=6,nst=1,exact;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -8.4547052805185974        4.9767276369542052E-015   85.842063290121274     
+ After    end:   -8.4547052805184784        2.2457091403640571E-015   85.842063290121374     
 select flag=ptc_twiss,column=name,s,betx,beta11,bety,beta22,beta12,beta21,mu1,mu2,beta11p,beta21p,beta22p,beta12p,disp1,disp1p;
 
 ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
@@ -304,13 +304,13 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0   -9.639454713e-06       0.0377924083 
+                 0                  0   -9.639454819e-06       0.0377924083 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.01483622117      0.01483622117    -1.24766566e-05    1.254878668e-05 
+    -0.01483622117      0.01483622117   -1.247665701e-05    1.254878708e-05 
 
           disp4min           disp4max             deltap            orbit_x 
-    -1.2659994e-05    1.265999529e-05                  0                  0 
+  -1.265999584e-05    1.265999448e-05                  0                  0 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 
