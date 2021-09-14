@@ -2,7 +2,9 @@
 !Copyright (C) Etienne Forest and CERN
 module sagan_WIGGLER
  ! use S_def_all_kinds
-  use S_DEF_KIND
+  USE S_def_all_kinds   ! not needed because of things below
+  use s_extend_poly, only : PRTP, PRTP1 ! LD: 22.03.2019
+!  use S_DEF_KIND
   implicit none
   public
   private INTR,INTP,ZERO_SAGANr,ZERO_SAGANp
@@ -28,6 +30,12 @@ integer, parameter :: hyper_y_family_x = 4, hyper_xy_family_x = 5, hyper_x_famil
 integer, parameter :: hyper_y_family_qu = 7, hyper_xy_family_qu = 8, hyper_x_family_qu = 9
 integer, parameter :: hyper_y_family_sq = 10, hyper_xy_family_sq = 11, hyper_x_family_sq = 12
 private conv_to_xprsagan,conv_to_xppsagan,conv_to_pxrsagan,conv_to_pxpsagan
+private gen_conv_to_pxp,gen_conv_to_pxr,gen_conv_to_xpp,gen_conv_to_xpr
+private conv_to_xpr,conv_to_xpp,conv_to_pxr
+private conv_to_pxp, conv_to_pxpabell ,conv_to_xprabell,conv_to_xppabell,conv_to_pxrabell
+private B_E_FIELDR,B_E_FIELDP
+private fx_newr,fx_newp
+integer :: put_a_abell = 1
 
   integer :: limit_sag(2) =(/4,18/) 
  
@@ -190,6 +198,43 @@ private conv_to_xprsagan,conv_to_xppsagan,conv_to_pxrsagan,conv_to_pxpsagan
   INTERFACE kick_integral
      MODULE PROCEDURE kick_integral_r
      MODULE PROCEDURE kick_integral_p
+  END INTERFACE
+
+
+  INTERFACE gen_conv_to_px
+     MODULE PROCEDURE gen_conv_to_pxr
+     MODULE PROCEDURE gen_conv_to_pxp
+  END INTERFACE
+
+  INTERFACE gen_conv_to_xp
+     MODULE PROCEDURE gen_conv_to_xpr
+     MODULE PROCEDURE gen_conv_to_xpp
+  END INTERFACE
+
+
+  INTERFACE conv_to_xp
+     MODULE PROCEDURE conv_to_xpr
+     MODULE PROCEDURE conv_to_xpp
+     MODULE PROCEDURE conv_to_xprabell
+     MODULE PROCEDURE conv_to_xppabell
+  END INTERFACE
+
+  INTERFACE conv_to_px
+     MODULE PROCEDURE conv_to_pxr
+     MODULE PROCEDURE conv_to_pxp
+     MODULE PROCEDURE conv_to_pxrabell
+     MODULE PROCEDURE conv_to_pxpabell
+  END INTERFACE
+
+  INTERFACE B_E_FIELD
+     MODULE PROCEDURE B_E_FIELDR
+     MODULE PROCEDURE B_E_FIELDP
+  END INTERFACE
+
+
+  INTERFACE fx_new
+     MODULE PROCEDURE fx_newr
+     MODULE PROCEDURE fx_newp
   END INTERFACE
 
 
@@ -545,11 +590,11 @@ end subroutine kick_integral_p
 
 
 
-  SUBROUTINE INTR(EL,X,k,mid)
+  SUBROUTINE INTR(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(SAGAN),INTENT(INOUT):: EL
-    TYPE(WORM),OPTIONAL,INTENT(INOUT):: mid
+    
     INTEGER I,ENT,EXI
     TYPE(INTERNAL_STATE),OPTIONAL :: K
  
@@ -559,16 +604,16 @@ end subroutine kick_integral_p
        ENT=2;EXI=1;
     ENDIF
 
-    IF(.NOT.PRESENT(MID))call ADJUST_LIKE_ABELL(EL,X,k,ENT)
+    call ADJUST_LIKE_ABELL(EL,X,k,ENT)
 
-    IF(PRESENT(MID)) CALL XMID(MID,X,0)
+    !  IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     DO I=1,EL%P%NST
        call track_slice(el,x,k,i)
-       IF(PRESENT(MID)) CALL XMID(MID,X,i)
+       !  IF(PRESENT(MID)) CALL XMID(MID,X,i)
     ENDDO
 
-   IF(.NOT.PRESENT(MID))call ADJUST_LIKE_ABELL(EL,X,k,EXI)
+   call ADJUST_LIKE_ABELL(EL,X,k,EXI)
 
     call ADJUST_WI(EL,X,k,2)
 
@@ -1927,7 +1972,7 @@ ENDIF
        elseif (EL%W%FORM(I) == hyper_y_family_qu) THEN
           A =    EL%W%A(I)*sin(EL%W%K(1,i)*(X(1)+EL%W%X0(i)))*cosh(EL%W%K(2,i)*(X(3)+EL%W%Y0(I)))* &
                 SIN(EL%W%K(3,i)*Z+EL%W%F(I))/EL%W%K(3,i) + A
-          B =   0.5_dp*EL%W%A(I)*sinx_x(0.5d0*EL%W%K(1,i)*(X(1)+EL%W%X0(i)))**2*sinh(EL%W%K(2,i)*(X(3)+EL%W%Y0(I)))* &
+          B =   0.5_dp*EL%W%A(I)*sinx_x(0.5_dp*EL%W%K(1,i)*(X(1)+EL%W%X0(i)))**2*sinh(EL%W%K(2,i)*(X(3)+EL%W%Y0(I)))* &
                 SIN(EL%W%K(3,i)*Z+EL%W%F(I))*EL%W%K(1,i)*EL%W%K(2,i)/EL%W%K(3,i)*(X(1)+EL%W%X0(i))**2 + B
        elseif (EL%W%FORM(I) == hyper_xy_family_qu) THEN
           A =    EL%W%A(I)*sinh(EL%W%K(1,i)*(X(1)+EL%W%X0(i)))*cosh(EL%W%K(2,i)*(X(3)+EL%W%Y0(I)))* &
@@ -3831,4 +3876,836 @@ subroutine feval_saganp(Z,X,k,f,EL)   !electric teapot s
     call kill(a)
   end SUBROUTINE conv_to_pxpsagan
 
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!    conversion  !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  SUBROUTINE gen_conv_to_xpr(X,a,ve,exact,beta0,hcurv)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    real(dp) ti,ve,a(3),beta0,hcurv
+    logical exact
+
+    if(exact) then
+       ti=ROOT(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2-(X(2)-put_a_abell*a(1))**2-(X(4)-put_a_abell*a(2))**2)
+       x(2)=(1.0_dp+hcurv*X(1))*(X(2)-put_a_abell*a(1))/ti
+       x(4)=(1.0_dp+hcurv*X(1))*(X(4)-put_a_abell*a(2))/ti
+    else
+       ti=ROOT(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2)
+       x(2)=(X(2)-put_a_abell*a(1))/ti
+       x(4)=(X(4)-put_a_abell*a(2))/ti
+    endif
+
+  end SUBROUTINE gen_conv_to_xpr
+
+  SUBROUTINE gen_conv_to_xpp(X,a,ve,exact,beta0,hcurv)
+    IMPLICIT NONE
+    type(real_8),INTENT(INOUT):: X(6)
+    type(real_8)  ti,ve,a(3)
+    real(dp) beta0,hcurv
+    logical exact
+
+    call alloc(ti)
+
+    if(exact) then
+       ti=sqrt(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2-(X(2)-put_a_abell*a(1))**2-(X(4)-put_a_abell*a(2))**2)
+       x(2)=(1.0_dp+hcurv*X(1))*(X(2)-put_a_abell*a(1))/ti
+       x(4)=(1.0_dp+hcurv*X(1))*(X(4)-put_a_abell*a(2))/ti
+    else
+       ti=sqrt(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2)
+       x(2)=(X(2)-put_a_abell*a(1))/ti
+       x(4)=(X(4)-put_a_abell*a(2))/ti
+    endif
+
+    call kill(ti)
+
+  end SUBROUTINE gen_conv_to_xpp
+
+  SUBROUTINE gen_conv_to_pxr(X,a,ve,exact,beta0,hcurv)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    real(dp) ti,ve,z,a(3),beta0,hcurv
+    logical exact
+
+    if(exact) then
+       ti=ROOT((1.0_dp+hcurv*X(1))**2+X(2)**2+X(4)**2)
+       x(2)=x(2)*ROOT(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2)/ti + put_a_abell*a(1)
+       x(4)=x(4)*ROOT(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2)/ti + put_a_abell*a(2)
+    else
+       x(2)=x(2)*ROOT(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2) + put_a_abell*a(1)
+       x(4)=x(4)*ROOT(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2) + put_a_abell*a(2)
+    endif
+
+  end SUBROUTINE gen_conv_to_pxr
+
+  SUBROUTINE gen_conv_to_pxp(X,a,ve,exact,beta0,hcurv)
+    IMPLICIT NONE
+    type(real_8) ,INTENT(INOUT):: X(6)
+    type(real_8) ti,ve,z,a(3)
+    real(dp)  beta0,hcurv
+    logical exact
+
+    if(exact) then
+      call alloc(ti)
+       ti=sqrt((1.0_dp+hcurv*X(1))**2+X(2)**2+X(4)**2)
+       x(2)=x(2)*sqrt(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2)/ti + put_a_abell*a(1)
+       x(4)=x(4)*sqrt(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2)/ti + put_a_abell*a(2)
+      call kill(ti)
+    else
+       x(2)=x(2)*sqrt(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2) + put_a_abell*a(1)
+       x(4)=x(4)*sqrt(1.0_dp+2.0_dp*(X(5)-ve)/beta0+(X(5)-ve)**2) + put_a_abell*a(2)
+    endif
+
+  end SUBROUTINE gen_conv_to_pxp
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!   abell conversion  !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  SUBROUTINE conv_to_xprABELL(EL,X,k,ent)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(ABELL),INTENT(INOUT):: EL
+    real(dp) ti,ve,z,a(3),beta0
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    integer ent
+    z=ent*el%l
+    call B_E_FIELD(EL,X,Z,PSIE_IN=VE,A_in=a,kick=.true.)
+
+      if(k%TIME) then
+       beta0=el%p%beta0
+      else
+       beta0=1.0_dp
+      endif
+      call gen_conv_to_xp(X,a,ve,el%p%exact,beta0,el%hc)
+
+ !   if(k%TIME) then
+ !      ti=ROOT(1.0_dp+2.0_dp*(X(5)-ve)/el%p%beta0+(X(5)-ve)**2-(X(2)-put_a_abell*a(1))**2-(X(4)-put_a_abell*a(2))**2)
+ !      x(2)=(1.0_dp+el%hc*X(1))*(X(2)-put_a_abell*a(1))/ti
+ !      x(4)=(1.0_dp+el%hc*X(1))*(X(4)-put_a_abell*a(2))/ti
+ !   else
+ !      ti=ROOT((1.0_dp+x(5)-ve)**2-(X(2)-put_a_abell*a(1))**2-(X(4)-put_a_abell*a(2))**2)
+ !      x(2)=(1.0_dp+el%hc*X(1))*(X(2)-put_a_abell*a(1))/ti
+ !      x(4)=(1.0_dp+el%hc*X(1))*(X(4)-put_a_abell*a(2))/ti
+ !   endif
+
+  end SUBROUTINE conv_to_xprabell
+
+  SUBROUTINE conv_to_xppABELL(EL,X,k,ent)
+    IMPLICIT NONE
+    type(real_8),INTENT(INOUT):: X(6)
+    TYPE(ABELLp),INTENT(INOUT):: EL
+    type(real_8) ti,ve,z,a(3)
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    integer ent
+    real(dp) beta0
+
+    call alloc(ti,ve,z)
+    call alloc(a)
+    z=ent*el%l
+
+    call B_E_FIELD(EL,X,Z,PSIE_IN=VE,A_in=a,kick=.true.)
+
+      if(k%TIME) then
+       beta0=el%p%beta0
+      else
+       beta0=1.0_dp
+      endif
+      call gen_conv_to_xp(X,a,ve,el%p%exact,beta0,el%hc)
+
+ !   if(k%TIME) then
+ !      ti=sqrt(1.0_dp+2.0_dp*(X(5)-ve)/el%p%beta0+(X(5)-ve)**2-(X(2)-put_a_abell*a(1))**2-(X(4)-put_a_abell*a(2))**2)
+ !      x(2)=(1.0_dp+el%hc*X(1))*(X(2)-put_a_abell*a(1))/ti
+ !      x(4)=(1.0_dp+el%hc*X(1))*(X(4)-put_a_abell*a(2))/ti
+ !   else
+ !      ti=sqrt((1.0_dp+x(5)-ve)**2-(X(2)-put_a_abell*a(1))**2-(X(4)-put_a_abell*a(2))**2)
+ !      x(2)=(1.0_dp+el%hc*X(1))*(X(2)-put_a_abell*a(1))/ti
+ !      x(4)=(1.0_dp+el%hc*X(1))*(X(4)-put_a_abell*a(2))/ti
+ !   endif
+
+   call kill(ti,ve,z)
+    call kill(a)
+
+  end SUBROUTINE conv_to_xppabell
+
+  SUBROUTINE conv_to_pxrABELL(EL,X,k,ent)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(ABELL),INTENT(INOUT):: EL
+    real(dp) ti,ve,z,a(3),beta0
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    integer ent
+    z=ent*el%l
+    call B_E_FIELD(EL,X,Z,PSIE_IN=VE,A_in=a,kick=.true.)
+
+  if(k%TIME) then
+   beta0=el%p%beta0
+  else
+   beta0=1.0_dp
+  endif
+    call gen_conv_to_px(X,a,ve,el%p%exact,beta0,el%hc)
+
+ !   ti=ROOT((1.0_dp+el%hc*X(1))**2+X(2)**2+X(4)**2)
+ !   if(k%TIME) then
+ !      x(2)=x(2)*ROOT(1.0_dp+2.0_dp*(X(5)-ve)/el%p%beta0+(X(5)-ve)**2)/ti + put_a_abell*a(1)
+ !      x(4)=x(4)*ROOT(1.0_dp+2.0_dp*(X(5)-ve)/el%p%beta0+(X(5)-ve)**2)/ti + put_a_abell*a(2)
+ !   else
+ !      x(2)=x(2)*(1.0_dp+(X(5)-ve))/ti + put_a_abell*a(1)
+ !      x(4)=x(4)*(1.0_dp+(X(5)-ve))/ti + put_a_abell*a(2)
+ !   endif
+
+  end SUBROUTINE conv_to_pxrabell
+
+  SUBROUTINE conv_to_pxpABELL(EL,X,k,ent)
+    IMPLICIT NONE
+    type(real_8),INTENT(INOUT):: X(6)
+    TYPE(ABELLp),INTENT(INOUT):: EL
+    type(real_8) ti,ve,z,a(3)
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    integer ent
+    real(dp) beta0
+    call alloc(ti,ve,z)
+    call alloc(a)
+    z=ent*el%l
+    call B_E_FIELD(EL,X,Z,PSIE_IN=VE,A_in=a,kick=.true.)
+
+  if(k%TIME) then
+   beta0=el%p%beta0
+  else
+   beta0=1.0_dp
+  endif
+    call gen_conv_to_px(X,a,ve,el%p%exact,beta0,el%hc)
+
+ !   ti=sqrt((1.0_dp+el%hc*X(1))**2+X(2)**2+X(4)**2)
+ !   if(k%TIME) then
+ !      x(2)=x(2)*sqrt(1.0_dp+2.0_dp*(X(5)-ve)/el%p%beta0+(X(5)-ve)**2)/ti + put_a_abell*a(1)
+ !      x(4)=x(4)*sqrt(1.0_dp+2.0_dp*(X(5)-ve)/el%p%beta0+(X(5)-ve)**2)/ti + put_a_abell*a(2)
+ !   else
+ !      x(2)=x(2)*(1.0_dp+(X(5)-ve))/ti + put_a_abell*a(1)
+ !      x(4)=x(4)*(1.0_dp+(X(5)-ve))/ti + put_a_abell*a(2)
+ !   endif
+
+    call kill(ti,ve,z)
+    call kill(a)
+  end SUBROUTINE conv_to_pxpabell
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  SUBROUTINE conv_to_xpr(EL,X,k)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(PANCAKE),INTENT(INOUT):: EL
+    real(dp) ti
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    if(k%TIME) then
+       ti=ROOT(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
+       x(2)=(1.0_dp+el%hc*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%hc*X(1))*x(4)/ti
+    else
+       ti=ROOT((1.0_dp+x(5))**2-X(2)**2-X(4)**2)
+       x(2)=(1.0_dp+el%hc*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%hc*X(1))*x(4)/ti
+    endif
+
+  end SUBROUTINE conv_to_xpr
+
+  SUBROUTINE conv_to_xpp(EL,X,k)
+    IMPLICIT NONE
+    type(real_8),INTENT(INOUT):: X(6)
+    TYPE(PANCAKEp),INTENT(INOUT):: EL
+    type(real_8) ti
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    call alloc(ti)
+    if(k%TIME) then
+       ti=sqrt(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
+       x(2)=(1.0_dp+el%hc*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%hc*X(1))*x(4)/ti
+    else
+       ti=sqrt((1.0_dp+x(5))**2-X(2)**2-X(4)**2)
+       x(2)=(1.0_dp+el%hc*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%hc*X(1))*x(4)/ti
+    endif
+    call kill(ti)
+
+  end SUBROUTINE conv_to_xpp
+
+  SUBROUTINE conv_to_pxr(EL,X,k)
+    IMPLICIT NONE
+    real(dp),INTENT(INOUT):: X(6)
+    TYPE(PANCAKE),INTENT(INOUT):: EL
+    real(dp) ti
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    ti=ROOT((1.0_dp+el%hc*X(1))**2+X(2)**2+X(4)**2)
+    if(k%TIME) then
+       x(2)=x(2)*ROOT(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
+       x(4)=x(4)*ROOT(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
+    else
+       x(2)=x(2)*(1.0_dp+x(5))/ti
+       x(4)=x(4)*(1.0_dp+x(5))/ti
+    endif
+  end SUBROUTINE conv_to_pxr
+
+  SUBROUTINE conv_to_pxp(EL,X,k)
+    IMPLICIT NONE
+    type(real_8),INTENT(INOUT):: X(6)
+    TYPE(PANCAKEp),INTENT(INOUT):: EL
+    type(real_8) ti
+    TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    call alloc(ti)
+    ti=SQRT((1.0_dp+el%hc*X(1))**2+X(2)**2+X(4)**2)
+    if(k%TIME) then
+       x(2)=x(2)*sqrt(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
+       x(4)=x(4)*sqrt(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
+    else
+       x(2)=x(2)*(1.0_dp+x(5))/ti
+       x(4)=x(4)*(1.0_dp+x(5))/ti
+    endif
+    call kill(ti)
+
+  end SUBROUTINE conv_to_pxp
+
+
+  SUBROUTINE B_E_FIELDR(EL,X,Z,PSIE_in,E_in,PSIM_in,B_in,A_in,DA_in,kick)
+    IMPLICIT NONE
+    TYPE(ABELL), INTENT(INOUT)::EL
+    logical, optional :: kick
+    real(dp), intent(inout) :: x(6)
+    real(dp), intent(in) :: z
+    REAL(DP), optional, INTENT(OUT) :: E_IN(3), B_IN(3),A_IN(3),DA_IN(3,2),PSIM_IN,PSIE_IN
+    REAL(DP)  B(3),A(3),DA(3,2),PSIM,PSIE,E(3)
+    COMPLEX(dp) X_IP(0:NMAX+1),AM,EX,AMB,AMI,CX,CY,C,D,DX,DY,dd
+    COMPLEX(dp) DE,DXE,DYE,ddE,AME,EXE,AMBE,AMIE
+    REAL(dp) K_N,XN,YN,nbm,nbm1,nbm2
+    INTEGER I,N,M,J,DIR(3),DIRE(3)
+
+
+    X_IP(0)=1.0_DP
+    X_IP(1)=X(1)+I_*X(3)
+    DO I=2,EL%M+1
+     X_IP(I)=X_IP(I-1)*X_IP(1)
+    ENDDO
+    do i=1,3
+     B(i)=0.0_dp
+    enddo
+    do i=1,3
+     E(i)=0.0_dp
+    enddo
+    do i=1,3
+     A(i)=0.0_dp
+    enddo
+    DO I=1,3
+    DO J=1,2
+     DA(I,J)=0.0_DP
+    ENDDO
+    ENDDO
+    PSIM=0.0_DP
+    PSIE=0.0_DP
+    AMI=0.0_DP
+   !  CONJG
+    DO  M=1,EL%M
+      EX=EXP(-I_*EL%T(M))
+      EXE=EXP(-I_*EL%TE(M))
+     DO  N=-EL%N/2,EL%N/2-1
+
+      K_N=TWOPI*N/EL%N/EL%DZ(M)
+      XN=K_N*X(1);YN=K_N*X(3)
+        AM=K_N**(M-1)*X_IP(m-1)*EX
+        AMB=CONJG(AM)
+        D=(AM*X_IP(1)-AMB*CONJG(X_IP(1)))
+        Dd=(AM*X_IP(1)+AMB*CONJG(X_IP(1)))
+        DX=(AM-AMB)  !  M FOR DERIVATIVE
+        DY=(AM+AMB) !  I_ * M FOR DERIVATIVE
+        AME=K_N**(M-1)*X_IP(m-1)*EXE
+        AMBE=CONJG(AME)
+        DE=(AME*X_IP(1)-AMBE*CONJG(X_IP(1)))
+        DdE=(AME*X_IP(1)+AMBE*CONJG(X_IP(1)))
+        DXE=(AME-AMBE)  !  M FOR DERIVATIVE
+        DYE=(AME+AMBE) !  I_ * M FOR DERIVATIVE
+
+        nbm=NBI(M,XN,YN)
+        nbm1=NBI(M+1,XN,YN)
+        nbm2=NBI(M+2,XN,YN)
+        PSIM=PSIM+EXP(I_*K_N*Z)*0.5_DP*EL%B(M,N)*dd*nbm
+        B(1)=DY*M*EXP(I_*K_N*Z)*0.5_DP*EL%B(M,N)*nbm+B(1)
+        B(1)=dd*0.5_DP*EXP(I_*K_N*Z)*EL%B(M,N)*nbm1*XN*K_N +B(1)
+        B(2)=I_*DX*M*EXP(I_*K_N*Z)*0.5_DP*EL%B(M,N)*nbm+B(2)
+        B(2)=dd*0.5_DP*EXP(I_*K_N*Z)*EL%B(M,N)*nbm1*YN*K_N +B(2)
+        B(3)=I_*K_N*dd*0.5_DP*EXP(I_*K_N*Z)*EL%B(M,N)*nbm+B(3)
+        PSIE=PSIE+EXP(I_*K_N*Z)*0.5_DP*EL%E(M,N)*ddE*nbm
+        E(1)=-DYE*M*EXP(I_*K_N*Z)*0.5_DP*EL%E(M,N)*nbm+E(1)
+        E(1)=-ddE*0.5_DP*EXP(I_*K_N*Z)*EL%E(M,N)*nbm1*XN*K_N +E(1)
+        E(2)=-I_*DXE*M*EXP(I_*K_N*Z)*0.5_DP*EL%E(M,N)*nbm+E(2)
+        E(2)=-ddE*0.5_DP*EXP(I_*K_N*Z)*EL%E(M,N)*nbm1*YN*K_N +E(2)
+        E(3)=-I_*K_N*ddE*0.5_DP*EXP(I_*K_N*Z)*EL%E(M,N)*nbm+E(3)
+
+        if(n==0) then
+       AMI=-0.5_dp*EXP(I_*K_N*Z)/M*EL%B(M,N)*nbm*d
+        C= -EL%B(M,N)*0.5_DP*EXP(I_*K_N*Z)
+        CX=C*(DX*nbm+d/M*XN*K_N*nbm1)  !  dami/dx
+        CY=C*(I_*DY*nbm+d/M*YN*K_N*nbm1)  !  dami/dy
+     !   DA(1,1)=DA(1,1)+AMI+X(1)*CX
+     !   DA(1,2)=DA(1,2)+X(1)*CYf
+      !  DA(2,1)=DA(2,1)+X(3)*CX
+    !    DA(2,2)=DA(2,2)+AMI+X(3)*CY
+    !    A(1)=AMI*X(1)+A(1)
+     !   A(2)=AMI*X(3)+A(2)
+          A(3)=A(3)-M/I_*AMI-0.5_DP*I_*EL%B(M,N)*EXP(I_*K_N*Z)*(XN**2+YN**2)*d/M*nbm1
+          DA(3,1)=+DA(3,1)-M*CX/I_  !+K_N*C*I_*( DX*(X(1)**2+X(3)**2) +d/M*2*X(1))*nbm1
+      !    DA(3,1)=C*I_*d/M*(XN**2+YN**2)*XN*nbm2+DA(3,1)
+          DA(3,2)=+DA(3,2)-M*CY/I_  !+ K_N*C*I_*( I_*DY*(X(1)**2+X(3)**2) +d/M*2*X(3))*nbm1
+      !    DA(3,2)=C*I_*d/M*(XN**2+YN**2)*YN*nbm2+DA(3,2)
+        else
+        AMI=-K_N*0.5_dp*EXP(I_*K_N*Z)/M*EL%B(M,N)*nbm*d
+        C= -K_N*EL%B(M,N)*0.5_DP*EXP(I_*K_N*Z)
+        CX=C*(DX*nbm+d/M*XN*K_N*nbm1)  !  dami/dx
+        CY=C*(I_*DY*nbm+d/M*YN*K_N*nbm1)  !  dami/dy
+        DA(1,1)=DA(1,1)+AMI+X(1)*CX
+        DA(1,2)=DA(1,2)+X(1)*CY
+        DA(2,1)=DA(2,1)+X(3)*CX
+        DA(2,2)=DA(2,2)+AMI+X(3)*CY
+        A(1)=AMI*X(1)+A(1)
+        A(2)=AMI*X(3)+A(2)
+          A(3)=A(3)-M/I_/K_N*AMI-0.5_DP*I_*EL%B(M,N)*EXP(I_*K_N*Z)*(XN**2+YN**2)*d/M*nbm1
+          DA(3,1)=+DA(3,1)-M*CX/I_/K_N +K_N*C*I_*( DX*(X(1)**2+X(3)**2) +d/M*2*X(1))*nbm1
+          DA(3,1)=C*I_*d/M*(XN**2+YN**2)*XN*nbm2+DA(3,1)
+          DA(3,2)=+DA(3,2)-M*CY/I_/K_N+K_N*C*I_*( I_*DY*(X(1)**2+X(3)**2) +d/M*2*X(3))*nbm1
+          DA(3,2)=C*I_*d/M*(XN**2+YN**2)*YN*nbm2+DA(3,2)
+        endif
+
+
+     ENDDO
+    ENDDO
+     DO  N=-EL%N/2,EL%N/2-1
+      K_N=TWOPI*N/EL%N/EL%DZ(0)
+      XN=K_N*X(1);YN=K_N*X(3)
+        nbm=NBI(0,XN,YN)
+        nbm1=NBI(1,XN,YN)
+        if(N/=0) THEN
+         PSIM=PSIM+EXP(I_*K_N*Z)*EL%B(0,N)*nbm/K_N
+         PSIE=PSIE+EXP(I_*K_N*Z)*EL%E(0,N)*nbm/K_N
+         else
+          PSIM=PSIM+I_*z*EL%B(0,N)*nbm
+          PSIE=PSIE+I_*z*EL%E(0,N)*nbm
+        ENDIF
+        B(1)=EXP(I_*K_N*Z)*XN*EL%B(0,N)*nbm1+B(1)
+        B(2)=EXP(I_*K_N*Z)*YN*EL%B(0,N)*nbm1+B(2)
+        B(3)=I_*EXP(I_*K_N*Z)*EL%B(0,N)*nbm+B(3)
+        E(1)=-EXP(I_*K_N*Z)*XN*EL%E(0,N)*nbm1+E(1)
+        E(2)=-EXP(I_*K_N*Z)*YN*EL%E(0,N)*nbm1+E(2)
+        E(3)=-I_*EXP(I_*K_N*Z)*EL%E(0,N)*nbm+E(3)
+        AMI=I_*EL%B(0,N)*nbm1*EXP(I_*K_N*Z)
+        C=I_*EL%B(0,N)*EXP(I_*K_N*Z)*K_N
+        CX=C*XN*NBI(2,XN,YN)
+        CY=C*YN*NBI(2,XN,YN)
+        DA(1,1)=DA(1,1)-CX*X(3)
+        DA(1,2)=DA(1,2)-CY*X(3)-AMI
+        DA(2,1)=DA(2,1)+CX*X(1)+AMI
+        DA(2,2)=DA(2,2)+CY*X(1)
+        A(1)=-AMI*X(3)+A(1)
+        A(2)=AMI*X(1)+A(2)
+     ENDDO
+!psie=sin(z+x(1)+x(3)**2+0.5d0)
+!e(1)=-cos(z+x(1)+x(3)**2+0.5d0)
+!e(2)=-cos(z+x(1)+x(3)**2+0.5d0)*2*x(3)
+!e(3)=-cos(z+x(1)+x(3)**2+0.5d0)
+ PSIE=el%scale*PSIE*volt_c/EL%P%P0C
+ PSIm=el%scale*PSIM
+ do i=1,3
+   e(i)=el%scale*e(i)*volt_c/EL%P%P0C
+   b(i)=el%scale*b(i)
+ enddo
+     if(present(kick)) then
+     if(kick) then
+      DIR=EL%P%DIR; DIR(3)=1;
+      DIRE=EL%P%DIR; DIRE(1:2)=1;
+        PSIE=el%p%charge*PSIE
+        PSIM=el%p%charge*PSIM
+      do i=1,3
+        a(i)=DIR(I)*el%p%charge*a(i)
+        b(i)=DIR(I)*el%p%charge*b(i)
+        e(i)=DIRE(I)*el%p%charge*e(i)
+       do j=1,2
+        da(i,j)=DIR(I)*el%p%charge*da(i,j)
+      enddo
+      enddo
+     endif
+     endif
+IF(PRESENT(PSIM_in) ) psim_in=psim
+IF(PRESENT(PSIE_in) ) psiE_in=psiE
+if(present(b_in)) then
+ do i=1,3
+  b_in(i)=b(i)
+ enddo
+endif
+if(present(E_in)) then
+ do i=1,3
+  E_in(i)=E(i)
+ enddo
+endif
+if(present(a_in)) then
+ do i=1,3
+  a_in(i)=a(i)
+ enddo
+endif
+if(present(da_in)) then
+ do i=1,3
+ do j=1,2
+  da_in(i,j)=da(i,j)
+ enddo
+ enddo
+endif
+
+
+  END SUBROUTINE B_E_FIELDR
+
+  SUBROUTINE B_E_FIELDP(EL,X,Z,PSIE_in,E_in,PSIM_in,B_in,A_in,DA_in,kick)
+    IMPLICIT NONE
+    TYPE(ABELLP), INTENT(INOUT)::EL
+    TYPE(REAL_8), INTENT(IN) :: X(6)
+    logical, optional :: kick
+    TYPE(REAL_8),  INTENT(In) :: Z
+    TYPE(REAL_8), optional, INTENT(OUT) :: E_IN(3), B_IN(3),A_IN(3),DA_IN(3,2),PSIM_IN,PSIE_IN
+    TYPE(REAL_8)  B(3),A(3),DA(3,2),PSIM,PSIE,E(3)
+    TYPE(complex_8) X_IP(0:NMAX+1),AM,EX,AMB,AMI,CX,CY,C,D,DX,DY,dd
+    TYPE(complex_8) DE,DXE,DYE,ddE,AME,EXE,AMBE,AMIE
+    REAL(dp) K_N
+    TYPE(REAL_8) XN,YN,nbm,nbm1,nbm2
+    INTEGER I,N,M,J,DIR(3),DIRE(3)
+
+    CALL alloc(X_IP)
+    CALL alloc(AM,EX,AMB,AMI,CX,CY,C,D,DX,DY)
+    CALL ALLOC(DE,DXE,DYE,ddE,AME,EXE,AMBE,AMIE)
+    CALL alloc(XN,YN,nbm,nbm1,nbm2)
+    call alloc(dd)
+    call alloc(B);
+    call alloc(A);
+    CALL alloc(PSIM)
+    call alloc(E);
+    CALL alloc(PSIE)
+    DO I=1,3
+    DO J=1,2
+     CALL alloC(DA(I,J))
+    ENDDO
+    ENDDO
+
+
+    X_IP(0)=1.0_DP
+    X_IP(1)=X(1)+I_*X(3)
+    DO I=2,EL%M+1
+     X_IP(I)=X_IP(I-1)*X_IP(1)
+    ENDDO
+    do i=1,3
+     B(i)=0.0_dp
+    enddo
+    do i=1,3
+     E(i)=0.0_dp
+    enddo
+    do i=1,3
+     A(i)=0.0_dp
+    enddo
+    DO I=1,3
+    DO J=1,2
+     DA(I,J)=0.0_DP
+    ENDDO
+    ENDDO
+    PSIM=0.0_DP
+    PSIE=0.0_DP
+    AMI=0.0_DP
+   !  CONJG
+    DO  M=1,EL%M
+      EX=EXP(-I_*EL%T(M))
+      EXE=EXP(-I_*EL%TE(M))
+     DO  N=-EL%N/2,EL%N/2-1
+
+      K_N=TWOPI*N/EL%N/EL%DZ(M)
+      XN=K_N*X(1);YN=K_N*X(3)
+        AM=K_N**(M-1)*X_IP(m-1)*EX
+        AMB=CONJG(AM)
+        D=(AM*X_IP(1)-AMB*CONJG(X_IP(1)))
+        Dd=(AM*X_IP(1)+AMB*CONJG(X_IP(1)))
+        DX=(AM-AMB)  !  M FOR DERIVATIVE
+        DY=(AM+AMB) !  I_ * M FOR DERIVATIVE
+        AME=K_N**(M-1)*X_IP(m-1)*EXE
+        AMBE=CONJG(AME)
+        DE=(AME*X_IP(1)-AMBE*CONJG(X_IP(1)))
+        DdE=(AME*X_IP(1)+AMBE*CONJG(X_IP(1)))
+        DXE=(AME-AMBE)  !  M FOR DERIVATIVE
+        DYE=(AME+AMBE) !  I_ * M FOR DERIVATIVE
+
+        nbm=NBI(M,XN,YN)
+        nbm1=NBI(M+1,XN,YN)
+        nbm2=NBI(M+2,XN,YN)
+        PSIM=PSIM+EXP(I_*K_N*Z)*0.5_DP*EL%B(M,N)*dd*nbm
+        B(1)=DY*M*EXP(I_*K_N*Z)*0.5_DP*EL%B(M,N)*nbm+B(1)
+        B(1)=dd*0.5_DP*EXP(I_*K_N*Z)*EL%B(M,N)*nbm1*XN*K_N +B(1)
+        B(2)=I_*DX*M*EXP(I_*K_N*Z)*0.5_DP*EL%B(M,N)*nbm+B(2)
+        B(2)=dd*0.5_DP*EXP(I_*K_N*Z)*EL%B(M,N)*nbm1*YN*K_N +B(2)
+        B(3)=I_*K_N*dd*0.5_DP*EXP(I_*K_N*Z)*EL%B(M,N)*nbm+B(3)
+        PSIE=PSIE+EXP(I_*K_N*Z)*0.5_DP*EL%E(M,N)*ddE*nbm
+        E(1)=-DYE*M*EXP(I_*K_N*Z)*0.5_DP*EL%E(M,N)*nbm+E(1)
+        E(1)=-ddE*0.5_DP*EXP(I_*K_N*Z)*EL%E(M,N)*nbm1*XN*K_N +E(1)
+        E(2)=-I_*DXE*M*EXP(I_*K_N*Z)*0.5_DP*EL%E(M,N)*nbm+E(2)
+        E(2)=-ddE*0.5_DP*EXP(I_*K_N*Z)*EL%E(M,N)*nbm1*YN*K_N +E(2)
+        E(3)=-I_*K_N*ddE*0.5_DP*EXP(I_*K_N*Z)*EL%E(M,N)*nbm+E(3)
+
+        if(n==0) then
+
+        AMI=-0.5_dp*EXP(I_*K_N*Z)/M*EL%B(M,N)*nbm*d
+        C= -EL%B(M,N)*0.5_DP*EXP(I_*K_N*Z)
+        CX=C*(DX*nbm+d/M*XN*K_N*nbm1)  !  dami/dx
+        CY=C*(I_*DY*nbm+d/M*YN*K_N*nbm1)  !  dami/dy
+     !   DA(1,1)=DA(1,1)+AMI+X(1)*CX
+     !   DA(1,2)=DA(1,2)+X(1)*CY
+      !  DA(2,1)=DA(2,1)+X(3)*CX
+    !    DA(2,2)=DA(2,2)+AMI+X(3)*CY
+    !    A(1)=AMI*X(1)+A(1)
+     !   A(2)=AMI*X(3)+A(2)
+          A(3)=A(3)-M/I_*AMI-0.5_DP*I_*EL%B(M,N)*EXP(I_*K_N*Z)*(XN**2+YN**2)*d/M*nbm1
+          DA(3,1)=+DA(3,1)-M*CX/I_  !+K_N*C*I_*( DX*(X(1)**2+X(3)**2) +d/M*2*X(1))*nbm1
+      !    DA(3,1)=C*I_*d/M*(XN**2+YN**2)*XN*nbm2+DA(3,1)
+          DA(3,2)=+DA(3,2)-M*CY/I_  !+ K_N*C*I_*( I_*DY*(X(1)**2+X(3)**2) +d/M*2*X(3))*nbm1
+      !    DA(3,2)=C*I_*d/M*(XN**2+YN**2)*YN*nbm2+DA(3,2)
+
+        else
+        AMI=-K_N*0.5_dp*EXP(I_*K_N*Z)/M*EL%B(M,N)*nbm*d
+        C= -K_N*EL%B(M,N)*0.5_DP*EXP(I_*K_N*Z)
+        CX=C*(DX*nbm+d/M*XN*K_N*nbm1)  !  dami/dx
+        CY=C*(I_*DY*nbm+d/M*YN*K_N*nbm1)  !  dami/dy
+        DA(1,1)=DA(1,1)+AMI+X(1)*CX
+        DA(1,2)=DA(1,2)+X(1)*CY
+        DA(2,1)=DA(2,1)+X(3)*CX
+        DA(2,2)=DA(2,2)+AMI+X(3)*CY
+        A(1)=AMI*X(1)+A(1)
+        A(2)=AMI*X(3)+A(2)
+          A(3)=A(3)-M/I_/K_N*AMI-0.5_DP*I_*EL%B(M,N)*EXP(I_*K_N*Z)*(XN**2+YN**2)*d/M*nbm1
+          DA(3,1)=+DA(3,1)-M*CX/I_/K_N +K_N*C*I_*( DX*(X(1)**2+X(3)**2) +d/M*2*X(1))*nbm1
+          DA(3,1)=C*I_*d/M*(XN**2+YN**2)*XN*nbm2+DA(3,1)
+          DA(3,2)=+DA(3,2)-M*CY/I_/K_N+K_N*C*I_*( I_*DY*(X(1)**2+X(3)**2) +d/M*2*X(3))*nbm1
+          DA(3,2)=C*I_*d/M*(XN**2+YN**2)*YN*nbm2+DA(3,2)
+        endif
+
+
+     ENDDO
+    ENDDO
+     DO  N=-EL%N/2,EL%N/2-1
+      K_N=TWOPI*N/EL%N/EL%DZ(0)
+      XN=K_N*X(1);YN=K_N*X(3)
+        nbm=NBI(0,XN,YN)
+        nbm1=NBI(1,XN,YN)
+        if(N/=0) THEN
+         PSIM=PSIM+EXP(I_*K_N*Z)*EL%B(0,N)*nbm/K_N
+         PSIE=PSIE+EXP(I_*K_N*Z)*EL%E(0,N)*nbm/K_N
+         else
+          PSIM=PSIM+I_*z*EL%B(0,N)*nbm
+          PSIE=PSIE+I_*z*EL%E(0,N)*nbm
+        ENDIF
+        B(1)=EXP(I_*K_N*Z)*XN*EL%B(0,N)*nbm1+B(1)
+        B(2)=EXP(I_*K_N*Z)*YN*EL%B(0,N)*nbm1+B(2)
+        B(3)=I_*EXP(I_*K_N*Z)*EL%B(0,N)*nbm+B(3)
+        E(1)=-EXP(I_*K_N*Z)*XN*EL%E(0,N)*nbm1+E(1)
+        E(2)=-EXP(I_*K_N*Z)*YN*EL%E(0,N)*nbm1+E(2)
+        E(3)=-I_*EXP(I_*K_N*Z)*EL%E(0,N)*nbm+E(3)
+        AMI=I_*EL%B(0,N)*nbm1*EXP(I_*K_N*Z)
+        C=I_*EL%B(0,N)*EXP(I_*K_N*Z)*K_N
+        CX=C*XN*NBI(2,XN,YN)
+        CY=C*YN*NBI(2,XN,YN)
+        DA(1,1)=DA(1,1)-CX*X(3)
+        DA(1,2)=DA(1,2)-CY*X(3)-AMI
+        DA(2,1)=DA(2,1)+CX*X(1)+AMI
+        DA(2,2)=DA(2,2)+CY*X(1)
+        A(1)=-AMI*X(3)+A(1)
+        A(2)=AMI*X(1)+A(2)
+     ENDDO
+
+!psie=sin(z+x(1)+x(3)**2+0.5d0)
+!e(1)=-cos(z+x(1)+x(3)**2+0.5d0)
+!e(2)=-cos(z+x(1)+x(3)**2+0.5d0)*2*x(3)
+!e(3)=-cos(z+x(1)+x(3)**2+0.5d0)
+
+ PSIE=el%scale*PSIE*volt_c/EL%P%P0C
+ PSIm=el%scale*PSIM
+ do i=1,3
+   e(i)=el%scale*e(i)*volt_c/EL%P%P0C
+   b(i)=el%scale*b(i)
+ enddo
+     if(present(kick)) then
+     if(kick) then
+      DIR=EL%P%DIR; DIR(3)=1;
+      DIRE=EL%P%DIR; DIRE(1:2)=1;
+        PSIE=el%p%charge*PSIE
+        PSIM=el%p%charge*PSIM
+      do i=1,3
+        a(i)=DIR(I)*el%p%charge*a(i)
+        b(i)=DIR(I)*el%p%charge*b(i)
+        e(i)=DIRE(I)*el%p%charge*e(i)
+       do j=1,2
+        da(i,j)=DIR(I)*el%p%charge*da(i,j)
+      enddo
+      enddo
+     endif
+     endif
+IF(PRESENT(PSIM_in) ) psim_in=psim
+IF(PRESENT(PSIE_in) ) psiE_in=psiE
+if(present(b_in)) then
+ do i=1,3
+  b_in(i)=b(i)
+ enddo
+endif
+if(present(E_in)) then
+ do i=1,3
+  E_in(i)=E(i)
+ enddo
+endif
+if(present(a_in)) then
+ do i=1,3
+  a_in(i)=a(i)
+ enddo
+endif
+if(present(da_in)) then
+ do i=1,3
+ do j=1,2
+  da_in(i,j)=da(i,j)
+ enddo
+ enddo
+endif
+
+
+    CALL KILL(X_IP)
+    CALL KILL(AM,EX,AMB,AMI,CX,CY,C,D,DX,DY)
+    CALL KILL(DE,DXE,DYE,ddE,AME,EXE,AMBE,AMIE)
+    CALL KILL(XN,YN,nbm,nbm1,nbm2)
+    call KILL(dd)
+    call KILL(B);
+    call KILL(A);
+    CALL KILL(PSIM)
+    call KILL(E);
+    CALL KILL(PSIE)
+    DO I=1,3
+    DO J=1,2
+     CALL KILL(DA(I,J))
+    ENDDO
+    ENDDO
+  END SUBROUTINE B_E_FIELDP
+
+!!!!!!!!!!!!!!!!!!!!!!!!         new xprime force routine      !!!!!!!!!!!!!!!!!!!!!!!
+  subroutine fx_newr(f,x,state,exact,hcurv,beta0,b,e,ve)   ! CAN BE USED BY ANY ELEMENT INCLUDING ABELL
+    implicit none
+
+    real(dp) ,intent(inOUT) :: b(3),e(3),ve,hcurv,BETA0
+    real(dp) ,intent(inout) :: x(6)
+    real(dp), intent(inout):: f(6)
+    TYPE(INTERNAL_STATE) state !,OPTIONAL :: K
+    real(dp)  d(2),c(3),de,delt,del,g(2),xp,yp,rho,k,ed,det
+    logical exact
+
+    xp=x(2);yp=x(4);
+    de=x(5)-VE
+    delt=root(1.0_dp + 2*de/beta0 + de**2)
+    del=(1.0_dp/beta0 + de)/delt
+    k=(1.0_dp+hcurv*x(1))
+    ed=-(e(1)*xp + e(2)*yp + e(3)*k)
+    f(1)=xp
+    f(3)=yp
+
+   if(exact) then
+
+    rho=root(xp**2+yp**2+k**2)
+
+    g(1)=k*hcurv*xp**2/rho**3*delt
+    g(2)=k*hcurv*xp*yp/rho**3*delt
+
+    d(1)=xp/rho*del*ed + g(1) + rho*del*e(1) + delt*k*hcurv/rho + yp*b(3) - k*b(2)
+    d(2)=yp/rho*del*ed + g(2) + rho*del*e(2)                    - xp*b(3) + k*b(1)
+
+    c(1)=delt*(1/rho-xp**2/rho**3)
+    c(2)=delt*(1/rho-yp**2/rho**3)
+    c(3)=xp*yp*delt/rho**3
+    det=c(1)*c(2)-c(3)**2
+
+    f(2)=(c(2)*d(1)+c(3)*d(2))/det
+    f(4)=(c(3)*d(1)+c(1)*d(2))/det
+    f(5)=0.0_dp
+
+    f(6)=del*rho
+
+          F(6)=f(6)+(state%TOTALPATH-1)/BETA0
+    else
+
+      f(2)=e(1)*del/delt*(k+0.5_dp*xp**2+0.5_dp*yp**2)+xp*ed*del/delt+hcurv+(yp*b(3)-k*b(2))/delt
+      f(4)=e(2)*del/delt*(k+0.5_dp*xp**2+0.5_dp*yp**2)+yp*ed*del/delt      +(-xp*b(3)+k*b(1))/delt
+      f(5)=0.0_dp
+
+
+      F(6)=del*(k+0.5_dp*(xp**2+yp**2) )
+      F(6)=f(6)+(state%TOTALPATH-1)/BETA0
+    endif
+
+  end subroutine fx_newr
+
+  subroutine fx_newp(f,x,state,exact,hcurv,beta0,b,e,ve)  ! CAN BE USED BY ANY ELEMENT INCLUDING ABELL
+    implicit none
+
+
+     type(real_8) ,intent(inOUT) :: b(3),e(3),ve
+     type(real_8) ,intent(inout) :: x(6)
+     type(real_8), intent(inout):: f(6)
+    TYPE(INTERNAL_STATE) state !,OPTIONAL :: K
+    type(real_8)  d(2),c(3),g(2),xp,yp,rho,k,ed,det,de,delt,del
+    real(dp)  BETA0,hcurv
+    logical exact
+
+     call alloc(xp,yp,rho,k,ed,det,de,delt,del)
+     call alloc(d)
+     call alloc(c)
+     call alloc(g)
+
+
+
+    xp=x(2);yp=x(4);
+    de=x(5)-VE
+    delt=sqrt(1.0_dp + 2*de/beta0 + de**2)
+    del=(1.0_dp/beta0 + de)/delt
+    k=(1.0_dp+hcurv*x(1))
+    ed=-(e(1)*xp + e(2)*yp + e(3)*k)
+    f(1)=xp
+    f(3)=yp
+
+   if(exact) then
+
+    rho=sqrt(xp**2+yp**2+k**2)
+
+    g(1)=k*hcurv*xp**2/rho**3*delt
+    g(2)=k*hcurv*xp*yp/rho**3*delt
+
+    d(1)=xp/rho*del*ed + g(1) + rho*del*e(1) + delt*k*hcurv/rho + yp*b(3) - k*b(2)
+    d(2)=yp/rho*del*ed + g(2) + rho*del*e(2)                    - xp*b(3) + k*b(1)
+
+    c(1)=delt*(1/rho-xp**2/rho**3)
+    c(2)=delt*(1/rho-yp**2/rho**3)
+    c(3)=xp*yp*delt/rho**3
+    det=c(1)*c(2)-c(3)**2
+
+    f(2)=(c(2)*d(1)+c(3)*d(2))/det
+    f(4)=(c(3)*d(1)+c(1)*d(2))/det
+    f(5)=0.0_dp
+
+    f(6)=del*rho
+
+          F(6)=f(6)+(state%TOTALPATH-1)/BETA0
+    else
+
+      f(2)=e(1)*del/delt*(k+0.5_dp*xp**2+0.5_dp*yp**2)+xp*ed*del/delt+hcurv+(yp*b(3)-k*b(2))/delt
+      f(4)=e(2)*del/delt*(k+0.5_dp*xp**2+0.5_dp*yp**2)+yp*ed*del/delt      +(-xp*b(3)+k*b(1))/delt
+      f(5)=0.0_dp
+
+      F(6)=del*(k+0.5_dp*(xp**2+yp**2) )
+      F(6)=f(6)+(state%TOTALPATH-1)/BETA0
+    endif
+
+
+     call kill(xp,yp,rho,k,ed,det,de,delt,del)
+     call kill(d)
+     call kill(c)
+     call kill(g)
+
+  end subroutine fx_newp
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
 end module sagan_WIGGLER

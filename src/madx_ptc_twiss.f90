@@ -704,7 +704,6 @@ contains
 
     slice = slice_magnets .or. center_magnets
 
-    call make_node_layout(my_ring)
     call getBeamBeam()
 
 

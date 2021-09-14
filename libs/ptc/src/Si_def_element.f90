@@ -6,8 +6,8 @@ MODULE S_DEF_ELEMENT
  ! USE S_DEF_KIND
   !  USE USER_kind1
   !  USE USER_kind2
-  USE sagan_WIGGLER
-
+ ! USE sagan_WIGGLER
+   use S_DEF_KIND
   IMPLICIT NONE
   public
   logical(lp),PARAMETER::BERZ=.TRUE.,ETIENNE=.NOT.BERZ
@@ -137,11 +137,11 @@ MODULE S_DEF_ELEMENT
 CONTAINS
 
 
-  SUBROUTINE TRACKR(EL,X,K,MID)
+  SUBROUTINE TRACKR(EL,X,K)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(ELEMENT),INTENT(INOUT):: EL
-    TYPE(WORM),OPTIONAL, INTENT(INOUT):: MID
+    
     TYPE(INTERNAL_STATE) K
 
     if(associated(el%p%aperture)) then
@@ -153,50 +153,50 @@ CONTAINS
     !    endif
     SELECT CASE(EL%KIND)
     CASE(KIND0)
-       IF(PRESENT(MID)) CALL XMID(MID,X,0)
-       IF(PRESENT(MID)) CALL XMID(MID,X,1)   ! ADDED FOR NST=1 IN MARKER FOR THIN_LAYOUT SURVEY
+      ! IF(PRESENT(MID)) CALL XMID(MID,X,0)
+      ! IF(PRESENT(MID)) CALL XMID(MID,X,1)   ! ADDED FOR NST=1 IN MARKER FOR THIN_LAYOUT SURVEY
     case(KIND1)
-       CALL TRACK(EL%D0,X,K,MID)
+       CALL TRACK(EL%D0,X,K)
     case(KIND2)
-       CALL TRACK(EL%K2,X,k,MID)
+       CALL TRACK(EL%K2,X,k)
     case(KIND3)
-       CALL TRACK(EL%K3,X,k,MID)
+       CALL TRACK(EL%K3,X,k)
     case(KIND4)
-       CALL TRACK(EL%C4,X,k,MID)
+       CALL TRACK(EL%C4,X,k)
     case(KIND5)
-       CALL TRACK(EL%S5,X,k,MID)
+       CALL TRACK(EL%S5,X,k)
     case(KIND6)
-       CALL TRACK(EL%T6,X,k,MID)
+       CALL TRACK(EL%T6,X,k)
     case(KIND7)
-       CALL TRACK(EL%T7,X,k,MID)
+       CALL TRACK(EL%T7,X,k)
     case(KIND8)
-       CALL TRACK(EL%S8,X,k,MID)
+       CALL TRACK(EL%S8,X,k)
     case(KIND9)
-       CALL TRACK(EL%S9,X,k,MID)
+       CALL TRACK(EL%S9,X,k)
     case(KIND10)
-       CALL TRACK(EL%TP10,X,k,MID)
+       CALL TRACK(EL%TP10,X,k)
     CASE(KIND11:KIND14)
-       call TRACK(EL%MON14,X,k,MID)
+       call TRACK(EL%MON14,X,k)
     CASE(KIND15)
-       call TRACK(EL%SEP15,X,k,MID)
+       call TRACK(EL%SEP15,X,k)
     CASE(KIND16,KIND20)
-       call TRACK(EL%K16,X,k,MID)
+       call TRACK(EL%K16,X,k)
     CASE(KIND18)
-       call TRACK(EL%RCOL18,X,k,MID)
+       call TRACK(EL%RCOL18,X,k)
     CASE(KIND19)
-       call TRACK(EL%ECOL19,X,k,MID)
+       call TRACK(EL%ECOL19,X,k)
     CASE(KIND21)
-       call TRACK(EL%CAV21,X,k,MID)
+       call TRACK(EL%CAV21,X,k)
     CASE(KIND22)
-       call TRACK(EL%HE22,X,k,MID)
+       call TRACK(EL%HE22,X,k)
     case(KINDWIGGLER)
-       call TRACK(EL%WI,X,k,MID)
+       call TRACK(EL%WI,X,k)
     case(KINDPA)
-       call TRACK(EL%PA,X,k,MID)
+       call TRACK(EL%PA,X,k)
     case(kindsuperdrift)
-       call TRACK(EL%SDR,X,k,MID)
+       call TRACK(EL%SDR,X,k)
     case(KINDABELL)
-       call TRACK(EL%AB,X,k,MID)
+       call TRACK(EL%AB,X,k)
 
     case default
  
@@ -1098,6 +1098,8 @@ CONTAINS
        EL%C4%VOLT=>EL%VOLT
        EL%C4%FREQ=>EL%FREQ
        EL%C4%PHAS=>EL%PHAS
+       EL%C4%H1=>EL%H1
+       EL%C4%H2=>EL%H2
        !       EL%C4%P0C=>EL%P0C
        EL%C4%DELTA_E=>EL%DELTA_E
        EL%C4%THIN=>EL%THIN
@@ -1134,6 +1136,7 @@ CONTAINS
        ALLOCATE(EL%CAV21%cavity_totalpath);EL%CAV21%cavity_totalpath=cavity_totalpath
        ALLOCATE(EL%CAV21%phase0);EL%CAV21%phase0=phase0
        ALLOCATE(EL%CAV21%always_on);EL%CAV21%always_on=my_false;
+       ALLOCATE(EL%CAV21%implicit);EL%CAV21%implicit=my_false;
     CASE(KIND22)
        if(.not.ASSOCIATED(EL%HE22)) THEN
           ALLOCATE(EL%HE22)
@@ -1390,7 +1393,7 @@ CONTAINS
        EL%K16%VA=>EL%VA
        EL%K16%VS=>EL%VS
        NULLIFY(EL%K16%DRIFTKICK);ALLOCATE(EL%K16%DRIFTKICK);EL%K16%DRIFTKICK=.true.;
-       NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
+!       NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
        NULLIFY(EL%K16%F);ALLOCATE(EL%K16%F);EL%K16%F=1;
     CASE(KIND17)
        if(.not.ASSOCIATED(EL%ENGE17)) THEN
@@ -1587,6 +1590,8 @@ CONTAINS
        EL%C4%VOLT=>EL%VOLT
        EL%C4%FREQ=>EL%FREQ
        EL%C4%PHAS=>EL%PHAS
+       EL%c4%H1=>EL%H1
+       EL%c4%H2=>EL%H2
        !       EL%C4%P0C=>EL%P0C
        EL%C4%DELTA_E=>EL%DELTA_E
        EL%C4%THIN=>EL%THIN
@@ -1621,6 +1626,8 @@ CONTAINS
        ALLOCATE(EL%CAV21%DPHAS);CALL ALLOC(EL%CAV21%DPHAS);EL%CAV21%DPHAS=0.0_dp
        ALLOCATE(EL%CAV21%cavity_totalpath);EL%CAV21%cavity_totalpath=cavity_totalpath
        ALLOCATE(EL%CAV21%always_on);EL%CAV21%always_on=my_false;
+       ALLOCATE(EL%CAV21%implicit);EL%CAV21%implicit=my_false;
+
        ALLOCATE(EL%CAV21%phase0);EL%CAV21%phase0=phase0
     CASE(KIND22)
        if(.not.ASSOCIATED(EL%HE22)) THEN
@@ -1867,7 +1874,7 @@ CONTAINS
        EL%K16%VA=>EL%VA
        EL%K16%VS=>EL%VS
        NULLIFY(EL%K16%DRIFTKICK);ALLOCATE(EL%K16%DRIFTKICK);EL%K16%DRIFTKICK=.true.;
-       NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
+!       NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
        NULLIFY(EL%K16%F);ALLOCATE(EL%K16%F);EL%K16%F=1;
     CASE(KIND17)
        if(.not.ASSOCIATED(EL%ENGE17)) THEN
@@ -2181,7 +2188,162 @@ CONTAINS
 
   END SUBROUTINE force_restore_ANBN
 
+  SUBROUTINE change_settings_fibre(EL,volt,FREQ,phase,B_SOL,TILT,EDGE,fringe,permfringe,bend_like)
+    IMPLICIT NONE
+    TYPE(fibre), target ::  EL
+    logical(lp), optional ::  bend_like,fringe(2,2) 
+    integer, optional ::  permfringe
+    real(dp), optional ::volt,TILT,EDGE(2),FREQ,phase,B_SOL
 
+    call change_settings_magnetr(EL%mag ,volt,FREQ,phase,B_SOL,TILT,EDGE,fringe,permfringe,bend_like)
+    call change_settings_magnetp(EL%magp,volt,FREQ,phase,B_SOL,TILT,EDGE,fringe,permfringe,bend_like)
+
+  END SUBROUTINE change_settings_fibre
+
+  SUBROUTINE change_settings_magnetr(EL,volt,FREQ,phase,B_SOL,TILT,EDGE, & 
+fringe,permfringe,bend_like,fint,hgap)
+
+    IMPLICIT NONE
+    TYPE(ELEMENT), target ::  EL
+    logical(lp), optional ::  bend_like,fringe(2,2) 
+    integer, optional ::  permfringe
+    real(dp), optional ::TILT,EDGE(2),volt,FREQ,phase,B_SOL,fint,hgap
+  !!!!   
+!   bend_like  puts regular vertical focussing rather than cos(phi) type fringe field
+!  
+!  fint hgap   the usual second effects of MAD. Default values:    fint=0.5 hgap=0   (only bend_like)
+!
+!   highest_fringe global: defaulted to 2, which is quadrupole. change globally outside this routine
+!
+!  permfringe does not affect bend_like 
+!  permfringe   = 0      is the default
+!  permfringe   = 1     only multipole fringe  (nonlinear on straight axis)  up to highest_fringe
+!  permfringe   = 2     only quad fringe SAD style  
+!  permfringe   = 3     all fringes on  (SAD+PTC)
+!
+!  Electric stuff for kind4,kind15 and kind21  (cavity, eseptum and travelling wave cavity)
+!  kind4 includes the BMAD style cavity if n_bessel=-1
+!  volt, freq and phase are the main input in a cavity. Volt is a multiplicative factor that can]
+! multiply an array of voltages for each mode.
+!
+!  B_SOL  solenoid field
+!   
+!  Killing fringe fields using fringe(2,2)  
+!     array shape  mimics the shape of the magnet      
+!        ( entrance orbital ,   entrance spin)
+!        (  exit    orbital ,   exit     spin)
+!
+!  tilt is the usual design tilt
+!
+!  edge(1:2) are the entrance effective angle. Here they are measured from the "design orbit"
+!  so edge = 0 means entering and exiting along the pipe
+
+ 
+    if(present(bend_like)) then
+     EL%p%bend_fringe=bend_like
+    endif
+    if(present(fint)) then
+     EL%fint=fint
+    endif
+    if(present(hgap)) then
+     EL%hgap=hgap
+    endif
+
+    if(present(permfringe)) then
+     EL%p%permfringe=permfringe
+    endif
+    if(present(volt)) then
+     EL%volt=volt
+    endif
+    if(present(FREQ)) then
+     EL%FREQ=FREQ
+    endif
+    if(present(phase)) then
+     EL%phas=phase
+    endif
+    if(present(B_SOL)) then
+     EL%B_SOL=B_SOL
+    endif
+
+     if(present(fringe)) then
+        EL%p%KILL_ENT_FRINGE=.not.(fringe(1,1))
+        EL%p%KILL_EXI_FRINGE=.not.(fringe(2,1))
+        EL%p%KILL_ENT_SPIN=.not.(fringe(1,2))
+        EL%p%KILL_EXI_SPIN=.not.(fringe(2,2))
+     endif
+  if(present(tilt)) then
+    EL%p%tiltd=tilt
+  endif
+  if(present(EDGE)) then
+    EL%p%EDGE=EDGE
+  endif
+
+
+  END SUBROUTINE change_settings_magnetr
+
+ 
+  SUBROUTINE change_settings_magnetp(EL,volt,FREQ,phase,B_SOL,TILT,EDGE, & 
+fringe,permfringe,bend_like,fint,hgap)
+    IMPLICIT NONE
+    TYPE(ELEMENTP), target ::  EL
+    logical(lp), optional ::  bend_like,fringe(2,2)
+    integer, optional :: permfringe 
+    real(dp), optional ::volt,TILT,EDGE(2),FREQ,phase,B_SOL,fint,hgap
+ 
+ 
+    if(present(bend_like)) then
+     EL%p%bend_fringe=bend_like
+    endif
+    if(present(fint)) then
+     EL%fint=fint
+    endif
+    if(present(hgap)) then
+     EL%hgap=hgap
+    endif
+
+    if(present(permfringe)) then
+     EL%p%permfringe=permfringe
+    endif
+    if(present(volt)) then
+     EL%volt=volt
+    endif
+    if(present(FREQ)) then
+     EL%FREQ=FREQ
+    endif
+    if(present(phase)) then
+     EL%phas=phase
+    endif
+    if(present(B_SOL)) then
+     EL%B_SOL=B_SOL
+    endif
+! highest is global
+! so change globally  defaulted to 2 in PTC (Quadrupole)
+  !   if(present(highest)) then
+ !     HIGHEST_FRINGE=highest
+  !   endif
+
+     if(present(fringe)) then
+        EL%p%KILL_ENT_FRINGE=.not.(fringe(1,1))
+        EL%p%KILL_EXI_FRINGE=.not.(fringe(2,1))
+        EL%p%KILL_ENT_SPIN=.not.(fringe(1,2))
+        EL%p%KILL_EXI_SPIN=.not.(fringe(2,2))
+     endif
+  if(present(tilt)) then
+    EL%p%tiltd=tilt
+  endif
+  if(present(EDGE)) then
+    EL%p%EDGE=EDGE
+  endif
+
+
+  END SUBROUTINE change_settings_magnetp
+
+ !   real(dp),  DIMENSION(:), POINTER :: EDGE  => null()        ! INTERNAL FRAME  design entrance and exit angle
+
+ 
+!   integer, pointer :: permFRINGE => null(),highest_fringe => null()     ! highest_fringe = 2 by default            !
+   !                       ! NUMBER OF MULTIPOLE   ! nmul maximum multipole
+ 
   SUBROUTINE ADD_ANBNR(EL,NM,F,V,electric)
     IMPLICIT NONE
     TYPE(ELEMENT), INTENT(INOUT) ::EL
@@ -2191,9 +2353,18 @@ CONTAINS
     real(dp), ALLOCATABLE,dimension(:)::AN,BN
     logical(lp), optional :: electric
     logical(lp) elec
+!!!!  On fibre call  add(FIBRE,NM,F,V,electric)
+!!      nm  > 0   bn(nm)  is changed
+!!      nm  < 0   an(nm)  is changed
+!!    EL%CN(NM)   = F*EL%CN(NM)+V         where cn=an,bn 
+!!  electric is false by default
+!!  if true then AE and BE are changed  for element kind10 only (TEAPOT)
+!!  notice that an and bn are available in cavity kind4, helical dipoles and wigglers
+
     elec=my_false
     if(present(electric)) elec=electric
     if(elec.and.(.not.EL%KIND==kind10)) return
+
 
 if(elec) then
     N=NM
@@ -2549,6 +2720,7 @@ nullify(EL%filef,el%fileb);
     TYPE(ELEMENTP), INTENT(INOUT)::EL
 
     nullify(EL%KNOB);
+    nullify(EL%probe);
     nullify(EL%KIND);
     nullify(EL%NAME);nullify(EL%vorname);nullify(EL%electric);
 
@@ -2609,6 +2781,7 @@ nullify(EL%filef,el%fileb);
        DEALLOCATE(EL%KIND);
        DEALLOCATE(EL%PLOT);
        DEALLOCATE(EL%recut);
+       DEALLOCATE(EL%probe);
        DEALLOCATE(EL%even);
        DEALLOCATE(EL%NAME);DEALLOCATE(EL%VORNAME);DEALLOCATE(EL%electric);
        DEALLOCATE(EL%L);
@@ -2788,6 +2961,7 @@ nullify(EL%filef,el%fileb);
        ALLOCATE(EL%KIND);EL%KIND=0;
        ALLOCATE(EL%PLOT);EL%PLOT=MY_TRUE;
        ALLOCATE(EL%RECUT);EL%RECUT=MY_TRUE;
+       ALLOCATE(EL%probe);EL%probe=my_false;
        ALLOCATE(EL%even);EL%even=MY_false;
        ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);ALLOCATE(EL%electric);
        ALLOCATE(EL%filef,el%fileb);
@@ -2990,7 +3164,7 @@ nullify(EL%filef,el%fileb);
        !       ENDIF
 
 
-       DEALLOCATE(EL%KIND);DEALLOCATE(EL%KNOB);
+       DEALLOCATE(EL%KIND);DEALLOCATE(EL%KNOB);DEALLOCATE(EL%probe);
        DEALLOCATE(EL%NAME);DEALLOCATE(EL%VORNAME);DEALLOCATE(EL%electric);
 !       DEALLOCATE(EL%PERMFRINGE);
        CALL KILL(EL%L);DEALLOCATE(EL%L);
@@ -3077,7 +3251,7 @@ nullify(EL%filef,el%fileb);
 
        call alloc(el%P)
 
-       ALLOCATE(EL%KIND);EL%KIND=0;ALLOCATE(EL%KNOB);EL%KNOB=.FALSE.;
+       ALLOCATE(EL%KIND);EL%KIND=0;ALLOCATE(EL%KNOB);EL%KNOB=.FALSE.;ALLOCATE(EL%probe);EL%probe=.FALSE.;
        ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);ALLOCATE(EL%electric);
        ALLOCATE(EL%skip_ptc_f);   EL%skip_ptc_f=0 ;   ALLOCATE(EL%skip_ptc_b);EL%skip_ptc_b=0  ;
        ALLOCATE(el%do1mapb);   el%do1mapb=.false. ;   ALLOCATE(el%do1mapf);el%do1mapf=.false.  ;
@@ -3141,6 +3315,8 @@ nullify(EL%filef,el%fileb);
     INTEGER J,i,N
 
 !    ELP%PERMFRINGE=EL%PERMFRINGE
+    ELP%probe=EL%probe
+
     ELP%NAME=EL%NAME
     ELP%electric=EL%electric
     ELP%vorname=EL%vorname
@@ -3283,7 +3459,7 @@ nullify(EL%filef,el%fileb);
     IF(EL%KIND==KIND16.OR.EL%KIND==KIND20) THEN
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
-       ELP%K16%LIKEMAD=EL%K16%LIKEMAD
+!       ELP%K16%LIKEMAD=EL%K16%LIKEMAD
        ELP%K16%F=EL%K16%F
     ENDIF
 
@@ -3323,6 +3499,8 @@ nullify(EL%filef,el%fileb);
        ELP%DELTA_E = EL%DELTA_E               ! DELTA_E IS real(dp)
        ELP%THIN = EL%THIN
        N_CAV4_F=EL%C4%NF
+       ELP%H1 = EL%H1
+       ELP%H2 = EL%H2
        CALL SETFAMILY(ELP)
        ELP%C4%N_BESSEL = EL%C4%N_BESSEL
        ELP%C4%cavity_totalpath = EL%C4%cavity_totalpath
@@ -3370,6 +3548,8 @@ nullify(EL%filef,el%fileb);
        ELP%CAV21%cavity_totalpath = EL%CAV21%cavity_totalpath
        ELP%CAV21%phase0 = EL%CAV21%phase0
        ELP%CAV21%Always_on=EL%CAV21%Always_on
+       ELP%CAV21%implicit=EL%CAV21%implicit
+
     ENDIF
 
     IF(EL%KIND==KIND22) THEN         !
@@ -3558,6 +3738,8 @@ nullify(EL%filef,el%fileb);
     !    if(associated(el%siamese)) elp%siamese=>el%siamese
     !    if(associated(el%girder)) elp%girder=>el%girder
 !    ELP%PERMFRINGE=EL%PERMFRINGE
+    ELP%probe=EL%probe
+
     ELP%electric=EL%electric
     ELP%vorname=EL%vorname
     ELP%KIND=EL%KIND
@@ -3678,7 +3860,7 @@ nullify(EL%filef,el%fileb);
     IF(EL%KIND==KIND16.OR.EL%KIND==KIND20) THEN
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
-       ELP%K16%LIKEMAD=EL%K16%LIKEMAD
+!       ELP%K16%LIKEMAD=EL%K16%LIKEMAD
        ELP%K16%F=EL%K16%F
     ENDIF
 
@@ -3758,6 +3940,8 @@ nullify(EL%filef,el%fileb);
        ELP%CAV21%cavity_totalpath = EL%CAV21%cavity_totalpath
        ELP%CAV21%phase0 = EL%CAV21%phase0
        ELP%CAV21%Always_on=EL%CAV21%Always_on
+       ELP%CAV21%implicit=EL%CAV21%implicit
+
     ENDIF
 
     IF(EL%KIND==KIND22) THEN         !
@@ -3963,6 +4147,7 @@ nullify(EL%filef,el%fileb);
     ELP%electric=EL%electric
     ELP%vorname=EL%vorname
     ELP%RECUT=EL%RECUT
+    ELP%probe=EL%probe
     ELP%even=EL%even
     ELP%KIND=EL%KIND
     ELP%PLOT=EL%PLOT
@@ -4083,7 +4268,7 @@ nullify(EL%filef,el%fileb);
     IF(EL%KIND==KIND16.OR.EL%KIND==KIND20) THEN
        CALL SETFAMILY(ELP)
        ELP%K16%DRIFTKICK=EL%K16%DRIFTKICK
-       ELP%K16%LIKEMAD=EL%K16%LIKEMAD
+!       ELP%K16%LIKEMAD=EL%K16%LIKEMAD
        ELP%K16%F=EL%K16%F
     ENDIF
 
@@ -4168,6 +4353,8 @@ nullify(EL%filef,el%fileb);
        ELP%CAV21%cavity_totalpath = EL%CAV21%cavity_totalpath
        ELP%CAV21%phase0 = EL%CAV21%phase0
        ELP%CAV21%Always_on=EL%CAV21%Always_on
+       ELP%CAV21%implicit=EL%CAV21%implicit
+
     ENDIF
 
     IF(EL%KIND==KIND22) THEN         !
