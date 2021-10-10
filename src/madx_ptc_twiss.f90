@@ -25,6 +25,7 @@ module madx_ptc_twiss_module
   !============================================================================================
   !  PRIVATE
   !    datta structures
+  logical(lp)              :: dospin = .true.
 
   !PSk 2011.01.05 goes global to the modules so the slice tracking produces it for the summ table
   type(probe_8)            :: theTransferMap
@@ -114,6 +115,11 @@ module madx_ptc_twiss_module
 
   character(48)           :: nl_table_name='nonlin'
   character(48)           :: rdt_table_name='twissrdt'
+
+  !============================================================================================
+  !  variables for spin treatment in equaltwiss subroutine
+  type(c_damap)           :: tw_SpinUmap, tw_SpinUmapCanonic, tw_D, tw_A, tw_R, tw_f,  tw_b
+  type(c_taylor)          :: tw_Phase(3), tw_NuSpin
 
   !============================================================================================
   !  PRIVATE
@@ -258,10 +264,11 @@ contains
 
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine equaltwiss(s1,A_script)
+  subroutine equaltwiss(s1,theAscriptProbe8)
     implicit none
     type(twiss), intent(inout)::s1
-    type(real_8), intent(in) ::A_script(6)
+    type(probe_8), intent(in), target ::theAscriptProbe8
+    type(real_8),pointer, dimension(:) :: A_script
     real(dp)  :: amatrix(6,6) ! first order A_script
     integer jj,i,k, ndel
     real(dp) :: lat(0:6,6,3)=0
@@ -269,7 +276,9 @@ contains
     real(dp) :: epsil=1e-12  !
     integer  :: J(lnv)
     real(dp)  :: beta(3)
+    
 
+  
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
       write(whymsg,*) ' check_stable ',check_stable,' c_%stable_da ',c_%stable_da,' PTC msg: ', &
                        messagelost(:len_trim(messagelost))
@@ -277,8 +286,9 @@ contains
       call seterrorflag(10,"equaltwiss CHECK 0 ",whymsg)
       return
     endif
-
-
+    
+    A_script => theAscriptProbe8%x
+    
     lat = zero
 
     ndel=0
@@ -364,30 +374,58 @@ contains
     !!!!!!!!!!!!!!!!
     ! phase advance!
     !!!!!!!!!!!!!!!!
+    if (dospin) then
+       tw_SpinUmap = theAscriptProbe8
+       ! U = U_c o  R = D o f o A o b o R  
+      
+       call c_full_canonise(tw_SpinUmap,tw_SpinUmapCanonic,tw_D,tw_f,tw_A,tw_b,tw_R,tw_Phase,tw_NuSpin) ! (10)
 
-    k = 2
-    if(c_%nd2==6.and.c_%ndpt==0) k = 3
+       print*,"Spin tune--> "
+       call print(tw_NuSpin,6)
 
-    j=0
-    do i=1, k
-       jj=2*i -1
-       if (i == 3) then
-          TEST = ATAN2((A_script(6).SUB.fo(5,:)),(A_script(6).SUB.fo(6,:)))/TWOPI
-       else
-          TEST = ATAN2((A_script(2*i -1).SUB.fo(2*i,:)),(A_script(2*i-1).SUB.fo(2*i-1,:)))/TWOPI
-       endif
+       k = 2
+       if(c_%nd2==6.and.c_%ndpt==0) k = 3
+
+       j=0
+       do i=1, k
+         
+         TEST = phase(i)
+         IF(TEST<zero.AND.abs(TEST)>EPSIL)TEST=TEST+one
+         DPH=TEST-TESTOLD(i)
+         IF(DPH<zero.AND.abs(DPH)>EPSIL) DPH=DPH+one
+         IF(DPH>half) DPH=DPH-one
+
+         PHASE(i)=PHASE(i)+DPH
+         TESTOLD(i)=TEST
+
+      enddo
+
+    else
+    
+      k = 2
+      if(c_%nd2==6.and.c_%ndpt==0) k = 3
+
+      j=0
+      do i=1, k
+         jj=2*i -1
+         if (i == 3) then
+            TEST = ATAN2((A_script(6).SUB.fo(5,:)),(A_script(6).SUB.fo(6,:)))/TWOPI
+         else
+            TEST = ATAN2((A_script(2*i -1).SUB.fo(2*i,:)),(A_script(2*i-1).SUB.fo(2*i-1,:)))/TWOPI
+         endif
 
 
-       IF(TEST<zero.AND.abs(TEST)>EPSIL)TEST=TEST+one
-       DPH=TEST-TESTOLD(i)
-       IF(DPH<zero.AND.abs(DPH)>EPSIL) DPH=DPH+one
-       IF(DPH>half) DPH=DPH-one
+         IF(TEST<zero.AND.abs(TEST)>EPSIL)TEST=TEST+one
+         DPH=TEST-TESTOLD(i)
+         IF(DPH<zero.AND.abs(DPH)>EPSIL) DPH=DPH+one
+         IF(DPH>half) DPH=DPH-one
 
-       PHASE(i)=PHASE(i)+DPH
-       TESTOLD(i)=TEST
+         PHASE(i)=PHASE(i)+DPH
+         TESTOLD(i)=TEST
 
-    enddo
+      enddo
 
+    endif
 
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
       write(whymsg,*) ' check_stable ',check_stable,' c_%stable_da ',c_%stable_da,' PTC msg: ', &
@@ -396,6 +434,8 @@ contains
       call seterrorflag(10,"equaltwiss CHECK 4 ",whymsg)
       return
     endif
+
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -574,7 +614,8 @@ contains
     character(48)           :: charconv !routine
     real(dp)                :: BETA0
     integer                 :: mapdumpbak ! LD: 04.06.2019
-
+    type(c_damap) id_s  ! dospin true
+    
     if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
        call seterrorflag(1,"ptc_twiss ","no universe created till now");
@@ -781,6 +822,13 @@ contains
        print*, "Closed orbit specified by the user!"
        !CALL write_closed_orbit(icase,x) at this position it isn't read
     endif
+    
+    if (dospin) then
+      print*, "skowron: forcing spin"
+      default = default + spin0
+      
+      nda = nda + 1
+    endif
 
 
     orbit_probe = orbit
@@ -802,11 +850,12 @@ contains
 
     n_rf = nclocks
 
-    ! old PTC
-    !call init(default,no,nda,BERZ,mynd2,npara)
-
-    !new complex PTC
     call init_all(default,no,nda,BERZ,mynd2,npara,nclocks) ! need to add number of clocks
+    
+    if (dospin) then
+      call alloc(id_s)
+    endif
+    
     c_verbose=.false.
 
     i_piotr(:) = 0
@@ -815,8 +864,6 @@ contains
     c_normal_auto=.true.;
 
 
-!    call init_all(default,no,nda)
-    ! mynd2 and npara are outputs
 
     if (getdebug() > 2) then
        print *, "ptc_twiss: internal state after init:"
@@ -842,16 +889,28 @@ contains
 
 
     call alloc(A_script_probe)
-    A_script_probe%u=my_false
-    A_script_probe%x=npara
-    A_script_probe%x=orbit
+    
+    if (dospin) then
+      id_s = 1
+      A_script_probe = orbit_probe + id_s
+    else
+      A_script_probe%u=my_false
+      A_script_probe%x=npara  
+      A_script_probe%x=orbit
+    endif
 
 
     !This must be before init map
     call alloc(theTransferMap)
-    theTransferMap%u = .false.
-    theTransferMap%x = npara
-    theTransferMap%x = orbit
+    
+    if (dospin) then
+      id_s = 1
+      theTransferMap = orbit_probe + id_s
+    else
+      theTransferMap%u = .false.
+      theTransferMap%x = npara
+      theTransferMap%x = orbit
+    endif
 
     !############################################################################
     !############################################################################
@@ -976,16 +1035,20 @@ contains
 
 
     call alloc(tw)
+    if (dospin) then
+      call alloc(tw_SpinUmap,tw_SpinUmapCanonic, tw_D, tw_A, tw_R, tw_f, tw_b)
+      call alloc(tw_Phase(3), tw_NuSpin)
+    endif
 
     !Y
-
     !the initial twiss is needed to initialize propely calculation of some variables f.g. phase advance
-    tw = A_script_probe%x
+    tw = A_script_probe
     if (geterrorflag() /= 0) then
        call fort_warn('ptc_twiss: ','equaltwiss at the begining of the line returned with error')
        call tidy()
        return
     endif
+    
 
     phase = zero !we have to do it after the very initial twiss params calculation above
     current=>MY_RING%start
@@ -1191,7 +1254,7 @@ contains
                write(6,*) "             Saving data CASE=",nodePtr%next%cas
             endif
 
-            tw = A_script_probe%x ! set the twiss parameters, with y being equal to the A_ phase advance
+            tw = A_script_probe ! set the twiss parameters, with y being equal to the A_ phase advance
             suml = s;
 
             call puttwisstable(theTransferMap%x)
@@ -1212,7 +1275,7 @@ contains
              write(6,*) "               Saving anyway, it is the last node"
           endif
 
-          tw = A_script_probe%x ! set the twiss parameters
+          tw = A_script_probe ! set the twiss parameters
           if (s > suml) then !work around against last element having s=0
             suml = s;
           endif
@@ -1225,7 +1288,7 @@ contains
 
       else
         ! ELEMENT AT ONCE MODE
-        if (nda > 0) then
+        if (nda > 0 .or. dospin) then
            if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
              mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
              call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
@@ -1293,7 +1356,7 @@ contains
         !print*,"Skowron 4 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
 
         ! compute the Twiss parameters
-        tw = A_script_probe%x
+        tw = A_script_probe
         if (geterrorflag() /= 0) then
            call fort_warn('ptc_twiss: ','equaltwiss at ' // current%mag%name // ' returned with error')
            call tidy()
@@ -1634,8 +1697,11 @@ contains
 
 
          do i=1,MY_RING%n
-
-           call propagate(my_ring,theTransferMap,default, fibre1=i,fibre2=i+1)
+           if (dospin) then
+               call propagate(my_ring,theTransferMap,+default, fibre1=i,fibre2=i+1)
+           else
+               call propagate(my_ring,theTransferMap, default, fibre1=i,fibre2=i+1)
+           endif
 
            if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
               write(whymsg,*) 'DA got unstable (one turn map production) at ', &
@@ -2714,7 +2780,7 @@ contains
       !Performes normal form on a map, and plugs A_ in its place
       implicit none
       type(c_normal_form) theNormalForm
-      type(c_damap)  :: c_Map, a_cs
+      type(c_damap)  :: c_Map, a_cs, U
       integer :: mf
 
       if (getdebug() > 2) then
@@ -2725,7 +2791,13 @@ contains
       c_Map = theTransferMap
 
       call alloc(theNormalForm)
-      call  c_normal(c_Map,theNormalForm)       ! (4)
+      
+      if (dospin) then
+        call  c_normal(c_Map,theNormalForm, dospin=my_true)    
+        call alloc(U)
+      else
+        call  c_normal(c_Map,theNormalForm)  
+      endif
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
          write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ', &
@@ -2753,12 +2825,18 @@ contains
 
       call kill(A_script_probe)
       call alloc(A_script_probe)
-
-      A_script_probe%u=my_false
-
-      !use Courant Snyder
       call alloc(a_cs)
-      call c_full_canonise(theNormalForm%atot,a_cs)   ! (0)
+      
+      if (dospin) then
+        U=theNormalForm%As*theNormalForm%A_t
+        call c_full_canonise(U,a_cs)
+      else
+        A_script_probe%u=my_false
+        !use Courant Snyder
+        call c_full_canonise(theNormalForm%atot,a_cs)   ! (0)
+      endif
+
+
       A_script_probe = orbit_probe +  a_cs
 
      ! A_script_probe =  orbit_probe + theNormalForm%a_t
@@ -2782,6 +2860,9 @@ contains
       call kill(theNormalForm)
       call kill(c_Map)
       call kill(a_cs)
+      if (dospin) then
+        call kill(U)
+      endif
 
     end subroutine maptoascript
     !_________________________________________________________________

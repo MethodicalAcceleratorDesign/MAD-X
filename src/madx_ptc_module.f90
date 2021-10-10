@@ -96,8 +96,9 @@ CONTAINS
     implicit none
     real(kind(1d0)) get_value
     integer maxnmul
-
-    use_quaternion=.true.
+    
+    print*, "skowron: using quaternion false to check with the book examples for spin"
+    use_quaternion=.false.
 
     piotr_freq=.true. ! PTC flag in cavity tracking to have correct phasing with time=false
 
@@ -3008,7 +3009,7 @@ CONTAINS
       call fort_warn("my_state ",  &
             "TIME=false with RF cavities gives approximative results valid only for fully relativistic beams (beta~1)")
     endif
-
+    
 
     call setintstate(default)
     CALL UPDATE_STATES
