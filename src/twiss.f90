@@ -928,7 +928,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         endif
         
      case (code_quadrupole, code_sextupole)
-        call element_name(el_name,len(el_name))
         dpt = orbit(6)/beta
         if (iterate .ge. 1) then ! loop is only one pass
            ORBITTAP = ORBIT 

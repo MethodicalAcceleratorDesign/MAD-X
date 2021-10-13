@@ -1,0 +1,76 @@
+! Test/Demo file for TAPER command and TAPERING flag for TWISS
+!
+! 2021-08-13 Ghislain Roy
+
+Option, -echo;
+Call, file="FCCee_t_241_nosol_3.seq"; ! This sequence contains active RF cavities
+Option, echo;
+
+Set, format="-20s","23.17g";
+
+Select, flag=twiss, column=name,keyword,s,x,px,y,py,t,pt;
+
+Beam, particle=electron, PC=182.5, radiate;
+
+Use, sequence = FCC_E_RING;
+
+! Without tapering Twiss will fail
+Twiss; 
+
+! Taper with all default values
+Taper;
+Twiss, save, file="taper-def.tfs";
+
+! Check parameters and guards
+! non default parameters
+Taper, iterate=2, stepsize=2.e-6, file="test1.madx";  
+
+! negative values for iterate and stepsize
+Taper, iterate=-11, stepsize=-2.e-3, file;
+
+! initial closed orbit will be taken into account
+Coguess, pt=1.e-4 ;
+Taper, file="coguess.madx";
+Coguess, clear ;
+
+Taper;
+! and with effect of deltap
+Twiss, deltap=1.e-3, save, file="taper_dp.tfs";
+
+! relative tapering
+Taper, stepsize=1.e-3, file="test2.madx";
+Twiss, save, file="taper_rel.tfs";
+
+! reset all tapering values 
+Taper, reset;
+
+! Alternative method still works
+Twiss, tapering, save, file="tapering.tfs";
+! see if two consecutive runs alter the results
+Twiss, tapering, save; 
+! See effect of deltap
+Twiss, tapering, deltap=1.e-3, save, file="tapering_dp.tfs";
+
+! Tapering also applied as option for matching
+Beam, radiate=false;
+Taper, reset;
+lagca1save = lagca1;
+lagca1 = 0.5;
+Savebeta, label=B.IP, place=#s, sequence=FCC_E_RING;
+Twiss;
+lagca1 = lagca1save + 0.05;
+Beam, radiate=true;
+
+Match, sequence=FCC_E_RING, BETA0 = B.IP, tapering;
+ 	Vary, name=LAGCA1, step=1.0E-7;
+!	Vary, name=LAGCA2, step=1.0E-7;
+	Constraint, sequence=FCC_E_RING, range=#e, PT=0.0;
+	Jacobian, tolerance=1.0E-16, calls=3000;
+Endmatch;
+	
+Twiss, file="fcc_radiate.tfs", tapering;
+Save, sequence=FCC_E_RING, file="tapered.seq";
+
+Stop;
+
+

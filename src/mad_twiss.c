@@ -775,7 +775,6 @@ pro_twiss(void)
     current_sequ->tw_centre=0;
     set_option("centre", &k);
     k = 1;
-
   }
 
   name = command_par_string_user("keeporbit", current_twiss);
