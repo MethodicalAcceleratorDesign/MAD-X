@@ -3512,8 +3512,9 @@ CONTAINS
     gamma0 = get_value('probe ','gamma ')
     arad=get_value('probe ', 'arad ')
     npart_tmp = node_value('npart ')
-    if(npart_tmp < 1d0) npart_tmp = node_value('charge ')
-    totch=npart_tmp * get_value('probe ', 'npart ')
+
+    if (npart_tmp .lt. 1d0) npart_tmp = get_value('probe ', 'npart ')
+    totch=node_value('charge ') * npart_tmp
 
     if (getdebug()>1) then
       print*, 'getfk for beam-beam: charge npart ',node_value('charge '), get_value('probe ', 'npart ')
