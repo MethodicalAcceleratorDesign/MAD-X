@@ -931,6 +931,19 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("stochastic is not present (keeping current value)\n");
    }
 
+/*spin SWITCH*/
+  found = command_par_value_user2("spin", cmd->clone, &switchvalue);
+  if (found)
+   {
+    if (debuglevel > 0) printf("spin is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setspin_(&i);
+   }
+  else
+   {
+    if (debuglevel > 0) printf("spin is not present (keeping current value)\n");
+   }
+   
   /*envelope SWITCH*/
   found = command_par_value_user2("envelope", cmd->clone, &switchvalue);
   if (found)

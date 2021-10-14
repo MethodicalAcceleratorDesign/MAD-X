@@ -97,8 +97,7 @@ CONTAINS
     real(kind(1d0)) get_value
     integer maxnmul
     
-    print*, "skowron: using quaternion false to check with the book examples for spin"
-    use_quaternion=.false.
+    use_quaternion=.true.
 
     piotr_freq=.true. ! PTC flag in cavity tracking to have correct phasing with time=false
 

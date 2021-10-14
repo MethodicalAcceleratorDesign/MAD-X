@@ -120,6 +120,7 @@ module madx_ptc_twiss_module
   !  variables for spin treatment in equaltwiss subroutine
   type(c_damap)           :: tw_SpinUmap, tw_SpinUmapCanonic, tw_D, tw_A, tw_R, tw_f,  tw_b
   type(c_taylor)          :: tw_Phase(3), tw_NuSpin
+  real(dp)                :: tw_SpinPhase(2), tw_SpinOrbitaPhase(3), tw_DampingPhase(3)
 
   !============================================================================================
   !  PRIVATE
@@ -267,8 +268,9 @@ contains
   subroutine equaltwiss(s1,theAscriptProbe8)
     implicit none
     type(twiss), intent(inout)::s1
-    type(probe_8), intent(in), target ::theAscriptProbe8
+    type(probe_8), intent(inout), target ::theAscriptProbe8
     type(real_8),pointer, dimension(:) :: A_script
+    type(probe) :: theAscriptProbeBak
     real(dp)  :: amatrix(6,6) ! first order A_script
     integer jj,i,k, ndel
     real(dp) :: lat(0:6,6,3)=0
@@ -276,8 +278,10 @@ contains
     real(dp) :: epsil=1e-12  !
     integer  :: J(lnv)
     real(dp)  :: beta(3)
+    !type (c_linear_map) l_axis, m_axis, n_axis,q_rot, q_as,q_cs,q_map,q_orb,q_u,q_u_inv
+    type (c_linear_map) q_rot, q_as,q_cs,q_u
+    type(c_lattice_function) latticefun
     
-
   
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
       write(whymsg,*) ' check_stable ',check_stable,' c_%stable_da ',c_%stable_da,' PTC msg: ', &
@@ -286,6 +290,8 @@ contains
       call seterrorflag(10,"equaltwiss CHECK 0 ",whymsg)
       return
     endif
+    
+    latticefun%symplectic=.true.
     
     A_script => theAscriptProbe8%x
     
@@ -375,31 +381,53 @@ contains
     ! phase advance!
     !!!!!!!!!!!!!!!!
     if (dospin) then
-       tw_SpinUmap = theAscriptProbe8
+      tw_SpinUmap = theAscriptProbe8
        ! U = U_c o  R = D o f o A o b o R  
+      theAscriptProbeBak=theAscriptProbe8
       
-       call c_full_canonise(tw_SpinUmap,tw_SpinUmapCanonic,tw_D,tw_f,tw_A,tw_b,tw_R,tw_Phase,tw_NuSpin) ! (10)
+      call c_fast_canonise(tw_SpinUmap, tw_SpinUmapCanonic, q_cs = q_cs, q_as = q_as, &
+                       damping=tw_DampingPhase, &
+	   phase = tw_SpinOrbitaPhase, &
+	   q_rot = q_rot, &
+                       spin_tune = tw_SpinPhase, &
+	   dospin = .true.)
+	   
+      print*, "q_rot ", q_rot 
+      
+      if(default%nocavity) then
+         Write(6,*) "Orbital phase advances and temporal slip"
+         write(6,format3) tw_SpinOrbitaPhase
+         Write(6,*) "Spin phase advance and dnu_spin/d_delta advance"
+         write(6,format2) tw_SpinPhase
+      else
+         Write(6,*) "Orbital phase advances "
+         write(6,format3) tw_SpinOrbitaPhase
+         Write(6,*) "Spin phase advance  "
+         write(6,format1) tw_SpinPhase(1)
+         Write(6,*) "damping advance "
+         write(6,format7) tw_DampingPhase
+      endif
+       
+      call     compute_lattice_functions(q_cs,latticefun)
 
-       print*,"Spin tune--> "
-       call print(tw_NuSpin,6)
 
-       k = 2
-       if(c_%nd2==6.and.c_%ndpt==0) k = 3
-
-       j=0
-       do i=1, k
-         
-         TEST = phase(i)
-         IF(TEST<zero.AND.abs(TEST)>EPSIL)TEST=TEST+one
-         DPH=TEST-TESTOLD(i)
-         IF(DPH<zero.AND.abs(DPH)>EPSIL) DPH=DPH+one
-         IF(DPH>half) DPH=DPH-one
-
-         PHASE(i)=PHASE(i)+DPH
-         TESTOLD(i)=TEST
-
-      enddo
-
+             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      write(6,*) " L,N,M vector from q_u=u : no need for canonise"
+      write(6,*) " L "
+      write(6,format7) latticefun%s(1,1,0:6)
+      write(6,format7) latticefun%s(1,2,0:6)
+      write(6,format7) latticefun%s(1,3,0:6)
+      write(6,*) " spin N vector, and 1st order derivatives"
+      write(6,format7) latticefun%s(2,1,0:6)
+      write(6,format7) latticefun%s(2,2,0:6)
+      write(6,format7) latticefun%s(2,3,0:6)
+      write(6,*) " M "
+      write(6,format7) latticefun%s(3,1,0:6)
+      write(6,format7) latticefun%s(3,2,0:6)
+      write(6,format7) latticefun%s(3,3,0:6)
+      
+      theAscriptProbe8 = theAscriptProbeBak + tw_SpinUmapCanonic
+      
     else
     
       k = 2
@@ -652,7 +680,10 @@ contains
         print*,"ptc_twiss"
     endif
     call momfirstinit()
-
+    
+    tw_SpinOrbitaPhase = 0
+    tw_SpinPhase = 0
+    tw_DampingPhase = 0
     !------------------------------------------------------------------------------
     table_name = charconv(tab_name)
     summary_table_name = charconv(summary_tab_name)
@@ -952,17 +983,13 @@ contains
     enddo
 
 
-
-
-       doRDTtracking = get_value('ptc_twiss ','trackrdts ') .ne. 0
-       if (doRDTtracking) then
-          call alloc(theRDTs)
-          call alloc(vectorField)
-          call alloc(AscriptInPhasor)
-          call alloc(dummyMap)
-       endif
-
-
+    doRDTtracking = get_value('ptc_twiss ','trackrdts ') .ne. 0
+    if (doRDTtracking) then
+      call alloc(theRDTs)
+      call alloc(vectorField)
+      call alloc(AscriptInPhasor)
+      call alloc(dummyMap)
+    endif
 
 
     !############################################################################
@@ -2780,7 +2807,7 @@ contains
       !Performes normal form on a map, and plugs A_ in its place
       implicit none
       type(c_normal_form) theNormalForm
-      type(c_damap)  :: c_Map, a_cs, U
+      type(c_damap)  :: c_Map, a_cs
       integer :: mf
 
       if (getdebug() > 2) then
@@ -2792,12 +2819,8 @@ contains
 
       call alloc(theNormalForm)
       
-      if (dospin) then
-        call  c_normal(c_Map,theNormalForm, dospin=my_true)    
-        call alloc(U)
-      else
-        call  c_normal(c_Map,theNormalForm)  
-      endif
+      call  c_normal(c_Map,theNormalForm,dospin=dospin)  
+      
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
          write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ', &
@@ -2827,15 +2850,10 @@ contains
       call alloc(A_script_probe)
       call alloc(a_cs)
       
-      if (dospin) then
-        U=theNormalForm%As*theNormalForm%A_t
-        call c_full_canonise(U,a_cs)
-      else
-        A_script_probe%u=my_false
-        !use Courant Snyder
-        call c_full_canonise(theNormalForm%atot,a_cs)   ! (0)
-      endif
-
+      A_script_probe%u=my_false
+      !use Courant Snyder
+      call c_full_canonise(theNormalForm%atot,a_cs)   ! (0)
+      
 
       A_script_probe = orbit_probe +  a_cs
 
@@ -2860,10 +2878,7 @@ contains
       call kill(theNormalForm)
       call kill(c_Map)
       call kill(a_cs)
-      if (dospin) then
-        call kill(U)
-      endif
-
+      
     end subroutine maptoascript
     !_________________________________________________________________
 
@@ -3141,11 +3156,17 @@ contains
       type(c_damap) :: yy, theA_beta ! added on November 6th to retreive momemtum compaction without differentiating the formula
       type(c_vector_field) :: vf_kernel
       type(c_damap)        :: c_Map
-      type(c_damap)        :: rotationMap, theA_CS, theA_Spin, theA0, theA1, theA2, theRot
+      type(c_damap)        :: theA_CS, theA_Spin, theA0, theA1, theA2, theRot, theA_CS_fast
       type(c_taylor)       :: thePhaseAndSlip(3), theNuSpin
       type(c_normal_form)  :: theNormalForm
-
-
+      type(c_linear_map)  :: linA_spin,  linA, linA_orbital, linOneTurnMap, spin_n_axis
+      real(dp)             :: spin_phase_advance(2)
+      type(c_spinor)       :: n_isf   ,s_isf ,isfom
+      type(c_lattice_function) :: latticefun
+      type(c_linear_map)   :: q_x, q_y, q_z, q_map ! to be removed in prod version
+      
+      latticefun%symplectic=.true.
+      
       order = get_value('ptc_twiss ', 'no ')
 
       ! should end-up gracefully here in case the topology of the lattice is not those of a closed-ring
@@ -3208,8 +3229,15 @@ contains
       endif
 
       call alloc(theNormalForm)
-      call  c_normal(c_Map,theNormalForm)       ! (4)
-
+      call alloc(thePhaseAndSlip)
+      call alloc(theNuSpin)
+      call alloc(thePhaseAndSlip)
+      call alloc(theA_CS, theA_Spin, theA0, theA1, theA2, theRot, theA_CS_fast)
+      
+      call  c_normal(c_Map,theNormalForm,dospin=dospin, &
+                     phase=thePhaseAndSlip, &
+	 nu_spin=theNuSpin)       ! (4)
+      
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
          write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ', &
               messagelost(:len_trim(messagelost))
@@ -3228,12 +3256,21 @@ contains
 
          return
       endif
-
+    
       if (getdebug() > 1) then
         write(6,*) "Doing normal form ... Done"
       endif
 
-
+      call c_full_canonise(theNormalForm%atot, & ! input, full "A script", i.e. the normalizing transformation
+                           theA_CS, & ! out, Courant Snyder convention for "A script"
+                           theA_Spin, & ! out, spin part of A
+	       theA0, & ! out, zero order, i.e. the closed orbit
+	       theA1, & ! out, 1st order A
+	       theA2, & ! out, the remaining orders
+	       theRot, & 
+	       thePhaseAndSlip,&
+	       theNuSpin)
+      
       if (debugFiles .eq. 1) then
 
         call kanalnummer(mf,file="NormalFormA_t.summ.txt")
@@ -3246,32 +3283,7 @@ contains
 
       endif
 
-      !********************************************!
-      ! new all-in-ine algorithm to get normal form goodies
-      ! unstable for 6D
-!       call alloc(rotationMap)
-!
-!       rotationMap=theNormalForm%atot**(-1)*c_Map*theNormalForm%atot ! (7a)
-!
-!       call alloc(theA_CS)
-!       call alloc(theA_Spin)
-!       call alloc(theA0)
-!       call alloc(theA1)
-!       call alloc(theA2)
-!       call alloc(theRot)
-!
-!       call alloc(thePhaseAndSlip)
-!       call alloc(theNuSpin)
-!
-!       call c_full_canonise(rotationMap,theA_CS,theA_Spin,theA0,theA1,theA2,theRot,phase=thePhaseAndSlip,nu_spin=theNuSpin)
-!
-!       call print(thePhaseAndSlip(1),6)
-!       call print(thePhaseAndSlip(2),6)
-!       call print(thePhaseAndSlip(3),6)
 
-      !********************************************!
-      !skowron: old ptc
-      !print*, "Cplx dispersion A1(1,5)", theNormalForm%A1%v(1).sub.'000010'
 
 
       if( (c_%npara==5)       .or.  (c_%ndpt/=0)  ) then
@@ -3650,7 +3662,97 @@ contains
 
 
       call augment_count( summary_table_name ); ! only one row actually...
+      
+      
+      
+      !___________________________________________________
+           
+      print*, "oneTurnSummary  Spin"
+      
+      
+      Write(6,*) " One-turn map Spin tune "
+      spin_phase_advance(1)=theNuSpin
+      if(spin_phase_advance(1)<0) spin_phase_advance(1)=spin_phase_advance(1)+1
+      spin_phase_advance(2)=theNuSpin.sub.'000001'
+      
+      write(6,format2) spin_phase_advance
+      if (default%nocavity) then
+        Write(6,*) "One-turn map dampings "
+        Write(6,format3) theNormalForm%damping(1:3)
+      endif
+      
+      print*, "c_fast_canonise ... "
+      
+      !brings the normalizing transformation to canonic Courant-Snyder form where A12=0
+      ! theA_CS_fast = atot * someRotation
+      !tw_SpinUmap = theNormalForm%atot
+      call c_fast_canonise(theNormalForm%as, & !input, "A script", the normalizing map 
+                           theA_CS_fast, & ! out, "A script" in Courant-Snyder convention
+	       q_cs= linA, & ! out, linear part of A script
+                           q_as = linA_spin, & ! out, spin part of A
+	       q_orb=linA_orbital, &  ! out, orbital part of A, q_cs= q_as*q_orb 
+	       dospin = .true.)
 
+      print*, "c_fast_canonise ... Done"
+      call compute_lattice_functions(linA,latticefun)
+      
+      print*, "compute_lattice_functions"
+      
+      linOneTurnMap=c_Map
+
+      spin_n_axis=0
+      spin_n_axis%q=0
+      spin_n_axis%q(1:3,0:6) =latticefun%s(2,1:3,0:6)
+
+
+      write(6,*);write(6,*);write(6,*) " Printing  ISF "
+      j=6
+      call print(spin_n_axis, quaternion_only=.true., mf=j)
+
+      write(6,*);write(6,*) " checking ISF  using the Barber Identity  Sn=n o m"
+      print*, "This code is just to check and prove the PTC works, to be removed for production"
+      call makeso3(theNormalForm%as)
+      call alloc(n_isf)
+      call alloc(s_isf)
+      call alloc(isfom)
+      n_isf=2
+
+      n_isf=theNormalForm%as%s*n_isf
+      call print(n_isf,6)
+
+      isfom=n_isf*c_map
+      call makeso3(c_map)
+      s_isf=c_map%s*n_isf
+
+
+      call print(isfom%v(1),6)
+      call print(s_isf%v(1),6)
+      call print(isfom%v(2),6)
+      call print(s_isf%v(2),6)
+      call print(isfom%v(3),6)
+      call print(s_isf%v(3),6)
+
+      write(6,*) " checking ISF with c_linear_map"
+      q_x=1
+      q_y=2 
+      q_z=3
+      
+      q_z=1.0_dp  ! makes quarternion part identity
+      q_z%mat=q_map%mat
+      q_x=spin_n_axis*q_z
+
+      call print(q_x,quaternion_only=.true.,mf=6)
+
+      q_z=0  ! makes identity 0, 1,2,3 makes identity in orbital + 1, i,j, or k in the quaternion
+      q_z%q=q_map%q
+      q_y=q_z*spin_n_axis*q_z**(-1)
+      call print(q_y,quaternion_only=.true.,mf=6)
+       
+       
+      !  cleaning spin
+      call kill(n_isf)
+      call kill(s_isf)
+      call kill(isfom)
     end subroutine oneTurnSummary
 
 
@@ -4261,8 +4363,10 @@ contains
      write(ch16lft,'(a16)') in
      ch16lft = adjustl(ch16lft)
     end function ch16lft
-
+    
+    
     !terminates string with null for C
+    ! contained in ptc_twiss
     subroutine ch16cterm(in)
      implicit none
      character(len=17) :: in
@@ -4272,7 +4376,8 @@ contains
       in(zeropos:zeropos) = char(0)
 
     end subroutine ch16cterm
-
+    !_________________________________________________
+    ! contained in ptc_twiss
     subroutine puttonormaltable(name, nick, basevar ,d_val,order,ind)
       implicit none
       character(len=17):: name, nick, basevar
@@ -4308,7 +4413,8 @@ contains
       call augment_count(nl_table_name)
 
     end  subroutine puttonormaltable
-
+    !_________________________________________________
+    ! contained in ptc_twiss
     subroutine putMnormaltable(vv)
       implicit none
       type(real_8) :: vv(6)
@@ -4366,7 +4472,8 @@ contains
       enddo
 
     end subroutine putMnormaltable
-
+    !_________________________________________________
+    ! contained in ptc_twiss
     ! when switched to real table from file mf, move it out of "contains"
     subroutine putDnormaltable(v,planei)
       implicit none
@@ -4470,7 +4577,8 @@ contains
 
     end subroutine putDnormaltable
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
+    !_________________________________________________
+    ! contained in ptc_twiss
     subroutine putHnormaltable(nrmlzdPseudoHam)
       implicit none
       type(c_taylor) :: nrmlzdPseudoHam
@@ -4571,10 +4679,9 @@ contains
       enddo
      enddo
     end subroutine putHnormaltable
-
-
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
+    !_________________________________________________
+    ! contained in ptc_twiss
     subroutine putGnormaltable(gen)
     !gets generating function that are the linear part of A_t
       implicit none
@@ -4669,7 +4776,8 @@ contains
 
 
     end subroutine putGnormaltable
-
+   !_________________________________________________
+   ! contained in ptc_twiss
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
@@ -4708,7 +4816,9 @@ contains
     end subroutine putEmiNormalTable
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
+    !_________________________________________________
+    ! contained in ptc_twiss
+    
     subroutine putESignormaltable(va)
     !gets Equilibrium Beam sizes
       implicit none
@@ -4752,7 +4862,8 @@ contains
     end subroutine putESignormaltable
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
+    !_________________________________________________
+    ! contained in ptc_twiss
     subroutine putEnormaltable(v,planei)
     !gets eigenvectors that are the linear part of A_t
       implicit none
@@ -4792,7 +4903,9 @@ contains
 
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+    !_________________________________________________
+    ! contained in ptc_twiss
+    
     subroutine putDampingNormalTable(va)
     !gets Emittances
       implicit none
@@ -4820,7 +4933,9 @@ contains
       enddo
 
     end subroutine putDampingNormalTable
-
+    !_________________________________________________
+    ! contained in ptc_twiss
+    
     subroutine putTunesNormalTable(va)
     !gets Emittances
       implicit none
@@ -4849,9 +4964,9 @@ contains
 
     end subroutine putTunesNormalTable
 
-
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
+    !_________________________________________________
+    ! contained in ptc_twiss
     ! when switched to real table from file mf, move it out of "contains"
     subroutine putQnormaltable(v,planei)
       implicit none
@@ -4999,10 +5114,7 @@ contains
 
      !!!!!!!!!!!!!!!!!!!!!!
 
-
-
     end subroutine putQnormaltable
-
 
 
   end subroutine normalFormAnalysis
