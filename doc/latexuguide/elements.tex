@@ -61,14 +61,14 @@ label: SBEND, \= L=real, ANGLE=real, TILT=real, \\
               \> K0=real, K1=real, K2=real, K1S=real,\\
               \> E1=real, E2=real, FINT=real, FINTX=real,\\
               \> HGAP=real, H1=real, H2=real,\\
-              \> THICK=logical;\\
+              \> KTAP=real, THICK=logical;\\
               \> \\
               \> \\
 label: RBEND, \> L=real, ANGLE=real, TILT=real, \\
               \> K0=real, K1=real, K2=real, K1S=real,\\
               \> E1=real, E2=real, FINT=real, FINTX=real, \\
               \> HGAP=real, H1=real, H2=real, \\
-              \> THICK=logical, \\
+              \> KTAP=real, THICK=logical, \\
               \> ADD\_ANGLE='array';
 }
 
@@ -165,7 +165,13 @@ Bending magnets have the following attributes:
    \texttt{ANGLE}. (see \hyperref[sec:efcomp]{\texttt{EFCOMP}}).\\
    With $K_0 = (1 / B \rho) B_y$, one gets \texttt{K0 = ANGLE / arclength}.
 
-
+   \ttitem{KTAP} The relative change of the dipole strength (See
+   \texttt{K0} above) to account for energy change of the
+   reference particle due to RF cavities or synchrotron radiation. The
+   actual strength of the dipole is calculated as \texttt{K0 * L = ANGLE
+   * (1 + KTAP)}. See the \hyperref[chap:taper]{\texttt{TAPER}}
+   command. (Default:~0)  
+  
    \ttitem{THICK} If this logical flag is set to true the bending
    magnet is kept as a thick-element, instead of being
    converted into thin-lenses after MAKETHIN. Note that
@@ -315,10 +321,10 @@ A \texttt{QUADRUPOLE} has six attributes:
 
    \ttitem{KTAP} The relative change of the quadrupoles strengths (both
    \texttt{K1} and \texttt{K1S}) to account for energy change of the
-   reference particle due to RF cavities or synchrtron radiation. The
+   reference particle due to RF cavities or synchrotron radiation. The
    actual strength of the quadrupole is calculated as \texttt{K1act = K1
-   * (1 + KTAP)}. See the \texttt{TAPER}
-   command.\ref{chap:taper}. (Default:~0)  
+   * (1 + KTAP)}. See the \hyperref[chap:taper]{\texttt{TAPER}}
+   command. (Default:~0)  
    
    \ttitem{THICK} If this logical flag is set to true the bending
    magnet is kept as a thick-element, instead of being

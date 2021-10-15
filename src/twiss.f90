@@ -905,7 +905,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         ! then maybe loop track through element to take energy loss in element into account 
         do i = 1, iterate 
            ORBITTAP = ORBIT ! work on a temporary orbit vector
-           !call store_node_value('k0 ', (one+dpt)*node_value('angle ')/el) ! initial guess
            call store_node_value('ktap ', dpt) ! initial guess
            call tmmap(code,fsec,ftrk,orbittap,fmap,ek,re,te,.false.,el)
            dpt = (orbittap(6)+orbit(6))/(two*beta) 
@@ -915,10 +914,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
            ! count and add # of steps of size stepsize means adding integers which is more precise
            ! than adding # of steps * stepsize which means adding small real values
            step_prev = step_prev + int((dpt/stepsize-step_prev)*two)
-           !call store_node_value('k0 ', (one+step_prev*stepsize)*node_value('angle ')/el)
            call store_node_value('ktap ', step_prev*stepsize)
         else 
-           !call store_node_value('k0 ', (one+dpt)*node_value('angle ')/el)
            call store_node_value('ktap ', dpt)
         endif
         

@@ -1,11 +1,11 @@
 %%\title{TAPER}
-% Time-stamp: <02 September 2021 11:24:24 ghislain>
+% Time-stamp: <15 October 2021 11:59:08 ghislain>
 
 \chapter{TAPER: strength tapering for energy variation}
 \label{chap:taper}
 
 \texttt{TAPER} calculates the adjustment to the strengths of elements to
-account for momentum variation through RF cavities or synchrotron
+account for small momentum variations through RF cavities or synchrotron
 radiation. 
 
 \madbox{
@@ -37,8 +37,7 @@ The attributes for the \texttt{TAPER} command are:
   \texttt{LOAD}ed in a subsequent \madx run. \\
   (Default: ``taper.madx'') 
 
-  \ttitem{RESET} causes \madx to reset tapering values (\texttt{KTAP} for
-  quadrupoles and sextupoles and \texttt{K0} for dipoles) of all nodes
+  \ttitem{RESET} causes \madx to reset tapering values of all nodes
   in the current sequence to zero values. All other command parameters
   are ignored. 
   
@@ -63,29 +62,27 @@ energy of the reference particle, relative to the nominal strength,
 taken as the average between the local energies at the entrance and at
 the exit of the element. 
 
-For example for a quadrupole the focusing strength \texttt{K1act} actually used
-is calculated from the nominal strength \texttt{K1nom} and
-\texttt{KTAP} as
-\madxmp{K1act = K1nom * (1 + KTAP)  i.e.  KTAP = (K1act - K1nom)/K1nom}
+For a quadrupole, the focusing strength \texttt{K1act}
+actually used is calculated from the nominal strength \texttt{K1nom} and 
+\texttt{KTAP} as \madxmp{K1act = K1nom * (1 + KTAP)}
 
-For dipoles with a given \texttt{ANGLE} and \texttt{LENGTH}, the
-tapering is applied via the \texttt{K0} parameter as
-\madxmp{K0 = ANGLE * (1 + KTAP) / LENGTH  i.e.  KTAP = (K0*LENGTH - ANGLE)/ANGLE}
+For a dipole with a given geometric \texttt{ANGLE} and \texttt{LENGTH},
+the tapering value \texttt{KTAP} is applied through the
+\hyperref[sec:bend]{\texttt{KO}} mechanism with the actual strength of
+the dipole calculated as \texttt{K0 * LENGTH = ANGLE * (1 + KTAP)}.
 
-The relative taper is stored as attribute \texttt{KTAP} for quadrupoles
-and sextupoles and is stored as \texttt{K0} for \texttt{RBEND} and
-\texttt{SBEND} dipoles.
+The \texttt{KTAP} attribute can be calculated and stored, or applied
+from input file, for each node of type \texttt{BEND},
+\texttt{QUADRUPOLE} or \texttt{SEXTUPOLE} in the active sequence. 
 
-The \texttt{KTAP} or \texttt{K0} is calculated and stored for each node
-of type \texttt{BEND}, \texttt{QUADRUPOLE} or \texttt{SEXTUPOLE} in the
-active sequence. If \texttt{STEPSIZE} is not specified or specfied as
-zero, the calculated value is stored and each node has a unique value
+If \texttt{STEPSIZE} is not specified or specfied as zero, the
+calculated value is stored and each node has a unique value 
 for tapering.
 
 If \texttt{STEPSIZE} is non-zero the calculated value is rounded to the
 nearest multiple of the \texttt{STEPSIZE} resulting in a quantization of
-the tapering values; several adjacent nodes in the sequence can share
-the same tapering value.
+the tapering values; the same tapering value can be assigned to several
+adjacent nodes in the sequence.
 
 Setting \texttt{STEPSIZE} to a non-zero value is useful to explore tolerances of a
 beamline to tapering and determine a likely strategy for stepwise and/or piecewise
@@ -93,13 +90,14 @@ tapering, {\it i.e.} applying the same tapering to a set of elements or
 part of a beamline.
 
 \texttt{TAPER} uses the closed orbit finding algorithm of the
-\texttt{TWISS} package \ref{chap:twiss} to calculate the
+\hyperref[chap:twiss]{\texttt{TWISS}} package to calculate the
 tapering values of all elements if \texttt{STEPSIZE} is zero.
 If \texttt{STEPSIZE} is non-zero it could be difficult to ensure a
 closure condition for the tapering values and the first turn algorithm
-of \madx is used instead, also from the \texttt{TWISS} package. Hence
-for evaluation of tapering of an open line the \texttt{STEPSIZE} should
-be set to a non-zero value.  
+of \madx is used instead, also from the
+\hyperref[chap:twiss]{\texttt{TWISS}} package. Hence for evaluation of
+tapering of an open line the \texttt{STEPSIZE} should be set to a
+non-zero value.   
 
 Every call to the \texttt{TAPER} command first resets all tapering
 values to zero in order to be able to adjust the
