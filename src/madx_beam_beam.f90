@@ -37,7 +37,7 @@ contains
     q_prime  = node_value('charge ')
     npart_el = node_value('npart' )
 
-    if (npart_el .gt. zero) then
+    if (npart_el .ge. one) then
       npart_eff = npart_el
     else
       npart_eff = npart
