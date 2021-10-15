@@ -374,7 +374,7 @@ module twisslfi
   public
   logical :: centre=.false., first
   logical :: rmatrix=.false., sectormap=.false., ripken=.false.
-  logical :: mode_flip=.false.
+  logical :: mode_flip=.false., exact_expansion=.false.
   logical :: ele_body=.false.
 end module twisslfi
 

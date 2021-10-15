@@ -10,7 +10,7 @@ module tree_element_MODULE
   PRIVATE track_TREE,track_TREEP,KILL_TREE,KILL_TREE_N   !,SET_TREE
   PRIVATE track_TREE_G,track_TREEP_g
   PRIVATE ALLOC_SPINOR_8,ALLOC_probe_8,r_AVERAGE
-  PRIVATE KILL_SPINOR_8,KILL_probe_8
+  PRIVATE KILL_SPINOR_8,KILL_probe_8,ALLOC_probes_8,KILL_probes_8
   PRIVATE EQUAL_SPINOR8_SPINOR8,EQUAL_IDENTITY_SPINOR_8 !,EQUAL_SPINOR8_RAY8,EQUAL_RAY8_SPINOR8,
   PRIVATE  EQUAL_IDENTITY_probe_8
   private EQUAL_IDENTITY_probe
@@ -130,6 +130,7 @@ module tree_element_MODULE
   INTERFACE ALLOC
      MODULE PROCEDURE ALLOC_SPINOR_8
      MODULE PROCEDURE ALLOC_probe_8
+     MODULE PROCEDURE ALLOC_probes_8
      MODULE PROCEDURE ALLOC_rf_phasor_8
      MODULE PROCEDURE SET_TREE
   END INTERFACE
@@ -137,6 +138,7 @@ module tree_element_MODULE
   INTERFACE KILL
      MODULE PROCEDURE KILL_SPINOR_8
      MODULE PROCEDURE KILL_probe_8
+     MODULE PROCEDURE KILL_probes_8
      MODULE PROCEDURE KILL_rf_phasor_8
   END INTERFACE
 
@@ -805,13 +807,12 @@ CONTAINS
     P%AC%t=0.0_dp
     p%e_ij=0.0_dp
     p%damps=0.0_dp
-    p%t_bks=0
-    p%t_bks0=0
+!    p%t_bks=0
+!    p%t_bks0=0
 
     p%b_kin=0.0_dp
     p%d_spin=0.0_dp
-    p%t_bks=0.0_dp
-    p%t_bks0=0.0_dp
+ 
 
   END    subroutine EQUAL_PROBE8_REAL6
 
@@ -848,8 +849,8 @@ CONTAINS
     P8%damps=P%damps
     P8%b_kin=P%b_kin
     p8%d_spin=p%d_spin
-    p8%t_bks=p%t_bks
-    p8%t_bks0=p%t_bks0
+!    p8%t_bks=p%t_bks
+!    p8%t_bks0=p%t_bks0
 
   END subroutine EQUAL_PROBE8_PROBE8
 
@@ -1051,8 +1052,8 @@ CONTAINS
     r%e=0
     r%x0=0
     r%damps=0
-    r%t_bks=0
-    r%t_bks0=0
+!    r%t_bks=0
+!    r%t_bks0=0
 
     r%b_kin=0
     r%d_spin=0
@@ -1389,8 +1390,8 @@ CONTAINS
     r%e=0
     r%x0=0
     r%damps=0
-    r%t_bks=0
-    r%t_bks0=0
+!    r%t_bks=0
+ !  r%t_bks0=0
 
     r%b_kin=0
     r%d_spin=0
@@ -1420,6 +1421,26 @@ CONTAINS
 
   END    subroutine KILL_SPINOR_8
 
+  subroutine KILL_probes_8(R)
+    implicit none
+    TYPE(probe_8), INTENT(INOUT) :: R(:)
+    INTEGER I   
+    do i=1,size(R)
+     call kill(r(i))
+    enddo
+end subroutine KILL_probes_8
+
+  subroutine alloc_probes_8(R)
+    implicit none
+    TYPE(probe_8), INTENT(INOUT) :: R(:)
+    INTEGER I   
+    do i=1,size(R)
+     call alloc(r(i))
+    enddo
+end subroutine alloc_probes_8
+
+
+
   subroutine KILL_probe_8(R)
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: R
@@ -1440,8 +1461,8 @@ CONTAINS
     r%e=0
     r%x0=0
     r%damps=0
-    r%t_bks=0
-    r%t_bks0=0
+!    r%t_bks=0
+ !   r%t_bks0=0
 
     r%b_kin=0
     r%d_spin=0

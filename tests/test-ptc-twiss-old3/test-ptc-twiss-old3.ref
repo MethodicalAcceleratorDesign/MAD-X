@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:29:33      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.09.12 19:20:18      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -289,7 +289,7 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
+ After    end:   -40.580758467025461        0.0000000000000000        532.53346053079542     
 ptc_align;
 
 
@@ -324,7 +324,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607161327489868E-004   2.5963466777806038E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    3.2607153201649747E-004   2.5963453800881828E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 ++++++ table: ptc_twiss_summary
 
@@ -359,22 +359,22 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
      -0.0296661037      0.02965905227                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    0.0003260716133 
+                 0                  0                  0     0.000326071532 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596346678e-06                  0                  0                  0 
+    2.59634538e-06                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    0.0002136648615                  0    3.396649496e-06 
+                 0    0.0002136648469                  0    3.396649268e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003315825074 
+                 0                  0                  0    0.0003315824833 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.310271876e-06                  0                 -0 
+                 0    5.310272196e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0    -0.000152545614                  0   -6.256319151e-06 
+                 0   -0.0001525455348                  0   -6.256318517e-06 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
@@ -404,7 +404,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607161327489868E-004   2.5963466777806038E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    3.2607153201649747E-004   2.5963453800881828E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 
 x_end  = table(map_table,c1_000000,coef);
@@ -426,8 +426,8 @@ print, text="orbit at the end from ptc_normal:";
 orbit at the end from ptc_normal:
 value,x_end,px_end;
 
-x_end              =    0.0003260715407 ;
-px_end             =    2.596345607e-06 ;
+x_end              =    0.0003260715592 ;
+px_end             =    2.596345739e-06 ;
 
 
 ptc_end;
@@ -478,7 +478,7 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
+ After    end:   -40.580758467025461        0.0000000000000000        532.53346053079542     
 ptc_align;
 
                                     
@@ -529,7 +529,7 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line;
        1.254674956           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       32.03433146        177.7089538        32.03308005        177.7231017 
+       32.03433146        177.7089538        32.03308004        177.7231017 
 
          beta11min          beta11max          beta12min          beta12max 
        32.03433146        177.7089538                  0                  0 
@@ -538,7 +538,7 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line;
                  0                  0                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
-       32.03308005        177.7231017                  0                  0 
+       32.03308004        177.7231017                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
                  0                  0                  0                  0 
@@ -550,22 +550,22 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line;
      -0.0296661037      0.02965905227                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    0.0003260715407 
+                 0                  0                  0    0.0003260715592 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596345607e-06                  0                  0                  0 
+   2.596345739e-06                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    0.0002136648231                  0      3.3966488e-06 
+                 0    0.0002136648563                  0    3.396649448e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003315824789 
+                 0                  0                  0    0.0003315824792 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.310270471e-06                  0                 -0 
+                 0    5.310272761e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -0.0001525455287                  0   -6.256318343e-06 
+                 0   -0.0001525455613                  0   -6.256318586e-06 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
@@ -609,10 +609,10 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line.orbit0, ignore_
        1.254717763           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       31.95711316        177.7201669        32.02754015        177.8007251 
+       31.95711315        177.7201669        32.02754015        177.8007251 
 
          beta11min          beta11max          beta12min          beta12max 
-       31.95711316        177.7201669                  0                  0 
+       31.95711315        177.7201669                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
                  0                  0                  0                  0 
@@ -627,7 +627,7 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line.orbit0, ignore_
                  0                  0                  0        2.177761014 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.02966859198      0.02967968743                  0                  0 
+    -0.02966859198      0.02967968742                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 
@@ -636,16 +636,16 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line.orbit0, ignore_
                  0                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    0.0003246756919                  0    6.322659082e-06 
+                 0    0.0003246756944                  0    6.322659139e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0006606179917 
+                 0                  0                  0    0.0006606179924 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0     8.96954224e-06                  0                 -0 
+                 0    8.969542365e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -0.0004845991979                  0    -8.98190454e-06 
+                 0   -0.0004845991976                  0   -8.981904489e-06 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 

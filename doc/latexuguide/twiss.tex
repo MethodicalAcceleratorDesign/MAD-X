@@ -28,7 +28,8 @@ TWISS, \=SEQUENCE=seqname, LINE=linename, RANGE=range,\\
        \>SECTORFILE=filename, SECTORPURE=logical,\\
        \>EIGENVECTOR=tabname, EIGENFILE=filename,\\
        \>KEEPORBIT=name, USEORBIT=name,\\
-       \>COUPLE=logical, RIPKEN=logical;\\
+       \>COUPLE=logical, EXACT=logical, \\
+       \>RIPKEN=logical, TAPERING=logical \\;
 }
 
 The  attributes of the \texttt{TWISS} command are: 
@@ -169,7 +170,10 @@ The  attributes of the \texttt{TWISS} command are:
   longer be set since TWISS in \madx is always calculated in
   coupled mode. \madx computes the coupled functions in the
   sense of Edwards and Teng \cite{edwards1973}. 
-  For the uncoupled cases they reduce to the C and S functions.    
+  For the uncoupled cases they reduce to the C and S functions. 
+
+  \ttitem{EXACT} If this is used the dirft is expanded around the actual
+  closed orbit instead of the ideal orbit. (Default: false)   
   
   \textit{ Twiss calculation is 4D only!} : The \texttt{TWISS}
   command calculates an approximate 6D closed orbit when the

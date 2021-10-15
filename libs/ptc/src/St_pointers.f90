@@ -1,10 +1,5 @@
 module pointer_lattice
   use madx_ptc_module !etienne, my_state_mad=>my_state, my_ring_mad=>my_ring
-use duan_zhe_map, probe_zhe=>probe,tree_element_zhe=>tree_element,dp_zhe=>dp, &
-DEFAULT0_zhe=>DEFAULT0,TOTALPATH0_zhe=>TOTALPATH0,TIME0_zhe=>TIME0,ONLY_4d0_zhe=>ONLY_4d0,RADIATION0_zhe=>RADIATION0, &
-NOCAVITY0_zhe=>NOCAVITY0,FRINGE0_zhe=>FRINGE0,STOCHASTIC0_zhe=>STOCHASTIC0,ENVELOPE0_zhe=>ENVELOPE0, &
-DELTA0_zhe=>DELTA0,SPIN0_zhe=>SPIN0,MODULATION0_zhe=>MODULATION0,only_2d0_zhe=>only_2d0 , &
-INTERNAL_STATE_zhe=>INTERNAL_STATE
 
   !  use madx_keywords
   USE gauss_dis
@@ -35,7 +30,8 @@ INTERNAL_STATE_zhe=>INTERNAL_STATE
   private thin
   real(dp) thin
   !  BEAM STUFF
-  REAL(DP) SIG(6) 
+  REAL(DP) SIG(6) ,Lbb
+  integer nbb
   REAL(DP) ait(6,6)
  
   logical :: nophase=.false. 
@@ -54,7 +50,7 @@ INTERNAL_STATE_zhe=>INTERNAL_STATE
  !private ind1,ind2,ipos,ireal,a_f,a_f0,yfit
   integer, allocatable:: ind1(:),ind2(:),ipos(:)
   logical, allocatable :: ireal(:)
-  real(dp), allocatable :: a_f(:),a_f0(:),yfit(:),dyfit(:,:)
+  real(dp), private, allocatable :: a_f(:),a_f0(:),yfit(:),dyfit(:,:)
   integer sizeind1
   logical :: onefunc = .true.,skipzero=.false.,skipcomplex=.true.
  type(probe), pointer :: xs0g(:) => null()
@@ -820,7 +816,7 @@ endif
        case('SURVEY_THIN_LAYOUT','SURVEYLAYOUT','SURVEY_NODE_LAYOUT')
 
           IF(associated(my_ering%t)) THEN
-             CALL fill_survey_data_in_NODE_LAYOUT(my_ering)
+             CALL survey(my_ering)
           ELSE
              WRITE(6,*) " NO NODE LAYOUT PRESENT "
           ENDIF
@@ -908,6 +904,12 @@ endif
         endif
        case('BEAMBEAM')
           READ(MF,*) SC,pos,patchbb
+          nbb=0 
+          lbb=0
+          if(sc<0) then
+           read(mf,*) Lbb,nbb
+            sc=-sc
+          endif
           read(mf,*) X_ref(1), X_ref(2), X_ref(3), X_ref(4)
           if(patchbb) then
            read(mf,*) x
@@ -918,23 +920,31 @@ endif
           ! s(1) total ld
           ! s(2) local integration distance
           !          SC=MOD(SC,MY_RING%T%END%S(1))
+if(pos<1) then
+call locate_b_b(TL,sc,x_ref,patchbb,x,Lbb,nbb)
+endif
+
+if(pos>=1) then
           b_b=.false.
           TL=>my_ering%T%START
           DO j=1,my_ering%T%N
-             if(pos<1) then
-                IF(TL%S(1)<=SC.AND.TL%NEXT%S(1)>SC) then
-                   b_b=.true.
-                   exit
-                endif
-             else
+         !    if(pos<1) then
+         !       IF(TL%S(1)<=SC.AND.TL%NEXT%S(1)>SC) then
+         !!          b_b=.true.
+         !          exit
+         !       endif
+         !    else
                 if(j==pos) then
                    b_b=.true.
                    exit
                 endif
-             endif
+          !   endif
              TL=>TL%NEXT
           ENDDO
-          if(b_b.and.tl%cas/=case0) tl=>tl%next
+        do while(.true.) 
+           if(tl%cas==case0) exit
+           if(b_b.and.tl%cas/=case0) tl=>tl%next
+        enddo
           if(b_b.and.tl%cas==case0) then
              write(6,*) " Beam-Beam position at ",tl%parent_fibre%mag%name
              if(.not.associated(tl%BB)) call alloc(tl%BB)
@@ -952,13 +962,16 @@ endif
           else
              write(6,*) " Beam-Beam position not found "
           endif
+endif
+  
+ 
 
        case('TAPERING','TAPER')
            read(mf,*) i1    ! staircase for reachuing full radiation
            read(mf,*) filename   !!!  put "nofile" for no plot
            X_ref=0
            p=>my_ering%start
-         call taper(p,X_ref,i1,my_estate,1.d-8,file=filename)  
+         call taper(p,X_ref,i1,my_estate,1.e-8_dp,file=filename)  
        case('UNTAPERING','UNTAPER')
            p=>my_ering%start
            call untaper(p)  
@@ -1566,8 +1579,8 @@ endif
 
 
 if(.not.my_estate%envelope) hgap=-1
-            call FIND_ORBIT_x(x_ref,my_estate,1.d-7,fibre1=f1)
- if(do_state0)            call FIND_ORBIT_x(x_ref0,state0,1.d-7,fibre1=f1)
+            call FIND_ORBIT_x(x_ref,my_estate,1.e-7_dp,fibre1=f1)
+ if(do_state0)            call FIND_ORBIT_x(x_ref0,state0,1.e-7_dp,fibre1=f1)
 
  if(do_state0)   then
               call fill_tree_element_line_zhe0(state0,my_estate,f1,f2,MY_A_NO,x_ref0,x_ref,file_zher,stochprec=hgap) 
@@ -1609,7 +1622,7 @@ write(6,*) " closed orbit at position ",i1
 
 
 if(.not.my_estate%envelope) hgap=-1
- if(my_a_no>0)            call FIND_ORBIT_x(x_ref,my_estate,1.d-7,fibre1=f1)
+ if(my_a_no>0)            call FIND_ORBIT_x(x_ref,my_estate,1.e-7_dp,fibre1=f1)
 
               call fill_tree_element_line_zhe(my_estate,f1,f2,iabs(MY_A_NO),x_ref,filename,stochprec=hgap) 
 
@@ -1653,9 +1666,9 @@ write(6,*) " closed orbit at position ",i1
              endif
 
 if(noca) then
-             call FIND_ORBIT_x(x_ref,time0+nocavity0,1.d-7,fibre1=f1)
+             call FIND_ORBIT_x(x_ref,time0+nocavity0,1.e-7_dp,fibre1=f1)
 else
-             call FIND_ORBIT_x(x_ref,time0,1.d-7,fibre1=f1)
+             call FIND_ORBIT_x(x_ref,time0,1.e-7_dp,fibre1=f1)
 endif  
 
              name_root=filename
@@ -1709,9 +1722,9 @@ endif
                 ft=>my_fring%start       
              endif
 if(noca) then
-             call FIND_ORBIT_x(x_ref,time0+nocavity0,1.d-7,fibre1=f1)
+             call FIND_ORBIT_x(x_ref,time0+nocavity0,1.e-7_dp,fibre1=f1)
 else
-             call FIND_ORBIT_x(x_ref,time0,1.d-7,fibre1=f1)
+             call FIND_ORBIT_x(x_ref,time0,1.e-7_dp,fibre1=f1)
 endif  
 write(6,*) x_ref
        
@@ -2461,17 +2474,6 @@ write(6,*) x_ref
 
           !         WRITE(6,*) M_U%END%N, M_U%END%END%POS
 
-       case('PSREXAMPLEOFPATCHING')
-
-          call APPEND_EMPTY_LAYOUT(m_u)
-          CALL remove_drifts(my_ering,m_u%END)
-          m_u%end%name="psr_no_drift"
-          call APPEND_EMPTY_LAYOUT(m_u)
-          m_u%end%name="psr_quads_for_bends"
-          CALL remove_drifts_bends(my_ering,m_u%END)
-
-          WRITE(6,*) my_ering%N , m_u%END%N
-
        case('NORMALFORM')
           READ(MF,*)POS,name
           READ(MF,*) FILENAME
@@ -2768,6 +2770,65 @@ write(6,*) x_ref
 
   END subroutine read_ptc_command
 
+subroutine locate_b_b(TL,sc,x_ref,patch,x,lbb,nbb)
+implicit none
+real(dp) sc,x_ref(6),lbb
+real(dp), optional :: x(6)
+logical, optional :: patch
+logical b_b
+integer j,nbb
+type(integration_node),pointer :: tl
+          b_b=.false.
+          TL=>my_ering%T%START
+          DO j=1,my_ering%T%N
+                 IF(TL%S(1)<=SC.AND.TL%NEXT%S(1)>SC) then
+                   b_b=.true.
+                   exit
+                endif
+             TL=>TL%NEXT
+          ENDDO
+
+        if(b_b.and.tl%cas/=case0) tl=>tl%next
+          if(b_b.and.tl%cas==case0) then
+             write(6,*) " Beam-Beam position at ",tl%parent_fibre%mag%name
+             if(.not.associated(tl%BB)) then
+              if(nbb==0) then
+               call alloc(tl%BB)
+                nbb=1
+              else
+               call alloc(tl%BB,nbb,lbb)
+                if(nbb>1) then
+               
+               do j=0,nbb-1
+                   tl%bb%s(j+1)= (j*lbb)/(nbb-1)-lbb/2.0_dp+tl%s(1)
+               enddo
+              endif
+              endif
+            endif
+             tl%bb%fk=X_ref(1)* X_ref(4)**2/nbb
+             tl%bb%sx=X_ref(2)* X_ref(4)
+             tl%bb%sy=X_ref(3)* X_ref(4)
+             !           if(pos<1) tl%bb%ds=SC-TL%S(1)
+             write(6,*) tl%pos,tl%parent_fibre%mag%name,' created'
+             !              write(6,*) " ds = ",tl%bb%ds
+             if(present(patch)) then
+             if(patch) then
+              tl%bb%patch=patch
+              tl%bb%a=x(1:3)
+              tl%bb%d=x(4:6)  
+              endif            
+             else
+              tl%bb%patch=.true.
+              tl%bb%a=0
+              tl%bb%d=0             
+              tl%bb%d(3)=sc-tl%s(1)
+            endif
+          else
+             write(6,*) " Beam-Beam position not found "
+          endif
+
+end subroutine locate_b_b
+
 !!!!!!!!!!!!!!!!   polarization scan  !!!!!!!!!!!!!!!
 subroutine  compute_polarisation(r,no,ang,nlm,lm,nturns,ngen,snake,isnake,plotfile,datafile)
  implicit none
@@ -2801,8 +2862,7 @@ real(dp) tune(1:3) , spin_tune
 
 TYPE(c_spinor) ISF  
      type(quaternion) q,q0
- type(q_linear)  q_c,q_ptc
-
+ 
     call get_length(r,circum)
     circum=circum/clight
  
@@ -2892,7 +2952,7 @@ number_zhe_maps = 1
 
 !!!! finds the closed orbit at position s=0
 closed_orbit=0
-call FIND_ORBIT_x(closed_orbit,state0,1.d-8,node1=it)
+call FIND_ORBIT_x(closed_orbit,state0,1.e-8_dp,node1=it)
  
     call GET_loss(r,energy,deltap)
  
@@ -2907,7 +2967,7 @@ write(6,'(6(E20.13,1X))' ) closed_orbit
 !!! First order maps for tests.
  
  ray=closed_orbit
-call FIND_ORBIT_x(ray%x,state0,1.d-5,node1=it)
+call FIND_ORBIT_x(ray%x,state0,1.e-5_dp,node1=it)
 
 
  
@@ -3025,7 +3085,7 @@ mapfile="olek"
 m%x0(1:6)=x
 call print(m)
 
-call fill_tree_element_line_zhe_outside_map(m ,mapfile,as_is=.false.,stochprec=1.d-8) 
+call fill_tree_element_line_zhe_outside_map(m ,mapfile,as_is=.false.,stochprec=1.e-8_dp) 
  
  
 call read_tree_zhe(t_olek_map(1:3),mapfile)
@@ -3040,7 +3100,7 @@ call read_tree_zhe(t_olek_map(1:3),mapfile)
   
  do i=1,bunch_zhe%n
  
-    bunch_zhe%xs(i)%q=1.d0
+    bunch_zhe%xs(i)%q=1.e0_dp
   
  enddo
 
@@ -3321,7 +3381,7 @@ matf=0
    if(present(file_bunch)) call kanalnummer(mfg,file_bunch)
   a0=1
   a0%e_ij=normal%s_ij0 
-  call c_stochastic_kick(a0,mat,ki,1.d-38)
+  call c_stochastic_kick(a0,mat,ki,1.0e-38_dp)
   i4=0
   do i1=0,ngen-1
   do i2=0,ngen-1
@@ -3385,7 +3445,7 @@ write(mf1,'(16X,a50)') "   Equilibrium moments in Phasors Basis           "
  do j=i,6 
   if(abs(normal%s_ijr(i,j))>1.d-20) then
    write(mf1,fmd) " Phasors -> ","<x_",i," x_",j,"> = ",  &   ! (14)
-                    c_clean(normal%s_ijr(i,j),1.d-20)  
+                    c_clean(normal%s_ijr(i,j),1.e-20_dp)  
   endif
  enddo
  enddo 
@@ -3647,74 +3707,6 @@ endif
 
   end SUBROUTINE remove_drifts
 
-  SUBROUTINE remove_drifts_bends(R,NR)  ! special example to be removed later
-    IMPLICIT NONE
-    TYPE(LAYOUT),TARGET :: R,NR
-    integer I,IG
-    type(fibre), pointer :: P,bend
-    logical(lp) doneit
-    real(dp) ent(3,3),a(3),ang(3),d(3)
-
-    p=>r%start
-    bend=>r%next%start%next   ! second layout in universe
-    write(6,*) " using bend called ",bend%mag%name
-    write(6,*) " 'USING SURVEY' TYPE 1 / 'USING GEOMETRY' TYPE 0 "
-    READ(5,*) IG
-    do i=1,r%n
-       IF(P%MAG%KIND/=KIND0.AND.P%MAG%KIND/=KIND1.and.P%MAG%p%b0==0.0_dp) THEN
-
-          CALL APPEND( NR, P )
-       elseif(P%MAG%p%b0/=0.0_dp) then
-          bend%mag%p%bend_fringe=.true.
-          bend%magp%p%bend_fringe=.true.
-          bend%mag%L=P%MAG%p%lc
-          bend%magp%L=P%MAG%p%lc   ! give it correct arc length
-          bend%mag%p%Lc=P%MAG%p%lc
-          bend%magp%p%Lc=P%MAG%p%lc   ! give it correct arc length
-          bend%mag%p%Ld=P%MAG%p%lc
-          bend%magp%p%Ld=P%MAG%p%lc   ! give it correct arc length
-          call add(bend,1,0,p%mag%bn(1))    ! Give a huge B field to quadrupole, i.e. looks like a kicker now
-          CALL APPEND( NR, bend )
-          ent=p%chart%f%mid     !  storing the bend location
-          a=p%chart%f%a         !
-          !     since we use a quadrupole, the entrance frame of this quad is the mid frame of the bend
-          !     The  fibre bend must be rotated and translated into position
-          ! easiest way is to survey it with initial condition correspounding to the actual position and orientation
-          !
-          IF(IG==1) THEN
-             call SURVEY(nr%end,ENT,A)
-          ELSE
-             d=a-nr%end%chart%f%a
-             CALL TRANSLATE_Fibre(nr%end,D)  ! translation in global frame
-             CALL COMPUTE_ENTRANCE_ANGLE(nr%end%chart%f%ENT,ENT,ANG)
-             CALL ROTATE_Fibre(nr%end,A,ang)  ! translation in global frame
-          ENDIF
-
-
-       ENDIF
-       P=>P%NEXT
-    ENDDO
-
-    NR%closed=.true.
-    doneit=.true.
-    call ring_l(NR,doneit)
-
-
-
-    p=>nr%start
-
-    do i=1,nr%n-1
-       CALL FIND_PATCH(P,P%next,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
-
-       P=>P%NEXT
-
-    ENDDO
-    CALL FIND_PATCH(P,P%next,NEXT=my_false,ENERGY_PATCH=MY_FALSE)
-
-    ! avoiding putting a patch on the very first fibre since survey is not a self-check in that case
-
-
-  end SUBROUTINE remove_drifts_bends
 
 
 
@@ -4640,6 +4632,119 @@ end   subroutine track_hermite_linear_inv_8
   end subroutine kill_hermite
 
  
+subroutine symplectify_for_oleksii(M,Am,Sspin,B,fsymp,fspin,frad )
+implicit none
+type(c_vector_field), intent(inout) :: fsymp,fspin,frad
+type(c_damap), intent(inout) :: M,Am,B,Sspin
+type(c_vector_field)  ft
+type(c_quaternion)  q
+complex(dp) v
+type(c_taylor) t,dt
+ 
+integer i,j,k,n(11),nv,nd2,al,ii,a,mul
+integer, allocatable :: je(:)
+real(dp) dm,norm,normb,norma,h(4)
+!TYPE(c_damap) mt,ids,m4,ml
+real(dp),allocatable::   S(:,:),id(:,:)
+
+! m = L_ns o N_pure_ns o L_s o N_s
+! d= = L_ns o N_pure_ns
+! ms= L_s o N_s
+ ! f=log(M)
+
+call alloc(ft)
+call alloc(q)
+ft=c_logf_spin(M)
+ 
+  B=0
+allocate(S(6,6),id(6,6))
+
+call c_get_indices(n,0)
+nv=n(4)
+nd2=n(3)
+
+S=0
+id=0
+do i=1,nd2/2
+ S(2*I-1,2*I)=1 ; S(2*I,2*I-1)=-1;
+ Id(2*I-1,2*I-1)=1 ; id(2*I,2*I)=1;
+enddo
+
+
+
+
+
+call alloc(t,dt); !call alloc(mt,ids,m4,ml);
+
+ 
+
+
+
+ 
+fsymp=0
+
+ ! Integrating a symplectic operator using the hypercube's diagonal
+
+allocate(je(nv))
+je=0
+do i=1,ft%n
+
+       j=1
+
+        do while(.true.)
+
+          call  c_cycle(ft%v(i),j,v ,je); if(j==0) exit;
+         dm=1
+         do ii=1,nd2
+          dm=dm+je(ii)
+         enddo
+        t=v.cmono.je
+        do a=1,nd2
+         dt=t.d.a
+        do al=1,nd2
+        do k=1,nd2
+          fsymp%v(al)=fsymp%v(al)+s(a,al)*s(k,i)*(id(k,a)*t+(1.0_dp.cmono.k)*dt)/dm
+        enddo ! k
+        enddo ! al
+        enddo ! a
+        enddo
+
+enddo
+ 
+!do i=1,6
+! frad%v(i)=f%v(i)-fsymp%v(i)
+!enddo
+! frad%q=f%q-fsymp%q
+
+ 
+Am=exp(fsymp)
+B= Am**(-1)*m
+
+! here Sspin is the orbital part of B
+Sspin=B
+Sspin%q=1.0_dp
+Sspin%e_ij=0.0_dp
+
+q=B%q*Sspin**(-1)
+Sspin=1
+Sspin%q=q
+ 
+B =Sspin**(-1)*B
+B%q=1.0_dp
+ 
+!Am=exp(fsymp)
+!B= Am**(-1)*m
+ fspin=c_logf_spin(Sspin)
+ frad=log(B)
+ 
+deallocate(je);deallocate(s,id);
+  
+call kill(t,dt);  !call kill(mt,ids,m4,ml);
+call kill(q)
+call kill(ft)
+
+end subroutine symplectify_for_oleksii
+
 
 
 
@@ -4796,7 +4901,7 @@ x2div2=2.0_dp*(1.0_dp.cmono.1)**2
 call C_AVERAGE(x2div2,a1,x2div2_f)  
 
 write(mf,*) " Phase advance in x "
-call clean(phase,phase,prec=1.d-10)
+call clean(phase,phase,prec=1.e-10_dp)
 call print(phase(1),mf)
 write(mf,*) " Beginning of lattice "
 call print(x2div2_f,mf)
@@ -4809,12 +4914,12 @@ write(mf,*) " end of Magnet ",f%mag%name
 
  a=xs  ! creates tracked canonical transformation
  xs0=xs
-call c_canonise(a,a_cs,a0,a1,a2,phase) ;call clean(a1,a1,prec=1.d-10);
+call c_canonise(a,a_cs,a0,a1,a2,phase) ;call clean(a1,a1,prec=1.e-10_dp);
  
 call C_AVERAGE(x2div2,a1,x2div2_f)  
 
 write(mf,*) " Phase advance in x "
-call clean(phase,phase,prec=1.d-10)
+call clean(phase,phase,prec=1.e-10_dp)
 call print(phase(1),mf)
 write(mf,*) " 2(x^2> ~ beta"
 call print(x2div2_f,mf)
@@ -4826,7 +4931,7 @@ enddo
 
 
 write(mf,*) " Tune in x from one turn map"
-call clean(phase_one_turn_map,phase_one_turn_map,prec=1.d-10)
+call clean(phase_one_turn_map,phase_one_turn_map,prec=1.e-10_dp)
 call print(phase_one_turn_map(1),mf)
 
 close(mf)
