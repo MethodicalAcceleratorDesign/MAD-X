@@ -28,10 +28,10 @@ contains
     integer :: beamshape, b_dir_int
     logical, save :: first=.true.
     logical :: bb_ultra_relati
-    double precision :: parvec(26), fk, q, q_prime, dp, npart_eff
+    double precision :: parvec(26), fk, q, q_prime, dp, npart_eff, node_value
     double precision :: gamma0, beta0, beta_dp, ptot, b_dir, npart_el
     integer, external :: get_option
-    double precision, external :: node_value, get_variable
+    double precision, external ::  get_variable
     !---  standard 4D
     q = charge
     q_prime  = node_value('charge ')
