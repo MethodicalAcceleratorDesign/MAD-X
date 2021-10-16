@@ -3544,7 +3544,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
   double precision :: dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  double precision :: plot_tilt, el
+  double precision :: plot_tilt, el, npart_tmp
   double precision :: node_value
 
   integer, external :: get_option
@@ -3612,7 +3612,9 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
      case (code_beambeam)
         !---- (Particles/bunch taken for the opposite beam).
-        call tmbb(fsec,ftrk,orbit,fmap,re,te)
+        npart_tmp = npart_el = node_value('npart' )
+
+        call tmbb(fsec,ftrk,orbit,fmap,re,te, npart_tmp)
 
      case (code_marker)
 

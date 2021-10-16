@@ -2,7 +2,7 @@ module BeamBeam
 
 contains
 
-  SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
+  SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te, npart_el)
     use trackfi, only : fsecarb
     use twissbeamfi, only : gamma, arad, charge, npart
     use math_constfi, only : zero, one, two
@@ -35,8 +35,6 @@ contains
     !---  standard 4D
     q = charge
     q_prime  = node_value('charge ')
-    npart_el = node_value('npart' )
-
     if (npart_el .ge. one) then
       npart_eff = npart_el
     else
