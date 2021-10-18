@@ -40,10 +40,14 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le                -nan
+@ DQMIN_PHASE      %le                   0
 @ TITLE            %35s " Diamond Light Source Lattice 8.1.1"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "16.29.47"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "18/10/21"
+@ TIME             %08s "17.56.18"
 * NAME                                S               BETX               BETY                 DX                 DY                MUX                MUY                  X                  Y 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "DIAMOND$START"                      0        9.978688586        5.831556551      0.07210045564                  0                  0                  0                  0                  0

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:40:44      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.10.18 17:55:07      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! YIL13: Taken from tests_old/test_runs/track_example/
 
@@ -12,7 +12,7 @@ option,-echo,-info;
 enter Twiss module
   
 iteration:   1 error:   1.502666E-21 deltap:   0.000000E+00
-orbit:  -5.743847E-31  2.627631E-39  0.000000E+00  0.000000E+00 -3.167331E-17 -2.960907E-30
+orbit:  -2.684511E-31  4.235791E-40  0.000000E+00  0.000000E+00 -3.167331E-17 -1.940708E-30
 
 ++++++ table: summ
 
@@ -23,10 +23,10 @@ orbit:  -5.743847E-31  2.627631E-39  0.000000E+00  0.000000E+00 -3.167331E-17 -2
       0.1072467205      -0.1135571662         13.8302683       0.2998762806 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2679078562    4.924658253e-23    2.820016038e-23       0.1058727477 
+      0.2679078562    4.924658284e-23    2.820016057e-23       0.1058727477 
 
                dq2            betymax              dymax              dyrms 
-     -0.1107431782        13.59510076                  0                  0 
+     -0.1107431782        13.59510076                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -34,14 +34,17 @@ orbit:  -5.743847E-31  2.627631E-39  0.000000E+00  0.000000E+00 -3.167331E-17 -2
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
 makethin: style chosen : hybrid
 makethin: slicing sequence : c314
 enter Twiss module
   
 iteration:   1 error:   4.718370E-19 deltap:   0.000000E+00
-orbit:   3.259003E-25  2.246997E-28  0.000000E+00  0.000000E+00 -9.945509E-15  1.051837E-24
+orbit:   3.259109E-25  2.246997E-28  0.000000E+00  0.000000E+00 -9.945509E-15  1.051873E-24
 
 ++++++ table: summ
 
@@ -52,7 +55,7 @@ orbit:   3.259003E-25  2.246997E-28  0.000000E+00  0.000000E+00 -9.945509E-15  1
        34.11408742        -35.1207073        13.64472903       0.2891279952 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2496080811    1.360146433e-19    6.804145754e-20        34.09973839 
+      0.2496080811    1.360146433e-19    6.804145755e-20        34.09973839 
 
                dq2            betymax              dymax              dyrms 
       -35.57770089        13.79106363                  0                  0 
@@ -63,8 +66,11 @@ orbit:   3.259003E-25  2.246997E-28  0.000000E+00  0.000000E+00 -9.945509E-15  1
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
 enter TRACK module
 one pass is on
 update is on

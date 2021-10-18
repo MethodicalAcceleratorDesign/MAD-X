@@ -3,6 +3,8 @@ import os
 from os.path import isfile, join
 from shutil import copyfile
 '''
+make tests-all > allout.txt 2>&1
+grep FAIL allout.txt > onlyfail.out
  + test-ptc-twiss-1                                   (0.00 s) -  2/ 4 : FAIL
  + test-ptc-twiss-2                                   (0.21 s) -  1/ 3 : FAIL
  + test-ptc-twiss-3                                   (0.00 s) -  2/ 4 : FAIL
@@ -32,23 +34,21 @@ from shutil import copyfile
 #copyfile(src, dst)
 mypath_orig = '../tests/'
 file1 = open('../onlyfail.out', 'r') 
-Lines = file1.readlines() 
+Lines = file1.readlines()
+os.chdir("..")
 loc = os.getcwd()
 count = 0
 # Strips the newline character 
-for line in Lines: 
-	os.chdir(loc)
-	mypath = mypath_orig + line.strip() + "/"
-	print(mypath)
-	#mypath = mypath +"test-emit/"
-	print(mypath)
+for line in Lines:
+	splited = line.split()
+	mypath = loc + "/tests/" + splited[1]
 	os.chdir(mypath)
 	onlyfiles = [f for f in listdir(".") if isfile(join(".", f))]
 	#for i in range(0, len(onlyfiles)):
 	#	onlyfiles[i] = [mypath + onlyfiles[i]]
 
 	for f in onlyfiles:
-		if(f.endswith('.ref') and f.startswith("test-")):
+		if(f.endswith('.ref')):
 			oname = f[:-4]
 			print(oname, f)
 			if(isfile(oname)):

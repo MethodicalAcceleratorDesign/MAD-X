@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:26:47      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.10.18 17:55:14      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 
@@ -73,10 +73,10 @@ iteration:   1 error:   8.714729E-04 deltap:   0.000000E+00
 orbit:  -4.929568E-04  8.090216E-06  2.107953E-06  1.445684E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   2.297742E-05 deltap:   0.000000E+00
-orbit:  -5.000003E-04 -4.472642E-09 -1.671459E-10  1.424984E-04  0.000000E+00  0.000000E+00
+orbit:  -5.000003E-04 -4.472647E-09 -1.671461E-10  1.424984E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   2.548596E-09 deltap:   0.000000E+00
-orbit:  -5.000008E-04 -2.358319E-09  8.002373E-12  1.425000E-04  0.000000E+00  0.000000E+00
+orbit:  -5.000008E-04 -2.358324E-09  8.002248E-12  1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -84,13 +84,13 @@ orbit:  -5.000008E-04 -2.358319E-09  8.002373E-12  1.425000E-04  0.000000E+00  0
         26658.8832                 -0    0.0003213813573        55.78143208 
 
                 q1                dq1            betxmax              dxmax 
-        64.3100005        1.918727823        4402.811247        2.890204322 
+        64.3100005        1.918727824        4402.811247        2.890204322 
 
              dxrms             xcomax             xcorms                 q2 
        1.399968988      0.01141009456    0.0008146034948        59.32000005 
 
                dq2            betymax              dymax              dyrms 
-       2.145016471        4402.812589        1.318436483       0.1774138187 
+       2.145016472        4402.812589        1.318436483       0.1774138187 
 
             ycomax             ycorms             deltap            synch_1 
     0.006931834736    0.0004834742802                  0                  0 
@@ -98,8 +98,11 @@ orbit:  -5.000008E-04 -2.358319E-09  8.002373E-12  1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.730142477e-10 
+
+       dqmin_phase 
+     -0.9905023273 
 
 
 ! Match the tune:
@@ -127,11 +130,11 @@ START LMDIF:
 Initial Penalty Function =   0.10000308E+00
 
 
-call:       4   Penalty function =   0.22508222E-08
-call:       7   Penalty function =   0.14348696E-18
-call:      10   Penalty function =   0.10324612E-22
+call:       4   Penalty function =   0.22508218E-08
+call:       7   Penalty function =   0.14097492E-18
+call:      10   Penalty function =   0.82798841E-23
  ++++++++++ LMDIF ended: converged successfully
-call:      10   Penalty function =   0.10324612E-22
+call:      10   Penalty function =   0.82798841E-23
 endmatch;
 
 
@@ -140,10 +143,10 @@ MATCH SUMMARY
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
 Global constraint:         q1           4     6.42800000E+01     6.42800000E+01     9.89547120E-25
-Global constraint:         q2           4     5.93100000E+01     5.93100000E+01     9.33506441E-24
+Global constraint:         q2           4     5.93100000E+01     5.93100000E+01     7.29033694E-24
 
 
-Final Penalty Function =   1.03246115e-23
+Final Penalty Function =   8.27988406e-24
 
 
 
@@ -156,7 +159,7 @@ kqd                      -8.59912e-03 -8.60096e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.03246115e-23
+VARIABLE "TAR" SET TO   8.27988406e-24
 
 
 Title, " Chromaticity correction";
@@ -186,9 +189,9 @@ START LMDIF:
 Initial Penalty Function =   0.83428531E-01
 
 
-call:       4   Penalty function =   0.42406590E-22
+call:       4   Penalty function =   0.44170496E-21
  ++++++++++ LMDIF ended: converged successfully
-call:       4   Penalty function =   0.42406590E-22
+call:       4   Penalty function =   0.44170496E-21
 endmatch;
 
 
@@ -196,11 +199,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     3.91237854E-24
-Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     3.84942115E-23
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     4.37690027E-22
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     4.01493598E-24
 
 
-Final Penalty Function =   4.24065900e-23
+Final Penalty Function =   4.41704963e-22
 
 
 
@@ -213,7 +216,7 @@ ksd.b1                   -1.70566e-01 -1.70877e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   4.24065900e-23
+VARIABLE "TAR" SET TO   4.41704963e-22
 
 
 ! Generate a twiss table:
@@ -230,10 +233,10 @@ iteration:   1 error:   9.132198E-04 deltap:   0.000000E+00
 orbit:  -4.940107E-04  5.438350E-06  2.134828E-06  1.443832E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   1.715061E-05 deltap:   0.000000E+00
-orbit:  -5.000007E-04 -4.025233E-09 -3.194492E-11  1.424988E-04  0.000000E+00  0.000000E+00
+orbit:  -5.000007E-04 -4.025238E-09 -3.194505E-11  1.424988E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   1.757360E-09 deltap:   0.000000E+00
-orbit:  -5.000010E-04 -2.693604E-09  8.055102E-12  1.425000E-04  0.000000E+00  0.000000E+00
+orbit:  -5.000010E-04 -2.693609E-09  8.054967E-12  1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -255,8 +258,11 @@ orbit:  -5.000010E-04 -2.693604E-09  8.055102E-12  1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.100054326e-08 
+
+       dqmin_phase 
+       -1.27537215 
 
 
 stop;

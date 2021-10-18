@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Darwin)      +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.02.17 17:53:22      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.10.18 17:59:22      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn, info, echo;
 
@@ -67,8 +67,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
 
 
 // track particles
@@ -152,6 +155,7 @@ plot, file=plot1, table=trackone, trackfile=plot1, noversion, multiple,
 
 trackfile is: plot1
 looking for file plot1one 
+gnuplot: error while loading shared libraries: libQt5Core.so.5: cannot open shared object file: No such file or directory
 
 
 // repeat with onetable
@@ -194,8 +198,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
 
 
 // track particles
@@ -282,6 +289,7 @@ looking for file plot2.obs0001.p0001
 looking for file plot2.obs0001.p0002 
 looking for file plot2.obs0001.p0003 
 looking for file plot2.obs0001.p0004 
+gnuplot: error while loading shared libraries: libQt5Core.so.5: cannot open shared object file: No such file or directory
 
 
 exit;

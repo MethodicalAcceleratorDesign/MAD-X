@@ -1,9 +1,9 @@
 @ NAME             %08s "TOUSCHEK"
 @ TYPE             %08s "TOUSCHEK"
 @ TITLE            %50s "Compiling Optics for the LHC 6.5 lattice with MADX"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "10/08/20"
-@ TIME             %08s "13.31.08"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "18/10/21"
+@ TIME             %08s "17.59.19"
 * NAME                                S                TLI               TLIW             TLITOT 
 $ %s                                %le                %le                %le                %le 
  "LHCB1$START"                        0    2.779855909e-07                  0                  0

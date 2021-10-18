@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.28 13:22:13      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.10.18 17:59:00      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -info, warn, -echo;
 
@@ -37,8 +37,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
        4.507883438       0.9276843614   -0.0003629111388    4.011207208e-05 
 
-           synch_6            synch_8             nflips 
-       47098.44487         3.70630496                  0 
+           synch_6            synch_8             nflips              dqmin 
+       47098.44487         3.70630496                  0               -nan 
+
+       dqmin_phase 
+                 0 
  
  TOUSCHEK MODULE PARAMETERS
  
@@ -101,8 +104,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
        4.507883438       0.9276843614   -0.0003629111388    4.011207208e-05 
 
-           synch_6            synch_8             nflips 
-       47098.44487         3.70630496                  0 
+           synch_6            synch_8             nflips              dqmin 
+       47098.44487         3.70630496                  0               -nan 
+
+       dqmin_phase 
+                 0 
  
  TOUSCHEK MODULE PARAMETERS
  

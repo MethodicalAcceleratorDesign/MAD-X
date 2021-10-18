@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.28 13:22:07      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.10.18 17:58:54      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example of PTC_TRACK command with 6D and totalpath true
 
@@ -56,8 +56,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
 rf1_spos           =        10.50643276 ;
 rf2_spos           =        20.51286551 ;
 rf2_spos-rf1_spos  =        10.00643276 ;
@@ -78,7 +81,7 @@ Determined SECTOR NMUL MAX :  2
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -1.1060596882828122E-014   0.0000000000000000        6.7723604502134549E-015
+ After    end:    7.9985605812293858E-014   0.0000000000000000       -9.1038288019262836E-015
 
 ++++++ table: ptc_twiss_summary
 
