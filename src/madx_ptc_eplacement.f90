@@ -386,7 +386,6 @@ contains
 
        case(kind16,kind7)
           if ( p%mag%kind==kind16 .and. getdebug() > 3) then
-             print*, "KIND16: likemad is ", p%mag%k16%likemad
              print*, "KIND16: bn(0) ", p%mag%bn(0), " bn(1)", p%mag%bn(1), " bn(2)", p%mag%bn(2)
              print*, "KIND16: an(0) ", p%mag%an(0), " an(1)", p%mag%an(1), " an(2)", p%mag%an(2)
           endif

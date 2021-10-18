@@ -40,6 +40,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   fsecarb=.false.
 
   ORBIT0 = zero
+  exact_expansion = get_value('twiss ','exact ') .ne. zero
   call get_node_vector('orbit0 ', 6, orbit0)
   RT = EYE
   RW = EYE
@@ -5994,7 +5995,18 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   endif
 
   call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
-  if (fcentre) return
+  if (fcentre) then
+     if (tilt .ne. zero)  then
+        !---  rotate orbit at exit
+        tmp = orbit(1)
+        orbit(1) = ct * tmp - st * orbit(3)
+        orbit(3) = ct * orbit(3) + st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp - st * orbit(4)
+        orbit(4) = ct * orbit(4) + st * tmp
+     endif
+     return
+  endif
 
   !---- Half radiation effect at exit.
   if (radiate .and. ftrk) then
@@ -6201,7 +6213,19 @@ SUBROUTINE tmsep(fsec,ftrk,fcentre,orbit,fmap,dl,ek,re,te)
   ekick  = efield * ten3m * charge / (pc * (one + deltap))
 
   call spbody(fsec,ftrk,tilt,ekick,orbit,dl,ek,re,te)
-  if (fcentre) return
+  if (fcentre)  then
+     if (tilt .ne. zero)  then
+        !---  rotate orbit at exit
+        tmp = orbit(1)
+        orbit(1) = ct * tmp - st * orbit(3)
+        orbit(3) = ct * orbit(3) + st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp - st * orbit(4)
+        orbit(4) = ct * orbit(4) + st * tmp
+     endif
+
+     return
+   endif
 
   if (tilt .ne. zero)  then
      !---  rotate orbit at exit
@@ -6407,7 +6431,18 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   endif
 
   call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
-  if (fcentre) return
+  if (fcentre)  then
+     if (tilt .ne. zero)  then
+        !---  rotate orbit at exit
+        tmp = orbit(1)
+        orbit(1) = ct * tmp - st * orbit(3)
+        orbit(3) = ct * orbit(3) + st * tmp
+        tmp = orbit(2)
+        orbit(2) = ct * tmp - st * orbit(4)
+        orbit(4) = ct * orbit(4) + st * tmp
+     endif
+     return
+   endif
 
   !---- Half radiation effects at exit.
   if (ftrk) then
@@ -6939,6 +6974,7 @@ end SUBROUTINE tmyrot
 
 SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
+  use twisslfi
   use matrices, only : EYE
   use math_constfi, only : zero, two, three
   implicit none
@@ -6960,34 +6996,90 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   logical :: fsec, ftrk, fmap
   double precision :: dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: px, py, pt, csq, l_pz, c3sq, c52sq
 
   !---- Initialize.
   EK = zero
   RE = EYE
   if (fsec) TE = zero
   fmap = dl .ne. zero
-
   !---- First-order terms.
+  if(exact_expansion) then
+      px = orbit(2)
+      py = orbit(4)
+      pt = orbit(6)
 
-  re(1,2) = dl
-  re(3,4) = dl
-  re(5,6) = dl/(beta*gamma)**2
+      csq = 1 + 2*pt*beta + pt**2 - px**2 - py**2
+      l_pz = dl / sqrt(csq)
+      c3sq = csq**(3d0/2d0)
+      c52sq =csq**(5d0/2d0)
+      re(1,2) = dl/sqrt(csq) + dl*px**2/c3sq;
+      re(1,4) = dl*px*py/c3sq;
+      re(1,6) = dl*px*(-beta - pt)/c3sq;
+      re(3,2) = dl*px*py/c3sq;
+      re(3,4) = dl/sqrt(csq) + dl*py**2/c3sq;
+      re(3,6) = dl*py*(-beta - pt)/c3sq;
+      re(5,2) = -dl*px*(beta + pt)/c3sq;
+      re(5,4) = -dl*py*(beta + pt)/c3sq;
+      re(5,6) = -dl/sqrt(csq) - dl*(-beta - pt)*(beta + pt)/c3sq;
 
-  ek(5) = dl*dtbyds
+      if (fsec) then
+         te(1,2,2) = 3d0*dl*px/(2d0*csq**(3d0/2d0)) + 3d0*dl*px**3d0/(2d0*c52sq)
+         te(1,2,4) = dl*py/(2d0*csq**(3d0/2d0)) + 3d0*dl*px**2d0*py/(2d0*c52sq)
+         te(1,2,6) = dl*(-beta - pt)/(2d0*csq**(3d0/2d0)) + dl*px**2d0*(-3d0*beta - 3d0*pt)/(2d0*c52sq)
+         te(1,4,2) = dl*py/(2d0*csq**(3d0/2d0)) + 3d0*dl*px**2d0*py/(2d0*c52sq)
+         te(1,4,4) = dl*px/(2d0*csq**(3d0/2d0)) + 3d0*dl*px*py**2d0/(2d0*c52sq)
+         te(1,4,6) = dl*px*py*(-3d0*beta - 3d0*pt)/(2d0*c52sq)
+         te(1,6,2) = dl*(-beta - pt)/(2d0*csq**(3d0/2d0)) + 3d0*dl*px**2d0*(-beta - pt)/(2d0*c52sq)
+         te(1,6,4) = 3d0*dl*px*py*(-beta - pt)/(2d0*c52sq)
+         te(1,6,6) = -dl*px/(2d0*csq**(3d0/2d0)) + dl*px*(-3d0*beta - 3d0*pt)*(-beta - pt)/(2d0*c52sq)
+         te(3,2,2) = dl*py/(2d0*csq**(3d0/2d0)) + 3d0*dl*px**2d0*py/(2d0*c52sq)
+         te(3,2,4) = dl*px/(2d0*csq**(3d0/2d0)) + 3d0*dl*px*py**2d0/(2d0*c52sq)
+         te(3,2,6) = dl*px*py*(-3d0*beta - 3d0*pt)/(2d0*c52sq)
+         te(3,4,2) = dl*px/(2d0*csq**(3d0/2d0)) + 3d0*dl*px*py**2d0/(2d0*c52sq)
+         te(3,4,4) = 3d0*dl*py/(2d0*csq**(3d0/2d0)) + 3d0*dl*py**3d0/(2d0*c52sq)
+         te(3,4,6) = dl*(-beta - pt)/(2d0*csq**(3d0/2d0)) + dl*py**2d0*(-3d0*beta - 3d0*pt)/(2d0*c52sq)
+         te(3,6,2) = 3d0*dl*px*py*(-beta - pt)/(2d0*c52sq)
+         te(3,6,4) = dl*(-beta - pt)/(2d0*csq**(3d0/2d0)) + 3d0*dl*py**2d0*(-beta - pt)/(2d0*c52sq)
+         te(3,6,6) = -dl*py/(2d0*csq**(3d0/2d0)) + dl*py*(-3d0*beta - 3d0*pt)*(-beta - pt)/(2d0*c52sq)
+         te(5,2,2) = -dl*(beta + pt)/(2d0*csq**(3d0/2d0)) - 3d0*dl*px**2d0*(beta + pt)/(2d0*c52sq)
+         te(5,2,4) = -3d0*dl*px*py*(beta + pt)/(2d0*c52sq)
+         te(5,2,6) = -dl*px/(2d0*csq**(3d0/2d0)) - dl*px*(-3d0*beta - 3d0*pt)*(beta + pt)/(2d0*c52sq)
+         te(5,4,2) = -3d0*dl*px*py*(beta + pt)/(2d0*c52sq)
+         te(5,4,4) = -dl*(beta + pt)/(2d0*csq**(3d0/2d0)) - 3d0*dl*py**2d0*(beta + pt)/(2d0*c52sq)
+         te(5,4,6) = -dl*py/(2d0*csq**(3d0/2d0)) - dl*py*(-3d0*beta - 3d0*pt)*(beta + pt)/(2d0*c52sq)
+         te(5,6,2) = -dl*px/(2d0*csq**(3d0/2d0)) - 3d0*dl*px*(-beta - pt)*(beta + pt)/(2d0*c52sq)
+         te(5,6,4) = -dl*py/(2d0*csq**(3d0/2d0)) - 3d0*dl*py*(-beta - pt)*(beta + pt)/(2d0*c52sq)
+         te(5,6,6) = -dl*(-beta - pt)/csq**(3d0/2d0) + dl*(beta + pt)/(2d0*csq**(3d0/2d0)) &
+         - dl*(-3d0*beta - 3d0*pt)*(-beta - pt)*(beta + pt)/(2d0*c52sq)
+      endif
 
-  !---- Second-order terms.
-  if (fsec) then
-     te(1,2,6) = - dl / (two * beta)
-     te(1,6,2) = te(1,2,6)
-     te(3,4,6) = te(1,2,6)
-     te(3,6,4) = te(3,4,6)
-     te(5,2,2) = te(1,2,6)
-     te(5,4,4) = te(5,2,2)
-     te(5,6,6) = te(1,2,6) * three / (beta * gamma) ** 2
+      orbit(1) = orbit(1) + px*l_pz
+      orbit(3) = orbit(3) + py*l_pz
+      orbit(5) = orbit(5) + (dl*beta - (beta + pt) * l_pz)
+  else
+
+     re(1,2) = dl
+     re(3,4) = dl
+     re(5,6) = dl/(beta*gamma)**2
+
+     ek(5) = dl*dtbyds
+
+     !---- Second-order terms.
+     if (fsec) then
+        te(1,2,6) = - dl / (two * beta)
+        te(1,6,2) = te(1,2,6)
+        te(3,4,6) = te(1,2,6)
+        te(3,6,4) = te(3,4,6)
+        te(5,2,2) = te(1,2,6)
+        te(5,4,4) = te(5,2,2)
+        te(5,6,6) = te(1,2,6) * three / (beta * gamma) ** 2
+     endif
+     
+     !---- Track orbit.
+     if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
   endif
-  
-  !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmdrf
 

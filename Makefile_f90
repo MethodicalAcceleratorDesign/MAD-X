@@ -90,6 +90,7 @@ m_real_polymorph.o:         $(FC_DIR_PTC)/m_real_polymorph.f90        l_complex_
 n_complex_polymorph.o:      $(FC_DIR_PTC)/n_complex_polymorph.f90     m_real_polymorph.o
 o_tree_element.o:           $(FC_DIR_PTC)/o_tree_element.f90          n_complex_polymorph.o
 
+Su_duan_zhe_map.o:          $(FC_DIR_PTC)/Su_duan_zhe_map.f90
 Ci_tpsa.o:                  $(FC_DIR_PTC)/Ci_tpsa.f90                 h_definition.o o_tree_element.o
 
 Sa_extend_poly.o:           $(FC_DIR_PTC)/Sa_extend_poly.f90          o_tree_element.o
@@ -98,9 +99,9 @@ Sc_euclidean.o:             $(FC_DIR_PTC)/Sc_euclidean.f90            Sb_sagan_p
 Sd_frame.o:                 $(FC_DIR_PTC)/Sd_frame.f90                Sc_euclidean.o
 Se_status.o:                $(FC_DIR_PTC)/Se_status.f90               Sd_frame.o Ci_tpsa.o
 Sf_def_all_kinds.o:         $(FC_DIR_PTC)/Sf_def_all_kinds.f90        Se_status.o
-Sh_def_kind.o:              $(FC_DIR_PTC)/Sh_def_kind.f90             Sf_def_all_kinds.o
-Sg_sagan_wiggler.o:         $(FC_DIR_PTC)/Sg_sagan_wiggler.f90        Sh_def_kind.o
-Si_def_element.o:           $(FC_DIR_PTC)/Si_def_element.f90          Sg_sagan_wiggler.o
+Sg_sagan_wiggler.o:         $(FC_DIR_PTC)/Sg_sagan_wiggler.f90        Sf_def_all_kinds.o
+Sh_def_kind.o:              $(FC_DIR_PTC)/Sh_def_kind.f90             Sg_sagan_wiggler.o
+Si_def_element.o:           $(FC_DIR_PTC)/Si_def_element.f90          Sh_def_kind.o
 Sk_link_list.o:             $(FC_DIR_PTC)/Sk_link_list.f90            Si_def_element.o
 Sl_family.o:                $(FC_DIR_PTC)/Sl_family.f90               Sk_link_list.o
 Sm_tracking.o:              $(FC_DIR_PTC)/Sm_tracking.f90             Sl_family.o

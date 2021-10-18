@@ -704,7 +704,6 @@ contains
 
     slice = slice_magnets .or. center_magnets
 
-    call make_node_layout(my_ring)
     call getBeamBeam()
 
 
@@ -1464,6 +1463,7 @@ contains
     subroutine tidy()
       ! deallocates all the variables
       implicit none
+      integer i
 
       call kill(tw)
       CALL kill(A_script_probe)

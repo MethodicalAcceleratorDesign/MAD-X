@@ -109,9 +109,6 @@ FCVER2 := 0
   ifeq ($(FCVER1),4)
   FCVER2 := $(findstring $(word 2,$(FCVERL)),"456789")
   endif
-ifeq ($(and $(FCVER1),$(FCVER2)),)
-$(error MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
-endif # version
 endif # gfortran
 endif # cmdgoal
 

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:35:38      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.09.12 19:22:56      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example script showing usage of tracking with PTC
 
@@ -124,7 +124,7 @@ ptc_create_layout, model=2, method=6, nst=20, exact=true, closed_layout=true;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    1.2170347930495041E-004   2.9337307977728667E-014  -7.9690752521344166E-005
+ After    end:    1.2170345407233592E-004   6.9373562330829282E-014  -7.9690632415807539E-005
  HARMONIC NUMBER defined in the ring:    35640.000000000000     
 
 

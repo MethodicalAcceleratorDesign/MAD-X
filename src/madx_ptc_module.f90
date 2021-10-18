@@ -225,7 +225,7 @@ CONTAINS
        call setintstate(default)
     endif
 
-
+    
   end subroutine ptc_create_layout
   !_________________________________________________________________
 
@@ -859,8 +859,14 @@ CONTAINS
              truerbend=node_value('truerbend ').ne.0
              if(truerbend) then
                 key%magnet="TRUERBEND"
-                if(key%list%t2/=zero) then
+                if(key%list%t2/=zero .or. key%list%t1/=zero) then
                    write(6,*) " The true parallel face bend "
+                   if (key%list%t1/=zero) then
+                      write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                      write(6,*) " Piotr has to implement patches around it to tackle E1=/0  "
+                      write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   endif
+
                    write(6,*) " only accepts the total angle and e1 as an input "
                    write(6,*) " if e1=0, then the pipe angle to the entrance face is "
                    write(6,*) " angle/2. It is a normal rbend."
@@ -869,6 +875,7 @@ CONTAINS
                    write(6,*) " with the exit face."
                    write(6,*) " The offending non-zero t2 = (e2 - angle/2) is set to zero! "
                    write(6,*) " Make sure that this is what you want!!! "
+                   
                    !                write(6,*) " CHANGE YOUR LATTICE FILRE."
                    !                stop 666
                    key%list%t2=zero
@@ -1714,7 +1721,8 @@ CONTAINS
     endif
 
     MY_RING%closed=isclosedlayout
-
+    
+    
     doneit=.true.
     call ring_l(my_ring,doneit)
 
@@ -1732,7 +1740,8 @@ CONTAINS
        write(6,*) "Before start: ",my_ring%start%chart%f%a
        write(6,*) "Before   end: ",my_ring%end%chart%f%b
     endif
-
+    
+    call make_node_layout(my_ring)
     call survey(my_ring)
 
     if (getdebug() > 0) then
@@ -2299,22 +2308,26 @@ CONTAINS
 
   !_____________________________________________________
   subroutine misalign_element(f,al_errors)
-    use twiss0fi, only: align_max
-    TYPE(FIBRE),target,INTENT(INOUT):: f
-    REAL(DP),INTENT(IN) :: al_errors(align_max)
-    REAL(DP)             :: mis(align_max), omegat(3), basist(3,3)
+     use twiss0fi, only: align_max
+     TYPE(FIBRE),target,INTENT(INOUT):: f
+     REAL(DP),INTENT(IN) :: al_errors(align_max)
+     REAL(DP)             :: mis(align_max), omegat(3), basist(3,3)
 
-      mis=0
-      mis(4:6)=al_errors(4:6)
-      mis(4:5)=-mis(4:5)
+       mis=0
+       mis(4:6)=al_errors(4:6)
+       mis(4:5)=-mis(4:5)
 
-      OMEGAT=f%mag%p%f%a
-      basist=f%mag%p%f%ent
-      CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.false.) ! false to remove previous alignment
+       !OMEGAT=f%mag%p%f%a
+       !basist=f%mag%p%f%ent
 
-      mis=0
-      mis(1:3)=al_errors(1:3)
-      CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.true.)
+       OMEGAT=f%chart%f%a
+       basist=f%chart%f%ent
+
+       CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.false.) ! false to remove previous alignment
+
+       mis=0
+       mis(1:3)=al_errors(1:3)
+       CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.true.)
 
   end subroutine misalign_element
   !_________________________________________________________________
