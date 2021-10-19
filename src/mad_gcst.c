@@ -649,7 +649,7 @@ const int summ_table_types[] =
   //2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2,   2, //for nflips
-  2,2,
+  2, 2
 };
 
 const char* const summ_table_cols[] =

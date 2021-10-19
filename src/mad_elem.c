@@ -859,9 +859,14 @@ el_par_vector(int* total, double* vect)
   struct command_parameter* cp;
   int i, len = 0;
   double val;
+  //dump_command_parameter(parl->parameters[0]);
+
   for (i = 0; i < *total; i++) {
      if (i < elc->par->curr) {
+        //printf("vvvv %d \n", cp->type);
         cp = parl->parameters[i];
+        //printf("vvvv %d \n", cp->type);
+        if(cp == NULL) return 0;
         if (cp->type < 3) {
           if (cp->expr == NULL) val = cp->double_value;
           else val = expression_value(cp->expr, 2);

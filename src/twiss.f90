@@ -1906,7 +1906,9 @@ subroutine track_one_element(el, fexit, contrib_rms)
 !  if (code .eq. code_tkicker)     code = code_kicker
   if (code .eq. code_placeholder) code = code_instrument
   bvk = node_value('other_bv ')
+  print *, "HEREEEeeee"
   elpar_vl = el_par_vector(g_polarity, g_elpar)
+  print *, "HEREEEeeee2"
   ele_body = el .gt. eps
 
   !--- 2013-Nov-14  10:34:00  ghislain: add acquisition of name of element here.
