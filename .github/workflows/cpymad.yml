@@ -105,7 +105,9 @@ jobs:
           path: ${{ env.MADXDIR }}
 
       - name: Install python setup dependencies
-        run: pip install cython
+        run: |
+          pip install cython
+          pip install pytest
 
       - name: Build cpymad
         run: |
