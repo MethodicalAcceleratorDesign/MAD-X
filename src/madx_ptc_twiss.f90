@@ -392,7 +392,7 @@ contains
                        spin_tune = tw_SpinPhase, &
 	   dospin = .true.)
 	   
-      print*, "q_rot ", q_rot 
+      !print*, "q_rot ", q_rot 
       
       if(default%nocavity) then
          Write(6,*) "Orbital phase advances and temporal slip"
@@ -3163,7 +3163,7 @@ contains
       type(c_spinor)       :: n_isf   ,s_isf ,isfom
       type(c_lattice_function) :: latticefun
       type(c_linear_map)   :: q_x, q_y, q_z, q_map ! to be removed in prod version
-      
+
       latticefun%symplectic=.true.
       
       order = get_value('ptc_twiss ', 'no ')
@@ -3230,7 +3230,6 @@ contains
       call alloc(theNormalForm)
       call alloc(thePhaseAndSlip)
       call alloc(theNuSpin)
-      call alloc(thePhaseAndSlip)
       call alloc(theA_CS, theA_Spin, theA0, theA1, theA2, theRot, theA_CS_fast)
       
       call  c_normal(c_Map,theNormalForm,dospin=dospin, &
@@ -3624,8 +3623,6 @@ contains
 
       call kill(vf_kernel)
 
-      call kill(theNormalForm)
-      call kill(c_Map)
 
 
       !write(6,*)
@@ -3665,7 +3662,19 @@ contains
       
       
       !___________________________________________________
-           
+      
+      if ( .not. dospin ) then
+        print*, "No spin requested"
+        call kill(c_Map)
+        call kill(theNormalForm)
+
+        call kill(thePhaseAndSlip)
+        call kill(theNuSpin)
+        call kill(theA_CS, theA_Spin, theA0, theA1, theA2, theRot, theA_CS_fast)
+
+        return
+      endif
+      
       print*, "oneTurnSummary  Spin"
       
       
@@ -3680,12 +3689,12 @@ contains
         Write(6,format3) theNormalForm%damping(1:3)
       endif
       
-      print*, "c_fast_canonise ... "
-      
       !brings the normalizing transformation to canonic Courant-Snyder form where A12=0
       ! theA_CS_fast = atot * someRotation
-      !tw_SpinUmap = theNormalForm%atot
-      call c_fast_canonise(theNormalForm%as, & !input, "A script", the normalizing map 
+
+      tw_SpinUmap = theNormalForm%atot
+      
+      call c_fast_canonise(tw_SpinUmap, & !input, "A script", the normalizing map 
                            theA_CS_fast, & ! out, "A script" in Courant-Snyder convention
 	       q_cs= linA, & ! out, linear part of A script
                            q_as = linA_spin, & ! out, spin part of A
@@ -3708,8 +3717,14 @@ contains
       j=6
       call print(spin_n_axis, quaternion_only=.true., mf=j)
 
+      
+      
       write(6,*);write(6,*) " checking ISF  using the Barber Identity  Sn=n o m"
       print*, "This code is just to check and prove the PTC works, to be removed for production"
+      
+      call kanalnummer(mf)
+      open(unit=mf,file='spinExtraDebug.tfs')
+       
       call makeso3(theNormalForm%as)
       call alloc(n_isf)
       call alloc(s_isf)
@@ -3717,34 +3732,47 @@ contains
       n_isf=2
 
       n_isf=theNormalForm%as%s*n_isf
-      call print(n_isf,6)
+      
+      write(mf,*) "n_isf: "
+      call print(n_isf,mf)
+      write(mf,*) "n_isf: end ========================================================== \n\n\n"
 
       isfom=n_isf*c_map
+      
       call makeso3(c_map)
       s_isf=c_map%s*n_isf
 
 
-      call print(isfom%v(1),6)
-      call print(s_isf%v(1),6)
-      call print(isfom%v(2),6)
-      call print(s_isf%v(2),6)
-      call print(isfom%v(3),6)
-      call print(s_isf%v(3),6)
+      call kanalnummer(mf)
+      open(unit=mf,file='spinExtraDebug.isfom.tfs')
+      call print(isfom%v(1),mf)
+      call print(isfom%v(2),mf)
+      call print(isfom%v(3),mf)
+
+      call kanalnummer(mf)
+      open(unit=mf,file='spinExtraDebug.s_isf.tfs')
+      call print(s_isf%v(1),mf)
+      call print(s_isf%v(2),mf)
+      call print(s_isf%v(3),mf)
+
 
       write(6,*) " checking ISF with c_linear_map"
       q_x=1
       q_y=2 
       q_z=3
       
+      q_map = c_map
+      
       q_z=1.0_dp  ! makes quarternion part identity
       q_z%mat=q_map%mat
       q_x=spin_n_axis*q_z
-
+      print*, "q_x=spin_n_axis*q_z"
       call print(q_x,quaternion_only=.true.,mf=6)
 
       q_z=0  ! makes identity 0, 1,2,3 makes identity in orbital + 1, i,j, or k in the quaternion
       q_z%q=q_map%q
       q_y=q_z*spin_n_axis*q_z**(-1)
+      print*, "q_y=q_z*spin_n_axis*q_z**(-1)"
       call print(q_y,quaternion_only=.true.,mf=6)
        
        
@@ -3752,6 +3780,15 @@ contains
       call kill(n_isf)
       call kill(s_isf)
       call kill(isfom)
+  
+      
+      call kill(c_Map)
+      call kill(theNormalForm)
+
+      call kill(thePhaseAndSlip)
+      call kill(theNuSpin)
+      call kill(theA_CS, theA_Spin, theA0, theA1, theA2, theRot, theA_CS_fast)
+
     end subroutine oneTurnSummary
 
 
