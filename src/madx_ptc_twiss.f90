@@ -854,11 +854,10 @@ contains
        !CALL write_closed_orbit(icase,x) at this position it isn't read
     endif
     
-    if (dospin) then
+    if (default%spin) then
       print*, "skowron: forcing spin"
-      default = default + spin0
-      
-      nda = nda + 1
+      !default = default + spin0
+      dospin = .true.
     endif
 
 
