@@ -25,7 +25,7 @@ module madx_ptc_twiss_module
   !============================================================================================
   !  PRIVATE
   !    datta structures
-  logical(lp)              :: dospin = .true.
+  logical(lp)              :: dospin = .false.
 
   !PSk 2011.01.05 goes global to the modules so the slice tracking produces it for the summ table
   type(probe_8)            :: theTransferMap
@@ -3664,7 +3664,7 @@ contains
       !___________________________________________________
       
       if ( .not. dospin ) then
-        print*, "No spin requested"
+        !print*, "No spin requested"
         call kill(c_Map)
         call kill(theNormalForm)
 
