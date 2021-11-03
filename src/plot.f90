@@ -1975,7 +1975,7 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
   !--- set line style to solid
   do i = 1, nel
      call jsln(1)
-     it = mod(ityp(i), 20)
+     it = mod(ityp(i), mobj+1)
      if (it .eq. 0) goto 10
 
      j_nodrift = j_nodrift + 1
