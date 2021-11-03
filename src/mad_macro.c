@@ -125,7 +125,7 @@ make_macro(char* statement)
   struct macro* m;
   char** toks = tmp_l_array->p;
   int i, n, rs, re, start_2;
-  int len = strlen(statement);
+  int len = strlen(statement)+1;
   while(len >= aux_buff->max) grow_char_array(aux_buff);
   strcpy(aux_buff->c, statement);
   get_bracket_range(aux_buff->c, '{', '}', &rs, &re);
