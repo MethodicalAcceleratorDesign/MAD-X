@@ -118,15 +118,15 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
         print '(''open line - error with deltap: '',1p,e14.6)', deltap
         print '(''initial orbit vector: '', 1p,6e14.6)', orbit0
      endif
-     call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on); if (eflag.ne.0) go to 900
+     call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on,.true.); if (eflag.ne.0) go to 900
      if (get_option('twiss_print ') .ne. 0) &
         print '(''final orbit vector:   '', 1p,6e14.6)', orbit
      call tmsigma(s0mat) !-- from initial conditions in opt_fun0
   else
      !---- Initial values from periodic solution.
-     call tmclor(orbit0,.true.,.true.,eig_tol,opt_fun0,rt,tt,eflag);          if (eflag.ne.0) go to 900
+     call tmclor(orbit0,.true.,.true.,eig_tol,opt_fun0,rt,tt,eflag,.true.);          if (eflag.ne.0) go to 900
 !    LD: useless, identical to last call to tmfrst in tmclor...
-!    call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on); if (eflag.ne.0) go to 900
+!    call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on,.true.); if (eflag.ne.0) go to 900
      call twcpin(rt,disp0,r0mat,eflag);                               if (eflag.ne.0) go to 900
      !----IrinaTecker: For Sagan-Rubin and Talman versions of coupling
 !    call twcpin_sagan(rt,disp0,r0mat,eflag);                         if (eflag.ne.0) go to 900
@@ -222,7 +222,7 @@ SUBROUTINE tmrefe(rt)
   ORBIT0 = zero ; ORBIT = zero ; TT = zero
 
   !---- Get transfer matrix.
-  call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0,0,ithr_on)
+  call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0,0,ithr_on,.false.)
 end SUBROUTINE tmrefe
 
 SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
@@ -267,8 +267,8 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   ithr_on = izero
   ORBIT0 = zero
   !---- Get closed orbit and coupled transfer matrix.
-  call tmclor(orbit0,.true.,.true.,eig_tol, opt_fun0,rt,tt,eflag)
-  call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,ithr_on) ! useless?
+  call tmclor(orbit0,.true.,.true.,eig_tol, opt_fun0,rt,tt,eflag,.false.)
+  call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,ithr_on,.false.) ! useless?
 end SUBROUTINE tmrefo
 
 SUBROUTINE twinifun(opt_fun0,rt)
@@ -514,7 +514,7 @@ SUBROUTINE twfill_ripken(opt_fun)
 
 end SUBROUTINE twfill_ripken
 
-SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
+SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag,from_twiss)
   use twissbeamfi, only : deltap
   use matrices, only : EYE
   use math_constfi, only : zero, one
@@ -537,7 +537,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   !     eflag        (integer) error flag (0: OK, else != 0)             *
   !----------------------------------------------------------------------*
   double precision :: guess(6), opt_fun0(*), rt(6,6), tt(6,6,6)
-  logical :: fsec, ftrk
+  logical :: fsec, ftrk, from_twiss
   integer :: eflag
 
   logical :: pflag
@@ -567,7 +567,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   iterate: do itra = 1, itmax
       orderrun = itra
      !---- Track orbit and transfer matrix.
-     call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
+     call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on,from_twiss)
 
      if (eflag.ne.0) return
      ! turn off threader immediately after first iteration, ie after first turn
@@ -615,7 +615,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
      if (err.lt.cotol) then
         orderrun = 0
         save_opt = get_option('keeporbit ')
-        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,ithr_on)
+        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,ithr_on,from_twiss)
         OPT_FUN0(9:14) = ORBIT0(1:6)
         GUESS = ORBIT0
         call tmcheckstab(rt,eig_tol, debug)
@@ -697,7 +697,7 @@ SUBROUTINE tmcheckstab(rt,tol, debug)
 
 end SUBROUTINE tmcheckstab
 
-SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
+SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on,from_twiss)
   use bbfi
   use twiss0fi
   use twissbeamfi, only : beta, gamma, arad, charge, npart, pc, energy
@@ -728,7 +728,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   !     thr_on    (integer) if > 0, use threader                         *
   !----------------------------------------------------------------------*
   double precision :: orbit0(6), orbit(6)
-  logical :: fsec, ftrk
+  logical :: fsec, ftrk, from_twiss
   double precision :: rt(6,6), tt(6,6,6)
   integer :: eflag, kobs, save, thr_on, i, tap_itter
 
@@ -769,8 +769,10 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      j = get_vector('threader ', 'vector ', vector)
      if (j .lt. 3) thr_on = 0
   endif
-  istaper = get_value('twiss ','tapering ').ne.zero
-  tap_itter = get_value('twiss ','tap_itter ')
+  if (from_twiss) then
+     istaper = get_value('twiss ','tapering ').ne.zero
+     tap_itter = get_value('twiss ','tap_itter ')
+  end if
 
   TT = zero
   RT = EYE

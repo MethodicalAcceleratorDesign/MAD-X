@@ -1027,5 +1027,5 @@ subroutine getclor(orbit0, rt, tt, error)
   RT  = EYE
   OPT = zero
   eig_tol = 1e-4
-  call tmclor(orbit0, .true., .true., eig_tol, opt, rt, tt, error)
+  call tmclor(orbit0, .true., .true., eig_tol, opt, rt, tt, error,.false.)
 end subroutine getclor
