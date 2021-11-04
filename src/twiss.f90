@@ -99,7 +99,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   dtbyds  = get_value('probe ','dtbyds ')
   charge  = get_value('probe ','charge ')
   npart   = get_value('probe ','npart ')
-  eig_tol = get_value('twiss ','clorb_tol' )
+  eig_tol = get_value('twiss ','clorb_tol ' )
 
 
   !---- Set fast_error_func flag to use faster error function
