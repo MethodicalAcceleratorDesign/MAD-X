@@ -1976,7 +1976,7 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
   do i = 1, nel
      call jsln(1)
      it = mod(ityp(i), 20)
-     if (it .eq. 0 .or. it .gt. mobj) goto 10
+     if (it .eq. 0) goto 10
 
      j_nodrift = j_nodrift + 1
      i_nodrift(j_nodrift) = i
@@ -1996,7 +1996,7 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
         endif
      endif
      if (es(i) .gt. actwin(2)) goto 50
-     if (ee(i) .ge. actwin(1)) then
+     if (ee(i) .ge. actwin(1) .and. it .le. mobj) then
         txp(1) = es(i) + shapex(npst(it)) * ell
         typ(1) = shapey(npst(it))
         do  j = npst(it)+1, npnd(it)
