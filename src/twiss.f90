@@ -772,6 +772,9 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on,from_twiss
   if (from_twiss) then
      istaper = get_value('twiss ','tapering ').ne.zero
      tap_itter = get_value('twiss ','tap_itter ')
+  else
+     istaper = .false.
+     tap_itter = 1
   end if
 
   TT = zero
