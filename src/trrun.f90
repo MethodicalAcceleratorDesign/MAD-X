@@ -619,7 +619,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
           call get_node_vector('aper_offset ',nn,offset)
           call trcoll(apint,  aperture, offset, al_errors,  maxaper, &
                 turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack, debug)
-          EXIT ! They are anway checked against all the particles so no need to continue to loop
+          EXIT ! They are anyway checked against all the particles so no need to continue to loop
           endif 
         enddo 
 
@@ -4190,7 +4190,7 @@ subroutine tttquad(track, ktrack)
   use twtrrfi
   use trackfi
   use twiss_elpfi
-  use math_constfi, only : zero, one, two, three, half
+  use math_constfi, only : zero, one, two, three, half, sqrt2
   implicit none
   !-------------------------*
   ! Andrea Latina 2012-2013 *
@@ -4217,8 +4217,6 @@ subroutine tttquad(track, ktrack)
   integer :: jtrk, elpar_vl
 
   double precision, external :: node_value
-  double precision, parameter ::  sqrt2=1.41421356237310d0
-
   double precision, external :: get_value
 
   double precision :: f_errors(0:maxferr)
@@ -4229,20 +4227,16 @@ subroutine tttquad(track, ktrack)
   !beta = get_value('probe ','beta ')
   
   !---- Read-in the parameters
-  elpar_vl = el_par_vector(q_k1st, g_elpar)
+  elpar_vl = el_par_vector(q_max, g_elpar)
   
   length = node_value('l ');
   tilt = g_elpar(q_tilt)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = g_elpar(q_k1)  + g_elpar(q_k1t)
-  k1s = g_elpar(q_k1s) + g_elpar(q_k1st)
+  k1  = g_elpar(q_k1)  * (1 + g_elpar(q_ktap))
+  k1s = g_elpar(q_k1s) * (1 + g_elpar(q_ktap))
   
-  !k1  = node_value('k1 ')
-  !k1s = node_value('k1s ')
-
-
   if (length.ne.zero) then
      k1  = k1  + f_errors(2)/length
      k1s = k1s + f_errors(3)/length
@@ -4393,7 +4387,7 @@ subroutine tttdipole(track, ktrack, code)
   double precision :: length, angle, rho, h, k0, k1
   double precision :: x, px, y, py, z, pt, delta_plus_1
   double precision :: hx, hy, rfac, curv
-  double precision :: e1, e2, h1, h2, hgap, fint, fintx
+  double precision :: e1, e2, h1, h2, hgap, fint, fintx, ktap
   double precision :: beta_sqr, beta_gamma, f_damp_t
 
   double precision, external :: node_value, get_value
@@ -4408,22 +4402,16 @@ subroutine tttdipole(track, ktrack, code)
   !radiate = get_value('probe ','radiate ') .ne. zero
   !All these were removed since they were global parameters. 
   
-  elpar_vl = el_par_vector(b_k3s, g_elpar)
+  elpar_vl = el_par_vector(b_max, g_elpar)
   !---- Read-in dipole edges angles
-  !e1    = node_value('e1 ');
-  !e2    = node_value('e2 ');
   e1 = g_elpar(b_e1)
   e2 = g_elpar(b_e2)
-  !h1    = node_value('h1 ')
-  !h2    = node_value('h2 ')
   h1 = g_elpar(b_h1)
   h2 = g_elpar(b_h2)
-  !hgap  = node_value('hgap ')
-  !fint  = node_value('fint ')
-  !fintx = node_value('fintx ')
   hgap = g_elpar(b_hgap)
   fint = g_elpar(b_fint)
   fintx = g_elpar(b_fintx)
+  ktap = g_elpar(b_ktap)
   
   length = node_value('l ')
   angle  = g_elpar(b_angle)
@@ -4432,9 +4420,6 @@ subroutine tttdipole(track, ktrack, code)
   h = angle/length
   k0 = g_elpar(b_k0)
   k1 = g_elpar(b_k1)
-  !k0 = node_value('k0 ') ! was h
-  !k1 = node_value('k1 ')
-
 
   if (code .eq. code_rbend) then
      e1 = e1 + angle / two;
@@ -4449,6 +4434,9 @@ subroutine tttdipole(track, ktrack, code)
   else
     k0 = h
   endif
+
+  k0 = k0 * (1+ktap) ! tapering to main field only
+ 
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
@@ -4456,6 +4444,7 @@ subroutine tttdipole(track, ktrack, code)
      call ttdrf(length,track,ktrack);
      return
   endif
+  
   !---- Apply entrance dipole edge effect
   if (node_value('kill_ent_fringe ') .eq. zero) &
        call ttdpdg_map(track, ktrack, e1, k0, hgap, fint, zero)

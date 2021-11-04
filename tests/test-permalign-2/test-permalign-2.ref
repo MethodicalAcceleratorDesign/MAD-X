@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.21 10:14:48      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.09.12 19:19:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
 a = 0.1;
 
@@ -141,7 +141,7 @@ ptc_create_layout,model=1, method=2, nst=2, exact=true;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        3.0000000000000004     
+ After    end:    0.0000000000000000        0.0000000000000000        3.0000000000000000     
 ptc_align;
 
 ptc_setswitch, debuglevel=0, fringe=false,  time=false, totalpath=false, exact_mis=false;                                                

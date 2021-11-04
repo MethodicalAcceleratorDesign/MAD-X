@@ -346,7 +346,7 @@ type probe_8
   real(dp) damps(3,3)
   real(dp) b_kin(3,3)
   real(dp) D_spin(3)
-  real(dp) t_bks(3,3),t_bks0 
+!  real(dp) t_bks(3,3),t_bks0 
 end type probe_8
   !@3 ---------------------------------------------</br>
   type TEMPORAL_PROBE
@@ -459,6 +459,7 @@ TYPE c_normal_form
 !!!Envelope radiation stuff to normalise radiation (Sand's like theory)
  complex(dp) s_ij0(6,6)  !@1  equilibrium beam sizes
  complex(dp) s_ijr(6,6)  !@1  equilibrium beam sizes in resonance basis
+ complex(dp) b_ijr(6,6)  !@1   stochastic kick in resonance basis
  real(dp) emittance(3)   !@1  Equilibrium emittances as defined by Chao (computed from s_ijr(2*i-1,2*i) i=1,2,3 )
 END TYPE c_normal_form
   !@2 the routine c_canonize(at,a_cs,a0,a1,a2,phase) factors neatly the map "at"
@@ -500,7 +501,17 @@ contains
 
 
 
+     subroutine in_bmad_units
+     implicit none  
+      use_bmad_units=.true.
+      ndpt_bmad=1
+     end subroutine in_bmad_units
 
+     subroutine in_ptc_units
+     implicit none  
+      use_bmad_units=.false.
+      ndpt_bmad=0
+     end subroutine in_ptc_units
 
 
 
