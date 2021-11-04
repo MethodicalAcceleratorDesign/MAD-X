@@ -156,8 +156,8 @@ private:
   double hybrid_at_shift(const int slices, const int slice_no) const;
   double at_shift(const int slices, const int slice_no,const std::string local_slice_style) const; // return at relative shifts from centre of unsliced magnet
   void kn_ks_from_thick_elem(const element* thick_elem,command_parameter* kn_pars[4],command_parameter* ks_pars[4]) const; // read k0-k3, k0s-k3s in thick_elem and put them in kn_pars, ks_pars
-  void add_ktap(command_parameter* k_param,const element* thick_elem);
-  void add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem);
+  //  void add_ktap(command_parameter* k_param,const element* thick_elem);
+  //  void add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem);
   command_parameter* make_k_list(const std::string parnam,command_parameter* k_pars[4]) const; // from k values 0-3 to  expr lists
   element*   new_marker_element(const std::string el_name, const element* el_inp);
   element*  create_wire_element(const element* thick_elem, int slice_no);
@@ -1697,29 +1697,30 @@ void SeqElList::kn_ks_from_thick_elem(const element* thick_elem,command_paramete
   for(unsigned int i=0;i<ks_name.size();++i) ks_pars[i] = (p=return_param_recurse(ks_name[i].c_str() ,thick_elem)) ? clone_command_parameter(p) : nullptr;
 }
 
-void SeqElList::add_ktap(command_parameter* k_param,const element* thick_elem)
-{
-  if(!k_param) return;
-  std::string k_param_name=k_param->name;
-  std::string k_name,ktap_name;
-  for(unsigned int i=1;i<3;++i)
-  {
-    k_name="k"+std::to_string(i); // k1, k2
-    if(k_param_name=="ksl") k_name=k_name+"s"; // or  k1s, k2s
-    ktap_name=k_name+"tap"; // corresponding tap attribute
-    add_ktap_i(i,k_param,k_name,ktap_name,thick_elem);
-  }
-}
+// void SeqElList::add_ktap(command_parameter* k_param,const element* thick_elem)
+// {
+//   if(!k_param) return;
+//   std::string k_param_name=k_param->name;
+//   std::string k_name,ktap_name;
+//   for(unsigned int i=1;i<3;++i)
+//     {
+//     // k_name="k"+std::to_string(i); // k1, k2
+//     // if(k_param_name=="ksl") k_name=k_name+"s"; // or  k1s, k2s
+//     // ktap_name=k_name+"tap"; // corresponding tap attribute
+//     ktap_name="ktap";
+//     add_ktap_i(i,k_param,k_name,ktap_name,thick_elem);
+//     }
+// }
 
-void SeqElList::add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem)
-{
-  if( command_parameter *p     = return_param_recurse(k_name.c_str(), thick_elem) )  // has k1n, or k1s, k2n, k2s
-    if( command_parameter *p_tap = return_param_recurse(ktap_name.c_str(), thick_elem) )// has corresponding tap
-    {
-      if(p->expr) k_param->expr_list->list[i] = compound_expr(p->expr,                          p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
-      else        k_param->expr_list->list[i] = compound_expr(expr_from_value(p->double_value), p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
-    }
-}
+// void SeqElList::add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem)
+// {
+//   if( command_parameter *p     = return_param_recurse(k_name.c_str(), thick_elem) )  // has k1n, or k1s, k2n, k2s
+//     if( command_parameter *p_tap = return_param_recurse(ktap_name.c_str(), thick_elem) )// has corresponding tap
+//     {
+//       if(p->expr) k_param->expr_list->list[i] = compound_expr(p->expr,                          p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
+//       else        k_param->expr_list->list[i] = compound_expr(expr_from_value(p->double_value), p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
+//     }
+// }
 
 command_parameter* SeqElList::make_k_list(const std::string parnam,command_parameter* k_pars[4]) const
 {
@@ -2099,8 +2100,8 @@ element* SeqElList::create_thin_slices(const element* thick_elem, int slice_no) 
     knl_param=make_k_list("knl",kn_pars); // make new knl 0,1,2,3 expr_list based on kn_pars from thick
     kns_param=make_k_list("ksl",ks_pars); // make new ksl 0,1,2,3 expr_list based on ks_pars from thick
 
-    add_ktap(knl_param,thick_elem);
-    add_ktap(kns_param,thick_elem);
+    //    add_ktap(knl_param,thick_elem);
+    //    add_ktap(kns_param,thick_elem);
 
     // multiply the k by length and divide by slice
     knl_param = scale_and_slice(knl_param,length_param,nslices,mult_with_length);
