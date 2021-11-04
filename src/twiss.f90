@@ -262,7 +262,7 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   dtbyds = get_value('probe ','dtbyds ')
   charge = get_value('probe ','charge ')
   npart  = get_value('probe ','npart ')
-  eig_tol = get_value('twiss ','clorb_tol' )
+  eig_tol = 1d-6
 
   ithr_on = izero
   ORBIT0 = zero
