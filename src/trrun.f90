@@ -363,6 +363,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         endif
 
         nlm = nlm + 1
+        
         if (nobs .gt. 0)  then
            OBS_ORB = zero
            call get_node_vector('obs_orbit ', lobs, obs_orb)
