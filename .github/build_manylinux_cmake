@@ -7,6 +7,10 @@ cd build
 : ${PY:=/opt/python/cp36-cp36m/bin}
 
 $PY/pip install --upgrade cmake
+$PY/cmake --version
+$PY/cmake3 --version
+gfortran --version
+gcc --version
 $PY/cmake .. \
     -DBUILD_SHARED_LIBS=OFF \
     -DMADX_STATIC=ON \
