@@ -8,7 +8,6 @@ cd build
 
 $PY/pip install --upgrade cmake
 $PY/cmake --version
-$PY/cmake3 --version
 gfortran --version
 gcc --version
 $PY/cmake .. \
