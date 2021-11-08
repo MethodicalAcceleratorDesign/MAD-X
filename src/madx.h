@@ -105,6 +105,7 @@
 #include "mad_touschek.h"
 #include "mad_track.h"
 #include "mad_twiss.h"
+#include "mad_taper.h"
 
 // ptc interface modules
 
