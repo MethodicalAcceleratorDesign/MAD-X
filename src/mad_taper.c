@@ -8,8 +8,10 @@ pro_taper(struct in_cmd* cmd)
 {
   struct command* taper = cmd->clone;
   double stepsize = 0.0;
-  int iterate = 0, error = 0, t_file;
-  char* filename = "no_taper_file";
+  int iterate = 0, error = 0;
+  char* filename;
+  filename = mymalloc("tapering", 30 * sizeof *filename);
+  strcpy(filename,"no_taper_file");
   int debug = get_option("debug");
   
   if (current_sequ == NULL || current_sequ->ex_start == NULL) {
@@ -30,7 +32,7 @@ pro_taper(struct in_cmd* cmd)
   stepsize  = command_par_value("stepsize", taper);
 
   if (par_present("file",taper)) {
-    t_file = command_par_string_user2("file", taper, &filename);
+    command_par_string_user2("file", taper, &filename);
   }
     
   if (iterate < 0) {
