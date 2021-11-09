@@ -40,11 +40,12 @@ jobs:
         if: matrix.os == 'ubuntu'
         run: |
           set -ex
+          sudo apt install gfortran-9 gcc-9 g++-9
           tags=(${{ matrix.cmake }})
           filename="cmake-${tags[1]}-${tags[2]}.tar.gz"
           curl -Lo "$filename" "https://cmake.org/files/${tags[0]}/$filename"
           tar -xzf "$filename" --one-top-level=cmake-dist --strip-components 1
-          sudo apt install gfortran-9 gcc-9 g++-9
+          
             
 
       - name: Download cmake for Windows
@@ -141,7 +142,9 @@ jobs:
           sudo apt-get install -qy \
             libblas-dev \
             liblapack-dev \
-            gfortran \
+            gfortran-9 \
+            gcc-9 \
+            g++-9 \
             gnuplot
 
       - name: Build MAD-X as library

@@ -8,11 +8,8 @@ cd build
 
 $PY/pip install --upgrade cmake
 $PY/cmake --version
-$PY/pip install --upgrade gfortran
-$PY/pip install --upgrade gcc-9
-$PY/pip install --upgrade g++-9
+
 gfortran --version
-$PY/gfortran --version
 gcc --version
 $PY/cmake .. \
     -DBUILD_SHARED_LIBS=OFF \
