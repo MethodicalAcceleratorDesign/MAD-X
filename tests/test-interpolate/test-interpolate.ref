@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.10.18 17:54:07      +
+  + Execution date: 2021.11.09 17:32:02      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -432,4 +432,675 @@ enter Twiss module
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
-+++ memory access outside program range, fatal +++
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 17 location, out of 110 in total. The Dqmin estimate might be inaccurate.                                      
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.573019357          0.0029753    0.0003358118319         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.287746856 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.154135105e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    6.770703777e-06 
+
+       dqmin_phase 
+     -0.7901000941 
+
+
+! single slice
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, slice=1;
+
+twiss, sequence="hht3", file="twiss-0-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 23 location, out of 149 in total. The Dqmin estimate might be inaccurate.                                      
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.573019357          0.0029753    0.0003358118319         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.287746856 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.154135105e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    9.937356054e-06 
+
+       dqmin_phase 
+     -0.7903690942 
+
+
+! big step (bigger than any element)
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, step=100;
+
+twiss, sequence="hht3", file="twiss-0-bigfoot.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 29 location, out of 188 in total. The Dqmin estimate might be inaccurate.                                      
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.573019357          0.0029753    0.0003358118319         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.287746856 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.154135105e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1     1.31040087e-05 
+
+       dqmin_phase 
+     -0.7905080838 
+
+
+
+
+//---------------------------------------
+
+// centre+end for quadrupole
+
+//---------------------------------------
+
+
+
+! centre+end for quadrupole
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=quadrupole, at={0.5,1};
+
+twiss, sequence="hht3", file="twiss-1-centre_quad-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 38 location, out of 239 in total. The Dqmin estimate might be inaccurate.                                      
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.621236349          0.0029753    0.0003144990333         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        283.3334145         3.95659478        1.252051915 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.446182179e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    1.588260586e-05 
+
+       dqmin_phase 
+     -0.7907982253 
+
+
+! centre+end for quadrupole
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=quadrupole, slice=2;
+
+twiss, sequence="hht3", file="twiss-1-centre_quad-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 47 location, out of 290 in total. The Dqmin estimate might be inaccurate.                                      
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.621236349          0.0029753    0.0003144990333         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        283.3334145         3.95659478        1.252051915 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.446182179e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    1.866120396e-05 
+
+       dqmin_phase 
+     -0.7910019643 
+
+
+
+
+//---------------------------------------
+
+// fixed number of slices
+
+//---------------------------------------
+
+
+
+! five-slice for quadrupole
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=quadrupole, slice=5;
+
+twiss, sequence="hht3", file="twiss-2-5slice_quad-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 62 location, out of 359 in total. The Dqmin estimate might be inaccurate.                                      
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+        7.71049489          0.0029753     0.000268820769         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        284.8706012         3.95659478        1.180270399 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.978683058e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    2.166781657e-05 
+
+       dqmin_phase 
+     -0.7911242976 
+
+
+! five-slice for quadrupole
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=quadrupole, at={1/5,2/5,3/5,4/5,5/5};
+
+twiss, sequence="hht3", file="twiss-2-5slice_quad-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 77 location, out of 428 in total. The Dqmin estimate might be inaccurate.                                      
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+        7.71049489          0.0029753     0.000268820769         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        284.8706012         3.95659478        1.180270399 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.978683058e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    2.467442943e-05 
+
+       dqmin_phase 
+     -0.7912168179 
+
+
+
+
+//---------------------------------------
+
+// uniform step
+
+//---------------------------------------
+
+
+
+! curve with uniform sampling/step
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, step=0.199999995; ! below 0.2 to avoid variation in slice count between platforms
+
+twiss, sequence="hht3", file="twiss-3-step_uniform.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 85 location, out of 557 in total. The Dqmin estimate might be inaccurate.                                      
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.596249782          0.0029753    0.0002373061489         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.512957788 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    7.471670615e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    2.792409854e-05 
+
+       dqmin_phase 
+     -0.7915238229 
+
+
+
+
+//---------------------------------------
+
+// suppress drift/monitor from output table
+
+//---------------------------------------
+
+
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=drift, slice=0;
+
+select, flag=interpolate, class=monitor, slice=0;
+
+twiss, sequence="hht3", file="twiss-4-nodriftmon-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 91 location, out of 596 in total. The Dqmin estimate might be inaccurate.                                      
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.278528529          0.0029753    0.0003581840674         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.251316003 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.583728987e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    3.109075111e-05 
+
+       dqmin_phase 
+     -0.7914647923 
+
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=drift, at={};
+
+select, flag=interpolate, class=monitor, at={};
+
+twiss, sequence="hht3", file="twiss-4-nodriftmon-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 97 location, out of 635 in total. The Dqmin estimate might be inaccurate.                                      
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.278528529          0.0029753    0.0003581840674         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.251316003 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.583728987e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    3.425740376e-05 
+
+       dqmin_phase 
+      -0.791416675 
+
+
+
+
+//---------------------------------------
+
+// deselect
+
+//---------------------------------------
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, slice=5, class=quadrupole;
+
+deselect, flag=interpolate, range=h3qd11/h3qd22;
+
+twiss, sequence="hht3", file="twiss-5-deselect.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 112 location, out of 704 in total. The Dqmin estimate might be inaccurate.                                     
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.418185545          0.0029753    0.0002780533304         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        284.8706012         3.95659478        1.220806454 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    9.287053396e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    3.726401708e-05 
+
+       dqmin_phase 
+     -0.7914543472 
+
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, slice=5, class=quadrupole;
+
+select, flag=interpolate, clear, range=h3qd11/h3qd22;
+
+twiss, sequence="hht3", file="twiss-5-clear.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 127 location, out of 773 in total. The Dqmin estimate might be inaccurate.                                     
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.418185545          0.0029753    0.0002780533304         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        284.8706012         3.95659478        1.220806454 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    9.287053396e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    4.027063045e-05 
+
+       dqmin_phase 
+     -0.7914863943 
+
+
+
+
+//---------------------------------------
+
+// multiple definitions
+
+//---------------------------------------
+
+
+
+! multiple selections (later definition overrides earlier definition)
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, at={0.5};
+
+select, flag=interpolate, step=0.099999995, class=quadrupole;
+
+select, flag=interpolate, slice=1, range=h3qd11/h3qd22;
+
+select, flag=interpolate, slice=0, range=h3qd11/h3qd22, class=drift;
+
+deselect, flag=interpolate, range=b3dk1;
+
+twiss, sequence="hht3", file="twiss-6-multiple_defs.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 139 location, out of 850 in total. The Dqmin estimate might be inaccurate.                                     
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+        7.69914458          0.0029753    0.0002686425904         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        283.3334145         3.95659478        1.226649618 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.389262002e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    4.307752238e-05 
+
+       dqmin_phase 
+     -0.7916517014 
+
+
+! selection stays intact after USE
+
+use, sequence="hht3";
+
+twiss, sequence="hht3", file="twiss-6-multiple_defs_after_use.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 151 location, out of 927 in total. The Dqmin estimate might be inaccurate.                                     
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.699123377          0.0029753    0.0002686425904         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        283.3334145         3.95659478        1.226649618 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.389262002e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  1    4.588441535e-05 
+
+       dqmin_phase 
+     -0.7917967837 
+
+  Number of warnings: 30
+0 in C and 30 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

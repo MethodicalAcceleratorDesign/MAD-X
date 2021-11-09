@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.10.18 17:53:31      +
+  + Execution date: 2021.11.09 17:53:11      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! based on examples/emit/LEP/
 
@@ -99,27 +99,34 @@ orbit:   4.964953E-05 -3.458931E-07  0.000000E+00  0.000000E+00  1.525320E-01  7
                  0 
 enter TRACK module
 damp is on
+  
+iteration:   1 error:   5.239522E-02 deltap:   0.000000E+00
+orbit:  -3.455640E-03  9.332289E-05  0.000000E+00  0.000000E+00  1.255450E-01  4.713058E-04
+  
+iteration:   2 error:   1.044041E-02 deltap:   0.000000E+00
+orbit:   2.283295E-04 -1.206173E-06  0.000000E+00  0.000000E+00  1.520058E-01  7.077063E-04
+  
+iteration:   3 error:   3.037441E-04 deltap:   0.000000E+00
+orbit:   5.124908E-05 -3.314252E-07  0.000000E+00  0.000000E+00  1.525243E-01  7.213752E-04
+  
+iteration:   4 error:   1.231751E-06 deltap:   0.000000E+00
+orbit:   4.965601E-05 -3.456829E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212389E-04
+  
+iteration:   5 error:   6.452801E-09 deltap:   0.000000E+00
+orbit:   4.964953E-05 -3.458931E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212367E-04
 
 Full 6D closed orbit search.
 Initial value of 6-D closed orbit from Twiss: 
-orbit0   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-particle #     0 lost turn      1  at pos. s =       NaN element=rfsc1.qs10.l4                                    aperture =RF-Bucket                                       
-    X=                       NaN   Y=                       NaN   T=                       NaN
-particle #     7 lost turn      0  at pos. s =       NaN element=rfsc1.qs10.l4                                    aperture =RF-Bucket                                       
-    X=                       NaN   Y=                       NaN   T=                       NaN
-  Singular matrix occurred during closed orbit search.
+orbit0   4.964953E-05 -3.458931E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212367E-04
 
 6D closed orbit found by subroutine trclor 
-iteration:   1 error:            NaN deltap:   0.000000E+00
-orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-particle #     1 lost turn      1  at pos. s =   9787.90 element=rfsc1.qs10.l4                                    aperture =RF-Bucket                                       
-    X=                       NaN   Y=                       NaN   T=                       NaN
-++++++ warning: ttrfloss:  Particle Number equals zero: exit from ttrfloss
+iteration:  11 error:   6.830647E-14 deltap:   0.000000E+00
+orbit:   4.973775E-05 -3.415935E-07  0.000000E+00  0.000000E+00  1.525320E-01  7.212355E-04
 exit TRACK module
 
 
-  Number of warnings: 3
-0 in C and 3 in Fortran
+  Number of warnings: 2
+0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
