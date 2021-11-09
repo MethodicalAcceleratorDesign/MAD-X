@@ -881,7 +881,10 @@ pro_twiss(void)
     adjust_beam();
     probe_beam = clone_command(current_beam);
     adjust_probe_fp(0);
-    int iterate = 3; double stepsize = 0.0; char* tapfilename = "no_taper_file";
+    int iterate = 3; double stepsize = 0.0;
+    char* tapfilename;
+    tapfilename = mymalloc("tapering", 30 * sizeof *tapfilename);
+    strcpy(tapfilename,"no_taper_file");
     taper_(taper_orbit, &iterate, &stepsize, tapfilename, &error); /* call taper module */
     probe_beam = delete_command(probe_beam);    
     if (get_option("info"))

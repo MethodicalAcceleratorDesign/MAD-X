@@ -57,7 +57,7 @@ m_real_polymorph.o:         $(FC_DIR)/m_real_polymorph.f90        l_complex_tayl
 n_complex_polymorph.o:      $(FC_DIR)/n_complex_polymorph.f90     m_real_polymorph.o
 o_tree_element.o:           $(FC_DIR)/o_tree_element.f90          n_complex_polymorph.o
 
-Ci_tpsa.o:                  $(FC_DIR)/Ci_tpsa.f90                 o_tree_element.o 
+Ci_tpsa.o:                  $(FC_DIR)/Ci_tpsa.f90                 o_tree_element.o Su_duan_zhe_map.o
 
 Sa_extend_poly.o:           $(FC_DIR)/Sa_extend_poly.f90          Ci_tpsa.o
 Sb_sagan_pol_arbitrary.o:   $(FC_DIR)/Sb_sagan_pol_arbitrary.f90  Sa_extend_poly.o

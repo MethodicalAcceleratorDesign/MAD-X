@@ -363,6 +363,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         endif
 
         nlm = nlm + 1
+        
         if (nobs .gt. 0)  then
            OBS_ORB = zero
            call get_node_vector('obs_orbit ', lobs, obs_orb)
@@ -371,8 +372,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            if (onetable)  then
               spos = sum
               call element_name(el_name,len(el_name))
-              call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
-                   z, obs_orb,spos,nlm,el_name,onlyaver)
+              if (mod(turn, ffile) .eq. 0)  then
+                 call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
+                      z, obs_orb,spos,nlm,el_name,onlyaver)
+              endif
            else
               if (mod(turn, ffile) .eq. 0)  then
                  do i = 1, jmax

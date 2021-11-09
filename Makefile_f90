@@ -91,7 +91,7 @@ n_complex_polymorph.o:      $(FC_DIR_PTC)/n_complex_polymorph.f90     m_real_pol
 o_tree_element.o:           $(FC_DIR_PTC)/o_tree_element.f90          n_complex_polymorph.o
 
 Su_duan_zhe_map.o:          $(FC_DIR_PTC)/Su_duan_zhe_map.f90
-Ci_tpsa.o:                  $(FC_DIR_PTC)/Ci_tpsa.f90                 h_definition.o o_tree_element.o
+Ci_tpsa.o:                  $(FC_DIR_PTC)/Ci_tpsa.f90                 h_definition.o o_tree_element.o Su_duan_zhe_map.o
 
 Sa_extend_poly.o:           $(FC_DIR_PTC)/Sa_extend_poly.f90          o_tree_element.o
 Sb_sagan_pol_arbitrary.o:   $(FC_DIR_PTC)/Sb_sagan_pol_arbitrary.f90  Sa_extend_poly.o
@@ -167,11 +167,12 @@ poisson.o:                  $(FC_DIR_MAD)/poisson.f90
 resindex.o:                 $(FC_DIR_MAD)/resindex.f90                util.o
 sodd.o:                     $(FC_DIR_MAD)/sodd.f90                    util.o
 survey.o:                   $(FC_DIR_MAD)/survey.f90                  util.o
+taper.o:                    $(FC_DIR_MAD)/taper.f90                   util.o
 timest.o:                   $(FC_DIR_MAD)/timest.f90
 timex.o:                    $(FC_DIR_MAD)/timex.f90
 touschek.o:                 $(FC_DIR_MAD)/touschek.f90                util.o
 trrun.o:                    $(FC_DIR_MAD)/trrun.f90                   util.o madx_space_charge.o madx_beam_beam.o
-twiss.o:                    $(FC_DIR_MAD)/twiss.f90                   util.o madx_space_charge.o madx_beam_beam.o
+twiss.o:                    $(FC_DIR_MAD)/twiss.f90                   util.o madx_space_charge.o madx_beam_beam.o taper.o
 madx_space_charge.o:	    $(FC_DIR_MAD)/madx_space_charge.f90       util.o
 madx_beam_beam.o:	    $(FC_DIR_MAD)/madx_beam_beam.f90          util.o madx_space_charge.o
 util.o:                     $(FC_DIR_MAD)/util.f90
