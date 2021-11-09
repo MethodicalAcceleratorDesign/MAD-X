@@ -8,6 +8,7 @@ cd build
 
 $PY/pip install --upgrade cmake
 $PY/cmake --version
+sudo apt-get install gfortran-9 gcc-9 g++-9
 gfortran --version
 gcc --version
 $PY/cmake .. \
