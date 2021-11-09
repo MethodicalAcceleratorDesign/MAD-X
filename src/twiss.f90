@@ -3659,8 +3659,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
      case (code_beambeam)
         !---- (Particles/bunch taken for the opposite beam).
-        npart_tmp = node_value('npart' )
-
+        npart_tmp = node_value('npart ')
         call tmbb(fsec,ftrk,orbit,fmap,re,te, npart_tmp)
 
      case (code_marker)
