@@ -49,6 +49,8 @@ module polymorphic_taylor
   private line,Mequaldacon,cos_quaternionr,cos_quaternionp,sin_quaternionr,sin_quaternionp
   private make_it_knobr,kill_knobr
   character(120) line
+  real(dp)  asin_coeff(0:100)
+   logical :: first_asin_set =.true.
   !integer npol
   !parameter (npol=20)
   !INTEGER iasspol
@@ -65,6 +67,12 @@ INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
   private allocquaternion,allocquaternionn,A_OPT_quaternion
   private k_opt_quaternion,killquaternionn,killquaternion
   private equalq,mulq,subq,addq,EQUALq_8_r,EQUALq_r_8,printpolyq,absq,absq2,invq,EQUALq_r
+private arcsin_xr,arcsin_xp
+
+  INTERFACE arcsin_x
+     MODULE PROCEDURE arcsin_xr
+     MODULE PROCEDURE arcsin_xp
+  end INTERFACE arcsin_x
 
  
 
@@ -862,6 +870,17 @@ end INTERFACE
   END INTERFACE
 
 contains
+ subroutine set_5(NO1,ND21,ND1,NDPT1,NV1,np1)
+ implicit none
+ integer np1,NO1,ND1,ND21,NDPT1,NV1
+  np=np1
+  NO=no1
+  ND=nd1
+  ND2=nd21
+  NDPT=ndpt1
+  NV=nv1
+  end subroutine set_5
+
 
   subroutine make_it_knobr(k,i,s)
     implicit none
@@ -962,13 +981,22 @@ contains
     real(dp) GETchar
     TYPE (real_8), INTENT (IN) :: S1
     CHARACTER(*)  , INTENT (IN) ::  S2
+    integer i,J
     !  integer localmaster
 
     GETchar=0.0_dp
     if(s1%kind==m2) then
        ! GETchar%t=s1%t.sub.s2   !  OLD
        GETchar=s1%t.sub.s2   !  CHANGE
-
+    elseif(s1%kind==m1) then  ! found 2020/3/30 by David Sagan in Beam beam
+       GETchar=s1
+       do i=1,len_trim(s2)
+          CALL  CHARINT(s2(i:i),j)
+          if(j/=0) then
+             GETchar=0.0_dp
+             exit
+          endif
+       enddo
     endif
 
   END FUNCTION GETchar
@@ -2138,6 +2166,159 @@ contains
        ! call !write_e(0)
     end select
   END FUNCTION dexpt
+
+
+  function arcsin_xr(x)
+    IMPLICIT NONE
+    real(dp) arcsin_xr,x,y
+     integer i
+     if(first_asin_set) first_asin_set=asin_coeff_set()
+
+     if(abs(x)<0.01_dp) then
+       arcsin_xr=0.0_dp
+       y=1.0_dp
+       do i=0,100,2
+        arcsin_xr=arcsin_xr + asin_coeff(i)*y
+        y=y*x
+        y=y*x
+       enddo
+     else
+       arcsin_xr=arcsin(x)/x
+     endif
+   
+  end function arcsin_xr 
+
+  subroutine arcsin_xt(x,arcsin_xr)
+    IMPLICIT NONE
+    type(taylor), intent(inout) :: arcsin_xr
+    type(taylor)  y
+    type(taylor), intent(in) :: x
+     integer i
+
+     call alloc(y)
+
+     if(first_asin_set) first_asin_set=asin_coeff_set()
+
+     if(abs(x.sub.'0')<0.01_dp) then
+       arcsin_xr=0.0_dp
+       y=1.0_dp
+       do i=0,100,2
+        arcsin_xr=arcsin_xr + asin_coeff(i)*y
+        y=y*x
+        y=y*x
+       enddo
+     else
+       arcsin_xr=asin(x)/x
+     endif
+        call kill(y)
+  end subroutine arcsin_xt
+
+
+  function arcsin_xp(s1)
+    IMPLICIT NONE
+    type(real_8) arcsin_xp
+    type(real_8), intent(in) :: s1
+    integer localmaster
+
+     if(first_asin_set) first_asin_set=asin_coeff_set()
+
+    select case(s1%kind)
+    case(m1)
+       arcsin_xp%r=arcsin_x(s1%r)
+       arcsin_xp%kind=1
+    case(m2)
+       localmaster=master
+       call ass(arcsin_xp)
+       call arcsin_xt(s1%t,arcsin_xp%t)
+       !arcsin_xp%t= asin(s1%t)/s1%t
+       master=localmaster
+    case(m3)
+       if(knob) then
+          localmaster=master
+          call ass(arcsin_xp)
+
+          call varfk1(S1)
+          call arcsin_xt(varf1,arcsin_xp%t)
+    !      arcsin_xp%t= asin(varf1)/varf1   
+          master=localmaster
+       else
+          arcsin_xp%r= arcsin_x(s1%r)  
+          arcsin_xp%kind=1
+       endif
+
+    case default
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in arcsin_xp "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
+       ! call !write_e(0)
+    end select
+
+  end function arcsin_xp 
+
+
+
+
+  function asin_coeff_set()
+  implicit none
+  logical asin_coeff_set
+  asin_coeff_set=.false.
+asin_coeff=0
+ asin_coeff(  0 )=   1.00000000000000000000000000000000_dp
+ asin_coeff(  2 )=  0.166666666666666666666666666666667_dp
+ asin_coeff(  4 )=  7.500000000000000000000000000000001E-0002_dp
+ asin_coeff(  6 )=  4.464285714285714285714285714285715E-0002_dp
+ asin_coeff(  8 )=  3.038194444444444444444444444444447E-0002_dp
+ asin_coeff( 10 )=  2.237215909090909090909090909090909E-0002_dp
+ asin_coeff( 12 )=  1.735276442307692307692307692307693E-0002_dp
+ asin_coeff( 14 )=  1.396484374999999999999999999999995E-0002_dp
+ asin_coeff( 16 )=  1.155180089613970588235294117647059E-0002_dp
+ asin_coeff( 18 )=  9.761609529194078947368421052631579E-0003_dp
+ asin_coeff( 20 )=  8.390335809616815476190476190476793E-0003_dp
+ asin_coeff( 22 )=  7.312525873598845108695652173913041E-0003_dp
+ asin_coeff( 24 )=  6.447210311889648437499999999998152E-0003_dp
+ asin_coeff( 26 )=  5.740037670841923466435185185186041E-0003_dp
+ asin_coeff( 28 )=  5.153309682319904195851293103448275E-0003_dp
+ asin_coeff( 30 )=  4.660143486915096159904233870967743E-0003_dp
+ asin_coeff( 32 )=  4.240907093679363077337091619328361E-0003_dp
+ asin_coeff( 34 )=  3.880964558837669236319405691931183E-0003_dp
+ asin_coeff( 36 )=  3.569205393825934545413867847339528E-0003_dp
+ asin_coeff( 38 )=  3.297059503473484745392432579649370E-0003_dp
+ asin_coeff( 40 )=  3.057821649258030669354810947325172E-0003_dp
+ asin_coeff( 42 )=  2.846178401108942167876764785411747E-0003_dp
+ asin_coeff( 44 )=  2.657870638207289933537443478888897E-0003_dp
+ asin_coeff( 46 )=  2.489448678246883494640759965206715E-0003_dp
+ asin_coeff( 48 )=  2.338091892111975186930883828007208E-0003_dp
+ asin_coeff( 50 )=  2.201473973710138205420020419216025E-0003_dp
+ asin_coeff( 52 )=  2.077661032518167442778473552230451E-0003_dp
+ asin_coeff( 54 )=  1.965033616277283618439303772436809E-0003_dp
+ asin_coeff( 56 )=  1.862226406403127489279102103292329E-0003_dp
+ asin_coeff( 58 )=  1.768081120515418238652192500875711E-0003_dp
+ asin_coeff( 60 )=  1.681609393583106800204448659985888E-0003_dp
+ asin_coeff( 62 )=  1.601963275351444035729839603985961E-0003_dp
+ asin_coeff( 64 )=  1.528411596122567638897051270287545E-0003_dp
+ asin_coeff( 66 )=  1.460320894079115394468575687948844E-0003_dp
+ asin_coeff( 68 )=  1.397139917630253411289308752512696E-0003_dp
+ asin_coeff( 70 )=  1.338386951275178368440321642090671E-0003_dp
+ asin_coeff( 72 )=  1.283639387629028568361427206578971E-0003_dp
+ asin_coeff( 74 )=  1.232525098500016800143792176428452E-0003_dp
+ asin_coeff( 76 )=  1.184715256162439251676148559386975E-0003_dp
+ asin_coeff( 78 )=  1.139918330702223681140521508511836E-0003_dp
+ asin_coeff( 80 )=  1.097875046591447221295984747586281E-0003_dp
+ asin_coeff( 82 )=  1.058354125872242906100935890306824E-0003_dp
+ asin_coeff( 84 )=  1.021148679710627644275818676868363E-0003_dp
+ asin_coeff( 86 )=  9.860731369833312924208179206796307E-0004_dp
+ asin_coeff( 88 )=  9.529606197429564035155529525687737E-0004_dp
+ asin_coeff( 90 )=  9.216606921836334154146551844363347E-0004_dp
+ asin_coeff( 92 )=  8.920374230917097140077265177521232E-0004_dp
+ asin_coeff( 94 )=  8.639677124658675606330349821451772E-0004_dp
+ asin_coeff( 96 )=  8.373398416027120634355493184703095E-0004_dp
+ asin_coeff( 98 )=  8.120522129086701509851372538808722E-0004_dp
+ asin_coeff(100 )=  7.880122513582055593877513035790295E-0004_dp 
+end  function asin_coeff_set
 
 
   FUNCTION abst( S1 )

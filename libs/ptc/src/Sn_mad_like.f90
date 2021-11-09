@@ -1944,7 +1944,8 @@ CONTAINS
        return
 
     ELSE  !  1
-
+    write(6,*) "This option of the true rbend must now be done with patches "
+   ! stop 
        LM1=0.0_dp
        ANG1=0.0_dp
        IF(PRESENT(L)) LM1=L
@@ -2419,23 +2420,7 @@ CONTAINS
 
   END FUNCTION CHANGEREF
 
-  !  subroutine  guirder(f,cell)
-  !    implicit none
-  !    type (fibre) f
-  !    type (layout),target :: cell!
 
-  !    f%MAG%G23=>CELL
-  !    f%MAGP%G23=>CELL
-  !    f%MAG%KIND=KIND23
-  !    f%MAGP%KIND=KIND23
-  !    f%MAG%p%nst=1
-  !    f%MAGP%p%nst=1
-  !    f%chart%f%ent=1
-  !    f%chart=0
-  !   CALL SURVEY_no_patch(f)
-
-
-  !  END  subroutine guirder
 
   FUNCTION  RFCAVITYL(NAME,L,VOLT,LAG,HARMON,REV_FREQ,DELTAE,LIST)
     implicit none
@@ -2985,7 +2970,7 @@ CONTAINS
           !w_p%c(1)= " Likemad is true and element is not STREX "
           ! call !write_e(kind16)
        endif
-       s2%k16%likemad=LIKEMAD
+!       s2%k16%likemad=LIKEMAD
        S2%KIND=KIND20
        LIKEMAD=.false.
     endif
@@ -3218,14 +3203,20 @@ CONTAINS
     !         s22%CHART%L=s2%P%LC
     !         s22%CHART%ALPHA=s2%P%LD*s2%P%B0
     IF(.NOT.MADX_MAGNET_ONLY) THEN      !  true in madx layout
+
        if(associated(s22%chart%f)) then
           s22%chart%f%ent=1
           !           s22%chart=1
           s22%chart=2
-          CALL SURVEY_no_patch(S22)
+         
+!          CALL SURVEY_no_patch(S22)
        endif
     else
-       CALL SURVEY_no_patch(S22)
+          s22%chart=2
+          s22%chart%f%ent=1
+          !           s22%chart=1
+
+!       CALL SURVEY_no_patch(S22)
     ENDIF
 
 
@@ -3925,6 +3916,8 @@ end subroutine kill_for_pancake
     DO I=1,S1%N
 
        CALL APPEND( R, C )
+       r%end%chart=1
+       r%end%patch=1
        c=>c%next
     ENDDO
 
@@ -3989,6 +3982,8 @@ end subroutine kill_for_pancake
     c=>s1%start
     DO I=1,S1%N
        call APPEND_mad_like(R,C)
+        r%end%chart=1
+        r%end%patch=1
        C=>C%NEXT
     ENDDO
 

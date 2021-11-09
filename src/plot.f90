@@ -1996,7 +1996,7 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
         endif
      endif
      if (es(i) .gt. actwin(2)) goto 50
-     if (ee(i) .ge. actwin(1)) then
+     if (ee(i) .ge. actwin(1) .and. it .le. mobj) then
         txp(1) = es(i) + shapex(npst(it)) * ell
         typ(1) = shapey(npst(it))
         do  j = npst(it)+1, npnd(it)
