@@ -40,10 +40,14 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le                -nan
+@ DQMIN_PHASE      %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "21/04/21"
-@ TIME             %08s "10.09.30"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "18/10/21"
+@ TIME             %08s "17.55.40"
 * NAME                                S                 DX                 DY               BETX               BETY                  X                 PX                  Y 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le 
  "MYSEQ$START"                        0                  0                  0                  1                  1              0.001              0.001                  0

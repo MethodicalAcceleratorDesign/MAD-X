@@ -1,0 +1,173 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.10.18 17:53:55      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+!--------------------------------------------------------------
+
+! title,"FCC-ee";
+
+! 		  
+
+!--------------------------------------------------------------
+
+	option, -echo;
+
+++++++ info: lagca1 redefined
+++++++ info: lagca2 redefined
+enter Twiss module
+  
+iteration:   1 error:   7.479653E-18 deltap:   0.000000E+00
+orbit:   1.205837E-28 -8.340641E-29  0.000000E+00  0.000000E+00 -9.564645E-18  1.448549E-19
+
+++++++ table: summ
+
+                   length                    orbit5                      alfa                   gammatr 
+9.77560642831906588981e+04 9.56464472877825348367e-18 6.47080972307823933424e-06 3.93115968444928796544e+02 
+
+                       q1                       dq1                   betxmax                     dxmax 
+3.89105999984929269431e+02 1.45454476134217824956e+00 1.57696505372149886171e+03 5.45242072832017199424e-01 
+
+                    dxrms                    xcomax                    xcorms                        q2 
+1.23752747458457310059e-01 2.47562895694795947197e-18 5.78287913061580703414e-19 3.89180000054676042964e+02 
+
+                      dq2                   betymax                     dymax                     dyrms 
+-1.50513478268910083635e+00 6.97156053483674349991e+03 0.00000000000000000000e+00 0.00000000000000000000e+00 
+
+                   ycomax                    ycorms                    deltap                   synch_1 
+0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 
+
+                  synch_2                   synch_3                   synch_4                   synch_5 
+0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 
+
+                  synch_6                   synch_8                    nflips                     dqmin 
+0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00                      -nan 
+
+              dqmin_phase 
+0.00000000000000000000e+00 
+START MATCHING
+
+number of sequences: 1
+sequence name: l000013
+number of beta0s: 1
+BETA0 name: b.ip
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+number of variables:    2
+user given constraints: 1
+total constraints:      1
+
+START JACOBIAN:
+
+ JACOBIAN Strategy =           3
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+Initial Penalty Function =   0.2195906878063653E+02
+
+
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Solve system with            1 con,           2 var
+ Rank             1   Condition number    1.0000000000000000     
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Step length   0.33129979347934496     
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+call:     2 Dx =   0.33129979E+00  Penalty function =  0.3662604637816039E+00
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Solve system with            1 con,           2 var
+ Rank             1   Condition number    1.0000000000000000     
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Step length    7.1641634796228676E-002
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+call:     3 Dx =   0.71641635E-01  Penalty function =  0.3440450932633201E-02
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Solve system with            1 con,           2 var
+ Rank             1   Condition number    1.0000000000000000     
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Step length    8.6820852469179522E-003
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+call:     4 Dx =   0.86820852E-02  Penalty function =  0.7086237925386089E-06
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Solve system with            1 con,           2 var
+ Rank             1   Condition number    1.0000000000000000     
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Step length    1.2828406525473718E-004
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+call:     5 Dx =   0.12828407E-03  Penalty function =  0.5111292762704209E-13
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Solve system with            1 con,           2 var
+ Rank             1   Condition number    1.0000000000000000     
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Step length    3.4468200716929579E-008
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+call:     6 Dx =   0.34468201E-07  Penalty function =  0.1373137937550158E-21
+ ++++++++++ JACOBIAN ended: converged successfully
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Final difference norm:  0.46671710360240970     
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+l000013$end:1              pt           4     0.00000000E+00    -1.17180968E-13     1.37313794E-22
+
+
+Final Penalty Function =   1.37313794e-22
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+lagca1                    3.86417e-01  5.00000e-01 -1.00000e+20  1.00000e+20
+lagca2                    3.14133e-01  5.00000e-01 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.37313794e-22
+enter Twiss module
+  
+iteration:   1 error:   8.479677E-11 deltap:   0.000000E+00
+orbit:  -1.762915E-12 -9.094051E-13  0.000000E+00  0.000000E+00 -4.251732E-11 -1.173428E-10
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+
+++++++ table: summ
+
+                   length                    orbit5                      alfa                   gammatr 
+9.77560642831906588981e+04 4.25173196464076590315e-11 6.88477385238367134673e-06 3.81114226154126242818e+02 
+
+                       q1                       dq1                   betxmax                     dxmax 
+3.89106002040146620402e+02 1.05101916182473176242e+00 1.57657404193178126661e+03 5.45239017407087800393e-01 
+
+                    dxrms                    xcomax                    xcorms                        q2 
+1.23763260992655776960e-01 8.36742398772521472842e-11 1.18371804500527155089e-11 3.89179745578685810870e+02 
+
+                      dq2                   betymax                     dymax                     dyrms 
+-7.00880615950212670917e-01 6.97448877303202698386e+03 0.00000000000000000000e+00 0.00000000000000000000e+00 
+
+                   ycomax                    ycorms                    deltap                   synch_1 
+0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 
+
+                  synch_2                   synch_3                   synch_4                   synch_5 
+0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00 
+
+                  synch_6                   synch_8                    nflips                     dqmin 
+0.00000000000000000000e+00 0.00000000000000000000e+00 0.00000000000000000000e+00                      -nan 
+
+              dqmin_phase 
+0.00000000000000000000e+00 
+++++++ warning: SAVE makes all previous USE invalid !  
+
+  Number of warnings: 27
+1 in C and 26 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

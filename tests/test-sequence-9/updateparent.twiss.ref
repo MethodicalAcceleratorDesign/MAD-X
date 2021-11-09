@@ -2,13 +2,13 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %09s "TESTORDER"
 @ PARTICLE         %08s "POSITRON"
-@ MASS             %le     0.0005109989461
+@ MASS             %le       0.00051099895
 @ CHARGE           %le                   1
 @ ENERGY           %le                   1
 @ PC               %le        0.9999998694
-@ GAMMA            %le         1956.951198
+@ GAMMA            %le         1956.951184
 @ KBUNCH           %le                   1
-@ BCURRENT         %le     4.803203419e-12
+@ BCURRENT         %le     4.803203458e-12
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
 @ NPART            %le                   1
@@ -40,10 +40,14 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le                -nan
+@ DQMIN_PHASE      %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "11.53.44"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "18/10/21"
+@ TIME             %08s "17.59.21"
 * NAME               APERTYPE                       APER_1             APER_2              ANGLE 
 $ %s                 %s                                %le                %le                %le 
  "TESTORDER$START"   "CIRCLE"                             0                  0                  0

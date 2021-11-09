@@ -40,10 +40,14 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     1.991791893e-15
+@ DQMIN_PHASE      %le         2.219658019
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "16.25.08"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "18/10/21"
+@ TIME             %08s "17.54.31"
 * NAME                                X                  Y               BETX               BETY 
 $ %s                                %le                %le                %le                %le 
  "LHCB1$START"                  -0.0005     6.69157066e-15               0.55               0.55

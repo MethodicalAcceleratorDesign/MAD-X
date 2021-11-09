@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.28 13:22:16      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.10.18 17:59:03      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -103,8 +103,11 @@ orbit:  -1.311603E-08 -2.518183E-10  2.083286E-08  1.699982E-04  9.252419E-06  1
            synch_2            synch_3            synch_4            synch_5 
     0.002244883795     7.99769003e-07    1.090641769e-06    2.114259331e-08 
 
-           synch_6            synch_8             nflips 
-       13.80516467       0.2515673143                  0 
+           synch_6            synch_8             nflips              dqmin 
+       13.80516467       0.2515673143                  0    1.046861659e-07 
+
+       dqmin_phase 
+      -1.226975717 
 
 
 ! reduce size of output table:
@@ -222,8 +225,11 @@ orbit:  -1.311603E-08 -2.518183E-10  2.083286E-08  1.699982E-04  9.252419E-06  1
            synch_2            synch_3            synch_4            synch_5 
     0.002244883795     7.99769003e-07    1.090641769e-06    2.114259331e-08 
 
-           synch_6            synch_8             nflips 
-       13.80516467       0.2515673143                  0 
+           synch_6            synch_8             nflips              dqmin 
+       13.80516467       0.2515673143                  0    1.046823163e-07 
+
+       dqmin_phase 
+      -1.227181265 
 
 
 select, flag=touschek, column= name, S, TLI, TLIW, TLITOT;

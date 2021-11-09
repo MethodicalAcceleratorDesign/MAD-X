@@ -1,14 +1,14 @@
 @ NAME             %07s "TWISS_1"
 @ TYPE             %05s "TWISS"
-@ SEQUENCE         %06s "GANTRY"
-@ PARTICLE         %08s "POSITRON"
-@ MASS             %le     0.0005109989461
+@ DQMIN            %le                -nan
+@ DQMIN_PHASE      %le                   0
+@ MASS             %le       0.00051099895
 @ CHARGE           %le                   1
 @ ENERGY           %le                   1
 @ PC               %le        0.9999998694
-@ GAMMA            %le         1956.951198
+@ GAMMA            %le         1956.951184
 @ KBUNCH           %le                   1
-@ BCURRENT         %le     2.061268445e-12
+@ BCURRENT         %le     2.061268462e-12
 @ SIGE             %le                0.03
 @ SIGT             %le                   1
 @ NPART            %le                   1
@@ -40,10 +40,14 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le                -nan
+@ DQMIN_PHASE      %le                   0
 @ TITLE            %35s "Triplet lattice for gantry - dec17i"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "11.38.08"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "18/10/21"
+@ TIME             %08s "17.53.55"
 * NAME                                S               BETX               ALFX                MUX                 DX                DPX               BETY               ALFY                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "GANTRY$START"                       0        0.743975239                  0                  0                  0                  0        0.743975239                  0                  0

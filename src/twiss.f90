@@ -2525,7 +2525,7 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error, currpos)
            prev_pos_s = currpos
            tot_int_length = tot_int_length + deltas
          endif
-         if(abs(f1010) > abs(f1001) .and. abs(f1001) .gt. 1e-6) then
+         if(abs(f1010) > abs(f1001) .and. abs(f1001) .gt. 1e-5) then
             diff_bigger_sum = diff_bigger_sum+1
          endif
      

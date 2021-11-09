@@ -1,15 +1,15 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.03.01 15:55:01      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.10.18 17:57:12      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
-FASER : SEQUENCE, L = 10;
+s1 : SEQUENCE, L = 10;
 
-b1:quadrupole, k1=0.2, at=5,l=1,TILT=1.0*pi/4;
+b1:sbend, k1=0, angle=1, at=5,l=1,TILT=0;
 
 endsequence;
 
@@ -17,9 +17,9 @@ endsequence;
 
 beam;
 
-use, sequence=faser;
+use, sequence=s1;
 
-x0=0.00;
+
 
 eoption, add=true;
 
@@ -32,16 +32,16 @@ ealign, dx= 0.001, dy= 0.00, ds=0.00,dphi=0.00, dtheta=0.00, dpsi=0.00;
 Assigned alignment errors to 1 elements
 
 
-select, flag=twiss, column=name,s,x,px,y, py;
+select, flag=twiss, column=name,s,x,px,y, py, betx, bety;
 
-twiss, betx=1, bety=1, x=x0, file="twiss.madx.simple";
+twiss, betx=1, bety=1, x=x0,y=y0, file="madx_notilt.tfs";
 
 enter Twiss module
- Found 1 initial orbit vector values from twiss command. 
+ Found 2 initial orbit vector values from twiss command. 
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -3.166813E-05 -6.666984E-06  1.000311E-03  2.000667E-04 -9.683178E-08  0.000000E+00
+final orbit vector:     3.786973E-03  8.414710E-04  0.000000E+00  0.000000E+00 -1.593165E-06  0.000000E+00
 
 ++++++ table: summ
 
@@ -49,30 +49,33 @@ final orbit vector:    -3.166813E-05 -6.666984E-06  1.000311E-03  2.000667E-04 -
                 10                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-      0.2338790466                  0        104.4418501    6.333921466e-05 
+      0.7056089162                  0        139.0343049         4.24253106 
 
              dxrms             xcomax             xcorms                 q2 
-   4.008696646e-05    3.166813493e-05    2.004255198e-05       0.2338790466 
+       2.691076425     0.003786973468     0.002395092325       0.2341104414 
 
                dq2            betymax              dymax              dyrms 
-                 0        104.4418501     0.001000933484    0.0006346246687 
+                 0        101.4245571                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
-    0.001000311115    0.0006342313264                  0                  0 
+                 0                  0                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
 
 
-select, flag=ptc_twiss, column=name,s,x,px,y, py;
+select, flag=ptc_twiss, column=name,s,x,px,y, py, beta11, beta22;
 
 ptc_create_universe;
 
-Determined SECTOR NMUL MAX :  0
-ptc_create_layout, model=1, method=6,nst=1, exact;
+Determined SECTOR NMUL MAX :  2
+ptc_create_layout, model=3, method=6,nst=10, exact=true;
 
  MAD-X Beam Parameters
                   Energy : 0.100000E+01
@@ -82,7 +85,7 @@ ptc_create_layout, model=1, method=6,nst=1, exact;
  Setting MADx with 
      energy           1.0000000000000000     
      method                   6
-     Num. of steps            1
+     Num. of steps           10
      charge           1.0000000000000000     
   Length of machine:    10.000000000000000     
  The machine is a RING
@@ -90,59 +93,22 @@ ptc_create_layout, model=1, method=6,nst=1, exact;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        10.000000000000000     
+ After    end:   -4.2463171257673942        0.0000000000000000        7.7728313612145268     
 ptc_align;
 
 ptc_start, x=x0;
 
 !ptc_observe, place=b1;
 
-ptc_track, icase=6, element_by_element, dump, file="track.simple", ffile=1,  maxaper={100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
+!ptc_track, icase=6, element_by_element, dump, file="track.simple", ffile=1,  maxaper={100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
 
-++++++ warning: my_state:   no cavity - dimensionality reduced 6 -> 5 and 1/2
- ************ State Summary ****************
- MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
-  Rectangular Bend: input arc length (rho alpha) 
-  Default integration method     6
-  Default integration steps      1
- This is an electron (positron actually if charge=1) 
-       EXACT_MODEL =  TRUE 
-       TOTALPATH   =     0
-       RADIATION   =  FALSE
-       STOCHASTIC  =  FALSE
-       ENVELOPE    =  FALSE
-       NOCAVITY    =  TRUE 
-       TIME        =  TRUE 
-       FRINGE      =  FALSE
-       PARA_IN     =  FALSE
-       ONLY_2D     =  FALSE
-       ONLY_4D     =  FALSE
-       DELTA       =  FALSE
-       SPIN        =  FALSE
-       MODULATION  =  FALSE
-       RAMPING     =  FALSE
-       ACCELERATE  =  FALSE
-
-++++++ table: tracksumm
-
-    number       turn                  x                 px 
-         1          0                  0                  0 
-         1          1    -3.16207568e-05   -6.657794469e-06 
-
-                 y                 py                  t                 pt 
-                 0                  0                 -0                  0 
-    0.001000308811    0.0002000661896   -9.684478997e-08                  0 
-
-                 s                  e 
-                 0                  1 
-                 0                  1 
-ptc_twiss, file="twiss.ptc.simple",betx=1,bety=1,betz=1, x=x0;
+ptc_twiss, file="ptc_notilt.tfs",betx=1,bety=1,betz=1, x=x0,y=y0;
 
  ************ State Summary ****************
- MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
+ MADTHICK=>KIND =   36  KICK-SixTrack-KICK     
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
-  Default integration steps      1
+  Default integration steps     10
  This is an electron (positron actually if charge=1) 
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
@@ -169,22 +135,22 @@ ptc_twiss, file="twiss.ptc.simple",betx=1,bety=1,betz=1, x=x0;
                 10           -1000000           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000           -1000000           -1000000       0.2338793977 
+          -1000000           -1000000           -1000000       0.7056089217 
 
                 q2                dq1                dq2                 qs 
-       0.233879398           -1000000           -1000000           -1000000 
+      0.2341104389           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-                 1        104.4371868                  1        104.4371908 
+                 1        139.0346828                  1        101.4245973 
 
          beta11min          beta11max          beta12min          beta12max 
-                 1        104.0887016                  0        25.84844449 
+                 1        139.0346828                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-                 0                  0                  0        25.84844642 
+                 0                  0                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
-                 1        104.0887056                  0                  0 
+                 1        101.4245973                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
                  0                  0                  0                  0 
@@ -202,27 +168,209 @@ ptc_twiss, file="twiss.ptc.simple",betx=1,bety=1,betz=1, x=x0;
                  0                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    2.001250801e-05    0.0006342298672    5.157105421e-06 
+                 0     0.002395093173                  0    0.0006518006221 
 
            pycorms             tcorms            ptcorms             xcomax 
-   0.0001549706041                  0                  0                  0 
+                 0                  0                  0     0.003786974809 
 
             ycomax            pxcomax            pycomax             tcomax 
-    0.001000308811                  0    0.0002000661896                 -0 
+                 0    0.0008414709848                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0    -3.16207568e-05                  0   -6.657794469e-06 
+                 0                  0                  0                  0 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
 ptc_track_end;
 
-
-
 ptc_end;
 
-  Number of warnings: 1
-0 in C and 1 in Fortran
+
+
+
+
+!!SEQUENCE2!!!!
+
+
+
+s2 : SEQUENCE, L = 10;
+
+b2:sbend, k1=0, angle=1, at=5,l=1,TILT=pi/2;
+
+endsequence;
+
+
+
+use, sequence=s2;
+
+eoption, add=true;
+
+select, flag=error, clear=true;
+
+select, flag=error, class=b2;
+
+ealign, dx= -0.00, dy= 0.001, ds=0.00,dphi=0.00, dtheta=0.00, dpsi=0.00;
+
+Assigned alignment errors to 1 elements
+
+
+
+
+select, flag=twiss, column=name,s,x,px,y, py, betx, bety;
+
+twiss, betx=1, bety=1, x=x0,y=y0, file="madx_tilt.tfs";
+
+enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     2.321172E-19  5.157676E-20  3.786973E-03  8.414710E-04 -1.593165E-06  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                10                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2341104414                  0        101.4245571    2.600118579e-16 
+
+             dxrms             xcomax             xcorms                 q2 
+   1.649270538e-16    2.321171537e-19    1.468037783e-19       0.7056089162 
+
+               dq2            betymax              dymax              dyrms 
+                 0        139.0343049         4.24253106        2.691076425 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.003786973468     0.002395092325                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     6.35391662e-16 
+
+       dqmin_phase 
+   -0.003534883094 
+
+
+select, flag=ptc_twiss, column=name,s,x,px,y, py, beta11, beta22;
+
+ptc_create_universe;
+
+Determined SECTOR NMUL MAX :  2
+ptc_create_layout, model=3, method=6,nst=10, exact=true;
+
+ MAD-X Beam Parameters
+                  Energy : 0.100000E+01
+          Kinetic Energy : 0.999489E+00
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.100000E+01
+ Setting MADx with 
+     energy           1.0000000000000000     
+     method                   6
+     Num. of steps           10
+     charge           1.0000000000000000     
+  Length of machine:    10.000000000000000     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -1.6311597903709652E-016  -4.2463171257673942        7.7728313612145268     
+ptc_align;
+
+ptc_start, x=x0;
+
+!ptc_observe, place=b1;
+
+!ptc_track, icase=6, element_by_element, dump, file="ot.simple", ffile=1,  maxaper={100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
+
+ptc_twiss, file="ptc_tilt.tfs",betx=1,bety=1,betz=1, x=x0,y=y0;
+
+ ************ State Summary ****************
+ MADTHICK=>KIND =   36  KICK-SixTrack-KICK     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps     10
+ This is an electron (positron actually if charge=1) 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  TRUE 
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Closed orbit:    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+                10           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000       0.2341104389 
+
+                q2                dq1                dq2                 qs 
+      0.7056089217           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+                 1        101.4245973                  1        139.0346828 
+
+         beta11min          beta11max          beta12min          beta12max 
+                 1        101.4245973                  0    1.781162447e-30 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0    1.781175908e-30 
+
+         beta22min          beta22max          beta23min          beta23max 
+                 1        139.0346828                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 0                  0                  0                  0 
+
+          disp2min           disp2max           disp3min           disp3max 
+                 0                  0                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0                  0 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0    1.468038303e-19     0.002395093173    3.995118857e-20 
+
+           pycorms             tcorms            ptcorms             xcomax 
+   0.0006518006221                  0                  0     2.32117236e-19 
+
+            ycomax            pxcomax            pycomax             tcomax 
+    0.003786974809    5.157676266e-20    0.0008414709848                 -0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0                  0                  0                  0 
+
+           pycomin             tcomin            ptcomin 
+                 0                 -0                  0 
+ptc_track_end;
+
+ptc_end
+
+
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

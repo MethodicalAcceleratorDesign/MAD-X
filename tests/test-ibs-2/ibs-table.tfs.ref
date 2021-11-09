@@ -1,9 +1,9 @@
 @ NAME             %03s "IBS"
 @ TYPE             %03s "IBS"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "16.24.57"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "18/10/21"
+@ TIME             %08s "17.54.24"
 * NAME                                S               DELS                TLI                TXI                TYI               BETX               ALFX                 DX                DPX               BETY               ALFY                 DY                DPY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "DIP2"                    0.3286165554       0.6572331108        1026.330934        4085.231557   -2.943252726e-05          3.5034439     -0.07630156883       0.2506481488      0.04005627522        3.645920091     -0.09087751656                  0                  0
