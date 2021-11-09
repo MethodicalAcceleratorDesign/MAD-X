@@ -198,6 +198,7 @@ CONTAINS
           B%A_ANG(I)=A%A_ANG(I)
           B%B_ANG(I)=A%B_ANG(I)
        ENDDO
+          B%track=a%track
     endif
 
   END SUBROUTINE COPY_PATCH
@@ -247,7 +248,6 @@ CONTAINS
 
 
 
-
   SUBROUTINE ZERO_PATCH(F,R)   !R=0 nullifies and allocates ; R=-1 deallocates
     IMPLICIT  NONE
     TYPE(PATCH), INTENT(INOUT):: F
@@ -259,12 +259,12 @@ CONTAINS
     !   endif
 
     IF(R==0.or.R==1) THEN    !
-       NULLIFY(F%A_T,F%B_T,F%A_L,F%B_L,F%A_D,  F%B_D,   F%A_ANG,F%B_ANG)
+       NULLIFY(F%track,F%A_T,F%B_T,F%A_L,F%B_L,F%A_D,  F%B_D,   F%A_ANG,F%B_ANG)
        NULLIFY(F%A_X1,F%A_X2,F%B_X1,F%B_X2,F%p0b,F%B0b)
 
        NULLIFY(F%TIME,F%ENERGY,F%PATCH)
        ALLOCATE(F%A_D(3),F%B_D(3),F%A_ANG(3),F%B_ANG(3))
-       ALLOCATE(F%A_T,F%B_T,F%A_L,F%B_L)
+       ALLOCATE(F%track,F%A_T,F%B_T,F%A_L,F%B_L)
        ALLOCATE(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        ALLOCATE(F%TIME,F%ENERGY,F%PATCH,F%p0b,F%B0b)
        F%A_T=0.0_dp
@@ -275,6 +275,7 @@ CONTAINS
        F%A_D=0.0_dp
        F%B_D=0.0_dp
        F%A_ANG=0.0_dp
+       F%track=.true.
        F%B_ANG=0.0_dp
        F%p0b=0.0_dp
        F%B0b=0.0_dp
@@ -282,11 +283,11 @@ CONTAINS
        f%ENERGY=0
        f%TIME=0
     ELSEIF(R==-1) THEN
-       DEALLOCATE(F%A_D,F%B_D,F%A_ANG,F%B_ANG,F%p0b,F%B0b)
+       DEALLOCATE(F%A_D,F%track,F%B_D,F%A_ANG,F%B_ANG,F%p0b,F%B0b)
        DEALLOCATE(F%A_T,F%B_T,F%A_L,F%B_L)
        DEALLOCATE(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        DEALLOCATE(F%TIME,F%ENERGY,F%PATCH)
-       nullify(F%A_D,F%B_D,F%A_ANG,F%B_ANG,F%p0b,F%B0b)
+       nullify(F%track,F%A_D,F%B_D,F%A_ANG,F%B_ANG,F%p0b,F%B0b)
        nullify(F%A_T,F%B_T,F%A_L,F%B_L)
        nullify(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        nullify(F%TIME,F%ENERGY,F%PATCH)
@@ -323,9 +324,9 @@ CONTAINS
        F%Ang_out=0.0_dp
        F%d_out=0.0_dp
        IF(associated(f%f)) THEN   ! R==1.and.
-          F%f%ENT=global_frame
-          F%f%EXI=global_frame
-          F%f%MID=global_frame
+      !    F%f%ENT=global_frame
+      !    F%f%EXI=global_frame
+      !    F%f%MID=global_frame
           F%f%ENT=global_frame
           F%f%EXI=global_frame
           F%f%MID=global_frame
@@ -361,9 +362,9 @@ CONTAINS
        F%Ang_out=0.0_dp
        F%d_out=0.0_dp
        IF(associated(f%f)) THEN   ! R==1.and.
-          F%f%ENT=global_frame
-          F%f%EXI=global_frame
-          F%f%MID=global_frame
+        !  F%f%ENT=global_frame
+        !  F%f%EXI=global_frame
+        !  F%f%MID=global_frame
           F%f%ENT=global_frame
           F%f%EXI=global_frame
           F%f%MID=global_frame
@@ -433,6 +434,24 @@ CONTAINS
     ENDDO
     A=A+I*B
   END SUBROUTINE GEO_TRA
+
+  SUBROUTINE print_triad(o,triad,mf)
+  real(dp),optional :: o(3),triad(3,3)
+  integer, optional :: mf
+  integer mf1
+ mf1=6
+  if(present(mf)) mf1=mf
+       if(present(o)) then
+        write(mf1,*) "  origin o(3) "
+        write(mf1,*) o
+       endif
+       if(present(triad)) then
+        write(mf1,*) " Exit frame (i,j,k)  "
+       write(mf1,*) triad(1,:)
+       write(mf1,*) triad(2,:)
+       write(mf1,*) triad(3,:)
+      endif
+end  SUBROUTINE print_triad
 
 
   SUBROUTINE GEO_ROTA_no_vec(ENT,ANG,I,basis)
@@ -971,6 +990,133 @@ CONTAINS
   END SUBROUTINE FIND_PATCH_B
 
 
+  SUBROUTINE FIND_PATCH_bmad_MARKER(EL1,B2,EXI2,dir2,PREC,patching) ! COMPUTES PATCHES
+    IMPLICIT NONE
+    TYPE (FIBRE), target, INTENT(INOUT) :: EL1
+    real(dp),target :: B2(3),exi2(3,3)
+    REAL(DP) ENT(3,3),EXI(3,3),ENT0(3,3),EXI0(3,3),D(3),ANG(3)
+    REAL(DP), POINTER,DIMENSION(:)::A,B
+ 
+
+    LOGICAL(LP), OPTIONAL, INTENT(out) ::  patching
+    REAL(DP), OPTIONAL, INTENT(IN) ::  PREC
+    INTEGER A_YZ,A_XZ
+    LOGICAL(LP) DISCRETE
+    INTEGER LOC,I,PATCH_NEEDED,DIR2
+    REAL(DP) NORM,pix(3)
+    PATCH_NEEDED=1
+    pix=0.0_dp
+    pix(1)=pi
+
+    DISCRETE=.FALSE.
+
+       LOC=1
+   !    EL2=>EL1%NEXT
+
+ 
+
+       IF(EL1%DIR*DIR2==1) THEN   !   1
+          IF(EL1%DIR==1) THEN
+             EXI=EL1%CHART%F%EXI
+             B=>EL1%CHART%F%B
+             ENT=EXI2
+             A=>B2
+             A_XZ=1;A_YZ=1;
+          ELSE
+             EXI=EL1%CHART%F%ENT
+             exi0=exi
+             call geo_rot(exi,pix,1,basis=exi0)
+             B=>EL1%CHART%F%A
+             ENT=EXI2
+             ent0=ent
+             call geo_rot(ent,pix,1,basis=ent0)
+             A=>B2
+             !  A_XZ=1;A_YZ=1;
+             A_XZ=-1;A_YZ=-1;
+          ENDIF
+       ELSE                          !   1
+          IF(EL1%DIR==1) THEN
+             EXI=EL1%CHART%F%EXI
+             B=>EL1%CHART%F%B
+             ENT=EXI2
+             ent0=ent
+             call geo_rot(ent,pix,1,basis=ent0)
+             A=>B2
+             A_XZ=1;A_YZ=-1;
+          ELSE
+             EXI=EL1%CHART%F%ENT
+             exi0=exi
+             call geo_rot(exi,pix,1,basis=exi0)
+             B=>EL1%CHART%F%A
+             ENT=EXI2
+             A=>B2
+             A_XZ=-1;A_YZ=1;
+          ENDIF
+       ENDIF                     !   1
+
+       CALL FIND_PATCH(B,EXI,A,ENT,D,ANG)
+
+       IF(PRESENT(PREC)) THEN
+          NORM=0.0_dp
+          DO I=1,3
+             NORM=NORM+ABS(D(I))
+          ENDDO
+          IF(NORM<=PREC) THEN
+             D=0.0_dp
+             PATCH_NEEDED=PATCH_NEEDED+1
+          ENDIF
+          NORM=0.0_dp
+          DO I=1,3
+             NORM=NORM+ABS(ANG(I))
+          ENDDO
+          IF(NORM<=PREC.and.(A_XZ==1.and.A_YZ==1)) THEN
+             ANG=0.0_dp
+             PATCH_NEEDED=PATCH_NEEDED+1
+          ELSEIF(NORM<=PREC.and.(A_XZ==-1.and.A_YZ==-1)) THEN  ! added 2008.6.18
+             ANG=0.0_dp
+             PATCH_NEEDED=PATCH_NEEDED+1
+          ENDIF
+          IF(PATCH_NEEDED==3) THEN
+             PATCH_NEEDED=0
+          ELSE
+             PATCH_NEEDED=2
+          ENDIF
+       ENDIF
+ 
+ 
+          
+          EL1%PATCH%B_X2=A_YZ    !  BUG WAS EL2
+          EL1%PATCH%B_X1=A_XZ    !
+          EL1%PATCH%B_D=D
+          EL1%PATCH%B_ANG=ANG
+          if(patch_needed/=0) PATCH_NEEDED=2
+          EL1%PATCH%PATCH=PATCH_NEEDED
+
+
+ 
+
+if(el1%patch%track) then
+    DISCRETE=.false.
+    IF(ANG(1)/TWOPI<-0.25_dp) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(1)/TWOPI>0.25_dp) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(2)/TWOPI<-0.25_dp) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+    IF(ANG(1)/TWOPI>0.25_dp) THEN
+       DISCRETE=.TRUE.
+    ENDIF
+endif
+    IF(DISCRETE) THEN
+       if(.not.present(patching))  write(6,*) " NO GEOMETRIC PATCHING POSSIBLE : MORE THAN 90 DEGREES BETWEEN FACES "
+    ENDIF
+
+    if(present(patching)) patching=.not.discrete
+
+  END SUBROUTINE FIND_PATCH_bmad_MARKER
 
 
   SUBROUTINE INVERSE_FIND_PATCH(A,ENT,D,ANG,B,EXI) !  used in misalignments of siamese

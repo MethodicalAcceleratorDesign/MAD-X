@@ -259,8 +259,9 @@ export_comm_par(struct command_parameter* par, char* string, int noexpr)
     case 3:
       if (par->string != NULL)
       {
-        strcat(string, "=");
+        strcat(string, "=\"");
         strcat(string, par->string);
+        strcat(string, "\"");
       }
       break;
     case 11:
@@ -748,47 +749,47 @@ comm_para(const char* name, int* n_int, int* n_double, int* n_string,
 
       switch (cp->type) {
       case 0:
-	*n_int = 1;
-	*int_array = cp->double_value;
-	break;
+  *n_int = 1;
+  *int_array = cp->double_value;
+  break;
       case 1:
-	*n_int = 1;
-	if (cp->expr == NULL) *int_array = cp->double_value;
-	else *int_array = expression_value(cp->expr, 2);
-	break;
+  *n_int = 1;
+  if (cp->expr == NULL) *int_array = cp->double_value;
+  else *int_array = expression_value(cp->expr, 2);
+  break;
       case 2:
-	*n_double = 1;
-	if (cp->expr == NULL) *double_array = cp->double_value;
-	else *double_array = expression_value(cp->expr, 2);
-	break;
+  *n_double = 1;
+  if (cp->expr == NULL) *double_array = cp->double_value;
+  else *double_array = expression_value(cp->expr, 2);
+  break;
       case 3:
-	if (cp->string != NULL) {
-	  *n_string = 1;
-	  strfcpy(strings, cp->string, NAME_L);
+  if (cp->string != NULL) {
+    *n_string = 1;
+    strfcpy(strings, cp->string, NAME_L);
           l = *string_lengths = imin(strlen(cp->string), NAME_L);
 //          printf("comm_para3: strings='%s'[%d]\n", strings, l);
-	}
-	break;
+  }
+  break;
       case 11:
       case 12:
-	arr = cp->double_array;
-	if (cp->expr_list != NULL) update_vector(cp->expr_list, arr);
-	if (cp->type == 11) {
+  arr = cp->double_array;
+  if (cp->expr_list != NULL) update_vector(cp->expr_list, arr);
+  if (cp->type == 11) {
             for (i = 0; i < arr->curr; i++) int_array[i] = arr->a[i];
             *n_int = arr->curr;
-	} else {
-	  for (i = 0; i < arr->curr; i++) double_array[i] = arr->a[i];
-	  *n_double = arr->curr;
-	}
-	break;
+  } else {
+    for (i = 0; i < arr->curr; i++) double_array[i] = arr->a[i];
+    *n_double = arr->curr;
+  }
+  break;
       case 13:
-	for (i = 0; i < cp->m_string->curr; i++) {
-	  strfcpy(strings, cp->m_string->p[i], NAME_L);
+  for (i = 0; i < cp->m_string->curr; i++) {
+    strfcpy(strings, cp->m_string->p[i], NAME_L);
           l = string_lengths[i] = imin(strlen(cp->m_string->p[i]), NAME_L);
 //          printf("comm_para13: strings='%s'[%d]\n", strings, l);
-	  strings += l;
-	}
-	*n_string = cp->m_string->curr;
+    strings += l;
+  }
+  *n_string = cp->m_string->curr;
       }
     }
   }

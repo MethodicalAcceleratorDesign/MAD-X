@@ -253,7 +253,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: x1, y1, t1, px1, py1, pt1
   double precision :: x2, y2, t2, px2, py2, pt2
 
-  double precision :: el, tilt, bvk
+  double precision :: el, tilt, bvk, ktap
   double precision :: edg1, edg2, sk0, sk1, sk2, hgap, fint, sks, sksol, h, ct
   double precision :: corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
   double precision :: tedg1, fact1, dfact1_dx, rfac, rfac1, drfac1_dx, drfac1_dy
@@ -272,7 +272,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
   integer, external :: node_fd_errors
   double precision, external  :: node_value, get_value
-
 
   if (code .eq. code_multipole .or. code .eq. code_rfmultipole)  then
      !--- thin multipole and thin RF multipole
@@ -294,20 +293,23 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   select case (code)
 
      case (code_rbend, code_sbend) !---- DIPOLE
-        an = bvk * node_value('angle ') * el/node_value('l ')
+        an = bvk * node_value('angle ') * el/node_value('l ') ! ??? 
         tilt = -node_value('tilt ')
         edg1 = bvk * node_value('e1 ')
         edg2 = bvk * node_value('e2 ')
         sk0  = bvk * node_value('k0 ')
-        sk1 = bvk * (node_value('k1 ') + node_value('k1tap ')) 
-        sk2 = bvk * (node_value('k2 ') + node_value('k2tap '))
+        sk1 = bvk * node_value('k1 ')
+        sk2 = bvk * node_value('k2 ')
         hgap = node_value('hgap ')
         fint = node_value('fint ')
+        ktap = node_value('ktap ')
         sks = zero
-        h = an / el
-
-       if (sk0.ne.0)  h = sk0
-       
+        if (sk0.ne.0)  then
+           h = sk0 * (1 + ktap) ! tapering
+        else
+           h = an / el * (1 + ktap) ! tapering
+        endif
+     
         !---- Refer orbit and eigenvectors to magnet midplane.
         ct = cos(tilt)
         st = sin(tilt)
@@ -489,12 +491,12 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         sksol = zero
         select case (code)
         case (code_quadrupole)  !---- Quadrupole
-           sk1 = bvk * (node_value('k1 ') + node_value('k1tap ')) 
+           sk1 = bvk * node_value('k1 ') * (1 + node_value('ktap '))
            str  = sk1
            n    = 1
            twon = two
         case (code_sextupole)   !---- Sextupole
-           sk2 = bvk * (node_value('k2 ') + node_value('k2tap '))
+           sk2 = bvk * node_value('k2 ') * (1 + node_value('ktap '))
            str  = sk2 / two
            n    = 2
            twon = four
@@ -816,6 +818,7 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
   use emitfi
   use math_constfi, only : zero, one, two, three, four, twopi
   use phys_constfi, only : clight, hbar
+  use io_units, only : stdout
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -848,7 +851,6 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
   double precision :: sigma(6,6), bstar(3,3), gstar(3,3), dummy(6,6)
 
   double precision, external :: get_value
-  integer, parameter :: iqpr2 = 6
   double precision, parameter :: ten3p=1.0d3, tenp6=1.0d6, tenp9=1.0d9
 
   SIGMA(:6,:6) = zero
@@ -926,22 +928,22 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
   !---- Summary output; header and global parameters.
 
   if (stabt) then !---- Dynamic case.
-     if (radiate) write (iqpr2, 910) ten3p * u0
-     write (iqpr2, 920) 1, 2, 3
-     write (iqpr2, 930) qx, qy, qs
-     if (radiate) write (iqpr2, 940) tune
-     write (iqpr2, 950) ((bstar(j,k), j = 1, 3), k = 1, 3), &
+     if (radiate) write (stdout, 910) ten3p * u0
+     write (stdout, 920) 1, 2, 3
+     write (stdout, 930) qx, qy, qs
+     if (radiate) write (stdout, 940) tune
+     write (stdout, 950) ((bstar(j,k), j = 1, 3), k = 1, 3), &
                         ((gstar(j,k), j = 1, 3), k = 1, 3), &
                         ((bmax(j,k), j = 1, 3), k = 1, 3),  &
                         ((gmax(j,k), j = 1, 3), k = 1, 3)
      if (radiate) then
-        write (iqpr2, 960) pdamp, alj, (tau(j), j = 1, 3), &
+        write (stdout, 960) pdamp, alj, (tau(j), j = 1, 3), &
                            ex*tenp6, ey*tenp6, et*tenp6
      endif
   else !---- Static case
-     write (iqpr2, 920) 1, 2
-     write (iqpr2, 930) qx, qy
-     write (iqpr2, 970) ((bstar(j,k), j = 1, 2), k = 1, 2), &
+     write (stdout, 920) 1, 2
+     write (stdout, 930) qx, qy
+     write (stdout, 970) ((bstar(j,k), j = 1, 2), k = 1, 2), &
                         ((gstar(j,k), j = 1, 2), k = 1, 2), &
                         ((bmax(j,k), j = 1, 2), k = 1, 2),  &
                         ((gmax(j,k), j = 1, 2), k = 1, 2)

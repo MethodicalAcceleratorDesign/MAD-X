@@ -24,7 +24,6 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-16.04
           - ubuntu-18.04
           # TODO: enable this after debugging internal compiler error:
           # - ubuntu-20.04

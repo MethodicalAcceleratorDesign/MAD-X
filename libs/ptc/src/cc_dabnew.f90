@@ -25,6 +25,7 @@ module c_dabnew
   logical(lp) C_STABLE_DA,C_watch_user,C_check_stable
   real(dp), private :: eps=1.d-38,epsprint=1.d-38
 !real(dp),public :: eps_clean=0
+  public c_print_c_nda_dab_c_lda
 complex(dp), private :: i_=(0.0_dp,1.0_dp)
 contains
   !******************************************************************************
@@ -584,7 +585,7 @@ contains
           c_nda_dab = c_nda_dab + 1
           ind=c_nda_dab
           if(c_nda_dab.gt.c_lda) then
-             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(line,'(a53)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,10'
              ipause=mypauses(8,line)
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -684,7 +685,7 @@ contains
              c_nda_dab = c_nda_dab + 1
              ind=c_nda_dab
              if(c_nda_dab.gt.c_lda) then
-                write(6,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+                write(6,'(a53)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,20'
                 !    ipause=mypauses(10,line)
                 call dadeb !(31,'ERR DAALL ',1)
                 stop 111
@@ -786,7 +787,7 @@ contains
           c_nda_dab = c_nda_dab + 1
           ind=c_nda_dab
           if(c_nda_dab.gt.c_lda) then
-             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(line,'(a53)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,30'
              ipause=mypauses(12,line)
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -842,6 +843,13 @@ contains
     return
   end subroutine daall1
 
+  subroutine c_print_c_nda_dab_c_lda(i)
+    implicit none
+     integer i
+     write(6,*) i,c_nda_dab,c_lda
+  end subroutine c_print_c_nda_dab_c_lda
+
+
   subroutine c_etall1(ic)
     implicit none
     integer ic
@@ -896,7 +904,7 @@ contains
           c_nda_dab = c_nda_dab + 1
           ind=c_nda_dab
           if(c_nda_dab.gt.c_lda) then
-             write(6,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(6,'(a53)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,40'
              write(6,*) c_nda_dab,c_lda
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -1263,6 +1271,7 @@ contains
     integer,dimension(c_lnv)::jj
     complex(dp) cjj
     !
+    cjj=0
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
           write(6,*) "big problem in dabnew ", sqrt(crash)
@@ -1344,9 +1353,11 @@ contains
        return
     elseif(ic.eq.icu) then
        cjj = c_cc(iu)
+
        return
     elseif(ic.eq.icz) then
        cjj = c_cc(iz)
+
        return
     elseif(ic.lt.icu.or.ic.gt.icz) then
        cjj = 0
@@ -1374,6 +1385,7 @@ contains
     return
 40  iz = i
     goto 10
+
     !
   end subroutine c_dapek
   !
@@ -3310,7 +3322,7 @@ contains
     return
   end subroutine c_dainv
 
-  subroutine dainvt(ma,ia,mb,ib)
+  subroutine dainvt(ma,ia,mb,ib,success)
     implicit none
     !     *****************************
     !
@@ -3325,6 +3337,8 @@ contains
     integer,dimension(:)::ma,mb
     complex(dp),dimension(c_lnv,c_lnv)::aa,ai
     complex(dp) amjj,amsjj,prod
+    logical, optional :: success
+    if(present(success)) success=.true.
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
           write(6,*) "big problem in dabnew ", sqrt(crash)
@@ -3353,6 +3367,8 @@ contains
     !etienne
     !
     if(ia.ne.ib) then
+    if(present(success)) success=.false.
+
        write(line,'(a26)')  'ERROR IN DAINV, IA .NE. IB'
        ipause=mypauses(35,line)
        call dadeb !(31,'ERR DAINV1',1)
@@ -3360,6 +3376,8 @@ contains
        write(line,'(a40)')  'ERROR IN DAINV, IA.NE.INVA.OR.IB.NE.INVB'
        ipause=mypauses(35,line)
        call dadeb !(31,'ERR DAINV2',1)
+    if(present(success)) success=.false.
+
     endif
     !
     !     ALLOCATING LOCAL VECTORS
@@ -3395,6 +3413,8 @@ contains
     call c_matinv(aa,ai,ia,c_lnv,ier)
     !
     if(ier.eq.132) then
+    if(present(success)) success=.false.
+
        if(check_da) then
           C_STABLE_DA=.false.
           C_check_stable=.false.
@@ -3420,6 +3440,8 @@ contains
           enddo
           if(i.eq.j) prod = prod - 1.0_dp
           if(abs(prod).gt.100.0_dp*epsmac) then
+          if(present(success)) success=.false.
+
              write(6,*) " abs(prod) > 100.0_dp*epsmac in dainvt",abs(prod), 100.0_dp*epsmac
              if(check_da) then
                 C_STABLE_DA=.false.

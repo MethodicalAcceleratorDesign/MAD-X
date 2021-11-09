@@ -40,6 +40,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   fsecarb=.false.
 
   ORBIT0 = zero
+  exact_expansion = get_value('twiss ','exact ') .ne. zero
   call get_node_vector('orbit0 ', 6, orbit0)
   RT = EYE
   RW = EYE
@@ -98,7 +99,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   dtbyds  = get_value('probe ','dtbyds ')
   charge  = get_value('probe ','charge ')
   npart   = get_value('probe ','npart ')
-  eig_tol = get_value('twiss ','clorb_tol' )
+  eig_tol = get_value('twiss ','clorb_tol ' )
 
 
   !---- Set fast_error_func flag to use faster error function
@@ -143,9 +144,9 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   ! save sigma matrix
   do i= 1,6
-  do j= 1,6
-    opt_fun0(74 + (i-1)*6 + j) = s0mat(i,j)
-  enddo
+     do j= 1,6
+        opt_fun0(74 + (i-1)*6 + j) = s0mat(i,j)
+     enddo
   enddo
   sigmat = s0mat
 
@@ -517,12 +518,14 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   use twissbeamfi, only : deltap
   use matrices, only : EYE
   use math_constfi, only : zero, one
-  use twtapering
+  ! watch out iterate is defined in taperfi and as loop label here in tmclor
+  use taperfi, only : taperout, stepsize 
+  use io_units, only : tapout
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Find closed orbit for a beam line sequence.                      *
-  !     Called from emit as well
+  !     Called also directly from emit and taper                         *
   !     Input:                                                           *
   !     guess(6)     (double)  first guess for orbit start               *
   !     fsec         (logical) if true, return second order terms.       *
@@ -549,6 +552,9 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   logical, external :: m66sta
   integer, parameter :: itmax=20
 
+  logical :: taperoutsave
+  ! double precision :: stepsizesave
+  
   deltap = get_value('probe ','deltap ')
 
   !---- Initialize.
@@ -562,13 +568,20 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   !---- Initialize guess.
   ORBIT0 = GUESS
 
+  !---- Need tapering output on last iteration only
+  taperoutsave = taperout
+  taperout = .false.
+  !---- use the stepsize on last iteration also
+  ! stepsizesave = stepsize
+  ! stepsize = zero
+  
   !---- Iteration for closed orbit.
   iterate: do itra = 1, itmax
-      orderrun = itra
+
      !---- Track orbit and transfer matrix.
      call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
-
      if (eflag.ne.0) return
+
      ! turn off threader immediately after first iteration, ie after first turn
      thr_on = 0
 
@@ -579,7 +592,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
         A(1:6,7) = ORBIT(1:6) - ORBIT0(1:6)
         err = maxval(abs(A(1:6,7)))
 
-        call solver(a,6,1,irank)
+        call solver(A,6,1,irank)
         if (irank.lt.6) then
            print *, 'Singular matrix occurred during closed orbit search.'
            eflag = 1
@@ -612,8 +625,9 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
      endif
 
      if (err.lt.cotol) then
-        orderrun = 0
         save_opt = get_option('keeporbit ')
+        taperout = taperoutsave  ! restore output flag for tapering
+        ! stepsize = stepsizesave  ! restore stepsize 
         call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,ithr_on)
         OPT_FUN0(9:14) = ORBIT0(1:6)
         GUESS = ORBIT0
@@ -626,9 +640,13 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
 
   !---- No convergence.
   call tmcheckstab(rt, eig_tol,debug)
-  orderrun = 0
   print '(''Closed orbit did not converge in '', i3, '' iterations'')', itmax
   OPT_FUN0(9:14) = zero
+
+  taperout = taperoutsave  ! restore output flag for tapering
+  if (taperout) &
+       write(tapout,'(a,i3,a)') "! Orbit did not converge in ",itmax," iterations. No ouput for tapering."
+
   return
 
 end SUBROUTINE tmclor
@@ -699,15 +717,15 @@ end SUBROUTINE tmcheckstab
 SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use bbfi
   use twiss0fi
-  use twissbeamfi, only : beta, gamma, arad, charge, npart, pc, energy
+  use twissbeamfi, only : beta, gamma, arad, charge, npart, pc, energy, radiate
   use name_lenfi
   use twisscfi
   use spch_bbfi
   use matrices, only : EYE, symp_thrd  ! , symp_thrd_orbit
-  use math_constfi, only : zero
+  use math_constfi, only : zero, one, two
   use code_constfi
-  use twtapering
-  use twissbeamfi, only : radiate, beta, gamma
+  use taperfi
+  use io_units
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -729,18 +747,19 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision :: orbit0(6), orbit(6)
   logical :: fsec, ftrk
   double precision :: rt(6,6), tt(6,6,6)
-  integer :: eflag, kobs, save, thr_on, i, tap_itter
+  integer :: eflag, kobs, save, thr_on
 
-  logical :: fmap, istaper
+  integer :: i
+  logical :: fmap, twisstaper
   character(len=28) :: tmptxt1, tmptxt2, tmptxt3
   character(len=150) :: warnstr
-  character(len=name_len) :: c_name(2), p_name, el_name
+  character(len=name_len) :: c_name(2), p_name, el_name, name
   character(len=2) :: ptxt(2)=(/'x-','y-'/)
   integer :: j, code, n_align, nobs, node, old, poc_cnt, debug, n_perm_align
   integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
-  double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6), orbitori(6)
-  double precision :: al_errors(align_max), dptemp
-  double precision :: el, cick, err, nrm, nrm0, anglet, newk0, tempk
+  double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6), orbittap(6)
+  double precision :: al_errors(align_max)
+  double precision :: el, cick, err, nrm, nrm0, angle
   double precision :: parvec(26),  vector(10), reforb(6)
   double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
@@ -750,10 +769,14 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision, parameter :: orb_limit=1d1
   integer, parameter :: max_rep=100
 
-  111 continue
-  debug = get_option('debug ')
+  double precision :: dpt ! for tapering
+  integer :: step_prev
   
-
+  debug = get_option('debug ')
+  radiate = get_value('probe ','radiate ') .ne. zero
+  beta    = get_value('probe ','beta ')
+  gamma   = get_value('probe ','gamma ')
+  
   !---- Initialize
   !---- corr_pick stores for both projection the last pickup used by the
   !     threader in order to avoid corrections in front of it when
@@ -763,13 +786,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   REP_CNT = 0
   RESTSUM = zero
   nrm0    = zero
+
   if (thr_on .gt. 0)  then
      VECTOR = zero
      j = get_vector('threader ', 'vector ', vector)
      if (j .lt. 3) thr_on = 0
   endif
-  istaper = get_value('twiss ','tapering ').ne.zero
-  tap_itter = get_value('twiss ','tap_itter ')
 
   TT = zero
   RT = EYE
@@ -786,9 +808,19 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   bbd_flag = 1
   i_spch = 0 !!!!!!!!!!
 
+  ! initialise first tapering value to initial momentum offset
+  step_prev = int((orbit0(6)/beta)/stepsize)
+
+  !---- Initiate the tapering output for command TAPER with RELATIVE option
+  if (taperflag .and. (stepsize .ne. zero)) then
+     print '(''initial orbit vector: '', 1p,6e14.6)', orbit
+     print '(''first taper value: '',1p,e14.6,1p,'' nsteps: '',1p,i8)', step_prev*stepsize, step_prev
+     print '('' '')' 
+  endif
+  
   !---  start
   node = restart_sequ()
-
+  
   !---  loop over nodes
 10 continue
 
@@ -862,51 +894,65 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     endif
   endif
 
+  !---- Tapering adjustment for dipoles, quadrupoles and sextupoles
+  ! can be initiated from TWISS or MATCH command (tapering = true) or TAPER command 
+  if (taperflag) then 
+     
+     select case (code)
+        
+     case (code_rbend, code_sbend)
+        ! first take only account of momentum deviation at entrance of element
+        dpt = orbit(6)/beta
+        ! then maybe loop track through element to take energy loss in element into account 
+        do i = 1, iterate 
+           ORBITTAP = ORBIT ! work on a temporary orbit vector
+           call store_node_value('ktap ', dpt) ! initial guess
+           call tmmap(code,fsec,ftrk,orbittap,fmap,ek,re,te,.false.,el)
+           dpt = (orbittap(6)+orbit(6))/(two*beta) 
+        enddo
+        
+        if (stepsize .ne. zero) then
+           ! count and add # of steps of size stepsize means adding integers which is more precise
+           ! than adding # of steps * stepsize which means adding small real values
+           step_prev = step_prev + int((dpt/stepsize-step_prev)*two)
+           call store_node_value('ktap ', step_prev*stepsize)
+        else 
+           call store_node_value('ktap ', dpt)
+        endif
+        
+        if (taperout) then
+           call element_name(el_name,len(el_name))
+           write(tapout,'(a,t15,a,e20.12,a)') trim(el_name),", KTAP = ",node_value('ktap ')," ;"
+        endif
+        
+     case (code_quadrupole, code_sextupole)
+        dpt = orbit(6)/beta
+        if (iterate .ge. 1) then ! loop is only one pass
+           ORBITTAP = ORBIT 
+           call store_node_value('ktap ', dpt)
+           call tmmap(code,fsec,ftrk,orbittap,fmap,ek,re,te,.false.,el)  
+           dpt = (orbittap(6)+orbit(6))/(two*beta)
+        endif
+        
+        if (stepsize .ne. zero) then
+           step_prev = step_prev + int((dpt/stepsize-step_prev)*two)
+           call store_node_value('ktap ', step_prev*stepsize)
+        else
+           call store_node_value('ktap ', dpt)
+        endif
+        
+        if (taperout) then
+           call element_name(el_name,len(el_name))
+           write(tapout,'(a,t15,a,e20.12,a)') trim(el_name),", KTAP = ",node_value('ktap ')," ;"
+        endif
+        
+     end select
+
+  endif ! End of tapering section.
+
   !---- Element matrix
-  if (istaper .and. orderrun < tap_itter) then
-
-    orbitori = orbit
-
-    select case (code)
-
-    case (code_rbend, code_sbend)
-      anglet = node_value('angle ')
-      do i=1,3
-        call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-        dptemp = (orbit(6)+orbitori(6))/(2*beta)
-        newk0 = (1+dptemp)*anglet/el
-        call store_node_value('k0 ',newk0 )
-        orbit = orbitori
-  	  enddo
-      
-    case (code_quadrupole)
-      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-      dptemp = (orbit(6)+orbitori(6))/(2*beta)
-      tempk = node_value('k1 ')
-      newk0 = tempk/(1-dptemp)-tempk
-      call store_node_value('k1tap ',newk0 )
-
-      tempk = node_value('k1s ')
-      newk0 = tempk/(1-dptemp)-tempk
-      call store_node_value('k1stap ',newk0 )
-
-    case (code_sextupole)
-      call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-      dptemp = (orbit(6)+orbitori(6))/(2*beta)
-      tempk = node_value('k2 ')
-      newk0 = tempk/(1-dptemp) - tempk
-      call store_node_value('k2tap ',newk0 )  
-
-      tempk = node_value('k2s ')
-      newk0 = tempk/(1-dptemp) - tempk
-      call store_node_value('k2stap ',newk0 )
-
-    end select
-    orbit = orbitori
-  endif
-
   call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
-
+  
   !--- if element has a map, concatenate
   if (fmap) then
     call tmcat(.true.,re,te,rt,tt,rt,tt)
@@ -1053,6 +1099,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   bbd_flag=0
 
+  !---- Finish the tapering output for command TAPER with stepwise option
+  if (taperflag .and. (stepsize .ne. zero)) then
+     print '(''final orbit vector:     '', 1p,6e14.6)', orbit
+     print '(''last taper value:  '',1p,e14.6,1p,'' nsteps: '',1p,i8)', step_prev*stepsize, step_prev
+  endif
+  
 end SUBROUTINE tmfrst
 
 SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
@@ -1893,16 +1945,14 @@ subroutine track_one_element(el, fexit, contrib_rms)
   logical :: contrib_rms
   integer n_perm_align
   integer, external :: is_permalign
+
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
 !  if (code .eq. code_tkicker)     code = code_kicker
   if (code .eq. code_placeholder) code = code_instrument
   bvk = node_value('other_bv ')
-  elpar_vl = el_par_vector(g_polarity, g_elpar)
+  elpar_vl = el_par_vector(g_max, g_elpar)
   ele_body = el .gt. eps
-
-  !--- 2013-Nov-14  10:34:00  ghislain: add acquisition of name of element here.
-  !call element_name(el_name,len(el_name))
 
   opt_fun(70) = g_elpar(g_kmax)
   opt_fun(71) = g_elpar(g_kmin)
@@ -1924,7 +1974,6 @@ subroutine track_one_element(el, fexit, contrib_rms)
   endif
 
   if (n_align .ne. 0)  then
-     !print*, "coupl1: Element = "
      ele_body = .false.
      orbit2 = orbit
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
@@ -1950,12 +1999,10 @@ subroutine track_one_element(el, fexit, contrib_rms)
 
   if (fmap) then
      call twcptk(re,orbit)
-     !print*, "couplfmap: Element = ", el_name
      if (sectormap) call tmcat(.true.,re,te,srmat,stmat,srmat,stmat)
   endif
 
   if (n_align .ne. 0)  then
-     !print*, "coupl2: Element = ", el_name
      ele_body = .false.
      orbit2 = orbit
      call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
@@ -3215,8 +3262,8 @@ SUBROUTINE tw_synch_int()
 
   !---- Initialisation
   blen = node_value('blen ')
-  rhoinv = node_value('rhoinv ')
-  sk1 = node_value('k1 ') + node_value('k1tap ')
+  rhoinv = node_value('rhoinv ') * (1+node_value('ktap ')) ! tapering
+  sk1 = node_value('k1 ')  * (1+node_value('ktap ')) ! tapering (issue if dipole has k1 component)
   e1 = node_value('e1 ')
   e2 = node_value('e2 ')
   an = node_value('angle ')
@@ -3587,7 +3634,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
           call tmmult_cf(fsec,ftrk,orbit,fmap,re,te)
         else
           call tmmult(fsec,ftrk,orbit,fmap,re,te)
-        endif
+       endif
+       
      case (code_solenoid)
         call tmsol(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
@@ -3614,7 +3662,6 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmbb(fsec,ftrk,orbit,fmap,re,te)
 
      case (code_marker)
-
         ! nothing on purpose!
 
      case (code_wire)
@@ -3627,7 +3674,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
 
       case(code_changeref)
-        call fort_warn('TWISS: ','Changeref is nto implemented for MAD-X twiss.')
+        call fort_warn('TWISS: ','Changeref is not implemented for MAD-X twiss.')
 
      case (code_crabcavity)
         call tmcrab(fsec,ftrk,orbit,fmap,dl,ek,re,te)
@@ -3640,8 +3687,10 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
      case (code_rfmultipole)
         call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
+
      case (code_changerefp0)
         call tmchp0(ftrk,orbit,fmap,ek,re, te)
+
      case default !--- anything else:
         ! nil (23, 28, 34)
 
@@ -3685,7 +3734,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
   double precision :: f_errors(0:maxferr)
   double precision :: rw(6,6), tw(6,6,6), ek0(6)
   double precision :: x, y
-  double precision :: an, sk0, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk
+  double precision :: an, sk0, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk, ktap, angle
   double precision :: dh, corr, ct, st, hx, hy, rfac, pt, h_k
 
   integer, external :: el_par_vector, node_fd_errors
@@ -3693,6 +3742,8 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
   character(len=name_len) :: name
   double precision :: bet0, bet_sqr, f_damp_t
 
+  integer, external :: get_option
+  
   bet0  =  get_value('beam ','beta ')
 
   !---- Initialize.
@@ -3705,129 +3756,132 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
   kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
   kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0 .or. fcentre
 
-
-
   !---- Test for non-zero length.
   fmap = el .ne. zero
   if (.not. fmap) return
 
-     !-- get element parameters
-     elpar_vl = el_par_vector(b_k3s, g_elpar)
-     bvk = node_value('other_bv ')
-     an = bvk * g_elpar(b_angle)
-     tilt = g_elpar(b_tilt)
-     e1 = g_elpar(b_e1)
-     e2 = g_elpar(b_e2)
+  !-- get element parameters
+  elpar_vl = el_par_vector(b_max, g_elpar)
 
-     if (code .eq. code_rbend) then
-        e1 = e1 + an / two
-        e2 = e2 + an / two
-     endif
+  bvk = node_value('other_bv ')
+  angle = g_elpar(b_angle)
+  an = bvk * angle
+  e1 = g_elpar(b_e1)
+  e2 = g_elpar(b_e2)
+  
+  if (code .eq. code_rbend) then
+     e1 = e1 + an / two
+     e2 = e2 + an / two
+  endif
 
-     !---  bvk also applied further down
-     sk0 = g_elpar(b_k0)
-     sk1 = g_elpar(b_k1)
-     sk2 = g_elpar(b_k2)
-     h1 = g_elpar(b_h1)
-     h2 = g_elpar(b_h2)
-     hgap = g_elpar(b_hgap)
-     fint = g_elpar(b_fint)
-     fintx = g_elpar(b_fintx)
-     sks = g_elpar(b_k1s)
-     h = an / el
-     h_k = h * bvk
-     !---- Apply field errors and change coefficients using DELTAP.
-     F_ERRORS = zero
-     n_ferr = node_fd_errors(f_errors)
-     if (sk0 .ne. 0) then 
-      f_errors(0) = f_errors(0) + sk0*el - g_elpar(b_angle)
-      h_k = sk0 * bvk
-    endif
+  !---  bvk also applied further down
+  sk0 = g_elpar(b_k0) 
+  sk1 = g_elpar(b_k1) 
+  sk2 = g_elpar(b_k2)
+  h1 = g_elpar(b_h1)
+  h2 = g_elpar(b_h2)
+  hgap = g_elpar(b_hgap)
+  fint = g_elpar(b_fint)
+  fintx = g_elpar(b_fintx)
+  sks = g_elpar(b_k1s)
+  tilt = g_elpar(b_tilt)
+  ktap = g_elpar(b_ktap)
+  
+  h = (an / el) 
+  h_k = h * bvk 
 
+  !---- Apply field errors 
+  F_ERRORS = zero
+  n_ferr = node_fd_errors(f_errors)
+  if (sk0 .ne. 0) then 
+     f_errors(0) = f_errors(0) + (sk0*el - angle)
+     h_k = sk0 * bvk
+  endif
 
-
-     
-!!     if (sk0*el .ne. g_elpar(b_angle)) then
-!!        call element_name(name,len(name))
-!!        print *, name, ': k0l ~= angle, delta= ', sk0*el - g_elpar(b_angle), g_elpar(b_angle)
-!!     endif
-
-     dh = (- h * deltap + bvk * f_errors(0) / el) / (one + deltap) ! dipole term
-     sk1 = bvk * (sk1 + f_errors(2) / el) / (one + deltap) ! quad term
-     sk2 = bvk * (sk2 + f_errors(4) / el) / (one + deltap) ! sext term
-     sks = bvk * (sks + f_errors(3) / el) / (one + deltap) ! skew quad term
-
-     !---  calculate body slice from start (no exit fringe field):
-     if (dl .lt. el .and. .not. fcentre) then
-       el = dl
-       kill_exi_fringe = .true.
-     endif
-
-     !---- Half radiation effects at entrance.
-     if (ftrk .and. radiate) then
-        ct = cos(tilt)
-        st = sin(tilt)
-        x =   orbit(1) * ct + orbit(3) * st
-        y = - orbit(1) * st + orbit(3) * ct
-        hx = h + dh + sk1*(x - h*y**2/two) + sks*y + sk2*(x**2 - y**2)/two
-        hy = sks * x - sk1*y - sk2*x*y
-        rfac = (arad * gamma**3 * el / three) * &
-             (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
-        pt = orbit(6)
-        bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
-        f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        orbit(2) = orbit(2) * f_damp_t;
-        orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
-     endif
-
-     !---- Body of the dipole.
-     !---- Get map for body section
-     call tmsect(.true.,dl,h,dh,sk1,sk2,ek,re,te)
-
-     !---- Get map for entrance fringe field and concatenate
-     if (.not.kill_ent_fringe) then
-        corr = (h_k + h_k) * hgap * fint
-        call tmfrng(.true.,h_k,sk1,e1,h1,one,corr,rw,tw)
-        call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-     endif
-
-   !---- Get map for exit fringe fields and concatenate
-     if (.not.kill_exi_fringe) then
-        if (fintx .lt. 0) fintx = fint
-        corr = (h_k + h_k) * hgap * fintx
-        call tmfrng(.true.,h_k,sk1,e2,h2,-one,corr,rw,tw)
-        call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
-     endif
-
-     !---- Apply tilt.
-     if (tilt .ne. zero) then
-        call tmtilt(.true.,tilt,ek,re,te)
-        cplxy = .true.
-     endif
-
-     !---- Track orbit.
-     if (ftrk) then
-        call tmtrak(ek,re,te,orbit,orbit)
-     endif
-
-     if (fcentre) return
-
-     !---- Half radiation effects at exit.
-     if (ftrk .and. radiate) then
-        x =   orbit(1) * ct + orbit(3) * st
-        y = - orbit(1) * st + orbit(3) * ct
-        hx = h + dh + sk1*(x - h*y**2/two) + sks*y + sk2*(x**2 - y**2)/two
-        hy = sks * x - sk1*y - sk2*x*y
-        rfac = (arad * gamma**3 * el / three) * &
-             (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
-        pt = orbit(6)
-        bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
-        f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
-        orbit(2) = orbit(2) * f_damp_t;
-        orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
-     endif
+  ! ugly kludge to mimic k0 integration in errors
+  if (ktap .ne. 0) then
+     f_errors(0) = f_errors(0) + ktap*angle     
+  endif
+  
+  !h_k = h_k * (1+ktap) ! tapering applied to actual strength
+  
+  !---- Change coefficients using DELTAP.
+  dh = (- h * deltap + bvk * f_errors(0) / el) / (one + deltap) ! dipole term
+  sk1 = bvk * (sk1 + f_errors(2) / el) / (one + deltap) ! quad term
+  sk2 = bvk * (sk2 + f_errors(4) / el) / (one + deltap) ! sext term
+  sks = bvk * (sks + f_errors(3) / el) / (one + deltap) ! skew quad term
+  
+  !---  calculate body slice from start (no exit fringe field):
+  if (dl .lt. el .and. .not. fcentre) then
+     el = dl
+     kill_exi_fringe = .true.
+  endif
+  
+  !---- Half radiation effects at entrance.
+  if (ftrk .and. radiate) then        
+     ct = cos(tilt)
+     st = sin(tilt)
+     x =   orbit(1) * ct + orbit(3) * st
+     y = - orbit(1) * st + orbit(3) * ct
+     hx = h + dh + sk1*(x - h*y**2/two) + sks*y + sk2*(x**2 - y**2)/two
+     hy = sks * x - sk1*y - sk2*x*y
+     rfac = (arad * gamma**3 * el / three) * &
+          (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+     pt = orbit(6)
+     bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+     f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
+     orbit(2) = orbit(2) * f_damp_t;
+     orbit(4) = orbit(4) * f_damp_t;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+  endif
+  
+  !---- Body of the dipole.
+  !---- Get map for body section
+  call tmsect(.true.,dl,h,dh,sk1,sk2,ek,re,te)
+  
+  !---- Get map for entrance fringe field and concatenate
+  if (.not.kill_ent_fringe) then
+     corr = (h_k + h_k) * hgap * fint
+     call tmfrng(.true.,h_k,sk1,e1,h1,one,corr,rw,tw)
+     call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+  endif
+  
+  !---- Get map for exit fringe fields and concatenate
+  if (.not.kill_exi_fringe) then
+     if (fintx .lt. 0) fintx = fint
+     corr = (h_k + h_k) * hgap * fintx
+     call tmfrng(.true.,h_k,sk1,e2,h2,-one,corr,rw,tw)
+     call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
+  endif
+  
+  !---- Apply tilt.
+  if (tilt .ne. zero) then
+     call tmtilt(.true.,tilt,ek,re,te)
+     cplxy = .true.
+  endif
+  
+  !---- Track orbit.
+  if (ftrk) then
+     call tmtrak(ek,re,te,orbit,orbit)
+  endif
+  
+  if (fcentre) return
+  
+  !---- Half radiation effects at exit.
+  if (ftrk .and. radiate) then
+     x =   orbit(1) * ct + orbit(3) * st
+     y = - orbit(1) * st + orbit(3) * ct
+     hx = h + dh + sk1*(x - h*y**2/two) + sks*y + sk2*(x**2 - y**2)/two
+     hy = sks * x - sk1*y - sk2*x*y
+     rfac = (arad * gamma**3 * el / three) * &
+          (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
+     pt = orbit(6)
+     bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+     f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
+     orbit(2) = orbit(2) * f_damp_t;
+     orbit(4) = orbit(4) * f_damp_t;
+     orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+  endif
 
 end SUBROUTINE tmbend
 
@@ -5303,7 +5357,7 @@ SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
   !-- get element parameters
   bvk = node_value('other_bv ')
-  elpar_vl = el_par_vector(o_k3s, g_elpar)
+  elpar_vl = el_par_vector(o_max, g_elpar)
 
   !---- Field error.
   F_ERRORS = zero
@@ -5836,6 +5890,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   use twiss_elpfi
   use twissbeamfi, only : radiate, deltap, gamma, arad
   use math_constfi, only : zero, one, two, three
+  use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -5872,6 +5927,9 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   double precision, external :: node_value, get_value
   double precision :: bet0, bet_sqr, f_damp_t
 
+  integer, external :: get_option
+  character(len=name_len) el_name
+  
   bet0  =  get_value('beam ','beta ')
 
   !---- Initialize.
@@ -5886,10 +5944,11 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   n_ferr = node_fd_errors(f_errors)
 
   !-- element paramters
-  elpar_vl = el_par_vector(q_k1st, g_elpar)
+  elpar_vl = el_par_vector(q_max, g_elpar)    
   bvk = node_value('other_bv ')
-  sk1  = bvk * ( g_elpar(q_k1)  + g_elpar(q_k1t)  + f_errors(2)/el)
-  sk1s = bvk * ( g_elpar(q_k1s) + g_elpar(q_k1st) + f_errors(3)/el)
+  sk1  = bvk * ( g_elpar(q_k1)  * (one + g_elpar(q_ktap)) + f_errors(2)/el)
+  sk1s = bvk * ( g_elpar(q_k1s) * (one + g_elpar(q_ktap)) + f_errors(3)/el)
+  
   tilt = g_elpar(q_tilt)
   if (sk1s .ne. zero) then
      tilt = -atan2(sk1s, sk1)/two + tilt
@@ -5924,18 +5983,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   endif
 
   call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
-  if (fcentre) then
-     if (tilt .ne. zero)  then
-        !---  rotate orbit at exit
-        tmp = orbit(1)
-        orbit(1) = ct * tmp - st * orbit(3)
-        orbit(3) = ct * orbit(3) + st * tmp
-        tmp = orbit(2)
-        orbit(2) = ct * tmp - st * orbit(4)
-        orbit(4) = ct * orbit(4) + st * tmp
-     endif
-     return
-  endif
+  if (fcentre) return
 
   !---- Half radiation effect at exit.
   if (radiate .and. ftrk) then
@@ -6107,7 +6155,7 @@ SUBROUTINE tmsep(fsec,ftrk,fcentre,orbit,fmap,dl,ek,re,te)
 
   if (ftrk) then
      !-- get element parameters
-     elpar_vl = el_par_vector(e_ey, g_elpar)
+     elpar_vl = el_par_vector(e_max, g_elpar)
      !---- Strength and tilt.
      exfld = g_elpar(e_ey) !--This is a correct. Needs to be like this because of how the tilt is defined.
      eyfld = g_elpar(e_ex) !--This is a correct. Needs to be like this because of how the tilt is defined.
@@ -6142,19 +6190,7 @@ SUBROUTINE tmsep(fsec,ftrk,fcentre,orbit,fmap,dl,ek,re,te)
   ekick  = efield * ten3m * charge / (pc * (one + deltap))
 
   call spbody(fsec,ftrk,tilt,ekick,orbit,dl,ek,re,te)
-  if (fcentre)  then
-     if (tilt .ne. zero)  then
-        !---  rotate orbit at exit
-        tmp = orbit(1)
-        orbit(1) = ct * tmp - st * orbit(3)
-        orbit(3) = ct * orbit(3) + st * tmp
-        tmp = orbit(2)
-        orbit(2) = ct * tmp - st * orbit(4)
-        orbit(4) = ct * orbit(4) + st * tmp
-     endif
-
-     return
-   endif
+  if (fcentre) return
 
   if (tilt .ne. zero)  then
      !---  rotate orbit at exit
@@ -6274,6 +6310,7 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   use twiss_elpfi
   use twissbeamfi, only : radiate, deltap, gamma, arad
   use math_constfi, only : zero, one, two, three, twelve
+  use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6308,10 +6345,12 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   double precision, external :: node_value, get_value
   double precision :: bet0, bet_sqr, f_damp_t
 
+  integer, external :: get_option
+  character(len=name_len) el_name
+  
   bet0  =  get_value('beam ','beta ')
 
-
-  !---- Initialize.
+  !---- Initialize.el
   st = zero
   ct = zero
   cplxy = .false.
@@ -6323,10 +6362,10 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   n_ferr = node_fd_errors(f_errors)
 
   !-- get element parameters
-  elpar_vl = el_par_vector(s_k2st, g_elpar)
+  elpar_vl = el_par_vector(s_max, g_elpar)
   bvk = node_value('other_bv ')
-  sk2  = bvk * ( g_elpar(s_k2)  + g_elpar(s_k2t)  +  f_errors(4)/el )
-  sk2s = bvk * ( g_elpar(s_k2s) + g_elpar(s_k2st) +  f_errors(5)/el )
+  sk2  = bvk * ( g_elpar(s_k2)  * (one + g_elpar(s_ktap)) + f_errors(4)/el )
+  sk2s = bvk * ( g_elpar(s_k2s) * (one + g_elpar(s_ktap)) + f_errors(5)/el )
   tilt = node_value('tilt ')
   if (sk2s .ne. zero) then
      tilt = -atan2(sk2s, sk2)/three + tilt
@@ -6360,18 +6399,7 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   endif
 
   call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
-  if (fcentre)  then
-     if (tilt .ne. zero)  then
-        !---  rotate orbit at exit
-        tmp = orbit(1)
-        orbit(1) = ct * tmp - st * orbit(3)
-        orbit(3) = ct * orbit(3) + st * tmp
-        tmp = orbit(2)
-        orbit(2) = ct * tmp - st * orbit(4)
-        orbit(4) = ct * orbit(4) + st * tmp
-     endif
-     return
-   endif
+  if (fcentre) return
 
   !---- Half radiation effects at exit.
   if (ftrk) then
@@ -6903,6 +6931,7 @@ end SUBROUTINE tmyrot
 
 SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
+  use twisslfi
   use matrices, only : EYE
   use math_constfi, only : zero, two, three
   implicit none
@@ -6924,34 +6953,90 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   logical :: fsec, ftrk, fmap
   double precision :: dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: px, py, pt, csq, l_pz, c3sq, c52sq
 
   !---- Initialize.
   EK = zero
   RE = EYE
   if (fsec) TE = zero
   fmap = dl .ne. zero
-
   !---- First-order terms.
+  if(exact_expansion) then
+      px = orbit(2)
+      py = orbit(4)
+      pt = orbit(6)
 
-  re(1,2) = dl
-  re(3,4) = dl
-  re(5,6) = dl/(beta*gamma)**2
+      csq = 1 + 2*pt*beta + pt**2 - px**2 - py**2
+      l_pz = dl / sqrt(csq)
+      c3sq = csq**(3d0/2d0)
+      c52sq =csq**(5d0/2d0)
+      re(1,2) = dl/sqrt(csq) + dl*px**2/c3sq;
+      re(1,4) = dl*px*py/c3sq;
+      re(1,6) = dl*px*(-beta - pt)/c3sq;
+      re(3,2) = dl*px*py/c3sq;
+      re(3,4) = dl/sqrt(csq) + dl*py**2/c3sq;
+      re(3,6) = dl*py*(-beta - pt)/c3sq;
+      re(5,2) = -dl*px*(beta + pt)/c3sq;
+      re(5,4) = -dl*py*(beta + pt)/c3sq;
+      re(5,6) = -dl/sqrt(csq) - dl*(-beta - pt)*(beta + pt)/c3sq;
 
-  ek(5) = dl*dtbyds
+      if (fsec) then
+         te(1,2,2) = 3d0*dl*px/(2d0*csq**(3d0/2d0)) + 3d0*dl*px**3d0/(2d0*c52sq)
+         te(1,2,4) = dl*py/(2d0*csq**(3d0/2d0)) + 3d0*dl*px**2d0*py/(2d0*c52sq)
+         te(1,2,6) = dl*(-beta - pt)/(2d0*csq**(3d0/2d0)) + dl*px**2d0*(-3d0*beta - 3d0*pt)/(2d0*c52sq)
+         te(1,4,2) = dl*py/(2d0*csq**(3d0/2d0)) + 3d0*dl*px**2d0*py/(2d0*c52sq)
+         te(1,4,4) = dl*px/(2d0*csq**(3d0/2d0)) + 3d0*dl*px*py**2d0/(2d0*c52sq)
+         te(1,4,6) = dl*px*py*(-3d0*beta - 3d0*pt)/(2d0*c52sq)
+         te(1,6,2) = dl*(-beta - pt)/(2d0*csq**(3d0/2d0)) + 3d0*dl*px**2d0*(-beta - pt)/(2d0*c52sq)
+         te(1,6,4) = 3d0*dl*px*py*(-beta - pt)/(2d0*c52sq)
+         te(1,6,6) = -dl*px/(2d0*csq**(3d0/2d0)) + dl*px*(-3d0*beta - 3d0*pt)*(-beta - pt)/(2d0*c52sq)
+         te(3,2,2) = dl*py/(2d0*csq**(3d0/2d0)) + 3d0*dl*px**2d0*py/(2d0*c52sq)
+         te(3,2,4) = dl*px/(2d0*csq**(3d0/2d0)) + 3d0*dl*px*py**2d0/(2d0*c52sq)
+         te(3,2,6) = dl*px*py*(-3d0*beta - 3d0*pt)/(2d0*c52sq)
+         te(3,4,2) = dl*px/(2d0*csq**(3d0/2d0)) + 3d0*dl*px*py**2d0/(2d0*c52sq)
+         te(3,4,4) = 3d0*dl*py/(2d0*csq**(3d0/2d0)) + 3d0*dl*py**3d0/(2d0*c52sq)
+         te(3,4,6) = dl*(-beta - pt)/(2d0*csq**(3d0/2d0)) + dl*py**2d0*(-3d0*beta - 3d0*pt)/(2d0*c52sq)
+         te(3,6,2) = 3d0*dl*px*py*(-beta - pt)/(2d0*c52sq)
+         te(3,6,4) = dl*(-beta - pt)/(2d0*csq**(3d0/2d0)) + 3d0*dl*py**2d0*(-beta - pt)/(2d0*c52sq)
+         te(3,6,6) = -dl*py/(2d0*csq**(3d0/2d0)) + dl*py*(-3d0*beta - 3d0*pt)*(-beta - pt)/(2d0*c52sq)
+         te(5,2,2) = -dl*(beta + pt)/(2d0*csq**(3d0/2d0)) - 3d0*dl*px**2d0*(beta + pt)/(2d0*c52sq)
+         te(5,2,4) = -3d0*dl*px*py*(beta + pt)/(2d0*c52sq)
+         te(5,2,6) = -dl*px/(2d0*csq**(3d0/2d0)) - dl*px*(-3d0*beta - 3d0*pt)*(beta + pt)/(2d0*c52sq)
+         te(5,4,2) = -3d0*dl*px*py*(beta + pt)/(2d0*c52sq)
+         te(5,4,4) = -dl*(beta + pt)/(2d0*csq**(3d0/2d0)) - 3d0*dl*py**2d0*(beta + pt)/(2d0*c52sq)
+         te(5,4,6) = -dl*py/(2d0*csq**(3d0/2d0)) - dl*py*(-3d0*beta - 3d0*pt)*(beta + pt)/(2d0*c52sq)
+         te(5,6,2) = -dl*px/(2d0*csq**(3d0/2d0)) - 3d0*dl*px*(-beta - pt)*(beta + pt)/(2d0*c52sq)
+         te(5,6,4) = -dl*py/(2d0*csq**(3d0/2d0)) - 3d0*dl*py*(-beta - pt)*(beta + pt)/(2d0*c52sq)
+         te(5,6,6) = -dl*(-beta - pt)/csq**(3d0/2d0) + dl*(beta + pt)/(2d0*csq**(3d0/2d0)) &
+         - dl*(-3d0*beta - 3d0*pt)*(-beta - pt)*(beta + pt)/(2d0*c52sq)
+      endif
 
-  !---- Second-order terms.
-  if (fsec) then
-     te(1,2,6) = - dl / (two * beta)
-     te(1,6,2) = te(1,2,6)
-     te(3,4,6) = te(1,2,6)
-     te(3,6,4) = te(3,4,6)
-     te(5,2,2) = te(1,2,6)
-     te(5,4,4) = te(5,2,2)
-     te(5,6,6) = te(1,2,6) * three / (beta * gamma) ** 2
+      orbit(1) = orbit(1) + px*l_pz
+      orbit(3) = orbit(3) + py*l_pz
+      orbit(5) = orbit(5) + (dl*beta - (beta + pt) * l_pz)
+  else
+
+     re(1,2) = dl
+     re(3,4) = dl
+     re(5,6) = dl/(beta*gamma)**2
+
+     ek(5) = dl*dtbyds
+
+     !---- Second-order terms.
+     if (fsec) then
+        te(1,2,6) = - dl / (two * beta)
+        te(1,6,2) = te(1,2,6)
+        te(3,4,6) = te(1,2,6)
+        te(3,6,4) = te(3,4,6)
+        te(5,2,2) = te(1,2,6)
+        te(5,4,4) = te(5,2,2)
+        te(5,6,6) = te(1,2,6) * three / (beta * gamma) ** 2
+     endif
+     
+     !---- Track orbit.
+     if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
   endif
-  
-  !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmdrf
 
@@ -7011,7 +7096,6 @@ end SUBROUTINE tmchp0
 
 SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   use twisslfi
-  use twtapering
   use twiss_elpfi
   use twissbeamfi, only : deltap, pc, radiate
   use matrices, only : EYE
@@ -7036,7 +7120,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
 
-  logical :: fsec, ftrk, fmap, fcentre, istaper, fringe
+  logical :: fsec, ftrk, fmap, fcentre, fringe
   double precision :: el, ds
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
   double precision :: ek_f(6), re_f(6,6), te_f(6,6,6)
@@ -7052,7 +7136,7 @@ SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   integer, external :: el_par_vector, get_ncavities
 
   !-- get element parameters
-  elpar_vl = el_par_vector(r_lagt, g_elpar)
+  elpar_vl = el_par_vector(r_max, g_elpar)
 
   !---- Fetch voltage.
   rfv = g_elpar(r_volt)
@@ -7194,7 +7278,7 @@ SUBROUTINE tmrffringe(fsec,ftrk,orbit, fmap, el, jc, ek, re, te)
   re = EYE
 
   !-- get element parameters
-  elpar_vl = el_par_vector(r_freq, g_elpar)
+  elpar_vl = el_par_vector(r_max, g_elpar)
 
   !---- Fetch voltage.
   rfv = g_elpar(r_volt)
@@ -7543,7 +7627,7 @@ subroutine m66div(anum,aden,target,eflag)
 
 end subroutine m66div
 
-subroutine m66symp(r,nrm) ! can be moved to twiss.f90
+subroutine m66symp(r,nrm) 
   use matrices, only : JMAT
   implicit none
   !----------------------------------------------------------------------*
@@ -8802,6 +8886,7 @@ SUBROUTINE twcpin_print(rt,r0mat )
   use twissbeamfi, only : deltap
   use matrices, only : EYE, SMAT
   use math_constfi, only : zero, one, two, quarter
+  use io_units, only : aftercleanout
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -8839,9 +8924,10 @@ SUBROUTINE twcpin_print(rt,r0mat )
   gamma  = one
 
 
-  open (unit = 2, file = "afterclean_twcpin.out")
-  write(2,*) "After clean fort "
-  !-- simplecticity
+  open (unit = aftercleanout, file = "afterclean_twcpin.out")
+  write(aftercleanout,*) "After clean fort "
+
+  !-- symplecticity
   RA  = RT(1:4, 1:4)
   ss  = zero
   ss(1:2, 1:2)  = SMAT
@@ -8857,9 +8943,9 @@ SUBROUTINE twcpin_print(rt,r0mat )
   r_det = r0mat(1,1) * r0mat(2,2) - r0mat(1,2) * r0mat(2,1)
   gamma = 1 /sqrt(1 + r_det)
 
-  write(2,*) "check symplecticity Rt(1:4,1:4) " , matmul(transpose(RA),matmul(SS,RA)) - SS
-  write(2,*) "R0MAT   = ", R0MAT
-  write(2,*) "gammacp = ", gamma
+  write(aftercleanout,*) "check symplecticity Rt(1:4,1:4) " , matmul(transpose(RA),matmul(SS,RA)) - SS
+  write(aftercleanout,*) "R0MAT   = ", R0MAT
+  write(aftercleanout,*) "gammacp = ", gamma
 
   e   = zero
   f   = zero
@@ -8894,11 +8980,11 @@ SUBROUTINE twcpin_print(rt,r0mat )
 
   ! --Compute VU = MV
   VU = matmul(RT(1:4,1:4),V)
-  write(2,*) "MADX   E=VU(1:2,1:2)        " , VU(1:2, 1:2)
-  write(2,*) "MADX   F=VU(3:4,3:4)        " , VU(3:4, 3:4)
-  write(2,*) "MADX -RE=VU(3:4,1:2)        " , VU(3:4, 1:2)
-  write(2,*) "MADX   E=VU(1:2,1:2)/(-R)   " , -matmul(R0MAT_BAR,VU(3:4, 1:2))/r_det
-  write(2,*) "det V = ", v(1,1) * v(2,2) - v(1,2) * v(2,1)
+  write(aftercleanout,*) "MADX   E=VU(1:2,1:2)        " , VU(1:2, 1:2)
+  write(aftercleanout,*) "MADX   F=VU(3:4,3:4)        " , VU(3:4, 3:4)
+  write(aftercleanout,*) "MADX -RE=VU(3:4,1:2)        " , VU(3:4, 1:2)
+  write(aftercleanout,*) "MADX   E=VU(1:2,1:2)/(-R)   " , -matmul(R0MAT_BAR,VU(3:4, 1:2))/r_det
+  write(aftercleanout,*) "det V = ", v(1,1) * v(2,2) - v(1,2) * v(2,1)
 
      ! --Compute uncoupled block-diagonal U = g**2*[E 0, F 0]
      U = zero
@@ -8908,10 +8994,10 @@ SUBROUTINE twcpin_print(rt,r0mat )
      EM = U(1:2, 1:2)
      FM = U(3:4, 3:4)
 
-     write(2,*) "MADX E=U(1:2,1:2) " , U(1:2, 1:2)
-     write(2,*) "MADX F=U(3:4,3:4) " , U(1:2, 1:2)
-     write(2,*) "MADX 0=U(1:2,3:4) " , U(1:2, 3:4)
-     write(2,*) "MADX 0=U(3:4,1:2) " , U(3:4, 1:2)
+     write(aftercleanout,*) "MADX E=U(1:2,1:2) " , U(1:2, 1:2)
+     write(aftercleanout,*) "MADX F=U(3:4,3:4) " , U(1:2, 1:2)
+     write(aftercleanout,*) "MADX 0=U(1:2,3:4) " , U(1:2, 3:4)
+     write(aftercleanout,*) "MADX 0=U(3:4,1:2) " , U(3:4, 1:2)
 
      tmp = matmul(D,R0MAT) - C
      e1 = matmul(R0MAT_BAR, TMP)/r_det ! another way to express E =
@@ -8925,14 +9011,14 @@ SUBROUTINE twcpin_print(rt,r0mat )
      et = gamma**2*(A - matmul(B,R0MAT) - matmul(R0MAT_BAR,C) + matmul(R0MAT_BAR,matmul(D,R0MAT)))
      ft = gamma**2*(D + matmul(R0MAT,B) + matmul(C, R0MAT_BAR) + matmul(R0MAT,matmul(A,R0MAT_BAR)))
 
-     write(2,*) "Talman 0=U(1:2,3:4) ", U(1:2, 3:4)
-     write(2,*) "Talman 0=U(3:4,1:2) ", U(3:4,1:2)
+     write(aftercleanout,*) "Talman 0=U(1:2,3:4) ", U(1:2, 3:4)
+     write(aftercleanout,*) "Talman 0=U(3:4,1:2) ", U(3:4,1:2)
 
-     write(2,*) "E legacy (E=A-BR)         " , e
-     write(2,*) "E (E1=RBAR(DR - C)/||R||) " , e1
-     write(2,*) "E (E11 from VU=MV)        " , e11
-     write(2,*) "E (Et)(talman)            " , et
-     write(2,*) "E (Em)(E from E =VBARMV)  " , em
+     write(aftercleanout,*) "E legacy (E=A-BR)         " , e
+     write(aftercleanout,*) "E (E1=RBAR(DR - C)/||R||) " , e1
+     write(aftercleanout,*) "E (E11 from VU=MV)        " , e11
+     write(aftercleanout,*) "E (Et)(talman)            " , et
+     write(aftercleanout,*) "E (Em)(E from E =VBARMV)  " , em
 
 end SUBROUTINE twcpin_print
 SUBROUTINE twcptk_print(re,r0mat, e, f)
@@ -8941,6 +9027,7 @@ SUBROUTINE twcptk_print(re,r0mat, e, f)
   use twissbeamfi, only : deltap
   use matrices, only : EYE, SMAT
   use math_constfi, only : zero, one, two, quarter
+  use io_units, only : aftercleantkout
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -8960,9 +9047,10 @@ SUBROUTINE twcptk_print(re,r0mat, e, f)
 
   edet = zero; fdet = zero
 
-  open (unit = 3, file = "afterclean_twcptk.out")
-  write(3,*) "After clean fort tk "
-  !-- simplecticity
+  open (unit = aftercleantkout, file = "afterclean_twcptk.out")
+  write(aftercleantkout,*) "After clean fort tk "
+
+  !-- symplecticity
   RA  = RE(1:4, 1:4)
   ss  = zero
   ss(1:2, 1:2)  = SMAT
@@ -8970,14 +9058,14 @@ SUBROUTINE twcptk_print(re,r0mat, e, f)
 
   R0MAT_BAR =  matmul(matmul(-SMAT,transpose(R0MAT)),SMAT)
 
-  write(3,*) "check symplecticity RE(1:4,1:4) " , matmul(transpose(RA),matmul(SS,RA)) - SS
-  write(3,*) "R0MAT = ", R0MAT
+  write(aftercleantkout,*) "check symplecticity RE(1:4,1:4) " , matmul(transpose(RA),matmul(SS,RA)) - SS
+  write(aftercleantkout,*) "R0MAT = ", R0MAT
 
   edet = e(1,1) * e(2,2) - e(1,2) * e(2,1)
   fdet = f(1,1) * f(2,2) - f(1,2) * f(2,1)
 
-  write(3,*) "EDET tk =       " , edet
-  write(3,*) "FDET tk =       " , fdet
+  write(aftercleantkout,*) "EDET tk =       " , edet
+  write(aftercleantkout,*) "FDET tk =       " , fdet
 
 
 end SUBROUTINE twcptk_print
