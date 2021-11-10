@@ -2061,15 +2061,22 @@ subroutine ttbb(track,ktrack)
   double precision :: gamma0, beta0, beta_dp, ptot, b_dir
 
   integer :: get_option
-  double precision :: get_value, node_value, get_variable
+  double precision :: get_value, node_value, get_variable, npart_el, npart_eff
   double precision, parameter :: cme32=1d-32
 
   !---- Calculate momentum deviation and according changes
   !     of the relativistic factor beta0
+  npart_el = node_value('npart ')
+  if (npart_el .gt. zero) then
+    npart_eff = npart_el
+  else
+    npart_eff = get_value('probe ', 'npart ')
+  endif
+
   q = get_value('probe ','charge ')
   q_prime = node_value('charge ')
   parvec(5) = get_value('probe ', 'arad ')
-  parvec(6) = node_value('charge ') * get_value('probe ', 'npart ')
+  parvec(6) = node_value('charge ') * npart_eff
   parvec(7) = get_value('probe ','gamma ')
 
   dp = get_variable('track_deltap ')

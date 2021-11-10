@@ -1468,7 +1468,7 @@ convert_madx_to_c6t(struct node* p, int ncombined)
     c6t_elem->value[14] = el_par_value_recurse("sigx",p->p_elem);
     c6t_elem->value[15] = el_par_value_recurse("sigy",p->p_elem);
     c6t_elem->value[16] = el_par_value_recurse("charge",p->p_elem);
-    c6t_elem->value[17] = 0.0; /* npart */
+    c6t_elem->value[17] = el_par_value_recurse("npart",p->p_elem); /* npart */
   }
   else if((strcmp(p->base_name,"elseparator") == 0  ))
   {

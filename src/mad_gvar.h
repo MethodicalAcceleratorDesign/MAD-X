@@ -195,6 +195,7 @@ extern char int_format[20],             /* current integer format */
 extern char blank[];
 extern char none[];
 extern char one_string[];
+
 // 2015-Jul-31  11:41:59  ghislain: aperture twiss file for output of twiss table ! not needed
 //extern char aptwfile[FNAME_L];
 extern char* aux_char_pt;               /* for debug purposes */

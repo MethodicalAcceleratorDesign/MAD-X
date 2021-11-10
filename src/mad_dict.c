@@ -2543,6 +2543,7 @@ const char *const_element_def =
 "siges    = [r, 1],  "
 "cot      = [r, 0],  "
 "copt     = [r, 0],  "
+"npart    = [r, 0],  "
 "slice    = [i, 1],  "
 "spacecharge = [l, false, true],  "
 "apertype = [s, circle, circle], "
