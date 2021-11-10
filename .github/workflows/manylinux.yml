@@ -93,7 +93,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -qy gnuplot
-          sudo apt install gfortran-9 gcc-9 g++-9
 
       - name: Run tests
         # Skip 32bit build - it's broken and mind-boggelingly slow (>>2h)!
@@ -101,11 +100,7 @@ jobs:
         id: tests
         run: .github/utils/make_tests ARCH=$ARCH
         env:
-          CC : gcc-9
-          CXX : g++-9
-          FC : gfortran-9
           GFORTRAN_UNBUFFERED_PRECONNECTED: y
-
 
       - name: Upload failed tests output for inspection
         # This below condition looks redundant - but there is something about
