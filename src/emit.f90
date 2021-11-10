@@ -973,7 +973,82 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
        ' '/' beta(max) [m]',t30,'x',t42,2e20.8/t30,'y',t42,2e20.8/       &
        ' '/' gamma(max) [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8)
 
+
+  call string_to_table_curr('emit ', 'parameter ', 'tune ')
+  call string_to_table_curr('emit ', 'type ', 'undamped ')
+  call double_to_table_curr('emit ', 'mode1 ',tunes(1))
+  call double_to_table_curr('emit ', 'mode2 ',tunes(2))
+  call double_to_table_curr('emit ', 'mode3 ',tunes(3))
+  call augment_count('emit ')
+
+  call string_to_table_curr('emit ', 'parameter ', 'tune ')
+  call string_to_table_curr('emit ', 'type ', 'damped ')
+  call double_to_table_curr('emit ', 'mode1 ',tunes(1))
+  call double_to_table_curr('emit ', 'mode2 ',tune(2))
+  call double_to_table_curr('emit ', 'mode3 ',tune(3))
+  call augment_count('emit ')
+
+  call write2table('beta* ','x ','m ',bstar,1)
+  call write2table('beta* ','y ','m ',bstar,2)
+  call write2table('beta* ','t ','m ',bstar,3)
+
+  call write2table('gamma* ','px ','1/m ',gstar,1)
+  call write2table('gamma* ','py ','1/m ',gstar,2)
+  call write2table('gamma* ','pt ','1/m ',gstar,3)
+
+  call write2table('beta_max ','x ','m ',bmax,1)
+  call write2table('beta_max ','y ','m ',bmax,2)
+  call write2table('beta_max ','t ','m ',bmax,3)
+
+  call write2table('gamma_max ','px ','1/m ',gmax,1)
+  call write2table('gamma_max ','py ','1/m ',gmax,2)
+  call write2table('gamma_max ','pt ','1/m ',gmax,3)
+  
+  call string_to_table_curr('emit ', 'parameter ', 'damping_partion ')
+  call double_to_table_curr('emit ', 'mode1 ',pdamp(1))
+  call double_to_table_curr('emit ', 'mode2 ',pdamp(2))
+  call double_to_table_curr('emit ', 'mode3 ',pdamp(3))
+  call augment_count('emit ')
+
+  call string_to_table_curr('emit ', 'parameter ', 'damping_constant ')
+  call string_to_table_curr('emit ', 'unit ', '1/s ')
+  call double_to_table_curr('emit ', 'mode1 ', alj(1))
+  call double_to_table_curr('emit ', 'mode2 ', alj(2))
+  call double_to_table_curr('emit ', 'mode3 ', alj(3))
+  call augment_count('emit ')
+
+  call string_to_table_curr('emit ', 'parameter ', 'damping_time ')
+  call string_to_table_curr('emit ', 'unit ', 's ')
+  call double_to_table_curr('emit ', 'mode1 ', tau(1))
+  call double_to_table_curr('emit ', 'mode2 ', tau(2))
+  call double_to_table_curr('emit ', 'mode3 ', tau(3))
+  call augment_count('emit ')
+
+  call string_to_table_curr('emit ', 'parameter ', 'emittance ')
+  call string_to_table_curr('emit ', 'unit ', 'pi_m ')
+  call double_to_table_curr('emit ', 'mode1 ', ex)
+  call double_to_table_curr('emit ', 'mode2 ', ey)
+  call double_to_table_curr('emit ', 'mode3 ', et)
+  call augment_count('emit ')
+
+
+!  "u0", "t0", "eta", "bcurrent", "f0", "alfa", "gamma_tr",
 end subroutine emsumm
+
+subroutine write2table(para, typ, unit, matrix, ind)
+   implicit none
+   double precision :: matrix(3,3)
+   character :: para, unit, typ
+   integer :: ind
+  call string_to_table_curr('emit ', 'parameter ', para)
+  call string_to_table_curr('emit ', 'type ', typ)
+  call string_to_table_curr('emit ', 'unit ', unit)
+  call double_to_table_curr('emit ', 'mode1 ',matrix(1,ind))
+  call double_to_table_curr('emit ', 'mode2 ',matrix(2,ind))
+  call double_to_table_curr('emit ', 'mode3 ',matrix(3,ind))
+  call augment_count('emit ')
+
+end subroutine write2table
 
 subroutine emce2i(stabt, em, ex, ey, et, sigma)
   implicit none
