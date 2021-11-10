@@ -3513,7 +3513,7 @@ CONTAINS
     implicit none
     real (dp) :: fk,dpp
     real (dp) :: gamma0,beta0,beta_dp,ptot,b_dir,arad,totch
-    real (dp) :: q,q_prime
+    real (dp) :: q,q_prime, npart_tmp
     integer   :: b_dir_int
     real(kind(1d0)) :: get_value
     real(kind(1d0)) :: get_variable
@@ -3525,7 +3525,10 @@ CONTAINS
 
     gamma0 = get_value('probe ','gamma ')
     arad=get_value('probe ', 'arad ')
-    totch=node_value('charge ') * get_value('probe ', 'npart ')
+    npart_tmp = node_value('npart ')
+
+    if (npart_tmp .lt. 1d0) npart_tmp = get_value('probe ', 'npart ')
+    totch=node_value('charge ') * npart_tmp
 
     if (getdebug()>1) then
       print*, 'getfk for beam-beam: charge npart ',node_value('charge '), get_value('probe ', 'npart ')

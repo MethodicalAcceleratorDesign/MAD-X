@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.10.18 17:54:45      +
+  + Execution date: 2021.11.10 14:07:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "test-c6t-4 conversion of thick elements with apertures";
 
@@ -215,10 +215,10 @@ orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.821178212e-10 
+                 0                  0                  0    4.821178184e-10 
 
        dqmin_phase 
-       -2.66931523 
+      -2.669315228 
 
 Processing apertures from s.ds.l1.b1:1 to e.ds.r1.b1:1...
 +++++++ deltap from TWISS            0
@@ -410,10 +410,10 @@ orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.821178212e-10 
+                 0                  0                  0    4.821178184e-10 
 
        dqmin_phase 
-       -2.66931523 
+      -2.669315228 
 
 Processing apertures from s.ds.l2.b1:1 to e.ds.r2.b1:1...
 +++++++ deltap from TWISS            0
@@ -607,10 +607,10 @@ orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.821178212e-10 
+                 0                  0                  0    4.821178184e-10 
 
        dqmin_phase 
-       -2.66931523 
+      -2.669315228 
 
 Processing apertures from s.ds.l3.b1:1 to e.ds.r3.b1:1...
 +++++++ deltap from TWISS            0
@@ -808,10 +808,10 @@ orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.821178212e-10 
+                 0                  0                  0    4.821178184e-10 
 
        dqmin_phase 
-       -2.66931523 
+      -2.669315228 
 
 Processing apertures from s.ds.l4.b1:1 to e.ds.r4.b1:1...
 +++++++ deltap from TWISS            0
@@ -998,10 +998,10 @@ orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.821178212e-10 
+                 0                  0                  0    4.821178184e-10 
 
        dqmin_phase 
-       -2.66931523 
+      -2.669315228 
 
 Processing apertures from s.ds.l5.b1:1 to e.ds.r5.b1:1...
 +++++++ deltap from TWISS            0
@@ -1208,10 +1208,10 @@ orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.821178212e-10 
+                 0                  0                  0    4.821178184e-10 
 
        dqmin_phase 
-       -2.66931523 
+      -2.669315228 
 
 Processing apertures from s.ds.l6.b1:1 to e.ds.r6.b1:1...
 +++++++ deltap from TWISS            0
@@ -1408,10 +1408,10 @@ orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.821178212e-10 
+                 0                  0                  0    4.821178184e-10 
 
        dqmin_phase 
-       -2.66931523 
+      -2.669315228 
 
 Processing apertures from s.ds.l7.b1:1 to e.ds.r7.b1:1...
 +++++++ deltap from TWISS            0
@@ -1620,10 +1620,10 @@ orbit:  -2.000003E-03 -6.692131E-10  3.076367E-11 -1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.821178212e-10 
+                 0                  0                  0    4.821178184e-10 
 
        dqmin_phase 
-       -2.66931523 
+      -2.669315228 
 
 Processing apertures from s.ds.l8.b1:1 to e.ds.r8.b1:1...
 +++++++ deltap from TWISS            0

@@ -32,7 +32,7 @@ from shutil import copyfile
 #copyfile(src, dst)
 mypath = '../tests/'
 
-mypath = mypath +"test-interpolate"
+mypath = mypath +"test-ptc-twiss-5D"
 print(mypath)
 os.chdir(mypath)
 onlyfiles = [f for f in listdir(".") if isfile(join(".", f))]

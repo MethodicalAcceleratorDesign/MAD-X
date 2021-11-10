@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.10.18 17:55:40      +
+  + Execution date: 2021.11.10 14:47:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -93,8 +93,8 @@ final orbit vector:     1.000000E+00  4.214857E-03  0.000000E+00  1.041119E-01  
 @ DQMIN_PHASE      %le                   0
 @ TITLE            %20s "test of rf-multipole"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "18/10/21"
-@ TIME             %08s "17.55.40"
+@ DATE             %08s "10/11/21"
+@ TIME             %08s "14.47.23"
 * NAME                                S                  L                  X                 PX                  Y                 PY                  T                 PT                K0L 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TEST_LINE$START"                    0                  0                  1                  0                  0                  0                  1                  0                  0

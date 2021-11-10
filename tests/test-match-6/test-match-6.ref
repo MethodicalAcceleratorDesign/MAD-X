@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.10.18 17:55:13      +
+  + Execution date: 2021.11.10 14:30:39      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 
@@ -127,4 +127,201 @@ orbit:   5.000004E-04  4.433481E-09  1.228160E-09 -1.424999E-04  0.000000E+00  0
   
 iteration:   3 error:   2.922722E-09 deltap:   0.000000E+00
 orbit:   5.000020E-04  4.645554E-09  1.227188E-12 -1.425000E-04  0.000000E+00  0.000000E+00
-+++ memory access outside program range, fatal +++
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003209654144        55.81756428 
+
+                q1                dq1            betxmax              dxmax 
+       64.30999976         2.03900624        4402.816581        3.234263445 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.414526976      0.01140997641     0.000824182213        59.32000003 
+
+               dq2            betymax              dymax              dyrms 
+       1.906400183        4402.813044         1.11262125       0.1830755603 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.006931835558    0.0004842285896                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     1.90623417e-08 
+
+       dqmin_phase 
+      -2.042941909 
+
+
+! Match the chromaticity:
+
+match,sequence=lhcb1,lhcb2;
+
+START MATCHING
+
+number of sequences: 2
+sequence name: lhcb1
+sequence name: lhcb2
+    vary, name=KSF.B1, step=0.00001;
+
+    vary, name=KSD.B1, step=0.00001;
+
+    vary, name=KSF.B2, step=0.00001;
+
+    vary, name=KSD.B2, step=0.00001;
+
+    global,sequence=lhcb1,DQ1=QPRIME;
+
+    global,sequence=lhcb1,DQ2=QPRIME;
+
+    global,sequence=lhcb2,DQ1=QPRIME;
+
+    global,sequence=lhcb2,DQ2=QPRIME;
+
+    Lmdif, calls=10, tolerance=1.0e-21;
+
+number of variables:    4
+user given constraints: 1
+total constraints:      4
+
+START LMDIF:
+
+Initial Penalty Function =   0.37917356E-01
+
+
+call:       6   Penalty function =   0.55892686E-22
+ ++++++++++ LMDIF ended: converged successfully
+call:       6   Penalty function =   0.55892686E-22
+endmatch;
+
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     4.99207155E-23
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     2.65372809E-27
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     2.42971131E-24
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     3.53960552E-24
+
+
+Final Penalty Function =   5.58926861e-23
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+ksf.b1                    1.03517e-01  1.03481e-01 -1.00000e+20  1.00000e+20
+ksd.b1                   -1.70739e-01 -1.70877e-01 -1.00000e+20  1.00000e+20
+ksf.b2                    1.03285e-01  1.03299e-01 -1.00000e+20  1.00000e+20
+ksd.b2                   -1.71385e-01 -1.71293e-01 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   5.58926861e-23
+
+
+! Generate a TWISS table:
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety;
+
+TWISS,sequence=lhcb1,file=twiss.b1.data;
+
+enter Twiss module
+  
+iteration:   1 error:   8.714867E-04 deltap:   0.000000E+00
+orbit:  -4.929581E-04  8.103387E-06  2.105819E-06  1.445662E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.299326E-05 deltap:   0.000000E+00
+orbit:  -5.000003E-04 -4.479985E-09 -1.672447E-10  1.424984E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   2.546104E-09 deltap:   0.000000E+00
+orbit:  -5.000008E-04 -2.358324E-09  8.002249E-12  1.425000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003213813573        55.78143208 
+
+                q1                dq1            betxmax              dxmax 
+        64.3100005                  2        4402.811248        2.890204333 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.399968988      0.01141009456    0.0008146034948        59.32000005 
+
+               dq2            betymax              dymax              dyrms 
+                 2        4402.812589        1.318436483       0.1774138186 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.006931834736    0.0004834742802                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.107785517e-08 
+
+       dqmin_phase 
+      -1.230564254 
+
+
+! Generate a TWISS table:
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety;
+
+TWISS,sequence=lhcb2,file=twiss.b2.data;
+
+enter Twiss module
+  
+iteration:   1 error:   8.566033E-04 deltap:   0.000000E+00
+orbit:   4.913949E-04  4.799520E-08 -3.317112E-06 -1.463934E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.449392E-05 deltap:   0.000000E+00
+orbit:   5.000004E-04  4.431485E-09  1.229806E-09 -1.424999E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   2.924088E-09 deltap:   0.000000E+00
+orbit:   5.000020E-04  4.645554E-09  1.227189E-12 -1.425000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003209654144        55.81756428 
+
+                q1                dq1            betxmax              dxmax 
+       64.30999976                  2        4402.816581        3.234263439 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.414526976      0.01140997641     0.000824182213        59.32000003 
+
+               dq2            betymax              dymax              dyrms 
+                 2        4402.813045         1.11262125       0.1830755603 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.006931835558    0.0004842285896                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    1.906231989e-08 
+
+       dqmin_phase 
+      -2.042942963 
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

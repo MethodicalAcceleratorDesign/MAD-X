@@ -1,0 +1,357 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.11.10 14:44:35      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+circum=2;
+
+beam_particles = 0;
+
+bb_particles = 1e12;
+
+
+
+beam, particle=proton, energy = 1, npart:=beam_particles;
+
+newquad:  MULTIPOLE, KNL={0.00, 0.001}, comments="testing the comments";
+
+option, BBORBIT = true;
+
+
+
+bb1: beambeam,  XMA=0.001, npart:=bb_particles, sigx = 0.01, sigy=0.01;
+
+
+
+seq: sequence, refer=center, l=circum;
+
+bb1, at=1;
+
+endsequence;
+
+
+
+use, sequence=seq;
+
+select, flag=twiss, column=name, s, x,px, y, py, BETX, BETY;
+
+twiss,X=0.0,Y=0.000, BETX=1, BETY=1, file="bb.twiss";
+
+enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:    -6.720796E-05 -6.720796E-05  0.000000E+00  0.000000E+00 -6.529250E-09  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 2                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.1741618079                  0        5.410176997    0.0001942998939 
+
+             dxrms             xcomax             xcorms                 q2 
+   0.0001228860428    6.720796215e-05    4.250604746e-05       0.1741519325 
+
+               dq2            betymax              dymax              dyrms 
+                 0        5.412281593                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
+use, sequence=seq;
+
+
+
+TRACK, file = "trackbb",ONEPASS, ONETABLE;
+
+enter TRACK module
+one pass is on
+OBSERVE, PLACE="bb1";
+
+START,  x=0, y=0, t=0.0;
+
+run, turns=1;
+
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0                  0                  0 
+         1          1    -6.72079623e-05   -6.720796215e-05 
+
+                 y                 py                  t                 pt 
+                 0                  0                  0                  0 
+                 0                  0   -6.529250474e-09                  0 
+
+                 s                  e 
+                 0                  0 
+                 2                  0 
+
+
+ptc_create_universe;
+
+Determined SECTOR NMUL MAX :  0
+ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+
+ MAD-X Beam Parameters
+                  Energy : 0.100000E+01
+          Kinetic Energy : 0.617279E-01
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.345898E+00
+ Setting MADx with 
+     energy           1.0000000000000000     
+     method                   6
+     Num. of steps            5
+     charge           1.0000000000000000     
+  Length of machine:    2.0000000000000000     
+ The machine is a LINE
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        2.0000000000000000     
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=false, exact_mis=true, time=true, totalpath=false;
+
+PTC_TWISS, table=twiss, icase=56, no=1, betx=1, bety=1, betz=1, x=0, y=0, px=0, py=0, t=0.0, pt=0.0;
+
+ BB fk=   1.3475224414774636E-005
+ BB sx=   1.0000000000000000E-002
+ BB sy=   1.0000000000000000E-002
+ BB xm=   1.0000000000000000E-003
+ BB ym=   0.0000000000000000     
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+                 2           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000       0.1741618081 
+
+                q2                dq1                dq2                 qs 
+      0.1741519326           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+                 1        5.410177028                  1        5.412281604 
+
+         beta11min          beta11max          beta12min          beta12max 
+                 1        5.410177028                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0    3.775244927e-08                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+                 1        5.412281604                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0    4.313927783e-08                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 1        217.5621367                  0    0.0001942998952 
+
+          disp2min           disp2max           disp3min           disp3max 
+                 0                  0                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0                  0 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0    4.250604756e-05                  0    5.205906363e-05 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0    4.129460582e-09                  0                  0 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0                  0                  0                 -0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0    -6.72079623e-05                  0   -6.720796215e-05 
+
+           pycomin             tcomin            ptcomin 
+                 0   -6.529250474e-09                  0 
+write, table=twiss, file="ptc.bb.twiss";
+
+ptc_end;
+
+
+
+beam_particles = 1e12;
+
+++++++ info: beam_particles redefined
+bb_particles = 0;
+
+++++++ info: bb_particles redefined
+
+
+
+
+beam, particle=proton, energy = 1, npart:=beam_particles;
+
+select, flag=twiss, column=name, s, x,px, y, py, BETX, BETY;
+
+twiss,X=0.0,Y=0.000, BETX=1, BETY=1, file="beam.twiss";
+
+enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:    -6.720796E-05 -6.720796E-05  0.000000E+00  0.000000E+00 -6.529250E-09  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 2                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.1741618079                  0        5.410176997    0.0001942998939 
+
+             dxrms             xcomax             xcorms                 q2 
+   0.0001228860428    6.720796215e-05    4.250604746e-05       0.1741519325 
+
+               dq2            betymax              dymax              dyrms 
+                 0        5.412281593                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
+
+
+TRACK, file = "trackbeam",ONEPASS, ONETABLE;
+
+enter TRACK module
+one pass is on
+OBSERVE, PLACE="bb1";
+
+START,  x=0, y=0, t=0.0;
+
+run, turns=1;
+
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0                  0                  0 
+         1          1    -6.72079623e-05   -6.720796215e-05 
+
+                 y                 py                  t                 pt 
+                 0                  0                  0                  0 
+                 0                  0   -6.529250474e-09                  0 
+
+                 s                  e 
+                 0                  0 
+                 2                  0 
+
+
+ptc_create_universe;
+
+ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=false, exact_mis=true, time=true, totalpath=false;
+
+PTC_TWISS, table=twiss, icase=56, no=1, betx=1, bety=1, betz=1, x=0, y=0, px=0, py=0, t=0.0, pt=0.0;
+
+ BB fk=   1.3475224414774640E-005
+ BB sx=   1.0000000000000000E-002
+ BB sy=   1.0000000000000000E-002
+ BB xm=   1.0000000000000000E-003
+ BB ym=   0.0000000000000000     
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+                 2           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000       0.1741618081 
+
+                q2                dq1                dq2                 qs 
+      0.1741519326           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+                 1        5.410177028                  1        5.412281604 
+
+         beta11min          beta11max          beta12min          beta12max 
+                 1        5.410177028                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0    3.775244927e-08                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+                 1        5.412281604                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0    4.313927783e-08                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 1        217.5621367                  0    0.0001942998952 
+
+          disp2min           disp2max           disp3min           disp3max 
+                 0                  0                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0                  0 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+                 0    4.250604756e-05                  0    5.205906363e-05 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0    4.129460582e-09                  0                  0 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0                  0                  0                 -0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0    -6.72079623e-05                  0   -6.720796215e-05 
+
+           pycomin             tcomin            ptcomin 
+                 0   -6.529250474e-09                  0 
+write, table=twiss, file="ptc.beam.twiss";
+
+ptc_end;
+
+
+
+
+
+
+
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

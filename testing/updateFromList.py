@@ -33,7 +33,7 @@ grep FAIL allout.txt > onlyfail.out
 
 #copyfile(src, dst)
 mypath_orig = '../tests/'
-file1 = open('../onlyfail.out', 'r') 
+file1 = open('../failedTests.txt', 'r') 
 Lines = file1.readlines()
 os.chdir("..")
 loc = os.getcwd()
