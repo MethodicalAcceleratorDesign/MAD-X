@@ -61,7 +61,7 @@ match, use_macro;
 
       m11: macro=
        {
-         use, period=CA.STLINE, RANGE=CA.QFD0350/#E;
+         !use, period=CA.STLINE, RANGE=CA.QFD0350/#E;
          twiss, betx=CA.IBETX, bety=CA.IBETY, alfx=CA.IALFX, ALFY=CA.IALFY;
        };
 
@@ -99,7 +99,7 @@ endmatch;
 
 !
 ! final settings
-use, period=CA.STLINE, RANGE=CA.QFD0350/#E;
+!use, period=CA.STLINE, RANGE=CA.QFD0350/#E;
 twiss, betx=CA.IBETX, bety=CA.IBETY, alfx=CA.IALFX, ALFY=CA.IALFY, file=twissFinal.tfs;
 !plot, noversion=true, table=twiss, haxis=s, vaxis1=betx,bety, interpolate,
 !     title="Optimised CLEAR Optics", colour=100;
