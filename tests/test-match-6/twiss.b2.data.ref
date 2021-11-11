@@ -42,12 +42,12 @@
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le     1.906231989e-08
-@ DQMIN_PHASE      %le        -2.042942963
+@ DQMIN            %le     1.906231536e-08
+@ DQMIN_PHASE      %le        -2.042942826
 @ TITLE            %74s "Matching chromaticity for beam1 and beam2 of the LHC 6.4 lattice with MADX"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "10/11/21"
-@ TIME             %08s "14.34.41"
+@ DATE             %08s "11/11/21"
+@ TIME             %08s "15.20.40"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "IP1"                                0       0.5499995661       0.5500000588

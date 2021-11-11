@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.11.10 14:30:39      +
+  + Execution date: 2021.11.11 15:06:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 
@@ -126,7 +126,7 @@ iteration:   2 error:   1.450422E-05 deltap:   0.000000E+00
 orbit:   5.000004E-04  4.433481E-09  1.228160E-09 -1.424999E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   2.922722E-09 deltap:   0.000000E+00
-orbit:   5.000020E-04  4.645554E-09  1.227188E-12 -1.425000E-04  0.000000E+00  0.000000E+00
+orbit:   5.000020E-04  4.645554E-09  1.227190E-12 -1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -149,10 +149,10 @@ orbit:   5.000020E-04  4.645554E-09  1.227188E-12 -1.425000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0     1.90623417e-08 
+                 0                  0                  0    1.906233718e-08 
 
        dqmin_phase 
-      -2.042941909 
+      -2.042941772 
 
 
 ! Match the chromaticity:
@@ -191,9 +191,9 @@ START LMDIF:
 Initial Penalty Function =   0.37917356E-01
 
 
-call:       6   Penalty function =   0.55892686E-22
+call:       6   Penalty function =   0.64124272E-22
  ++++++++++ LMDIF ended: converged successfully
-call:       6   Penalty function =   0.55892686E-22
+call:       6   Penalty function =   0.64124272E-22
 endmatch;
 
 
@@ -203,11 +203,11 @@ Node_Name                  Constraint   Type  Target Value       Final Value    
 --------------------------------------------------------------------------------------------------
 Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     4.99207155E-23
 Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     2.65372809E-27
-Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     2.42971131E-24
-Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     3.53960552E-24
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     1.33157924E-23
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     8.85110268E-25
 
 
-Final Penalty Function =   5.58926861e-23
+Final Penalty Function =   6.41242719e-23
 
 
 
@@ -222,7 +222,7 @@ ksd.b2                   -1.71385e-01 -1.71293e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   5.58926861e-23
+VARIABLE "TAR" SET TO   6.41242719e-23
 
 
 ! Generate a TWISS table:
@@ -311,10 +311,10 @@ orbit:   5.000020E-04  4.645554E-09  1.227189E-12 -1.425000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    1.906231989e-08 
+                 0                  0                  0    1.906231536e-08 
 
        dqmin_phase 
-      -2.042942963 
+      -2.042942826 
 
 
 stop;
