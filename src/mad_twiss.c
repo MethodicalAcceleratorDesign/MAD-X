@@ -92,7 +92,7 @@ static void
 fill_twiss_header(struct table* t)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, h_length = 40; /* change adding header lines ! */
+  int i, h_length = 50; /* change adding header lines ! */
   struct table* s;
   char tmp[NAME_L+1];
 
