@@ -3927,8 +3927,8 @@ do i = 0, nn-1
   NNORM=1e-7/chi
 
   do j=1,ktrack
-    xi = (TRACK(1,j)+dx) ! [m]
-    yi = (TRACK(3,j)+dy) ! [m]
+    xi = (TRACK(1,j)-dx) ! [m]
+    yi = (TRACK(3,j)-dy) ! [m]
 
     ! 3 apply wire kick
     RTWO = xi**2+yi**2

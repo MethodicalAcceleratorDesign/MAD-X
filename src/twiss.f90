@@ -3899,8 +3899,8 @@ subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
    Lint = l_int(i)  ! integrated length [m]
    l    = l_phy(i) ! physical length [m]
    cur  = current(i)
-   x = orbit(1)+dx ! [m]
-   y = orbit(3)+dy ! [m]
+   x = orbit(1)-dx ! [m]
+   y = orbit(3)-dy ! [m]
       
    chi = pc*1e9/clight
    NNORM=1e-7/chi 
