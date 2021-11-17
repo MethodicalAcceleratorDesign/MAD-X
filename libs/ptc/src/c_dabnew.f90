@@ -596,7 +596,7 @@ contains
           nda_dab = nda_dab + 1
           ind=nda_dab
           if(nda_dab.gt.lda) then
-             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(line,'(a52)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,1'
              ipause=mypauses(8,line)
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -696,7 +696,7 @@ contains
              nda_dab = nda_dab + 1
              ind=nda_dab
              if(nda_dab.gt.lda) then
-                write(6,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+                write(6,'(a52)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,2'
                 !    ipause=mypauses(10,line)
                 call dadeb !(31,'ERR DAALL ',1)
                 stop 111
@@ -798,7 +798,7 @@ contains
           nda_dab = nda_dab + 1
           ind=nda_dab
           if(nda_dab.gt.lda) then
-             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(line,'(a52)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,3'
              ipause=mypauses(12,line)
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -900,7 +900,7 @@ contains
           nda_dab = nda_dab + 1
           ind=nda_dab
           if(nda_dab.gt.lda) then
-             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(line,'(a52)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,4'
              ipause=mypauses(12,line)
              call dadeb !(31,'ERR DAALL ',1)
           endif

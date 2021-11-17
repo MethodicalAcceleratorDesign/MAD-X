@@ -1,0 +1,30 @@
+
+seq: sequence, l=10;
+m1:marker, at=1;
+m2:marker, at=3;
+m3:marker, at=5;
+m4:marker, at=7;
+m5:marker, at=9;
+endsequence;
+set,  format="13.11f";
+beam,particle=proton,energy=2;
+use, sequence=seq;
+option, sympl=false;
+px0 = 0.001;
+py0 = 0.02;
+betx0 = 1;
+bety0 = 2;
+select, flag = twiss, column=name,s,x,y,pt,betx,bety;
+
+twiss, file="madx.tfs", betx=betx0, bety=bety0, px=px0, py=py0, pt=pt0;
+twiss, file="madx_exact.tfs", betx=betx0, bety=bety0, px=px0, py=py0, exact;
+
+
+ptc_create_universe;
+ptc_create_layout,model=3, method=2, nst=1, exact=true;
+
+ptc_setswitch, debuglevel=0, fringe=false, totalpath=false	;
+PTC_TWISS, table=twiss, icase=6, no=3, betx=betx0, bety=bety0, betz=5, px=px0,py=py0;
+write, table=twiss, file="ptc.tfs";
+PTC_END;
+stop;

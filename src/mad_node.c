@@ -17,6 +17,12 @@ new_node(char* name)
   const char *rout_name = "new_node";
   struct node* p = mycalloc(rout_name, 1, sizeof *p);
   p->perm_align = mycalloc(rout_name, 1, sizeof *p->perm_align);
+  p->perm_align->dx_value = 0;
+  p->perm_align->dy_value = 0;
+  p->perm_align->ds_value = 0;
+  p->perm_align->dtheta_value = 0;
+  p->perm_align->dphi_value = 0;
+  p->perm_align->dpsi_value = 0;
   //if(strlen(name)>20) fatal_error("The string is to long: ", name);
   strcpy(p->name, name);
   p->stamp = 123456;
@@ -318,15 +324,15 @@ node_value(const char* par)
   mycpy(lpar, par);
   if (strcmp(lpar, "l") == 0) value = current_node->length;
 /*  else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;*/
-  else if(strcmp(lpar, "dx") == 0){  
+  else if(current_node->p_elem->def->mad8_type != 36 && strcmp(lpar, "dx") == 0){
       if (current_node->perm_align->dx_expr == NULL) value = current_node->perm_align->dx_value;
       else                                            value = expression_value(current_node->perm_align->dx_expr , 2);
   }
-  else if (strcmp(lpar, "dy") == 0){  
+  else if (current_node->p_elem->def->mad8_type != 36 && strcmp(lpar, "dy") == 0){
       if (current_node->perm_align->dy_expr == NULL) value = current_node->perm_align->dy_value;
       else                                            value = expression_value(current_node->perm_align->dy_expr , 2);
   }
-  else if (strcmp(lpar, "ds") == 0){  
+  else if (current_node->p_elem->def->mad8_type != 36 && strcmp(lpar, "ds") == 0){
       if (current_node->perm_align->ds_expr == NULL) value = current_node->perm_align->ds_value;
       else                                            value = expression_value(current_node->perm_align->ds_expr , 2);
   }
@@ -521,21 +527,10 @@ store_node_value(const char* par, double* value)
   else if (strcmp(lpar, "k1") == 0) store_comm_par_value("k1",*value,el->def);
   else if (strcmp(lpar, "k2") == 0) store_comm_par_value("k2",*value,el->def);
   // The inform is to make sure they are written out to a new sequence. 
-  else if (strcmp(lpar, "k1tap") == 0) {
-    store_comm_par_value("k1tap",*value,el->def);
-    el->def->par_names->inform[9] = 1;
-  }
-  else if (strcmp(lpar, "k1stap") == 0) {
-    store_comm_par_value("k1stap",*value,el->def);
-    el->def->par_names->inform[10] = 1;
-  }
-  else if (strcmp(lpar, "k2tap") == 0){
-    store_comm_par_value("k2tap",*value,el->def);
-    el->def->par_names->inform[9] = 1;
-  }
-  else if (strcmp(lpar, "k2stap") == 0){
-    store_comm_par_value("k2stap",*value,el->def);
-    el->def->par_names->inform[10] = 1;
+  else if (strcmp(lpar, "ktap") == 0) {
+    store_comm_par_value("ktap",*value,el->def);
+    el->def->par_names->inform[9] = 1;  // for quads and sextupoles
+    el->def->par_names->inform[23] = 1; // for bends
   }
   else if (strcmp(lpar, "lagtap") == 0) {
     store_comm_par_value("lagtap",*value,el->def);
@@ -694,6 +689,14 @@ node_name(char* name, int* l)
   strfcpy(name, current_node->name, *l);
   stoupper(name);
 }
+void
+node_name_f_lower(char* name, int* l)
+  /* returns current node name in Fortran format */
+  /* l is max. allowed length in name */
+{
+  strfcpy(name, current_node->name, *l);
+}
+
 
 int
 get_node_count(struct node* node)
@@ -912,7 +915,6 @@ replace_one(struct node* node, struct element* el)
   strcpy(node->name, compound(el->name, k));
   add_to_node_list(node, 0, edit_sequ->nodes);
   node->p_elem = el;
-
   node->base_name = el->base_type->name;
   //strcpy(node->base_name, el->base_type->name);
   node->length = el->length;

@@ -950,6 +950,16 @@ end INTERFACE
 
 contains
 
+ subroutine set_6(NO1,ND21,ND1,NDPT1,NV1, np1)
+ implicit none
+ integer np1,NO1,ND1,ND21,NDPT1,NV1
+  np=np1
+  NO=no1
+  ND=nd1
+  ND2=nd21
+  NDPT=ndpt1
+  NV=nv1
+  end subroutine set_6
 
   FUNCTION polymorpht( S1 )
     implicit none

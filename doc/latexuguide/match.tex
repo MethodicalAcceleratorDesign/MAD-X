@@ -129,10 +129,8 @@ or
 
 \madbox{
 MATCH, \=SEQUENCE='seqname', \\ 
-       \>BETX=real, ALFX=real, MUX=real, \\
-       \>BETY=real, ALFY=real, MUY=real, \\
-       \>X=real, PX=real, Y=real, PY=real, \\
-       \>DX=real, DY=real, DPX=real, DPY=real, \\
+       \>BETX=real, ALFX=real, MUX=real, BETY=real, ALFY=real, MUY=real, \\
+       \>X=real, PX=real, Y=real, PY=real, DX=real, DPX=real, DY=real, DPY=real, \\
        \>DELTAP=real, SLOW=logical;
 }
 
@@ -164,7 +162,7 @@ or
 
 \textbf{Example 1:}   
 \begin{verbatim}
-CELL: SEQUENCE=(...) ;
+CELL:   SEQUENCE=(...) ;
 INSERT: SEQUENCE=(...) ;
 USE, PERIOD=cell;
 SAVEBETA, LABEL=bini, PLACE=#e;
@@ -272,6 +270,12 @@ command are:
   repective keywords 
   \hyperref[subsec:tables-chrom]{\texttt{WX, PHIX, WY, PHIY,...}} for
   the chromatic functions. 
+
+  \ttitem{TAPERING} Adjust the strengths of the quadrupoles and sextupoles
+  in order to compensate for the offset in energy. This flag triggers a
+  call to the \hyperref[chap:taper]{\texttt{TAPER}} command with default
+  parameters and no output file. 
+
 \end{madlist}
 
 

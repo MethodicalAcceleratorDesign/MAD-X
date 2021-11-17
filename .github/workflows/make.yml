@@ -24,7 +24,6 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-16.04
           - ubuntu-18.04
           # TODO: enable this after debugging internal compiler error:
           # - ubuntu-20.04
@@ -110,6 +109,10 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          brew install gnuplot
 
       - name: Setup gcc/gfortran
         run: |

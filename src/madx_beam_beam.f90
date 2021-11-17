@@ -2,7 +2,7 @@ module BeamBeam
 
 contains
 
-  SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
+  SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te, npart_el)
     use trackfi, only : fsecarb
     use twissbeamfi, only : gamma, arad, charge, npart
     use math_constfi, only : zero, one, two
@@ -28,15 +28,21 @@ contains
     integer :: beamshape, b_dir_int
     logical, save :: first=.true.
     logical :: bb_ultra_relati
-    double precision :: parvec(26), fk, q, q_prime, dp
-    double precision :: gamma0, beta0, beta_dp, ptot, b_dir
+    double precision :: parvec(26), fk, q, q_prime, dp, npart_eff, node_value
+    double precision :: gamma0, beta0, beta_dp, ptot, b_dir, npart_el
     integer, external :: get_option
-    double precision, external :: node_value, get_variable
+    double precision, external ::  get_variable
     !---  standard 4D
     q = charge
-    q_prime = node_value('charge ')
+    q_prime  = node_value('charge ')
+    if (npart_el .ge. one) then
+      npart_eff = npart_el
+    else
+      npart_eff = npart
+    endif
+
     parvec(5) = arad
-    parvec(6) = q_prime * npart
+    parvec(6) = q_prime * npart_eff
     parvec(7) = gamma
     !---- Calculate momentum deviation and according changes
     !     of the relativistic factor beta0

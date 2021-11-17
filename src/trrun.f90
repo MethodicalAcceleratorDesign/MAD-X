@@ -363,6 +363,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         endif
 
         nlm = nlm + 1
+
         if (nobs .gt. 0)  then
            OBS_ORB = zero
            call get_node_vector('obs_orbit ', lobs, obs_orb)
@@ -371,8 +372,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            if (onetable)  then
               spos = sum
               call element_name(el_name,len(el_name))
-              call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
-                   z, obs_orb,spos,nlm,el_name,onlyaver)
+              if (mod(turn, ffile) .eq. 0)  then
+                 call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
+                      z, obs_orb,spos,nlm,el_name,onlyaver)
+              endif
            else
               if (mod(turn, ffile) .eq. 0)  then
                  do i = 1, jmax
@@ -758,7 +761,7 @@ end subroutine ttmap
 
 SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   use twtrrfi
-  use twissbeamfi, only : deltap, beta
+  use twissbeamfi, only : deltap
   use math_constfi, only : zero, one, two, three
   use time_varfi
   use trackfi
@@ -789,7 +792,7 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   integer, external :: Factorial
   double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
   double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle, tilt2
-  double precision :: gstr, sstr, x, px0, y, py0, orb50, orb60, deltapp
+  double precision :: gstr, sstr, x, px0, y, py0, t0, pt0, deltapp
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   !double precision :: orbit(6),
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -818,7 +821,7 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   !      dipr = bvk * vals(1,0) / (one + deltas)
   !      dipi = bvk * vals(2,0) / (one + deltas)
 
-  bet0   = get_value('probe ','beta ')
+  !bet0   = get_value('probe ','beta ')
   !---- Multipole components.
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
@@ -838,8 +841,8 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
        px0 = track(2,jtrk)
        y = track(3,jtrk)
        py0 = track(4,jtrk)
-       orb50 = track(5,jtrk)
-       orb60 = track(6,jtrk)
+       t0 = track(5,jtrk)
+       pt0 = track(6,jtrk)
 
        ! get \Delta p/p + 1 (which we denote by the variable
        ! deltapp here) out of orbit(6), for the corresponding
@@ -865,8 +868,8 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
      &0.5*dipi*dipr*gstr*x*y**2 - dipi*dipr*x +&
      &dipr**2*gstr*y**3/6.0d0)/elrad
 
-       track(5, jtrk) = (bet0*orb50*deltapp - (bet0*orb60 +&
-     &1.0)*(dipi*y + dipr*x))/(bet0*deltapp)
+       track(5, jtrk) = (betas*t0*deltapp - (betas*pt0 +&
+     &1.0)*(dipi*y + dipr*x))/(betas*deltapp)
 
     enddo
 
@@ -991,7 +994,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   enddo
 
   do jtrk = 1, ktrack
-     etahat = sqrt(two*track(6,jtrk)/beta + track(6,jtrk)**2 + one) - one ! etahat = deltap of individual particle
+     etahat = sqrt(two*track(6,jtrk)*beti + track(6,jtrk)**2 + one) - one ! etahat = deltap of individual particle
      h0 = sqrt((one + etahat)**2 - track(2,jtrk)**2 - track(4,jtrk)**2)
 
      rp = (track(1,jtrk) + (0, 1)*track(3,jtrk))/two
@@ -1016,7 +1019,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
      track(4, jtrk) = track(4, jtrk) + dpy
      ! N.B. orbit(5) = \sigma/beta and orbit(6) = beta*p_\sigma
      track(5, jtrk) = track(5, jtrk) - elrad*(kx*track(1, jtrk) + ky*track(3, jtrk)) &
-                *(one + beta*track(6, jtrk))/beta/(one + etahat)
+                *(one + betas*track(6, jtrk))*beti/(one + etahat)
   enddo
 
 
@@ -1214,11 +1217,11 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
            px = track(2,jtrk)
            py = track(4,jtrk)
            pt = track(6,jtrk)
-           beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+           beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            track(2,jtrk) = px * f_damp_t;
            track(4,jtrk) = py * f_damp_t;
-           track(6,jtrk) = pt * (one - rfac) - rfac / bet0;
+           track(6,jtrk) = pt * (one - rfac) - rfac * beti;
         enddo
         !---- Energy loss like for closed orbit.
      else
@@ -1226,18 +1229,18 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
         ! 2016-Mar-16  18:45:41  ghislain: track(i,1) is not the closed orbit but the first particle!!!
         rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
         pt = track(6,1)
-        beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+        beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
         TRACK(2,:ktrack) = TRACK(2,:ktrack) * f_damp_t;
         TRACK(4,:ktrack) = TRACK(4,:ktrack) * f_damp_t;
-        TRACK(6,:ktrack) = TRACK(6,:ktrack) * (one - rfac) - rfac / bet0;
+        TRACK(6,:ktrack) = TRACK(6,:ktrack) * (one - rfac) - rfac * beti;
      endif
   endif
 
   !---- Apply multipole effect including dipole.
   do jtrk = 1,ktrack
      !       Added for correct Ripken implementation of formulae
-     ttt = sqrt( one + two*track(6,jtrk)*bet0i + track(6,jtrk)**2 )
+     ttt = sqrt( one + two*track(6,jtrk)*beti + track(6,jtrk)**2 )
      ! track(2,jtrk) = track(2,jtrk) - (dbr + dxt(jtrk) - dipr * (deltas + beti*track(6,jtrk)))
      ! track(4,jtrk) = track(4,jtrk) + (dbi + dyt(jtrk) - dipi * (deltas + beti*track(6,jtrk)))
      ! track(5,jtrk) = track(5,jtrk) - (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
@@ -1245,7 +1248,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
      track(4,jtrk) = track(4,jtrk) + (dbi + dyt(jtrk) - dipi * (ttt - one))
      track(5,jtrk) = track(5,jtrk) - &
           (dipr*track(1,jtrk) - dipi*track(3,jtrk)) *   &
-          ((one + bet0*track(6,jtrk))/ttt) * bet0i
+          ((one + betas*track(6,jtrk))/ttt) * beti
   enddo
 
   !---- Radiation loss at exit.
@@ -1262,11 +1265,11 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
            px = track(2,jtrk)
            py = track(4,jtrk)
            pt = track(6,jtrk)
-           beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+           beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            track(2,jtrk) = px * f_damp_t;
            track(4,jtrk) = py * f_damp_t;
-           track(6,jtrk) = pt * (one - rfac) - rfac / bet0;
+           track(6,jtrk) = pt * (one - rfac) - rfac * beti;
         enddo
 
         !---- Energy loss like for closed orbit.
@@ -1275,11 +1278,11 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
         !---- Store energy loss on closed orbit.
         rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
         pt = track(6,1)
-        beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+        beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
         TRACK(2,:ktrack) = TRACK(2,:ktrack) * f_damp_t;
         TRACK(4,:ktrack) = TRACK(4,:ktrack) * f_damp_t;
-        TRACK(6,:ktrack) = TRACK(6,:ktrack) * (one - rfac) - rfac / bet0;
+        TRACK(6,:ktrack) = TRACK(6,:ktrack) * (one - rfac) - rfac * beti;
 
      endif
   endif
@@ -1349,13 +1352,13 @@ subroutine ttxrot(track,ktrack)
     py = TRACK(4,i)
     t  = TRACK(5,i)
     pt = TRACK(6,i)
-    pz = sqrt(one + two*pt/bet0i + pt**2 - px**2 - py**2)
+    pz = sqrt(one + two*pt*beti + pt**2 - px**2 - py**2)
     ptt = 1 - ta*py/pz
 
     track(3,i) = y/(ca*ptt)
     track(4,i) = ca*py + sa*pz
     track(1,i) = x + ta*y*px/(pz*ptt)
-    track(5,i) = t - ta*y*(one/bet0i+pt)/(pz*ptt)
+    track(5,i) = t - ta*y*(beti+pt)/(pz*ptt)
   enddo
 end subroutine ttxrot
 
@@ -1378,7 +1381,7 @@ subroutine ttyrot(track,ktrack)
   double precision :: x, px, y, py, t, pt, pz, ptt
   double precision :: node_value
 
-  angle = node_value('angle ')
+  angle = -node_value('angle ') !Sign to be consistent with a geometrical rotation
   if (angle .eq. 0) return
 
   angle = angle * node_value('other_bv ')
@@ -1393,12 +1396,12 @@ subroutine ttyrot(track,ktrack)
     t  = TRACK(5,i)
     pt = TRACK(6,i)
 
-    pz = sqrt(one + two*pt/bet0i + pt**2 - px**2 - py**2)
+    pz = sqrt(one + two*pt*beti + pt**2 - px**2 - py**2)
     ptt = 1 - ta*px/pz
     track(1,i) = x/(ca*ptt)
     track(2,i) = ca*px + sa*pz
     track(3,i) = y + ta*x*py/(pz*ptt)
-    track(5,i) = t - ta*x*(one/bet0i+pt)/(pz*ptt)
+    track(5,i) = t - ta*x*(beti+pt)/(pz*ptt)
   enddo
 end subroutine ttyrot
 
@@ -1429,13 +1432,13 @@ subroutine ttdrf(el,track,ktrack)
      py = track(4,i)
      pt = track(6,i)
      ! L/pz
-     l_pz = el / sqrt( one + two*pt*bet0i + pt**2 - px**2 - py**2)
+     l_pz = el / sqrt( one + two*pt*beti + pt**2 - px**2 - py**2)
      track(1,i) = track(1,i) + l_pz*px
      track(3,i) = track(3,i) + l_pz*py
      ! track(5,i) = track(5,i) + el*(beti + pt*dtbyds) - (beti+pt)*l_pz
      !---- AK 20060413
      !---- Ripken DESY-95-189 p.36
-     track(5,i) = track(5,i) + bet0i*(el - (one + bet0*pt) * l_pz)
+     track(5,i) = track(5,i) + (el*beti - (beti + pt) * l_pz)
   enddo
 !$OMP END DO
 !$OMP END PARALLEL
@@ -1560,6 +1563,7 @@ end subroutine ttrf
 subroutine ttchangep0(track,ktrack)
   use math_constfi, only : zero, two, one
   use phys_constfi, only : clight
+  use trackfi
   implicit none
   double precision :: track(6,*)
   double precision :: get_value, bet0
@@ -1769,7 +1773,7 @@ end subroutine ttvacdip
 subroutine ttsep(track,ktrack)
   use twtrrfi
   use trackfi
-  use math_constfi, only : one, ten3m
+  use math_constfi, only : one, two, ten3m
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1786,7 +1790,7 @@ subroutine ttsep(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: el, ex, ey, tilt, charge, mass, pc, beta, deltap, kick0
+  double precision :: el, ex, ey, tilt, charge, mass, pc, pt0, deltap, kick0
   double precision :: pt
 
   double precision :: node_value, get_value
@@ -1796,13 +1800,14 @@ subroutine ttsep(track,ktrack)
 
   charge = get_value('probe ','charge ')
   pc     = get_value('probe ','pc ')
-  beta   = get_value('probe ','beta ')
+  !beta   = get_value('probe ','beta ')
 
   !Before there was rotation here. This made rotation not work because any rotation was later cancelled.
 
   do i = 1, ktrack
-     deltap = sqrt(one - one/beta/beta + (track(6,i)+one/beta)**2) - one
-     kick0 = charge * ten3m / pc / (one+deltap) / beta
+     pt0 = track(6,i);
+     deltap = sqrt(pt0*pt0 + two*pt0*beti + one);
+     kick0 = charge * ten3m / pc / (one+deltap) * beti
      track(2,i) = track(2,i) + kick0*ex
      track(4,i) = track(4,i) + kick0*ey
   end do
@@ -1830,7 +1835,7 @@ subroutine ttcorr(el,track,ktrack,turn, code)
   integer :: ktrack, turn
 
   integer :: i, n_ferr, code, bvk, sinkick
-  double precision :: bi2gi2, bil2, curv, dpx, dpy, pt, px, py, rfac, rpt
+  double precision :: curv, dpx, dpy, pt, px, py, rfac, rpt
   double precision :: rpx, rpy, xkick, ykick, div, temp
   double precision :: f_errors(0:maxferr), field(2)
   double precision :: dpxx, dpyy
@@ -1838,7 +1843,7 @@ subroutine ttcorr(el,track,ktrack,turn, code)
   double precision :: beta_sqr, f_damp_t
 
   integer :: node_fd_errors, get_option
-  double precision :: get_variable, get_value, node_value
+  double precision :: get_variable, get_value, node_value, elrad
   double precision :: external, get_tt_attrib
 
   !---- Initialize.
@@ -1868,8 +1873,10 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   if (el .eq. zero)  then
      div = one
+     elrad = node_value('lrad ')
   else
      div = el
+     elrad = el
   endif
 
   FIELD(1:2) = zero
@@ -1912,15 +1919,15 @@ subroutine ttcorr(el,track,ktrack,turn, code)
   dpxx = xkick
   dpyy = ykick
 
-  bil2 = el / (two * betas)
-  bi2gi2 = one / (betas * gammas) ** 2
+  !bil2 = el / (two * betas)
+  !bi2gi2 = one / (betas * gammas) ** 2
 
   !---- Half radiation effects at entrance.
-  if (radiate  .and.  el .ne. 0) then
+  if (radiate  .and.  elrad .ne. 0) then
      if (damp .and. quantum) then
-        curv = sqrt(dpx**2 + dpy**2) / el
+        curv = sqrt(dpx**2 + dpy**2) / elrad
      else
-        rfac = arad * (betas * gammas)**3 * (dpx**2 + dpy**2) / (three * el)
+        rfac = arad * (betas * gammas)**3 * (dpx**2 + dpy**2) / (three * elrad)
      endif
 
      if (damp) then !---- Full damping.
@@ -1928,20 +1935,20 @@ subroutine ttcorr(el,track,ktrack,turn, code)
            px = track(2,i)
            py = track(4,i)
            pt = track(6,i)
-           if (quantum) call trphot(el,curv,rfac,pt)
-           beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+           if (quantum) call trphot(elrad,curv,rfac,pt)
+           beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            track(2,i) = px * f_damp_t;
            track(4,i) = py * f_damp_t;
-           track(6,i) = pt * (one - rfac) - rfac / bet0;
+           track(6,i) = pt * (one - rfac) - rfac * beti;
         enddo
      else !---- Energy loss as for closed orbit.
         pt = track(6,1)
-        beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+        beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
         track(2,:ktrack) = track(2,:ktrack) * f_damp_t;
         track(4,:ktrack) = track(4,:ktrack) * f_damp_t;
-        track(6,:ktrack) = track(6,:ktrack) * (one - rfac) - rfac / bet0
+        track(6,:ktrack) = track(6,:ktrack) * (one - rfac) - rfac * beti
      endif
   endif
 
@@ -2011,24 +2018,24 @@ subroutine ttcorr(el,track,ktrack,turn, code)
   endif
   !---- Half radiation effects at exit.
   !     If not random, use same RFAC as at entrance.
-  if (radiate  .and.  el .ne. 0) then
+  if (radiate  .and.  elrad .ne. 0) then
      if (damp) then !---- Full damping.
         do i = 1, ktrack
            pt = track(6,i)
-           if (quantum) call trphot(el,curv,rfac,pt)
-           beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+           if (quantum) call trphot(elrad,curv,rfac,pt)
+           beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            track(2,i) = track(2,i) * f_damp_t;
            track(4,i) = track(4,i) * f_damp_t;
-           track(6,i) = track(6,i) * (one - rfac) - rfac / bet0;
+           track(6,i) = track(6,i) * (one - rfac) - rfac * beti;
         enddo
      else !---- Energy loss as for closed orbit.
         pt = track(6,1)
-        beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+        beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
         track(2,:ktrack) = track(2,:ktrack) * f_damp_t;
         track(4,:ktrack) = track(4,:ktrack) * f_damp_t;
-        track(6,:ktrack) = track(6,:ktrack) * (one - rfac) - rfac / bet0;
+        track(6,:ktrack) = track(6,:ktrack) * (one - rfac) - rfac * beti;
      endif
   endif
 
@@ -2057,15 +2064,22 @@ subroutine ttbb(track,ktrack)
   double precision :: gamma0, beta0, beta_dp, ptot, b_dir
 
   integer :: get_option
-  double precision :: get_value, node_value, get_variable
+  double precision :: get_value, node_value, get_variable, npart_el, npart_eff
   double precision, parameter :: cme32=1d-32
 
   !---- Calculate momentum deviation and according changes
   !     of the relativistic factor beta0
+  npart_el = node_value('npart ')
+  if (npart_el .gt. zero) then
+    npart_eff = npart_el
+  else
+    npart_eff = get_value('probe ', 'npart ')
+  endif
+
   q = get_value('probe ','charge ')
   q_prime = node_value('charge ')
   parvec(5) = get_value('probe ', 'arad ')
-  parvec(6) = node_value('charge ') * get_value('probe ', 'npart ')
+  parvec(6) = node_value('charge ') * npart_eff
   parvec(7) = get_value('probe ','gamma ')
 
   dp = get_variable('track_deltap ')
@@ -3157,6 +3171,8 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
   et = get_value('probe ','et ')
   bet0  = get_value('beam ','beta ')
   bet0i = one / bet0
+  betas = get_value('probe ','beta ')
+  beti = one / betas
   !-----get x add-on for lyaponuv calculation from dynap table
   deltax = get_value('dynap ', 'lyapunov ')
 
@@ -3330,7 +3346,7 @@ subroutine ttdpdg(track, ktrack)
 end subroutine ttdpdg
 
 subroutine trsol(track,ktrack,dxt,dyt)
-  use trackfi, only : radiate, arad, damp, quantum, gammas
+  use trackfi, only : radiate, arad, damp, quantum, gammas, betas, beti
   use math_constfi, only : zero, half, one, two, three, four
   implicit none
   !----------------------------------------------------------------------*
@@ -3347,7 +3363,6 @@ subroutine trsol(track,ktrack,dxt,dyt)
 
   integer :: i, step
   double precision :: dxt(*), dyt(*)
-  double precision :: bet0
   double precision :: sk, skl, cosTh, sinTh, Q, R, Z
   double precision :: xf, yf, pxf, pyf, sigf, psigf, bvk
   double precision :: onedp, fpsig, fppsig
@@ -3360,9 +3375,6 @@ subroutine trsol(track,ktrack,dxt,dyt)
   double precision :: bet, length_, elrad
   double precision :: curv, const, rfac
   double precision :: beta_sqr, f_damp_t
-
-  !---- Initialize.
-  bet0 = get_value('probe ','beta ')
 
   !---- Get solenoid parameters
   elrad   = node_value('lrad ')
@@ -3380,12 +3392,12 @@ subroutine trsol(track,ktrack,dxt,dyt)
            !     Ripken formulae p.28 (3.35 and 3.36)
            xf    = track(1,i)
            yf    = track(3,i)
-           psigf = track(6,i) / bet0
+           psigf = track(6,i) * beti
 
            !     We do not use a constant deltap!!!!! WE use full 6D formulae!
-           onedp   = sqrt( one + two*psigf + (bet0**2)*(psigf**2) )
+           onedp   = sqrt( one + two*psigf + (betas**2)*(psigf**2) )
            fpsig   = onedp - one
-           fppsig  = ( one + (bet0**2)*psigf ) / onedp
+           fppsig  = ( one + (betas**2)*psigf ) / onedp
 
            ! Set up C,S, Q,R,Z
            cosTh = cos(skl/onedp)
@@ -3396,7 +3408,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
 
            pxf  = track(2,i) + xf*Q
            pyf  = track(4,i) + yf*Q
-           sigf = track(5,i)*bet0 - half*(xf**2 + yf**2)*R
+           sigf = track(5,i)*betas - half*(xf**2 + yf**2)*R
 
            ! For radiation calculations (initial angles)
            dxt(i) = track(2,i);
@@ -3419,25 +3431,25 @@ subroutine trsol(track,ktrack,dxt,dyt)
                     if (quantum) then
                        call trphot(elrad,curv,rfac,track(6,i))
                     else
-                       const = arad * (bet0 * gammas)**3 / three
+                       const = arad * (betas * gammas)**3 / three
                        rfac = const * curv**2 * elrad
                     endif
                     pt_ = track(6,i)
-                    beta_sqr = (pt_*pt_ + two*pt_/bet0 + one) / (one/bet0 + pt_)**2;
+                    beta_sqr = (pt_*pt_ + two*pt_*beti + one) / (beti + pt_)**2;
                     f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
                     track(2,i) = track(2,i) * f_damp_t;
                     track(4,i) = track(4,i) * f_damp_t;
-                    track(6,i) = track(6,i) * (one - rfac) - rfac / bet0;
+                    track(6,i) = track(6,i) * (one - rfac) - rfac * beti;
                     !---- Energy loss like for closed orbit.
                  else
                     !---- Store energy loss on closed orbit.
                     rfac = const * (dxt(1)**2 + dyt(1)**2)
                     pt_ = track(6,1)
-                    beta_sqr = (pt_*pt_ + two*pt_/bet0 + one) / (one/bet0 + pt_)**2;
+                    beta_sqr = (pt_*pt_ + two*pt_*beti + one) / (beti + pt_)**2;
                     f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
                     TRACK(2,i) = TRACK(2,i) * f_damp_t;
                     TRACK(4,i) = TRACK(4,i) * f_damp_t;
-                    TRACK(6,i) = TRACK(6,i) * (one - rfac) - rfac / bet0;
+                    TRACK(6,i) = TRACK(6,i) * (one - rfac) - rfac * beti;
                  endif
               endif
            else !   step.eq.2, body of the solenoid
@@ -3446,8 +3458,8 @@ subroutine trsol(track,ktrack,dxt,dyt)
               track(2,i) =  pxf_
               track(3,i) = -xf  * sinTh  +  yf  * cosTh
               track(4,i) =  pyf_
-              track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) / bet0
-              ! track(6,i) =  psigf*bet0
+              track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) * beti
+              ! track(6,i) =  psigf*betas
            endif
         enddo ! step
      enddo ! i
@@ -3468,7 +3480,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
               pt_ = track(6,i)
 
               ! set up constants
-              onedp = sqrt(one + two*pt_/bet0 + pt_**2);
+              onedp = sqrt(one + two*pt_*beti + pt_**2);
 
               ! set up constants
               cosTh = cos(two*skl/onedp)
@@ -3489,28 +3501,28 @@ subroutine trsol(track,ktrack,dxt,dyt)
                        if (quantum) then
                           call trphot(length,curv,rfac,track(6,i))
                        else
-                          const = arad * (bet0 * gammas)**3 / three
+                          const = arad * (betas * gammas)**3 / three
                           rfac = const * curv**2 * length
                        endif
-                       beta_sqr = (pt_*pt_ + two*pt_/bet0 + one) / (one/bet0 + pt_)**2;
+                       beta_sqr = (pt_*pt_ + two*pt_*beti + one) / (beti + pt_)**2;
                        f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
                        track(2,i) = track(2,i) * f_damp_t;
                        track(4,i) = track(4,i) * f_damp_t;
-                       track(6,i) = track(6,i) * (one - rfac) - rfac / bet0;
+                       track(6,i) = track(6,i) * (one - rfac) - rfac * beti;
                        !---- Energy loss like for closed orbit.
                     else
                        !---- Store energy loss on closed orbit.
                        rfac = const * (dxt(1)**2 + dyt(1)**2)
-                       beta_sqr = (pt_*pt_ + two*pt_/bet0 + one) / (one/bet0 + pt_)**2;
+                       beta_sqr = (pt_*pt_ + two*pt_*beti + one) / (beti + pt_)**2;
                        f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
                        track(2,i) = track(2,i) * f_damp_t;
                        track(4,i) = track(4,i) * f_damp_t;
-                       track(6,i) = track(6,i) * (one - rfac) - rfac / bet0;
+                       track(6,i) = track(6,i) * (one - rfac) - rfac * beti;
                     endif
                  endif
               else
                  ! total path length traveled by the particle
-                 bet = onedp / (one/bet0 + pt_);
+                 bet = onedp / (beti + pt_);
                  length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
                       two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
 
@@ -3519,7 +3531,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
                  track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
                  track(2,i) = pxf_;
                  track(4,i) = pyf_;
-                 track(5,i) = z_ + length/bet0 - length_/bet;
+                 track(5,i) = z_ + length*beti - length_/bet;
               endif
            enddo ! step
 
@@ -3531,7 +3543,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
 end subroutine trsol
 
 subroutine tttrans(track,ktrack)
-  use trackfi, only : betas
+  use trackfi, only : beti
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3561,7 +3573,7 @@ subroutine tttrans(track,ktrack)
      ! Add vector to particle coordinates
      track(1,i) = track(1,i) - t_x
      track(3,i) = track(3,i) - t_y
-     track(5,i) = track(5,i) - t_z/betas
+     track(5,i) = track(5,i) - t_z*beti
   enddo
 
 !$OMP END DO
@@ -3675,7 +3687,7 @@ subroutine trclor(switch,orbit0)
      Z(:,k) = ORBIT0
   enddo
 
-  DDD(1:6) = 1d-15
+  DDD(1:6) = 1d-10
 
 ! How does it work without the code right after? i.e. A will always be singular!
 !  do k = 1, 6
@@ -4020,19 +4032,19 @@ subroutine ttrfmult(track, ktrack, turn)
           rfac = arad * (betas * gammas)**3 * (dpx**2+dpy**2) / (three*elrad)
        endif
        if (damp) then
-          beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+          beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
           f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
           px = px * f_damp_t;
           py = py * f_damp_t;
-          pt = pt * (one - rfac) - rfac / bet0;
+          pt = pt * (one - rfac) - rfac * beti;
        else
           if (jtrk.eq.1) then
-             beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+             beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
              f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
           endif
           px = px * f_damp_t;
           py = py * f_damp_t;
-          pt = pt * (one - rfac) - rfac / bet0;
+          pt = pt * (one - rfac) - rfac * beti;
        endif
     endif
 
@@ -4050,19 +4062,19 @@ subroutine ttrfmult(track, ktrack, turn)
           rfac = arad * (betas * gammas)**3 * (dpx**2+dpy**2) / (three*elrad)
        endif
        if (damp) then
-          beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+          beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
           f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
           px = px * f_damp_t;
           py = py * f_damp_t;
-          pt = pt * (one - rfac) - rfac / bet0;
+          pt = pt * (one - rfac) - rfac * beti;
        else
           if (jtrk.eq.1) then
-             beta_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+             beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
              f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
           endif
           px = px * f_damp_t;
           py = py * f_damp_t;
-          pt = pt * (one - rfac) - rfac / bet0;
+          pt = pt * (one - rfac) - rfac * beti;
        endif
     endif
 
@@ -4107,8 +4119,8 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
   integer, parameter:: dp=kind(0.d0)
   complex(kind=dp) :: sqrt_Kx, sqrt_Ky
 
-  delta_plus_1 = sqrt(pt*pt + two*pt/bet0 + one);
-  bet = delta_plus_1/(one/bet0+pt);
+  delta_plus_1 = sqrt(pt*pt + two*pt*beti + one);
+  bet = delta_plus_1/(beti+pt);
 
   k0 = k0_ / delta_plus_1; ! 1/m
   k1 = k1_ / delta_plus_1; ! 1/m^2
@@ -4170,7 +4182,7 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
   else
      length_ = length_ + half*(D**2)*length;
   endif
-  z_ = z + length/bet0 - length_/bet;
+  z_ = z + length*beti - length_/bet;
 
   x  = x_;
   px = px_;
@@ -4184,7 +4196,7 @@ subroutine tttquad(track, ktrack)
   use twtrrfi
   use trackfi
   use twiss_elpfi
-  use math_constfi, only : zero, one, two, three, half
+  use math_constfi, only : zero, one, two, three, half, sqrt2
   implicit none
   !-------------------------*
   ! Andrea Latina 2012-2013 *
@@ -4211,8 +4223,6 @@ subroutine tttquad(track, ktrack)
   integer :: jtrk, elpar_vl
 
   double precision, external :: node_value
-  double precision, parameter ::  sqrt2=1.41421356237310d0
-
   double precision, external :: get_value
 
   double precision :: f_errors(0:maxferr)
@@ -4223,6 +4233,7 @@ subroutine tttquad(track, ktrack)
   !beta = get_value('probe ','beta ')
   
   !---- Read-in the parameters
+<<<<<<< HEAD
   elpar_vl = el_par_vector(q_k1st, g_elpar)
   length = node_value('l ');
   tilt = g_elpar(q_tilt)
@@ -4279,7 +4290,7 @@ subroutine tttquad(track, ktrack)
      endif
 
      !---- Computes 1+delta
-     delta_plus_1 = sqrt(pt*pt + two*pt/beta + one);
+     delta_plus_1 = sqrt(pt*pt + two*pt*beti + one);
 
      !---- Radiation effects at entrance
      if (radiate) then
@@ -4289,23 +4300,23 @@ subroutine tttquad(track, ktrack)
            curv = sqrt(hx**2+hy**2);
            call trphot(length,curv,rfac,pt)
         else
-           beta_gamma = delta_plus_1 * gamma * beta;
+           beta_gamma = delta_plus_1 * gamma * betas;
            rfac = (arad * beta_gamma**3 * length / three) * (hx**2 + hy**2);
         endif
         if (damp) then
-           beta_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
+           beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * (one - rfac) - rfac / beta;
+           pt = pt * (one - rfac) - rfac * beti;
         else
            if (jtrk.eq.1) then
-              beta_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
+              beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
               f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            endif
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * (one - rfac) - rfac / beta;
+           pt = pt * (one - rfac) - rfac * beti;
         endif
      endif
 
@@ -4323,19 +4334,19 @@ subroutine tttquad(track, ktrack)
            rfac = (arad * beta_gamma**3 * length / three) * (hx**2 + hy**2);
         endif
         if (damp) then
-           beta_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
+           beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * (one - rfac) - rfac / beta;
+           pt = pt * (one - rfac) - rfac * beti;
         else
            if (jtrk.eq.1) then
-              beta_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
+              beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
               f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            endif
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * (one - rfac) - rfac / beta;
+           pt = pt * (one - rfac) - rfac * beti;
         endif
      endif
 
@@ -4385,8 +4396,8 @@ subroutine tttdipole(track, ktrack, code)
   integer :: jtrk
   double precision :: length, angle, rho, h, k0, k1
   double precision :: x, px, y, py, z, pt, delta_plus_1
-  double precision :: beta, gamma, hx, hy, rfac, curv
-  double precision :: e1, e2, h1, h2, hgap, fint, fintx
+  double precision :: hx, hy, rfac, curv
+  double precision :: e1, e2, h1, h2, hgap, fint, fintx, ktap
   double precision :: beta_sqr, beta_gamma, f_damp_t
 
   double precision, external :: node_value, get_value
@@ -4403,21 +4414,13 @@ subroutine tttdipole(track, ktrack, code)
 
   elpar_vl = el_par_vector(b_k3s, g_elpar)
   !---- Read-in dipole edges angles
-  !e1    = node_value('e1 ');
-  !e2    = node_value('e2 ');
   e1 = g_elpar(b_e1)
   e2 = g_elpar(b_e2)
-  !h1    = node_value('h1 ')
-  !h2    = node_value('h2 ')
   h1 = g_elpar(b_h1)
   h2 = g_elpar(b_h2)
-  !hgap  = node_value('hgap ')
-  !fint  = node_value('fint ')
-  !fintx = node_value('fintx ')
   hgap = g_elpar(b_hgap)
   fint = g_elpar(b_fint)
   fintx = g_elpar(b_fintx)
-
   length = node_value('l ')
   angle  = g_elpar(b_angle)
 
@@ -4425,9 +4428,6 @@ subroutine tttdipole(track, ktrack, code)
   h = angle/length
   k0 = g_elpar(b_k0)
   k1 = g_elpar(b_k1)
-  !k0 = node_value('k0 ') ! was h
-  !k1 = node_value('k1 ')
-
 
   if (code .eq. code_rbend) then
      e1 = e1 + angle / two;
@@ -4442,6 +4442,9 @@ subroutine tttdipole(track, ktrack, code)
   else
     k0 = h
   endif
+
+  k0 = k0 * (1+ktap) ! tapering to main field only
+
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
@@ -4449,6 +4452,7 @@ subroutine tttdipole(track, ktrack, code)
      call ttdrf(length,track,ktrack);
      return
   endif
+
   !---- Apply entrance dipole edge effect
   if (node_value('kill_ent_fringe ') .eq. zero) &
        call ttdpdg_map(track, ktrack, e1, k0, hgap, fint, zero)
@@ -4463,7 +4467,7 @@ subroutine tttdipole(track, ktrack, code)
      z  = track(5,jtrk);
      pt = track(6,jtrk);
 
-     delta_plus_1 = sqrt(pt*pt + two*pt/beta + one);
+     delta_plus_1 = sqrt(pt*pt + two*pt*beti + one);
 
      !---- Radiation effects at entrance.
      if (radiate) then
@@ -4475,23 +4479,23 @@ subroutine tttdipole(track, ktrack, code)
            curv = sqrt(hx**2+hy**2);
            call trphot(length * (one + h*x) - two * tan(e1)*x, curv, rfac, pt);
         else
-           beta_gamma = delta_plus_1 * gammas * beta;
+           beta_gamma = delta_plus_1 * gammas * betas;
            rfac = (arad * beta_gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e1)*x)
         endif
         if (damp) then
-           beta_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
+           beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * (one - rfac) - rfac / beta;
+           pt = pt * (one - rfac) - rfac * beti;
         else
            if (jtrk.eq.1) then
-              beta_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
+              beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
               f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            endif
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * (one - rfac) - rfac / beta;
+           pt = pt * (one - rfac) - rfac * beti;
         endif
      endif
 
@@ -4507,23 +4511,23 @@ subroutine tttdipole(track, ktrack, code)
            curv = sqrt(hx**2+hy**2);
            call trphot(length * (one + h*x) - two * tan(e2)*x, curv, rfac, pt);
         else
-           beta_gamma = delta_plus_1 * gammas * beta;
+           beta_gamma = delta_plus_1 * gammas * betas;
            rfac = (arad * beta_gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e2)*x)
         endif
         if (damp) then
-           beta_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
+           beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * (one - rfac) - rfac / beta;
+           pt = pt * (one - rfac) - rfac * beti;
         else
            if (jtrk.eq.1) then
-              beta_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
+              beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
               f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            endif
            px = px * f_damp_t;
            py = py * f_damp_t;
-           pt = pt * (one - rfac) - rfac / beta;
+           pt = pt * (one - rfac) - rfac * beti;
         endif
      endif
 
@@ -4548,7 +4552,7 @@ end subroutine tttdipole
 subroutine trphot(el,curv,rfac,pt)
   use math_constfi, only : zero, one, two, three, five, twelve
   use phys_constfi, only : clight, hbar
-  use trackfi, only : arad, gammas, betas
+  use trackfi, only : arad, gammas, betas, beti
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -4648,7 +4652,7 @@ subroutine trphot(el,curv,rfac,pt)
   amass  = get_value('probe ','mass ')
 
   gamma = (betas*pt + one)*gammas;
-  delta_plus_1 = sqrt(pt*pt + two*pt/betas + one);
+  delta_plus_1 = sqrt(pt*pt + two*pt*beti + one);
 
   !---- AMEAN is the average number of photons emitted.,
   !     NPHOT is the integer number generated from Poisson's law.
@@ -4657,8 +4661,8 @@ subroutine trphot(el,curv,rfac,pt)
   ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
   sumxi = zero
   if (amean.gt.3d-1) then
-     print *,"More than 0.3 photons emitted in element."
-     print *,"You might want to consider increasing the number of slices to reduce this number."
+    call fort_warn('TWCPGO: ','More than 0.3 photons emitted in element. '// &
+                         'You might want to consider increasing the number of slices to reduce this number.')
   endif
 
   if (amean .gt. zero) then

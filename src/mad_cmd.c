@@ -198,7 +198,8 @@ exec_command(void)
       else if (strcmp(p->cmd_def->module, "track") == 0)     pro_track(p);
       else if (strcmp(p->cmd_def->module, "twiss") == 0)     { current_twiss = p->clone; pro_twiss(); }
       else if (strcmp(p->cmd_def->module, "distribution") == 0)       pro_distribution(p); 
-
+      else if (strcmp(p->cmd_def->module, "taper") == 0)     pro_taper(p); 
+      
       else if (strcmp(p->cmd_def->module, "sdds") == 0) {
 #ifdef _ONLINE
         pro_sdds(p);

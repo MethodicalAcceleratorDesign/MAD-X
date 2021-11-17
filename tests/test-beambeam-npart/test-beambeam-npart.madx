@@ -1,0 +1,55 @@
+circum=2;
+beam_particles = 0;
+bb_particles = 1e12;
+
+beam, particle=proton, energy = 1, npart:=beam_particles;
+newquad:  MULTIPOLE, KNL={0.00, 0.001}, comments="testing the comments";
+option, BBORBIT = true;
+
+bb1: beambeam,  XMA=0.001, npart:=bb_particles, sigx = 0.01, sigy=0.01;
+
+seq: sequence, refer=center, l=circum;
+bb1, at=1;
+endsequence;
+
+use, sequence=seq;
+select, flag=twiss, column=name, s, x,px, y, py, BETX, BETY;
+twiss,X=0.0,Y=0.000, BETX=1, BETY=1, file="bb.twiss";
+use, sequence=seq;
+
+TRACK, file = "trackbb",ONEPASS, ONETABLE;
+OBSERVE, PLACE="bb1";
+START,  x=0, y=0, t=0.0;
+run, turns=1;
+
+ptc_create_universe;
+ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=false, exact_mis=true, time=true, totalpath=false;
+PTC_TWISS, table=twiss, icase=56, no=1, betx=1, bety=1, betz=1, x=0, y=0, px=0, py=0, t=0.0, pt=0.0;
+write, table=twiss, file="ptc.bb.twiss";
+ptc_end;
+
+beam_particles = 1e12;
+bb_particles = 0;
+
+
+beam, particle=proton, energy = 1, npart:=beam_particles;
+select, flag=twiss, column=name, s, x,px, y, py, BETX, BETY;
+twiss,X=0.0,Y=0.000, BETX=1, BETY=1, file="beam.twiss";
+
+TRACK, file = "trackbeam",ONEPASS, ONETABLE;
+OBSERVE, PLACE="bb1";
+START,  x=0, y=0, t=0.0;
+run, turns=1;
+
+ptc_create_universe;
+ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+ptc_setswitch, debuglevel=0, nocavity=true, fringe=false, exact_mis=true, time=true, totalpath=false;
+PTC_TWISS, table=twiss, icase=56, no=1, betx=1, bety=1, betz=1, x=0, y=0, px=0, py=0, t=0.0, pt=0.0;
+write, table=twiss, file="ptc.beam.twiss";
+ptc_end;
+
+
+
+
+stop;

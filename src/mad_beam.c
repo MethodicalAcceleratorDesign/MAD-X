@@ -506,10 +506,10 @@ adjust_probe_fp(double dp) // fix point version of adjust_probe, includes adjust
   do {
     tmrefe_(oneturnmat); /* one-turn linear transfer map */
     twdisp_ini_(oneturnmat,disp0);  /* added for disp0 computation */
-
+    
     adjust_probe(dp);    /* sets correct gamma, beta, etc. */
     adjust_rfc();        /* sets rf freq and harmon */
-
+  
     ds0 = ds;
     ds = oneturnmat[4 + 6*5]; // must be same as adjust_probe!
     for (int j=0; j < 4; j++) ds += oneturnmat[4 + 6*j] * disp0[j];
