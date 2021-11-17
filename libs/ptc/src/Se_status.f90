@@ -152,7 +152,7 @@ module S_status
      real(dp), DIMENSION(:,:), POINTER   :: a_x,a_y,b_x,b_y,va,vb
   END  TYPE B_CYL
 
- ! TYPE(B_CYL),ALLOCATABLE ::  S_B(:) 
+ ! TYPE(B_CYL),ALLOCATABLE ::  S_B(:)
  ! TYPE(B_CYL) S_B,S_EB
   TYPE(B_CYL) S_E,S_B_from_V
 
@@ -243,7 +243,7 @@ module S_status
   INTERFACE track_TREE_probe_complex
      MODULE PROCEDURE track_TREE_probe_complexr
      MODULE PROCEDURE track_TREE_probe_complexp_new
-  END INTERFACE 
+  END INTERFACE
 
 CONTAINS
 
@@ -254,14 +254,14 @@ CONTAINS
     !   cradf=radfac*crad*p%p0c**3
     ! else
        cradf=radfac*CGAM0*twopii/p%GAMMA0I**3/p%MASS
-    ! endif  
+    ! endif
 
   end function cradf
 
   real(dp) function cflucf(p)
     implicit none
     type (MAGNET_CHART), pointer:: P
-    ! if(junk_e) then    
+    ! if(junk_e) then
     !  cflucf=cfluc*p%p0c**5
     ! else
       cflucf=cfluc0*twopii/p%GAMMA0I**5/p%MASS**2
@@ -287,7 +287,7 @@ CONTAINS
     P%KIND=0; P%R=0.0_dp;P%X=0.0_dp;P%Y=0.0_dp;P%pos=aperture_pos_default;
     ALLOCATE(P%DX);ALLOCATE(P%DY);
     P%DX=0.0_dp;P%DY=0.0_dp;
-    
+
   end subroutine alloc_A
 
   SUBROUTINE  dealloc_A(p)
@@ -298,13 +298,13 @@ CONTAINS
        DEALLOCATE(P%R);DEALLOCATE(P%X);DEALLOCATE(P%Y);DEALLOCATE(P%KIND);
        DEALLOCATE(P%DX);DEALLOCATE(P%DY);DEALLOCATE(P%pos);
     endif
-    
+
     if (associated(p%POLYGN)) then
        DEALLOCATE(p%POLYGN)
        DEALLOCATE(p%POLYGX)
        DEALLOCATE(p%POLYGY)
     endif
-    
+
   end SUBROUTINE  dealloc_A
 
 
@@ -636,13 +636,13 @@ CONTAINS
           ENDIF
 
        CASE(6) ! PILES OF POINTS
-          
+
           IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) then
             ! first check insribed square (user defined)
             ! if it is out if this square only then check the polygon
-            
+
             flag = chkAperPolygon(E,X)
-          
+
             if ( flag ) then
                !print*,"OUT polyg"
                CHECK_STABLE=.FALSE.
@@ -651,11 +651,11 @@ CONTAINS
                xlost=x
                !messagelost="Lost in real kind=6 racetrack Aperture"
                write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=6 polygon Aperture. ",&
-                                    "Orbit: X=",X(1)," Y=",X(3)   
+                                    "Orbit: X=",X(1)," Y=",X(3)
             endif
-           
+
            endif
-           
+
        CASE DEFAULT
           !   STOP 223
        END SELECT
@@ -676,7 +676,7 @@ CONTAINS
 
   END SUBROUTINE  CHECK_APERTURE_P
 
-  
+
   ! checks aperture of aribtrary polygon
   ! returns true if out of aperture
   ! algorithm: winding number https://en.wikipedia.org/wiki/Point_in_polygon
@@ -688,23 +688,23 @@ CONTAINS
     real(dp) p, q
     integer i,wn
     REAL(DP),pointer :: pipex(:), pipey(:)
-    
+
     wn = 0
-    
+
     p = x(1) - E%DX
     q = x(3) - E%DY
-    
+
     if ( .NOT. associated(E%POLYGN) ) then
        print*, "chkAperPolygon: POLYGN is NULL"
        chkAperPolygon = .true.
        return
     endif
-    
+
    ! print*,"chkAperPolygon POLYGN = ",E%POLYGN
-    
+
     pipex => E%POLYGX
     pipey => E%POLYGY
-    
+
     do i=1,E%POLYGN !! edge from V[i] to  V[i+1]
       !print*,"chkAperPolygon i = ",i,E%POLYGX(i),E%POLYGY(i)
       if( pipey(i) <= q  .and.  pipey(i+1) > q) then
@@ -715,7 +715,7 @@ CONTAINS
          continue;
         endif
       endif
-     
+
       if (pipey(i) > q  .and.  pipey(i+1)  <= q) then
       ! first vertex is above point; second vertex is below; downward crossing
         if ( (pipex(i+1)-pipex(i))*(q - pipey(i)) - (p-pipex(i))*(pipey(i+1)-pipey(i)) < 0) then
@@ -724,18 +724,18 @@ CONTAINS
           continue
         endif
       endif
-    enddo    
-    
+    enddo
+
     if (wn == 0) then
       !outside the aperture
       chkAperPolygon = .true.
     else
       chkAperPolygon = .false.
     endif
-    
-    
+
+
   end function chkAperPolygon
- 
+
 
 
   FUNCTION minu( S1,S2  )
@@ -774,10 +774,10 @@ CONTAINS
     logical :: change_first=.true.
 
 !    W_P=>W_I
-    NULLIFY(ACC);       
-    NULLIFY(ACCfirst);       
-    NULLIFY(paccfirst);       
-    NULLIFY(paccthen);       
+    NULLIFY(ACC);
+    NULLIFY(ACCfirst);
+    NULLIFY(paccfirst);
+    NULLIFY(paccthen);
 
 
     insane_PTC=.true.
@@ -871,7 +871,7 @@ CONTAINS
        !  verb=global_verbose
        !  global_verbose=.false.
        if(firsttime_coef) THEN ! .or.(.not.allocated(S_B))) then
-       
+
          if(   SECTOR_NMUL==11.and.sector_nmul_max==22.and.read_sector_info) then
 
              if(mcmillan) then
@@ -881,11 +881,11 @@ CONTAINS
              call set_s_b
              call set_s_e
              endif
-         else 
- if(change_first) then  
+         else
+ if(change_first) then
   if(lielib_print(11)==1) write(6,*) " recomputing with new SECTOR_NMUL and sector_nmul_max ",SECTOR_NMUL,SECTOR_NMUL_max
  change_first=.false.
- endif        
+ endif
 
           lda_old=lda_used
           lda_used=3000
@@ -896,8 +896,8 @@ CONTAINS
 !             call nul_coef(S_B)
 !             call make_coef(S_B,I,0)  !1)
 !             call get_bend_coeff(S_B,I)
-             s_e%firsttime = 0  ! Piotr 8.19.2014 
-!             s_eB%firsttime = 0 
+             s_e%firsttime = 0  ! Piotr 8.19.2014
+!             s_eB%firsttime = 0
              call nul_coef(s_e)
              call make_coef(s_e,I,0)
 !             call make_coef(s_eB,I,0)
@@ -909,12 +909,13 @@ CONTAINS
 
 !          ENDDO
           lda_used=lda_old
+          global_verbose=.true.
           if (global_verbose ) then
             call print_curv("Maxwellian_bend_for_ptc.txt",S_B_from_V)
             call print_curv_elec("Maxwellian_bend_for_ptc_electric.txt",s_e)
            !call print_curv_elec("Maxwellian_bend_mag_from_pot.txt",S_B_from_V)
           endif
-          
+
        endif
 
        firsttime_coef=.FALSE.
@@ -931,18 +932,18 @@ CONTAINS
     !  global_verbose=verb
 
   END  SUBROUTINE MAKE_STATES_0
-  
+
  SUBROUTINE print_curv(filename,s_b)
     IMPLICIT NONE
     INTEGER I,J,nmul,mf
     character(*) filename
     character(255) line
-    type(b_cyl), target :: s_b 
+    type(b_cyl), target :: s_b
 
 
     call kanalnummer(mf,filename)
 
-    
+
     nmul=SECTOR_NMUL_MAX
     write(mf,*) SECTOR_NMUL ,SECTOR_NMUL_MAX
          DO J=1,S_B_from_V%N_MONO
@@ -990,7 +991,7 @@ CONTAINS
         endif
        ENDDO
     ENDDO
-    
+
 
     DO I=1,NMUL
        DO J=1,S_B_from_V%N_MONO
@@ -1024,12 +1025,12 @@ CONTAINS
     INTEGER I,J,nmul,mf
     character(*) filename
     character(255) line
-    type(b_cyl), target :: S_E 
+    type(b_cyl), target :: S_E
 
 
     call kanalnummer(mf,filename)
 
-    
+
     nmul=SECTOR_NMUL_MAX
     write(mf,*) SECTOR_NMUL  ,SECTOR_NMUL_MAX
          DO J=1,S_E%N_MONO
@@ -1131,7 +1132,7 @@ CONTAINS
     b%va=0.0_dp
     b%vb=0.0_dp
   end subroutine make_set_coef
-  
+
 
   subroutine clear_states     !%nxyz
     implicit none
@@ -1173,16 +1174,16 @@ CONTAINS
        if(muon==1.0_dp)  then
           write(mf,*)"This is an electron (positron actually if charge=1) "
        else
-         if(abs(1836.1526740143d0-muon)<1.d-8)then
+        if(abs(1836.1526740143d0-muon)<1.d-8)then
           write(mf,*) "This is a proton"
-         else
+        else
           write(mf,'((1X,a21,1x,G21.14,1x,A24))' ) "This a particle with ",muon, "times the electron mass "
-         endif
-       endif
+        endif
+      endif
     else
-
-       write(mf,*) "This is a proton "
+      write(mf,*) "This is a proton "
     endif
+
     write(mf, '((1X,a20,1x,a5))' )  "      EXACT_MODEL = ", CONV(EXACT_MODEL    )
     write(mf, '((1X,a20,1x,i4))' )  "      TOTALPATH   = ", S%TOTALPATH
     !    write(mf, '((1X,a20,1x,a5))' )  "      EXACTMIS    = ", CONV(S%EXACTMIS    )
@@ -1223,20 +1224,20 @@ CONTAINS
     MASSF=muon*pmae
     call MAKE_STATES_0(doneitt)
 
-    IF(ABS(MASSF-pmap)/PMAP<0.01E0_DP) THEN
-       A_PARTICLE=A_PROTON
-    ELSEIF(ABS(MASSF-pmae)/pmae<0.01E0_DP) THEN
-       A_PARTICLE=A_ELECTRON
-    ELSEIF(ABS(MASSF-pmaMUON)/pmaMUON<0.01E0_DP) THEN
-       A_PARTICLE=A_MUON
+    IF(ABS(MASSF-pmap)/PMAP<0.0001_dp) THEN
+      A_PARTICLE=A_PROTON
+    ELSEIF(ABS(MASSF-pmae)/pmae<0.0001_dp) THEN
+      A_PARTICLE=A_ELECTRON
+    ELSEIF(ABS(MASSF-pmaMUON)/pmaMUON<0.0001_dp) THEN
+      A_PARTICLE=A_MUON
     elseif(present(ag)) then
-     a_particle=ag
-    else 
+      a_particle=ag
+    else
      write(6,*) "Cannot do spin : provide a=g-2. Now it is set to zero."
     ENDIF
-     initial_charge=1
+    initial_charge=1
     if(present(ne)) then
-     initial_charge=ne
+      initial_charge=ne
     endif
   END  SUBROUTINE MAKE_STATES_m
 
@@ -1304,9 +1305,9 @@ CONTAINS
     implicit none
     type (INTERNAL_STATE),INTENT(OUT)::S2
     integer, intent(in) :: i
-    
+
     S2=default0
-    select case(i) 
+    select case(i)
      case(0)
       S2=default0
     case(1)
@@ -1336,7 +1337,7 @@ CONTAINS
     case default
       S2%TOTALPATH = -1
     end select
- 
+
   END SUBROUTINE EQUALi
 
 
@@ -1346,11 +1347,11 @@ CONTAINS
     TYPE (INTERNAL_STATE) add
     TYPE (INTERNAL_STATE), INTENT (IN) :: S1, S2
 
-    if(s2%totalpath/=0.and.s2%totalpath/=1) then 
+    if(s2%totalpath/=0.and.s2%totalpath/=1) then
       add=s1
       return
     endif
-    if(s1%totalpath/=0.and.s1%totalpath/=1) then 
+    if(s1%totalpath/=0.and.s1%totalpath/=1) then
       add=s1
       return
     endif
@@ -1423,11 +1424,11 @@ CONTAINS
     TYPE (INTERNAL_STATE), INTENT (IN) :: S1, S2
     logical(lp) dum1,dum2,tt1,tt2
 
-    if(s2%totalpath/=0.and.s2%totalpath/=1) then 
+    if(s2%totalpath/=0.and.s2%totalpath/=1) then
       sub=s1
       return
     endif
-    if(s1%totalpath/=0.and.s1%totalpath/=1) then 
+    if(s1%totalpath/=0.and.s1%totalpath/=1) then
       sub=s1
       return
     endif
@@ -1570,7 +1571,7 @@ CONTAINS
        doing_ac_modulation_in_ptc=.true.
       n_acc=1
      !  ND1=ND1+1
-     if(present(number_of_clocks)) n_acc=number_of_clocks 
+     if(present(number_of_clocks)) n_acc=number_of_clocks
         !1
     endif
 
@@ -1601,7 +1602,7 @@ no1c=no1+complex_extra_order
 ND1=ND1+n_acc
     if(use_complex_in_ptc) call c_init(NO1c,nd1,np1+ndel,ndpt1,n_acc,ptc=my_false)  ! PTC false because we will not use the real FPP for acc modulation
     n_rf=n_acc
- 
+
   END  subroutine S_init
 
   subroutine kill_map_cp()
@@ -1612,19 +1613,19 @@ ND1=ND1+n_acc
       deallocate(dz_8)
       nullify(dz_8)
     endif
-    
+
     if(associated(dz_t)) then
       call kill(dz_t)
       deallocate(dz_t)
       nullify(dz_t)
-    endif    
+    endif
 
-    
+
     if(associated(dz_c)) then
       call kill(dz_c)
       deallocate(dz_c)
       nullify(dz_c)
-    endif    
+    endif
 
   end subroutine kill_map_cp
 
@@ -1690,7 +1691,7 @@ ND1=ND1+n_acc
   SUBROUTINE DTILTR_EXTERNAL(TILTD,I,X)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    INTEGER,INTENT(IN):: I 
+    INTEGER,INTENT(IN):: I
     REAL(DP),INTENT(IN) :: TILTD
     real(dp) YS
 
@@ -1711,14 +1712,14 @@ ND1=ND1+n_acc
        x(4)=COS(TILTD)*x(4)+SIN(TILTD)*x(2)
        x(2)=ys
     ENDIF
- 
+
 
   END SUBROUTINE DTILTR_EXTERNAL
 
   SUBROUTINE DTILTP_EXTERNAL(TILTD,I,X)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    INTEGER,INTENT(IN):: I 
+    INTEGER,INTENT(IN):: I
     REAL(DP),INTENT(IN) :: TILTD
     TYPE(REAL_8) YS
 
@@ -1771,14 +1772,14 @@ ND1=ND1+n_acc
 subroutine set_s_b
   implicit none
   integer i
- 
+
 
 
   !ALLOCATE(S_B(SECTOR_NMUL_MAX))
 i=SECTOR_NMUL_MAX
           ! DO I=1,SECTOR_NMUL_MAX
 
-             S_B_from_V%firsttime = 1  ! Piotr 8.19.2014 
+             S_B_from_V%firsttime = 1  ! Piotr 8.19.2014
              call nul_coef(S_B_from_V)
              call make_set_coef(S_B_from_V,I,0)
              S_B_from_V%firsttime=0
@@ -3871,20 +3872,20 @@ S_B_FROM_V%I(1)=22;S_B_FROM_V%J(1)=0;
  S_B_FROM_V%VB(22,232)=-1.00000000000000E0_DP
  S_B_FROM_V%VA(22,254)=4.545454545454546E-002_DP
 
-end subroutine set_s_b  
+end subroutine set_s_b
 
 
 
 subroutine set_s_e
   implicit none
   integer i
- 
+
 
 i=SECTOR_NMUL_MAX
 !  ALLOCATE(S_e(SECTOR_NMUL_MAX))
 !           DO I=1,SECTOR_NMUL_MAX
 !           DO I=SECTOR_NMUL_MAX,SECTOR_NMUL_MAX   ! etienne 5/10/2015
-             S_e%firsttime = 1  ! Piotr 8.19.2014 
+             S_e%firsttime = 1  ! Piotr 8.19.2014
              call nul_coef(S_e)
              call make_set_coef(S_e,I,0)
              S_e%firsttime=0
@@ -6244,24 +6245,24 @@ i=SECTOR_NMUL_MAX
  S_E%VA(22,232)=-1.00000000000000E0_DP
  S_E%VB(22,254)=4.545454545454546E-002_DP
 
-end subroutine set_s_e 
+end subroutine set_s_e
 
 subroutine set_s_b_mcmillan
   implicit none
   integer i
- 
+
 
 
   !ALLOCATE(S_B(SECTOR_NMUL_MAX))
 i=SECTOR_NMUL_MAX
           ! DO I=1,SECTOR_NMUL_MAX
 
-             S_B_from_V%firsttime = 1  ! Piotr 8.19.2014 
+             S_B_from_V%firsttime = 1  ! Piotr 8.19.2014
              call nul_coef(S_B_from_V)
              call make_set_coef(S_B_from_V,I,0)
              S_B_from_V%firsttime=0
         !  ENDDO
- 
+
  S_B_FROM_V%I(1)=22;S_B_FROM_V%J(1)=0;
  S_B_FROM_V%I(2)=21;S_B_FROM_V%J(2)=1;
  S_B_FROM_V%I(3)=21;S_B_FROM_V%J(3)=0;
@@ -7930,13 +7931,13 @@ end subroutine set_s_b_mcmillan
 subroutine set_s_e_mcmillan
   implicit none
   integer i
- 
+
 
 i=SECTOR_NMUL_MAX
 !  ALLOCATE(S_e(SECTOR_NMUL_MAX))
 !           DO I=1,SECTOR_NMUL_MAX
 !           DO I=SECTOR_NMUL_MAX,SECTOR_NMUL_MAX   ! etienne 5/10/2015
-             S_e%firsttime = 1  ! Piotr 8.19.2014 
+             S_e%firsttime = 1  ! Piotr 8.19.2014
              call nul_coef(S_e)
              call make_set_coef(S_e,I,0)
              S_e%firsttime=0
@@ -9613,14 +9614,14 @@ end  subroutine set_s_e_mcmillan
     implicit none
     integer no,i,k,j(2),NO1,l,mf,m,n
     type(taylor) x,y,h,df,ker,sol
-    type(complextaylor) z 
+    type(complextaylor) z
     type(taylor) f,kick_x,kick_y
     type(damap) y0
     type(taylor), allocatable :: fs(:)
     real(dp) h0,cker,cker1
      TYPE(B_CYL), intent(inout) :: s_b0t
-      logical(lp),optional :: verb    
-      real(dp),optional :: h00    
+      logical(lp),optional :: verb
+      real(dp),optional :: h00
 
     no=sector_nmul
 
@@ -9641,8 +9642,8 @@ endif
       y=1.d0.mono.2
       y0=1
       y0%v(2)=0
-      z=x+i_*y      
-!!!  
+      z=x+i_*y
+!!!
 
 
     h0=1.d0
@@ -9652,17 +9653,17 @@ endif
     do k=1,no1
     !  erect multipole
     f=dreal(-z**K/K)
-    
+
     df=f
 
     do i=k,no-1 !k+1
      df=-h0*(df.d.1)/h
      call  invert_laplace(df)
       sol=f+df
-      sol=-(sol.d.1) 
+      sol=-(sol.d.1)
       j=0
       j(1)=i
- 
+
       cker=(sol.sub.j)
       df=df-cker*dreal(-z**(I+1)/(I+1))
       f=f+df
@@ -9698,7 +9699,7 @@ endif
        enddo
 
 if(mcmillan) fs(k)=f
-enddo    
+enddo
 
 
 
@@ -9706,9 +9707,9 @@ if(mcmillan) then
 
 do k=1,no
 
- 
+
 f=fs(k)
- 
+
 
  do m=k+1,no  !no,k+1,-1
 
@@ -9720,16 +9721,16 @@ f=fs(k)
   cker=fs(m).sub.j
   if(abs(cker)>1.d-10) exit
  enddo
- 
- 
+
+
   cker=f.sub.j
- 
+
   cker1=fs(m).sub.j
   f=f-(cker/cker1)*fs(m)
  call clean_taylor(f,f,1.d-10)
- 
+
  enddo
- 
+
        kick_x=-(f.d.1)  ! electric field
        kick_y=-(f.d.2)
        call clean_taylor(kick_x,kick_x,1.d-6)
@@ -9744,14 +9745,14 @@ f=fs(k)
        enddo
 
 enddo
-        
+
 
 
 endif
 
     do k=1,no1
-    !  Skew multipole 
- 
+    !  Skew multipole
+
     f=aimag(-z**K/K)   ! check this
     df=f
     do i=k,no-1 !k+1
@@ -9791,10 +9792,10 @@ endif
         s_b0t%a_y(k,l)=kick_y.sub.j
         s_b0t%va(k,l)=f.sub.j
        enddo
-    
+
 
 if(mcmillan) fs(k)=f
-enddo    
+enddo
 
 
 
@@ -9838,7 +9839,7 @@ f=fs(k)
        enddo
 
 enddo
-        
+
 
 
 endif
@@ -9860,14 +9861,14 @@ endif
     implicit none
     integer no,i,k,j(2),NO1,l,mf,m,n
     type(taylor) x,y,h,df,ker,sol
-    type(complextaylor) z 
+    type(complextaylor) z
     type(taylor) f,kick_x,kick_y
     type(damap) y0
     real(dp) h0,cker,cker1
     type(taylor), allocatable :: fs(:)
      TYPE(B_CYL), intent(inout) :: s_b0t
-      logical(lp),optional :: verb    
-      real(dp),optional :: h00    
+      logical(lp),optional :: verb
+      real(dp),optional :: h00
 
 
       if(present(verb)) call kanalnummer(mf,"internal_mag_pot.txt")
@@ -9886,11 +9887,44 @@ endif
 
 
       x=1.d0.mono.1
+
+!      print*, "@@ x"
+!      call print(x,6)
+
+! etall    1, NO =   15, NV =    2, INA =   31
+! *********************************************
+!    I  COEFFICIENT          ORDER   EXPONENTS
+!     1    1.000000000000        1     1 0
+!
       y=1.d0.mono.2
-      y0=1
-      y0%v(2)=0
-      z=x+i_*y      
-!!!  
+!      print*, "@@ y"
+!      call print(y,6)
+
+!etall    1, NO =   15, NV =    2, INA =   32
+! *********************************************
+!
+!    I  COEFFICIENT          ORDER   EXPONENTS
+!     1    1.000000000000        1     0 1
+
+      z=x+i_*y
+!      print*, "@@ z"
+!      call print(z,6)
+
+! etall    1, NO =   15, NV =    2, INA =   35
+! *********************************************
+!
+!    I  COEFFICIENT          ORDER   EXPONENTS
+!     1    1.000000000000        1     1 0
+!
+!
+! etall    1, NO =   15, NV =    2, INA =   36
+! *********************************************
+!
+!    I  COEFFICIENT          ORDER   EXPONENTS
+!     1    1.000000000000        1     0 1
+
+
+!!!
 
 
     h0=1.d0
@@ -9900,17 +9934,27 @@ endif
     do k=1,no1
     !  erect multipole
     f=dreal(i_*z**K/K)
-    
+
     df=f
 
     do i=k,no-1 !k+1
      df=-h0*(df.d.1)/h
      call  invert_laplace(df)
       sol=f+df
-      sol=-(sol.d.2) 
+
+!      print*, "@@ sol = f+df"
+      call print(sol,6)
+      sol=-(sol.d.2)
+!      print*, "@@ sol deriv 2"
+      call print(sol,6)
+
       j=0
       j(1)=i
+!      print*, "@@ j = ", j
       cker=(sol.sub.j)
+!      print*, "@@ cker"
+      call print(cker,6)
+
       df=df-cker*dreal(i_*z**(I+1)/(I+1))
       f=f+df
       f=f.cut.(no+1)
@@ -9949,7 +9993,7 @@ endif
         s_b0t%vb(k,l)=f.sub.j
        enddo
 if(mcmillan) fs(k)=f
-enddo    
+enddo
 
 
 if(mcmillan) then
@@ -9969,10 +10013,10 @@ f=fs(k)
   cker=fs(m).sub.j
   if(abs(cker)>1.d-10) exit
  enddo
- 
- 
+
+
   cker=f.sub.j
- 
+
   cker1=fs(m).sub.j
   f=f-(cker/cker1)*fs(m)
  call clean_taylor(f,f,1.d-10)
@@ -9994,14 +10038,14 @@ f=fs(k)
        enddo
 
 enddo
-        
+
 
 
 endif
 
     do k=1,no1
-    !  Skew multipole 
- 
+    !  Skew multipole
+
     f=dreal(-z**K/K)   ! check this
     df=f
     do i=k,no-1 !k+1
@@ -10046,7 +10090,7 @@ endif
         s_b0t%va(k,l)=f.sub.j
        enddo
 if(mcmillan) fs(k)=f
-enddo    
+enddo
 
 
 if(mcmillan) then
@@ -10066,9 +10110,9 @@ f=fs(k)
   cker=fs(m).sub.j
   if(abs(cker)>1.d-10) exit
  enddo
- 
+
   cker=f.sub.j
- 
+
   cker1=fs(m).sub.j
   f=f-(cker/cker1)*fs(m)
  call clean_taylor(f,f,1.d-10)
@@ -10088,7 +10132,7 @@ f=fs(k)
        enddo
 
 enddo
-        
+
 
 
 endif
@@ -10119,7 +10163,7 @@ endif
      call kill(dfr)
     end subroutine invert_laplace
 
- 
+
   subroutine make_coef(b,no,ic)
     implicit none
     integer no
@@ -10127,7 +10171,7 @@ endif
 
     type(B_CYL) b
 
- 
+
     b%firsttime=-100
     allocate(b%nmul)
     allocate(b%n_mono)
@@ -10135,7 +10179,7 @@ endif
     b%n_mono=((no+2-ic)*(no+1-ic))/2
     allocate(b%i(b%n_mono),b%j(b%n_mono))
     allocate(b%a_x(no,b%n_mono),b%a_y(no,b%n_mono))
-    allocate(b%b_x(no,b%n_mono),b%b_y(no,b%n_mono))    
+    allocate(b%b_x(no,b%n_mono),b%b_y(no,b%n_mono))
     allocate(b%va(no,b%n_mono),b%vb(no,b%n_mono))
 
     do i=1,no
@@ -10204,7 +10248,7 @@ endif
 
   end subroutine nul_coef
 
-!!!!!!!!!!!!!!!!!!!!   tree tracking for PTC using stuff in 
+!!!!!!!!!!!!!!!!!!!!   tree tracking for PTC using stuff in
   SUBROUTINE SET_TREE_G_complex(T,Ma,factor)
     IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T(:)
@@ -10218,7 +10262,7 @@ endif
     logical fact
     fact=.false.
     if(present(factor)) fact=factor
-    
+
 !    np=ma%n+18
     if(ma%n/=6) then
      write(6,*) " you need a 6-d map in SET_TREE_G_complex for PTC "
@@ -10228,7 +10272,7 @@ endif
 ! initialized in ptc ini
  !   ind_spin(1,1)=1+ma%n;ind_spin(1,2)=2+ma%n;ind_spin(1,3)=3+ma%n;
  !   ind_spin(2,1)=4+ma%n;ind_spin(2,2)=5+ma%n;ind_spin(2,3)=6+ma%n;
- !   ind_spin(3,1)=7+ma%n;ind_spin(3,2)=8+ma%n;ind_spin(3,3)=9+ma%n;    
+ !   ind_spin(3,1)=7+ma%n;ind_spin(3,2)=8+ma%n;ind_spin(3,3)=9+ma%n;
  !   k1_spin(1)=1;k2_spin(1)=1;
  !   k1_spin(2)=1;k2_spin(2)=2;
  !   k1_spin(3)=1;k2_spin(3)=3;
@@ -10239,7 +10283,7 @@ endif
  !   k1_spin(8)=3;k2_spin(8)=2;
  !   k1_spin(9)=3;k2_spin(9)=3;
 
-   
+
     ALLOCATE(M(NP))
     CALL ALLOC(M,NP)
     ALLOCATE(Mg(NP))
@@ -10253,7 +10297,7 @@ endif
      enddo
 
 
- 
+
 
 if(use_quaternion) then
     call c_full_norm_quaternion(Ma%q,kq,norm)
@@ -10283,9 +10327,9 @@ else
     endif
 endif
 
- 
 
-  
+
+
 
 
 
@@ -10297,7 +10341,7 @@ endif
      else
        ms=ma
      endif
- 
+
 
      ms=ms**js
 !     do i=1,3
@@ -10305,16 +10349,16 @@ endif
 !      mg(3+i)=ms%v(2*i)   !  p_f(q_f,p_i)
 !     enddo
      do i=1,6
-      mg(i)=ms%v(i) 
+      mg(i)=ms%v(i)
      enddo
-    
+
      do i=1,3
      do j=1,3
        mg(ind_spin(i,j))=ms%v(2*i-1).d.(2*j-1)  !   Jacobian for Newton search
      enddo
      enddo
-      call kill(ms)    
-   
+      call kill(ms)
+
 
      call SET_TREE_g(T(1),m(1:6))
 
@@ -10334,7 +10378,7 @@ endif
 
        mat=ma**(-1)
        t(1)%e_ij=matmul(matmul(mat,ma%e_ij),transpose(mat))
- 
+
      call kill(m); call kill(mg);
     deallocate(M);    deallocate(Mg);
 
@@ -10349,7 +10393,7 @@ endif
     logical, optional :: jump,all_map
     type(probe) xs
     real(dp) x(size_tree),x0(size_tree),s0(3,3),r(3,3),dx6,beta,q(3),p(3),qg(3),qf(3)
-    real(dp) normb,norm 
+    real(dp) normb,norm
     type(quaternion)qu
     integer i,j,k,ier,nrmax,is
     type(internal_state) sta
@@ -10358,7 +10402,7 @@ endif
     jumpnot=.true.
     if(present(jump)) jumpnot=.not.jump
 
- 
+
     allmap=.true.
     if(present(all_map)) allmap=all_map
 
@@ -10394,7 +10438,7 @@ endif
 !      x(1:6)=x(1:6)
       x(7:12)=x(1:6)
     endif
-    
+
 
 !!!
 
@@ -10424,11 +10468,11 @@ normb=1.d38
 do is=1,nrmax
    do i=1,3
      x0(2*i)=p(i)
-     x0(2*i-1)=qf(i)  
+     x0(2*i-1)=qf(i)
      qg(i)=0
     enddo
     call track_TREE_G_complex(T(3),X0(1:15))
- 
+
     do i=1,3
     do j=1,3
      r(i,j)=x0(ind_spin(i,j))
@@ -10454,13 +10498,13 @@ do is=1,nrmax
 !     if(normb<=norm) doit=.false.
 !     normb=norm
 !   else
-!     if(normb<=norm) then 
+!     if(normb<=norm) then
 !       x(1)=qf(1)
 !       x(3)=qf(2)
 !       x(5)=qf(3)
 !       x(2)=x0(2)
 !       x(4)=x0(4)
-!       x(6)=x0(6)       
+!       x(6)=x0(6)
 
 !       if(allmap) x(1:6)=matmul(t(3)%rad,x(1:6))
 !       exit
@@ -10471,13 +10515,13 @@ do is=1,nrmax
    if(norm>t(3)%eps) then
      normb=norm
    else
-     if(normb<=norm) then 
+     if(normb<=norm) then
        x(1)=qf(1)
        x(3)=qf(2)
        x(5)=qf(3)
        x(2)=x0(2)
        x(4)=x0(4)
-       x(6)=x0(6)       
+       x(6)=x0(6)
 
        if(allmap) x(1:6)=matmul(t(3)%rad,x(1:6))
        exit
@@ -10487,29 +10531,29 @@ do is=1,nrmax
 
 
 
-enddo  ! is 
+enddo  ! is
  if(is>nrmax-10) then
    xs%u=.true.
   check_stable=.false.
  endif
-!!!    
+!!!
  endif
 
 if(jumpnot) then
     if(sta%spin) then  ! spin
- 
+
     call track_TREE_G_complex(T(2),X(7:15))
- 
+
      if(xs%use_q) then
        do k=0,3
          qu%x(k)=x(7+k)
-       enddo 
- 
+       enddo
+
        xs%q=qu*xs%q
        xs%q%x=xs%q%x/sqrt(xs%q%x(1)**2+xs%q%x(2)**2+xs%q%x(3)**2+xs%q%x(0)**2)
      else
     s0=0.0e0_dp
- 
+
     do i=1,3
     do j=1,3
      r(i,j)=x(ind_spin(i,j))
@@ -10517,7 +10561,7 @@ if(jumpnot) then
     enddo
 
     call orthonormalise(r)
-    
+
     do k=1,3
      s0(k,1:3)=0.0e0_dp
      do i=1,3
@@ -10532,7 +10576,7 @@ if(jumpnot) then
      do j=1,3
        xs%s(k)%x(j)=s0(k,j)
      enddo
-    enddo   
+    enddo
 
 endif
     endif ! spin
@@ -10561,8 +10605,8 @@ endif
        endif
     else
         if(sta%totalpath==1) then
-        x(6)=x(6)+t(1)%ds/t(1)%beta0 
-       endif     
+        x(6)=x(6)+t(1)%ds/t(1)%beta0
+       endif
     endif
 endif ! jumpnot
 
@@ -10576,7 +10620,7 @@ endif ! jumpnot
    implicit none
    real(dp)  r(3,3),id(3,3),rt(3,3),eps,a,ab
    integer nmax,i,j,k
-! Furmanizing the rotation 
+! Furmanizing the rotation
     eps=1.d-8
     nmax=1000
     id=0
@@ -10603,7 +10647,7 @@ endif ! jumpnot
     if(i>nrmax-10) then
      write(6,*) i, a, "did not converge in orthonormaliser"
       stop
-    endif 
+    endif
   end SUBROUTINE orthonormaliser
 
 SUBROUTINE track_TREE_probe_complexp_new(T,xs,dofix0,dofix,sta)
@@ -10621,7 +10665,7 @@ SUBROUTINE track_TREE_probe_complexp_new(T,xs,dofix0,dofix,sta)
     type(internal_state) sta
     logical dofix0,dofix
     integer, allocatable :: js(:)
- 
+
     call alloc(x,size_tree)
     call alloc(x0,size_tree)
     call alloc(dx6,beta)
@@ -10703,14 +10747,14 @@ SUBROUTINE track_TREE_probe_complexp_new(T,xs,dofix0,dofix,sta)
 
     endif
 
- 
+
     if(t(3)%symptrack) then
      xs0=0
      do i=1,6
       xs0%x(i)=x0(i)
       xi(i)=x0(i)
      enddo
- 
+
       call  track_TREE_probe_complexr(T,xs0,.false.,.false.,sta,jump=.true.,all_map=.not.t(3)%factored)
 
 !!! compute map  for speed up
@@ -10735,24 +10779,24 @@ SUBROUTINE track_TREE_probe_complexp_new(T,xs,dofix0,dofix,sta)
                x0(6)=0.0_dp !xi(6)
               elseif(C_%NPARA==4) then
                x0(5)=xi(5)
-               x0(6)=0.0_dp !xi(6)       
+               x0(6)=0.0_dp !xi(6)
               endif
 
           call track_TREE_G_complex(T(3),X0(1:15))
        js=0
       do i=1,c_%nd2
           if(mod(i,2)==1) js(i)=1
-          dm%v(i)=x0(i)-(x0(i).sub.'0') 
+          dm%v(i)=x0(i)-(x0(i).sub.'0')
       enddo
         dm=dm**(js)
         do i=1,c_%nd2
-          md%v(i)=x(i)-(x(i).sub.'0') 
-        enddo 
+          md%v(i)=x(i)-(x(i).sub.'0')
+        enddo
           if(c_%nd2==4) then
             do i=1,c_%nd
-              iq%v(2*i-1)=dm%v(2*i-1) 
+              iq%v(2*i-1)=dm%v(2*i-1)
               iq%v(2*i)=1.0_dp.mono.(2*i)
-            enddo 
+            enddo
             x0(6)=x0(6)*iq  ! partial invertion undone
             x0(6)=x0(6)*md  ! previous line concatenated
           endif
@@ -10779,7 +10823,7 @@ SUBROUTINE track_TREE_probe_complexp_new(T,xs,dofix0,dofix,sta)
 
        do i=1,6
         do j=1,6
-       x0(i)=t(3)%rad(i,j)*x(j)+x0(i)  
+       x0(i)=t(3)%rad(i,j)*x(j)+x0(i)
        enddo
       enddo
 
@@ -10790,13 +10834,13 @@ SUBROUTINE track_TREE_probe_complexp_new(T,xs,dofix0,dofix,sta)
      else
        call track_TREE_G_complex(T(1),X(1:6))
      endif
- 
 
 
 
 
 
- 
+
+
     if(sta%spin) then  ! spin
     call track_TREE_G_complex(T(2),X(7:15))
       if(xs%use_q) then
@@ -10804,8 +10848,8 @@ call alloc(qu)
 call alloc(ds)
        do k=0,3
          qu%x(k)=x(7+k)
-       enddo 
- 
+       enddo
+
        xs%q=qu*xs%q
         ds=1.0_dp/sqrt(xs%q%x(1)**2+xs%q%x(2)**2+xs%q%x(3)**2+xs%q%x(0)**2)
             xs%q%x(1)=ds*xs%q%x(1)
@@ -10836,7 +10880,7 @@ call KILL(ds)
      do j=1,3
        xs%s(k)%x(j)=s0(k,j)
      enddo
-    enddo   
+    enddo
 endif ! spin
 endif
 
@@ -10866,8 +10910,8 @@ endif
     call kill(dx6)
     else
         if(sta%totalpath==1) then
-        x(6)=x(6)+t(1)%ds/t(1)%beta0 
-       endif     
+        x(6)=x(6)+t(1)%ds/t(1)%beta0
+       endif
     endif
 
 
@@ -10878,17 +10922,17 @@ endif
 
     mt=xs
     xs=mt*m0
-    
+
     do i=1,6
      xs%x(i)=xs%x(i)-(xs%x(i).sub.'0')+z0(i)
     enddo
-    
+
 
 
     call kill(m0,mt)
     call kill(dx6,beta)
     call kill(x0,size_tree)
-    call kill(x,size_tree)  
+    call kill(x,size_tree)
     do i=1,3
     do j=1,3
      call kill(s0(i,j))
@@ -10903,7 +10947,7 @@ endif
    type(real_8)  r(3,3),id(3,3),rt(3,3)
     real(dp) eps,a,ab
    integer nmax,i,j,k
-! Furmanizing the rotation  
+! Furmanizing the rotation
     do i=1,3
     do j=1,3
      call alloc(id(i,j))
@@ -10937,7 +10981,7 @@ endif
     if(i>nrmax-10) then
      write(6,*) i, a, "did not converge in orthonormalisep"
      ! stop
-    endif 
+    endif
     do i=1,3
     do j=1,3
      call kill(id(i,j))

@@ -2953,17 +2953,15 @@ end  SUBROUTINE  flatten_c_factored_lie_r
  
     s2=0
     do j=1,s1%n
-if(use_quaternion)   THEN
-       s2%q=s2%q+s1%f(j)%q
- 
-endif
-
-
-       do i=1,s2%n
-       s2%v(i)=s2%v(i)+s1%f(j)%v(i)
+      if(use_quaternion) THEN
+        s2%q=s2%q+s1%f(j)%q
+      endif
+      do i=1,s2%n
+        s2%v(i)=s2%v(i)+s1%f(j)%v(i)
       enddo      
     enddo
     st=s2
+
   if(complex_extra_order==1.and.special_extra_order_1) s2=s2.cut.no
    call kill(s2)
   END SUBROUTINE flatten_c_factored_lie
@@ -11094,8 +11092,13 @@ subroutine c_linear_ac_longitudinal(xy,a1,ac)
     rel=1
     v=1
  
-
     x=xy
+
+  print *, "LD: gofix start"
+  print *, "LD: rel="
+  call print(rel,6)
+  print *, "LD: v0="
+  call print(v,6)
 
     do i=1,nd2  
      if(i/=ndpt.and.i/=ndptb) then
@@ -11105,9 +11108,24 @@ subroutine c_linear_ac_longitudinal(xy,a1,ac)
       endif
     enddo
 
+  print *, "LD: nv=", nv, "nd2=", nd2, "ndpt=", ndpt, "ndptb=", ndptb, "ndloc=", ndloc
+  print *, "LD: x="
+  call print(x,6)
+  print *, "LD: v="
+  call print(v,6)
+  print *, "LD: x-v="
+  w = x-v
+  call print(w,6)
+
     v=v.cut.(order_gofix+1)
+
+  print*, "LD: v(cut)="
+  call print(v,6)
  
     w=v**(-1)    !  W= (Map-1)**-1   
+
+  print*, "LD: w=v^-1"
+  call print(w,6)
 
     x=0
     x%s=1    ! spin part is identity
@@ -11117,10 +11135,15 @@ subroutine c_linear_ac_longitudinal(xy,a1,ac)
     enddo
     if(ndpt/=0) x%v(ndpt)=1.d0.cmono.ndpt !  If coasting, then energy is a parameter
 
+    print*, "LD: x="
+    call print(x,6)
+
     v=w*x  ! v contains the fixed point, for example v(1)= eta_x * x_pt + ...
          
-
     a1=v
+
+    print*, "LD: a0=w*x"
+    call print(a1,6)
 
   ! however a1 is not a  transformation, we must add the identity (done at the end) 
   ! also we must add some stuff to time to make it symplectic if coasting
@@ -11139,6 +11162,12 @@ if(dosymp) then
 
           endif
          enddo
+
+print*, "LD: x="
+call print(x,6)
+print*, "LD: v="
+call print(v,6)
+
          do i=1,nd
            if(i/=ndloc) then
              t1=-(1.0_dp.cmono.(2*i-1))*v%v(2*i-1)+t1  ! first order
@@ -11158,6 +11187,11 @@ if(dosymp) then
     do i=1,nd2 
      if(i/=ndptb.and.i/=ndpt) a1%v(i)=(1.d0.cmono.i)+a1%v(i)
     enddo
+
+print*, "LD: t1="
+call print(t1,6)
+print*, "LD: a0="
+call print(a1,6)
 
 !call print(a1,6)
 !pause 333
@@ -11221,6 +11255,11 @@ endif
  
     call kill(t1);
     call kill(v);call kill(w);call kill(rel);call kill(x);
+
+print*, "returned a0="
+call print(a1,6)
+print *, "LD: gofix end"
+
     return
   end subroutine c_gofix
 
@@ -17751,17 +17790,32 @@ END FUNCTION FindDet
     ! including the coasting beam gymnastic: time-energy is canonical
     ! but energy is constant. (Momentum compaction, phase slip etc.. falls from there)
  ! etienne
+   call print(m1, 1010)
+
     call  c_gofix(m1,a1) 
 
+   call print(a1, 1020)
+
      m1=c_simil(a1,m1,-1)
+
+   call print(m1, 1030)
+
     ! Does the the diagonalisation into a rotation
     call c_linear_a(m1,a2)  
 
+   call print(a2, 1040)
+
     !!! Now the linear map is normalised
     m1=c_simil(a2,m1,-1)
+
+   call print(m1, 1050)
+
     !!! We go into the phasors' basis
     m1=c_simil(from_phasor(-1),m1,1)
 
+    ri = from_phasor(-1)
+   call print(ri, 1060)
+   call print(m1, 1070)
  
     ri=(m1.sub.-1)**(-1) 
     ri%s=1  ! make spin identity
@@ -17843,6 +17897,7 @@ END FUNCTION FindDet
 
             n%g%f(i)%v(k)=n%g%f(i)%v(k)+(v.cmono.je)/(1.0_dp-lam)
 
+            write (1100,*) "1) i=", i, ", j=", j, ", k=", k, ", v=", v
           else ! Put in the kernel
 
             if(lielib_print(13)/=0) then
@@ -17854,6 +17909,8 @@ END FUNCTION FindDet
                je(k)=je(k)+1
             endif
                n%ker%f(i)%v(k)=n%ker%f(i)%v(k)+(v.cmono.je)
+
+               write (1100,*) "2) i=", i, ", j=", j, ", k=", k, ", v=", v
             endif
 
         enddo  ! over monomial
@@ -17861,9 +17918,14 @@ END FUNCTION FindDet
 
       m1=c_simil(n%g%f(i),m1,-1)
 
+      call print(n%g%f(i), 1100+i)
+      call print(m1, 1200+i)
+
     enddo
 
     n%a_t=a1*a2*from_phasor()*texp(n%g)*from_phasor(-1)
+
+    call print(n%a_t, 1300)
 
     n%a1=a1
     n%a2=a2

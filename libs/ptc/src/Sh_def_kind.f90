@@ -3,7 +3,7 @@
 
 MODULE S_DEF_KIND
   USE S_def_all_kinds   ! not needed because of things below
-  use s_extend_poly, only : PRTP, PRTP1 ! LD: 22.03.2019
+  use s_extend_poly, only : PRTR, PRTP, PRTP1 ! LD: 22.03.2019
   public
   PRIVATE DRIFTP  !,DRIFT   ! ,DRIFTR
   PRIVATE SPARR,SPARP !,SPAR
@@ -1472,6 +1472,8 @@ CONTAINS !----------------------------------------------------------------------
     integer,INTENT(IN):: J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("ADJTIME_CAVR4:0", X)
+
     IF(J==1) THEN
        EL%DELTA_E=X(5)
        IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
@@ -1493,6 +1495,8 @@ CONTAINS !----------------------------------------------------------------------
 
        EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
     ENDIF
+
+    call PRTR("ADJTIME_CAVR4:1", X)
 
   END SUBROUTINE ADJUSTR_TIME_CAV4
 
@@ -1766,7 +1770,7 @@ CONTAINS !----------------------------------------------------------------------
 
     CALL ADJUST_TIME_CAV4(EL,X,k,1)
 !    IF(EL%N_BESSEL>0)
- CALL FRINGECAV(EL,X,k,1)
+    CALL FRINGECAV(EL,X,k,1)
 
     !    TOTALPATH_FLAG=k%TOTALPATH
     !    k%TOTALPATH=CAVITY_TOTALPATH
@@ -1781,7 +1785,7 @@ CONTAINS !----------------------------------------------------------------------
     !    k%TOTALPATH=TOTALPATH_FLAG
 
 !    IF(EL%N_BESSEL>0)
- CALL FRINGECAV(EL,X,k,2)
+    CALL FRINGECAV(EL,X,k,2)
     CALL ADJUST_TIME_CAV4(EL,X,k,2)
 
 
@@ -1904,10 +1908,11 @@ CONTAINS !----------------------------------------------------------------------
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTP("CAVE:0", X)
 
     CALL ADJUST_TIME_CAV4(EL,X,k,1)
    ! IF(EL%N_BESSEL>0)
-CALL FRINGECAV(EL,X,k,1)
+    CALL FRINGECAV(EL,X,k,1)
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     !   TOTALPATH_FLAG=k%TOTALPATH
@@ -1921,9 +1926,10 @@ CALL FRINGECAV(EL,X,k,1)
     !    k%TOTALPATH=TOTALPATH_FLAG
 
   !  IF(EL%N_BESSEL>0)
-CALL FRINGECAV(EL,X,k,2)
+    CALL FRINGECAV(EL,X,k,2)
     CALL ADJUST_TIME_CAV4(EL,X,k,2)
 
+    call PRTP("CAVE:1", X)
 
   END SUBROUTINE CAVEP
 
@@ -3499,6 +3505,8 @@ CALL FRINGECAV(EL,X,k,2)
      z=EL%L
     endif
 
+   call PRTR("FRNG_CAVR4:0", X)
+
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(.NOT.(k%FRINGE.or.EL%P%permfringe/=0.or.el%N_BESSEL==-1)) RETURN  ! 2012 forcing fringes if n_bessel > 0
     IF(EL%THIN) RETURN
@@ -3534,6 +3542,8 @@ CALL FRINGECAV(EL,X,k,2)
     x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
 
    enddo
+
+   call PRTR("FRNG_CAVR4:1", X)
 
   END SUBROUTINE FRINGECAVR
 
@@ -3625,6 +3635,8 @@ CALL FRINGECAV(EL,X,k,2)
     it=tot_t*k%totalpath+(1-tot_t)
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
+    call PRTR("KICKCAVR:0", X)
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
        if(freq_redefine) then
@@ -3640,6 +3652,9 @@ CALL FRINGECAV(EL,X,k,2)
     VL=dir*YL*EL%volt*volt_c/EL%P%P0C
 
     !print*,"skowron: ph:",EL%PHAS," ph0=",EL%phase0, EL%t," volt omega",VL,O
+
+    ! Ph0 = Pi
+    write (*,'(6(a,ES25.16))') '@ VL= ', VL, ' O= ', O, ' Ph= ', EL%PHAS, ' P0C=', EL%P%P0C, ' YL= ', YL, ' PH0= ', EL%phase0
 
     do ko=1,el%nf    ! over modes
 
@@ -3715,6 +3730,8 @@ CALL FRINGECAV(EL,X,k,2)
        X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*EL%R*sin(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0)
     enddo    ! over modes
 
+    call PRTR("KICKCAVR:1", X)
+
 END SUBROUTINE KICKCAVR
 
 SUBROUTINE KICKCAVP(EL,YL,X,k)
@@ -3750,7 +3767,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     VL=dir*YL*EL%volt*volt_c/EL%P%P0C
 
     ! Ph0 = Pi
-!    write (*,'(6(a,E25.16))') '@ VL= ', VL%r, ' O= ', O%r, ' Ph= ', EL%PHAS%r, 'P0C=', EL%P%P0C, ' YL= ', YL%r, ' PH0= ', EL%phase0
+    write (*,'(6(a,ES25.16))') '@ VL= ', VL%r, ' O= ', O%r, ' Ph= ', EL%PHAS%r, &
+             ' P0C=', EL%P%P0C, ' YL= ', YL%r, ' PH0= ', EL%phase0
+
+    call PRTP1("Ph=", EL%PHAS)
 
     do ko=1,el%nf    ! over modes
 
@@ -3844,6 +3864,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp) PZ,b
     logical(lp) EXACT,CTIME
 
+    call PRTR("DRIFTR:0", X)
+
     IF(EXACT) THEN
        if(CTIME) then
           PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
@@ -3872,6 +3894,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        endif
     ENDIF
 
+    call PRTR("DRIFTR:1", X)
+
   END SUBROUTINE DRIFTR
 
   SUBROUTINE DRIFTP(L,LD,b,T,EXACT,ctime,X)
@@ -3880,7 +3904,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(REAL_8),INTENT(IN):: L
     real(dp), INTENT(IN):: LD
     INTEGER,INTENT(IN):: T
-    TYPE(REAL_8) PZ
+    TYPE(REAL_8) PZ, L_PZ
     logical(lp) EXACT,ctime
     real(dp) b
 
@@ -3888,11 +3912,29 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     IF(EXACT) THEN
        CALL ALLOC(PZ)
+!       CALL ALLOC(L_PZ)
        if(ctime) then
+!          L_PZ = -X(6)
+!          print *,"B=", B
+!          print *,"X"  ; call print(X(1),6)
+!          print *,"PX" ; call print(X(2),6)
+!          print *,"Y"  ; call print(X(3),6)
+!          print *,"PY" ; call print(X(4),6)
+!          print *,"T"  ; call print(L_PZ,6)
+!          print *,"PT" ; call print(X(5),6)
+
           PZ=SQRT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
           X(1)=X(1)+L*X(2)/PZ
           X(3)=X(3)+L*X(4)/PZ
           X(6)=X(6)+L*(1.0_dp/b+X(5))/PZ-(1-T)*LD/b
+
+!          L_PZ = 1.0_dp+2.0_dp*X(5)/b+x(5)**2 ; print *,"(1+DP)^2"   ; call print(L_PZ,6)
+!          L_PZ = L_PZ-X(2)**2                 ; print *,"(1+DP)^2-PX^2" ; call print(L_PZ,6)
+!          L_PZ = L_PZ-X(4)**2                 ; print *,"(1+DP)^2-PX^2-PY^2" ; call print(L_PZ,6)
+!          L_PZ = SQRT(L_PZ)                   ; print *,"SQRT((1+DP)^2-PX^2-PY^2)" ; call print(L_PZ,6)
+!          L_PZ = L/PZ
+!          print *,"PZ"   ; call print(PZ  ,6)
+!          print *,"L_PZ" ; call print(L_PZ,6)
        else
           call PRTP("********* UNEXPECTED TIME=FALSE **********")
 
@@ -3902,6 +3944,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           X(6)=X(6)+L*(1.0_dp+X(5))/PZ-(1-T)*LD
        endif
        CALL KILL(PZ)
+!       CALL KILL(L_PZ)
     ELSE
        call PRTP("********* UNEXPECTED EXACT=FALSE **********")
        if(ctime) then
@@ -3919,7 +3962,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           X(3)=X(3)+L*X(4)/(1.0_dp+X(5))
 
          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+T*L
- 
+
        endif
     ENDIF
 
@@ -6121,6 +6164,8 @@ integer :: kkk=0
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
 
+    print*, "**** GETMATR CALLED ****"
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
 
@@ -6209,6 +6254,8 @@ integer :: kkk=0
     INTEGER I,J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
+
+    print*, "**** GETMATD CALLED ****"
 
     call PRTP("GETMAT:0", X)
 
@@ -7037,6 +7084,8 @@ integer :: kkk=0
     real(dp) OMEGA, OMEGA2,C,S
     INTEGER S_OMEGA
 
+    call PRTP("GETMAT7R:0")
+
     IF(MOD(EL%P%METHOD,2)==1) THEN
        DH=(EL%L/EL%P%NST)  ! method=1,3,5
     ELSEIF(EL%P%METHOD/=6) THEN
@@ -7088,6 +7137,9 @@ integer :: kkk=0
           EL%LX(3)=EL%MATX(1,3)*EL%P%B0*DH/3.0_dp
        ENDIF
 
+!       print*, "DH=", DH, "K0=", EL%BN(1), "K1=", EL%BN(2)
+!       print*, "W=", OMEGA, "WS=", S_OMEGA, ", C=", C, ", S=", S
+
        S_OMEGA=-1
        OMEGA2=-DIR*EL%BN(2)
 
@@ -7118,9 +7170,7 @@ integer :: kkk=0
           EL%MATY(2,2)=1.0_dp;EL%MATY(2,1)=0.0_dp;
        ENDIF
 
-
-
-
+!       print*, "W=", OMEGA, "WS=", S_OMEGA, ", C=", C, ", S=", S
 
     ELSE     !  SPEED FALSE OR KNOB TRUE
 
@@ -7144,15 +7194,7 @@ integer :: kkk=0
 
        CALL EXPCOSY7(HY,EL%MATY,EL%LX)
        CALL EXPCOSY7(HX,EL%MATX,EL%LX)
-
-
-
-
-
-
-
     ENDIF
-
 
     DIR=-1
     IF(SPEED) THEN
@@ -7252,18 +7294,25 @@ integer :: kkk=0
 
        CALL EXPCOSY7(HY,EL%RMATY,EL%RLX)
        CALL EXPCOSY7(HX,EL%RMATX,EL%RLX)
-
-
-
-
-
-
-
     ENDIF
 
+!    WRITE(*, '(a,ES25.16)') '@@ MX11', EL%MATX(1,1)
+!    WRITE(*, '(a,ES25.16)') '@@ MX12', EL%MATX(1,2)
+!    WRITE(*, '(a,ES25.16)') '@@ MX13', EL%MATX(1,3)
+!    WRITE(*, '(a,ES25.16)') '@@ MX21', EL%MATX(2,1)
+!    WRITE(*, '(a,ES25.16)') '@@ MX22', EL%MATX(2,2)
+!    WRITE(*, '(a,ES25.16)') '@@ MX23', EL%MATX(2,3)
+!    WRITE(*, '(a,ES25.16)') '@@ MY11', EL%MATY(1,1)
+!    WRITE(*, '(a,ES25.16)') '@@ MY12', EL%MATY(1,2)
+!    WRITE(*, '(a,ES25.16)') '@@ MY13', EL%MATY(1,3)
+!    WRITE(*, '(a,ES25.16)') '@@ MY21', EL%MATY(2,1)
+!    WRITE(*, '(a,ES25.16)') '@@ MY22', EL%MATY(2,2)
+!    WRITE(*, '(a,ES25.16)') '@@ MY23', EL%MATY(2,3)
+!    WRITE(*, '(a,ES25.16)') '@@ LX1 ', EL%LX(1)
+!    WRITE(*, '(a,ES25.16)') '@@ LX2 ', EL%LX(2)
+!    WRITE(*, '(a,ES25.16)') '@@ LX3 ', EL%LX(3)
 
-
-
+    call PRTP("GETMAT7R:1")
 
   END SUBROUTINE GETMAT7R
 
@@ -7571,17 +7620,6 @@ integer :: kkk=0
     !    T(2)=EL%MATX(2,1)*X(1)+EL%MATX(2,2)*X(2)+EL%MATX(2,3)*X(5)
     IF(EL%P%DIR*EL%P%CHARGE>0) THEN
        IF(k%TIME) THEN
-!        call PRTP1 ("MX11", EL%MATX(1,1))
-!        call PRTP1 ("MX12", EL%MATX(1,2))
-!        call PRTP1 ("MX13", EL%MATX(1,3))
-!        call PRTP1 ("MX21", EL%MATX(2,1))
-!        call PRTP1 ("MX22", EL%MATX(2,2))
-!        call PRTP1 ("MX23", EL%MATX(2,3))
-!        call PRTP1 ("MY11", EL%MATY(1,1))
-!        call PRTP1 ("MY12", EL%MATY(1,2))
-!        call PRTP1 ("MY21", EL%MATY(2,1))
-!        call PRTP1 ("MY22", EL%MATY(2,2))
-
           T(1)=EL%MATX(1,1)*X(1)+EL%MATX(1,2)*X(2)+EL%MATX(1,3)*X(5)/el%P%beta0
           T(2)=EL%MATX(2,1)*X(1)+EL%MATX(2,2)*X(2)+EL%MATX(2,3)*X(5)/el%P%beta0
           T(3)=EL%MATY(1,1)*X(3)+EL%MATY(1,2)*X(4)

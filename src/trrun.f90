@@ -20,7 +20,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !          Interface RUN and DYNAP command to tracking routine         *
   !                                                                      *
   !-- Input:                                                             *
-  !   switch  (int)         1: RUN, 2: DYNAP fastune            f         *
+  !   switch  (int)         1: RUN, 2: DYNAP fastune                     *
   !   turns   (int)         number of turns to track                     *
   !   orbit0  (dp. array)   start of closed orbit                        *
   !   rt      (dp. matrix)  one-turn matrix                              *

@@ -756,10 +756,10 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   el = node_value('l ')
 
   nobs = node_value('obs_point ')
-  al_errors = 0 
+  al_errors = 0
   n_align = node_al_errors(al_errors)
   n_perm_align = is_permalign()
-  
+
   if (n_perm_align .ne. 0) then
     al_errors(1) = al_errors(1) + node_value('dx ')
     al_errors(2) = al_errors(2) + node_value('dy ')
@@ -1120,6 +1120,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   double precision  :: reval(6), aival(6) ! re and im parts
   logical, external :: m66sta
   character(len=180):: warnstr
+  integer :: i
 
   !--- initialize deltap because twcpin can be called directly from mad_emit
   deltap = get_value('probe ','deltap ')
@@ -1231,6 +1232,16 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   ! Create decoupled matrix R_EIG =[E 0; 0 F ] for eigenvalues calculation
    R_EIG(1:2, 1:2) = E
    R_EIG(3:4, 3:4) = F
+
+write(6,*) " ";
+write(6,*) "  One Turn Map R";
+do i=1,6
+ write(6,'(6(1x,g12.5))') ra(i,1:6)
+enddo
+write(6,*) "  Canonical transformation A";
+do i=1,6
+ write(6,'(6(1x,g12.5))') r_eig(i,1:6)
+enddo
 
   !---- Find eigenvectors at initial position.
   reval = zero
@@ -1842,7 +1853,7 @@ subroutine track_one_element(el, fexit, contrib_rms)
   al_errors = 0
   n_align = node_al_errors(al_errors)
   n_perm_align = is_permalign()
-  
+
   if (n_perm_align .ne. 0) then
     al_errors(1) = al_errors(1) + node_value('dx ')
     al_errors(2) = al_errors(2) + node_value('dy ')
@@ -3028,7 +3039,7 @@ subroutine track_one_element(el, fexit)
   !---- Physical element.
   n_align = node_al_errors(al_errors)
   n_perm_align = is_permalign()
-  
+
   if (n_perm_align .ne. 0) then
     al_errors(1) = node_value('dx ')
     al_errors(2) = node_value('dy ')
@@ -3360,6 +3371,11 @@ SUBROUTINE tw_summ(rt,tt)
         gamtr = sign(one,alfa) * sqrt( one / abs(alfa))
      endif
 
+!     print*, "R=", rt(5,1), rt(5,2), rt(5,3), rt(5,4), rt(5,5), rt(5,6)
+!     print*, "T=", rt(1,5), rt(2,5), rt(3,5), rt(4,5), rt(5,5), rt(6,5)
+!     print*, "D=", disp(1), disp(2), disp(3), disp(4)
+!     print*, "sd=", sd, "suml=", suml, "eta=", eta, "alfa=", alfa, "gamtr=", gamtr
+
      if (get_option('info  ') .ne. 0) then
         if (abs(cosmux - cos(amux)) .gt. diff_cos) then
            write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cos(amux) =  ", cosmux - cos(amux)
@@ -3569,7 +3585,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
      case (code_changerefp0)
         call tmchp0(ftrk,orbit,fmap,ek,re, te)
      case default !--- anything else:
-        ! nil (23, 28, 34)
+        ! should send an error...
 
      end select
 
@@ -7587,7 +7603,7 @@ SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
   call sumtrx(the, phi, psi, w)
 
   !---- VE and WE represent the change of reference.
-  code = node_value('mad8_type ') 
+  code = node_value('mad8_type ')
   call suelem(el, ve, we, tilt, code)
 
   !---- Misalignment displacements at exit w.r.t. entrance system.
@@ -8302,6 +8318,7 @@ end SUBROUTINE tmrfmult
 
 SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   use math_constfi, only : zero, one, two
+  use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -8352,6 +8369,7 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
 
   integer, external :: get_option
   double precision, external :: node_value
+  character(len=name_len) :: name
 
   betx = betxi
   dx = dxi
@@ -8400,8 +8418,8 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   if(k1 .ge. zero) then
     k1n = k1
     u0x = (one + sin(two*sqrt(k1n)*lq)/(two*sqrt(k1n)*lq))/two
-    u1x = sin(sqrt(k1n)*lq)**two/(k1n*lq)
     u2x = (one - sin(two*sqrt(k1n)*lq)/(two*sqrt(k1n)*lq))/(two*k1n)
+    u1x = sin(sqrt(k1n)*lq)**two/(k1n*lq)
     dx2 = cos(sqrt(k1n)*lq)*dxi + (one/sqrt(k1n))*sin(sqrt(k1n)*lq)*dpxi
     dispaverage = (dxi+dx2)/two
   else
@@ -8421,14 +8439,16 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   endif
 
   if (get_option('debug ') .ne. 0) then
-     print *, ' '
-     print *, 'Input:  rhoinv = ', rhoinv, 'k1 = ', k1, 'e1 =', e1, 'e2 = ', e2, 'blen = ', blen
+     call element_name(name,len(name))
+     print *, ' ', name
+     print *, 'Input:  rhoinv = ', rhoinv, 'k1 = ', k1, 'e1 =', e1, 'e2 = ', e2, 'blen = ', blen, 'lq = ', lq
      print *, '        betxi = ', betxi, 'alfxi = ', alfxi, 'dxi = ', dxi, 'dpxi = ', dpxi
      print *, ' --> '
      print *, '        k2 = ', k2, '  k = ', k, 'k*l = ', kl
      print *, '        alfx = ', alfx, 'dpx = ', dpx, 'gamx = ', gamx, 'dx2 = ', dx2
-     print *, '        dispaverage = ', dispaverage, 'curlyhaverage = ', curlyhaverage
-     print *, 'Contributions to Radiation Integrals:', I(1), I(2), I(3), I(4), I(5)
+     print *, '        u0x = ', u0x, 'u1x = ', u1x, 'u2x = ', u2x
+     print *, '        dispaverage = ', dispaverage, 'curlyhaverage = ', curlyhaverage, 'betxaverage = ', betxaverage
+     print *, 'Contributions to Radiation Integrals:', I(1), I(2), I(3), I(4), I(5), I(6), I(8)
      print *, ' '
   endif
 

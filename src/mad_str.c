@@ -17,13 +17,14 @@ myatof(const char *instr){
   }
   return atof(instr);
 }
+
 void
 mystrcpy(struct char_array* target, char* source)
 {
   /* string copy to char_array with size adjustment */
   int len = strlen(source);
   while (len >= target->max) grow_char_array(target);
-  strncat((*target->c=0, target->c), source, len);
+  strncpy(target->c, source, len+1);
 }
 
 char*
@@ -69,25 +70,21 @@ myrepl(const char* in, const char* out, char* string_in, char* string_out)
   /* replaces all occurrences of "in" in string_in by "out"
      in output string string_out */
 {
-  int n, add, l_in = strlen(in), l_out = strlen(out);
-  char* cp;
-  char tmp[8];
-  while ((cp = strstr(string_in, in)) != NULL)
+  char tmp[16];
+
+  if (*out == '$') {
+    int n = get_variable(&out[1]);
+    sprintf(tmp, "%d", n); out = tmp;
+  }
+
+  int l_in = strlen(in), l_out = strlen(out);
+
+  for (char *cp; (cp=strstr(string_in, in)); )
   {
     while (string_in != cp) *string_out++ = *string_in++;
-    string_in += l_in;
-    if (*out == '$')
-    {
-      n = get_variable(&out[1]);
-      sprintf(tmp,"%d", n); add = strlen(tmp);
-      strncpy(string_out, tmp, add);
-      string_out += add;
-    }
-    else
-    {
-      strncpy(string_out, out, l_out);
-      string_out += l_out;
-    }
+    strncpy(string_out, out, l_out+1);
+    string_in  += l_in;
+    string_out += l_out;
   }
   strcpy(string_out, string_in);
 }

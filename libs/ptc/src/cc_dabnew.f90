@@ -3936,10 +3936,10 @@ contains
     if(inva.eq.0) then
        write(iunit,'(A)') '    I  VALUE  '
        do i = ipoa,ipoa+illa-1
-          write(iunit,'(I6,2X,G20.13)') i-ipoa, c_clean_complex(c_cc(i))
+          write(iunit,'(I6,2X,E23.16)') i-ipoa, c_clean_complex(c_cc(i))
        enddo
     elseif(c_nomax.eq.1) then
-       if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
+       if(illa.ne.0) write(iunit,'(A)') '   I  COEFFICIENT          ORDER   EXPONENTS'
        if(illa.eq.0) write(iunit,'(A)') '   ALL COMPONENTS 0.0_dp '
        do i=1,illa
           do k=1,inva
@@ -3950,11 +3950,12 @@ contains
              j(i-1)=1
              ioa=1
           endif
-          write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout,c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
-          write(iunit,*) c_clean_complex(c_cc(ipoa+i-1))
+          write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,100(2i3,1X))') iout, &
+                     c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
+! LD          write(iunit,*) c_clean_complex(c_cc(ipoa+i-1))
        enddo
     else
-       if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
+       if(illa.ne.0) write(iunit,'(A)') '   I  COEFFICIENT          ORDER   EXPONENTS'
        if(illa.eq.0) write(iunit,'(A)') '   ALL COMPONENTS 0.0_dp '
        do ioa = 0,inoa
           do ii=ipoa,ipoa+illa-1
@@ -3970,9 +3971,9 @@ contains
                 !ETIENNE
                 
                 iout = iout+1
-                write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout,ccc,ioa,(j(iii),iii=1,c_nvmax)
+                write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,100(2i3,1X))') iout,ccc,ioa,(j(iii),iii=1,c_nvmax)
                 !ETIENNE
-                write(iunit,*) c_cc(ii)
+! LD                write(iunit,*) c_cc(ii)
              endif
              !ETIENNE
              !
@@ -4043,16 +4044,16 @@ end function c_clean_complex
        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') c_daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
          '*********************************************'
     else
-        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') "Properties",', NO =',inoa,', NV =',inva,', INA =',ina,&
+        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') c_daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
          '*********************************************'
     endif
     !
-    if(illa.ne.0.and.longprint) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
+    if(illa.ne.0.and.longprint) write(iunit,'(A)') '   I  COEFFICIENT          ORDER   EXPONENTS'
     if(illa.eq.0.and.longprint) write(iunit,'(A)') '   ALL COMPONENTS 0.0_dp '
     !
-    c10='      NO ='
-    k10='      NV ='
-    if(longprint)write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
+!    c10='      NO ='
+!    k10='      NV ='
+!    if(longprint)write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
     iout = 0
     !
     !      DO 100 IOA = 0,INOA
@@ -4097,9 +4098,9 @@ end function c_clean_complex
                    write(iunit,503) ioa,ccc,(j(i),i=1,inva)
                 endif
              endif
-501          format(' ', i3,1x,g23.16,1x,g23.16,1x,100(1x,i2))
-503          format(' ', i3,1x,g23.16,1x,g23.16,1x,100(1x,i2))
-502          format(' ', i5,1x,g23.16,1x,g23.16,1x,100(1x,i2))
+501          format(' ', i3,1x,e23.16,1x,e23.16,1x,100(1x,2i3))
+503          format(' ', i3,1x,e23.16,1x,e23.16,1x,100(1x,2i3))
+502          format(' ', i5,1x,e23.16,1x,e23.16,1x,100(1x,2i3))
           endif
           !ETIENNE
           !
@@ -4111,7 +4112,7 @@ end function c_clean_complex
        j(i)=0
     enddo
     if(iout.eq.0) iout=1
-if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
+!if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
     if((.not.longprint).and.(.not.some)) write(iunit,*) " Complex Polynomial is zero "
 if(.not.longprint) write(6,*) " "
     !

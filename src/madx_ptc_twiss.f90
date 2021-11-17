@@ -133,7 +133,6 @@ contains
     do i=1,3
       Iaa(2*i-1,2*i-1,i) =1;  Iaa(2*i,2*i,i)   = 1;
     enddo
-
   end subroutine initIaaMatrix
 
   subroutine dispersion6D(A_script,disp)
@@ -159,17 +158,22 @@ contains
       disp = zero;
     endif
 
-
     do i=1,c_%nd
 
       Ha(1:6,1:6,i)=matmul(matmul(amatrix,Iaa(1:6,1:6,i)),amatrix_inv)  ! (15b)
 
     enddo
 
-   do i=1,4
-     disp(i) = Ha(i,5,3)/Ha(5,5,3)
-   enddo
+    do i=1,4
+      disp(i) = Ha(i,5,3)/Ha(5,5,3)
+    enddo
 
+!    print*, "Amat=", amatrix
+!    print*, "Amat_inv=", amatrix_inv
+!    do i=1,c_%nd
+!      print*, "Ha[",i,"]=", Ha(:,:,i)
+!    enddo
+!    print*, "disp=", disp
 
   end subroutine dispersion6D
 
@@ -377,15 +381,14 @@ contains
           TEST = ATAN2((A_script(2*i -1).SUB.fo(2*i,:)),(A_script(2*i-1).SUB.fo(2*i-1,:)))/TWOPI
        endif
 
-
        IF(TEST<zero.AND.abs(TEST)>EPSIL)TEST=TEST+one
        DPH=TEST-TESTOLD(i)
        IF(DPH<zero.AND.abs(DPH)>EPSIL) DPH=DPH+one
+
        IF(DPH>half) DPH=DPH-one
 
        PHASE(i)=PHASE(i)+DPH
        TESTOLD(i)=TEST
-
     enddo
 
 
@@ -530,7 +533,7 @@ contains
 
   subroutine ptc_twiss(tab_name,summary_tab_name)
     use twissafi
-    use s_extend_poly, only : MAPDUMP ! LD: 04.06.2019
+    use s_extend_poly, only : mapdump
     implicit none
     logical(lp)             :: closed_orbit,beta_flg, slice, goslice
     integer                 :: k,i,ii
@@ -568,12 +571,11 @@ contains
     logical(lp)             :: doTMtrack ! true if rmatrix==true .and. isRing==true . do not track theTransferMap and save time
                                            !      .or. already tracked form closed solution search
     logical(lp)             :: usertableActive = .false.  ! flag to mark that there was something requested with ptc_select
-    integer                 :: countSkipped
+    integer                 :: countSkipped, mdump
     character(48)           :: summary_table_name
     character(12)           :: tmfile='transfer.map'
     character(48)           :: charconv !routine
     real(dp)                :: BETA0
-    integer                 :: mapdumpbak ! LD: 04.06.2019
 
     if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
@@ -638,9 +640,9 @@ contains
 
     maptable = get_value('ptc_twiss ','maptable ') .ne. 0
     if (maptable) then
-      rmatrix = .true. 
+      rmatrix = .true.
     endif
-    
+
     isTMsave = .false.
 
     no = get_value('ptc_twiss ','no ')
@@ -1153,9 +1155,9 @@ contains
           !!!!!!!!!!!!!!!
 
           if (center_magnets ) then
-            
+
             if ( associated(nodePtr,current%tm) ) then
-              
+
               if (mod(current%mag%p%nst,2)/=0) then !checking if number od slices is even
                  !here it is odd (we should be in the middle)
                  if (current%mag%L==0) then
@@ -1172,9 +1174,9 @@ contains
                  isputdata = .true.
               endif
             endif
-            
+
           else
-          
+
             if (nodePtr%next%cas==case0) then
               !not center_magnets, take every reasonable node
               ! this an inner integration node i.e. neither an extremity nor a fringe node, both to be discarded
@@ -1227,24 +1229,19 @@ contains
       else
         ! ELEMENT AT ONCE MODE
         if (nda > 0) then
-           if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-             mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-             call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
-             mapdump = mapdumpbak
-           endif
-           if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
-             call propagate(my_ring,theTransferMap,+default,fibre1=i,fibre2=i+1)
-           endif
+            call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
+          if (doTMtrack) then
+!            mdump = mapdump ; mapdump = 0
+            call propagate(my_ring,theTransferMap,+default,fibre1=i,fibre2=i+1)
+!            mapdump = mdump
+          endif
         else
-           if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-             mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-             call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
-             mapdump = mapdumpbak
-           endif
-           if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
-             call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
-           endif
-
+            call propagate(my_ring,A_script_probe, default,fibre1=i,fibre2=i+1)
+          if (doTMtrack) then
+!            mdump = mapdump ; mapdump = 0
+            call propagate(my_ring,theTransferMap, default,fibre1=i,fibre2=i+1)
+!            mapdump = mdump
+          endif
         endif
 
 
@@ -1438,25 +1435,17 @@ contains
     subroutine propagateswy()
       implicit none
 
-       if (nda > 0) then
-          if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-            mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-            call propagate(my_ring,A_script_probe,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
-            mapdump = mapdumpbak
-          endif
-          if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
-            call propagate(my_ring,theTransferMap,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
-          endif
-        else
-          if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-            mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-            call propagate(my_ring,A_script_probe,default,node1=nodePtr%pos,node2=nodePtr%pos+1)
-            mapdump = mapdumpbak
-          endif
-          if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
-            call propagate(my_ring,theTransferMap,default,node1=nodePtr%pos,node2=nodePtr%pos+1)
-          endif
+      if (nda > 0) then
+          call propagate(my_ring,A_script_probe,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
+        if (doTMtrack) then
+          call propagate(my_ring,theTransferMap,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
         endif
+      else
+          call propagate(my_ring,A_script_probe, default,node1=nodePtr%pos,node2=nodePtr%pos+1)
+        if (doTMtrack) then
+          call propagate(my_ring,theTransferMap, default,node1=nodePtr%pos,node2=nodePtr%pos+1)
+        endif
+      endif
 
     end subroutine propagateswy
 
@@ -1464,6 +1453,7 @@ contains
     subroutine tidy()
       ! deallocates all the variables
       implicit none
+      integer :: i
 
       call kill(tw)
       CALL kill(A_script_probe)
@@ -1856,8 +1846,8 @@ contains
       else
         onedp = one + A_script_probe%x(5).sub.'0'
       endif
-      
 
+!      print *, "******** onedp=", onedp, default%time
 
       opt_fun(beta11)= tw%beta(1,1) * onedp ! beta11=1
       opt_fun(beta12)= tw%beta(1,2) * onedp
@@ -1869,15 +1859,15 @@ contains
       opt_fun(beta32)= tw%beta(3,2) * onedp
       opt_fun(beta33)= tw%beta(3,3) * onedp
 
-      opt_fun(alfa11)= tw%alfa(1,1) 
-      opt_fun(alfa12)= tw%alfa(1,2) 
-      opt_fun(alfa13)= tw%alfa(1,3) 
-      opt_fun(alfa21)= tw%alfa(2,1) 
-      opt_fun(alfa22)= tw%alfa(2,2) 
-      opt_fun(alfa23)= tw%alfa(2,3) 
-      opt_fun(alfa31)= tw%alfa(3,1) 
-      opt_fun(alfa32)= tw%alfa(3,2) 
-      opt_fun(alfa33)= tw%alfa(3,3) 
+      opt_fun(alfa11)= tw%alfa(1,1)
+      opt_fun(alfa12)= tw%alfa(1,2)
+      opt_fun(alfa13)= tw%alfa(1,3)
+      opt_fun(alfa21)= tw%alfa(2,1)
+      opt_fun(alfa22)= tw%alfa(2,2)
+      opt_fun(alfa23)= tw%alfa(2,3)
+      opt_fun(alfa31)= tw%alfa(3,1)
+      opt_fun(alfa32)= tw%alfa(3,2)
+      opt_fun(alfa33)= tw%alfa(3,3)
 
       opt_fun(gama11)= tw%gama(1,1) / onedp
       opt_fun(gama12)= tw%gama(1,2) / onedp
@@ -1902,15 +1892,15 @@ contains
          opt_fun(beta32p)= tw%beta_p(3,2) * onedp
          opt_fun(beta33p)= tw%beta_p(3,3) * onedp
 
-         opt_fun(alfa11p)= tw%alfa_p(1,1) 
-         opt_fun(alfa12p)= tw%alfa_p(1,2) 
-         opt_fun(alfa13p)= tw%alfa_p(1,3) 
-         opt_fun(alfa21p)= tw%alfa_p(2,1) 
-         opt_fun(alfa22p)= tw%alfa_p(2,2) 
-         opt_fun(alfa23p)= tw%alfa_p(2,3) 
-         opt_fun(alfa31p)= tw%alfa_p(3,1) 
-         opt_fun(alfa32p)= tw%alfa_p(3,2) 
-         opt_fun(alfa33p)= tw%alfa_p(3,3) 
+         opt_fun(alfa11p)= tw%alfa_p(1,1)
+         opt_fun(alfa12p)= tw%alfa_p(1,2)
+         opt_fun(alfa13p)= tw%alfa_p(1,3)
+         opt_fun(alfa21p)= tw%alfa_p(2,1)
+         opt_fun(alfa22p)= tw%alfa_p(2,2)
+         opt_fun(alfa23p)= tw%alfa_p(2,3)
+         opt_fun(alfa31p)= tw%alfa_p(3,1)
+         opt_fun(alfa32p)= tw%alfa_p(3,2)
+         opt_fun(alfa33p)= tw%alfa_p(3,3)
 
          opt_fun(gama11p)= tw%gama_p(1,1) / onedp
          opt_fun(gama12p)= tw%gama_p(1,2) / onedp
@@ -1993,7 +1983,8 @@ contains
          ! this part of the code is out of sync with the rest
          !j(:)=0
          write(6,'(a,1(f9.4,1x))') current%MAG%name,suml
-         write(6,'(a,1(f11.7,1x))') "Delta E ", deltae
+         !write(6,'(a,1(f11.7,1x))') "Delta E ", deltae
+         write(6,'(a,1(f11.7,1x))') "1+delta_p ", onedp
          write(6,'(a,3(i8.0,1x))')  "idxes   ", beta11,beta22,beta33
          write(6,'(a,3(f11.4,1x))')  "betas raw    ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
          write(6,'(a,3(f11.4,1x))')  "betas w/ener ", opt_fun(beta11),opt_fun(beta22),opt_fun(beta33)
@@ -2084,8 +2075,8 @@ contains
 
             betx = (tw%beta(1,1)/kappa) * onedp
             bety = (tw%beta(2,2)/kappa) * onedp
-            alfx = (tw%alfa(1,1)/kappa) 
-            alfy = (tw%alfa(2,2)/kappa) 
+            alfx = (tw%alfa(1,1)/kappa)
+            alfy = (tw%alfa(2,2)/kappa)
 
             bx = kx*kappa+u/kx
             by = ky*kappa-u/ky
@@ -4013,6 +4004,9 @@ contains
       vf_kernel=0
       call flatten_c_factored_lie(theNormalForm%ker,vf_kernel)
 
+      write (*,*) "LD: debug vf_kernel="
+      call print(vf_kernel, 6)
+
       call putQnormaltable(vf_kernel%v(1),1)
       call putQnormaltable(vf_kernel%v(3),2)
       if (c_%nd2 == 6) then
@@ -4906,6 +4900,10 @@ contains
            endif
 
         endif !else order==0
+
+        write(*,*) "LD: debug putQnormaltable"
+        write(*,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
+                          d_val, order, ind(1:cnv)
 
          if (getdebug() > 2) then
             write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &

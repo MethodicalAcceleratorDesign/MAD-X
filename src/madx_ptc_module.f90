@@ -61,15 +61,15 @@ MODULE madx_ptc_module
      integer                 :: nelements = 0
      type(fibreptr)          :: elements(maxelperclock)
   end type clockdef
-  
-  
+
+
   integer, private, parameter:: nmaxclocks = 3
   type(clockdef),  dimension(nmaxclocks) :: clocks ! 3 pointers
   integer                                :: nclocks = 0
 
   real(dp) :: beta0start
   real(dp) :: my_ring_length
-  
+
   character(1000), private  :: whymsg
   external :: aafail, dcopy, get_node_vector, fort_warn
   external :: element_name, node_name, node_string
@@ -216,7 +216,12 @@ CONTAINS
        return
     endif
 
-    cavsareset = .false.
+    cavsareset = get_value('ptc_setswitch ', 'maxacceleration ').eq.0
+    if (getdebug() > 1) then
+      print *, 'maxacceleration =', cavsareset
+    endif
+    cavsareset = .not. cavsareset
+
     mytime=get_value('ptc_create_layout ','time ').ne.0
 
     if(mytime) then
@@ -297,7 +302,7 @@ CONTAINS
     integer, parameter :: aplen=0
     REAL(DP), pointer, dimension (:) :: apx => null()
     REAL(DP), pointer, dimension (:) :: apy => null()
-    
+
 
 
     !real :: tstart, tfinish, tsum
@@ -335,13 +340,13 @@ CONTAINS
     beta0=e0f/ENERGY
 
 
-    if(abs(pma-pmae)/pmae<c_0_002) then
+    if(abs(pma-pmae)/pmae<0.0001_DP) then
        if (getdebug() > 1) then
            print *,'Executing MAKE_STATES(TRUE), i.e. ELECTRON beam'
        endif
        particle=.true.
        CALL MAKE_STATES(PARTICLE)
-    elseif(abs(pma-pmap)/pmap<c_0_002) then
+    elseif(abs(pma-pmap)/pmap<0.0001_DP) then
        if (getdebug() > 1) then
            print *,'Executing MAKE_STATES(FALSE), i.e. PROTON beam'
        endif
@@ -350,7 +355,7 @@ CONTAINS
     else
        muonfactor=pma/pmae
        if (getdebug() > 1) then
-           print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. PROTON beam'
+           print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. CUSTOM beam'
        endif
        CALL MAKE_STATES(muonfactor)
     endif
@@ -629,11 +634,11 @@ CONTAINS
     APERTURE = zero
     nn = 0
     call get_node_vector('aperture ',nn,aperture)
-    
+
     apoffset = zero
     napoffset = 0
     call get_node_vector('aper_offset ',napoffset,apoffset)
-    
+
     if (getdebug() > 2) then
        print*,' Aperture type: >',aptype,'< ',nn,' parameters:'
        do i=1,nn
@@ -644,9 +649,9 @@ CONTAINS
          print*,'             ',i,' : ',apoffset(i)
        enddo
     endif
-    
-    
-    
+
+
+
     !print*, name,'madx_ptc_module: Got for aperture nn=',nn, aperture(1), aperture(2)
 
     if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then
@@ -716,14 +721,14 @@ CONTAINS
           write(whymsg,*) 'Aperture: <<',aptype,'>> at magnet ',name(:len_trim(name)),' is not implemented by PTC'
           call fort_warn('ptc_createlayout: ',whymsg(:len_trim(whymsg)))
           call aafail('ptc_input:','Aperture type not implemented. Program stops')
-          
+
         case("general") ! 2015-Mar-10  14:25:48  ghislain: kind was 6
           key%list%aperture_kind=8
           print*,"General aperture not implemented"
           call aafail('ptc_input:','General aperture not implemented. Program stops')
-        
+
         case DEFAULT
-          
+
           ! in case aperture is defined as file with arbitrary polygon points
           i = get_userdefined_geometry_len()
           if (i > 0) then
@@ -734,36 +739,36 @@ CONTAINS
               key%list%aperture_x=0
               key%list%aperture_y=0
             endif
-             
+
             allocate(apx(i))
             allocate(apy(i))
-            
+
             i = get_userdefined_geometry(apx,apy,i)
-            
+
             key%list%APERTURE_POLYGX => apx
             key%list%APERTURE_POLYGY => apy
-            
+
             key%list%aperture_on=.true.
             key%list%aperture_kind=6
-            
+
             if (getdebug()>1)  then
               print*, "Aperture defined as a polygon with ", i, " points "
             endif
-          
+
           else
-          
-          
+
+
             write(whymsg,*) 'Aperture: <<',aptype,'>> at magnet ',name(:len_trim(name)),' is not recognized by PTC'
             call fort_warn('ptc_createlayout: ',whymsg(:len_trim(whymsg)))
             call aafail('ptc_input:','Aperture type not implemented. Program stops')
           endif
        end select
-       
-       
+
+
        key%list%aperture_dx=apoffset(1)
        key%list%aperture_dy=apoffset(2)
-       
-       
+
+
   !  else
   !   if( .not. ((code.eq.1) .or. (code.eq.4)) ) then
   !     write(*,'(a10,1x,a16,1x,a14,1x,6f10.6)') 'Aperture: ',aptype(1:16),'aperture pars:', aperture(1:6)
@@ -1251,7 +1256,7 @@ CONTAINS
 
        modulationq = node_value('modulationq ')
        if (abs(modulationq) .gt. 1e-12) then
-         
+
          key%list%clockno_ac = getclockidx(modulationq)
 
          if (key%list%clockno_ac .lt. 0) then
@@ -1259,9 +1264,9 @@ CONTAINS
            'Too many AC Dipole clocks, PTC can accept max 3 clocks with given tune and ramp. Program stops.')
          endif
 
-       
-         key%list%n_ac = 1 
-         
+
+         key%list%n_ac = 1
+
          key%list%d_volt = node_value('volterr ')
          key%list%d_phas = node_value('lagerr ')
 
@@ -1306,7 +1311,7 @@ CONTAINS
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
        PATCH_TRANS = zero
-       patch_ang(2)=node_value('angle ')
+       patch_ang(2)=-node_value('angle ')
        key%list%patchg=2
        do i=1,3
           key%list%ang(i)=patch_ang(i)
@@ -1494,7 +1499,7 @@ CONTAINS
         if (getdebug() > 1) then
           print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
         endif
-        
+
         key%list%d_an(1) = zero
 
         key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
@@ -1527,11 +1532,11 @@ CONTAINS
         else
           key%list%d_an(1) =  0.3 * node_value('volt ')  / (beta0 * get_value('beam ','pc '))
         endif
-        
+
         if (getdebug() > 1) then
           print*,"VACD bn(1)=", key%list%d_an(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
         endif
-        
+
         key%list%d_bn(1) = zero
 
         key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
@@ -1680,7 +1685,7 @@ CONTAINS
       if (getdebug() > 1) then
          print*,"Adding Modulated Element: ",name, " of type ",code," to clock ",key%list%clockno_ac
       endif
-      
+
       call addelementtoclock(my_ring%end,key%list%clockno_ac)
     endif
 
@@ -1698,10 +1703,10 @@ CONTAINS
     if (getdebug() > 0) then
        print*,' Length of machine: ',l_machine
     endif
-    
+
     CALL GET_ENERGY(ENERGY,kin,BRHO,beta0,P0C)
     beta0start = beta0
-    
+
     isclosedlayout=get_value('ptc_create_layout ','closed_layout ') .ne. 0
 
     if (getdebug() > 0) then
@@ -1740,12 +1745,12 @@ CONTAINS
     endif
 
     call setintstate(default)
-    
+
     call get_length(my_ring,l)
     my_ring_length = l
     if(my_ring%HARMONIC_NUMBER>0) then
        print*,"HARMONIC NUMBER defined in the ring: ", my_ring%HARMONIC_NUMBER
-       
+
 
        j=restart_sequ()
        p=>my_ring%start
@@ -1909,7 +1914,7 @@ CONTAINS
           endif                                                !
        enddo                                                   !
     endif !====================================================!
-    if (key%magnet == 'sbend' .or. key%magnet == 'rbend') then 
+    if (key%magnet == 'sbend' .or. key%magnet == 'rbend') then
       bk0 = node_value('k0 ')
       if(bk0 .ne. 0) key%list%k(1) = key%list%k(1) + bk0 - node_value('angle ')/l
     endif
@@ -2138,7 +2143,7 @@ CONTAINS
     j=0
     f=>my_ring%start
 10  continue
-   
+
     j=j+1
     al_errors = 0
     n_align = node_al_errors(al_errors)
@@ -3685,7 +3690,7 @@ CONTAINS
     ! frequency is in fact tune
     ! kept like this on Rogelio request not to break the codes before LS2
     ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
-    
+
 
     r1 = node_value('ramp1 ')
     r2 = node_value('ramp2 ')
@@ -3723,7 +3728,7 @@ CONTAINS
     getclockidx = nclocks
 
     clocks(nclocks)%nelements = 0
-    
+
     if (getdebug() > 1) then
       print*,"getclockidx: Created new clock. nclocks = ", nclocks
     endif
@@ -3747,7 +3752,7 @@ CONTAINS
      elidx = clocks(c)%nelements
 
      clocks(c)%elements(elidx)%p=>p
-     
+
      ! sets amplitude of modulation to maximum for ptc_twiss
      ! (in track this parameter is ramped up and down)
      p%magp%d_ac = 1
@@ -3765,9 +3770,9 @@ CONTAINS
     integer  n,i
     real(dp) r
     type(fibre), pointer :: p
-    
+
     !print*,"acdipoleramping t=",t
-    
+
     do n=1,nclocks
 
       do i=1,clocks(n)%nelements
@@ -3807,10 +3812,10 @@ CONTAINS
         p%mag%d_ac = zero
 
       enddo
-     
+
 
     enddo
-    
+
     !print*,"acdipoleramping d_ac=",p%mag%d_ac
   end subroutine acdipoleramping
 

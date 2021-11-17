@@ -45,12 +45,12 @@ contains
 
     !Below we enforce that x(6) is cT, and it is time of flight from the start
     !we use time T=x(6)/ctime to find the time of arrival to a cavity so we can adjust its phase optimally
-    
-    !This is not needed, and even to contrary, it creates a bug: 
+
+    !This is not needed, and even to contrary, it creates a bug:
     !if the tracking is done without totalpath, cavities should be tuned to such x(6)=0 gives max acceleration
 
     localis = getintstate()
-    
+
 !    localis = localis - nocavity0 + totalpath0
     localis = localis - delta0 - only_4d0 - nocavity0 + totalpath0
     if (getdebug() > 1) then
@@ -213,8 +213,8 @@ contains
          if ( getdebug() > 2 ) print*,"x(5) = dp = (pc-p0c)/p0c so (pc-p0c) = x(5)*p0c = ", x(5)*nfen%p0c * 1e3, "MeV"
          FEED_P0C = .true.
          nfen = x(5)*nfen%p0c
-       endif  
-        
+       endif
+
 
        if ( getdebug() > 2 ) then
           write(6,100) 'New Fibre: energy=',nfen%energy,' momentum=',nfen%p0c,' kinetic=',nfen%kinetic
@@ -237,7 +237,7 @@ contains
 
        !from this point on we do not need to calculate TOF cause there is no further cavs to set
     enddo
-    
+
 
     if ( getdebug() > 2 ) then
        write (*,*) 'Loop over cavities done'
@@ -358,11 +358,11 @@ contains
       real(dp)                 :: de_mev ! delta energy
       real(dp)                 :: arrivtime !time of arrival
 !      type(internal_state)     :: globalis ! internal state to be use in the tracking
-      
-      
-      
+
+
+
       arrivtime = x(6)/clight
-      
+
       if (getdebug()>2) then
           print *, 'arrivtime = ', arrivtime*1e9, ' ns'
       endif
@@ -383,40 +383,33 @@ contains
 !      globalis = getintstate()
 !      print*, "Total path is ", globalis%totalpath
 !      chargesign = charge/abs(charge)
-      
+
       phase_old = f%mag%phas
-      
+
       if(ene) then
-
-         if ( getdebug() > 2 ) then
-            print*,"MAX ACCEL MODE" ! ptc stores gradient not total voltage
-            de_mev=f%mag%volt*f%mag%l
-            write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
-         endif
-         ! nunmber of radians from the lauch of the synchr particle to its arrival to the cavity
-         f%mag%phas = pi/two - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
-         f%magp%phas= f%mag%phas
-         phase_rel=f%mag%phas
-
+        if ( getdebug() > 2 ) then
+           print*,"MAX ACCEL MODE" ! ptc stores gradient not total voltage
+           de_mev=f%mag%volt*f%mag%l
+           write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
+        endif
+        ! nunmber of radians from the lauch of the synchr particle to its arrival to the cavity
+        f%mag%phas = pi/two - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
+        f%magp%phas= f%mag%phas
+        phase_rel=f%mag%phas
       else
-         if ( getdebug() > 2 ) then
-           print*,"REGULAR MODE, not max accel"
-         endif  
-         
-         if( f%mag%kind == kind21  ) then
-         
-           f%mag%phas = - f%mag%lag
-           f%magp%phas= f%mag%phas
-           phase_rel=f%mag%phas
-         
-         else !(f%mag%kind==kind4) 
-          
-           f%mag%phas = - f%mag%lag
-           f%magp%phas= f%mag%phas
-           phase_rel=f%mag%phas
-         
-         endif
+        if ( getdebug() > 2 ) then
+          print*,"REGULAR MODE, not max accel"
+        endif
 
+        if( f%mag%kind == kind21  ) then
+          f%mag%phas = - f%mag%lag
+          f%magp%phas= f%mag%phas
+          phase_rel=f%mag%phas
+        else !(f%mag%kind==kind4)
+          f%mag%phas = - f%mag%lag
+          f%magp%phas= f%mag%phas
+          phase_rel=f%mag%phas
+         endif
       endif
 
 

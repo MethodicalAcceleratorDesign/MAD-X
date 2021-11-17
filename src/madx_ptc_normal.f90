@@ -257,6 +257,12 @@ contains
 
        call  c_normal(c_Map,theNormalForm)       ! (4) !! HERE WE DO NORMAL FORM TYPE 1
 
+       write (*,*) "LD: theTransferMap="
+       call print(theTransferMap, 6)
+
+       write (*,*) "LD: theNormalForm="
+       call print(theNormalForm%a_t, 6)
+
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           write(whymsg,*) 'DA got unstable in Normal Form: PTC msg: ',messagelost
           call fort_warn('ptc_normal: ',whymsg)
@@ -405,6 +411,8 @@ contains
 
           call equal_c_tayls(g_io,cgetpb(vf))
 
+          write (*,*) "vf="  ; call print(vf  , 6)
+          write (*,*) "g_io="; call print(g_io, 6)
 
           call kill(vf)
           call kill(a_CS)
@@ -538,19 +546,20 @@ contains
 
 
        if (n_gnfu > 0) then
+          write (*,*) "theGeneratingFunc=" ; call print(g_io,6)
           call kill(g_io)
        endif
 
        if (n_haml > 0) then
-          call kill(nrmlzdPseudoHam)
+          write (*,*) "theTransferMap=" ; call print(theTransferMap   ,6)
+          write (*,*) "theNormalForm="  ; call print(theNormalForm%a_t,6)
+          write (*,*) "nrmlzdPseudoHam="; call print(nrmlzdPseudoHam  ,6)
+
+          call kill (nrmlzdPseudoHam)
        endif
 
-
        call kill(theNormalForm)
-
     endif
-
-
 
     CALL kill(theTransferMap)
     close(18)
@@ -617,7 +626,7 @@ contains
 
        CASE ('q2')
           ind(:)=0
-          ind(3)=1 !kernel has extra exponent at the plane variable, q1=v(1).sub.'100000'
+          ind(3)=1 !kernel has extra exponent at the plane variable, q1=v(1).sub.'001000'
           c_val=vf_kernel%v(3).sub.ind
           d_val = -aimag(c_val)/(2.*pi)
        CASE DEFAULT
@@ -713,12 +722,13 @@ contains
              k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
              ind(5) = int(doublenum)
              ind(6) = 0
-             !print*,"ANHX order ", ind(1),ind(3),ind(5)
+             print*,"ANHX order ", ind(1),ind(3),ind(5)
              ind(1) = ind(1) + 1
-             !print*,"ANHX extracting ", ind
+             print*,"ANHX extracting ", ind
              c_val=vf_kernel%v(1).sub.ind
              d_val = -aimag(c_val)/(2.*pi)
-             !print*,"ANHX = ", d_val
+             print*,"ANHX = ", d_val
+             print*,"LD: kernel =" ; call print(vf_kernel,6)
              ind(1) = ind(1) - 1 ! need to subtract it back to get factorial factor correct
              ind(2) = 0    ! to get the order and factorial factor correct
              ind(4) = 0    !
@@ -734,10 +744,14 @@ contains
              k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
              ind(5) = int(doublenum)
              ind(6) = 0
-             ind(3) = ind(3) + 1
 
+             print*,"ANHY order ", ind(1),ind(3),ind(5)
+             ind(3) = ind(3) + 1
+             print*,"ANHY extracting ", ind
              c_val=vf_kernel%v(3).sub.ind
              d_val = -aimag(c_val)/(2.*pi)
+             print*,"ANHY = ", d_val
+             print*,"LD: kernel =" ; call print(vf_kernel,6)
 
              ind(3) = ind(3) - 1 ! need to subtract it back to get factorial factor correct
              ind(2) = 0    ! to get the order and factorial factor correct
