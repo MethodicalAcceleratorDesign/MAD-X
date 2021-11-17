@@ -1468,7 +1468,7 @@ convert_madx_to_c6t(struct node* p, int ncombined)
     c6t_elem->value[14] = el_par_value_recurse("sigx",p->p_elem);
     c6t_elem->value[15] = el_par_value_recurse("sigy",p->p_elem);
     c6t_elem->value[16] = el_par_value_recurse("charge",p->p_elem);
-    c6t_elem->value[17] = 0.0; /* npart */
+    c6t_elem->value[17] = el_par_value_recurse("npart",p->p_elem); /* npart */
   }
   else if((strcmp(p->base_name,"elseparator") == 0  ))
   {
@@ -2509,13 +2509,31 @@ pro_elem(struct node* cnode,  int ncombined)
       } 
   }
 
-  if (cnode->p_al_err) {
+  if (cnode->p_al_err || cnode->perm_misalign==1) {
     align_cnt++;
-    current_element->na_err = cnode->p_al_err->curr;
+    current_element->na_err = ALIGN_MAX;
     current_element->p_al_err = make_obj("ALDUM",0,ALIGN_MAX,0,0);
-    current_element->p_al_err->c_dble = cnode->p_al_err->curr;
-    for (i=0;i<cnode->p_al_err->curr;i++)
-      current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
+    current_element->p_al_err->c_dble = ALIGN_MAX;
+    if(cnode->p_al_err){
+      for (i=0;i<cnode->p_al_err->curr;i++)
+        current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
+    }
+    if(cnode->perm_misalign==1){
+      double value;
+
+      if (cnode->perm_align->dx_expr == NULL) value = cnode->perm_align->dx_value;
+      else                                            value = expression_value(cnode->perm_align->dx_expr , 2);
+      current_element->p_al_err->a_dble[0] = current_element->p_al_err->a_dble[0] + value;
+
+      if (cnode->perm_align->dy_expr == NULL) value = cnode->perm_align->dy_value;
+      else                                            value = expression_value(cnode->perm_align->dy_expr , 2);
+      current_element->p_al_err->a_dble[1] = current_element->p_al_err->a_dble[1] + value;
+
+      if (cnode->perm_align->dpsi_expr == NULL) value = cnode->perm_align->dpsi_value;
+      else                                             value = expression_value(cnode->perm_align->dpsi_expr , 2);
+      current_element->p_al_err->a_dble[5] = current_element->p_al_err->a_dble[5] + value;    
+     
+    }
   }
 
   /* if we have a tilt set the flag */
@@ -3438,7 +3456,8 @@ write_f3_mult(struct c6t_element* el)
         {
           if (eln->p_fd_err->a_dble[i] != zero)
           {
-            i_max = i; error_matrix[i] = 1.;
+            if (i > i_max){ i_max = i;}
+            error_matrix[i] = 1.;
           }
         }
       }

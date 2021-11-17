@@ -83,7 +83,7 @@ Several commands are actually required to complete a tracking run:
 \madbox{
 xxxxxxx\= \kill
 TRACK, \>DELTAP=real, ONEPASS=logical, DAMP=logical; \\
-      \>QUANTUM=logical, SEED=real, UPDATE=logical, \\
+      \>QUANTUM=logical, SEED=integer, UPDATE=logical, \\
       \>ONETABLE=logical, RECLOSS=logical, FILE=filename, \\
       \>APERTURE=logical,ONLY\_AVERAGE=logical; \\
 xxxx\=xxxxxxx\= \kill
@@ -159,7 +159,7 @@ thin-lens tracking module.
 \madbox{
 xxxxxxx\= \kill
 TRACK, \>DELTAP=real, ONEPASS=logical, DAMP=logical; \\
-       \>QUANTUM=logical, SEED=real, UPDATE=logical, \\
+       \>QUANTUM=logical, SEED=integer, UPDATE=logical, \\
        \>ONETABLE=logical, RECLOSS=logical, FILE=filename, \\
        \>APERTURE=logical;
 }
@@ -195,14 +195,23 @@ The attributes of the TRACK command are:
   and flag \texttt{RADIATE} in the \texttt{BEAM} command). \\ (Default:~false)
 
   \ttitem{QUANTUM} flag to introduce quantum excitation via random
-  number generator and tables look-up (\texttt{SYNRAD} $=1$, see ref. \cite{roy1990}) or polynomial
+  number generator and table look-up (\texttt{SYNRAD} $=1$, see ref. \cite{roy1990}) or polynomial
   interpolation (\texttt{SYNRAD} $=2$, see ref. \cite{hbu2007}) for photon emission.
   The choice of the generator can be selected via the command
   \hyperref[sec:option]{\texttt{OPTION}} attribute \texttt{SYNRAD}. \\ (Default:~2)
 
-  \ttitem{SEED} If \texttt{QUANTUM} is true, it selects a particular sequence of random values. 
-A \texttt{SEED} value is an integer in the range [0...999999999] (default:
-123456789). Note that the seed set with this command is shared with the \hyperref[sec:coption]{\texttt{COPTION}} and \hyperref[sec:coption]{\texttt{EOPTION}} commands. See also: \hyperref[subsubsec:random]{Random Values}.
+  \ttitem{SEED} If \texttt{QUANTUM} is true, seeds or starts a
+  particular sequence of random values. 
+  A valid \texttt{SEED} value is an integer in the range
+  [0...999999999], or an expression that evaluates to an integer in the
+  same range (default: 123456789). \\
+  Internally the code takes as the effective seed the value
+  \texttt{ABS(seed)\%1.e10} hence normalizing the provided seed to an
+  appropriate value in the range irrespective of the provided value. \\
+  Note that the seed set with this command is shared with the
+  \hyperref[sec:coption]{\texttt{COPTION}} and
+  \hyperref[sec:coption]{\texttt{EOPTION}} commands. See also:
+  \hyperref[subsubsec:random]{Random Values}. 
 
   \ttitem{DUMP} flag to write the particle coordinates in files, whose
   names are generated automatically. \\ (Default:~false)

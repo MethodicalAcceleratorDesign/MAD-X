@@ -1,15 +1,25 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.01.22 11:25:14      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.09.12 19:19:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
 a = 0.1;
 
-myseq: sequence, l=1;
+q3:quadrupole,  l=0.1, k1=0.3;
 
-q1:quadrupole,  at=0.5, l=1, k1=0.01,dx=0.01, at=0.5;
+myseq: sequence, l=3;
+
+q1:quadrupole,  at=0.2, l=0.1, k1= 0.1 ,dx=0.01;
+
+q2:quadrupole,  at=0.5, l=0.1, knl= 0.2 ,dy=0.02;
+
+q3, at= 0.6, dx=0.11;
+
+q3, at= 0.7, dy=0.22;
+
+q3, at= 0.8, dpsi=0.33;
 
 endsequence;
 
@@ -25,33 +35,89 @@ enter Twiss module
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     4.995835E-05  9.983342E-05  0.000000E+00  0.000000E+00 -1.663337E-09  0.000000E+00
+final orbit vector:     8.156298E-03  3.380874E-03 -1.525084E-02 -6.632170E-03 -6.383466E-05  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-                 1                 -0                  0                  0 
+                 3                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-      0.1252658784                  0        1.986704397    4.991671484e-05 
+      0.2076218785                  0         8.80000099     0.008112740131 
 
              dxrms             xcomax             xcorms                 q2 
-     4.0756827e-05    4.995834722e-05    4.079081969e-05       0.1247353595 
+    0.003643659029     0.008156298203     0.003663132268       0.1908832196 
 
                dq2            betymax              dymax              dyrms 
-                 0        2.013371159                  0                  0 
+                 0        11.35129585      0.01532164488     0.006860038993 
 
             ycomax             ycorms             deltap            synch_1 
-                 0                  0                  0                  0 
+     0.01525083841     0.006828385719                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips 
                  0                  0                  0 
-save, sequence=myseq, file="myseq";
+!save, sequence=myseq, file="myseq";
 
-++++++ warning: SAVE makes all previous USE invalid !  
+select, flag=makethin, class=quadrupole, slice=3;
+
+makethin, sequence=myseq;
+
+makethin: slicing sequence : myseq
+use, sequence=myseq;
+
+twiss, file="twiss.tfs_thin", betx=1, bety=1;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     7.904734E-03  3.280324E-03 -1.524958E-02 -6.631611E-03 -8.005043E-05  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 3                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.5275505636                  0        58.61580392         1.38360802 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.3303859921     0.007904733536     0.001845180997       0.1908830516 
+
+               dq2            betymax              dymax              dyrms 
+                 0        11.35122515     0.008461993035      0.00196120962 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01524957732     0.003511421056                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
+survey, file="test.survey", perm_align_survey;
+
+sixtrack;
+
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+++++++ info: c6t - long names flag selected 
+Reference radius set to : 1.000000
+++++++ info: MADX sequence converted to c6t internal. 
+
+total block length: 3.000000
+
+c6t terminated - total number of elements: 36
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 0
+                 alignment errors   MAD-X: 20
+                alignment errors SixTrack: 15
+                          sequence length: 3.000000 [m]
 
 
 ptc_create_universe;                                                                                                    
@@ -69,13 +135,13 @@ ptc_create_layout,model=1, method=2, nst=2, exact=true;
      method                   2
      Num. of steps            2
      charge           1.0000000000000000     
-  Length of machine:    1.0000000000000000     
+  Length of machine:    3.0000000000000000     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        1.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        3.0000000000000000     
 ptc_align;
 
 ptc_setswitch, debuglevel=0, fringe=false,  time=false, totalpath=false, exact_mis=false;                                                
@@ -87,59 +153,58 @@ PTC_TWISS, table=twiss, icase=5, no=5, betx=1, bety=2, betz=10, x=xin, y=yin, t=
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-                 1           -1000000           -1000000           -1000000 
+                 3           -1000000           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000           -1000000           -1000000         0.12524935 
+          -1000000           -1000000           -1000000       0.5275507981 
 
                 q2                dq1                dq2                 qs 
-     0.07359358392           -1000000           -1000000           -1000000 
+      0.1446691154           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-                 1        1.986286305                  2        2.521940105 
+     0.08291635026        58.62054322                  2        7.919358239 
 
          beta11min          beta11max          beta12min          beta12max 
-                 1        1.986286305                  0                  0 
+     0.08291634915          58.620508                  0     0.003909291569 
 
          beta13min          beta13max          beta21min          beta21max 
-                 0                  0                  0                  0 
+                 0                  0                  0    0.0001356031943 
 
          beta22min          beta22max          beta23min          beta23max 
-                 2        2.521940105                  0                  0 
+                 2        7.919353482                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0   -4.993750047e-05                  0 
+                 0                  0   -2.624218821e-05        1.383656488 
 
           disp2min           disp2max           disp3min           disp3max 
-                 0    1.250000005e-07                  0                  0 
+                 0       0.5645014328                  0     0.008434771885 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0                  0 
+   -0.003089748481    3.294634987e-06                  0                  0 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    4.079931366e-05                  0    8.154759602e-05 
+                 0     0.001845228299     0.003511516445     0.002276392488 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    4.996875016e-05 
+    0.003594982628                  0                  0     0.007904940108 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0         9.9875e-05                  0                 -0 
+                 0     0.003295259622                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0                  0                  0                  0 
+                 0                  0     -0.01524999219   -2.192510037e-06 
 
            pycomin             tcomin            ptcomin 
-                 0                 -0                  0 
-write, table=twiss, file="twiss.ptc.tfs";                                                                                                                       
+   -0.006631611308                 -0                  0 
+write, table=twiss, file="twiss.ptc.tfs";
 
-  Number of warnings: 1
-1 in C and 0 in Fortran
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

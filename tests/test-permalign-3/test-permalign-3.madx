@@ -1,0 +1,24 @@
+beam;
+q1:quadrupole,  k1=0.01, l=1; ; !hbu element class q1
+q2:quadrupole,  k1=0.01, l=2;
+q3:quadrupole,  k1=0.01, l=3;
+a=0.5;
+myseq: sequence, l=6;
+  q1, at:=a, dx=0.002, dtheta=0.01;
+  q2, at=2.0, dy= 0.003, dphi=0.02;
+  q3, at=4.5, ds = 0.005, dpsi=0.02;
+endsequence;
+use, sequence=myseq;
+select, flag=twiss, column=name,s, dx, x,px, y,;
+twiss, betx=1, bety=1, file="thick.dat";
+select, flag=makethin, class=quadrupole, thick=true, slice=2;
+survey, perm_align_survey, file = "survey_thick.dat";
+
+makethin, sequence=myseq;
+use, sequence=myseq;
+twiss, betx=1, bety=1, file="sliced.dat";
+survey, perm_align_survey, file = "survey_thin.dat";
+save, sequence=myseq, file="mysliced.seq";
+
+
+ 

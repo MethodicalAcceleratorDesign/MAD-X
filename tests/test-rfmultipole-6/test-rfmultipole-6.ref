@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.06.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:28:01      +
+  + Release   date: 2020.09.01               +
+  + Execution date: 2021.04.28 13:19:27      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -44,6 +44,7 @@ enter Twiss module
   
 iteration:   1 error:   1.119543E-19 deltap:   0.000000E+00
 orbit:   6.130248E-36  3.107732E-34  0.000000E+00  0.000000E+00 -2.434672E-16  4.773364E-35
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
 
 ++++++ table: summ
 
@@ -122,7 +123,8 @@ exit TRACK module
 stop;
 
 
-  Number of warnings: 0
+  Number of warnings: 1
+0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

@@ -3,9 +3,15 @@
 # Runs "make tests $@", logs to "tests/tests-log.txt".
 # Returns failed tests as output.
 
+set -e
+set -o pipefail
+
 make tests "$@" 2>&1 | tee tests/tests-log.txt
 
-NUM_FAILED=$(grep -oP '(?<= FAILED ).*' tests/tests-summary.txt)
+# We invoke perl manually here instead of the more convenient `grep -P`
+# because mac's grep implementation doesn't know the `-P` flag:
+NUM_FAILED=$(
+    perl -nle 'print $& while m/(?<= FAILED ).*/g' tests/tests-summary.txt)
 
 if [[ $NUM_FAILED -ne 0 ]]; then
 

@@ -76,6 +76,8 @@
 #define advance_to_pos advance_to_pos_
 #define current_node_name current_node_name_
 #define node_name node_name_
+#define node_name node_name_
+#define node_name_f_lower node_name_f_lower_
 #define node_string node_string_
 #define node_value node_value_ // **
 #define retreat_node retreat_node_
@@ -279,7 +281,7 @@ void soddin_(F_INTEGER ierr);
 void survey_(void);
 void elementloc_(void);
 void survtest_(void);
-
+void locslice_(F_DOUBLE, F_DOUBLE, F_DOUBLE);
 
 // from toucheck.f90
 void touschek_(void);
@@ -355,5 +357,9 @@ int  w_ptc_getnmoments_(void);
 
 // from madx_ptc_knobs.f90
 void w_ptc_rviewer_(void);
+
+// from taper.f90
+void taper_(F_DOUBLE orbit0, F_INTEGER iterate, F_DOUBLE stepsize, F_CHARACTER filename, F_INTEGER error);
+void taperreset_(F_INTEGER error);
 
 #endif

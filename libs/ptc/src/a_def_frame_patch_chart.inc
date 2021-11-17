@@ -31,6 +31,7 @@ TYPE PATCH
    REAL(DP), POINTER:: A_T => null() ,B_T => null()      ! TIME SHIFT NEEDED SOMETIMES WHEN RELATIVE TIME IS USED
    REAL(DP), POINTER:: A_L => null() ,B_L => null() 
    REAL(DP), POINTER:: p0b => null() ,b0b => null()      ! for bmad patching
+   logical, POINTER:: track => null()
 END TYPE PATCH
 
 TYPE CHART

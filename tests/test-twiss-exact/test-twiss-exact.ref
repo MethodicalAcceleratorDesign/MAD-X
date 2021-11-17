@@ -1,0 +1,205 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.08.25 00:34:10      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+
+
+seq: sequence, l=10;
+
+m1:marker, at=1;
+
+m2:marker, at=3;
+
+m3:marker, at=5;
+
+m4:marker, at=7;
+
+m5:marker, at=9;
+
+endsequence;
+
+set,  format="13.11f";
+
+beam,particle=proton,energy=2;
+
+use, sequence=seq;
+
+option, sympl=false;
+
+px0 = 0.001;
+
+py0 = 0.02;
+
+betx0 = 1;
+
+bety0 = 2;
+
+select, flag = twiss, column=name,s,x,y,pt,betx,bety;
+
+
+
+twiss, file="madx.tfs", betx=betx0, bety=bety0, px=px0, py=py0, pt=pt0;
+
+enter Twiss module
+ Found 3 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  1.000000E-03  0.000000E+00  2.000000E-02  0.000000E+00  0.000000E+00
+final orbit vector:     1.000000E-02  1.000000E-03  2.000000E-01  2.000000E-02 -2.270344E-03  0.000000E+00
+
+++++++ table: summ
+
+       length        orbit5          alfa       gammatr 
+10.00000000000 -0.00000000000 0.00000000000 0.00000000000 
+
+           q1           dq1       betxmax         dxmax 
+0.23413724128 0.00000000000 101.00000000000 0.01132341367 
+
+        dxrms        xcomax        xcorms            q2 
+0.00723008881 0.01000000000 0.00638507876 0.21858352091 
+
+          dq2       betymax         dymax         dyrms 
+0.00000000000 52.00000000000 0.22646827347 0.14460177627 
+
+       ycomax        ycorms        deltap       synch_1 
+0.20000000000 0.12770157520 0.00000000000 0.00000000000 
+
+      synch_2       synch_3       synch_4       synch_5 
+0.00000000000 0.00000000000 0.00000000000 0.00000000000 
+
+      synch_6       synch_8        nflips 
+0.00000000000 0.00000000000 0.00000000000 
+twiss, file="madx_exact.tfs", betx=betx0, bety=bety0, px=px0, py=py0, exact;
+
+enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  1.000000E-03  0.000000E+00  2.000000E-02  0.000000E+00  0.000000E+00
+final orbit vector:     1.000201E-02  1.000000E-03  2.000401E-01  2.000000E-02 -1.771200E-03  0.000000E+00
+
+++++++ table: summ
+
+       length        orbit5          alfa       gammatr 
+10.00000000000 -0.00000000000 0.00000000000 0.00000000000 
+
+           q1           dq1       betxmax         dxmax 
+0.23414041683 0.00000000000 101.04031624715 0.00883657376 
+
+        dxrms        xcomax        xcorms            q2 
+0.00564222194 0.01000200560 0.00638635935 0.21860189884 
+
+          dq2       betymax         dymax         dyrms 
+0.00000000000 52.06009815221 0.17673147524 0.11284443887 
+
+       ycomax        ycorms        deltap       synch_1 
+0.20004011206 0.12772718707 0.00000000000 0.00000000000 
+
+      synch_2       synch_3       synch_4       synch_5 
+0.00000000000 0.00000000000 0.00000000000 0.00000000000 
+
+      synch_6       synch_8        nflips 
+0.00000000000 0.00000000000 0.00000000000 
+
+
+
+
+ptc_create_universe;
+
+Determined SECTOR NMUL MAX :  0
+ptc_create_layout,model=3, method=2, nst=1, exact=true;
+
+ MAD-X Beam Parameters
+                  Energy : 0.200000E+01
+          Kinetic Energy : 0.106173E+01
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.176625E+01
+ Setting MADx with 
+     energy           2.0000000000000000     
+     method                   2
+     Num. of steps            1
+     charge           1.0000000000000000     
+  Length of machine:    10.000000000000000     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        10.000000000000000     
+
+
+ptc_setswitch, debuglevel=0, fringe=false, totalpath=false	;
+
+PTC_TWISS, table=twiss, icase=6, no=3, betx=betx0, bety=bety0, betz=5, px=px0,py=py0;
+
+++++++ warning: my_state:   no cavity - dimensionality reduced 6 -> 5 and 1/2
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+       length       alpha_c     alpha_c_p    alpha_c_p2 
+10.00000000000 -1000000.00000000000 -1000000.00000000000 -1000000.00000000000 
+
+   alpha_c_p3         eta_c      gamma_tr            q1 
+-1000000.00000000000 -1000000.00000000000 -1000000.00000000000 0.23414041683 
+
+           q2           dq1           dq2            qs 
+0.21860189884 -1000000.00000000000 -1000000.00000000000 -1000000.00000000000 
+
+   beta_x_min    beta_x_max    beta_y_min    beta_y_max 
+1.00000000000 101.04031624715 2.00000000000 52.06009815221 
+
+    beta11min     beta11max     beta12min     beta12max 
+1.00000000000 101.04031624715 0.00000000000 0.00000002002 
+
+    beta13min     beta13max     beta21min     beta21max 
+0.00000000000 0.00002567481 0.00000000000 0.00000004005 
+
+    beta22min     beta22max     beta23min     beta23max 
+2.00000000000 52.06009815221 0.00000000000 0.01026992554 
+
+    beta31min     beta31max     beta32min     beta32max 
+0.00000000000 0.00012837407 0.00000000000 0.02567481386 
+
+    beta33min     beta33max      disp1min      disp1max 
+5.00000000000 6.59915529106 -0.00506703206 0.00000000000 
+
+     disp2min      disp2max      disp3min      disp3max 
+0.00000000000 0.00000000000 -0.10134064113 0.00000000000 
+
+     disp4min      disp4max        deltap       orbit_x 
+0.00000000000 0.00000000000 0.00000000000 0.00000000000 
+
+     orbit_px       orbit_y      orbit_py      orbit_pt 
+0.00100000000 0.00000000000 0.02000000000 0.00000000000 
+
+      orbit_t        xcorms        ycorms       pxcorms 
+0.00000000000 0.00638635935 0.12772718707 0.00100000000 
+
+      pycorms        tcorms       ptcorms        xcomax 
+0.02000000000 0.00145006893 0.00000000000 0.01000200560 
+
+       ycomax       pxcomax       pycomax        tcomax 
+0.20004011206 0.00100000000 0.02000000000 -0.00000000000 
+
+      ptcomax        xcomin        ycomin       pxcomin 
+0.00000000000 0.00000000000 0.00000000000 0.00100000000 
+
+      pycomin        tcomin       ptcomin 
+0.02000000000 -0.00227102748 0.00000000000 
+write, table=twiss, file="ptc.tfs";
+
+PTC_END;
+
+stop;
+
+
+  Number of warnings: 1
+0 in C and 1 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

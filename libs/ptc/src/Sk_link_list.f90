@@ -63,7 +63,8 @@ MODULE S_FIBRE_BUNDLE
   END INTERFACE
 
   INTERFACE move_to
-     MODULE PROCEDURE move_to_p
+   !  MODULE PROCEDURE move_to_p
+     MODULE PROCEDURE move_to_p_safe
      MODULE PROCEDURE move_to_name_old
      MODULE PROCEDURE move_to_nameS
      MODULE PROCEDURE move_to_name_FIRSTNAME
@@ -149,6 +150,7 @@ CONTAINS
     current%magp=>el%magp
     current%CHART=>el%CHART
     current%PATCH=>el%PATCH
+
     if(use_info) current%i=>el%i
     current%dir=>el%dir
     !  OCTOBER 2007
@@ -163,10 +165,11 @@ CONTAINS
     current%PARENT_LAYOUT=>L
     if(L%N==1) current%next=> L%start
     Current % previous => L % end  ! point it to next fibre
+
+
     if(L%N>1)  THEN
        L % end % next => current      !
     ENDIF
-
     L % end => Current
     if(L%N==1) L%start=> Current
 
@@ -174,7 +177,6 @@ CONTAINS
     L%LAST=>CURRENT;
 
   END SUBROUTINE APPEND_mad_like
-
 
   SUBROUTINE kill_layout( L )  ! Destroys a layout
     implicit none
@@ -376,8 +378,11 @@ CONTAINS
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET, intent(inout):: L
     integer i,k,POS
-
-    !    CALL LINE_L(L,doneit)  !TGV
+    if(L%closed) then
+      call move_to_p( L,current,POS )
+       return
+    endif
+     !    CALL LINE_L(L,doneit)  !TGV
     I=mod_n(POS,L%N)
  
 
@@ -406,10 +411,12 @@ CONTAINS
     logical(lp) foundit
     TYPE (fibre), POINTER :: p
     
+if(l%closed) then
     if(present(reset)) then
      if(reset) then
-       l%lastpos=1
-       l%last=>L%start
+       l%lastpos=0
+       l%last=>L%start%previous
+       l%last%next=>L%start
      endif
     endif
     
@@ -422,6 +429,7 @@ CONTAINS
 
     if(.not.associated(p)) goto 100
     do i=1,l%n
+ 
        if(p%mag%name==s1name) then
           foundit=.true.
           goto 100
@@ -439,6 +447,54 @@ CONTAINS
        poss=0
        WRITE(6,*) " Fibre not found in move_to_name_old ",S1name
     endif
+else
+    if(present(reset)) then
+     if(reset) then
+       l%lastpos=0
+       l%last=>L%start  !%previous
+     endif
+    endif
+    
+    foundit=.false.
+    S1NAME=name
+    CALL CONTEXT(S1name)
+    
+    nullify(p)
+
+   if(l%lastpos==0) then
+      p=>l%last
+     if(p%mag%name==s1name) then
+          foundit=.true.
+          goto 101
+       endif
+
+   endif
+
+    p=>l%last%next
+
+    if(.not.associated(p)) goto 101
+    do i=l%lastpos+1,l%n
+    !   write(6,*) i, p%pos,p%mag%name
+       if(p%mag%name==s1name) then
+          foundit=.true.
+          goto 101
+       endif
+       p=>p%next
+       if(.not.associated(p)) goto 101
+    enddo
+101 continue
+    if(foundit) then
+       current=>p
+       poss=mod_n(l%lastpos+i,l%n)
+       l%lastpos=poss
+       l%last=>current
+    else
+       poss=0
+       WRITE(6,*) " Fibre not found in move_to_name_old ",S1name
+    endif
+
+
+endif
     if(present(pos)) pos=poss
   END SUBROUTINE move_to_name_old
 
@@ -1539,6 +1595,7 @@ CONTAINS
 
     ENDIF
 
+if(el1%patch%track) then
     DISCRETE=.false.
     IF(ANG(1)/TWOPI<-0.25_dp) THEN
        DISCRETE=.TRUE.
@@ -1552,7 +1609,7 @@ CONTAINS
     IF(ANG(1)/TWOPI>0.25_dp) THEN
        DISCRETE=.TRUE.
     ENDIF
-
+endif
     IF(DISCRETE) THEN
        if(.not.present(patching))  write(6,*) " NO GEOMETRIC PATCHING POSSIBLE : MORE THAN 90 DEGREES BETWEEN FACES "
     ENDIF
@@ -2590,20 +2647,41 @@ CONTAINS
 
   !  Beam beam stuff
 
-  SUBROUTINE ALLOC_BEAM_BEAM_NODE(B)
+  SUBROUTINE ALLOC_BEAM_BEAM_NODE(B,N,S)
     IMPLICIT NONE
     TYPE(BEAM_BEAM_NODE),POINTER :: B
-
+    integer, optional ::n 
+    integer n0
+    logical np,sp
+    real(dp), optional :: S
+    real(dp) s0,ds
+    n0=1
+    s0=0
+    ds=0
+    sp=.false.
+    np=.false.
+    if(present(n)) then
+     np=.true.
+     n0=n 
+    endif
+    if(present(S)) then
+     S0=S
+    sp=.true.
+    endif
+ !   if((np.and.(.not.sp)).or.(sp.and.(.not.np))) then
+ !     write(6,*) "both S and N must be present if one is present "
+ !      stop 
+ !   endif
     allocate(B)
-    !    ALLOCATE(B%DS)
-    ALLOCATE(B%S)
-    ALLOCATE(B%FK)
-    ALLOCATE(B%SX)
-    ALLOCATE(B%SY)
-    ALLOCATE(B%XM)
-    ALLOCATE(B%YM)
+      ALLOCATE(B%S(n0))
+    ALLOCATE(B%n)
+    ALLOCATE(B%FK(N0))
+    ALLOCATE(B%SX(N0))
+    ALLOCATE(B%SY(N0))
+    ALLOCATE(B%XM(N0))
+    ALLOCATE(B%YM(N0))
     !    ALLOCATE(B%DPOS)
-    ALLOCATE(B%bbk(2))
+    ALLOCATE(B%bbk(N0,2))
     !    ALLOCATE(B%mid(3,3))
     !    ALLOCATE(B%o(3))
     ALLOCATE(B%A(3))
@@ -2629,6 +2707,8 @@ CONTAINS
     B%S=0.0_dp
     !    B%DPOS=0
     B%FK=0.0_dp
+    B%N=n0
+
   END SUBROUTINE ALLOC_BEAM_BEAM_NODE
 
   SUBROUTINE KILL_BEAM_BEAM_NODE(B)
@@ -2637,11 +2717,12 @@ CONTAINS
 
     !    DEALLOCATE(B%DS)
     DEALLOCATE(B%FK)
+    DEALLOCATE(B%S)
+    DEALLOCATE(B%N)
     DEALLOCATE(B%SX)
     DEALLOCATE(B%SY)
     DEALLOCATE(B%XM)
     DEALLOCATE(B%YM)
-    DEALLOCATE(B%s)
     !    DEALLOCATE(B%DPOS)
     DEALLOCATE(B%bbk)
     !    DEALLOCATE(B%mid)

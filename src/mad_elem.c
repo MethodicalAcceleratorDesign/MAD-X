@@ -169,6 +169,7 @@ check_for_perm_misalign(struct node* c_node, struct in_cmd* cmd){
   if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0)     isperm = 1;
   if(command_par_expr("dphi", cmd->clone) || command_par_value("dphi", cmd->clone)!=0)     isperm = 1;
   if(command_par_expr("dpsi", cmd->clone) || command_par_value("dpsi", cmd->clone)!=0)     isperm = 1;
+  if(command_par_value("slice_straight", cmd->clone)!=0)     isperm = 1;
   
   if(isperm==1){
    
@@ -861,6 +862,7 @@ el_par_vector(int* total, double* vect)
   for (i = 0; i < *total; i++) {
      if (i < elc->par->curr) {
         cp = parl->parameters[i];
+        if(cp == NULL) return 0;
         if (cp->type < 3) {
           if (cp->expr == NULL) val = cp->double_value;
           else val = expression_value(cp->expr, 2);
@@ -1084,7 +1086,10 @@ add_to_el_list( /* adds element to alphabetic element list */
           p_node = sequences->sequs[j]->start;
           while (p_node && p_node != sequences->sequs[j]->end)
           {
-            if (p_node->p_elem == ell->elem[pos]) p_node->p_elem = *el;
+            if (p_node->p_elem == ell->elem[pos]) {
+              p_node->p_elem = *el;
+              p_node->base_name = (*el)->base_type->name;
+            }
             p_node = p_node->next;
           }
           if (strcmp((*el)->base_type->name, "rfcavity") == 0 &&

@@ -124,7 +124,7 @@ module S_status
 
   !  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   private s_init,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
-  LOGICAL(lp), target :: compute_stoch_kick = .true.
+  LOGICAL(lp), target :: compute_stoch_kick = .false.
   private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A
   PRIVATE KILL_S_APERTURE,ALLOC_S_APERTURE
   !,NULL_p
@@ -905,7 +905,7 @@ CONTAINS
       !       call make_coef_e(s_e,I)
 !             call get_bend_coeff(S_EB,I,1.D0,MY_TRUE)
              call get_bend_electric_coeff(s_e,I)
-             call get_bend_magnetic_potential(S_B_from_V,I,1.D0,MY_TRUE)
+             call get_bend_magnetic_potential(S_B_from_V,I,1.0e0_dp,MY_TRUE)
 
 !          ENDDO
           lda_used=lda_old
@@ -9638,8 +9638,8 @@ endif
     call alloc(y0)
 
 
-      x=1.d0.mono.1
-      y=1.d0.mono.2
+      x=1.0e0_dp.mono.1
+      y=1.0e0_dp.mono.2
       y0=1
       y0%v(2)=0
       z=x+i_*y
@@ -9649,7 +9649,7 @@ endif
     h0=1.d0
     if(present(h00)) h0=h00
 
-    h=(1.d0+h0*x)
+    h=(1.e0_dp+h0*x)
     do k=1,no1
     !  erect multipole
     f=dreal(-z**K/K)
@@ -9673,7 +9673,7 @@ endif
     if(present(verb)) then
 
         write(mf,*) " Normal ",k
-         call clean_taylor(f,f,1.d-10)
+         call clean_taylor(f,f,1.0e-10_dp)
         call print(f,mf)
          y=((f.d.1).d.1)+((f.d.2).d.2)+h0*(f.d.1)/h
         y=y.cut.(no-1)
@@ -9687,8 +9687,8 @@ endif
 
        kick_x=-(f.d.1)  ! electric field
        kick_y=-(f.d.2)
-       call clean_taylor(kick_x,kick_x,1.d-6)
-       call clean_taylor(kick_y,kick_y,1.d-6)
+       call clean_taylor(kick_x,kick_x,1.0e-6_dp)
+       call clean_taylor(kick_y,kick_y,1.0e-6_dp)
        do l=1,s_b0t%n_mono
         j(1)=s_b0t%i(l)
         j(2)=s_b0t%j(l)
@@ -9727,14 +9727,14 @@ f=fs(k)
 
   cker1=fs(m).sub.j
   f=f-(cker/cker1)*fs(m)
- call clean_taylor(f,f,1.d-10)
-
+ call clean_taylor(f,f,1.0e-10_dp)
+ 
  enddo
 
        kick_x=-(f.d.1)  ! electric field
        kick_y=-(f.d.2)
-       call clean_taylor(kick_x,kick_x,1.d-6)
-       call clean_taylor(kick_y,kick_y,1.d-6)
+       call clean_taylor(kick_x,kick_x,1.0e-6_dp)
+       call clean_taylor(kick_y,kick_y,1.0e-6_dp)
        do l=1,s_b0t%n_mono
         j(1)=s_b0t%i(l)
         j(2)=s_b0t%j(l)
@@ -9769,7 +9769,7 @@ endif
      enddo
      if(present(verb)) then
         write(mf,*) " Skew ",k
-        call clean_taylor(f,f,1.d-10)
+        call clean_taylor(f,f,1.0e-10_dp)
         call print(f,mf)
          y=((f.d.1).d.1)+((f.d.2).d.2)+h0*(f.d.1)/h
         y=y.cut.(no-1)
@@ -9783,8 +9783,8 @@ endif
 
        kick_x=-(f.d.1)   ! electric field
        kick_y=-(f.d.2)
-       call clean_taylor(kick_x,kick_x,1.d-6)
-       call clean_taylor(kick_y,kick_y,1.d-6)
+       call clean_taylor(kick_x,kick_x,1.0e-6_dp)
+       call clean_taylor(kick_y,kick_y,1.0e-6_dp)
        do l=1,s_b0t%n_mono
         j(1)=s_b0t%i(l)
         j(2)=s_b0t%j(l)
@@ -9822,14 +9822,14 @@ f=fs(k)
 
   cker1=fs(m).sub.j
   f=f-(cker/cker1)*fs(m)
- call clean_taylor(f,f,1.d-10)
+ call clean_taylor(f,f,1.0e-10_dp)
 
  enddo
 
        kick_x=-(f.d.1)   ! electric field
        kick_y=-(f.d.2)
-       call clean_taylor(kick_x,kick_x,1.d-6)
-       call clean_taylor(kick_y,kick_y,1.d-6)
+       call clean_taylor(kick_x,kick_x,1.0e-6_dp)
+       call clean_taylor(kick_y,kick_y,1.0e-6_dp)
        do l=1,s_b0t%n_mono
         j(1)=s_b0t%i(l)
         j(2)=s_b0t%j(l)
@@ -9885,52 +9885,18 @@ endif
     call alloc(f,h,df,ker,sol)
     call alloc(y0)
 
-
-      x=1.d0.mono.1
-
-!      print*, "@@ x"
-!      call print(x,6)
-
-! etall    1, NO =   15, NV =    2, INA =   31
-! *********************************************
-!    I  COEFFICIENT          ORDER   EXPONENTS
-!     1    1.000000000000        1     1 0
-!
-      y=1.d0.mono.2
-!      print*, "@@ y"
-!      call print(y,6)
-
-!etall    1, NO =   15, NV =    2, INA =   32
-! *********************************************
-!
-!    I  COEFFICIENT          ORDER   EXPONENTS
-!     1    1.000000000000        1     0 1
-
-      z=x+i_*y
-!      print*, "@@ z"
-!      call print(z,6)
-
-! etall    1, NO =   15, NV =    2, INA =   35
-! *********************************************
-!
-!    I  COEFFICIENT          ORDER   EXPONENTS
-!     1    1.000000000000        1     1 0
-!
-!
-! etall    1, NO =   15, NV =    2, INA =   36
-! *********************************************
-!
-!    I  COEFFICIENT          ORDER   EXPONENTS
-!     1    1.000000000000        1     0 1
-
-
-!!!
+      x=1.0e0_dp.mono.1
+      y=1.0e0_dp.mono.2
+      y0=1
+      y0%v(2)=0
+      z=x+i_*y      
+!!!  
 
 
     h0=1.d0
     if(present(h00)) h0=h00
 
-    h=(1.d0+h0*x)
+    h=(1.e0_dp+h0*x)
     do k=1,no1
     !  erect multipole
     f=dreal(i_*z**K/K)
@@ -9963,7 +9929,7 @@ endif
     if(present(verb)) then
 
         write(mf,*) " Normal ",k
-         call clean_taylor(f,f,1.d-10)
+         call clean_taylor(f,f,1.0e-10_dp)
         call print(f,mf)
          y=((f.d.1).d.1)+((f.d.2).d.2)+h0*(f.d.1)/h
         y=y.cut.(no-1)
@@ -9973,8 +9939,8 @@ endif
        kick_y=-h*(f.d.1)
        kick_x=kick_x.cut.no
        kick_y=kick_y.cut.no
-         call clean_taylor(kick_x,kick_x,1.d-10)
-         call clean_taylor(kick_Y,kick_Y,1.d-10)
+         call clean_taylor(kick_x,kick_x,1.0e-10_dp)
+         call clean_taylor(kick_Y,kick_Y,1.0e-10_dp)
         call print(kick_x,mf)
         call print(kick_Y,mf)
        endif
@@ -9982,8 +9948,8 @@ endif
        kick_x= -(f.d.1)  ! magnetic field
        kick_y= -(f.d.2)
 
-       call clean_taylor(kick_x,kick_x,1.d-6)
-       call clean_taylor(kick_y,kick_y,1.d-6)
+       call clean_taylor(kick_x,kick_x,1.0e-6_dp)
+       call clean_taylor(kick_y,kick_y,1.0e-6_dp)
        do l=1,s_b0t%n_mono
         j(1)=s_b0t%i(l)
         j(2)=s_b0t%j(l)
@@ -10019,15 +9985,15 @@ f=fs(k)
 
   cker1=fs(m).sub.j
   f=f-(cker/cker1)*fs(m)
- call clean_taylor(f,f,1.d-10)
+ call clean_taylor(f,f,1.0e-10_dp)
 
  enddo
 
        kick_x= -(f.d.1)  ! magnetic field
        kick_y= -(f.d.2)
 
-       call clean_taylor(kick_x,kick_x,1.d-6)
-       call clean_taylor(kick_y,kick_y,1.d-6)
+       call clean_taylor(kick_x,kick_x,1.0e-6_dp)
+       call clean_taylor(kick_y,kick_y,1.0e-6_dp)
        do l=1,s_b0t%n_mono
         j(1)=s_b0t%i(l)
         j(2)=s_b0t%j(l)
@@ -10062,7 +10028,7 @@ endif
      enddo
      if(present(verb)) then
         write(mf,*) " Skew ",k
-        call clean_taylor(f,f,1.d-10)
+        call clean_taylor(f,f,1.0e-10_dp)
         call print(f,mf)
          y=((f.d.1).d.1)+((f.d.2).d.2)+h0*(f.d.1)/h
         y=y.cut.(no-1)
@@ -10072,16 +10038,16 @@ endif
        kick_y=-h*(f.d.1)
        kick_x=kick_x.cut.no
        kick_y=kick_y.cut.no
-         call clean_taylor(kick_x,kick_x,1.d-10)
-         call clean_taylor(kick_Y,kick_Y,1.d-10)
+         call clean_taylor(kick_x,kick_x,1.0e-10_dp)
+         call clean_taylor(kick_Y,kick_Y,1.0e-10_dp)
         call print(kick_x,mf)
         call print(kick_Y,mf)
        endif
 
        kick_x= -(f.d.1)  ! magnetic field
        kick_y= -(f.d.2)
-       call clean_taylor(kick_x,kick_x,1.d-6)
-       call clean_taylor(kick_y,kick_y,1.d-6)
+       call clean_taylor(kick_x,kick_x,1.0e-6_dp)
+       call clean_taylor(kick_y,kick_y,1.0e-6_dp)
        do l=1,s_b0t%n_mono
         j(1)=s_b0t%i(l)
         j(2)=s_b0t%j(l)
@@ -10115,14 +10081,14 @@ f=fs(k)
 
   cker1=fs(m).sub.j
   f=f-(cker/cker1)*fs(m)
- call clean_taylor(f,f,1.d-10)
+ call clean_taylor(f,f,1.0e-10_dp)
 
  enddo
 
        kick_x= -(f.d.1)  ! magnetic field
        kick_y= -(f.d.2)
-       call clean_taylor(kick_x,kick_x,1.d-6)
-       call clean_taylor(kick_y,kick_y,1.d-6)
+       call clean_taylor(kick_x,kick_x,1.0e-6_dp)
+       call clean_taylor(kick_y,kick_y,1.0e-6_dp)
        do l=1,s_b0t%n_mono
         j(1)=s_b0t%i(l)
         j(2)=s_b0t%j(l)
@@ -10657,7 +10623,7 @@ SUBROUTINE track_TREE_probe_complexp_new(T,xs,dofix0,dofix,sta)
     type(probe_8) xs
     type(probe) xs0
     type(real_8) x(size_tree),x0(size_tree),s0(3,3),r(3,3),dx6,beta,ds
-    real(dp) m(6,6),xi(6),norm,z0(6)
+    real(dp) m(6,6),xi(6),norm,z0(6),X0_PROBE(6)
     type(damap) dm,md,iq
     type(c_damap) m0,mt
     type(quaternion_8) qu
@@ -10683,7 +10649,7 @@ SUBROUTINE track_TREE_probe_complexp_new(T,xs,dofix0,dofix,sta)
   ! else
     call alloc(m0,mt)
     m0=xs
-
+    X0_PROBE=XS%X0
     do o=1,6
      z0(o)=xs%x(o)
      enddo
@@ -10907,7 +10873,7 @@ endif
        if(sta%totalpath==1) then
         x(6)=x(6)+t(1)%ds
        endif
-    call kill(dx6)
+!    call kill(dx6)
     else
         if(sta%totalpath==1) then
         x(6)=x(6)+t(1)%ds/t(1)%beta0
@@ -10920,7 +10886,9 @@ endif
       z0(i)=x(i)
     enddo
 
+
     mt=xs
+
     xs=mt*m0
 
     do i=1,6
@@ -10939,6 +10907,7 @@ endif
      call kill(r(i,j))
     enddo
     enddo
+    XS%X0 = X0_PROBE
 
   end SUBROUTINE track_TREE_probe_complexp_new
 

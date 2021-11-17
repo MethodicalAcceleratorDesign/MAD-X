@@ -712,7 +712,16 @@ match_match(struct in_cmd* cmd)
       /* END defining a TWISS input command for each sequence */
     }
   }
-  /* END CHK-BETA0 */
+/* END CHK-BETA0 */
+
+  if(log_val("tapering", cmd->clone)){
+      for (i = 0; i < match_num_seqs; i++) {
+        tnl = local_twiss[i]->cmd_def->par_names;
+        tpos = name_list_pos("tapering", tnl);
+        local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
+        local_twiss[i]->cmd_def->par->parameters[tpos]->double_value = 1;
+      }
+  }
 
   /* START CHK-RANGE */
   if(command_par("range", cmd->clone, &cp)) /* range specified */
@@ -831,6 +840,7 @@ match_match(struct in_cmd* cmd)
     }
   }
   /* END CHK-DELTAP */
+
 
   /* START CHK-ENTRIES of TYPE DOUBLE-REAL */
   for (j = 0; j < nl->curr; j++)

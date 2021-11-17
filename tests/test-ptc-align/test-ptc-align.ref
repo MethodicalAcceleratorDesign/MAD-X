@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:35:43      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.09.12 19:22:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !test for element misalignment in ptc twiss
 
@@ -104,7 +104,7 @@ Determined SECTOR NMUL MAX :  2
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -1.7758819045102521        0.0000000000000000        4.1276814958744428     
+ After    end:   -1.7758819045102510        0.0000000000000000        4.1276814958744428     
 
 
  ptc_setswitch, debuglevel=1, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;

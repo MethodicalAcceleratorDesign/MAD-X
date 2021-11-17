@@ -78,15 +78,14 @@ contains
   ! END old Sj_elements
 
   !  recursive
-  integer function TRACK_LAYOUT_FLAG_R1f(R,X,II1,k,X_IN)
+  integer function TRACK_LAYOUT_FLAG_R1f(R,X,II1,k)
     implicit none
     TYPE(layout),target,INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
-    TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
     TYPE(INTERNAL_STATE) K
     INTEGER, INTENT(IN):: II1
 
-    call track(R,X,II1,k,X_IN)
+    call track(R,X,II1,k)
     call PRODUCE_APERTURE_FLAG(TRACK_LAYOUT_FLAG_R1f)
     !    call RESET_APERTURE_FLAG(my_false)
   end  function TRACK_LAYOUT_FLAG_R1f
@@ -107,11 +106,10 @@ contains
   end  function TRACK_LAYOUT_FLAG_P1f
 
   !  recursive
-  SUBROUTINE TRACK_LAYOUT_FLAG_R1(R,X,II1,k,X_IN) ! Tracks real(dp) from II1 to the end or back to II1 if closed
+  SUBROUTINE TRACK_LAYOUT_FLAG_R1(R,X,II1,k) ! Tracks real(dp) from II1 to the end or back to II1 if closed
     implicit none
     TYPE(layout),target,INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
-    TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
     TYPE(INTERNAL_STATE) K
     INTEGER, INTENT(IN):: II1
     INTEGER II2
@@ -124,7 +122,7 @@ contains
        II2=R%N+1
     ENDIF
 
-    CALL TRACK(R,X,II1,II2,k,X_IN)
+    CALL TRACK(R,X,II1,II2,k)
     !    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
   END SUBROUTINE TRACK_LAYOUT_FLAG_R1
 
@@ -152,15 +150,14 @@ contains
   END SUBROUTINE TRACK_LAYOUT_FLAG_P1
 
   !  recursive
-  integer function TRACK_LAYOUT_FLAG_Rf(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
+  integer function TRACK_LAYOUT_FLAG_Rf(R,X,I1,I2,k) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
     TYPE(INTERNAL_STATE) K
-    TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
     INTEGER, INTENT(IN):: I1,I2
 
-    call track(R,X,I1,I2,k,X_IN)
+    call track(R,X,I1,I2,k)
     call PRODUCE_APERTURE_FLAG(TRACK_LAYOUT_FLAG_Rf)
 
   end  function TRACK_LAYOUT_FLAG_Rf
@@ -284,12 +281,12 @@ contains
 
 
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_R(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
+  SUBROUTINE TRACK_LAYOUT_FLAG_R(R,X,I1,I2,k) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
     TYPE(INTERNAL_STATE) K
-    TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
+
     INTEGER, INTENT(IN):: I1,I2
     INTEGER J,i22
     TYPE (fibre), POINTER :: C
@@ -311,7 +308,7 @@ contains
     J=I1
 
     DO  WHILE(J<I22.AND.ASSOCIATED(C))
-       CALL TRACK(C,X,K,X_IN=X_IN)  !,C%CHARGE
+       CALL TRACK(C,X,K)  !,C%CHARGE
        !       CALL TRACK(C,X,K,R%CHARGE,X_IN)
 
        if(.not.check_stable) then
@@ -408,14 +405,14 @@ contains
   END SUBROUTINE TRACK_LAYOUT_FLAG_P
 
   !  recursive
-  !  SUBROUTINE TRACK_FIBRE_R(C,X,K,CHARGE,X_IN)
-  SUBROUTINE TRACK_FIBRE_R(C,X,K,X_IN)
+
+  SUBROUTINE TRACK_FIBRE_R(C,X,K)
     implicit none
     logical(lp) :: doneitt=.true.
     logical(lp) :: doneitf=.false.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     real(dp), INTENT(INOUT):: X(6)
-    TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
+
     !    INTEGER,optional, target, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) ou,patch
@@ -441,9 +438,6 @@ contains
 
 
 
-    IF(PRESENT(X_IN)) then
-       X_IN%F=>c ; X_IN%E%F=>C; X_IN%NST=>X_IN%E%NST;
-    endif
 
     !
     !    IF(.NOT.CHECK_STABLE) CHECK_STABLE=.TRUE.
@@ -453,10 +447,7 @@ contains
     !    ELSE
     !       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     !    ENDIF
-    IF(PRESENT(X_IN)) then
-       CALL XMID(X_IN,X,-6)
-       X_IN%POS(1)=X_IN%nst
-    endif
+
 
     IF(PATCHE/=0.AND.PATCHE/=2.AND.PATCHE/=5) THEN
        NULLIFY(P0);NULLIFY(B0);
@@ -493,14 +484,14 @@ contains
        ENDIF ! ASSOCIATED
 
     ENDIF
-    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-5)
+
 
     ! The chart frame of reference is located here implicitely
     IF(PATCHG==1.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        CALL PATCH_FIB(C,X,k,PATCH,MY_TRUE)
     ENDIF
-    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
+
     IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH==0)) THEN
       if(K%time) then
        X(6)=X(6)-C%PATCH%a_T  !/c%beta0
@@ -508,10 +499,10 @@ contains
        X(6)=X(6)-C%PATCH%a_L
       endif
     ENDIF
-    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
+
 
     CALL DTILTD(C%MAG%P%TILTD,1,X)
-    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-2)
+
     ! The magnet frame of reference is located here implicitely before misalignments
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
@@ -519,26 +510,14 @@ contains
        ou = ALWAYS_EXACTMIS    !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
-    IF(PRESENT(X_IN)) then
-       CALL XMID(X_IN,X,-1)
-       X_IN%POS(2)=X_IN%nst
-    endif
 
-    CALL TRACK(C%MAG,X,K,X_IN)
-
-
-    IF(PRESENT(X_IN)) then
-       CALL XMID(X_IN,X,X_IN%nst+1)
-       X_IN%POS(3)=X_IN%nst
-    endif
+    CALL TRACK(C%MAG,X,K)
 
     IF(C%MAG%MIS) THEN
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
-    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
     ! The magnet frame of reference is located here implicitely before misalignments
     CALL DTILTD(C%MAG%P%TILTD,2,X)
-    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
       if(K%time) then
@@ -547,13 +526,11 @@ contains
        X(6)=X(6)-C%PATCH%b_L
       endif
     ENDIF
-    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     IF(PATCHG==2.or.PATCHG==3) THEN
        patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
        CALL PATCH_FIB(C,X,k,PATCH,MY_FALSE)
     ENDIF
-    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     ! The CHART frame of reference is located here implicitely
 
@@ -589,19 +566,6 @@ contains
     ENDIF
     endif ! associated
 
-    IF(PRESENT(X_IN)) then
-       CALL XMID(X_IN,X,X_IN%nst+1)
-       X_IN%POS(4)=X_IN%nst
-    endif
-
-    IF(PRESENT(X_IN))  THEN
-       IF(X_IN%E%DO_SURVEY) THEN
-          CALL G_FRAME(X_IN%E,ENT,A,-7)
-          CALL  SURVEY(C,ENT,A,E_IN=X_IN%E)
-       ELSE
-          CALL SURVEY_INNER_MAG(X_IN%E)
-       ENDIF
-    ENDIF
 
     !    endif ! new 2010
 
@@ -802,7 +766,7 @@ ENDIF
     real(dp), INTENT(INOUT):: X(6)
     logical(lp),INTENT(IN):: PATCH,ENTERING
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-
+    if(C%PATCH%track) then
     IF(ENTERING) THEN
        X(3)=C%PATCH%A_X1*X(3);X(4)=C%PATCH%A_X1*X(4);
        CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAG%P%BETA0,PATCH,k%TIME)
@@ -818,6 +782,7 @@ ENDIF
        CALL TRANS(C%PATCH%B_D,X,C%MAG%P%BETA0,PATCH,k%TIME)
        X(3)=C%PATCH%B_X2*X(3);X(4)=C%PATCH%B_X2*X(4);
     ENDIF
+    endif
 
 
   END SUBROUTINE PATCH_FIBR
@@ -830,7 +795,7 @@ ENDIF
     TYPE(REAL_8), INTENT(INOUT):: X(6)
     logical(lp),INTENT(IN):: PATCH,ENTERING
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-
+    if(C%PATCH%track) then
     IF(ENTERING) THEN
        X(3)=C%PATCH%A_X1*X(3);X(4)=C%PATCH%A_X1*X(4);
        CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAGP%P%BETA0,PATCH,k%TIME)
@@ -846,7 +811,7 @@ ENDIF
        CALL TRANS(C%PATCH%B_D,X,C%MAGP%P%BETA0,PATCH,k%TIME)
        X(3)=C%PATCH%B_X2*X(3);X(4)=C%PATCH%B_X2*X(4);
     ENDIF
-
+    endif
 
   END SUBROUTINE PATCH_FIBP
 

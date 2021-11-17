@@ -1,0 +1,21 @@
+beam;
+s1:rbend,  angle=0.01, l=1, k1=0.02, slice_straight=true ; 
+myseq: sequence, l=6;
+  s1, at:=1.5, dtheta=0.00;
+endsequence;
+
+x0=0.001;
+px0=0.001;
+use, sequence=myseq;
+select, flag=twiss, column=name,s, dx, dy, betx, bety,x , px, y;
+twiss, betx=1, bety=1, x=x0, px=px0, file="thick.dat";
+select, flag=makethin, class=rbend, slice=50, thick=false;
+survey, perm_align_survey, file = "survey_thick.dat";
+
+makethin, sequence=myseq;
+use, sequence=myseq;
+twiss, betx=1, bety=1, x=x0, px=px0, file="sliced.dat";
+survey, perm_align_survey, file = "survey_thin.dat";
+save, sequence=myseq, file="mysliced.seq";
+
+

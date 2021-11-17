@@ -19,8 +19,9 @@ myatof(const char *instr){
 }
 
 void
-mystrcpy(struct char_array* target, char* source)
+mystrcpy(struct char_array* target, const char *source)
 {
+  // LD: 2021.04.27, fixed bug, switch to strncpy to avoid warning
   /* string copy to char_array with size adjustment */
   int len = strlen(source);
   while (len >= target->max) grow_char_array(target);
@@ -66,10 +67,11 @@ mystrstr(char* string, const char* s)
 }
 
 void
-myrepl(const char* in, const char* out, char* string_in, char* string_out)
+myrepl(const char* in, const char* out, const char* restrict string_in, char* restrict string_out)
   /* replaces all occurrences of "in" in string_in by "out"
      in output string string_out */
 {
+  // LD: 2021.04.27, fixed bug, speed-up.
   char tmp[16];
 
   if (*out == '$') {
@@ -88,6 +90,7 @@ myrepl(const char* in, const char* out, char* string_in, char* string_out)
   }
   strcpy(string_out, string_in);
 }
+
 
 char*
 mystrchr(char* string, char c)
