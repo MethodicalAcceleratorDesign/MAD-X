@@ -1296,7 +1296,7 @@ endif
 !    CALL alloc(X)
 !    X=P%X
 
-    call PRTP("TKNODE_SNGLE:0", X)
+    call PRTP("TKNODE_SNGLE:0", p%x)
 
     if(abs(p%x(1))+abs(p%x(3))>absolute_aperture.or.abs(p%x(6))>t_aperture) then
        messageLOST="exceed absolute_aperture in TRACKP_NODE_SINGLE"
@@ -1551,7 +1551,7 @@ endif
     ! NEW STUFF WITH KIND=3
     KNOB=.FALSE.
     ! END NEW STUFF WITH KIND=3
-    call PRTP("TKNODE_SNGLE:1", X)
+    call PRTP("TKNODE_SNGLE:1", p%x)
   END SUBROUTINE TRACK_NODE_SINGLE_quaP
 
   SUBROUTINE TRACK_NODE_SINGLER(T,X,K) !!
