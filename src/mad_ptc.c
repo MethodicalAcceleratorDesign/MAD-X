@@ -588,7 +588,7 @@ select_ptc_normal(struct in_cmd* cmd)
         order[i] = atoi(order_list);
       }
 
-      if (j == 10 || j == 11)
+      if (j == 10 || j == 11) // GNFU or HAML
       {
         min_req_order = order[0]+order[1]+order[2];
         mynres = 0;

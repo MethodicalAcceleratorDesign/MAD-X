@@ -1,5 +1,5 @@
 subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
-                 z, dxt, dyt, last_orbit, eigen, coords, e_flag, code_buf, & 
+                 z, dxt, dyt, last_orbit, eigen, coords, e_flag, code_buf, &
                  l_buf)
   use twtrrfi
   use bbfi
@@ -20,7 +20,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !          Interface RUN and DYNAP command to tracking routine         *
   !                                                                      *
   !-- Input:                                                             *
-  !   switch  (int)         1: RUN, 2: DYNAP fastune            f         *
+  !   switch  (int)         1: RUN, 2: DYNAP fastune                     *
   !   turns   (int)         number of turns to track                     *
   !   orbit0  (dp. array)   start of closed orbit                        *
   !   rt      (dp. matrix)  one-turn matrix                              *
@@ -48,7 +48,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   double precision :: last_pos(*), z(6,*), dxt(*), dyt(*)
   double precision :: last_orbit(6,*),  l_buf(*)
   double precision :: theta
-  double precision, dimension (:), allocatable :: theta_buf   
+  double precision, dimension (:), allocatable :: theta_buf
   logical :: onepass, onetable, last_out, info, aperflag, doupdate, debug
   logical :: run=.false.,dynap=.false., thin_foc, onlyaver
   logical, save :: first=.true.
@@ -56,10 +56,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   integer :: i, j, k, code, ffile, n_perm_align
   integer :: n_align, nlm, j_tot, turn, nobs, lobs
   integer :: nint, ndble, nchar, char_l, tot_segm, int_arr(1)
-  
+
   double precision :: orbit(6), el, re(6,6), deltap, sum, spos
   double precision :: al_errors(align_max), zz(6), maxaper(6), obs_orb(6)
-    
+
   character(len=12) :: tol_a='maxaper ', char_a=' '
   character(len=name_len) :: el_name
   character(len=4) :: vec_names(7)
@@ -115,7 +115,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
   !---- get options for space charge variables
   call SC_Init(first, run, dynap, turns);
-  
+
   if (fsecarb) then
      call fort_warn('TRRUN: ','Second order terms of arbitrary Matrix not allowed for tracking.')
      return
@@ -251,7 +251,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   nobs = 0
 
   call BB_Init(first);
-  
+
   turnloop: do turn = 1, turns
 
      !--- Write checkpoint_restart data - disable for speed reasons
@@ -291,8 +291,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            theta_buf(nlm+1) = theta
            code_buf(nlm+1) = code
            l_buf(nlm+1) = el
-           !param(nlm+1, enum_bvk) = 
-           !param(nlm+1, enum_lrad) -= 
+           !param(nlm+1, enum_bvk) =
+           !param(nlm+1, enum_lrad) -=
            !param(nlm+1, enum_bvk)
            !param(nlm+1, enum_bvk)
 
@@ -346,14 +346,14 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               enddo
            endif
         endif
-        
+
         !-------- Track through element  // suppress dxt 13.12.04
         call ttmap(switch, code, el, z, jmax, dxt, dyt, sum, tot_turn+turn, part_id, &
              last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass, debug, theta, thin_foc)
 
         !-------- Space Charge update
         call SC_Update(orbit0, z);
-        
+
         !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. code_drift .and. n_align.ne.0)  then
            do i = 1, jmax
@@ -363,7 +363,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         endif
 
         nlm = nlm + 1
-        
+
         if (nobs .gt. 0)  then
            OBS_ORB = zero
            call get_node_vector('obs_orbit ', lobs, obs_orb)
@@ -443,7 +443,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   turn = min(turn, turns)
 
   call BB_Update2(jmax, orbit0, z, part_id, last_turn);
-  
+
   !--- enter last turn in tables if not done already
   if (run .and. .not.last_out)  then
      if (onetable)  then
@@ -460,7 +460,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
   !--- Write checkpoint_restart data
   call BB_Write(jmax, orbit0, z);
-  
+
   !--- enter last turn in summary table
   do  i = 1, j_tot
      call double_to_table_curr('tracksumm ', 'number ', dble(i))
@@ -489,9 +489,9 @@ subroutine init_elements
   integer, external :: restart_sequ, advance_node, get_option
   double precision, external :: node_value
   external :: update_node_aperture
- 
+
   aperflag = get_option('aperture ') .ne. 0
-  
+
   j = restart_sequ()
   do !---- loop over nodes
     code    = node_value('mad8_type ')
@@ -520,7 +520,7 @@ subroutine init_elements
     if(aperflag .and. code .ne. code_drift) then
        call update_node_aperture()
     endif
-    
+
     if (advance_node() .eq. 0)  exit
 
   end do !--- end of loop over nodes to set upt things
@@ -575,7 +575,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   dynap = switch .eq. 2
 
   fmap=.false.
- 
+
   !---- Drift space; no rotation or aperture check, go straight to tracking and return
   if (code .eq. code_drift) then
      call ttdrf(el,track,ktrack)
@@ -602,7 +602,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   !     print *, "apint", apint, "ap_notset", ap_notset
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
-    
+
      apint=node_apertype()
 
      if(apint .eq. ap_notset) then
@@ -622,9 +622,9 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
           call get_node_vector('aper_offset ',nn,offset)
           call trcoll(apint,  aperture, offset, al_errors,  maxaper, &
                 turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack, debug)
-          EXIT ! They are anyway checked against all the particles so no need to continue to loop
-          endif 
-        enddo 
+          EXIT ! They are anway checked against all the particles so no need to continue to loop
+          endif
+        enddo
 
      else
      !APERTURE(:maxnaper) = zero
@@ -768,7 +768,7 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   use time_varfi
   use track_enums
 
-  implicit none 
+  implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Computes thin-lens kick through combined-function magnet.        *
@@ -812,8 +812,8 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
     !---- Multipole length for radiation.
   elrad = get_tt_attrib(enum_lrad)
   an = get_tt_attrib(enum_angle)
-  time_var = get_tt_attrib(enum_time_var) .ne. 0  
-  
+  time_var = get_tt_attrib(enum_time_var) .ne. 0
+
   !dbr = bvk * f_errors(0) !field(1,0)
   !dbi = bvk * f_errors(1) !field(2,0)
 
@@ -829,7 +829,7 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   call get_tt_multipoles(nn,normal,ns,skew)
 
   dipr = bvk * normal(0) !vals(1,0)
-  dipi = bvk * skew(0)  
+  dipi = bvk * skew(0)
 
 
      ! cf magnet with quadrupole & sextupole
@@ -847,8 +847,8 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
        ! get \Delta p/p + 1 (which we denote by the variable
        ! deltapp here) out of orbit(6), for the corresponding
        ! particle
-       deltapp = sqrt(pt0*pt0 + two*pt0*beti + one);
-       
+       deltapp = bet0i*sqrt((1d0 + bet0*orb60)**2 - 1 + bet0**2)
+
        ! orbit transformation:
        ! attention: The following formulas constitute only the kick part
        ! of the CF in a drift-kick-drift decomposition.
@@ -884,7 +884,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   use time_varfi
   use track_enums
 
-  implicit none 
+  implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Computes thin-lens kick through combined-function magnet.        *
@@ -917,7 +917,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   double precision, external :: node_value, get_tt_attrib
   integer, external :: node_fd_errors
   fmap = .true.
-  
+
   ! Read magnetic field components & fill lambda's according to field
   ! components relative to given plane
   F_ERRORS(0:maxferr) = zero
@@ -927,7 +927,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
     !---- Multipole length for radiation.
   elrad = get_tt_attrib(enum_lrad)
   an = get_tt_attrib(enum_angle)
-  time_var = get_tt_attrib(enum_time_var) .ne. 0  
+  time_var = get_tt_attrib(enum_time_var) .ne. 0
 
   !---- Multipole components.
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
@@ -951,7 +951,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
      f_errors(2*iord+1) = bvk * (f_errors(2*iord+1) + skew(iord))
      if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) nord=iord
   enddo
-  !Done with all the setting up... 
+  !Done with all the setting up...
 
   lambda(0:maxmul) = 0
 
@@ -965,7 +965,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   endif
 
   kx = real(lambda(0))    ! N.B. B_y |_{\varphi = tilt, r = 0} = kx
-  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in 
+  ky = - aimag(lambda(0)) !      B_x |_{\varphi = tilt, r = 0} = -ky, see Eqs. (18) in
                           ! Phys. Rev. AccelBeams 19.054002
 
   kappa = kx + (0, 1)*ky
@@ -1000,7 +1000,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
      rp = (track(1,jtrk) + (0, 1)*track(3,jtrk))/two
      rm = conjg(rp)
 
-     ! Compute \partial_+ G using Eq. (7) in Ref. above     
+     ! Compute \partial_+ G using Eq. (7) in Ref. above
      del_p_g = 0
      do k = 1, nord
         sum0 = 0
@@ -1064,7 +1064,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   double precision :: beta_sqr, f_damp_t
 
   integer :: node_fd_errors, store_no_fd_err, get_option
-  double precision , external:: get_tt_attrib  
+  double precision , external:: get_tt_attrib
   external:: get_tt_multipoles
 
   !---- Precompute reciprocals of orders and radiation constant
@@ -1084,9 +1084,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   elrad = get_tt_attrib(enum_lrad)
   noise = get_tt_attrib(enum_noise)
   an = get_tt_attrib(enum_angle)
-  time_var = get_tt_attrib(enum_time_var) .ne. 0  
+  time_var = get_tt_attrib(enum_time_var) .ne. 0
 
-  
+
   !---- Multipole components.
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
@@ -1557,7 +1557,7 @@ subroutine ttrf(track,ktrack)
     enddo
   endif
   !! frs add-on end
- 
+
 end subroutine ttrf
 
 subroutine ttchangep0(track,ktrack)
@@ -1565,17 +1565,20 @@ subroutine ttchangep0(track,ktrack)
   use phys_constfi, only : clight
   use trackfi
   implicit none
-  double precision :: track(6,*) 
-  double precision :: get_value
-  double precision :: pc0, pt_, onedp
+  double precision :: track(6,*)
+  double precision :: get_value, bet0
+  double precision :: pc0, px_, py_, pt_, onedp
   integer :: i, ktrack
 
   pc0 = get_value('beam ','pc ')
   bet0 = get_value('beam ','beta ')
-  bet0i = one / bet0
-  do i = 1, ktrack
-    pt_ = track(6,i) 
-    onedp = sqrt( one + two*pt_*bet0i + pt_**2)
+  do i =1, ktrack
+    px_ = track(1,i)
+    py_ = track(3,i)
+    pt_ = track(6,i)
+
+    onedp   = sqrt( one + two*pt_/bet0 + (pt_**2))
+
     TRACK(2,i) = TRACK(2,i)/onedp
     TRACK(4,i) = TRACK(4,i)/onedp
     TRACK(6,i) = zero
@@ -1658,8 +1661,8 @@ subroutine ttcrabrf(track,ktrack,turn)
 
   TRACK(6,1:ktrack) = TRACK(6,1:ktrack) - &
        omega * vrf * TRACK(1,1:ktrack) * cos(phirf - bvk*omega*TRACK(5,1:ktrack))
-  
- 
+
+
 end subroutine ttcrabrf
 
 subroutine tthacdip(track,ktrack,turn)
@@ -1844,25 +1847,25 @@ subroutine ttcorr(el,track,ktrack,turn, code)
   double precision :: external, get_tt_attrib
 
   !---- Initialize.
-        
-      
+
+
   bvk = get_tt_attrib(enum_other_bv)
   sinkick = get_tt_attrib(enum_sinkick)
-  
 
-  
+
+
   !deltas = get_variable('track_deltap ')
-  
+
   !arad = get_value('probe ','arad ')
   !betas = get_value('probe ','beta ')
   !gammas = get_value('probe ','gamma ')
   !dtbyds = get_value('probe ','dtbyds ')
   !radiate = get_value('probe ','radiate ') .ne. zero
-  
+
   !damp = get_option('damp ') .ne. 0
   !quantum = get_option('quantum ') .ne. 0
 
-  
+
 !  if (code .eq. code_tkicker)      code = code_kicker
   !if (code .eq. code_placeholder) code = code_instrument
 
@@ -2715,7 +2718,7 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
       enddo
       call double_to_table_curr(table, vec_names(j), tmp/npart)
     enddo
-    
+
     call double_to_table_curr(table,vec_names(7),spos)
     call augment_count(table)
   else
@@ -2966,7 +2969,7 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
         ap1 = aperture(1)
         ap2 = aperture(2)
      case(ap_custom_inter)
-     ! Intenitionaly left blank. 
+     ! Intenitionaly left blank.
 
 
      case default
@@ -3041,10 +3044,10 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
        if(is_custom) then
           x = z(1,i) - al_errors(11) - offset(1)
           y = z(3,i) - al_errors(12) - offset(2)
-          lost = inside_userdefined_geometry(x,y) .eq. 0  
+          lost = inside_userdefined_geometry(x,y) .eq. 0
        endif
      endif
-    
+
 
      if (.not. lost) then
         lost =  ISNAN(z(2,i)) .or. ISNAN(z(4,i))                                .or. &
@@ -3548,7 +3551,7 @@ subroutine tttrans(track,ktrack)
   ! Input/output:                                                        *
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !----------------------------------------------------------------------*
-  
+
   double precision :: track(6,*)
   integer :: ktrack
 
@@ -3563,7 +3566,7 @@ subroutine tttrans(track,ktrack)
   t_z    = node_value('ds ')
 
   !---- Loop over particles
-  
+
 !$OMP PARALLEL PRIVATE(i)
 !$OMP DO
   do  i = 1, ktrack
@@ -3629,7 +3632,7 @@ subroutine trupdate(turn)
 end subroutine trupdate
 
 subroutine trclor(switch,orbit0)
-  use twiss0fi  
+  use twiss0fi
   use name_lenfi
   use trackfi
   use matrices, only : EYE
@@ -3732,8 +3735,8 @@ subroutine trclor(switch,orbit0)
 !        if (code .eq. code_tkicker)     code = code_kicker
         if (code .eq. code_placeholder) code = code_instrument
         el      = node_value('l ')
-        
-        
+
+
       !  if (itra .eq. 1 .and. &
       !      code.ne.code_drift .and. &
       !      code.ne.code_quadrupole .and. &
@@ -3777,7 +3780,7 @@ subroutine trclor(switch,orbit0)
               enddo
            endif
         endif
-    
+
     theta = node_value('tilt ')
         !-------- Track through element
         call ttmap(switch,code,el,z,pmax,dxt,dyt,sum,turn,part_id, &
@@ -3875,12 +3878,12 @@ subroutine ttnllens(track,ktrack)
     if (u .eq. one) then
        dd = zero
     else
-       dd = u**2 * log(u + sqrt(u*u-one))/sqrt(u**2-one)
+       dd = u**2 * log(u + sqrt(u**2-one))/sqrt(u**2-one)
     endif
-    dUu = (u + log(u+sqrt(u*u-one))*sqrt(u**2-one) + dd)/(u**2-v**2) &
-         - two*u*(u*log(u+sqrt(u*u-one))*sqrt(u**2-one) &
+    dUu = (u + log(u+sqrt(u**2-one))*sqrt(u**2-one) + dd)/(u**2-v**2) &
+         - two*u*(u*log(u+sqrt(u**2-one))*sqrt(u**2-one) &
                 + v*(acos(v)-pi/two)*sqrt(one-v**2)) /(u**2-v**2)**2
-    dUv = two*v*(u*log(u+sqrt(u*u-one))*sqrt(u**2-one) &
+    dUv = two*v*(u*log(u+sqrt(u**2-one))*sqrt(u**2-one) &
                + v*(acos(v)-pi/two)*sqrt(one-v**2)) /(u**2-v**2)**2 &
          - (v - (acos(v)-pi/two)*sqrt(one-v**2) + v**2*(acos(v)-pi/two)/sqrt(one-v**2)) &
             / (u**2-v**2)
@@ -4225,21 +4228,25 @@ subroutine tttquad(track, ktrack)
   double precision :: f_errors(0:maxferr)
   integer, external :: node_fd_errors, el_par_vector
   integer :: n_ferr
-  
+
   !gamma = get_value('probe ','gamma ')
   !beta = get_value('probe ','beta ')
   
   !---- Read-in the parameters
-  elpar_vl = el_par_vector(q_max, g_elpar)
-  
+<<<<<<< HEAD
+  elpar_vl = el_par_vector(q_k1st, g_elpar)
   length = node_value('l ');
   tilt = g_elpar(q_tilt)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = g_elpar(q_k1)  * (1 + g_elpar(q_ktap))
-  k1s = g_elpar(q_k1s) * (1 + g_elpar(q_ktap))
-  
+  k1  = g_elpar(q_k1)  + g_elpar(q_k1t)
+  k1s = g_elpar(q_k1s) + g_elpar(q_k1st)
+
+  !k1  = node_value('k1 ')
+  !k1s = node_value('k1s ')
+
+
   if (length.ne.zero) then
      k1  = k1  + f_errors(2)/length
      k1s = k1s + f_errors(3)/length
@@ -4403,9 +4410,9 @@ subroutine tttdipole(track, ktrack, code)
   !beta    = get_value('probe ','beta ')
   !gamma   = get_value('probe ','gamma ')
   !radiate = get_value('probe ','radiate ') .ne. zero
-  !All these were removed since they were global parameters. 
-  
-  elpar_vl = el_par_vector(b_max, g_elpar)
+  !All these were removed since they were global parameters.
+
+  elpar_vl = el_par_vector(b_k3s, g_elpar)
   !---- Read-in dipole edges angles
   e1 = g_elpar(b_e1)
   e2 = g_elpar(b_e2)
@@ -4414,8 +4421,6 @@ subroutine tttdipole(track, ktrack, code)
   hgap = g_elpar(b_hgap)
   fint = g_elpar(b_fint)
   fintx = g_elpar(b_fintx)
-  ktap = g_elpar(b_ktap)
-  
   length = node_value('l ')
   angle  = g_elpar(b_angle)
 
@@ -4439,7 +4444,7 @@ subroutine tttdipole(track, ktrack, code)
   endif
 
   k0 = k0 * (1+ktap) ! tapering to main field only
- 
+
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
@@ -4447,7 +4452,7 @@ subroutine tttdipole(track, ktrack, code)
      call ttdrf(length,track,ktrack);
      return
   endif
-  
+
   !---- Apply entrance dipole edge effect
   if (node_value('kill_ent_fringe ') .eq. zero) &
        call ttdpdg_map(track, ktrack, e1, k0, hgap, fint, zero)

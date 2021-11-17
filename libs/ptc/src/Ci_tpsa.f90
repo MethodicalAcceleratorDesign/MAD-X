@@ -139,7 +139,7 @@ type c_lattice_function
  logical :: symplectic = .true.
 !!!!  radiation quantity
  real(dp) :: sigmas(6,6)
-end type c_lattice_function 
+end type c_lattice_function
 
 type(c_linear_map) q_phasor,qi_phasor
 
@@ -548,9 +548,9 @@ type(c_linear_map) q_phasor,qi_phasor
      MODULE PROCEDURE exp_ad    ! exp(<F,>)F    F is a vector field  !v5
   END INTERFACE
 
-  INTERFACE iexp 
+  INTERFACE iexp
        MODULE PROCEDURE iexp_ad
-  END INTERFACE iexp 
+  END INTERFACE iexp
 
   INTERFACE texp
      MODULE PROCEDURE c_expflo   
@@ -1574,7 +1574,7 @@ enddo
     call c_DADAL1(s1%i)
 !call c_count_da(i_alloc)
 !write(6,*) 2,i_alloc
- 
+
     !    else
     !       call KILLNEWDAs(s1%j)
     !    endif
@@ -1623,7 +1623,7 @@ enddo
     s1%q=0.0_dp
    ! s1%q=1.0_dp
     
- 
+
     do i=n+1,size(s1%v)
      s1%v(i)%i=0
     enddo
@@ -1643,7 +1643,7 @@ enddo
 !*
     implicit none
     type (c_damap),INTENT(INOUT) :: S1(:)
-    INTEGER i 
+    INTEGER i
 
     do i=1,size(s1)
      call alloc(s1(i))
@@ -3041,17 +3041,15 @@ end  SUBROUTINE  flatten_c_factored_lie_r
  
     s2=0
     do j=1,s1%n
-if(use_quaternion)   THEN
-       s2%q=s2%q+s1%f(j)%q
- 
-endif
-
-
-       do i=1,s2%n
-       s2%v(i)=s2%v(i)+s1%f(j)%v(i)
+      if(use_quaternion) THEN
+        s2%q=s2%q+s1%f(j)%q
+      endif
+      do i=1,s2%n
+        s2%v(i)=s2%v(i)+s1%f(j)%v(i)
       enddo      
     enddo
     st=s2
+
   if(complex_extra_order==1.and.special_extra_order_1) s2=s2.cut.no
    call kill(s2)
   END SUBROUTINE flatten_c_factored_lie
@@ -3910,7 +3908,7 @@ endif
    !   CUTORDERquaternion=S1
 
      DO I=0,3
-      CUTORDERquaternion%x(i)=S1%x(i).cut.s2 
+      CUTORDERquaternion%x(i)=S1%x(i).cut.s2
     enddo
 
     c_master=localmaster
@@ -5364,7 +5362,7 @@ cgetvectorfield=0
  
   END FUNCTION addq
 
- 
+
   FUNCTION absq2( S1 )
     implicit none
     type(c_taylor)   absq2
@@ -5397,7 +5395,7 @@ cgetvectorfield=0
               localmaster=c_master
               call ass(absq)
            absq=sqrt(abs_square(s1))
-             c_master=localmaster         
+             c_master=localmaster
   END FUNCTION absq
 
   FUNCTION mulq( S1, S2 )
@@ -5727,7 +5725,7 @@ endif
 ! real(dp) E(3,6,6),K(3,6,6),B(3,6,6)
 ! real(dp) H(3,6,6)
 ! real(dp)  S(1:3,0:6)
-! logical symplectic 
+! logical symplectic
 !end type c_lattice_function
 
   SUBROUTINE  EQUALql_c_spin(S2,S1)
@@ -5736,7 +5734,7 @@ endif
     type (c_linear_map),INTENT(inOUT)::S2
     type (c_spinor),INTENT(IN)::S1
     type (c_quaternion) q
-    call alloc(q)    
+    call alloc(q)
     q=s1
     s2=q
     call kill(q)
@@ -5915,8 +5913,8 @@ endif
   function   inv_c_linear_map(S1)
     implicit none
     integer ipause, mypauses
-    type(c_linear_map) inv_c_linear_map 
-    type(c_linear_map),intent (IN) :: s1 
+    type(c_linear_map) inv_c_linear_map
+    type(c_linear_map),intent (IN) :: s1
     integer i
        call c_matinv(s1%mat,inv_c_linear_map%mat,6,6,i)
       inv_c_linear_map%q(0,0:6)=s1%q(0,0:6)
@@ -5929,12 +5927,12 @@ endif
   function   inv_c_linear_map_symplectic(S1)
     implicit none
     integer ipause, mypauses
-    type(c_linear_map) inv_c_linear_map_symplectic 
-    type(c_linear_map),intent (IN) :: s1 
+    type(c_linear_map) inv_c_linear_map_symplectic
+    type(c_linear_map),intent (IN) :: s1
     real(dp) matr(6,6)
     integer i
-    matr=s1%mat 
-       inv_c_linear_map_symplectic%mat=  inv_symplectic66(matr) 
+    matr=s1%mat
+       inv_c_linear_map_symplectic%mat=  inv_symplectic66(matr)
       inv_c_linear_map_symplectic%q(0,0:6)=s1%q(0,0:6)
       inv_c_linear_map_symplectic%q(1:3,0:6)=-s1%q(1:3,0:6)
 
@@ -5945,7 +5943,7 @@ endif
   function   mulqdiv(S1,s2)
     implicit none
     integer ipause, mypauses
-    type(c_linear_map) mulqdiv 
+    type(c_linear_map) mulqdiv
     type(c_linear_map),intent (IN) :: s1 ,s2
 
      mulqdiv=s1*inv_c_linear_map(s2)
@@ -6269,7 +6267,7 @@ m%q=p%q
      call kill(sf)
      call kill(p)
 
-    end subroutine  c_linear_map_to_matrix 
+    end subroutine  c_linear_map_to_matrix
 
   subroutine  c_linear_map_to_3_by_3_by_6 (q_lin,m)
     implicit none
@@ -6299,7 +6297,7 @@ m%q=p%q
     enddo
  
 
-    end subroutine  c_linear_map_to_3_by_3_by_6 
+    end subroutine  c_linear_map_to_3_by_3_by_6
 
   subroutine  quaternion_to_matrix(q_lin,m)
     implicit none
@@ -7449,7 +7447,7 @@ endif
           call print_e_ij(S1,mfi)
         else
          write(mfi,*) "No Stochastic Radiation "
-        endif   
+        endif
 
   END SUBROUTINE c_pri_map
 
@@ -8421,7 +8419,7 @@ end   SUBROUTINE  c_clean_yu_w
     !   x=value
     !   if(abs(xx)>prec) v=x
     !   xx=aimag(y)
-    !   x=aimag(value)      
+    !   x=aimag(value)
     !   if(abs(xx)>prec) v=v+i_*x
            t=t+(v.cmono.j)
      ENDDO
@@ -8529,7 +8527,7 @@ end   SUBROUTINE  c_clean_yu_w
      ndct=1  ! 1 if coasting, otherwise 0
      ndc2t=2  ! 2 if coasting, otherwise 0
       ndptb=ndpt_bmad+1
-      if(mod(ndpt_bmad,2)==0) ndptb=ndpt_bmad-1  
+      if(mod(ndpt_bmad,2)==0) ndptb=ndpt_bmad-1
     endif
     nd2t=nd2-2*rf-ndc2t   !  size of harmonic oscillators minus modulated clocks
     ndt=nd2t/2        ! ndt number of harmonic oscillators minus modulated clocks
@@ -8556,11 +8554,11 @@ end subroutine c_bmad_reinit
     integer, intent(in) :: NO1,NV1
     integer, optional :: np1,ndpt1,AC_RF
     logical(lp), optional :: ptc  !spin,
-    integer ndpt_ptc,i 
+    integer ndpt_ptc,i
     if(use_quaternion) spin_def_tune=-1
- 
+
    ip_mat=0; jp_mat=0; jt_mat=0;
-   
+
    do i=1,3
     ip_mat(i,2*i-1,2*i-1)=1
     ip_mat(i,2*i,2*i)=1
@@ -11361,8 +11359,13 @@ subroutine c_linear_ac_longitudinal(xy,a1,ac)
     rel=1
     v=1
  
-
     x=xy
+
+  print *, "LD: gofix start"
+  print *, "LD: rel="
+  call print(rel,6)
+  print *, "LD: v0="
+  call print(v,6)
 
     do i=1,nd2  
      if(i/=ndpt.and.i/=ndptb) then
@@ -11372,9 +11375,24 @@ subroutine c_linear_ac_longitudinal(xy,a1,ac)
       endif
     enddo
 
+  print *, "LD: nv=", nv, "nd2=", nd2, "ndpt=", ndpt, "ndptb=", ndptb, "ndloc=", ndloc
+  print *, "LD: x="
+  call print(x,6)
+  print *, "LD: v="
+  call print(v,6)
+  print *, "LD: x-v="
+  w = x-v
+  call print(w,6)
+
     v=v.cut.(order_gofix+1)
+
+  print*, "LD: v(cut)="
+  call print(v,6)
  
     w=v**(-1)    !  W= (Map-1)**-1   
+
+  print*, "LD: w=v^-1"
+  call print(w,6)
 
     x=0
     x%s=1    ! spin part is identity
@@ -11384,10 +11402,15 @@ subroutine c_linear_ac_longitudinal(xy,a1,ac)
     enddo
     if(ndpt/=0) x%v(ndpt)=1.0e0_dp.cmono.ndpt !  If coasting, then energy is a parameter
 
+    print*, "LD: x="
+    call print(x,6)
+
     v=w*x  ! v contains the fixed point, for example v(1)= eta_x * x_pt + ...
          
-
     a1=v
+
+    print*, "LD: a0=w*x"
+    call print(a1,6)
 
   ! however a1 is not a  transformation, we must add the identity (done at the end) 
   ! also we must add some stuff to time to make it symplectic if coasting
@@ -11406,6 +11429,12 @@ if(dosymp) then
 
           endif
          enddo
+
+print*, "LD: x="
+call print(x,6)
+print*, "LD: v="
+call print(v,6)
+
          do i=1,nd
            if(i/=ndloc) then
              t1=-(1.0_dp.cmono.(2*i-1))*v%v(2*i-1)+t1  ! first order
@@ -11425,6 +11454,11 @@ if(dosymp) then
     do i=1,nd2 
      if(i/=ndptb.and.i/=ndpt) a1%v(i)=(1.0e0_dp.cmono.i)+a1%v(i)
     enddo
+
+print*, "LD: t1="
+call print(t1,6)
+print*, "LD: a0="
+call print(a1,6)
 
 !call print(a1,6)
 !pause 333
@@ -11488,6 +11522,11 @@ endif
  
     call kill(t1);
     call kill(v);call kill(w);call kill(rel);call kill(x);
+
+print*, "returned a0="
+call print(a1,6)
+print *, "LD: gofix end"
+
     return
   end subroutine c_gofix
 
@@ -11890,7 +11929,7 @@ endif
 endif
 
 qs=2
-qs=q3*qs*q3**(-1)   
+qs=q3*qs*q3**(-1)
 tone=qs%x(2)
 if(tone<0) then
  qs=1
@@ -12024,7 +12063,7 @@ alpha=2*atan2(q0%x(2),q0%x(0))
      do i=1,3
       n%emittance(i)=abs(n%s_ijr(2*i-1,2*i))/abs(n_cai)
      enddo
-    n%b_ijr=m1%e_ij 
+    n%b_ijr=m1%e_ij
    m1%e_ij= n%s_ijr  !using m1 to transform equilibrium beam sizes
    ri=from_phasor()
    ri=c_simil(ri,m1,1)
@@ -12935,18 +12974,18 @@ prec=1.d-8
     type(c_vector_field), intent(in):: x
     type(c_vector_field), intent(in) :: h
     complex(dp), optional, intent(in) :: m
-    real(dp) prec,xnorm,r,xnorma 
+    real(dp) prec,xnorm,r,xnorma
     complex(dp) m0
     IF(.NOT.C_STABLE_DA) then
      iexp_ad%v%i=0
      RETURN
-     endif 
+     endif
      m0=0
      if(present(m)) m0=m
 prec=1.d-8
     localmaster=c_master
 
- 
+
      iexp_ad%n=x%n
      ft%n=x%n
      call alloc(ft)
@@ -12955,38 +12994,38 @@ prec=1.d-8
      iexp_ad=x
    !  c=1.0_dp
      ft=x
-     
+
          xnorm=0.0_dp
           do j=1,ft%n
              r=full_abs(ft%v(j))
              xnorm=xnorm+r
           enddo
-      
+
      do i=2,x%nrmax
 
          ft=(1.0_dp/i)*((h.lb.ft)+(m0*ft))
          iexp_ad=iexp_ad+ ft
-         
+
           xnorma=0.0_dp
           do j=1,ft%n
              r=full_abs(ft%v(j))
              xnorma=xnorma+r
-          enddo        
-      
+          enddo
+
           if(xnorma>=xnorm.and.i > 20) then
 
-             exit 
-          endif    
-          xnorm=xnorma      
+             exit
+          endif
+          xnorm=xnorma
      enddo
-    
- 
+
+
 
 
      call kill(ft)
-     
+
     c_master=localmaster
- 
+
   end function iexp_ad
 
 
@@ -14000,7 +14039,7 @@ function c_vector_field_quaternion(h,ds) ! spin routine
        if(norm1==0)  stop 1066
     endif
     if(present(ds)) c_exp_quaternion=c_exp_quaternion*ds
- 
+
     call kill(dh)
     call kill(dhn)
     call kill(dr)
@@ -14303,7 +14342,7 @@ function c_vector_field_quaternion(h,ds) ! spin routine
       norma=norm_matrix(t)
       m= m+t
       x=x+1
-      
+
       if(norma<y.and.norma>=normb.and.i>100) exit
       normb=norma
     enddo
@@ -16067,20 +16106,20 @@ subroutine extract_linear_from_normalised(m,a1,phi1,f1,f2,integer_part,dospin)
    if(dos) then
       do i=0,3
        j=1
-        do while(.true.) 
+        do while(.true.)
 
 
-          call  c_cycle(a%q%x(i),j,v ,je); if(j==0) exit;   
+          call  c_cycle(a%q%x(i),j,v ,je); if(j==0) exit;
           kr=0
           do k=1,nd2
            if(k==ndpt) cycle
            kr=je(k)+kr
           enddo
- 
+
            if(kr==0) then
             b1%q%x(i)=b1%q%x(i)+(v.cmono.je)
            endif
-           
+
        enddo
      enddo
   endif  ! spin
@@ -16100,7 +16139,7 @@ subroutine extract_linear_from_normalised(m,a1,phi1,f1,f2,integer_part,dospin)
         f1%q%x(2)=atan2(t(2),t(1))
        call kill(t)
       endif
- 
+
 
      do i=1,nd2t/2
       f1%v(2*i-1)=-(i_*twopi*integer_part(i).cmono.(2*i-1))+ f1%v(2*i-1)
@@ -16113,7 +16152,7 @@ else
       f2=log(a1)
 endif
 
-     f2=to_phasor()*f2  !transform_vector_field_by_map(f2,to_phasor())     
+     f2=to_phasor()*f2  !transform_vector_field_by_map(f2,to_phasor())
      f1=to_phasor()*f1 !transform_vector_field_by_map(f1,to_phasor())
 
 
@@ -16485,7 +16524,7 @@ subroutine extract_a2(a,phi2)
      call alloc(h) 
      call alloc(hr) 
      call alloc(hf) 
-     call alloc(ri) 
+     call alloc(ri)
 
 
 
@@ -16523,7 +16562,7 @@ subroutine extract_a2(a,phi2)
    b1=texp(-hr,b1) 
 
  enddo  
- 
+
 
    a=c_simil(ri,b1,-1)
    phi2=texp(hf) 
@@ -16539,7 +16578,7 @@ subroutine extract_a2(a,phi2)
      call kill(h) 
      call kill(hr) 
      call kill(hf) 
-     call kill(ri) 
+     call kill(ri)
 
 end subroutine extract_a2
 
@@ -17951,21 +17990,21 @@ q=1
  q=u%q
 !  make sure isf not below y plane
     !   aq=q%q(0,0)**2-(q%q(1,0)**2+q%q(2,0)**2+q%q(3,0)**2)
-      ! aq=real(q%q(2,0))   
- 
+      ! aq=real(q%q(2,0))
+
 !if(aq<0) then
-!          qr=1   !  = i 
+!          qr=1   !  = i
 !          qr=0.0_dp
 !          qr%q(1,0)=1.0_dp
 !          q=q*qr
 !endif
- 
+
  qr=1
  qr=0.0_dp
 
- 
+
  aq=-atan2(real(q%q(2,0)),real(q%q(0,0)))
- 
+
  qr%q(0,0)= cos(aq)
  qr%q(2,0)= sin(aq)
 
@@ -17977,7 +18016,7 @@ q=1
   qr%q(2,ndpt)= daq*qr%q(0,0)
  endif
  qc=q*qr
- 
+
  if(present(spin_tune)) then
   spin_tune(1)=spin_tune(1)+aq/pi   ! changed 2018.11.01
  endif
@@ -17986,8 +18025,8 @@ qc=qc*cri
  u_c%q=qc 
 
 
-if(present(q_as) ) then 
-q_as=1 
+if(present(q_as) ) then
+q_as=1
  if(abs(damp(1))+abs(damp(2))+abs(damp(3))<1.d-10) then
    cri=inv_symplectic66(s)
  else
@@ -18003,11 +18042,11 @@ endif
   spin_tune(2)=spin_tune(2)+daq/pi   ! changed 2018.11.01
  endif
 
-if(present(q_cs) ) then 
-q_cs=u_c 
+if(present(q_cs) ) then
+q_cs=u_c
 endif
 if(present(q_orb)) then
-q_orb=u_c 
+q_orb=u_c
 q_orb=1.0_dp
 endif
 if(present(q_rot) ) then 
@@ -18143,7 +18182,7 @@ if(bmad_automatic) then
     alpha=abs(xyso3%v(6).sub.'000001')
     norm=full_abs(xyso3%v(6))
     alpha=abs(alpha-1.0_dp)+abs(norm-1.0_dp)
-    if(alpha<1.d-12) then 
+    if(alpha<1.d-12) then
       ndptbmad=6
      call in_bmad_units
     endif
@@ -18155,7 +18194,7 @@ if(bmad_automatic) then
      call in_ptc_units
     endif
   call c_bmad_reinit(ndptbmad)
- 
+
 
   if(use_quaternion) then
     call c_full_norm_quaternion(xyso3%q,k,norm)
@@ -18201,42 +18240,47 @@ inside_normal=.true.
     allocate(je(nv))    
     allocate(eg(xyso3%n))
 
-    
     m1=xy
 
     ! Brings the map to the parameter dependent fixed point
     ! including the coasting beam gymnastic: time-energy is canonical
     ! but energy is constant. (Momentum compaction, phase slip etc.. falls from there)
  ! etienne
- 
- if(c_skip_gofix) then
-  a1=1
-else
-    call  c_gofix(m1,a1) 
-endif 
+   call print(m1, 1010)
+
+   if(c_skip_gofix) then
+     a1=1
+   else
+     call  c_gofix(m1,a1)
+   endif
+
+   call print(a1, 1020)
+
      m1=c_simil(a1,m1,-1)
- 
+
+   call print(m1, 1030)
+
     ! Does the the diagonalisation into a rotation
     call c_linear_a(m1,a2)  
- 
+
+
+   call print(a2, 1040)
 
     !!! Now the linear map is normalised
     m1=c_simil(a2,m1,-1)
- 
 
-    !!! We go into the phasors' basis
-    ri=from_phasor(-1)
- 
+   call print(m1, 1050)
 
-    m1=c_simil(ri,m1,1)
- 
+   !!! We go into the phasors' basis
+   ri=from_phasor(-1)
+   m1=c_simil(ri,m1,1)
 
+   call print(ri, 1060)
+   call print(m1, 1070)
  
     ri=(m1.sub.-1)**(-1) 
     ri%s=1  ! make spin identity
     ri%q=1.0_dp  ! make spin identity
- 
-
 
     !!! The tunes are stored for the nonlinear normal form recursive algorithm
     do k=1,xy%n
@@ -18313,6 +18357,7 @@ endif
 
             n%g%f(i)%v(k)=n%g%f(i)%v(k)+(v.cmono.je)/(1.0_dp-lam)
 
+            write (1100,*) "1) i=", i, ", j=", j, ", k=", k, ", v=", v
           else ! Put in the kernel
 
             if(lielib_print(13)/=0) then
@@ -18324,6 +18369,8 @@ endif
                je(k)=je(k)+1
             endif
                n%ker%f(i)%v(k)=n%ker%f(i)%v(k)+(v.cmono.je)
+
+               write (1100,*) "2) i=", i, ", j=", j, ", k=", k, ", v=", v
             endif
 
         enddo  ! over monomial
@@ -18331,9 +18378,14 @@ endif
 
       m1=c_simil(n%g%f(i),m1,-1)
 
+      call print(n%g%f(i), 1100+i)
+      call print(m1, 1200+i)
+
     enddo
 
     n%a_t=a1*a2*from_phasor()*texp(n%g)*from_phasor(-1)
+
+    call print(n%a_t, 1300)
 
     n%a1=a1
     n%a2=a2
@@ -18691,7 +18743,7 @@ inside_normal=.false.
     
      if(.not.sagan_gen) call symplectify_for_zhe(ma,L_ns , N_pure_ns, L_s , N_s )
 
-     
+
 
 
 
@@ -18731,7 +18783,7 @@ else
    !  L_ns=L_ns*L_s
        L_s=ma.sub.1
        L_ns=L_s**(-1)*ma
- 
+
 endif
 
 if(.not.sagan_gen) then
@@ -18780,7 +18832,7 @@ endif
 
 
 if(.not.sagan_gen) then
-      
+
        ms=n_s
 
 else
@@ -18963,7 +19015,7 @@ character(*),optional :: filef
   as_is0=.false.
  
 if(present(as_is)) as_is0=as_is
-  
+
   allocate(forward(3))
  
 

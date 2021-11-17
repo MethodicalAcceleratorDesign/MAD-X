@@ -1027,7 +1027,7 @@ contains
           C_%STABLE_DA = .false.
           l = 1
           return
-          
+
           call dadeb !(31,'ERR DADAL ',1)
        endif
        if(idal(i).eq.nda_dab) then
@@ -4689,7 +4689,7 @@ contains
              ioa=1
           endif
           write(iunit,'(I6,2X,g20.13,I5,4X,18(2i2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
-          write(iunit,*) cc(ipoa+i-1)
+! LD      write(iunit,*) cc(ipoa+i-1)
        enddo
     else
        if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
@@ -4704,7 +4704,7 @@ contains
                 iout = iout+1
                 write(iunit,'(I6,2X,g20.13,I5,4X,18(2i2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
                 !ETIENNE
-                write(iunit,*) cc(ii)
+! LD             write(iunit,*) cc(ii)
              endif
              !ETIENNE
              !

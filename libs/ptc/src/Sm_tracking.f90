@@ -212,7 +212,7 @@ contains
        if(.not.check_stable) then
          write(messagelost,*) "Error in tracking ",c%mag%name," ", messagelost(:len_trim(messagelost))
          exit
-       endif  
+       endif
 
        C=>C%NEXT
     ENDDO
@@ -262,7 +262,7 @@ contains
        if(.not.check_stable) then
          write(messagelost,*) "Error in tracking ",c%mag%name," ", messagelost(:len_trim(messagelost))
          exit
-       endif  
+       endif
 
        C=>C%NEXT
 
@@ -286,7 +286,7 @@ contains
     TYPE(layout),target,INTENT(INOUT):: R
     real(dp), INTENT(INOUT):: X(6)
     TYPE(INTERNAL_STATE) K
-    
+
     INTEGER, INTENT(IN):: I1,I2
     INTEGER J,i22
     TYPE (fibre), POINTER :: C
@@ -314,7 +314,7 @@ contains
        if(.not.check_stable) then
          write(messagelost,*) "Error in tracking ",c%mag%name," ", messagelost(:len_trim(messagelost))
          exit
-       endif  
+       endif
 
        C=>C%NEXT
        J=J+1
@@ -375,7 +375,7 @@ contains
        if(.not.check_stable) then
          write(messagelost,*) "Error in tracking ",c%mag%name," ", messagelost(:len_trim(messagelost))
          exit
-       endif  
+       endif
 
        C=>C%NEXT
        J=J+1
@@ -412,7 +412,7 @@ contains
     logical(lp) :: doneitf=.false.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     real(dp), INTENT(INOUT):: X(6)
-    
+
     !    INTEGER,optional, target, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) ou,patch
@@ -480,7 +480,7 @@ contains
                 X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/C%MAG%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAG%P%BETA0)
              ELSE
                 X(5)=(1.0_dp+X(5))*P0/C%MAG%P%P0C-1.0_dp
-             ENDIF           
+             ENDIF
        ENDIF ! ASSOCIATED
 
     ENDIF
@@ -510,12 +510,8 @@ contains
        ou = ALWAYS_EXACTMIS    !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
-  
 
     CALL TRACK(C%MAG,X,K)
- 
-
-  
 
     IF(C%MAG%MIS) THEN
        CALL MIS_FIB(C,X,k,OU,DONEITF)
@@ -541,7 +537,7 @@ contains
     IF(PATCHE/=0.AND.PATCHE/=1.AND.PATCHE/=4) THEN
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
-       IF(ASSOCIATED(CN).and.PATCHE/=5) THEN ! ASSOCIATED       
+       IF(ASSOCIATED(CN).and.PATCHE/=5) THEN ! ASSOCIATED
 !       IF(.NOT.ASSOCIATED(CN)) CN=>C
        P0=>CN%MAG%P%P0C
        B0=>CN%BETA0
@@ -566,11 +562,9 @@ contains
           X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/B0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/B0) ! 8/31/2016
        ELSE
           X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp ! 8/31/2016
-       ENDIF        
+       ENDIF
     ENDIF
     endif ! associated
-    
-
 
 
     !    endif ! new 2010
@@ -647,7 +641,7 @@ contains
                 X(5)=(2.0_dp*X(5)+X(5)**2)/(SQRT(1.0_dp/C%MAGP%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAGP%P%BETA0)
              ELSE
                 X(5)=(1.0_dp+X(5))*P0/C%MAGP%P%P0C-1.0_dp
-             ENDIF           
+             ENDIF
       ENDIF ! ASSOCIATED
 
     ENDIF
@@ -684,8 +678,6 @@ contains
     !       CHECK_STABLE=.false.
     !    else ! new 2010
 
-
-
     ! MISALIGNMENTS AT THE EXIT
     IF(C%MAGP%MIS) THEN
        CALL MIS_FIB(C,X,k,OU,DONEITF)
@@ -718,7 +710,7 @@ contains
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
 !       IF(.NOT.ASSOCIATED(CN)) CN=>C
-       IF(ASSOCIATED(CN).and.PATCHE/=5) THEN ! ASSOCIATED        
+       IF(ASSOCIATED(CN).and.PATCHE/=5) THEN ! ASSOCIATED
        P0=>CN%MAGP%P%P0C
        B0=>CN%BETA0
        X(2)=X(2)*C%MAGP%P%P0C/P0
@@ -730,7 +722,7 @@ contains
        ELSE
           X(5)=(1.0_dp+X(5))*C%MAGP%P%P0C/P0-1.0_dp
        ENDIF
-    
+
        else ! ASSOCIATED
              P0=>C%PATCH%P0b ! 8/31/2016
              B0=>C%PATCH%B0b ! 8/31/2016
@@ -743,10 +735,10 @@ contains
           X(5)=(2.0_dp*X(5)+X(5)**2)/(sqrt(1.0_dp/B0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/B0) ! 8/31/2016
        ELSE
           X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp ! 8/31/2016
-       ENDIF        
-      
-      ENDIF ! ASSOCIATED  
-ENDIF  
+       ENDIF
+
+      ENDIF ! ASSOCIATED
+ENDIF
     !   endif ! new 2010
 
 

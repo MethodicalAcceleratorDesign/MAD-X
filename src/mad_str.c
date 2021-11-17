@@ -17,6 +17,7 @@ myatof(const char *instr){
   }
   return atof(instr);
 }
+
 void
 mystrcpy(struct char_array* target, const char *source)
 {
@@ -70,7 +71,7 @@ myrepl(const char* in, const char* out, const char* restrict string_in, char* re
   /* replaces all occurrences of "in" in string_in by "out"
      in output string string_out */
 {
-  // LD: 2021.04.27, fixed bug, speed-up. 
+  // LD: 2021.04.27, fixed bug, speed-up.
   char tmp[16];
 
   if (*out == '$') {

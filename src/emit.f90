@@ -126,10 +126,10 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
    if(code .eq. code_tkicker)     code = code_kicker
    if(code .eq. code_placeholder) code = code_instrument
 
-   al_errors = 0 
+   al_errors = 0
    n_align = node_al_errors(al_errors)
    n_perm_align = is_permalign()
-    
+
    if (n_perm_align .ne. 0) then
       al_errors(1) = al_errors(1) + node_value('dx ')
       al_errors(2) = al_errors(2) + node_value('dy ')
@@ -139,7 +139,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
       al_errors(6) = al_errors(6) + node_value('dpsi ')
       n_align = 1
    endif
-   
+
    if (n_align .ne. 0)  then
       ORBIT2 = ORBIT
       call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
@@ -293,7 +293,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   select case (code)
 
      case (code_rbend, code_sbend) !---- DIPOLE
-        an = bvk * node_value('angle ') * el/node_value('l ') ! ??? 
+        an = bvk * node_value('angle ') * el/node_value('l ') ! ???
         tilt = -node_value('tilt ')
         edg1 = bvk * node_value('e1 ')
         edg2 = bvk * node_value('e2 ')
@@ -309,7 +309,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         else
            h = an / el * (1 + ktap) ! tapering
         endif
-     
+
         !---- Refer orbit and eigenvectors to magnet midplane.
         ct = cos(tilt)
         st = sin(tilt)
@@ -404,7 +404,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         dbet2_sqr_dpt = (two/betas+two*pt2)/(pt2+one/betas)**2-(two*((pt2*two)/betas+pt2**2+one))/(pt2+one/betas)**3;
         denominator1 = two*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
         denominator2 = two*sqrt(((rfac2-two)*rfac2)/bet2_sqr+one);
-        
+
         !---- Cubic integration over h**3 * E(i,5) * conjg(E(i,5)).
         bi2gi2 = one / (betas * gammas)**2
         hbi = h / betas
@@ -483,7 +483,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         !rw(6,4) = -drfac2_dpy*pt2-drfac2_dpy/betas;
         !rw(6,6) = one-rfac2;
         RE = matmul(RW,RE)
-        
+
      case (code_quadrupole , code_sextupole, code_octupole, code_solenoid) !---- Common to all pure multipoles.
         sk1 = zero
         sk2 = zero
@@ -652,7 +652,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
         dbet1_sqr_dpt = (two/betas+two*pt1)/(pt1+one/betas)**2-(two*((pt1*two)/betas+pt1**2+one))/(pt1+one/betas)**3;
         denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
-        
+
         RW = EYE
         rw(2,1) = (two*drfac1_dx*px1*rfac1-two*drfac1_dx*px1)/(bet1_sqr*denominator1);
         rw(2,2) = sqrt(rfac1**2/bet1_sqr-two*rfac1/bet1_sqr+one)+&
@@ -739,7 +739,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         !---- Support variables
         x1 = orb1(1); px1 = orb1(2); y1 = orb1(3); py1 = orb1(4); t1 = orb1(5); pt1 = orb1(6)
         x2 = orb2(1); px2 = orb2(2); y2 = orb2(3); py2 = orb2(4); t2 = orb2(5); pt2 = orb2(6)
-        
+
         p1 = sqrt(pt1*pt1 + two*pt1/betas + one)
         p2 = sqrt(pt2*pt2 + two*pt2/betas + one)
         bet1_sqr = (pt1*pt1 + two*pt1/betas + one) / (one/betas + pt1)**2;
@@ -748,7 +748,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         dbet2_sqr_dpt = (two/betas+two*pt2)/(pt2+one/betas)**2-(two*((pt2*two)/betas+pt2**2+one))/(pt2+one/betas)**3;
         denominator1 = 2*sqrt(((rfac1-two)*rfac1)/bet1_sqr+one);
         denominator2 = 2*sqrt(((rfac2-two)*rfac2)/bet2_sqr+one);
-        
+
         !---- Damping matrices.
         RW = EYE
         rw(2,1) = (two*drfac1_dx*px1*rfac1-two*drfac1_dx*px1)/(bet1_sqr*denominator1);
@@ -810,7 +810,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         ! nothing
 
      end select
-     
+
 end subroutine emdamp
 
 subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
@@ -1003,7 +1003,7 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
   call write2table('gamma_max ','px ','1/m ',gmax,1)
   call write2table('gamma_max ','py ','1/m ',gmax,2)
   call write2table('gamma_max ','pt ','1/m ',gmax,3)
-  
+
   call string_to_table_curr('emit ', 'parameter ', 'damping_partion ')
   call double_to_table_curr('emit ', 'mode1 ',pdamp(1))
   call double_to_table_curr('emit ', 'mode2 ',pdamp(2))
