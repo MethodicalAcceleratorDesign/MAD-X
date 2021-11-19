@@ -3974,7 +3974,7 @@ contains
           endif
           write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,3X,18(1X,I2))') iout, &
                      c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
-! LD          write(iunit,*) c_clean_complex(c_cc(ipoa+i-1))
+          if (.not.madxprint) write(iunit,*) c_clean_complex(c_cc(ipoa+i-1))
        enddo
     else
        if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT                                     ORDER   EXPONENTS'
@@ -3989,13 +3989,11 @@ contains
              if(abs(real(c_cc(ii)))> epsprint) a=c_cc(ii)
              if(abs(aimag(c_cc(ii)))> epsprint) b=aimag(c_cc(ii))
              ccc=a+(0.0_dp,1.0_dp)*b
-
                 !ETIENNE
-                
                 iout = iout+1
                 write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,3X,18(1X,I2))') iout,ccc,ioa,(j(iii),iii=1,c_nvmax)
-                !ETIENNE
-! LD                write(iunit,*) c_cc(ii)
+                !ETIENNE + LD
+                if (.not.madxprint) write(iunit,*) c_cc(ii)
              endif
              !ETIENNE
              !
@@ -4065,16 +4063,18 @@ end function c_clean_complex
        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') c_daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
          '*********************************************'
     else
-        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') c_daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
+        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') "Properties",', NO =',inoa,', NV =',inva,', INA =',ina,&
          '*********************************************'
     endif
     !
     if(illa.ne.0.and.longprint) write(iunit,'(A)') '     I   COEFFICIENT                                     ORDER   EXPONENTS'
     if(illa.eq.0.and.longprint) write(iunit,'(A)') '         ALL COMPONENTS 0.0_dp '
     !
-!    c10='      NO ='
-!    k10='      NV ='
-!    if(longprint)write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
+    if (.not.madxprint) then
+       c10='      NO ='
+       k10='      NV ='
+       if(longprint) write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
+    endif
     iout = 0
     !
     !      DO 100 IOA = 0,INOA
@@ -4133,9 +4133,9 @@ end function c_clean_complex
        j(i)=0
     enddo
     if(iout.eq.0) iout=1
-!if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
+    if(longprint.and.(.not.madxprint)) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
     if((.not.longprint).and.(.not.some)) write(iunit,*) " Complex Polynomial is zero "
-if(.not.longprint) write(6,*) " "
+    !if((.not.longprint).and.(.not.madxprint)) write(iunit,*) " "
     !
     return
 longprint=long
@@ -4315,7 +4315,7 @@ longprint=long
     !
     if(ii.eq.0) goto 20
     !ETIENNE
-!    read(iunit,*) c
+    if (.not.madxprint) read(iunit,*) c
     !ETIENNE
     if(ii.ne.iin) then
        iwarin = 1
