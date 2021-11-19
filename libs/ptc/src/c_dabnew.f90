@@ -4484,7 +4484,7 @@ contains
              ioa=1
           endif
           write(iunit,'(I6,2X,ES23.16,I5,3X,18(1X,I2))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
-! LD      write(iunit,*) cc(ipoa+i-1)
+          if (.not.madxprint) write(iunit,*) cc(ipoa+i-1)
        enddo
     else
        if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT             ORDER   EXPONENTS'
@@ -4499,7 +4499,7 @@ contains
                 iout = iout+1
                 write(iunit,'(I6,2X,ES23.16,I5,3X,18(1X,I2))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
                 !ETIENNE
-! LD             write(iunit,*) cc(ii)
+                if (.not.madxprint) write(iunit,*) cc(ii)
              endif
              !ETIENNE
              !
@@ -4556,9 +4556,11 @@ contains
     if(illa.ne.0.and.longprint) write(iunit,'(A)') '     I   COEFFICIENT             ORDER   EXPONENTS'
     if(illa.eq.0.and.longprint) write(iunit,'(A)') '         ALL COMPONENTS ZERO '
     !
-!LD c10='      NO ='
-!LD k10='      NV ='
-!LD if(longprint)write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
+    if (.not.madxprint) then
+       c10='      NO ='
+       k10='      NV ='
+       if(longprint)write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
+    endif
     iout = 0
     !
     !      DO 100 IOA = 0,INOA
@@ -4606,9 +4608,9 @@ contains
        j(i)=0
     enddo
     if(iout.eq.0) iout=1
-!LD if(longprint) write(iunit,502) -iout,zero,(j(i),i=1,inva)
-if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero "
-!if(.not.longprint) write(iunit,*) " "
+    if(longprint.and.(.not.madxprint)) write(iunit,502) -iout,zero,(j(i),i=1,inva)
+    if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero "
+    !if((.not.longprint).and.(.not.madxprint)) write(iunit,*) " "
     !
     return
       end subroutine dapri77
@@ -4783,7 +4785,7 @@ if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero 
     !
     if(ii.eq.0) goto 20
     !ETIENNE
-!LD read(iunit,*) c
+    if(.not.madxprint) read(iunit,*) c
     !ETIENNE
     if(ii.ne.iin) then
        iwarin = 1
