@@ -4460,20 +4460,19 @@ contains
     ipoa = idapo(ina)
     ilma = idalm(ina)
     illa = idall(ina)
-    ! LD f90 format (remove last /)
-    write(iunit,'(/1X,A,A,I5,A,I5,A,I5/A)') daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
-         '********************************************************'
+    !
+    write(iunit,'(/1X,A,A,I5,A,I5,A,I5/1X,A/)') daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
+         '*********************************************'
     !
     iout = 0
     ioa = 0
     if(inva.eq.0) then
        write(iunit,'(A)') '    I  VALUE  '
        do i = ipoa,ipoa+illa-1
-          ! LD f90 format
           write(iunit,'(I6,2X,ES23.16)') i-ipoa, cc(i)
        enddo
     elseif(nomax.eq.1) then
-       if(illa.ne.0) write(iunit,'(A)') '    I   COEFFICIENT           ORDER   EXPONENTS'
+       if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT             ORDER   EXPONENTS'
        if(illa.eq.0) write(iunit,'(A)') '         ALL COMPONENTS ZERO '
        do i=1,illa
           do k=1,inva
@@ -4484,12 +4483,11 @@ contains
              j(i-1)=1
              ioa=1
           endif
-          ! LD f90 format
-          write(iunit,'(I6,2X,ES23.16,I5,4X,100(2i3,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
+          write(iunit,'(I6,2X,ES23.16,I5,3X,18(1X,I2))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
 ! LD      write(iunit,*) cc(ipoa+i-1)
        enddo
     else
-       if(illa.ne.0) write(iunit,'(A)') '    I   COEFFICIENT           ORDER   EXPONENTS'
+       if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT             ORDER   EXPONENTS'
        if(illa.eq.0) write(iunit,'(A)') '         ALL COMPONENTS ZERO '
        do ioa = 0,inoa
           do ii=ipoa,ipoa+illa-1
@@ -4499,8 +4497,7 @@ contains
              if(abs(cc(ii)).gt.eps) then
                 !ETIENNE
                 iout = iout+1
-                ! LD f90 format
-                write(iunit,'(I6,2X,ES23.16,I5,4X,100(2i3,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
+                write(iunit,'(I6,2X,ES23.16,I5,3X,18(1X,I2))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
                 !ETIENNE
 ! LD             write(iunit,*) cc(ii)
              endif
@@ -4552,16 +4549,16 @@ contains
        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
          '*********************************************'
     else
-        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
+       write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') "Properties",', NO =',inoa,', NV =',inva,', INA =',ina,&
          '*********************************************'
     endif
    !
-    if(illa.ne.0.and.longprint) write(iunit,'(A)') '   I  COEFFICIENT          ORDER   EXPONENTS'
-    if(illa.eq.0.and.longprint) write(iunit,'(A)') '   ALL COMPONENTS ZERO '
+    if(illa.ne.0.and.longprint) write(iunit,'(A)') '     I   COEFFICIENT             ORDER   EXPONENTS'
+    if(illa.eq.0.and.longprint) write(iunit,'(A)') '         ALL COMPONENTS ZERO '
     !
-!    c10='      NO ='
-!    k10='      NV ='
-!    if(longprint)write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
+!LD c10='      NO ='
+!LD k10='      NV ='
+!LD if(longprint)write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
     iout = 0
     !
     !      DO 100 IOA = 0,INOA
@@ -4595,9 +4592,9 @@ contains
                    write(iunit,503) ioa,cc(ii),(j(i),i=1,inva)
                 endif
              endif
-501          format(' ', i3,1x,g23.16,1x,100(1x,i3))
-503          format(' ', i3,1x,g23.16,1x,100(1x,i3))
-502          format(' ', i5,1x,g23.16,1x,100(1x,i3))
+501          format(' ', i3,1x,es23.16,1x,100(1x,i2))
+503          format(' ', i3,1x,es23.16,1x,100(1x,i2))
+502          format(' ', i5,1x,es23.16,1x,100(1x,i2))
           endif
           !ETIENNE
           !
@@ -4609,7 +4606,7 @@ contains
        j(i)=0
     enddo
     if(iout.eq.0) iout=1
-!if(longprint) write(iunit,502) -iout,zero,(j(i),i=1,inva)
+!LD if(longprint) write(iunit,502) -iout,zero,(j(i),i=1,inva)
 if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero "
 !if(.not.longprint) write(iunit,*) " "
     !
@@ -4774,7 +4771,7 @@ if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero 
      read(iunit,'(18X,I4)') nno
      read(iunit,'(A10)') c10
      read(iunit,'(A10)') c10
-! LD read(iunit,'(A10)') c10
+     read(iunit,'(A10)') c10
     endif
     !
     !
@@ -4782,12 +4779,11 @@ if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero 
     !
 10  continue
     iin = iin + 1
-    ! LD f90 format
-    read(iunit,'(I6,2X,ES21.14,I5,4X,18(2i2,1X))') ii,c,io,(j(i),i=1,inva)
+    read(iunit,'(I6,2X,ES23.16,I5,3X,18(1X,i2))') ii,c,io,(j(i),i=1,inva)
     !
     if(ii.eq.0) goto 20
     !ETIENNE
-    read(iunit,*) c
+!LD read(iunit,*) c
     !ETIENNE
     if(ii.ne.iin) then
        iwarin = 1

@@ -11356,175 +11356,146 @@ subroutine c_linear_ac_longitudinal(xy,a1,ac)
     call alloc(rel);call alloc(w);call alloc(v);call alloc(x);
     call alloc(t1);
 
+print *, "LD: gofix start"
+
     rel=1
     v=1
  
     x=xy
 
-  print *, "LD: gofix start"
-  print *, "LD: rel="
-  call print(rel,6)
-  print *, "LD: v0="
-  call print(v,6)
-
-    do i=1,nd2  
-     if(i/=ndpt.and.i/=ndptb) then
+    do i=1,nd2
+      if(i/=ndpt.and.i/=ndptb) then
         v%v(i)=x%v(i)-rel%v(i)    !   V= X-1  where X is the map
-       else
+      else
         if(mod(i,2)==0) ndloc=i/2  ! degree of freedom of coasting plane
       endif
     enddo
 
-  print *, "LD: nv=", nv, "nd2=", nd2, "ndpt=", ndpt, "ndptb=", ndptb, "ndloc=", ndloc
-  print *, "LD: x="
-  call print(x,6)
-  print *, "LD: v="
-  call print(v,6)
-  print *, "LD: x-v="
-  w = x-v
-  call print(w,6)
+print *, "LD: nv=", nv, ", nd2=", nd2, ", ndpt=", ndpt, ", ndptb=", ndptb, &
+         ", ndloc=", ndloc, ", dosymp=", dosymp, ", order_gofix=", order_gofix
 
     v=v.cut.(order_gofix+1)
 
-  print*, "LD: v(cut)="
-  call print(v,6)
- 
+call print(v, 1011)
+
     w=v**(-1)    !  W= (Map-1)**-1   
 
-  print*, "LD: w=v^-1"
-  call print(w,6)
+call print(w, 1012)
 
     x=0
     x%s=1    ! spin part is identity
     x%q=1.0_dp 
     do i=nd2+1,nv
-     x%v(i)=1.0e0_dp.cmono.i  !  Identity in all the parameter planes
+      x%v(i)=1.0e0_dp.cmono.i  !  Identity in all the parameter planes
     enddo
     if(ndpt/=0) x%v(ndpt)=1.0e0_dp.cmono.ndpt !  If coasting, then energy is a parameter
 
-    print*, "LD: x="
-    call print(x,6)
+call print(x, 1013)
 
     v=w*x  ! v contains the fixed point, for example v(1)= eta_x * x_pt + ...
          
+call print(v, 1014)
+
     a1=v
 
-    print*, "LD: a0=w*x"
-    call print(a1,6)
+call print(a1, 1015)
 
   ! however a1 is not a  transformation, we must add the identity (done at the end) 
   ! also we must add some stuff to time to make it symplectic if coasting
   ! because the Lie operator which produces v(1)= eta_x * x_pt + ...
   ! is, within a sign, eta_x * x_pt * p_x-eta_x_prime * x_pt * x-...  which affects time
-if(ndpt/=0) then
-if(dosymp) then
+   if(ndpt/=0) then
+      if(dosymp) then
       ! if(ndpt/=0) then 
          t1=0
          do i=1,nd
-           if(i/=ndloc) then
-            x%v(2*i)  =(-1)**(2*i-1)*(a1%v(2*i-1))
-            x%v(2*i-1)=(-1)**(2*i  )*(a1%v(2*i))
-            v%v(2*i)=   x%v(2*i).d.ndpt
-            v%v(2*i-1)= x%v(2*i-1).d.ndpt
-
-          endif
+            if(i/=ndloc) then
+               x%v(2*i)  =(-1)**(2*i-1)*(a1%v(2*i-1))
+               x%v(2*i-1)=(-1)**(2*i  )*(a1%v(2*i))
+               v%v(2*i)=   x%v(2*i).d.ndpt
+               v%v(2*i-1)= x%v(2*i-1).d.ndpt
+            endif
          enddo
-
-print*, "LD: x="
-call print(x,6)
-print*, "LD: v="
-call print(v,6)
 
          do i=1,nd
-           if(i/=ndloc) then
-             t1=-(1.0_dp.cmono.(2*i-1))*v%v(2*i-1)+t1  ! first order
-             t1=-(1.0_dp.cmono.(2*i))*v%v(2*i)+t1      ! first order
-             t1=-0.5_dp*(x%v(2*i-1)*v%v(2*i)-x%v(2*i)*v%v(2*i-1))+t1  ! second order
+            if(i/=ndloc) then
+               t1=-(1.0_dp.cmono.(2*i-1))*v%v(2*i-1)+t1  ! first order
+               t1=-(1.0_dp.cmono.(2*i))*v%v(2*i)+t1      ! first order
+               t1=-0.5_dp*(x%v(2*i-1)*v%v(2*i)-x%v(2*i)*v%v(2*i-1))+t1  ! second order
 ! because  eta_x * x_pt * p_x-eta_x_prime * x_pt * x-...  is linear in the transverse
 !          there are NO terms higher than second order
-           endif
+            endif
          enddo
+
          t1=(-1)**ndpt*t1
          a1%v(ndptb)=(1.0_dp.cmono.ndptb)+t1 !!! effect on  time added to identity map in the time-energy plane
          a1%v(ndpt)=1.0_dp.cmono.ndpt
-      !  endif
 !!!! end of the coasting beam gymnastic !!!!!!!!!!!!!!
 
 !!! identity is added to a1 except coasting plane (already there) !!! 
-    do i=1,nd2 
-     if(i/=ndptb.and.i/=ndpt) a1%v(i)=(1.0e0_dp.cmono.i)+a1%v(i)
-    enddo
-
-print*, "LD: t1="
-call print(t1,6)
-print*, "LD: a0="
-call print(a1,6)
+         do i=1,nd2
+            if(i/=ndptb.and.i/=ndpt) a1%v(i)=(1.0e0_dp.cmono.i)+a1%v(i)
+         enddo
 
 !call print(a1,6)
 !pause 333
 
-else
+      else ! dosymp
 
-!  v=1
-  v=xy
+         v=xy
 
- allocate(mt(nd2t,nd2t),mv(nd2t)); allocate(je(nv));
+         allocate(mt(nd2t,nd2t),mv(nd2t)); allocate(je(nv));
 
-  mt=0.0_dp
- do i=1,nd2t
-  do j=1,nd2t
-   je=0
-   je(j)=1
-   mt(i,j)=v%v(i).sub.je
-  enddo
- enddo
+         mt=0.0_dp
+         do i=1,nd2t
+         do j=1,nd2t
+            je=0
+            je(j)=1
+            mt(i,j)=v%v(i).sub.je
+         enddo
+         enddo
 
-  mt=-transpose(mt)
+         mt=-transpose(mt)
 
-  do i=1,nd2t
-     mt(i,i)=1.0_dp+mt(i,i)
-  enddo
-  call matinv(mt,mt,nd2t,nd2t,i)
+         do i=1,nd2t
+            mt(i,i)=1.0_dp+mt(i,i)
+         enddo
 
+         call matinv(mt,mt,nd2t,nd2t,i)
 
+         mv=0.0_dp
+         do i=1,nd2t
+            je=0
+            je(i)=1
+            mv(i)=-xy%v(ndptb).sub.je
+         enddo
 
- mv=0.0_dp
-  do i=1,nd2t
-   je=0
-    je(i)=1
-    mv(i)=-xy%v(ndptb).sub.je
-  enddo
+         mv=matmul(mt,mv)
 
- mv=matmul(mt,mv)
+         do i=1,nd2
+            if(i/=ndpt) then
+               a1%v(i)=(1.0e0_dp.cmono.i)+a1%v(i)  ! ndpt is already identity
+            endif
+         enddo
 
-    do i=1,nd2 
-     if(i/=ndpt) then 
-       a1%v(i)=(1.0e0_dp.cmono.i)+a1%v(i)  ! ndpt is already identity
-     endif
-    enddo 
+         do i=1,nd2t
+            a1%v(ndptb)=a1%v(ndptb)+mv(i)*(1.0e0_dp.cmono.i)
+         enddo
+         deallocate(mt,mv);deallocate(je);
+         ! endif ! npdt/=0
+      endif ! dosymp
 
-    do i=1,nd2t 
-     a1%v(ndptb)=a1%v(ndptb)+mv(i)*(1.0e0_dp.cmono.i)
-    enddo
- deallocate(mt,mv);deallocate(je);
-! endif ! npdt/=0
- endif       
+   else ! npdt=0
 
-else ! npdt=0
+      do i=1,nd2
+         a1%v(i)=(1e0_dp.cmono.i)+a1%v(i)  ! ndpt is already identity
+      enddo
 
-    do i=1,nd2 
-       a1%v(i)=(1e0_dp.cmono.i)+a1%v(i)  ! ndpt is already identity
-    enddo 
+   endif ! ndpt
 
-endif
+   call kill(t1);
+   call kill(v);call kill(w);call kill(rel);call kill(x);
 
- 
- 
-    call kill(t1);
-    call kill(v);call kill(w);call kill(rel);call kill(x);
-
-print*, "returned a0="
-call print(a1,6)
 print *, "LD: gofix end"
 
     return
@@ -18248,6 +18219,7 @@ inside_normal=.true.
  ! etienne
    call print(m1, 1010)
 
+   c_skip_gofix = .false.
    if(c_skip_gofix) then
      a1=1
    else
