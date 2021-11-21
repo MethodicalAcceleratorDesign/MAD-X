@@ -79,7 +79,7 @@ in order to run the IBS module:
   \ttitemn{PARTICLE} This is mandatory but \madx provides default
   value of \texttt{PARTICLE=proton}. For ions, this parameter specifies
   only the name of the ions, and the MASS (approximated to the atomic
-  unit number times the neutron mass \texttt{NMASS}) and CHARGE must be
+  unit number times the unified atomic mass \texttt{AMASS}) and CHARGE must be
   provided as well.
 
   \ttitemn{NPART} the number of particles (or number of ions).
@@ -121,7 +121,7 @@ defined as follows for \texttt{IBS} calculations:
 nucleon = 208; \\
 charge = 82; \\
 \\
-BEAM, \=PARTICLE= lead, CHARGE= charge, MASS= nucleon*nmass, \\
+BEAM, \=PARTICLE= lead, CHARGE= charge, MASS= nucleon*amass, \\
       \>ENERGY= 450*charge, NPART= 1.1E7, BUNCHED, \\
       \>EX= 7.82E-9, EY= 7.82E-9, SIGE= 4.68E-4, SIGT= 0.115;
 }

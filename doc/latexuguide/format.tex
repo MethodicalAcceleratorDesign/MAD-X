@@ -516,7 +516,8 @@ RADDEG & $\pi/180$ & PI / 180 & rad/deg \\
 E & e & exp(1) & 1 \\ 
 EMASS & $m_e$ & $0.51099895000\times 10^{-3}$& GeV \\ 
 PMASS & $m_p$ & 0.93827208816 & GeV \\ 
-NMASS & $u$ & 0.93956542052 & GeV \\
+NMASS & $m_n$ & 0.93956542052 & GeV \\
+AMASS & $u$ & 0.93149410242 & GeV \\
 MUMASS & $m_\mu$ & 0.1056583715 & GeV \\ 
 CLIGHT & $c$ & $2.99792458\times 10^{8}$ & m/s \\ 
 QELECT & $e$ & $1.602176634\times 10^{-19}$ & A.s \\ 
@@ -527,8 +528,8 @@ PRAD & $r_e (m_e / m_p)$ & ERAD*EMASS/PMASS & m \\
 \end{tabular}
 \end{table}
 
-Note that the \texttt{NMASS} constant in \madx is the unified atomic mass unit and 
-not the neutron mass.
+The \texttt{NMASS} constant in \madx is now really the neutron mass and the atomic mass
+unit is \texttt{AMASS}.
 
 \subsubsection{Parameter labels} 
 Often a set of numerical values depends on a common variable
