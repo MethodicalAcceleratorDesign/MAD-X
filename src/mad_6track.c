@@ -1468,7 +1468,7 @@ convert_madx_to_c6t(struct node* p, int ncombined)
     c6t_elem->value[14] = el_par_value_recurse("sigx",p->p_elem);
     c6t_elem->value[15] = el_par_value_recurse("sigy",p->p_elem);
     c6t_elem->value[16] = el_par_value_recurse("charge",p->p_elem);
-    c6t_elem->value[17] = 0.0; /* npart */
+    c6t_elem->value[17] = el_par_value_recurse("npart",p->p_elem); /* npart */
   }
   else if((strcmp(p->base_name,"elseparator") == 0  ))
   {
@@ -3455,7 +3455,8 @@ write_f3_mult(struct c6t_element* el)
         {
           if (eln->p_fd_err->a_dble[i] != zero)
           {
-            i_max = i; error_matrix[i] = 1.;
+            if (i > i_max){ i_max = i;}
+            error_matrix[i] = 1.;
           }
         }
       }

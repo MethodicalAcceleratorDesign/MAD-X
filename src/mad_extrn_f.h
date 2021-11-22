@@ -361,4 +361,8 @@ int  w_ptc_getnmoments_(void);
 // from madx_ptc_knobs.f90
 void w_ptc_rviewer_(void);
 
+// from taper.f90
+void taper_(F_DOUBLE orbit0, F_INTEGER iterate, F_DOUBLE stepsize, F_CHARACTER filename, F_INTEGER error);
+void taperreset_(F_INTEGER error);
+
 #endif

@@ -492,7 +492,7 @@ set_twiss_deltas(struct command* comm)
 {
   char* string;
   int i, k = 0, n = 0;
-  double s, sign = one, ar[3];
+  double s, sign = one, ar[3]={0};
   twiss_deltas->curr = 1;
   twiss_deltas->a[0] = 0;
   string = command_par_string_user("deltap", comm);
@@ -607,6 +607,7 @@ complete_twiss_table(struct table* t)
     else if (strcmp(tmp, "yma") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "sigx") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "sigy") == 0) val =  el_par_value(tmp, c_node->p_elem); 
+    else if (strcmp(tmp, "ktap") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if(mult)
     {
       if(j<=twiss_mult_end)
@@ -774,7 +775,6 @@ pro_twiss(void)
     current_sequ->tw_centre=0;
     set_option("centre", &k);
     k = 1;
-
   }
 
   name = command_par_string_user("keeporbit", current_twiss);
@@ -869,6 +869,28 @@ pro_twiss(void)
     printf(" Initial orbit: %e %e %e %e %e %e\n", orbit0[0], orbit0[1], orbit0[2], orbit0[3], orbit0[4], orbit0[5]);
   // 2014-May-30  12:33:48  ghislain: end of modifications
 
+
+  // 2021-Sep-01 ghislain: if tapering=true, from TWISS or MATCH, call taper command
+  if (command_par_value("tapering", current_twiss) != 0) {
+    if (get_option("info"))
+      printf(" Initial tapering before entering Twiss \n");
+    int error = 0;
+    taperreset_(&error); /* reset all taper values to zero before adjusting probe */
+    double taper_orbit[6];
+    copy_double(orbit0,taper_orbit,6);
+    adjust_beam();
+    probe_beam = clone_command(current_beam);
+    adjust_probe_fp(0);
+    int iterate = 3; double stepsize = 0.0;
+    char* tapfilename;
+    tapfilename = mymalloc("tapering", 30 * sizeof *tapfilename);
+    strcpy(tapfilename,"no_taper_file");
+    taper_(taper_orbit, &iterate, &stepsize, tapfilename, &error); /* call taper module */
+    probe_beam = delete_command(probe_beam);    
+    if (get_option("info"))
+      printf(" Tapering applied, proceeding to Twiss \n");
+  }
+  
   // LD 2016.04.19
   adjust_beam();
   probe_beam = clone_command(current_beam);

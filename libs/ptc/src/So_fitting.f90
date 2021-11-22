@@ -2799,13 +2799,15 @@ endif
      C=>R%START
     endif
     do  ii=1,nt    ! WHILE(ASSOCIATED(C))
-       if(C%MAG%KIND==kind0) cycle
+       if(C%MAG%KIND==kind0) then
+        doit=.false.
+       else
        doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind4.or.C%MAG%KIND==kind5)
        doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
        DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
        DOIT=DOIT.OR.(C%MAG%KIND==kind17.or.C%MAG%KIND==kindwiggler.or.C%MAG%KIND==KINDhel)
        doit=doit.and.C%MAG%recut
-
+       endif
        if(doit) then
           select case(C%MAG%P%METHOD)
           CASE(2)
@@ -4047,13 +4049,13 @@ endif
     p=>r%start
     do i=1,r%n
 
-       IF(P%MAG%KIND/=KIND0.AND.P%MAG%KIND/=KIND1) THEN
+     !  IF(P%MAG%KIND/=KIND0.AND.P%MAG%KIND/=KIND1) THEN
           DO J=1,6
              call GRNF(X,cut)
              MIS(J)=X*SIG(J)
           ENDDO
           call MISALIGN_FIBRE(p,mis)
-       ENDIF
+     !  ENDIF
        P=>P%NEXT
     ENDDO
   end SUBROUTINE MESS_UP_ALIGNMENT

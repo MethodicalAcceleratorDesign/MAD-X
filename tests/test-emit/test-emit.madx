@@ -8,5 +8,8 @@ Show, beam%Machine;
 Emit, DELTAP=0.0 ;
 Show, beam%Machine;
 
+write, table=summ, file="twisssum.tfs" ;
+write, table=emit, file="emittab.tfs" ;
+write, table=emitsumm, file="emitsums.tfs" ;
 Stop;
 
