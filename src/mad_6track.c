@@ -2637,7 +2637,6 @@ read_sequ(void)
       double inorm [20];
       ncombined = element_vector(cnode->p_elem, "current", inorm);
       for(int i=0; i<ncombined; i++){
-        printf("nnwires %d \n", i);
         pro_elem(cnode, i);
       }
       cnode = cnode->next;

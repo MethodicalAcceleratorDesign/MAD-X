@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.06.11 17:32:15      +
+  + Execution date: 2021.11.22 10:58:33      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -76,7 +76,44 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 
            synch_6            synch_8             nflips 
                  0                  0                  0 
+track;
 
+enter TRACK module
+start, x=0.001;
+
+run, turns=10;
+
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+
+Full 6D closed orbit search.
+Initial value of 6-D closed orbit from Twiss: 
+orbit0   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  Singular matrix occurred during closed orbit search.
+
+6D closed orbit found by subroutine trclor 
+iteration:   2 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0              0.001                  0 
+         1         10     -0.05342036601    -0.001180674861 
+
+                 y                 py                  t                 pt 
+                 0                  0                  0                  0 
+    -0.02156488102   -0.0005461622664   -2.977793222e-05                  0 
+
+                 s                  e 
+                 0                  0 
+                20                  0 
+endtrack;
+
+exit TRACK module
 
 sixtrack;
 
@@ -86,12 +123,6 @@ sixtrack;
 
 ++++++ info: c6t - long names flag selected 
 Reference radius set to : 1.000000
-nnwires 0 
-nnwires 1 
-nnwires 0 
-nnwires 1 
-nnwires 0 
-nnwires 1 
 ++++++ info: MADX sequence converted to c6t internal. 
 
 total block length: 20.000000
@@ -108,8 +139,8 @@ save sequence=testseq, file="thin.seq";
 
 ++++++ warning: SAVE makes all previous USE invalid !  
 
-  Number of warnings: 1
-1 in C and 0 in Fortran
+  Number of warnings: 3
+1 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

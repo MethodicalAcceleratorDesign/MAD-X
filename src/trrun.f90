@@ -3896,7 +3896,7 @@ subroutine ttwire(track, ktrack, isFirst)
   implicit none
   double precision :: track(6,*)
   integer :: ktrack
-  logical :: isFirst, bborbit
+  logical :: isFirst, bborbit, onepass
   double precision :: xma(0:maxmul), yma(0:maxmul), current(0:maxmul), l_int(0:maxmul)
   double precision :: l_phy(0:maxferr)
   integer :: i, j, wire_flagco, nn, ibeco
@@ -3939,8 +3939,8 @@ do i = 0, nn-1
   end do
 end do
 
-
-  if(.not. bborbit) then
+  onepass  = get_option('onepass ') .ne. 0
+  if(.not. bborbit .and. .not. onepass) then
       closed_orb_kick_px = get_closed_orb_node(2)
       closed_orb_kick_py = get_closed_orb_node(4)
       do j=1,ktrack

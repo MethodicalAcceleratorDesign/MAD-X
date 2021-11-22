@@ -19,7 +19,10 @@ makethin, sequence=testseq;
 use, sequence=testseq;
 
 twiss, betx=1, bety=1, file ="thin.twiss";
-
+track;
+start, x=0.001;
+run, turns=10;
+endtrack;
 sixtrack;
 
 save sequence=testseq, file="thin.seq";
