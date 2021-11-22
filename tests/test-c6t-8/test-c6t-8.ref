@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.11.22 10:58:33      +
+  + Execution date: 2021.11.22 15:24:41      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -31,8 +31,36 @@ beam;
 
 use, sequence=testseq;
 
+twiss, betx=1, bety=1, file="thick.twiss";
 
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                20                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2412750856                  0        489.5108943                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  0                  0       0.2429216389 
+
+               dq2            betymax              dymax              dyrms 
+                 0        343.2713115                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips 
+                 0                  0                  0 
 select, flag = makethin, class=collimator,  slice=1	;
 
 select, flag = makethin, class=wire,  slice=2	;

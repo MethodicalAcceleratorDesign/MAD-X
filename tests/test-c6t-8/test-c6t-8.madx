@@ -11,7 +11,7 @@ endsequence;
 //-- strength can also be set after sequence definition
 beam;
 use, sequence=testseq;
-
+twiss, betx=1, bety=1, file="thick.twiss";
 select, flag = makethin, class=collimator,  slice=1	;
 select, flag = makethin, class=wire,  slice=2	;
 
