@@ -35,7 +35,7 @@ module phys_constfi
   double precision, parameter ::  pmass  = 0.93827208816     ! GeV CODATA 2018
 
   double precision, parameter ::  nmass  = 0.93956542052      ! GeV CODATA 2018
-  double precision, parameter ::  aumass  = 0.93149410242      ! GeV CODATA 2018
+  double precision, parameter ::  umass  = 0.93149410242      ! GeV CODATA 2018
   double precision, parameter ::  mumass = 0.1056583755     ! GeV CODATA 2018
 
   ! Classical radius [m]
