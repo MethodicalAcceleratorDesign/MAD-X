@@ -3667,7 +3667,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         ! nothing on purpose!
 
      case (code_wire,code_collimator)
-        call tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        call tmwire(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
      case (code_dipedge)
         call tmdpdg(ftrk,orbit,fmap,ek,re,te)
