@@ -3965,28 +3965,28 @@ subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
    Ldiff = (-L + Lint)**2
    Lsum = (L + Lint)**2
 
-   re(2,1) = 2*N*x**2*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 &
+   re_t(2,1) = 2*N*x**2*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 &
    - N*x*(4*x/sqrt(4d0*R + Lsum) - 4*x/sqrt(4d0*R + Ldiff))/R -&
     N*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R
 
-   re(2,3) = 2*N*x*y*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2  &
+   re_t(2,3) = 2*N*x*y*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2  &
    - N*x*(4*y/sqrt(4d0*R + Lsum) - 4*y/sqrt(4d0*R + Ldiff))/R
 
-   re(4,1) = 2*N*x*y*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 - &
+   re_t(4,1) = 2*N*x*y*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 - &
     N*y*(4*x/sqrt(4d0*R + Lsum) - 4*x/sqrt(4d0*R + Ldiff))/R
 
-   re(4,3) = 2*N*y**2*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 -&
+   re_t(4,3) = 2*N*y**2*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 -&
    N*y*(4*y/sqrt(4d0*R + Lsum) - 4*y/sqrt(4d0*R + Ldiff))/R -  &
    N*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R
 
-   te(2,1,1) = -8*N*x**3*Leff/R**3 + 6*N*x*Leff/R**2
-   te(2,1,3) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
-   te(2,3,1) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
-   te(2,3,3) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
-   te(4,1,1) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
-   te(4,1,3) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
-   te(4,3,1) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
-   te(4,3,3) = -8*N*y**3*Leff/R**3 + 6*N*y*Leff/R**2
+   te_t(2,1,1) = -8*N*x**3*Leff/R**3 + 6*N*x*Leff/R**2
+   te_t(2,1,3) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
+   te_t(2,3,1) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
+   te_t(2,3,3) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
+   te_t(4,1,1) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
+   te_t(4,1,3) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
+   te_t(4,3,1) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
+   te_t(4,3,3) = -8*N*y**3*Leff/R**3 + 6*N*y*Leff/R**2
 
    call tmcat(fsec,re_t,te_t,re,te,re,te) ! At the moment there is no second order
 
@@ -4007,7 +4007,7 @@ if(el .gt. 1e-6) then
    re_t = EYE
    te_t = zero
    call tmdrf(fsec,ftrk,orbit,fmap,el/two,ek,re_t,te_t) ! Call drift for half of the lentgh
-   call tmcat(fsec,re_t,te_t,re,te,re,te) ! At the moment there is no second order
+   call tmcat(fsec,re_t,te_t,re,te,re,te)
 endif
 end subroutine
 
