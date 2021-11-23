@@ -4008,6 +4008,9 @@ if(el .gt. 1e-6) then
    te_t = zero
    call tmdrf(fsec,ftrk,orbit,fmap,el/two,ek,re_t,te_t) ! Call drift for half of the lentgh
    call tmcat(fsec,re_t,te_t,re,te,re,te)
+else
+   re = re_t
+   te = te_t
 endif
 end subroutine
 
