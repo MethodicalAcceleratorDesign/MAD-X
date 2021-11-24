@@ -29,6 +29,7 @@ const char *const_constant_def =
 "const emass = 0.51099895000e-3; "
 "const mumass = 0.1056583755; "
 "const nmass = 0.93956542052; "
+"const umass = 0.93149410242; "
 "const pmass = 0.93827208816; " 
 "const clight = 299792458; "
 "const qelect = 1.602176634e-19; "
