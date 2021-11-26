@@ -495,7 +495,7 @@ set_twiss_deltas(struct command* comm)
 {
   char* string;
   int i, k = 0, n = 0;
-  double s, sign = one, ar[3];
+  double s, sign = one, ar[3]={0};
   twiss_deltas->curr = 1;
   twiss_deltas->a[0] = 0;
   string = command_par_string_user("deltap", comm);

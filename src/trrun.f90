@@ -349,7 +349,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         
         !-------- Track through element  // suppress dxt 13.12.04
         call ttmap(switch, code, el, z, jmax, dxt, dyt, sum, tot_turn+turn, part_id, &
-             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass, debug, theta, thin_foc)
+             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass, debug, theta, thin_foc,.false.)
 
         !-------- Space Charge update
         call SC_Update(orbit0, z);
@@ -528,7 +528,7 @@ subroutine init_elements
 end subroutine init_elements
 
 subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
-     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc)
+     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc, isFirst)
   use twtrrfi
   use twiss0fi
   use name_lenfi
@@ -556,7 +556,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   double precision :: last_orbit(6,*), maxaper(6), al_errors(align_max)
   logical :: aperflag, onepass, lost_global
 
-  logical :: fmap, debug
+  logical :: fmap, debug, isFirst
   logical :: run=.false., dynap=.false., thin_foc
   integer :: i, nn, jtrk, apint
   double precision :: ct, tmp, st, theta
@@ -728,11 +728,14 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
     case (code_rfmultipole)
        call ttrfmult(track,ktrack,turn)
 
+    case (code_wire)
+       call ttwire(track,ktrack, isFirst)
+
     case(code_changerefp0)
       call ttchangep0(track,ktrack)
 
     case (code_hmonitor:code_rcollimator, code_instrument, &
-        code_slmonitor:code_imonitor, code_placeholder, code_collimator)
+        code_slmonitor:code_imonitor, code_placeholder)
         if(el .gt. 0) call ttdrf(el,track,ktrack)
     case default ! The rest: do nothing
 
@@ -1582,7 +1585,6 @@ subroutine ttchangep0(track,ktrack)
   end do
 
 end subroutine ttchangep0
-
 
 
 subroutine ttcrabrf(track,ktrack,turn)
@@ -2731,7 +2733,6 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
        call augment_count(table)
     enddo
   endif
-
 end subroutine tt_putone
 
 subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
@@ -2767,10 +2768,12 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   call double_to_table_curr(table, 'turn ', tt)
   call double_to_table_curr(table, 'number ', tn)
   call double_to_table_curr(table, 'e ', energy)
+
   do i = 1, 6
      tmp = orbit(i) - orbit0(i)
      call double_to_table_curr(table, vec_names(i), tmp)
   enddo
+
   call double_to_table_curr(table,vec_names(7),spos)
   call augment_count(table)
 end subroutine tt_puttab
@@ -3781,7 +3784,7 @@ subroutine trclor(switch,orbit0)
     theta = node_value('tilt ')
         !-------- Track through element
         call ttmap(switch,code,el,z,pmax,dxt,dyt,sum,turn,part_id, &
-             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc)
+             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass, debug, theta, thin_foc, .true.)
 
         !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. code_drift .and. n_align .ne. 0)  then
@@ -3895,6 +3898,68 @@ subroutine ttnllens(track,ktrack)
   enddo
 end subroutine ttnllens
 
+subroutine ttwire(track, ktrack, isFirst)
+  use twtrrfi
+  use trackfi
+  use math_constfi, only : zero, one, two, four
+  use phys_constfi, only : clight
+  implicit none
+  double precision :: track(6,*)
+  integer :: ktrack
+  logical :: isFirst, bborbit, onepass
+  double precision :: xma(0:maxmul), yma(0:maxmul), current(0:maxmul), l_int(0:maxmul)
+  double precision :: l_phy(0:maxferr)
+  integer :: i, j, wire_flagco, nn, ibeco
+  double precision :: dx, dy, embl, l, cur, dxi, dyi, chi, nnorm, xi, yi, RTWO, pc
+  double precision :: closed_orb_kick_px, closed_orb_kick_py
+
+  ! WIRE basd on the SixTrack implementation
+  double precision, external :: node_value, get_value, get_closed_orb_node
+  integer, external :: get_option
+  external ::set_closed_orb_node
+
+  call get_node_vector('xma ', nn, xma)
+  call get_node_vector('yma ', nn, yma)
+  call get_node_vector('current ', nn, current)
+  call get_node_vector('l_int ', nn, l_int)
+  call get_node_vector('l_phy ', nn, l_phy)
+
+  pc = get_value('probe ','pc ')
+  bborbit = get_option('bborbit ') .ne. 0
+
+do i = 0, nn-1
+  dx   = xma(i) ! displacement x [m]
+  dy   = yma(i) ! displacement y [mm]
+  embl = l_int(i)  ! integrated length [m]
+  L    = l_phy(i) ! physical length [m]
+  cur  = current(i)
+  chi = pc*1e9/clight
+  NNORM=1e-7/chi
+
+  do j=1,ktrack
+    xi = (TRACK(1,j)-dx) ! [m]
+    yi = (TRACK(3,j)-dy) ! [m]
+
+    ! 3 apply wire kick
+    RTWO = xi**2+yi**2
+
+    TRACK(2,j) = TRACK(2,j)-(((CUR*NNORM)*xi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO
+    TRACK(4,j) = TRACK(4,j)-(((CUR*NNORM)*yi)*(sqrt((embl+L)**2+four*RTWO)-sqrt((embl-L)**2+four*RTWO)))/RTWO  
+    
+  end do
+end do
+
+  onepass  = get_option('onepass ') .ne. 0
+  if(.not. bborbit .and. .not. onepass) then
+      closed_orb_kick_px = get_closed_orb_node(2)
+      closed_orb_kick_py = get_closed_orb_node(4)
+      do j=1,ktrack
+         TRACK(2,j) = TRACK(2,j) - closed_orb_kick_px
+         TRACK(4,j) = TRACK(4,j) - closed_orb_kick_py
+      enddo 
+endif
+
+end subroutine ttwire
 !FIXME Unused dummy argument 'turn'
 subroutine ttrfmult(track, ktrack, turn)
   use twtrrfi

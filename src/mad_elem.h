@@ -26,6 +26,8 @@ struct element  /* each element is unique */
 
   struct aperture* aper;
   double *tt_attrib;
+  double *tt_closed_x;
+  double *tt_closed_y;
   struct multipole* multip;
   int perm_misalign;
 };

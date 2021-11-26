@@ -3,7 +3,11 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
+<<<<<<< HEAD
   + Execution date: 2021.11.10 14:43:17      +
+=======
+  + Execution date: 2021.11.22 11:02:26      +
+>>>>>>> 024d8cc50e1c3e0eb4ccc39c6d0430bae0081e8d
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Test/Demo file for TAPER command and TAPERING flag for TWISS
 

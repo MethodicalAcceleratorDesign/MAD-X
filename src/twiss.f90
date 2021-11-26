@@ -3679,10 +3679,11 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
   el = node_value('l ')
 
   !---- Select element type.
+  
   select case (code)
 
      case (code_drift, code_hmonitor:code_rcollimator, code_instrument, code_twcavity, &
-        code_slmonitor:code_imonitor, code_placeholder, code_collimator)
+        code_slmonitor:code_imonitor, code_placeholder)
         !---- Drift space, monitors and derivatives, collimators, instrument
         call tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
@@ -3738,8 +3739,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
      case (code_marker)
         ! nothing on purpose!
 
-     case (code_wire)
-        ! nothing for now...
+     case (code_wire,code_collimator)
+        call tmwire(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
      case (code_dipedge)
         call tmdpdg(ftrk,orbit,fmap,ek,re,te)
@@ -3769,7 +3770,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         ! nil (23, 28, 34)
 
      end select
-
+     
 end SUBROUTINE tmmap
 
 SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
@@ -3958,6 +3959,133 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
   endif
 
 end SUBROUTINE tmbend
+
+subroutine tmwire(fsec,ftrk,orbit,fmap,el,ek,re,te)
+  use twtrrfi
+  use trackfi
+  use math_constfi, only : zero, one, two, four
+  use phys_constfi, only : clight
+  use matrices, only: EYE
+  use twissbeamfi, only : deltap
+  implicit none
+    !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for WIRE                                           *
+  !     Input:                                                           *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     el        (double)  element length.                              *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical :: fsec, ftrk, fmap, fcentre
+  double precision :: orbit(6), ek(6), re(6,6), re_t(6,6), te(6,6,6), te_t(6,6,6), el, dl
+  double precision :: xma(0:maxmul), yma(0:maxmul), current(0:maxmul), l_int(0:maxmul)
+  double precision :: l_phy(0:maxferr), Ldiff, Lsum
+  integer :: i, j, wire_flagco, nn, ibeco
+  double precision :: dx, dy, Lint, l, cur, dxi, dyi, chi, nnorm, R,Leff, pc,N
+  double precision :: wire_clo_x, wire_clo_y,x,y,Ntot, closed_px, closed_py
+  logical :: bborbit
+  ! WIRE basd on the SixTrack implementation
+  double precision, external :: node_value, get_value, get_closed_orb_node
+  integer, external :: get_option
+  external ::set_closed_orb_node
+
+  call get_node_vector('l_phy ', nn, l_phy)
+  if(l_phy(0) < 1e-12) then ! If it is a normal comlimator simply use the drift 
+     call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+   return
+  endif
+
+  call get_node_vector('xma ', nn, xma)
+  call get_node_vector('yma ', nn, yma)
+  call get_node_vector('current ', nn, current)
+  call get_node_vector('l_int ', nn, l_int)
+  
+  fmap = .true.
+  bborbit = get_option('bborbit ') .ne. 0
+  pc = get_value('probe ','pc ')
+  re = EYE
+  te = zero
+  closed_px = zero
+  closed_py = zero
+  if(el .gt. 1e-6) then
+      call tmdrf(fsec,ftrk,orbit,fmap,el/two,ek,re,te) ! Call drift for half of the lentgh
+  endif
+
+  
+  do i = 0, nn-1
+   re_t = EYE
+   te_t = zero
+   dx   = xma(i) ! displacement x [m]
+   dy   = yma(i) ! displacement y [mm]
+   Lint = l_int(i)  ! integrated length [m]
+   l    = l_phy(i) ! physical length [m]
+   cur  = current(i)
+   x = orbit(1)-dx ! [m]
+   y = orbit(3)-dy ! [m]
+      
+   chi = pc*1e9/clight
+   NNORM=1e-7/chi 
+   N = NNORM*CUR/(one+deltap)
+   R = x**2+y**2
+   Leff = (L + Lint - Abs(L - Lint))
+   Ldiff = (-L + Lint)**2
+   Lsum = (L + Lint)**2
+
+   re_t(2,1) = 2*N*x**2*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 &
+   - N*x*(4*x/sqrt(4d0*R + Lsum) - 4*x/sqrt(4d0*R + Ldiff))/R -&
+    N*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R
+
+   re_t(2,3) = 2*N*x*y*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2  &
+   - N*x*(4*y/sqrt(4d0*R + Lsum) - 4*y/sqrt(4d0*R + Ldiff))/R
+
+   re_t(4,1) = 2*N*x*y*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 - &
+    N*y*(4*x/sqrt(4d0*R + Lsum) - 4*x/sqrt(4d0*R + Ldiff))/R
+
+   re_t(4,3) = 2*N*y**2*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R**2 -&
+   N*y*(4*y/sqrt(4d0*R + Lsum) - 4*y/sqrt(4d0*R + Ldiff))/R -  &
+   N*(-sqrt(4d0*R + Ldiff) + sqrt(4d0*R + Lsum))/R
+
+   te_t(2,1,1) = -8*N*x**3*Leff/R**3 + 6*N*x*Leff/R**2
+   te_t(2,1,3) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
+   te_t(2,3,1) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
+   te_t(2,3,3) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
+   te_t(4,1,1) = -8*N*x**2*y*Leff/R**3 + 2*N*y*Leff/R**2
+   te_t(4,1,3) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
+   te_t(4,3,1) = -8*N*x*y**2*Leff/R**3 + 2*N*x*Leff/R**2
+   te_t(4,3,3) = -8*N*y**3*Leff/R**3 + 6*N*y*Leff/R**2
+
+   call tmcat(fsec,re_t,te_t,re,te,re,te) ! At the moment there is no second order
+
+   if(bborbit) then
+      orbit(2) = orbit(2)-(((CUR*NNORM)*x)*(sqrt((Lint+L)**2+four*R)-sqrt((Lint-L)**2+four*R)))/R
+      orbit(4) = orbit(4)-(((CUR*NNORM)*y)*(sqrt((Lint+L)**2+four*R)-sqrt((Lint-L)**2+four*R)))/R
+   else
+      closed_px  = closed_px -(((CUR*NNORM)*x)*(sqrt((Lint+L)**2+four*R)-sqrt((Lint-L)**2+four*R)))/R
+      closed_py  = closed_py -(((CUR*NNORM)*y)*(sqrt((Lint+L)**2+four*R)-sqrt((Lint-L)**2+four*R)))/R
+   endif
+
+enddo
+
+   call set_closed_orb_node(2, closed_px)
+   call set_closed_orb_node(4, closed_py)
+
+if(el .gt. 1e-6) then
+   re_t = EYE
+   te_t = zero
+   call tmdrf(fsec,ftrk,orbit,fmap,el/two,ek,re_t,te_t) ! Call drift for half of the lentgh
+   call tmcat(fsec,re_t,te_t,re,te,re,te)
+else
+   re = re_t
+   te = te_t
+endif
+end subroutine
 
 SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
