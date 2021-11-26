@@ -1525,8 +1525,8 @@ convert_madx_to_c6t(struct node* p, int ncombined)
       c6t_elem->value[2] = current[ncombined];
       c6t_elem->value[3] = l_int[ncombined];
       c6t_elem->value[4] = l_phy[ncombined];
-      c6t_elem->value[5] = xma[ncombined]*1000;
-      c6t_elem->value[6] = yma[ncombined]*1000;
+      c6t_elem->value[5] = -xma[ncombined]*1000; //add a minus to be consictent with SixTrack
+      c6t_elem->value[6] = -yma[ncombined]*1000; //add a minus to be consictent with SixTrack
       c6t_elem->value[7] = 0;
       c6t_elem->value[8] = 0;
     }
@@ -2637,7 +2637,6 @@ read_sequ(void)
       double inorm [20];
       ncombined = element_vector(cnode->p_elem, "current", inorm);
       for(int i=0; i<ncombined; i++){
-        printf("nnwires %d \n", i);
         pro_elem(cnode, i);
       }
       cnode = cnode->next;
