@@ -3,11 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-<<<<<<< HEAD
-  + Execution date: 2021.11.10 14:43:17      +
-=======
-  + Execution date: 2021.11.22 11:02:26      +
->>>>>>> 024d8cc50e1c3e0eb4ccc39c6d0430bae0081e8d
+  + Execution date: 2021.11.26 10:16:16      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Test/Demo file for TAPER command and TAPERING flag for TWISS
 
@@ -79,16 +75,16 @@ orbit:  -3.009189E-13  5.694534E-13  0.000000E+00  0.000000E+00 -4.455048E-10 -1
 ++++++ table: summ
 
                  length                  orbit5                    alfa                 gammatr 
-     97756.072627066169  4.4550481064053768e-10  6.7368976041691593e-06      385.27428822113944 
+     97756.072627066169  4.4550481064053763e-10  6.7368976041691635e-06      385.27428822113933 
 
                      q1                     dq1                 betxmax                   dxmax 
-     389.05942327459911     0.97242839370930223      1619.4277922428787     0.53578797772048581 
+     389.05942327459928     0.97242839370929324      1619.4277922428439     0.53578797772049092 
 
                   dxrms                  xcomax                  xcorms                      q2 
-    0.12379185857494912  6.6070669208248745e-11  1.8579076433169285e-11      389.17276467241521 
+    0.12379185857494898  6.6070669208248745e-11  1.8579076433169282e-11      389.17276467241578 
 
                     dq2                 betymax                   dymax                   dyrms 
-   -0.81165641418174317      7121.1444419790932                      -0                       0 
+   -0.81165641418165435      7121.1444419755389                      -0                       0 
 
                  ycomax                  ycorms                  deltap                 synch_1 
                       0                       0                       0                       0 
@@ -142,7 +138,7 @@ iteration:   1 error:   1.402770E-05 deltap:   0.000000E+00
 orbit:   1.033604E-10 -2.421153E-11  0.000000E+00  0.000000E+00  2.400125E-05  9.305407E-05
   
 iteration:   2 error:   6.823880E-07 deltap:   0.000000E+00
-orbit:   7.693533E-12  5.781801E-12  0.000000E+00  0.000000E+00  2.516936E-05  9.271617E-05
+orbit:   7.693533E-12  5.781802E-12  0.000000E+00  0.000000E+00  2.516936E-05  9.271617E-05
 ++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
 ++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
 ++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
@@ -174,16 +170,16 @@ orbit:  -1.224543E-07  4.132685E-07  0.000000E+00  0.000000E+00  1.823771E-04 -7
 ++++++ table: summ
 
                  length                  orbit5                    alfa                 gammatr 
-     97756.072627066169  -0.0001823771135840327  6.7518035614361008e-06      384.84876819764207 
+     97756.072627066169 -0.00018237711358403346  6.7518035614360974e-06      384.84876819764219 
 
                      q1                     dq1                 betxmax                   dxmax 
-     389.05994144350001      2.5267238136637333      1657.4217367204815      0.5445146982123148 
+     389.05994144349916      2.5267238136638315      1657.4217367205304     0.54451469821231724 
 
                   dxrms                  xcomax                  xcorms                      q2 
-    0.12402080397082783  0.00049831653645338926  0.00011501432351449565      389.17726275310332 
+    0.12402080397082789  0.00049831653645338936   0.0001150143235144958       389.1772627531023 
 
                     dq2                 betymax                   dymax                   dyrms 
-     7.3076027158167918      6848.9451700797408                      -0                       0 
+     7.3076027158151158      6848.9451700788995                      -0                       0 
 
                  ycomax                  ycorms                  deltap                 synch_1 
                       0                       0                   0.001                       0 
@@ -283,16 +279,16 @@ orbit:  -3.009189E-13  5.694534E-13  0.000000E+00  0.000000E+00 -4.455048E-10 -1
 ++++++ table: summ
 
                  length                  orbit5                    alfa                 gammatr 
-     97756.072627066169  4.4550481064053768e-10  6.7368976041691593e-06      385.27428822113944 
+     97756.072627066169  4.4550481064053763e-10  6.7368976041691635e-06      385.27428822113933 
 
                      q1                     dq1                 betxmax                   dxmax 
-     389.05942327459911     0.97242839370930223      1619.4277922428787     0.53578797772048581 
+     389.05942327459928     0.97242839370929324      1619.4277922428439     0.53578797772049092 
 
                   dxrms                  xcomax                  xcorms                      q2 
-    0.12379185857494912  6.6070669208248745e-11  1.8579076433169285e-11      389.17276467241521 
+    0.12379185857494898  6.6070669208248745e-11  1.8579076433169282e-11      389.17276467241578 
 
                     dq2                 betymax                   dymax                   dyrms 
-   -0.81165641418174317      7121.1444419790932                      -0                       0 
+   -0.81165641418165435      7121.1444419755389                      -0                       0 
 
                  ycomax                  ycorms                  deltap                 synch_1 
                       0                       0                       0                       0 
@@ -326,16 +322,16 @@ orbit:  -3.009189E-13  5.694534E-13  0.000000E+00  0.000000E+00 -4.455048E-10 -1
 ++++++ table: summ
 
                  length                  orbit5                    alfa                 gammatr 
-     97756.072627066169  4.4550481064053768e-10  6.7368976041691593e-06      385.27428822113944 
+     97756.072627066169  4.4550481064053763e-10  6.7368976041691635e-06      385.27428822113933 
 
                      q1                     dq1                 betxmax                   dxmax 
-     389.05942327459911     0.97242839370930223      1619.4277922428787     0.53578797772048581 
+     389.05942327459928     0.97242839370929324      1619.4277922428439     0.53578797772049092 
 
                   dxrms                  xcomax                  xcorms                      q2 
-    0.12379185857494912  6.6070669208248745e-11  1.8579076433169285e-11      389.17276467241521 
+    0.12379185857494898  6.6070669208248745e-11  1.8579076433169282e-11      389.17276467241578 
 
                     dq2                 betymax                   dymax                   dyrms 
-   -0.81165641418174317      7121.1444419790932                      -0                       0 
+   -0.81165641418165435      7121.1444419755389                      -0                       0 
 
                  ycomax                  ycorms                  deltap                 synch_1 
                       0                       0                       0                       0 
@@ -372,16 +368,16 @@ orbit:  -1.224543E-07  4.132685E-07  0.000000E+00  0.000000E+00  1.823771E-04 -7
 ++++++ table: summ
 
                  length                  orbit5                    alfa                 gammatr 
-     97756.072627066169  -0.0001823771135840327  6.7518035614361008e-06      384.84876819764207 
+     97756.072627066169 -0.00018237711358403346  6.7518035614360974e-06      384.84876819764219 
 
                      q1                     dq1                 betxmax                   dxmax 
-     389.05994144350001      2.5267238136637333      1657.4217367204815      0.5445146982123148 
+     389.05994144349916      2.5267238136638315      1657.4217367205304     0.54451469821231724 
 
                   dxrms                  xcomax                  xcorms                      q2 
-    0.12402080397082783  0.00049831653645338926  0.00011501432351449565      389.17726275310332 
+    0.12402080397082789  0.00049831653645338936   0.0001150143235144958       389.1772627531023 
 
                     dq2                 betymax                   dymax                   dyrms 
-     7.3076027158167918      6848.9451700797408                      -0                       0 
+     7.3076027158151158      6848.9451700788995                      -0                       0 
 
                  ycomax                  ycorms                  deltap                 synch_1 
                       0                       0                   0.001                       0 
@@ -481,7 +477,7 @@ START JACOBIAN:
 ++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
 ++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
-Initial Penalty Function =   0.2218013001060190E+01
+Initial Penalty Function =   0.2218013001060188E+01
 
 
 ++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
@@ -492,10 +488,12 @@ Initial Penalty Function =   0.2218013001060190E+01
  Rank             1   Condition number    1.0000000000000000     
 ++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
 ++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
- Step length   0.11775834606836000     
+ Step length   0.11775834606835994     
 ++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
 ++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 call:     2 Dx =   0.11775835E+00  Penalty function =  0.3261253406528580E-01
 ++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
@@ -620,16 +618,16 @@ orbit:  -3.002920E-13  5.690394E-13  0.000000E+00  0.000000E+00 -8.084385E-11 -2
 ++++++ table: summ
 
                  length                  orbit5                    alfa                 gammatr 
-     97756.072627066169  8.0843846405569781e-11  6.7368976048368745e-06      385.27428820204659 
+     97756.072627066169  8.0843846405569781e-11  6.7368976048368754e-06      385.27428820204653 
 
                      q1                     dq1                 betxmax                   dxmax 
-     389.05942327458087     0.97242849740412107      1619.4277927354676     0.53578797743860773 
+     389.05942327458087     0.97242849740393589      1619.4277927354676     0.53578797743860895 
 
                   dxrms                  xcomax                  xcorms                      q2 
-      0.123791858587985  6.7989248092383364e-11  1.8483993951337972e-11      389.17276467247484 
+     0.1237918585879851  6.7989248092383364e-11  1.8483993951337968e-11      389.17276467247535 
 
                     dq2                 betymax                   dymax                   dyrms 
-   -0.81165615980673667      7121.1444417555012                      -0                       0 
+   -0.81165615980585393      7121.1444417492976                      -0                       0 
 
                  ycomax                  ycorms                  deltap                 synch_1 
                       0                       0                       0                       0 
@@ -650,8 +648,8 @@ Save, sequence=FCC_E_RING, file="tapered.seq";
 Stop;
 
 
-  Number of warnings: 115
-7 in C and 108 in Fortran
+  Number of warnings: 117
+7 in C and 110 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
