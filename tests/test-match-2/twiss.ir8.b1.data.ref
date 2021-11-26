@@ -46,8 +46,8 @@
 @ DQMIN_PHASE      %le         1.253561932
 @ TITLE            %54s "Matching an insertion of the LHC 6.5 lattice with MADX"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "10/11/21"
-@ TIME             %08s "14.30.35"
+@ DATE             %08s "26/11/21"
+@ TIME             %08s "10.57.08"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                  X                 PX                  Y                 PY                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "S.DS.L8.B1"                         0        168.7188694        35.09214899       -2.407088013        0.571406758        1.960763171      0.02818763508                  0                  0                  0                  0                  0                  0
