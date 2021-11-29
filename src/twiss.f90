@@ -5,6 +5,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   use twisscfi
   use twissotmfi
   use twissbeamfi
+  use twissdqmin
   use trackfi, only : fsecarb
   use fasterror
   use matrices, only : EYE
@@ -2526,7 +2527,7 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error, currpos)
            tot_int_length = tot_int_length + deltas
          endif
          if(abs(f1010) > abs(f1001) .and. abs(f1001) .gt. 1e-5) then
-            diff_bigger_sum = diff_bigger_sum+1
+               diff_bigger_sum = diff_bigger_sum+1
          endif
      
 
@@ -3590,9 +3591,9 @@ SUBROUTINE tw_summ(rt,tt)
   
   dqmin2 = 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(abs(dqmin_rdt)/tot_int_length)
   dqmin_ph = atan2(aimag(dqmin_rdt), real(dqmin_rdt))
-  if(diff_bigger_sum .gt. 0) then
-         write (warnstr, '(a, I0, a, I0, a)') "The f1010 is bigger than the f1001 in: ", diff_bigger_sum, &
-        " location, out of ", dqmin_rdt_c,  " in total. The Dqmin estimate might be inaccurate."
+  if(diff_bigger_sum/dqmin_rdt_c .gt. 0.1 .and. dqmin2 .ge. 1e-8) then
+         write (warnstr, '(a, I0, a, I0, a)') "The f1010 is bigger than the f1001 in: ", int(diff_bigger_sum), &
+        " location, out of ", int(dqmin_rdt_c),  " in total. The Dqmin estimate might be inaccurate."
         call fort_warn('TWCPTK: ', warnstr)
   endif
   !---- Fill summary table

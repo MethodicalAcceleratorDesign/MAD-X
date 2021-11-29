@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.11.26 10:57:07      +
+  + Execution date: 2021.11.26 15:44:27      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 
@@ -540,410 +540,94 @@ call:     2 Dx =   0.23534069E+03  Penalty function =  0.3549501076747043E+02
  Rank            14   Condition number    1766.6935246595579     
 reset parameter: kqt13.l8b1              from  0.64035039E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57471124E-02  to -0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4 location, out of 13056 in total. The Dqmin estimate might be inaccurate.                                     
  Step length   0.13349473660960748     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 33 location, out of 13328 in total. The Dqmin estimate might be inaccurate.                                    
  Bisec iteration            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 62 location, out of 13600 in total. The Dqmin estimate might be inaccurate.                                    
 call:     3 Dx =   0.13339436E+00  Penalty function =  0.2919691314038932E+03
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 91 location, out of 13872 in total. The Dqmin estimate might be inaccurate.                                    
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 14144 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 149 location, out of 14416 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 178 location, out of 14688 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 207 location, out of 14960 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 236 location, out of 15232 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 265 location, out of 15504 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 294 location, out of 15776 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 323 location, out of 16048 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 352 location, out of 16320 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381 location, out of 16592 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 410 location, out of 16864 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 439 location, out of 17136 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 468 location, out of 17408 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 497 location, out of 17680 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 526 location, out of 17952 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 555 location, out of 18224 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 584 location, out of 18496 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 613 location, out of 18768 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 642 location, out of 19040 in total. The Dqmin estimate might be inaccurate.                                   
  Solve system with           14 con,          20 var
  Rank            14   Condition number    2768.1845294478467     
 reset parameter: kqt13.l8b1              from  0.73272329E-02  to  0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 697 location, out of 19312 in total. The Dqmin estimate might be inaccurate.                                   
  Step length   0.11811180984153352     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 752 location, out of 19584 in total. The Dqmin estimate might be inaccurate.                                   
  Bisec iteration            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 807 location, out of 19856 in total. The Dqmin estimate might be inaccurate.                                   
 call:     4 Dx =   0.11820782E+00  Penalty function =  0.3056254622568692E+02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 862 location, out of 20128 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 917 location, out of 20400 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 972 location, out of 20672 in total. The Dqmin estimate might be inaccurate.                                   
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1027 location, out of 20944 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1082 location, out of 21216 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1137 location, out of 21488 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1192 location, out of 21760 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1247 location, out of 22032 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1302 location, out of 22304 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1357 location, out of 22576 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1412 location, out of 22848 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1467 location, out of 23120 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1522 location, out of 23392 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1577 location, out of 23664 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1632 location, out of 23936 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1687 location, out of 24208 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1742 location, out of 24480 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1797 location, out of 24752 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1852 location, out of 25024 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1907 location, out of 25296 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    2738.2242325869829     
 reset parameter: kqt13.l8b1              from  0.74001107E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.56322140E-02  to -0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1936 location, out of 25568 in total. The Dqmin estimate might be inaccurate.                                  
  Step length   0.10026117106367628     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1961 location, out of 25840 in total. The Dqmin estimate might be inaccurate.                                  
  Bisec iteration            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1986 location, out of 26112 in total. The Dqmin estimate might be inaccurate.                                  
 call:     5 Dx =   0.10034019E+00  Penalty function =  0.2329886659438288E+02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2011 location, out of 26384 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2036 location, out of 26656 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2061 location, out of 26928 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2086 location, out of 27200 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2111 location, out of 27472 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2136 location, out of 27744 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2161 location, out of 28016 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2186 location, out of 28288 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2211 location, out of 28560 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2236 location, out of 28832 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2261 location, out of 29104 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2286 location, out of 29376 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2311 location, out of 29648 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2336 location, out of 29920 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2361 location, out of 30192 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2386 location, out of 30464 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2411 location, out of 30736 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2436 location, out of 31008 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2461 location, out of 31280 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2486 location, out of 31552 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    2909.6234770704086     
 reset parameter: kqt13.l8b1              from  0.73724319E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57058754E-02  to -0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2490 location, out of 31824 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    8.9173245776694762E-002
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2494 location, out of 32096 in total. The Dqmin estimate might be inaccurate.                                  
 call:     6 Dx =   0.89173246E-01  Penalty function =  0.7119378764523223E+01
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2498 location, out of 32368 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2502 location, out of 32640 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2506 location, out of 32912 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2510 location, out of 33184 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2514 location, out of 33456 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2518 location, out of 33728 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2522 location, out of 34000 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2526 location, out of 34272 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2530 location, out of 34544 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2534 location, out of 34816 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2538 location, out of 35088 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2542 location, out of 35360 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2546 location, out of 35632 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2550 location, out of 35904 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2554 location, out of 36176 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2558 location, out of 36448 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2562 location, out of 36720 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2566 location, out of 36992 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2570 location, out of 37264 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2574 location, out of 37536 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    3132.4349449775395     
 reset parameter: kqt13.l8b1              from  0.71625835E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57706210E-02  to -0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2578 location, out of 37808 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    7.1711432337456263E-002
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2582 location, out of 38080 in total. The Dqmin estimate might be inaccurate.                                  
 call:     7 Dx =   0.71711432E-01  Penalty function =  0.6767018458361322E+01
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2586 location, out of 38352 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2590 location, out of 38624 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2594 location, out of 38896 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2598 location, out of 39168 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2602 location, out of 39440 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2606 location, out of 39712 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2610 location, out of 39984 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2614 location, out of 40256 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2618 location, out of 40528 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2622 location, out of 40800 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2626 location, out of 41072 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2630 location, out of 41344 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2634 location, out of 41616 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2638 location, out of 41888 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2642 location, out of 42160 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2646 location, out of 42432 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2650 location, out of 42704 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2654 location, out of 42976 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2658 location, out of 43248 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2662 location, out of 43520 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    3074.2084457287351     
 reset parameter: kqt13.l8b1              from  0.68666640E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57705176E-02  to -0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2666 location, out of 43792 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    5.9932297723976416E-002
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2670 location, out of 44064 in total. The Dqmin estimate might be inaccurate.                                  
 call:     8 Dx =   0.59932298E-01  Penalty function =  0.3701954762255145E+01
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2674 location, out of 44336 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2678 location, out of 44608 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2682 location, out of 44880 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2686 location, out of 45152 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2690 location, out of 45424 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2694 location, out of 45696 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2698 location, out of 45968 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2702 location, out of 46240 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2706 location, out of 46512 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2710 location, out of 46784 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2714 location, out of 47056 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2718 location, out of 47328 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2722 location, out of 47600 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2726 location, out of 47872 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2730 location, out of 48144 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2734 location, out of 48416 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2738 location, out of 48688 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2742 location, out of 48960 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2746 location, out of 49232 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2750 location, out of 49504 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    2957.0541493966407     
 reset parameter: kqt13.l8b1              from  0.65623959E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57508001E-02  to -0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2754 location, out of 49776 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    4.7383605290435504E-002
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2758 location, out of 50048 in total. The Dqmin estimate might be inaccurate.                                  
 call:     9 Dx =   0.47383605E-01  Penalty function =  0.1829020823020315E+01
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2762 location, out of 50320 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2766 location, out of 50592 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2770 location, out of 50864 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2774 location, out of 51136 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2778 location, out of 51408 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2782 location, out of 51680 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2786 location, out of 51952 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2790 location, out of 52224 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2794 location, out of 52496 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2798 location, out of 52768 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2802 location, out of 53040 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2806 location, out of 53312 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2810 location, out of 53584 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2814 location, out of 53856 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2818 location, out of 54128 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2822 location, out of 54400 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2826 location, out of 54672 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2830 location, out of 54944 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2834 location, out of 55216 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2838 location, out of 55488 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    2751.4513389381927     
 reset parameter: kqt13.l8b1              from  0.62373769E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.57068541E-02  to -0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2842 location, out of 55760 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    3.3859834944970420E-002
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2846 location, out of 56032 in total. The Dqmin estimate might be inaccurate.                                  
 call:    10 Dx =   0.33859835E-01  Penalty function =  0.6404905727523187E+00
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2850 location, out of 56304 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2854 location, out of 56576 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2858 location, out of 56848 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2862 location, out of 57120 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2866 location, out of 57392 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2870 location, out of 57664 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2874 location, out of 57936 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2878 location, out of 58208 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2882 location, out of 58480 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2886 location, out of 58752 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2890 location, out of 59024 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2894 location, out of 59296 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2898 location, out of 59568 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2902 location, out of 59840 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2906 location, out of 60112 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2910 location, out of 60384 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2914 location, out of 60656 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2918 location, out of 60928 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2922 location, out of 61200 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2926 location, out of 61472 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    2411.4522605683474     
 reset parameter: kqt13.l8b1              from  0.59063176E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.56393947E-02  to -0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2930 location, out of 61744 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    1.9334937131218734E-002
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2934 location, out of 62016 in total. The Dqmin estimate might be inaccurate.                                  
 call:    11 Dx =   0.19334937E-01  Penalty function =  0.1063480773099900E+00
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2938 location, out of 62288 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2942 location, out of 62560 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2946 location, out of 62832 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2950 location, out of 63104 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2954 location, out of 63376 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2958 location, out of 63648 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2962 location, out of 63920 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2966 location, out of 64192 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2970 location, out of 64464 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2974 location, out of 64736 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2978 location, out of 65008 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2982 location, out of 65280 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2986 location, out of 65552 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2990 location, out of 65824 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2994 location, out of 66096 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2998 location, out of 66368 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3002 location, out of 66640 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3006 location, out of 66912 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3010 location, out of 67184 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3014 location, out of 67456 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1992.0519028618007     
 reset parameter: kqt13.l8b1              from  0.56708381E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.55842926E-02  to -0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3018 location, out of 67728 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    7.2122034644787033E-003
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3022 location, out of 68000 in total. The Dqmin estimate might be inaccurate.                                  
 call:    12 Dx =   0.72122035E-02  Penalty function =  0.1067128337426401E-01
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3026 location, out of 68272 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3030 location, out of 68544 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3034 location, out of 68816 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3038 location, out of 69088 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3042 location, out of 69360 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3046 location, out of 69632 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3050 location, out of 69904 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3054 location, out of 70176 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3058 location, out of 70448 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3062 location, out of 70720 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3066 location, out of 70992 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3070 location, out of 71264 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3074 location, out of 71536 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3078 location, out of 71808 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3082 location, out of 72080 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3086 location, out of 72352 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3090 location, out of 72624 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3094 location, out of 72896 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3098 location, out of 73168 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3102 location, out of 73440 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1755.2773458987751     
 reset parameter: kqt13.l8b1              from  0.55890470E-02  to  0.55657143E-02
 reset parameter: kqtl11.r8b1             from -0.55678101E-02  to -0.55676184E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3106 location, out of 73712 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    1.8374717080833862E-003
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3110 location, out of 73984 in total. The Dqmin estimate might be inaccurate.                                  
 call:    13 Dx =   0.18374717E-02  Penalty function =  0.1345079913072709E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3114 location, out of 74256 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3118 location, out of 74528 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3122 location, out of 74800 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3126 location, out of 75072 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3130 location, out of 75344 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3134 location, out of 75616 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3138 location, out of 75888 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3142 location, out of 76160 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3146 location, out of 76432 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3150 location, out of 76704 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3154 location, out of 76976 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3158 location, out of 77248 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3162 location, out of 77520 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3166 location, out of 77792 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3170 location, out of 78064 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3174 location, out of 78336 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3178 location, out of 78608 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3182 location, out of 78880 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3186 location, out of 79152 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3190 location, out of 79424 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1704.6394921670137     
 reset parameter: kqt13.l8b1              from  0.55712916E-02  to  0.55657143E-02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3194 location, out of 79696 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    4.5013446209699775E-004
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3198 location, out of 79968 in total. The Dqmin estimate might be inaccurate.                                  
 call:    14 Dx =   0.45013446E-03  Penalty function =  0.8233993689587227E-04
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3202 location, out of 80240 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3206 location, out of 80512 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3210 location, out of 80784 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3214 location, out of 81056 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3218 location, out of 81328 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3222 location, out of 81600 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3226 location, out of 81872 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3230 location, out of 82144 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3234 location, out of 82416 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3238 location, out of 82688 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3242 location, out of 82960 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3246 location, out of 83232 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3250 location, out of 83504 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3254 location, out of 83776 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3258 location, out of 84048 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3262 location, out of 84320 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3266 location, out of 84592 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3270 location, out of 84864 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3274 location, out of 85136 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3278 location, out of 85408 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1697.0453048728609     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3282 location, out of 85680 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    1.1404097508769422E-004
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3286 location, out of 85952 in total. The Dqmin estimate might be inaccurate.                                  
 call:    15 Dx =   0.11404098E-03  Penalty function =  0.1170711055024843E-08
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3290 location, out of 86224 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3294 location, out of 86496 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3298 location, out of 86768 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3302 location, out of 87040 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3306 location, out of 87312 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3310 location, out of 87584 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3314 location, out of 87856 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3318 location, out of 88128 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3322 location, out of 88400 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3326 location, out of 88672 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3330 location, out of 88944 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3334 location, out of 89216 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3338 location, out of 89488 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3342 location, out of 89760 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3346 location, out of 90032 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3350 location, out of 90304 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3354 location, out of 90576 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3358 location, out of 90848 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3362 location, out of 91120 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3366 location, out of 91392 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1695.3825039364790     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3370 location, out of 91664 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    1.5199315730627840E-007
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3374 location, out of 91936 in total. The Dqmin estimate might be inaccurate.                                  
 call:    16 Dx =   0.15199316E-06  Penalty function =  0.1665202619835535E-16
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3378 location, out of 92208 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3382 location, out of 92480 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3386 location, out of 92752 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3390 location, out of 93024 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3394 location, out of 93296 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3398 location, out of 93568 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3402 location, out of 93840 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3406 location, out of 94112 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3410 location, out of 94384 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3414 location, out of 94656 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3418 location, out of 94928 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3422 location, out of 95200 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3426 location, out of 95472 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3430 location, out of 95744 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3434 location, out of 96016 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3438 location, out of 96288 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3442 location, out of 96560 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3446 location, out of 96832 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3450 location, out of 97104 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3454 location, out of 97376 in total. The Dqmin estimate might be inaccurate.                                  
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1695.3813756941954     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3458 location, out of 97648 in total. The Dqmin estimate might be inaccurate.                                  
  Step length    5.5475420297766029E-012
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3462 location, out of 97920 in total. The Dqmin estimate might be inaccurate.                                  
 call:    17 Dx =   0.55475420E-11  Penalty function =  0.6893447719485298E-24
  ++++++++++ JACOBIAN ended: converged successfully
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3466 location, out of 98192 in total. The Dqmin estimate might be inaccurate.                                  
  Final difference norm:   6.5423096847693707E-002
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3470 location, out of 98464 in total. The Dqmin estimate might be inaccurate.                                  
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3474 location, out of 98736 in total. The Dqmin estimate might be inaccurate.                                  
 ip8:1                      betx         4     6.00000000E+00     6.00000000E+00     5.97088819E-27
 ip8:1                      bety         4     6.00000000E+00     6.00000000E+00     1.45860381E-27
 ip8:1                      alfx         4     0.00000000E+00    -1.16773008E-14     1.36359353E-26
@@ -1000,7 +684,6 @@ number of sequences: 1
 sequence name: lhcb1
 number of beta0s: 1
 BETA0 name: bir8b1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3478 location, out of 99008 in total. The Dqmin estimate might be inaccurate.                                  
 number of variables:    20
 user given constraints: 2
 total constraints:      14
@@ -1008,238 +691,57 @@ total constraints:      14
 START JACOBIAN:
 
  JACOBIAN Strategy =           3
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3482 location, out of 99280 in total. The Dqmin estimate might be inaccurate.                                  
 Initial Penalty Function =   0.1152000000000019E+02
 
 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3486 location, out of 99552 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3490 location, out of 99824 in total. The Dqmin estimate might be inaccurate.                                  
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3494 location, out of 100096 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3498 location, out of 100368 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3502 location, out of 100640 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3506 location, out of 100912 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3510 location, out of 101184 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3514 location, out of 101456 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3518 location, out of 101728 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3522 location, out of 102000 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3526 location, out of 102272 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3530 location, out of 102544 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3534 location, out of 102816 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3538 location, out of 103088 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3542 location, out of 103360 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3546 location, out of 103632 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3550 location, out of 103904 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3554 location, out of 104176 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3558 location, out of 104448 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3562 location, out of 104720 in total. The Dqmin estimate might be inaccurate.                                 
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1695.3813737304170     
  exclude parameter:kqtl11.r8b1                                     hit minimum
  Reset system to           14 con,          19 var
  Solve system with           14 con,          19 var
  Rank            14   Condition number    1725.9839003372313     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3566 location, out of 104992 in total. The Dqmin estimate might be inaccurate.                                 
  Step length    4.9044925830611069E-002
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3570 location, out of 105264 in total. The Dqmin estimate might be inaccurate.                                 
  Bisec iteration            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3574 location, out of 105536 in total. The Dqmin estimate might be inaccurate.                                 
 call:     2 Dx =   0.48940749E-01  Penalty function =  0.1206672099658748E+02
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3578 location, out of 105808 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3582 location, out of 106080 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3586 location, out of 106352 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3590 location, out of 106624 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3594 location, out of 106896 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3598 location, out of 107168 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3602 location, out of 107440 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3606 location, out of 107712 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3610 location, out of 107984 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3614 location, out of 108256 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3618 location, out of 108528 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3622 location, out of 108800 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3626 location, out of 109072 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3630 location, out of 109344 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3634 location, out of 109616 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3638 location, out of 109888 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3642 location, out of 110160 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3646 location, out of 110432 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3650 location, out of 110704 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3654 location, out of 110976 in total. The Dqmin estimate might be inaccurate.                                 
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1721.1997870149780     
  exclude parameter:kqt13.l8b1                                      hit maximum
  Reset system to           14 con,          19 var
  Solve system with           14 con,          19 var
  Rank            14   Condition number    1800.7685697707882     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3658 location, out of 111248 in total. The Dqmin estimate might be inaccurate.                                 
  Step length    2.4058748152846771E-002
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3662 location, out of 111520 in total. The Dqmin estimate might be inaccurate.                                 
 call:     3 Dx =   0.24058748E-01  Penalty function =  0.6766371159229297E+01
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3666 location, out of 111792 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3670 location, out of 112064 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3674 location, out of 112336 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3678 location, out of 112608 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3682 location, out of 112880 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3686 location, out of 113152 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3690 location, out of 113424 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3694 location, out of 113696 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3698 location, out of 113968 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3702 location, out of 114240 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3706 location, out of 114512 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3710 location, out of 114784 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3714 location, out of 115056 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3718 location, out of 115328 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3722 location, out of 115600 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3726 location, out of 115872 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3730 location, out of 116144 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3734 location, out of 116416 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3738 location, out of 116688 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3742 location, out of 116960 in total. The Dqmin estimate might be inaccurate.                                 
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1763.7510726106123     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3746 location, out of 117232 in total. The Dqmin estimate might be inaccurate.                                 
  Step length    4.8573675064045819E-003
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3750 location, out of 117504 in total. The Dqmin estimate might be inaccurate.                                 
 call:     4 Dx =   0.48573675E-02  Penalty function =  0.5391162133393520E-01
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3754 location, out of 117776 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3758 location, out of 118048 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3762 location, out of 118320 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3766 location, out of 118592 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3770 location, out of 118864 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3774 location, out of 119136 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3778 location, out of 119408 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3782 location, out of 119680 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3786 location, out of 119952 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3790 location, out of 120224 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3794 location, out of 120496 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3798 location, out of 120768 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3802 location, out of 121040 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3806 location, out of 121312 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3810 location, out of 121584 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3814 location, out of 121856 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3818 location, out of 122128 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3822 location, out of 122400 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3826 location, out of 122672 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3830 location, out of 122944 in total. The Dqmin estimate might be inaccurate.                                 
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1791.6651321322749     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3834 location, out of 123216 in total. The Dqmin estimate might be inaccurate.                                 
  Step length    4.3744353582580558E-004
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3838 location, out of 123488 in total. The Dqmin estimate might be inaccurate.                                 
 call:     5 Dx =   0.43744354E-03  Penalty function =  0.1154656220946098E-05
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3842 location, out of 123760 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3846 location, out of 124032 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3850 location, out of 124304 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3854 location, out of 124576 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3858 location, out of 124848 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3862 location, out of 125120 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3866 location, out of 125392 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3870 location, out of 125664 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3874 location, out of 125936 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3878 location, out of 126208 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3882 location, out of 126480 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3886 location, out of 126752 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3890 location, out of 127024 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3894 location, out of 127296 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3898 location, out of 127568 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3902 location, out of 127840 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3906 location, out of 128112 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3910 location, out of 128384 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3914 location, out of 128656 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3918 location, out of 128928 in total. The Dqmin estimate might be inaccurate.                                 
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1789.1150732856136     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3922 location, out of 129200 in total. The Dqmin estimate might be inaccurate.                                 
  Step length    2.1160489871673564E-006
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3926 location, out of 129472 in total. The Dqmin estimate might be inaccurate.                                 
 call:     6 Dx =   0.21160490E-05  Penalty function =  0.1541454896161814E-13
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3930 location, out of 129744 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3934 location, out of 130016 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3938 location, out of 130288 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3942 location, out of 130560 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3946 location, out of 130832 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3950 location, out of 131104 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3954 location, out of 131376 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3958 location, out of 131648 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3962 location, out of 131920 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3966 location, out of 132192 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3970 location, out of 132464 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3974 location, out of 132736 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3978 location, out of 133008 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3982 location, out of 133280 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3986 location, out of 133552 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3990 location, out of 133824 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3994 location, out of 134096 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 3998 location, out of 134368 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4002 location, out of 134640 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4006 location, out of 134912 in total. The Dqmin estimate might be inaccurate.                                 
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1789.1216677562484     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4010 location, out of 135184 in total. The Dqmin estimate might be inaccurate.                                 
  Step length    4.6058414629163114E-010
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4014 location, out of 135456 in total. The Dqmin estimate might be inaccurate.                                 
 call:     7 Dx =   0.46058415E-09  Penalty function =  0.7935097791377104E-20
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4018 location, out of 135728 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4022 location, out of 136000 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4026 location, out of 136272 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4030 location, out of 136544 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4034 location, out of 136816 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4038 location, out of 137088 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4042 location, out of 137360 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4046 location, out of 137632 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4050 location, out of 137904 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4054 location, out of 138176 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4058 location, out of 138448 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4062 location, out of 138720 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4066 location, out of 138992 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4070 location, out of 139264 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4074 location, out of 139536 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4078 location, out of 139808 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4082 location, out of 140080 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4086 location, out of 140352 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4090 location, out of 140624 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4094 location, out of 140896 in total. The Dqmin estimate might be inaccurate.                                 
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1789.1216676229394     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4098 location, out of 141168 in total. The Dqmin estimate might be inaccurate.                                 
  Step length    3.8595805758901690E-014
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4102 location, out of 141440 in total. The Dqmin estimate might be inaccurate.                                 
 call:     8 Dx =   0.38595806E-13  Penalty function =  0.2025809944106458E-23
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4106 location, out of 141712 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4110 location, out of 141984 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4114 location, out of 142256 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4118 location, out of 142528 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4122 location, out of 142800 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4126 location, out of 143072 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4130 location, out of 143344 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4134 location, out of 143616 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4138 location, out of 143888 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4142 location, out of 144160 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4146 location, out of 144432 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4150 location, out of 144704 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4154 location, out of 144976 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4158 location, out of 145248 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4162 location, out of 145520 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4166 location, out of 145792 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4170 location, out of 146064 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4174 location, out of 146336 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4178 location, out of 146608 in total. The Dqmin estimate might be inaccurate.                                 
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4182 location, out of 146880 in total. The Dqmin estimate might be inaccurate.                                 
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1789.1216678314247     
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4186 location, out of 147152 in total. The Dqmin estimate might be inaccurate.                                 
  Step length    1.7553217866448854E-015
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4190 location, out of 147424 in total. The Dqmin estimate might be inaccurate.                                 
 call:     9 Dx =   0.17553218E-14  Penalty function =  0.1169619551421741E-24
  ++++++++++ JACOBIAN ended: converged successfully
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4194 location, out of 147696 in total. The Dqmin estimate might be inaccurate.                                 
  Final difference norm:   3.1841196207884996E-002
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4198 location, out of 147968 in total. The Dqmin estimate might be inaccurate.                                 
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4202 location, out of 148240 in total. The Dqmin estimate might be inaccurate.                                 
 ip8:1                      betx         4     3.60000000E+00     3.60000000E+00     2.27980802E-28
 ip8:1                      bety         4     3.60000000E+00     3.60000000E+00     3.15544362E-30
 ip8:1                      alfx         4     0.00000000E+00    -3.94012451E-15     1.55245812E-27
@@ -1293,8 +795,7 @@ write,table=str.ip8.b1,file="str.ip8.b1.dat";
 stop;
 
 
-  Number of warnings: 498
-0 in C and 498 in Fortran
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

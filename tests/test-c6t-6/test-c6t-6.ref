@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.10.18 17:55:07      +
+  + Execution date: 2021.11.26 15:44:24      +
   ++++++++++++++++++++++++++++++++++++++++++++
 SET, FORMAT="12d", "-18.5e", "25s";
 
@@ -49,7 +49,6 @@ enter Twiss module
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   5.000000E-03  0.000000E+00  7.000000E-03  0.000000E+00  0.000000E+00  0.000000E+00
 final orbit vector:     9.577790E-02  1.506568E-01  7.000000E-03  1.054758E-03 -4.810263E-02  0.000000E+00
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1 location, out of 1 in total. The Dqmin estimate might be inaccurate.                                         
 
 ++++++ table: summ
 
@@ -102,7 +101,6 @@ enter Twiss module
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   5.000000E-03  0.000000E+00  7.000000E-03  0.000000E+00  0.000000E+00  0.000000E+00
 final orbit vector:     1.995000E-01  3.890000E-01  1.050000E-02  7.000000E-03 -4.284251E-02  0.000000E+00
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1 location, out of 1 in total. The Dqmin estimate might be inaccurate.                                         
 
 ++++++ table: summ
 
@@ -153,8 +151,8 @@ save, sequence=bend_seq, file="thin.seq";
 
 
 
-  Number of warnings: 3
-1 in C and 2 in Fortran
+  Number of warnings: 1
+1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
