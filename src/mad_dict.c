@@ -1320,6 +1320,7 @@ const char *const_command_def =
 "ddq1     = [c, 0],   ddq2      = [c, 0], "
 "dq1de1   = [c, 0],   dq1de2    = [c, 0], "
 "dq2de2   = [c, 0],   gammatr   = [c, 0], "
+"dqmin   = [c, 0],    dqmin_phase   = [c, 0], "
 "alfa     = [c, 0],"
 "sequence = [s, none]; "
 " "
@@ -1329,6 +1330,8 @@ const char *const_command_def =
 "ddq1     = [r, 0.1], ddq2      = [r, 0.1], "
 "dq1de1   = [r, 0.1], dq1de2    = [r, 0.1], "
 "dq2de2   = [r, 1],   alfa      = [r, 1.0],"
+"dqmin   = [r, 10],   dqmin_phase   = [r, 10], "
+
 "gammatr   = [r, 1]; "
 " "
 "sequence: sequence none 0 0 "
