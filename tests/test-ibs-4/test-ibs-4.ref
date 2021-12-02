@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.02 17:01:04      +
+  + Execution date: 2021.12.02 17:19:11      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-warn,-info;
 
@@ -25,3 +25,141 @@ enter Twiss module
   
 iteration:   1 error:   4.820013E-09 deltap:   0.000000E+00
 orbit:  -2.314121E-09 -7.003851E-10  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003216341688        55.75950505 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000068        2.000000105         595.119401        2.859817201 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.396821986     3.33542306e-08    8.590562235e-09        59.31000011 
+
+               dq2            betymax              dymax              dyrms 
+       2.000000037        609.5259631                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
+Use, period=lhcb1;
+
+twiss;
+
+enter Twiss module
+  
+iteration:   1 error:   4.820013E-09 deltap:   0.000000E+00
+orbit:  -2.314121E-09 -7.003851E-10  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003216341688        55.75950505 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000068        2.000000105         595.119401        2.859817201 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.396821986     3.33542306e-08    8.590562235e-09        59.31000011 
+
+               dq2            betymax              dymax              dyrms 
+       2.000000037        609.5259631                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
+ibs,file="ibs-table.tfs";
+
+ sige    4.6800203460593836E-004
+ Twiss was calculated at the exit of the elements.
+ Twiss functions at the center of the elements are calculated through linear interpolation
+
+ Global parameters for the machine: 
+
+radiate = F:
+
+     C           26658.883200 m              f0              0.011245 MHz            T0             88.924656 microseconds
+     alfa            0.321634E-03            eta             0.317287E-03            gamma(tr)      55.759505
+     Bcurrent        0.000198 A/bunch        Kbunch         1                        Npart           0.110000E+12 per bunch
+     E             450.000000 GeV            gamma         479.605016                beta            0.999998
+
+ Emittances:
+
+     Ex            0.782000E-02 pi*mm*mrad     sigx            0.876942 mm
+     Ey            0.782000E-02 pi*mm*mrad     sigy            0.895105 mm
+     Et            0.100000E+04 pi*mm*mrad     sigt          115.000000 mm             sigE          0.468002 1/1000
+
+sequence name: lhcb1
+
+acnca.d5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
+acnca.c5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
+acnca.b5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
+acnca.a5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
+acsca.d5l4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.c5l4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.b5l4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.a5l4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.a5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.b5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.c5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.d5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+
+     CONST               =   4.122770E-07
+
+     ENERGY              =     450.000000 GeV
+     BETA                =       0.999998
+     GAMMA               =        479.605
+     COULOMB LOG         =         23.231
+
+     X-emittance         =   7.820000E-09 m*rad
+     Y-emittance         =   7.820000E-09 m*rad
+
+     Momentum spread     =   4.680020E-04
+     Bunch length        =       0.115000 m
+
+     Particles per bunch =   1.100000E+11
+     Bunch current       =   1.981896E-04 A
+
+ Ring average values (m) 
+
+     betx   =   9.83411E+01    bety   =   1.02457E+02    Dx  =  1.15329E+00    Dy  =  0.00000E+00
+     alfx   =   2.44286E-06    alfy   =   1.36010E-05    Dpx = -4.75563E-08    Dpy =  0.00000E+00
+     1/betx =   1.44932E-02    1/bety =   1.34416E-02
+
+     (Weighted) average rates (1/sec):
+     Longitudinal=    8.208517E-06
+     Horizontal  =    5.074062E-06
+     Vertical    =   -3.693280E-08
+
+     (Weighted) average lifetimes (sec):
+     Longitudinal=    1.218247E+05
+     Horizontal  =    1.970808E+05
+     Vertical    =   -2.707620E+07
+
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

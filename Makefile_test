@@ -84,7 +84,7 @@ test-ptc-twiss-accel-56D test-ptc-twiss-56Dt-ini_map_man test-ptc-twiss-56Dt-ini
 test-ptc-normal test-ptc-normal-5D-beambeam test-ptc-twiss-rotations \
 test-ptc-twiss-normal-genfu test-ptc-twiss-normal-5D test-ptc-twiss-normal-6D test-ptc-twiss-maptable \
 test-ptc-track test-ptc-track-2 test-ptc-track-3 test-ptc-track-4 test-ptc-track-5 \
-test-ptc-track-acd test-ptc-track-acd-2 test-ptc-track-acd-3 test-ptc-twiss-eplace-srot test-ptc-track-6Dtl-acd \
+test-ptc-track-acd test-ptc-track-acd-2 test-ptc-track-6Dtl-acd \
 test-ptc-track-polygonaper \
 test-ptc-trackline test-ptc-trackline-2 test-ptc-trackline-3 \
 test-ptc-align test-ptc-align-2 \
@@ -95,7 +95,6 @@ test-plot test-plot-2 \
 test-setknob test-fillknob \
 test-coupling test-coupling-2 \
 test-machine-clear \
-test-lhc test-hllhc test-hllhc-wire test-hllhc-fma test-lhc-wire test-lhc-virtualcorr \
 \
 $(call onlx64,$(user-cases),)
 
@@ -115,8 +114,8 @@ test-touschek test-touschek-2 \
 $(call onlx64,$(user-cases),)
 
 # user-cases are run only with tests-all on Lxplus + AFS + Gnu 64 bit
-#user-cases = \
-#test-lhc test-hllhc test-hllhc-wire test-hllhc-fma test-lhc-wire test-lhc-virtualcorr
+user-cases = \
+test-lhc test-hllhc test-hllhc-wire test-hllhc-fma test-lhc-wire test-lhc-virtualcorr
 
 # tests to remove (e.g. that relies on external resources)
 tests-to-rm =
