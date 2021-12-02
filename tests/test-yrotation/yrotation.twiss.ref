@@ -40,6 +40,10 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le                -nan
+@ DQMIN_PHASE      %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.06.01 Linux 64"
 @ DATE             %08s "02/03/21"

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.03.03 15:14:41      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.11.30 15:35:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=3;
 
@@ -93,8 +93,11 @@ final orbit vector:    -1.000000E-01  0.000000E+00 -2.000000E-01  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
 SURVEY, SEQUENCE=seq, FILE= survey_translation.out;
 
 ptc_create_universe;
@@ -375,8 +378,11 @@ final orbit vector:     0.000000E+00  0.000000E+00  3.999997E-03  1.999999E-03 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
 SURVEY, SEQUENCE=seq, FILE= survey_xrotation.out;
 
 ptc_create_universe;
@@ -646,8 +652,11 @@ final orbit vector:    -3.999997E-03 -1.999999E-03  0.000000E+00  0.000000E+00 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
 SURVEY, SEQUENCE=seq, FILE= survey_yrotation.out;
 
 ptc_create_universe;

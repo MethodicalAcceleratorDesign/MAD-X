@@ -40,6 +40,10 @@
 @ SYNCH_3          %le          1.78636985
 @ SYNCH_4          %le         3.049096885
 @ SYNCH_5          %le         10.03783676
+@ SYNCH_6          %le         201.5015927
+@ SYNCH_8          %le         119.9664171
+@ DQMIN            %le                -nan
+@ DQMIN_PHASE      %le                   0
 @ TITLE            %18s "TRANSLINE_2+4 type"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "29/07/20"

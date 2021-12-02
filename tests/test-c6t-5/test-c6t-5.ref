@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.03.31 13:31:39      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.11.30 15:31:07      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=120.;
 
@@ -117,8 +117,11 @@ orbit:   4.733614E-03  2.906454E-04  1.382562E-01 -7.404873E-03 -9.455828E-04  2
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.348843474e-08 
+
+       dqmin_phase 
+      -3.108632022 
 
 
 dphix = 0.15;
@@ -196,8 +199,11 @@ orbit:   4.733614E-03  2.906454E-04  1.382562E-01 -7.404873E-03 -9.455828E-04  2
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    3.838844969e-08 
+
+       dqmin_phase 
+       2.165907088 
 betxLOC.BIM=table(twiss,markLOC.BIM,betx);betyLOC.BIM=table(twiss,markLOC.BIM,bety);
 
 alfxLOC.BIM=table(twiss,markLOC.BIM,alfx);alfyLOC.BIM=table(twiss,markLOC.BIM,alfy);
@@ -294,8 +300,11 @@ orbit:   2.907156E-03  1.362662E-04  9.678030E-02 -8.782200E-03 -7.344539E-04  1
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    3.217590627e-08 
+
+       dqmin_phase 
+      -1.863483441 
 sixtrack, CAVALL;	
 
   ++++++++++++++++++++++++++++

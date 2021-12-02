@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.26 14:54:16      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.02 16:38:38      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example file showing the usage of PTC_TRACK command 
 
@@ -21,7 +21,57 @@
 
 option,-echo;
 
-Determined SECTOR NMUL MAX :  0
+enter Twiss module
+  
+iteration:   1 error:   2.449294E-21 deltap:   0.000000E+00
+orbit:   1.106346E-32  1.578924E-34  0.000000E+00  0.000000E+00 -9.570215E-17  2.019636E-32
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       4.910104174    9.570215156e-17     0.003815562804        16.18902511 
+
+                q1                dq1            betxmax              dxmax 
+      0.2426964796      -0.4337346309        8.599345427       0.3305313738 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.2463561472    1.985115167e-22    9.013706946e-23       0.2763546394 
+
+               dq2            betymax              dymax              dyrms 
+      -0.242277287        3.821950368                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               -nan 
+
+       dqmin_phase 
+                 0 
+Plot - default table plotted: twiss
+
+ GXPLOT-X11  1.50 initialized
+
+ plot number =            1
+Plot - default table plotted: twiss
+ plot number =            2
+Determined SECTOR NMUL MAX :  2
+ Setting debug level to           1
+maxaccel is not present (keeping current value)
+exact_mis is not present (keeping current value)
+radiation is not present (keeping current value)
+modulation is found and its value is 0.000000
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
+fringe is not present (keeping current value)
+totalpath is found and its value is 0.000000
+time is found and its value is 1.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
+obs_points pro_ptc_setswitch Done
  MAD-X Beam Parameters
                   Energy : 0.500000E+01
           Kinetic Energy : 0.499949E+01
@@ -32,21 +82,116 @@ Determined SECTOR NMUL MAX :  0
      method                   2
      Num. of steps            5
      charge          -1.0000000000000000     
-  Length of machine:    5.0000000000000000     
- The machine is a LINE
+ S2%volt =   0.40000000000000002     
+ S2%phas =    2.9816371581236458     
+ S2%volt = 
+ S2%phas = 
+  0.40000000000000002     
+   2.9816371581236458     
+  Length of machine:    4.9101041742626537     
+ The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        5.0000000000000000     
+ After    end:  -0.24524718779598886        0.0000000000000000        4.9008556213854124     
+ ************ State Summary ****************
+ MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     2
+  Default integration steps      5
+ This is an electron (positron actually if charge=1) 
+       EXACT_MODEL =  FALSE
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  FALSE
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Closed orbit:    2.6278015232477492E-014   3.1256890920077953E-023   0.0000000000000000        0.0000000000000000        1.8423070450127813E-016   8.0316459732633543E-014
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       4.910104174     0.003767958881           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000     0.003767948436         16.2909692       0.2440792767 
+
+                q2                dq1                dq2                 qs 
+      0.2771645012                  0                  0    0.0001092918627 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+       2.409086649        8.590640883        2.208872132        3.817797424 
+
+         beta11min          beta11max          beta12min          beta12max 
+       2.409086649        8.590640883    2.140628987e-33    8.621003196e-33 
+
+         beta13min          beta13max          beta21min          beta21max 
+    0.001215584777     0.003980172245    3.076206131e-33    5.927937441e-33 
+
+         beta22min          beta22max          beta23min          beta23max 
+       2.208872132        3.817797424    1.684218792e-31    6.794695277e-31 
+
+         beta31min          beta31max          beta32min          beta32max 
+     0.01248258139      0.01363122585    6.121949581e-33     6.55433221e-33 
+
+         beta33min          beta33max           disp1min           disp1max 
+       26.94189279        26.94189281                  0       0.3274649945 
+
+          disp2min           disp2max           disp3min           disp3max 
+     -0.2503361165       0.2503361165                  0    1.204757954e-16 
+
+          disp4min           disp4max             deltap            orbit_x 
+  -1.002739504e-16    1.001752964e-16                  0    2.627801523e-14 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+   3.125689092e-23                  0                  0    8.031645973e-14 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+   1.842307045e-16    1.956134169e-14                  0    9.930713552e-15 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0     5.88056481e-16    8.031645503e-14    2.627801523e-14 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    2.006405442e-14                  0    3.885780586e-16 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+   8.031645973e-14    1.451338951e-14                  0   -2.008867019e-14 
+
+           pycomin             tcomin            ptcomin 
+                 0   -9.436895709e-16    8.031645085e-14 
  Setting debug level to           1
-maxaccel is found and its value is 0.000000
-exact_mis is found and its value is 1.000000
+maxaccel is not present (keeping current value)
+exact_mis is not present (keeping current value)
+radiation is not present (keeping current value)
+modulation is found and its value is 0.000000
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
+fringe is not present (keeping current value)
+totalpath is found and its value is 0.000000
+time is found and its value is 1.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
+obs_points pro_ptc_setswitch Done
+ Setting debug level to           1
+maxaccel is not present (keeping current value)
+exact_mis is not present (keeping current value)
 radiation is not present (keeping current value)
 modulation is found and its value is 1.000000
 stochastic is not present (keeping current value)
 envelope is not present (keeping current value)
-fringe is found and its value is 1.000000
+fringe is not present (keeping current value)
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
 nocavity is not present (keeping current value)
@@ -65,7 +210,7 @@ obs_points pro_ptc_setswitch Done
        ENVELOPE    =  FALSE
        NOCAVITY    =  FALSE
        TIME        =  TRUE 
-       FRINGE      =  TRUE 
+       FRINGE      =  FALSE
        PARA_IN     =  FALSE
        ONLY_2D     =  FALSE
        ONLY_4D     =  FALSE

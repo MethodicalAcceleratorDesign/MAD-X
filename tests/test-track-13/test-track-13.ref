@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Darwin)      +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2019.11.06 10:19:27      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.02 17:00:32      +
   ++++++++++++++++++++++++++++++++++++++++++++
 beam;
 
@@ -67,18 +67,18 @@ run, turns=100;
 Number 20
 ++++++ info: k redefined
 particle #     1 lost turn     20  at pos. s =      1.00 element=myrb                                             aperture =circle                                          
-    X=   9.0000000000011963E-003   Y=   8.6685998860731913E-003   T=  -1.7100154224156763E-003
+    X=   8.9999999999999074E-003   Y=   8.6685998860731913E-003   T=  -1.7100154224165554E-003
 ++++++ warning: trcoll:  Particle Number equals zero: exit from trcoll
 
 ++++++ table: tracksumm
 
     number       turn                  x                 px 
          1          0              0.009                  0 
-         1         20              0.009    3.084510182e-17 
+         1         20              0.009   -2.494141453e-18 
 
                  y                 py                  t                 pt 
-             0.009                  0                  0    2.220446049e-16 
-    0.008668599886    -8.44759052e-06    -0.001710015422    2.220446049e-16 
+             0.009                  0                  0                  0 
+    0.008668599886    -8.44759052e-06    -0.001710015422                  0 
 
                  s                  e 
                  0                  0 
