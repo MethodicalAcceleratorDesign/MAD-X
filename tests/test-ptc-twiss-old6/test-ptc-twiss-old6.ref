@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2020.09.01 18:18:53      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.11.30 15:33:01      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -123,8 +123,11 @@ orbit:  -2.499994E-03 -4.455023E-09 -8.182293E-08  1.600081E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    5.993966921e-09 
+
+       dqmin_phase 
+       1.098898903 
 
 
 SEEDSYS = 1;
@@ -250,8 +253,11 @@ orbit:  -2.499994E-03 -4.455021E-09 -8.182286E-08  1.600081E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    8.975713439e-07 
+
+       dqmin_phase 
+      -2.215776525 
 
 
 option,-echo,-info,warn;
@@ -323,8 +329,11 @@ orbit:  -2.499994E-03 -4.455013E-09 -8.182299E-08  1.600081E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    8.674683171e-07 
+
+       dqmin_phase 
+       3.106302334 
 
 
 !------------------------------------------------------------------------
@@ -392,8 +401,11 @@ orbit:  -2.499994E-03 -4.455013E-09 -8.182299E-08  1.600081E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    8.674678891e-07 
+
+       dqmin_phase 
+       3.106301182 
 
 
 !------------------------------------------------------------------------
@@ -461,8 +473,11 @@ orbit:  -2.499994E-03 -4.455013E-09 -8.182300E-08  1.600081E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    8.674678892e-07 
+
+       dqmin_phase 
+       3.106301185 
 
 
 
@@ -641,8 +656,11 @@ orbit:  -2.500017E-03 -4.219634E-09 -7.649123E-08  1.600066E-04  1.141440E-05  8
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    1.296404328e-06 
+
+       dqmin_phase 
+      -2.229264479 
 emit;
 
 enter EMIT module
@@ -718,7 +736,7 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=1;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        26658.883200002034     
+ After    end:    0.0000000000000000        0.0000000000000000        26658.883200000000     
 
 
 SELECT, flag=ptc_twiss, clear;
