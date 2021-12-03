@@ -506,7 +506,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
            n    = 3
            twon = six
         case (code_solenoid)  !---- Solenoid
-           sksol = node_value('ks ');
+           sksol = node_value('ks ') / two;
            str   = zero
            n     = 0
            twon  = zero
