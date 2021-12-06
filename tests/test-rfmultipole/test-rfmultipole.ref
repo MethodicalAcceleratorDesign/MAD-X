@@ -41,7 +41,7 @@ final orbit vector:     1.000000E+00  4.214857E-03  0.000000E+00  1.041119E-01  
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               -nan 
+                 0                  0                  0               0 
 
        dqmin_phase 
                  0 
@@ -89,7 +89,7 @@ final orbit vector:     1.000000E+00  4.214857E-03  0.000000E+00  1.041119E-01  
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le                -nan
+@ DQMIN            %le                0
 @ DQMIN_PHASE      %le                   0
 @ TITLE            %20s "test of rf-multipole"
 @ ORIGIN           %16s "5.07.00 Linux 64"

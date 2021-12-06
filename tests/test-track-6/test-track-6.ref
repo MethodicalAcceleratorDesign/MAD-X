@@ -39,7 +39,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               -nan 
+                 0                  0                  0               0 
 
        dqmin_phase 
                  0 
@@ -93,7 +93,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               -nan 
+                 0                  0                  0               0 
 
        dqmin_phase 
                  0 
@@ -214,7 +214,7 @@ final orbit vector:     9.569931E-04  3.268034E-06  0.000000E+00  0.000000E+00 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               -nan 
+                 0                  0                  0               0 
 
        dqmin_phase 
                  0 
@@ -281,7 +281,7 @@ final orbit vector:     9.569931E-02  3.268034E-04  0.000000E+00  0.000000E+00 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               -nan 
+                 0                  0                  0               0 
 
        dqmin_phase 
                  0 

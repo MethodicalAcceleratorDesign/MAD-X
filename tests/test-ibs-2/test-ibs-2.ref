@@ -132,7 +132,7 @@ orbit:  -8.359849E-07 -1.313310E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               -nan 
+                 0                  0                  0               0 
 
        dqmin_phase 
                  0 
@@ -181,7 +181,7 @@ orbit:  -8.359849E-07 -1.313310E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               -nan 
+                 0                  0                  0               0 
 
        dqmin_phase 
                  0 

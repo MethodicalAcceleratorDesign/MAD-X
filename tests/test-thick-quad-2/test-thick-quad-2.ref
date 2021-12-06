@@ -35,7 +35,7 @@ orbit:  -2.684511E-31  4.235791E-40  0.000000E+00  0.000000E+00 -3.167331E-17 -1
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               -nan 
+                 0                  0                  0               0 
 
        dqmin_phase 
                  0 
@@ -67,7 +67,7 @@ orbit:   3.259109E-25  2.246997E-28  0.000000E+00  0.000000E+00 -9.945509E-15  1
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               -nan 
+                 0                  0                  0               0 
 
        dqmin_phase 
                  0 

@@ -42,7 +42,7 @@
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le                -nan
+@ DQMIN            %le                0
 @ DQMIN_PHASE      %le                   0
 @ TITLE            %01s "s"
 @ ORIGIN           %16s "5.05.02 Linux 64"

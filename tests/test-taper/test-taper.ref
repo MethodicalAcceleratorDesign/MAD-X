@@ -93,7 +93,7 @@ orbit:  -3.009189E-13  5.694534E-13  0.000000E+00  0.000000E+00 -4.455048E-10 -1
                       0                       0                       0                       0 
 
                 synch_6                 synch_8                  nflips                   dqmin 
-                      0                       0                       0                    -nan 
+                      0                       0                       0                    0 
 
             dqmin_phase 
                       0 
@@ -188,7 +188,7 @@ orbit:  -1.224543E-07  4.132685E-07  0.000000E+00  0.000000E+00  1.823771E-04 -7
                       0                       0                       0                       0 
 
                 synch_6                 synch_8                  nflips                   dqmin 
-                      0                       0                       0                    -nan 
+                      0                       0                       0                    0 
 
             dqmin_phase 
                       0 
@@ -244,7 +244,7 @@ orbit:   1.199793E-04 -1.162774E-04  0.000000E+00  0.000000E+00  5.214916E-04  8
                       0                       0                       0                       0 
 
                 synch_6                 synch_8                  nflips                   dqmin 
-                      0                       0                       0                    -nan 
+                      0                       0                       0                    0 
 
             dqmin_phase 
                       0 
@@ -297,7 +297,7 @@ orbit:  -3.009189E-13  5.694534E-13  0.000000E+00  0.000000E+00 -4.455048E-10 -1
                       0                       0                       0                       0 
 
                 synch_6                 synch_8                  nflips                   dqmin 
-                      0                       0                       0                    -nan 
+                      0                       0                       0                    0 
 
             dqmin_phase 
                       0 
@@ -340,7 +340,7 @@ orbit:  -3.009189E-13  5.694534E-13  0.000000E+00  0.000000E+00 -4.455048E-10 -1
                       0                       0                       0                       0 
 
                 synch_6                 synch_8                  nflips                   dqmin 
-                      0                       0                       0                    -nan 
+                      0                       0                       0                    0 
 
             dqmin_phase 
                       0 
@@ -386,7 +386,7 @@ orbit:  -1.224543E-07  4.132685E-07  0.000000E+00  0.000000E+00  1.823771E-04 -7
                       0                       0                       0                       0 
 
                 synch_6                 synch_8                  nflips                   dqmin 
-                      0                       0                       0                    -nan 
+                      0                       0                       0                    0 
 
             dqmin_phase 
                       0 
@@ -435,7 +435,7 @@ orbit:   1.622361E-28 -1.216894E-28  0.000000E+00  0.000000E+00 -9.503297E-18  1
                       0                       0                       0                       0 
 
                 synch_6                 synch_8                  nflips                   dqmin 
-                      0                       0                       0                    -nan 
+                      0                       0                       0                    0 
 
             dqmin_phase 
                       0 
@@ -634,7 +634,7 @@ orbit:  -3.002920E-13  5.690394E-13  0.000000E+00  0.000000E+00 -8.084385E-11 -2
                       0                       0                       0                       0 
 
                 synch_6                 synch_8                  nflips                   dqmin 
-                      0                       0                       0                    -nan 
+                      0                       0                       0                    0 
 
             dqmin_phase 
                       0 

@@ -394,7 +394,7 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 -nan 
+0 0 0 0 
 
 dqmin_phase 
 0 
@@ -462,7 +462,7 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 -nan 
+0 0 0 0 
 
 dqmin_phase 
 0 
@@ -510,7 +510,7 @@ dqmin_phase
 @ SYNCH_5          %le  0
 @ SYNCH_6          %le  0
 @ SYNCH_8          %le  0
-@ DQMIN            %le  -nan
+@ DQMIN            %le  0
 @ DQMIN_PHASE      %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
@@ -549,7 +549,7 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 -nan 
+0 0 0 0 
 
 dqmin_phase 
 0 
@@ -597,7 +597,7 @@ dqmin_phase
 @ SYNCH_5          %le  0
 @ SYNCH_6          %le  0
 @ SYNCH_8          %le  0
-@ DQMIN            %le  -nan
+@ DQMIN            %le  0
 @ DQMIN_PHASE      %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"

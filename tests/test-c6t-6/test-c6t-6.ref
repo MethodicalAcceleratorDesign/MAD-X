@@ -71,7 +71,7 @@ synch_2            synch_3            synch_4            synch_5
 0.00000e+00        0.00000e+00        0.00000e+00        0.00000e+00        
 
 synch_6            synch_8            nflips             dqmin              
-0.00000e+00        0.00000e+00        0.00000e+00        -nan               
+0.00000e+00        0.00000e+00        0.00000e+00        0               
 
 dqmin_phase        
 0.00000e+00        
@@ -123,7 +123,7 @@ synch_2            synch_3            synch_4            synch_5
 0.00000e+00        0.00000e+00        0.00000e+00        0.00000e+00        
 
 synch_6            synch_8            nflips             dqmin              
-0.00000e+00        0.00000e+00        0.00000e+00        -nan               
+0.00000e+00        0.00000e+00        0.00000e+00        0               
 
 dqmin_phase        
 0.00000e+00        
