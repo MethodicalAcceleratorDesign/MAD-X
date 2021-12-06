@@ -3623,6 +3623,7 @@ SUBROUTINE tw_summ(rt,tt)
   call double_to_table_curr('summ ','synch_5 ' ,synch_5)
   call double_to_table_curr('summ ','synch_6 ' ,synch_6)
   call double_to_table_curr('summ ','synch_8 ' ,synch_8)
+  if (isnan(dqmin2)) dqmin2 = zero
   call double_to_table_curr('summ ','dqmin ' ,dqmin2)
   call double_to_table_curr('summ ','dqmin_phase ' ,dqmin_ph)
 
