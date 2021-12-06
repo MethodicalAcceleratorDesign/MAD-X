@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.11.30 15:31:57      +
+  + Execution date: 2021.12.06 14:24:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=15;
 
@@ -78,7 +78,7 @@ synch_2 synch_3 synch_4 synch_5
 0X0P+0 0X0P+0 0X0P+0 0X0P+0 
 
 synch_6 synch_8 nflips dqmin 
-0X0P+0 0X0P+0 0X0P+0 -NAN 
+0X0P+0 0X0P+0 0X0P+0 0X0P+0 
 
 dqmin_phase 
 0X0P+0 

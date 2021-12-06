@@ -42,12 +42,12 @@
 @ SYNCH_5          %le  0X0P+0
 @ SYNCH_6          %le  0X0P+0
 @ SYNCH_8          %le  0X0P+0
-@ DQMIN            %le  -NAN
+@ DQMIN            %le  0X0P+0
 @ DQMIN_PHASE      %le  0X0P+0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "25/09/20"
-@ TIME             %08s "14.31.24"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "06/12/21"
+@ TIME             %08s "14.24.36"
 * NAME                                    S                      X                     PX                      Y                     PY                     PT                      T                   BETX                   BETY 
 $ %s                                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le 
  "SEQ$START"           0.00000000000000e+00   0.00000000000000e+00   0.00000000000000e+00   0.00000000000000e+00   0.00000000000000e+00   0.00000000000000e+00   0.00000000000000e+00   1.00000000000000e+00   1.00000000000000e+00
