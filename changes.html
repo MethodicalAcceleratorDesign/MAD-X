@@ -13,7 +13,36 @@
 <hr class="h1">
 <!-- -------- -->
   
-<h3>MAD-X release 5.07.01 (2021.05.03)</h3>
+<h3>MAD-X release 5.08.00 (2021.12.YY)</h3>
+<ul>  
+<li> Wire is now fully implemented in TWISS and TRACK. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1018">#1018</a>. (Tobias, testing: Phillipe and Guido)
+<li> Bug in the output of fc.3 where sometimes the highest orders multipoles were not included. 
+     <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1022">#1022</a>. (Riccardo)
+<li> Restore the internal names in the SURVEY table. 
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1024">#1024</a>. (Tobias)
+<li> When an element was replaced the keyword was not updated. This is fixed now.  
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1024">#1024</a>. (Tobias)
+<li> Bug in TWISS with center option combined with a tilted quadrupole.  
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1026">#1026</a>. (Tobias)
+<li>  Bug in emit for octupole where k2 was retrived instead of k3.  
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1028">#1028</a>. (Ghislain)
+<li>  Bug in emit for octupole where k2 was retrived instead of k3.  
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1028">#1028</a>. (Ghislain)
+<li>  Exact drift option implmented in TWISS.  
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1030">#1030</a>. (Tobias)
+<li>  New PTC.  
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1031">#1031</a>. (Piotr, Tobias)
+  <li>  Npart for beam-beam element can now also be set directly in the element.  
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1033">#1033</a>. (Tobias)
+   <li>  Npart for beam-beam element can now also be set directly in the element.  
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1033">#1033</a>. (Tobias)
+     <li>  New taper implementation .  
+  <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1034">#1034</a>. (Ghislain)
+  
+</ul>  
+  
+<h3>MAD-X release 5.07.00 (2021.05.03)</h3>
 <ul>
 <li> Enable to save and load sequences with double precision floating point numbers in a hexadecimal format. In this way the exact same values are obtained after a saving and then loading a sequence. 
      <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/pull/954">#954</a>. (Tobias)
