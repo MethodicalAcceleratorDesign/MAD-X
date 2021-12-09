@@ -760,6 +760,7 @@ const char *const_command_def =
 "maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
 "exact_mis  = [l, false, true], "  /* switch to ensure exact misaligment treatment */
 "totalpath  = [l, false, true], "  /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
+"spin       = [l, false, true], "  /*sets the spin switch/internal state of PTC*/
 "radiation  = [l, false, true], "  /*sets the radiation switch/internal state of PTC */
 "modulation = [l, false, true], "  /*sets the modulation switch/internal state of PTC */
 "stochastic = [l, false, true], "  /*sets the stochastic switch/internal state of PTC */

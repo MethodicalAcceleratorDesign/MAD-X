@@ -23,7 +23,7 @@ ptc_create_universe;
 !  ptc_printframes, file="ALS.C", format=rootmacro;!this prints my visualisation with ROOT
 
   !!!!!       T I M E   T R U E ,   T O T P A T H  F A L S E
-  ptc_setswitch, debuglevel=3, exact_mis=true, time=true, totalpath=false;
+  ptc_setswitch, debuglevel=3, exact_mis=true, time=true, totalpath=false, spin=true;
   
 !  ptc_script, file="printflatfile.txt";
   
