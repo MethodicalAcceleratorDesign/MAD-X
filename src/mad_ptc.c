@@ -941,7 +941,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
    }
   else
    {
-    if (debuglevel > 0) printf("spin is not present (keeping current value)\n");
+    if (debuglevel > 10) printf("spin is not present (keeping current value)\n");
    }
    
   /*envelope SWITCH*/
