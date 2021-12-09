@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:24:15      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.02 17:00:39      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Threader example
 
@@ -111,8 +111,11 @@ orbit:   1.302335E-01  1.974439E-03  2.736300E-02  1.294316E-03  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    0.0001033368137 
+
+       dqmin_phase 
+     0.08647871706 
 
 
 !acbv1:=1.e-4;
@@ -159,8 +162,11 @@ orbit:   2.578233E-03  3.848899E-05 -2.257435E-08 -3.834450E-10  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    3.191968042e-08 
+
+       dqmin_phase 
+      -1.542161428 
 
   Number of warnings: 0
 

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.28 21:42:36      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.02 15:55:15      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2009
 
@@ -391,8 +391,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 refbetxip1b1       = 0.149999995252676 ;
 refbetyip1b1       = 0.149999999995155 ;
 refbetxip5b1       = 0.150000000792417 ;
@@ -456,8 +459,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -500,10 +506,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  0
+@ DQMIN_PHASE      %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "28/04/21"
-@ TIME             %08s "21.42.54"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "02/12/21"
+@ TIME             %08s "15.55.29"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.5684327563 0.150000000792417 0.14999999999774 4.56963895388558e-08 3.12481956538397e-11 -3.00094859267699e-10 5.19797138070879e-09 15.0109070352973 14.5393647705992
@@ -536,8 +546,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -580,10 +593,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  0
+@ DQMIN_PHASE      %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "28/04/21"
-@ TIME             %08s "21.42.55"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "02/12/21"
+@ TIME             %08s "15.55.30"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.8731672437 0.149999995141886 0.149999999999552 2.96974407962579e-08 1.77484857230974e-12 7.57657057265898e-10 -3.83457101221391e-09 15.1385489606468 14.4448340932668
@@ -619,8 +636,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 8.17597209836863e-07 
+
+dqmin_phase 
+2.79065596550715 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -663,10 +683,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  8.17597209836863e-07
+@ DQMIN_PHASE      %le  2.79065596550715
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "28/04/21"
-@ TIME             %08s "21.42.56"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "02/12/21"
+@ TIME             %08s "15.55.31"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.5684327563 -2.82901667781991e-09 0.000749978480249974 0.00025010849452088 4.65249475680409e-08
@@ -702,8 +726,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000131432033176358 
+
+dqmin_phase 
+2.69529635627739 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -746,10 +773,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  0.000131432033176358
+@ DQMIN_PHASE      %le  2.69529635627739
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "28/04/21"
-@ TIME             %08s "21.42.58"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "02/12/21"
+@ TIME             %08s "15.55.32"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.8731672437 -7.03201360400911e-09 -0.000749972214158974 -0.000250143361576922 -7.61144269306663e-08
@@ -829,8 +860,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.36134636433096e-13 
+
+dqmin_phase 
+1.85196294270261 
 Set8 halo to 1.254210 sigma, the lumi is reduced from 2.9636101544506e+33 Hz/cm2 to 2e+33 Hz/cm2
 halo8              = 1.25421049490897 ;
 enter Twiss module
@@ -858,8 +892,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.3614650742156e-13 
+
+dqmin_phase 
+1.85196342930483 
 Want to make named table: twissb1
 enter Twiss module
   
@@ -886,8 +923,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.82655301374944e-16 
+
+dqmin_phase 
+-2.6363979596696 
 Want to make named table: twissb2
 sepr1              = 211.573004472955 ;
 sepr2              = 69.0994529252393 ;
@@ -928,8 +968,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 8.44473931655966e-15 
+
+dqmin_phase 
+1.94824556720423 
 xnom1              = -1.24555107297869e-14 ;
 xnom2              = -0.000144718946013526 ;
 xnom5              = -1.36972681460956e-14 ;
@@ -979,8 +1022,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 6.83983557085223e-12 
+
+dqmin_phase 
+1.88349180661318 
 Want to make named table: twissb1
 enter Twiss module
   
@@ -1007,8 +1053,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 7.86560475510201e-12 
+
+dqmin_phase 
+2.2746260029556 
 Want to make named table: twissb2
 enter Twiss module
   
@@ -1035,8 +1084,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -1062,8 +1114,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 enter Twiss module
   
 iteration:   1 error:   7.957270E-06 deltap:   0.000000E+00
@@ -1092,8 +1147,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.95995072770556e-05 
+
+dqmin_phase 
+2.07496711653053 
 Want to make named table: twissb1_crab
 enter Twiss module
   
@@ -1123,8 +1181,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.18565573976671e-05 
+
+dqmin_phase 
+2.31880450058593 
 Want to make named table: twissb2_crab
 Number of parasitic encounter before D1
 npara0_1           = 20 ;
@@ -1202,8 +1263,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.98243250445666e-05 
+
+dqmin_phase 
+-1.04922776668602 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -1246,10 +1310,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  2.98243250445666e-05
+@ DQMIN_PHASE      %le  -1.04922776668602
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "28/04/21"
-@ TIME             %08s "21.43.13"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "02/12/21"
+@ TIME             %08s "15.55.44"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6589.76797484384 "BBMK_PAR.L5B1_20"  7622.79267873972 18878.7268115465 -27.9631314170753 -123.751987457866 14.7610980155191 14.2893001824243 -0.00819315712583501 0.00010150760876179 -9.8488298919745e-05 6.62592527038303e-07
@@ -1369,8 +1437,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.64530314884098e-05 
+
+dqmin_phase 
+-0.810861910758047 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -1413,10 +1484,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  1.64530314884098e-05
+@ DQMIN_PHASE      %le  -0.810861910758047
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "28/04/21"
-@ TIME             %08s "21.43.14"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "02/12/21"
+@ TIME             %08s "15.55.45"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6590.07270933124 "BBMK_PAR.L5B2_20"  18878.9640377068 7621.00664448405 -123.753500776964 -27.9566348537238 14.8884782363789 14.1950566784004 0.0130388103648641 -6.48873599484348e-05 0.000162066648375159 -2.31783766151174e-07
@@ -1533,8 +1608,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.98243250445666e-05 
+
+dqmin_phase 
+-1.04922776668602 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -1577,10 +1655,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  2.98243250445666e-05
+@ DQMIN_PHASE      %le  -1.04922776668602
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "28/04/21"
-@ TIME             %08s "21.43.16"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "02/12/21"
+@ TIME             %08s "15.55.46"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6664.5009327563 "BB_HO.L5B1_5"      0.180389279435029 0.180345388196951 0.450185941801743 0.449863375487957 14.9435763967769 14.4720923784923 5.73374968682055e-06 -2.04586880635513e-08 0.000250247395571573 -1.90710976176588e-06
@@ -1645,8 +1727,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.97632390317424e-05 
+
+dqmin_phase 
+-1.0468662775034 
 Close orbite position of the weak beam at the wire compensator s position
 s_at_wire_c_l1.b1  = -195 ;
 x_at_wire_c_l1.b1  = -4.14393174650214e-05 ;
@@ -1722,8 +1807,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.97632390325313e-05 
+
+dqmin_phase 
+-1.04686627751386 
 beta.ip1           = 0.150001759926586 ;
 enter Twiss module
   
@@ -1756,8 +1844,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.97632390325313e-05 
+
+dqmin_phase 
+-1.04686627751386 
 enter Twiss module
   
 iteration:   1 error:   1.867748E-05 deltap:   0.000000E+00
@@ -1789,8 +1880,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.97632390325313e-05 
+
+dqmin_phase 
+-1.04686627751386 
 Running survey for aligment calculations...
 mbrc_mech_sep      = 188 ;
 mbrd_mech_sep      = 186 ;
@@ -3770,8 +3864,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 6.71256653562992e-05 
+
+dqmin_phase 
+1.18200474566441 
     cta0     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     closest0 = cta0;
@@ -3817,8 +3914,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 3.75427503267208e-05 
+
+dqmin_phase 
+0.627679009414849 
     ctap     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     !value,ctap;
@@ -3862,8 +3962,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 8.67581477602078e-05 
+
+dqmin_phase 
+1.32536340108023 
     ctam     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     !value,ctam;
@@ -3907,8 +4010,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 3.60619845994124e-05 
+
+dqmin_phase 
+0.095152079133419 
     cta0     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     !value,cta0;
@@ -3952,8 +4058,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 3.99378586303459e-05 
+
+dqmin_phase 
+0.100599332154855 
     ctap     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     !value,ctap;
@@ -3997,8 +4106,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.57599241702522e-05 
+
+dqmin_phase 
+0.741195781632055 
     ctam     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     !value,ctam;
@@ -4042,8 +4154,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.85255482073901e-08 
+
+dqmin_phase 
+-1.63190283073475 
 
 
     closest1 =abs(2*(qx-qy)-round(2*(qx-qy)))/2;
@@ -4389,8 +4504,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.85255482073901e-08 
+
+dqmin_phase 
+-1.63190283073475 
 closest2=abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
 value, closest0, closest1, closest2, cmrskew, cmiskew;
@@ -5460,23 +5578,125 @@ total constraints:      4
 
 START SIMPLEX:
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 2906 location, out of 24674 in total. The Dqmin estimate might be inaccurate.                                  
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 4359 location, out of 26447 in total. The Dqmin estimate might be inaccurate.                                  
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 5812 location, out of 28220 in total. The Dqmin estimate might be inaccurate.                                  
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 7265 location, out of 29993 in total. The Dqmin estimate might be inaccurate.                                  
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 8718 location, out of 31766 in total. The Dqmin estimate might be inaccurate.                                  
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 10171 location, out of 33539 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 11624 location, out of 35312 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 13077 location, out of 37085 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 14530 location, out of 38858 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 15983 location, out of 40631 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 17436 location, out of 42404 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18889 location, out of 44177 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 20342 location, out of 45950 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 21795 location, out of 47723 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 23248 location, out of 49496 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24701 location, out of 51269 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 26154 location, out of 53042 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 27607 location, out of 54815 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 29060 location, out of 56588 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 30513 location, out of 58361 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 31966 location, out of 60134 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 33419 location, out of 61907 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 34872 location, out of 63680 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 36325 location, out of 65453 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 37778 location, out of 67226 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 39231 location, out of 68999 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 40684 location, out of 70772 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 42137 location, out of 72545 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 43549 location, out of 74318 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 45002 location, out of 76091 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 46414 location, out of 77864 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 47867 location, out of 79637 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 49279 location, out of 81410 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 50732 location, out of 83183 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 52185 location, out of 84956 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 53388 location, out of 86729 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 54800 location, out of 88502 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 56253 location, out of 90275 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 57665 location, out of 92048 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 59118 location, out of 93821 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 60571 location, out of 95594 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 62024 location, out of 97367 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 63477 location, out of 99140 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 64930 location, out of 100913 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 66383 location, out of 102686 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 67836 location, out of 104459 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 69289 location, out of 106232 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 70742 location, out of 108005 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 72154 location, out of 109778 in total. The Dqmin estimate might be inaccurate.                                
 call:      49   Penalty function =   0.14908251E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 73566 location, out of 111551 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 74978 location, out of 113324 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 76390 location, out of 115097 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 77802 location, out of 116870 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 79255 location, out of 118643 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 80634 location, out of 120416 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 82087 location, out of 122189 in total. The Dqmin estimate might be inaccurate.                                
 call:      56   Penalty function =   0.12693917E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 83540 location, out of 123962 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 84993 location, out of 125735 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 86446 location, out of 127508 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 87858 location, out of 129281 in total. The Dqmin estimate might be inaccurate.                                
 call:      60   Penalty function =   0.10014259E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 89270 location, out of 131054 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 90682 location, out of 132827 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 92094 location, out of 134600 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 93547 location, out of 136373 in total. The Dqmin estimate might be inaccurate.                                
 call:      64   Penalty function =   0.96223916E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 95000 location, out of 138146 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 96412 location, out of 139919 in total. The Dqmin estimate might be inaccurate.                                
 call:      66   Penalty function =   0.93107013E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 97824 location, out of 141692 in total. The Dqmin estimate might be inaccurate.                                
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 99277 location, out of 143465 in total. The Dqmin estimate might be inaccurate.                                
 call:      68   Penalty function =   0.90367785E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 100730 location, out of 145238 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 102183 location, out of 147011 in total. The Dqmin estimate might be inaccurate.                               
 call:      70   Penalty function =   0.89337441E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 103636 location, out of 148784 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 105089 location, out of 150557 in total. The Dqmin estimate might be inaccurate.                               
 call:      72   Penalty function =   0.85352101E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 106501 location, out of 152330 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 107913 location, out of 154103 in total. The Dqmin estimate might be inaccurate.                               
 call:      74   Penalty function =   0.78179758E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 109366 location, out of 155876 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 110778 location, out of 157649 in total. The Dqmin estimate might be inaccurate.                               
 call:      76   Penalty function =   0.77662128E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 112190 location, out of 159422 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 113602 location, out of 161195 in total. The Dqmin estimate might be inaccurate.                               
 call:      78   Penalty function =   0.64871344E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 115014 location, out of 162968 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 116467 location, out of 164741 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 117879 location, out of 166514 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 119291 location, out of 168287 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120744 location, out of 170060 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 122156 location, out of 171833 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 123568 location, out of 173606 in total. The Dqmin estimate might be inaccurate.                               
 call:      85   Penalty function =   0.61113102E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 124980 location, out of 175379 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 126392 location, out of 177152 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 127804 location, out of 178925 in total. The Dqmin estimate might be inaccurate.                               
 call:      88   Penalty function =   0.33644454E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 129216 location, out of 180698 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 130628 location, out of 182471 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 132040 location, out of 184244 in total. The Dqmin estimate might be inaccurate.                               
 call:      91   Penalty function =   0.31419288E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 133452 location, out of 186017 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 134864 location, out of 187790 in total. The Dqmin estimate might be inaccurate.                               
 call:      93   Penalty function =   0.23521876E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 136276 location, out of 189563 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 137688 location, out of 191336 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 139100 location, out of 193109 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 140512 location, out of 194882 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 141924 location, out of 196655 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 143336 location, out of 198428 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 144748 location, out of 200201 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 146160 location, out of 201974 in total. The Dqmin estimate might be inaccurate.                               
 call:     101   Penalty function =   0.21626053E-14
  call limit
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 147572 location, out of 203747 in total. The Dqmin estimate might be inaccurate.                               
 call:     102   Penalty function =   0.20812935E-14
 number of variables:    4
 user given constraints: 4
@@ -5484,18 +5704,32 @@ total constraints:      4
 
 START LMDIF:
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 148984 location, out of 205520 in total. The Dqmin estimate might be inaccurate.                               
 Initial Penalty Function =   0.20812935E-14
 
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 150396 location, out of 207293 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 151808 location, out of 209066 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 153220 location, out of 210839 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 154632 location, out of 212612 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 156044 location, out of 214385 in total. The Dqmin estimate might be inaccurate.                               
 call:       6   Penalty function =   0.13014065E-25
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 157456 location, out of 216158 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 158868 location, out of 217931 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 160280 location, out of 219704 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 161692 location, out of 221477 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 163104 location, out of 223250 in total. The Dqmin estimate might be inaccurate.                               
 call:      11   Penalty function =   0.46165783E-36
  ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 164516 location, out of 225023 in total. The Dqmin estimate might be inaccurate.                               
 call:      11   Penalty function =   0.46165783E-36
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 165928 location, out of 226796 in total. The Dqmin estimate might be inaccurate.                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 167340 location, out of 228569 in total. The Dqmin estimate might be inaccurate.                               
 e.ds.l1.b1:1               x            4     0.00000000E+00     3.90654404E-22     1.52610863E-43
 e.ds.l1.b1:1               px           4     0.00000000E+00     1.75909482E-21     3.09441459E-40
 e.ds.l1.b1:1               y            4     0.00000000E+00     6.59161084E-19     4.34493334E-37
@@ -5540,30 +5774,133 @@ entry value: 0.000000
 entry name: py
 number of entries: 1
 entry value: 0.000000
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 168801 location, out of 231085 in total. The Dqmin estimate might be inaccurate.                               
 number of variables:    4
 user given constraints: 4
 total constraints:      4
 
 START SIMPLEX:
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 170262 location, out of 233601 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 171507 location, out of 236117 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 172460 location, out of 238633 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 173671 location, out of 241149 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 174704 location, out of 243665 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 176118 location, out of 246181 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 177461 location, out of 248697 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 178922 location, out of 251213 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 180383 location, out of 253729 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 181844 location, out of 256245 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 183305 location, out of 258761 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 184252 location, out of 261277 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 185504 location, out of 263793 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 186537 location, out of 266309 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 187792 location, out of 268825 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 189302 location, out of 271341 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 190800 location, out of 273857 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 192261 location, out of 276373 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 193766 location, out of 278889 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 195227 location, out of 281405 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 196688 location, out of 283921 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 198149 location, out of 286437 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 199610 location, out of 288953 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 201837 location, out of 291469 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 204000 location, out of 293985 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 206283 location, out of 296501 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 208518 location, out of 299017 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 210008 location, out of 301533 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 212200 location, out of 304049 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 213698 location, out of 306565 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 215150 location, out of 309081 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 217335 location, out of 311597 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 219521 location, out of 314113 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 221832 location, out of 316629 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 223878 location, out of 319145 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 226189 location, out of 321661 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 228117 location, out of 324177 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 230302 location, out of 326693 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 232334 location, out of 329209 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 234519 location, out of 331725 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 236704 location, out of 334241 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 238889 location, out of 336757 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 241077 location, out of 339273 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 242533 location, out of 341789 in total. The Dqmin estimate might be inaccurate.                               
 call:      44   Penalty function =   0.53691524E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 244720 location, out of 344305 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 246164 location, out of 346821 in total. The Dqmin estimate might be inaccurate.                               
 call:      46   Penalty function =   0.51474124E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 247621 location, out of 349337 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 249068 location, out of 351853 in total. The Dqmin estimate might be inaccurate.                               
 call:      48   Penalty function =   0.43966543E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 250515 location, out of 354369 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 252710 location, out of 356885 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 254154 location, out of 359401 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 256339 location, out of 361917 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 258540 location, out of 364433 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 260728 location, out of 366949 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 262923 location, out of 369465 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 264376 location, out of 371981 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 265822 location, out of 374497 in total. The Dqmin estimate might be inaccurate.                               
 call:      57   Penalty function =   0.42782958E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 267274 location, out of 377013 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 269503 location, out of 379529 in total. The Dqmin estimate might be inaccurate.                               
 call:      59   Penalty function =   0.42481860E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 270947 location, out of 382045 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 273174 location, out of 384561 in total. The Dqmin estimate might be inaccurate.                               
 call:      61   Penalty function =   0.41504206E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 274634 location, out of 387077 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 276090 location, out of 389593 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 277500 location, out of 392109 in total. The Dqmin estimate might be inaccurate.                               
 call:      64   Penalty function =   0.28416263E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 279686 location, out of 394625 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 281888 location, out of 397141 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 283296 location, out of 399657 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 284670 location, out of 402173 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 286039 location, out of 404689 in total. The Dqmin estimate might be inaccurate.                               
 call:      69   Penalty function =   0.98134703E-12
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 287413 location, out of 407205 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 288777 location, out of 409721 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 290845 location, out of 412237 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 292924 location, out of 414753 in total. The Dqmin estimate might be inaccurate.                               
 call:      73   Penalty function =   0.91765388E-12
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 295031 location, out of 417269 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 296995 location, out of 419785 in total. The Dqmin estimate might be inaccurate.                               
 call:      75   Penalty function =   0.44219831E-12
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 299104 location, out of 422301 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 301180 location, out of 424817 in total. The Dqmin estimate might be inaccurate.                               
 call:      77   Penalty function =   0.13508625E-12
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 303142 location, out of 427333 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 305156 location, out of 429849 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 307235 location, out of 432365 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 309244 location, out of 434881 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 311358 location, out of 437397 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 313423 location, out of 439913 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 314796 location, out of 442429 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 316869 location, out of 444945 in total. The Dqmin estimate might be inaccurate.                               
 call:      85   Penalty function =   0.47288293E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 318850 location, out of 447461 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 320929 location, out of 449977 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 323003 location, out of 452493 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 325089 location, out of 455009 in total. The Dqmin estimate might be inaccurate.                               
 call:      89   Penalty function =   0.35984312E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 327057 location, out of 457525 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 329167 location, out of 460041 in total. The Dqmin estimate might be inaccurate.                               
 call:      91   Penalty function =   0.25783175E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 331282 location, out of 462557 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 333366 location, out of 465073 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 335446 location, out of 467589 in total. The Dqmin estimate might be inaccurate.                               
 call:      94   Penalty function =   0.15828145E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 337520 location, out of 470105 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 339590 location, out of 472621 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 341702 location, out of 475137 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 343791 location, out of 477653 in total. The Dqmin estimate might be inaccurate.                               
 call:      98   Penalty function =   0.13105985E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 345900 location, out of 480169 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 347980 location, out of 482685 in total. The Dqmin estimate might be inaccurate.                               
 call:     100   Penalty function =   0.10076893E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 350095 location, out of 485201 in total. The Dqmin estimate might be inaccurate.                               
  call limit
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 352173 location, out of 487717 in total. The Dqmin estimate might be inaccurate.                               
 call:     102   Penalty function =   0.24877733E-14
 number of variables:    4
 user given constraints: 4
@@ -5571,18 +5908,32 @@ total constraints:      4
 
 START LMDIF:
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 354251 location, out of 490233 in total. The Dqmin estimate might be inaccurate.                               
 Initial Penalty Function =   0.24877733E-14
 
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 356329 location, out of 492749 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 358407 location, out of 495265 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 360488 location, out of 497781 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 362566 location, out of 500297 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 364640 location, out of 502813 in total. The Dqmin estimate might be inaccurate.                               
 call:       6   Penalty function =   0.30149755E-23
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 366714 location, out of 505329 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 368788 location, out of 507845 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 370866 location, out of 510361 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 372940 location, out of 512877 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 375014 location, out of 515393 in total. The Dqmin estimate might be inaccurate.                               
 call:      11   Penalty function =   0.97494069E-33
  ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 377088 location, out of 517909 in total. The Dqmin estimate might be inaccurate.                               
 call:      11   Penalty function =   0.97494069E-33
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 379162 location, out of 520425 in total. The Dqmin estimate might be inaccurate.                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
 s.ds.r2.b1:1               x            4     0.00000000E+00    -6.37106097E-19     4.05904179E-37
 s.ds.r2.b1:1               px           4     0.00000000E+00    -2.40871691E-21     5.80191717E-40
 s.ds.r2.b1:1               y            4     0.00000000E+00     3.01470019E-17     9.08841721E-34
@@ -5627,26 +5978,130 @@ entry value: 0.000000
 entry name: py
 number of entries: 1
 entry value: 0.000000
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
 number of variables:    4
 user given constraints: 4
 total constraints:      4
 
 START SIMPLEX:
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381236 location, out of 522941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381450 location, out of 523191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381664 location, out of 523441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 381873 location, out of 523691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 382082 location, out of 523941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 382299 location, out of 524191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 382516 location, out of 524441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 382692 location, out of 524691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 382909 location, out of 524941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 383085 location, out of 525191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 383302 location, out of 525441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 383395 location, out of 525691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 383612 location, out of 525941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 383829 location, out of 526191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 383922 location, out of 526441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 384139 location, out of 526691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 384139 location, out of 526941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 384351 location, out of 527191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 384560 location, out of 527441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 384769 location, out of 527691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 384769 location, out of 527941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 384981 location, out of 528191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385190 location, out of 528441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385190 location, out of 528691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385190 location, out of 528941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 529191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 529441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 529691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 529941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 530191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 530441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 530691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 530941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 531191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 531441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 531691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 531941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 532191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 532441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 532691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 532941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 533191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 533441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 533691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 533941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 534191 in total. The Dqmin estimate might be inaccurate.                               
 call:      60   Penalty function =   0.21616112E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 534441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 534691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 534941 in total. The Dqmin estimate might be inaccurate.                               
 call:      63   Penalty function =   0.22409012E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 535191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 535441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 535691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 535941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 536191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 536441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 536691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 536941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 537191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 537441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 537691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 537941 in total. The Dqmin estimate might be inaccurate.                               
 call:      75   Penalty function =   0.18968927E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 538191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 538441 in total. The Dqmin estimate might be inaccurate.                               
 call:      77   Penalty function =   0.15364503E-14
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 538691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 538941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 539191 in total. The Dqmin estimate might be inaccurate.                               
 call:      80   Penalty function =   0.85658287E-15
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 539441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 539691 in total. The Dqmin estimate might be inaccurate.                               
 call:      82   Penalty function =   0.52164852E-15
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 539941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 540191 in total. The Dqmin estimate might be inaccurate.                               
 call:      84   Penalty function =   0.48234169E-15
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 540441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 540691 in total. The Dqmin estimate might be inaccurate.                               
 call:      86   Penalty function =   0.26476029E-15
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 540941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 541191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 541441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 541691 in total. The Dqmin estimate might be inaccurate.                               
 call:      90   Penalty function =   0.19605007E-15
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 541941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 542191 in total. The Dqmin estimate might be inaccurate.                               
 call:      92   Penalty function =   0.15533948E-15
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 542441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 542691 in total. The Dqmin estimate might be inaccurate.                               
 call:      94   Penalty function =   0.11983537E-15
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 542941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 543191 in total. The Dqmin estimate might be inaccurate.                               
 call:      96   Penalty function =   0.62918323E-16
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 543441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 543691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 543941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 544191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 544441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 544691 in total. The Dqmin estimate might be inaccurate.                               
 call:     102   Penalty function =   0.54406353E-16
  call limit
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 544941 in total. The Dqmin estimate might be inaccurate.                               
 call:     103   Penalty function =   0.16462209E-16
 number of variables:    4
 user given constraints: 4
@@ -5654,18 +6109,32 @@ total constraints:      4
 
 START LMDIF:
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 545191 in total. The Dqmin estimate might be inaccurate.                               
 Initial Penalty Function =   0.16462209E-16
 
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 545441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 545691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 545941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 546191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 546441 in total. The Dqmin estimate might be inaccurate.                               
 call:       6   Penalty function =   0.81131510E-29
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 546691 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 546941 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 547191 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 547441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 547691 in total. The Dqmin estimate might be inaccurate.                               
 call:      11   Penalty function =   0.15785739E-36
  ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 547941 in total. The Dqmin estimate might be inaccurate.                               
 call:      11   Penalty function =   0.15785739E-36
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548191 in total. The Dqmin estimate might be inaccurate.                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
 e.ds.l5.b1:1               x            4     0.00000000E+00     3.82719368E-19     1.46474115E-37
 e.ds.l5.b1:1               px           4     0.00000000E+00     1.06692437E-20     1.13832762E-38
 e.ds.l5.b1:1               y            4     0.00000000E+00    -3.26976647E-27     1.06913728E-53
@@ -5710,26 +6179,130 @@ entry value: 0.000000
 entry name: py
 number of entries: 1
 entry value: 0.000000
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
 number of variables:    4
 user given constraints: 4
 total constraints:      4
 
 START SIMPLEX:
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 385399 location, out of 548441 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 386728 location, out of 550475 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 388057 location, out of 552509 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 389385 location, out of 554543 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 390713 location, out of 556577 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 391878 location, out of 558611 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 393043 location, out of 560645 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 393043 location, out of 562679 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 394201 location, out of 564713 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 395465 location, out of 566747 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 396685 location, out of 568781 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 397905 location, out of 570815 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 399043 location, out of 572849 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400075 location, out of 574883 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 576917 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 578951 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 580985 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 583019 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 585053 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 587087 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 589121 in total. The Dqmin estimate might be inaccurate.                               
 call:      36   Penalty function =   0.24919145E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 591155 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 593189 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 595223 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 597257 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 599291 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 601325 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 603359 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 605393 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 607427 in total. The Dqmin estimate might be inaccurate.                               
 call:      45   Penalty function =   0.20245419E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 609461 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 611495 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 400526 location, out of 613529 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 401283 location, out of 615563 in total. The Dqmin estimate might be inaccurate.                               
 call:      49   Penalty function =   0.14967692E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 401283 location, out of 617597 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 401452 location, out of 619631 in total. The Dqmin estimate might be inaccurate.                               
 call:      51   Penalty function =   0.12528477E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 402407 location, out of 621665 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 403565 location, out of 623699 in total. The Dqmin estimate might be inaccurate.                               
 call:      53   Penalty function =   0.12270969E-11
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 404520 location, out of 625733 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 405708 location, out of 627767 in total. The Dqmin estimate might be inaccurate.                               
 call:      55   Penalty function =   0.35741792E-12
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 406866 location, out of 629801 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 408024 location, out of 631835 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 409171 location, out of 633869 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 410359 location, out of 635903 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 411547 location, out of 637937 in total. The Dqmin estimate might be inaccurate.                               
 call:      60   Penalty function =   0.25383846E-12
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 412735 location, out of 639971 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 413923 location, out of 642005 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 414878 location, out of 644039 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 414878 location, out of 646073 in total. The Dqmin estimate might be inaccurate.                               
 call:      64   Penalty function =   0.60039430E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 416066 location, out of 648107 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 417254 location, out of 650141 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 417254 location, out of 652175 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 418442 location, out of 654209 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 419630 location, out of 656243 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 419630 location, out of 658277 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 420818 location, out of 660311 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 422006 location, out of 662345 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 423113 location, out of 664379 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 424301 location, out of 666413 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 425408 location, out of 668447 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 425619 location, out of 670481 in total. The Dqmin estimate might be inaccurate.                               
 call:      76   Penalty function =   0.30261487E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 426807 location, out of 672515 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 427914 location, out of 674549 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 427914 location, out of 676583 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 427914 location, out of 678617 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 429021 location, out of 680651 in total. The Dqmin estimate might be inaccurate.                               
 call:      81   Penalty function =   0.26125747E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 429845 location, out of 682685 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 430753 location, out of 684719 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 431941 location, out of 686753 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 431985 location, out of 688787 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 432029 location, out of 690821 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 432438 location, out of 692855 in total. The Dqmin estimate might be inaccurate.                               
 call:      87   Penalty function =   0.23368791E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 432607 location, out of 694889 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 433606 location, out of 696923 in total. The Dqmin estimate might be inaccurate.                               
 call:      89   Penalty function =   0.22073470E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 434363 location, out of 698957 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 435271 location, out of 700991 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 436418 location, out of 703025 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 436919 location, out of 705059 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 438026 location, out of 707093 in total. The Dqmin estimate might be inaccurate.                               
 call:      94   Penalty function =   0.19811931E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 438026 location, out of 709127 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 439133 location, out of 711161 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 440240 location, out of 713195 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 441347 location, out of 715229 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 442454 location, out of 717263 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 443483 location, out of 719297 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 444590 location, out of 721331 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 445697 location, out of 723365 in total. The Dqmin estimate might be inaccurate.                               
  call limit
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 446804 location, out of 725399 in total. The Dqmin estimate might be inaccurate.                               
 call:     103   Penalty function =   0.19238920E-13
 number of variables:    4
 user given constraints: 4
@@ -5737,18 +6310,32 @@ total constraints:      4
 
 START LMDIF:
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 447911 location, out of 727433 in total. The Dqmin estimate might be inaccurate.                               
 Initial Penalty Function =   0.19238920E-13
 
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 449018 location, out of 729467 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 450125 location, out of 731501 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 451232 location, out of 733535 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 452339 location, out of 735569 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 452339 location, out of 737603 in total. The Dqmin estimate might be inaccurate.                               
 call:       6   Penalty function =   0.22232562E-22
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 452339 location, out of 739637 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 452339 location, out of 741671 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 452339 location, out of 743705 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 452339 location, out of 745739 in total. The Dqmin estimate might be inaccurate.                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 452339 location, out of 747773 in total. The Dqmin estimate might be inaccurate.                               
 call:      11   Penalty function =   0.56862849E-33
  ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 452339 location, out of 749807 in total. The Dqmin estimate might be inaccurate.                               
 call:      11   Penalty function =   0.56862849E-33
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 452339 location, out of 751841 in total. The Dqmin estimate might be inaccurate.                               
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 452339 location, out of 753875 in total. The Dqmin estimate might be inaccurate.                               
 s.ds.r6.b1:1               x            4     0.00000000E+00     2.26628478E-17     5.13604671E-34
 s.ds.r6.b1:1               px           4     0.00000000E+00    -7.41780424E-19     5.50238198E-35
 s.ds.r6.b1:1               y            4     0.00000000E+00    -4.24298145E-23     1.80028916E-45
@@ -8081,8 +8668,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000803098492656774 
+
+dqmin_phase 
+1.8235152385321 
 xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
 
 xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
@@ -8182,8 +8772,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000803098492656774 
+
+dqmin_phase 
+1.8235152385321 
   ++++++++++++++++++++++++++++
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
@@ -8227,11 +8820,14 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000803098492656774 
 
-  Number of warnings: 643
-117 in C and 526 in Fortran
+dqmin_phase 
+1.8235152385321 
+
+  Number of warnings: 1112
+117 in C and 995 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

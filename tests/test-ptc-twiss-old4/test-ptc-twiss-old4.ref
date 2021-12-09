@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.09.12 19:20:20      +
+  + Execution date: 2021.11.30 15:32:49      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -224,8 +224,11 @@ orbit:   3.260716E-04  2.596347E-06  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               0 
+
+       dqmin_phase 
+                 0 
 
 
 SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)

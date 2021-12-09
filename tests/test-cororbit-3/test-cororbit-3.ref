@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:24:44      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.02 17:00:55      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, s='MAD-X test';
 
@@ -52,8 +52,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               0 
+
+       dqmin_phase 
+                 0 
 
 
 Readmytable,file="input/orbps.in",table=orbint;
@@ -150,8 +153,11 @@ orbit:  -2.692856E-03 -5.679458E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               0 
+
+       dqmin_phase 
+                 0 
 
 
 ! MICADO with SVD conditioning
@@ -239,8 +245,11 @@ orbit:  -2.762425E-03 -5.729290E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               0 
+
+       dqmin_phase 
+                 0 
 
 
 ! SVD without SVD conditioning
@@ -326,8 +335,11 @@ orbit:  -2.762162E-03 -5.728768E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               0 
+
+       dqmin_phase 
+                 0 
 
 
 ! SVD with SVD conditioning
@@ -414,8 +426,11 @@ orbit:  -2.762425E-03 -5.729290E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               0 
+
+       dqmin_phase 
+                 0 
 
 
 ! LSQ without SVD conditioning
@@ -479,10 +494,10 @@ Twiss, file=result5;
 
 enter Twiss module
   
-iteration:   1 error:   2.771559E-05 deltap:   0.000000E+00
-orbit:  -2.531452E-03 -4.831853E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.771558E-05 deltap:   0.000000E+00
+orbit:  -2.531451E-03 -4.831853E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   5.015230E-08 deltap:   0.000000E+00
+iteration:   2 error:   5.015228E-08 deltap:   0.000000E+00
 orbit:  -2.531502E-03 -4.831920E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
@@ -494,7 +509,7 @@ orbit:  -2.531502E-03 -4.831920E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
        1.244737918        1.057577307        176.2740748        89.98937594 
 
              dxrms             xcomax             xcorms                 q2 
-       70.29135164     0.009247147304     0.003778945341        1.851577089 
+       70.29135164     0.009247147151     0.003778945261        1.851577089 
 
                dq2            betymax              dymax              dyrms 
       0.3300208738         184.980016                  0                  0 
@@ -505,8 +520,11 @@ orbit:  -2.531502E-03 -4.831920E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               0 
+
+       dqmin_phase 
+                 0 
 
 
 ! LSQ with SVD conditioning
@@ -596,8 +614,11 @@ orbit:  -2.762425E-03 -5.729290E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               0 
+
+       dqmin_phase 
+                 0 
 
 
 

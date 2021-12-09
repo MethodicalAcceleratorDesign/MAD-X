@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:31:40      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.11.30 15:33:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !example of 6D calculation on ALS (synchrotron light source)
 
@@ -60,7 +60,7 @@ Determined SECTOR NMUL MAX :  2
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    5.6919674902566881E-014   0.0000000000000000       -7.7160500211448380E-015
+ After    end:   -3.7693476863994694E-014   0.0000000000000000       -1.4675760606763788E-015
 
 
 !  ptc_printframes, file="ALS.C", format=rootmacro;!this prints my visualisation with ROOT

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.03.02 09:16:19      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.02 17:00:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=2;
 
@@ -78,8 +78,11 @@ final orbit vector:     1.998533E-03 -2.003017E-03  1.500525E-02  9.010429E-03 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0               0 
+
+       dqmin_phase 
+                 0 
 track, onepass, dump, onetable;
 
 enter TRACK module
@@ -135,7 +138,7 @@ ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    4.9999166670833331E-003  -4.9999791666927081E-003   1.9999750002083330     
+ After    end:    4.9999166670833331E-003  -4.9999791666927081E-003   1.9999750002083325     
 ptc_setswitch, debuglevel=0, nocavity=true, fringe=false, exact_mis=true, time=true, totalpath=false;
 
 PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=xin, y=yin, px=xpin, py=ypin, t=0.0, pt=0.0;
