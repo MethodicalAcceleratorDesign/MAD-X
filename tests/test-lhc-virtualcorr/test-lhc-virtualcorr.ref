@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.04.28 21:57:36      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.09 12:17:53      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Links definitions
 
@@ -306,8 +306,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -350,10 +353,14 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le                   0
+@ DQMIN_PHASE      %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "28/04/21"
-@ TIME             %08s "21.57.42"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.05"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP5"                      6664.568433        11.00260699        11.00650363     0.002850892684    0.0007548514235    0.0004950767763   -2.680921442e-05        15.59181943        14.29786066
@@ -386,8 +393,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -430,10 +440,14 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le                   0
+@ DQMIN_PHASE      %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.01 Linux 64"
-@ DATE             %08s "28/04/21"
-@ TIME             %08s "21.57.44"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.07"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP1"                                0        11.00474119        11.00406663    -0.003641817309   -0.0006151400488    0.0005597189687   -2.942489079e-05                  0                  0
@@ -466,8 +480,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -493,8 +510,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -520,8 +540,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 ++++++ warning: Cannot save an empty error table ignored
 Want to make named table: my_target
 enter Twiss module
@@ -535,6 +558,7 @@ orbit:   7.470275E-03 -1.290259E-04 -1.004680E-03  6.448374E-06  0.000000E+00  0
 iteration:   3 error:   4.748877E-09 deltap:   1.000000E-06
 orbit:   7.470274E-03 -1.290259E-04 -1.004687E-03  6.448226E-06  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 8281 location, out of 42439 in total. The Dqmin estimate might be inaccurate.                                  
   
 iteration:   1 error:   7.507605E-03 deltap:   0.000000E+00
 orbit:   7.535102E-03 -1.301307E-04 -1.006551E-03  5.992410E-06  0.000000E+00  0.000000E+00
@@ -545,6 +569,7 @@ orbit:   7.470756E-03 -1.290191E-04 -1.004635E-03  6.448762E-06  0.000000E+00  0
 iteration:   3 error:   4.750102E-09 deltap:   0.000000E+00
 orbit:   7.470754E-03 -1.290191E-04 -1.004642E-03  6.448613E-06  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 8281 location, out of 42439 in total. The Dqmin estimate might be inaccurate.                                  
 
 ++++++ table: summ
 
@@ -566,8 +591,11 @@ orbit:   7.470754E-03 -1.290191E-04 -1.004642E-03  6.448613E-06  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    0.0009298722555 
+
+       dqmin_phase 
+      0.0299764886 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -636,8 +664,11 @@ orbit:   5.871921E-05 -2.111219E-08  3.158783E-04  4.895847E-06  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.00776098295 
+
+       dqmin_phase 
+     -0.8778423275 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -706,8 +737,11 @@ orbit:  -2.328558E-06  1.501569E-07  2.039862E-06  4.853291E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.007634371025 
+
+       dqmin_phase 
+     -0.8878446766 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -773,8 +807,11 @@ orbit:  -1.141610E-08  4.045142E-10  2.351324E-07  3.700986E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.007674696004 
+
+       dqmin_phase 
+     -0.8879040725 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -917,8 +954,11 @@ orbit:  -1.083629E-05  3.124320E-07 -1.581889E-06 -2.061841E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.00765092608 
+
+       dqmin_phase 
+       2.321030243 
 enter Twiss module
   
 iteration:   1 error:   1.698364E-05 deltap:   0.000000E+00
@@ -947,8 +987,11 @@ orbit:  -6.888434E-06  1.989196E-07 -1.831189E-06 -9.873055E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.01015092568 
+
+       dqmin_phase 
+      -1.151415576 
 enter Twiss module
   
 iteration:   1 error:   3.614304E-05 deltap:   0.000000E+00
@@ -977,8 +1020,11 @@ orbit:  -1.473907E-05  4.245324E-07 -1.383014E-06 -3.162013E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.006575667961 
+
+       dqmin_phase 
+     -0.3163037562 
 enter Twiss module
   
 iteration:   1 error:   3.668655E-05 deltap:   0.000000E+00
@@ -1007,8 +1053,11 @@ orbit:  -1.496296E-05  4.309597E-07 -1.373076E-06 -3.226290E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.006593173878 
+
+       dqmin_phase 
+     -0.2761486192 
 enter Twiss module
   
 iteration:   1 error:   4.457100E-05 deltap:   0.000000E+00
@@ -1037,8 +1086,11 @@ orbit:  -1.797106E-05  5.213123E-07  6.762852E-07  1.514669E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.00967102437 
+
+       dqmin_phase 
+      -0.282517377 
 enter Twiss module
   
 iteration:   1 error:   2.882970E-05 deltap:   0.000000E+00
@@ -1067,8 +1119,11 @@ orbit:  -1.194998E-05  3.405000E-07 -3.512902E-06 -8.083118E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.003235594137 
+
+       dqmin_phase 
+       2.878292537 
 enter Twiss module
   
 iteration:   1 error:   2.096854E-05 deltap:   0.000000E+00
@@ -1097,8 +1152,11 @@ orbit:  -8.919823E-06  2.495607E-07 -5.752655E-06 -1.307681E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.637200706e-05 
+
+       dqmin_phase 
+     -0.6411149062 
 START MATCHING
 
 number of variables:    2
@@ -1308,8 +1366,11 @@ orbit:  -8.872123E-06  2.483250E-07 -5.721369E-06 -1.303896E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    3.394334326e-05 
+
+       dqmin_phase 
+       2.923527899 
 closest0           =     0.007643182249 ;
 closest1           =    9.449953095e-05 ;
 closest2           =    2.849613244e-05 ;
@@ -1368,8 +1429,11 @@ orbit:  -3.616668E-05  7.567384E-07  1.770894E-05  4.030453E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009332273808 
+
+       dqmin_phase 
+       2.753943241 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -1435,8 +1499,11 @@ orbit:  -8.822845E-07  2.031111E-08  1.647182E-07  7.054026E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009351992753 
+
+       dqmin_phase 
+        2.76982743 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -1502,8 +1569,11 @@ orbit:   3.089117E-08 -8.503450E-10 -1.340546E-08 -2.388760E-10  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009348174109 
+
+       dqmin_phase 
+       2.769705601 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -1569,8 +1639,11 @@ orbit:   2.433291E-09 -6.508525E-11  6.322174E-10 -1.524891E-12  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009348316131 
+
+       dqmin_phase 
+       2.769716264 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -1717,8 +1790,11 @@ orbit:   7.042448E-06 -1.297538E-07 -5.389303E-06 -6.522366E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009369858385 
+
+       dqmin_phase 
+       2.695140289 
 enter Twiss module
   
 iteration:   1 error:   2.075883E-05 deltap:   0.000000E+00
@@ -1747,8 +1823,11 @@ orbit:   1.194603E-05 -2.706818E-07 -5.815124E-06 -5.350902E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.01134732866 
+
+       dqmin_phase 
+        2.26986682 
 enter Twiss module
   
 iteration:   1 error:   3.061241E-06 deltap:   0.000000E+00
@@ -1777,8 +1856,11 @@ orbit:   2.213357E-06  8.923576E-09 -5.039346E-06 -7.731485E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009776253147 
+
+       dqmin_phase 
+      0.0327245549 
 enter Twiss module
   
 iteration:   1 error:   5.323342E-06 deltap:   0.000000E+00
@@ -1807,8 +1889,11 @@ orbit:   5.100177E-06 -7.396431E-08 -5.240071E-06 -7.001936E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009308229982 
+
+       dqmin_phase 
+     -0.2459565861 
 enter Twiss module
   
 iteration:   1 error:   8.062648E-06 deltap:   0.000000E+00
@@ -1837,8 +1922,11 @@ orbit:   1.006324E-06  5.099610E-08 -2.220058E-06  7.275339E-10  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.01374095118 
+
+       dqmin_phase 
+     -0.2667596524 
 enter Twiss module
   
 iteration:   1 error:   1.496414E-05 deltap:   0.000000E+00
@@ -1867,8 +1955,11 @@ orbit:   9.204580E-06 -1.991552E-07 -8.446381E-06 -1.431325E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.004582625223 
+
+       dqmin_phase 
+       2.906155211 
 enter Twiss module
   
 iteration:   1 error:   2.595390E-05 deltap:   0.000000E+00
@@ -1897,8 +1988,11 @@ orbit:   1.334375E-05 -3.253275E-07 -1.186020E-05 -2.190809E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    0.0001528131987 
+
+       dqmin_phase 
+      -1.480199558 
 START MATCHING
 
 number of variables:    2
@@ -1985,6 +2079,7 @@ START LMDIF:
 Initial Penalty Function =   0.10874196E-05
 
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 15146 location, out of 42439 in total. The Dqmin estimate might be inaccurate.                                 
  ++++++++++ LMDIF ended: converged: info =            1
 call:      11   Penalty function =   0.10874196E-05
 
@@ -2059,6 +2154,7 @@ START LMDIF:
 Initial Penalty Function =   0.13992853E-06
 
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 13062 location, out of 42439 in total. The Dqmin estimate might be inaccurate.                                 
 call:       7   Penalty function =   0.13972409E-06
  ++++++++++ LMDIF ended: converged without success
 call:      13   Penalty function =   0.13972409E-06
@@ -2113,8 +2209,11 @@ orbit:   1.338657E-05 -3.266844E-07 -1.185017E-05 -2.180429E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    5.045265535e-05 
+
+       dqmin_phase 
+       1.537945703 
 closest0           =     0.009453932422 ;
 closest1           =    0.0002224806908 ;
 closest2           =    5.286243627e-05 ;
@@ -2156,8 +2255,11 @@ orbit:   1.876864E-05 -4.460893E-07 -3.875523E-06 -1.323718E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.00927200474 
+
+       dqmin_phase 
+       1.757233423 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -2226,8 +2328,11 @@ orbit:   1.506932E-07 -1.238343E-09 -5.025200E-07 -1.992847E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009223335958 
+
+       dqmin_phase 
+       1.773511289 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -2293,8 +2398,11 @@ orbit:   7.291610E-09 -1.498377E-10  8.750875E-09  2.000316E-10  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009224455267 
+
+       dqmin_phase 
+         1.7734343 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -2360,8 +2468,11 @@ orbit:   1.915683E-10 -7.010081E-12  5.618642E-10  1.344110E-12  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009224406079 
+
+       dqmin_phase 
+       1.773429758 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -2406,17 +2517,36 @@ Initial Penalty Function =   0.42219515E+04
 
 
 call:       6   Penalty function =   0.16287281E+04
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 17502 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      11   Penalty function =   0.91428936E+02
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 17502 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 17502 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 17502 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 17500 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      16   Penalty function =   0.93253309E-05
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18341 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18335 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      21   Penalty function =   0.42855753E-19
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18341 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      26   Penalty function =   0.35300141E-23
  ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      26   Penalty function =   0.35300141E-23
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 18343 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 Global constraint:         q1           4     6.42700000E+01     6.42700000E+01     3.41292782E-24
 Global constraint:         q2           4     5.93550000E+01     5.93550000E+01     4.54383881E-26
 Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     6.47514780E-26
@@ -2509,8 +2639,11 @@ orbit:   1.300129E-05 -3.481583E-07 -1.273300E-05 -1.955429E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.01065074259 
+
+       dqmin_phase 
+     -0.6088330402 
 enter Twiss module
   
 iteration:   1 error:   4.254053E-05 deltap:   0.000000E+00
@@ -2539,8 +2672,11 @@ orbit:   1.838317E-05 -5.044685E-07 -1.358444E-05 -1.888856E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.01013555727 
+
+       dqmin_phase 
+    -0.09369539061 
 enter Twiss module
   
 iteration:   1 error:   1.609233E-05 deltap:   0.000000E+00
@@ -2569,8 +2705,11 @@ orbit:   7.712952E-06 -1.946398E-07 -1.198267E-05 -2.027677E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.01326672792 
+
+       dqmin_phase 
+       2.170742936 
 enter Twiss module
   
 iteration:   1 error:   3.820610E-05 deltap:   0.000000E+00
@@ -2599,8 +2738,11 @@ orbit:   1.664095E-05 -4.538593E-07 -1.329945E-05 -1.909661E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.01005718488 
+
+       dqmin_phase 
+     -0.2627869903 
 enter Twiss module
   
 iteration:   1 error:   2.668608E-05 deltap:   0.000000E+00
@@ -2629,8 +2771,11 @@ orbit:   1.234525E-05 -3.217514E-07 -9.365139E-06 -1.056478E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.005014937732 
+
+       dqmin_phase 
+       2.899613514 
 enter Twiss module
   
 iteration:   1 error:   4.965723E-05 deltap:   0.000000E+00
@@ -2659,8 +2804,11 @@ orbit:   2.094802E-05 -5.862780E-07 -1.745228E-05 -2.790729E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.01499146525 
+
+       dqmin_phase 
+     -0.2646596149 
 enter Twiss module
   
 iteration:   1 error:   1.729102E-05 deltap:   0.000000E+00
@@ -2689,8 +2837,11 @@ orbit:   8.050020E-06 -1.896021E-07 -5.638786E-06 -2.288178E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    0.0001707780303 
+
+       dqmin_phase 
+      -1.678435082 
 START MATCHING
 
 number of variables:    2
@@ -2776,6 +2927,7 @@ START LMDIF:
 Initial Penalty Function =   0.14378127E-05
 
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 17973 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
  ++++++++++ LMDIF ended: converged: info =            1
 call:      16   Penalty function =   0.14378127E-05
 
@@ -2909,8 +3061,11 @@ orbit:   7.959610E-06 -1.861734E-07 -5.627907E-06 -2.381915E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     2.41063464e-05 
+
+       dqmin_phase 
+      0.5111350933 
 closest0           =      0.01060166412 ;
 closest1           =    0.0002668144586 ;
 closest2           =    1.998735343e-05 ;
@@ -2927,17 +3082,36 @@ START LMDIF:
 Initial Penalty Function =   0.44334787E+00
 
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 21178 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:       7   Penalty function =   0.25519500E+00
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 21178 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 21178 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 21181 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 21188 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22017 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      12   Penalty function =   0.18211663E-04
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22017 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22017 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22019 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22021 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22019 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      17   Penalty function =   0.23346120E-16
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22019 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22019 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22021 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22024 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22019 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      22   Penalty function =   0.80109476E-24
  ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22019 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      22   Penalty function =   0.80109476E-24
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22019 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22019 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 Global constraint:         q1           4     6.42700000E+01     6.42700000E+01     7.27014210E-25
 Global constraint:         q2           4     5.93550000E+01     5.93550000E+01     2.01948392E-26
 Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     3.26685050E-26
@@ -2968,6 +3142,7 @@ orbit:   3.110915E-05 -7.278254E-07 -1.921929E-05 -1.879020E-07  0.000000E+00  0
 iteration:   2 error:   2.560838E-09 deltap:   1.000000E-06
 orbit:   3.110902E-05 -7.278031E-07 -1.921849E-05 -1.878823E-07  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22021 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
   
 iteration:   1 error:   5.167213E-05 deltap:   0.000000E+00
 orbit:   3.166581E-05 -7.217492E-07 -1.922230E-05 -1.877754E-07  0.000000E+00  0.000000E+00
@@ -2975,6 +3150,7 @@ orbit:   3.166581E-05 -7.217492E-07 -1.922230E-05 -1.877754E-07  0.000000E+00  0
 iteration:   2 error:   2.525313E-09 deltap:   0.000000E+00
 orbit:   3.166557E-05 -7.217260E-07 -1.922147E-05 -1.877557E-07  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22019 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 
 ++++++ table: summ
 
@@ -2996,8 +3172,11 @@ orbit:   3.166557E-05 -7.217260E-07 -1.922147E-05 -1.877557E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.001781119107 
+
+       dqmin_phase 
+      -2.078328404 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -3038,6 +3217,7 @@ orbit:   9.996442E-08 -2.535466E-08  1.335397E-06  1.654467E-08  0.000000E+00  0
 iteration:   2 error:   1.914555E-11 deltap:   1.000000E-06
 orbit:   9.997257E-08 -2.535467E-08  1.335407E-06  1.654478E-08  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22360 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
   
 iteration:   1 error:   2.062387E-06 deltap:   0.000000E+00
 orbit:   6.551219E-07 -1.924093E-08  1.332842E-06  1.667008E-08  0.000000E+00  0.000000E+00
@@ -3045,6 +3225,7 @@ orbit:   6.551219E-07 -1.924093E-08  1.332842E-06  1.667008E-08  0.000000E+00  0
 iteration:   2 error:   4.570883E-12 deltap:   0.000000E+00
 orbit:   6.551221E-07 -1.924092E-08  1.332843E-06  1.667008E-08  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22355 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 
 ++++++ table: summ
 
@@ -3066,8 +3247,11 @@ orbit:   6.551221E-07 -1.924092E-08  1.332843E-06  1.667008E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.001681958722 
+
+       dqmin_phase 
+      -2.020265485 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -3108,10 +3292,12 @@ orbit:  -6.862025E-07 -2.432752E-09  4.505693E-09 -1.548900E-10  0.000000E+00  0
 iteration:   2 error:   5.062476E-12 deltap:   1.000000E-06
 orbit:  -6.862014E-07 -2.432720E-09  4.508693E-09 -1.548386E-10  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22355 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
   
 iteration:   1 error:   2.971994E-07 deltap:   0.000000E+00
 orbit:  -1.310797E-07  3.681596E-09  1.955926E-09 -2.924657E-11  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22351 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 
 ++++++ table: summ
 
@@ -3133,8 +3319,11 @@ orbit:  -1.310797E-07  3.681596E-09  1.955926E-09 -2.924657E-11  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.001676817778 
+
+       dqmin_phase 
+      -2.018556851 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -3175,10 +3364,12 @@ orbit:  -5.572164E-07 -6.056795E-09  1.109006E-09 -1.535013E-10  0.000000E+00  0
 iteration:   2 error:   5.361598E-12 deltap:   1.000000E-06
 orbit:  -5.572144E-07 -6.056769E-09  1.112171E-09 -1.534465E-10  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22355 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
   
 iteration:   1 error:   4.597426E-09 deltap:   0.000000E+00
 orbit:  -2.088787E-09  5.743989E-11 -1.441869E-09 -2.786117E-11  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 22351 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 
 ++++++ table: summ
 
@@ -3200,8 +3391,11 @@ orbit:  -2.088787E-09  5.743989E-11 -1.441869E-09 -2.786117E-11  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.00167756772 
+
+       dqmin_phase 
+      -2.018602965 
 Want to correct orbit of a single ring
 Want to use target orbit from: my_target
 587 monitors and 1204 correctors found in input
@@ -3236,16 +3430,21 @@ after correction:  -0.000001        0.000730          0.000730        0.015895
 Max strength: 5.524436e-08 is below corrector strength limit: 1.000000e+00
 START MATCHING
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 14255 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 number of variables:    2
 user given constraints: 2
 total constraints:      2
 
 START LMDIF:
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 14255 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 Initial Penalty Function =   0.42367906E+00
 
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 14255 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 14253 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:       4   Penalty function =   0.17346957E-03
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 7610 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                  
 call:      10   Penalty function =   0.17269856E-03
 call:      13   Penalty function =   0.17262617E-03
 call:      16   Penalty function =   0.17205814E-03
@@ -3305,8 +3504,11 @@ orbit:  -1.856930E-05  3.996967E-07  1.928611E-05  1.644013E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.001848069861 
+
+       dqmin_phase 
+       1.849817406 
 enter Twiss module
   
 iteration:   1 error:   3.944482E-05 deltap:   0.000000E+00
@@ -3335,8 +3537,11 @@ orbit:  -1.761186E-05  3.723320E-07  1.924371E-05  1.667387E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.002703119654 
+
+       dqmin_phase 
+       1.687553713 
 enter Twiss module
   
 iteration:   1 error:   4.101597E-05 deltap:   0.000000E+00
@@ -3365,8 +3570,11 @@ orbit:  -1.952411E-05  4.269820E-07  1.932559E-05  1.620489E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.001158901338 
+
+       dqmin_phase 
+       2.258040637 
 enter Twiss module
   
 iteration:   1 error:   4.157961E-05 deltap:   0.000000E+00
@@ -3395,8 +3603,11 @@ orbit:  -2.020888E-05  4.465477E-07  1.935216E-05  1.603486E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    0.0009351781739 
+
+       dqmin_phase 
+       2.858235794 
 enter Twiss module
   
 iteration:   1 error:   4.134496E-05 deltap:   0.000000E+00
@@ -3425,8 +3636,11 @@ orbit:  -2.062727E-05  4.593421E-07  1.965943E-05  1.672355E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.001387783674 
+
+       dqmin_phase 
+     -0.2802905485 
 enter Twiss module
   
 iteration:   1 error:   4.181446E-05 deltap:   0.000000E+00
@@ -3455,8 +3669,11 @@ orbit:  -1.979041E-05  4.337512E-07  1.904299E-05  1.534372E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.000457890034 
+
+       dqmin_phase 
+       2.843102259 
 enter Twiss module
   
 iteration:   1 error:   4.205017E-05 deltap:   0.000000E+00
@@ -3485,8 +3702,11 @@ orbit:  -1.937065E-05  4.209161E-07  1.873102E-05  1.464817E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    5.753830867e-06 
+
+       dqmin_phase 
+     0.06864943055 
 START MATCHING
 
 number of variables:    2
@@ -3695,8 +3915,11 @@ orbit:  -1.937065E-05  4.209161E-07  1.873102E-05  1.464817E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    5.753830867e-06 
+
+       dqmin_phase 
+     0.06864943055 
 closest0           =     0.001854874487 ;
 closest1           =     1.98926221e-05 ;
 closest2           =     1.98926221e-05 ;
@@ -3713,17 +3936,31 @@ START LMDIF:
 Initial Penalty Function =   0.10555137E+00
 
 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24589 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:       6   Penalty function =   0.34083993E-04
 ++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.102238E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24589 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24589 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24589 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24585 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24522 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      11   Penalty function =   0.13354022E-13
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24522 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24522 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24510 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24493 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24522 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      16   Penalty function =   0.22193722E-22
  ++++++++++ LMDIF ended: converged successfully
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24522 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 call:      16   Penalty function =   0.22193722E-22
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24522 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24522 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 Global constraint:         q1           4     6.43100000E+01     6.43100000E+01     2.19921799E-23
 Global constraint:         q2           4     5.93200000E+01     5.93200000E+01     1.81753553E-25
 Global constraint:         dq1          4     3.00000000E+00     3.00000000E+00     1.39541606E-26
@@ -3754,6 +3991,7 @@ orbit:   1.342299E-05 -1.218665E-07  3.775109E-06 -6.603938E-08  0.000000E+00  0
 iteration:   2 error:   1.558268E-09 deltap:   1.000000E-06
 orbit:   1.342189E-05 -1.218454E-07  3.775303E-06 -6.603775E-08  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24520 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
   
 iteration:   1 error:   2.812290E-05 deltap:   0.000000E+00
 orbit:   1.396014E-05 -1.153687E-07  3.773382E-06 -6.588081E-08  0.000000E+00  0.000000E+00
@@ -3761,6 +3999,7 @@ orbit:   1.396014E-05 -1.153687E-07  3.773382E-06 -6.588081E-08  0.000000E+00  0
 iteration:   2 error:   1.752594E-09 deltap:   0.000000E+00
 orbit:   1.395894E-05 -1.153453E-07  3.773711E-06 -6.587706E-08  0.000000E+00  0.000000E+00
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 24522 location, out of 42455 in total. The Dqmin estimate might be inaccurate.                                 
 
 ++++++ table: summ
 
@@ -3782,8 +4021,11 @@ orbit:   1.395894E-05 -1.153453E-07  3.773711E-06 -6.587706E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    0.0001397459477 
+
+       dqmin_phase 
+      -2.542197079 
 Determined SECTOR NMUL MAX :  0
  MAD-X Beam Parameters
                   Energy : 0.450000E+03
@@ -3832,10 +4074,10 @@ Determined SECTOR NMUL MAX :  0
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   -1.2343310889072883E-005   1.2345069138660401E-006   5.5792562206558433E-006  -5.5000387849725801E-008   0.0000000000000000     
+ Closed orbit:   -1.2343310889070225E-005   1.2345069138659662E-006   5.5792562206701158E-006  -5.5000387849578490E-008   0.0000000000000000     
 
-  Number of warnings: 272
-235 in C and 37 in Fortran
+  Number of warnings: 344
+235 in C and 109 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

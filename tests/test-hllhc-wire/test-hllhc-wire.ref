@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.02 15:55:15      +
+  + Execution date: 2021.12.09 12:17:31      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2009
 
@@ -512,8 +512,8 @@ dqmin_phase
 @ DQMIN_PHASE      %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "02/12/21"
-@ TIME             %08s "15.55.29"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.17.58"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.5684327563 0.150000000792417 0.14999999999774 4.56963895388558e-08 3.12481956538397e-11 -3.00094859267699e-10 5.19797138070879e-09 15.0109070352973 14.5393647705992
@@ -599,8 +599,8 @@ dqmin_phase
 @ DQMIN_PHASE      %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "02/12/21"
-@ TIME             %08s "15.55.30"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.00"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.8731672437 0.149999995141886 0.149999999999552 2.96974407962579e-08 1.77484857230974e-12 7.57657057265898e-10 -3.83457101221391e-09 15.1385489606468 14.4448340932668
@@ -689,8 +689,8 @@ dqmin_phase
 @ DQMIN_PHASE      %le  2.79065596550715
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "02/12/21"
-@ TIME             %08s "15.55.31"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.02"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.5684327563 -2.82901667781991e-09 0.000749978480249974 0.00025010849452088 4.65249475680409e-08
@@ -779,8 +779,8 @@ dqmin_phase
 @ DQMIN_PHASE      %le  2.69529635627739
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "02/12/21"
-@ TIME             %08s "15.55.32"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.04"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.8731672437 -7.03201360400911e-09 -0.000749972214158974 -0.000250143361576922 -7.61144269306663e-08
@@ -1316,8 +1316,8 @@ dqmin_phase
 @ DQMIN_PHASE      %le  -1.04922776668602
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "02/12/21"
-@ TIME             %08s "15.55.44"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.27"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6589.76797484384 "BBMK_PAR.L5B1_20"  7622.79267873972 18878.7268115465 -27.9631314170753 -123.751987457866 14.7610980155191 14.2893001824243 -0.00819315712583501 0.00010150760876179 -9.8488298919745e-05 6.62592527038303e-07
@@ -1490,8 +1490,8 @@ dqmin_phase
 @ DQMIN_PHASE      %le  -0.810861910758047
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "02/12/21"
-@ TIME             %08s "15.55.45"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.29"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6590.07270933124 "BBMK_PAR.L5B2_20"  18878.9640377068 7621.00664448405 -123.753500776964 -27.9566348537238 14.8884782363789 14.1950566784004 0.0130388103648641 -6.48873599484348e-05 0.000162066648375159 -2.31783766151174e-07
@@ -1661,8 +1661,8 @@ dqmin_phase
 @ DQMIN_PHASE      %le  -1.04922776668602
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "02/12/21"
-@ TIME             %08s "15.55.46"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.31"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6664.5009327563 "BB_HO.L5B1_5"      0.180389279435029 0.180345388196951 0.450185941801743 0.449863375487957 14.9435763967769 14.4720923784923 5.73374968682055e-06 -2.04586880635513e-08 0.000250247395571573 -1.90710976176588e-06
