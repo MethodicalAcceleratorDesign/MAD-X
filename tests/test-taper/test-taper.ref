@@ -1,0 +1,654 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.02 16:59:31      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+! Test/Demo file for TAPER command and TAPERING flag for TWISS
+
+!
+
+! 2021-08-13 Ghislain Roy
+
+
+
+Option, -echo;
+
+
+
+Set, format="-20s","23.17g";
+
+
+
+Select, flag=twiss, column=name,keyword,s,x,px,y,py,t,pt;
+
+
+
+Beam, particle=electron, PC=182.5, radiate;
+
+
+
+Use, sequence = FCC_E_RING;
+
+
+
+! Without tapering Twiss will fail
+
+Twiss; 
+
+enter Twiss module
+  
+iteration:   1 error:   3.985885E-04 deltap:   0.000000E+00
+orbit:   4.449744E-06  1.053100E-05  0.000000E+00  0.000000E+00 -7.375850E-04  8.928131E-05
+  
+iteration:   2 error:   9.890901E-06 deltap:   0.000000E+00
+orbit:   4.542147E-06  1.121460E-05  0.000000E+00  0.000000E+00 -7.555235E-04  9.179113E-05
+  
+iteration:   3 error:   2.477758E-07 deltap:   0.000000E+00
+orbit:   4.551192E-06  1.125545E-05  0.000000E+00  0.000000E+00 -7.559763E-04  9.184437E-05
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCPIN:  Mode 1 is unstable for delta(p)/p =     0.000000: cosmux =     1.151538, cosmuy =    -0.919950                                                        
+++++++ Error: seterrorflag : Errorcode: 1   Reported from pro_twiss:
+++++++ Error: seterrorflag : Description: TWISS failed
+++++++ warning: Twiss failed:  MAD-X continues
+
+
+! Taper with all default values
+
+Taper;
+
+  
+iteration:   1 error:   2.134290E-10 deltap:   0.000000E+00
+orbit:  -3.018296E-13  5.695083E-13  0.000000E+00  0.000000E+00 -4.063248E-10 -6.183646E-12
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+Twiss, save, file="taper-def.tfs";
+
+enter Twiss module
+  
+iteration:   1 error:   2.126608E-10 deltap:   0.000000E+00
+orbit:  -3.009189E-13  5.694534E-13  0.000000E+00  0.000000E+00 -4.455048E-10 -1.166410E-10
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+
+++++++ table: summ
+
+                 length                  orbit5                    alfa                 gammatr 
+     97756.072627066169  4.4550481064053768e-10  6.7368976041691593e-06      385.27428822113944 
+
+                     q1                     dq1                 betxmax                   dxmax 
+     389.05942327459911     0.97242839370930223      1619.4277922428787     0.53578797772048581 
+
+                  dxrms                  xcomax                  xcorms                      q2 
+    0.12379185857494912  6.6070669208248745e-11  1.8579076433169285e-11      389.17276467241521 
+
+                    dq2                 betymax                   dymax                   dyrms 
+   -0.81165641418174317      7121.1444419790932                      -0                       0 
+
+                 ycomax                  ycorms                  deltap                 synch_1 
+                      0                       0                       0                       0 
+
+                synch_2                 synch_3                 synch_4                 synch_5 
+                      0                       0                       0                       0 
+
+                synch_6                 synch_8                  nflips                   dqmin 
+                      0                       0                       0                    0 
+
+            dqmin_phase 
+                      0 
+
+
+! Check parameters and guards
+
+! non default parameters
+
+Taper, iterate=2, stepsize=2.e-6, file="test1.madx";  
+
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+first taper value:   0.000000E+00 nsteps:        0
+ 
+final orbit vector:       5.215299E-07 -1.214317E-06  0.000000E+00  0.000000E+00 -5.217371E-06 -6.844945E-07
+last taper value:    0.000000E+00 nsteps:        0
+
+
+! negative values for iterate and stepsize
+
+Taper, iterate=-11, stepsize=-2.e-3, file;
+
+++++++ warning: negative value for ITERATE,  reset to absolute value
+++++++ warning: ITERATE value larger than 10 is probably useless,  reset to 10.
+++++++ warning: negative value for STEPSIZE,  reset to absolute value
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+first taper value:   0.000000E+00 nsteps:        0
+ 
+final orbit vector:       3.000026E-04  1.435167E-05  0.000000E+00  0.000000E+00 -1.423031E-06 -3.225320E-04
+last taper value:    0.000000E+00 nsteps:        0
+
+
+! initial closed orbit will be taken into account
+
+Coguess, pt=1.e-4 ;
+
+Taper, file="coguess.madx";
+
+ Found initial orbit vector from COGUESS values. 
+  
+iteration:   1 error:   1.402770E-05 deltap:   0.000000E+00
+orbit:   1.033604E-10 -2.421153E-11  0.000000E+00  0.000000E+00  2.400125E-05  9.305407E-05
+  
+iteration:   2 error:   6.823880E-07 deltap:   0.000000E+00
+orbit:   7.693533E-12  5.781801E-12  0.000000E+00  0.000000E+00  2.516936E-05  9.271617E-05
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+Coguess, clear ;
+
+
+
+Taper;
+
+  
+iteration:   1 error:   2.134290E-10 deltap:   0.000000E+00
+orbit:  -3.018296E-13  5.695083E-13  0.000000E+00  0.000000E+00 -4.063248E-10 -6.183646E-12
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+! and with effect of deltap
+
+Twiss, deltap=1.e-3, save, file="taper_dp.tfs";
+
+enter Twiss module
+  
+iteration:   1 error:   1.105442E-04 deltap:   1.000000E-03
+orbit:  -9.135213E-08  4.123017E-07  0.000000E+00  0.000000E+00  1.835133E-04 -7.030935E-05
+  
+iteration:   2 error:   6.193924E-07 deltap:   1.000000E-03
+orbit:  -1.224543E-07  4.132685E-07  0.000000E+00  0.000000E+00  1.823771E-04 -7.092048E-05
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+
+++++++ table: summ
+
+                 length                  orbit5                    alfa                 gammatr 
+     97756.072627066169  -0.0001823771135840327  6.7518035614361008e-06      384.84876819764207 
+
+                     q1                     dq1                 betxmax                   dxmax 
+     389.05994144350001      2.5267238136637333      1657.4217367204815      0.5445146982123148 
+
+                  dxrms                  xcomax                  xcorms                      q2 
+    0.12402080397082783  0.00049831653645338926  0.00011501432351449565      389.17726275310332 
+
+                    dq2                 betymax                   dymax                   dyrms 
+     7.3076027158167918      6848.9451700797408                      -0                       0 
+
+                 ycomax                  ycorms                  deltap                 synch_1 
+                      0                       0                   0.001                       0 
+
+                synch_2                 synch_3                 synch_4                 synch_5 
+                      0                       0                       0                       0 
+
+                synch_6                 synch_8                  nflips                   dqmin 
+                      0                       0                       0                    0 
+
+            dqmin_phase 
+                      0 
+
+
+! relative tapering
+
+Taper, stepsize=1.e-3, file="test2.madx";
+
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+first taper value:   0.000000E+00 nsteps:        0
+ 
+final orbit vector:       4.965916E-05  2.522992E-06  0.000000E+00  0.000000E+00  2.622710E-06 -1.514927E-05
+last taper value:    0.000000E+00 nsteps:        0
+Twiss, save, file="taper_rel.tfs";
+
+enter Twiss module
+  
+iteration:   1 error:   4.965916E-05 deltap:   0.000000E+00
+orbit:   6.410054E-05 -1.126109E-04  0.000000E+00  0.000000E+00  2.724985E-05 -3.540629E-06
+  
+iteration:   2 error:   1.740877E-04 deltap:   0.000000E+00
+orbit:   1.061600E-04 -1.182883E-04  0.000000E+00  0.000000E+00  3.605941E-04  5.474818E-06
+  
+iteration:   3 error:   6.589003E-05 deltap:   0.000000E+00
+orbit:   1.197224E-04 -1.171318E-04  0.000000E+00  0.000000E+00  4.851376E-04  2.517580E-06
+  
+iteration:   4 error:   1.924468E-05 deltap:   0.000000E+00
+orbit:   1.205317E-04 -1.163749E-04  0.000000E+00  0.000000E+00  5.213890E-04  1.121883E-06
+  
+iteration:   5 error:   1.668277E-07 deltap:   0.000000E+00
+orbit:   1.199793E-04 -1.162774E-04  0.000000E+00  0.000000E+00  5.214916E-04  8.385059E-07
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+
+++++++ table: summ
+
+                 length                  orbit5                    alfa                 gammatr 
+     97756.072627066169 -0.00052149159472088746  6.7400488298864054e-06      385.18421259878244 
+
+                     q1                     dq1                 betxmax                   dxmax 
+     389.02055324109523      -6.409385338523327      4407.9485737195319     0.73559240813005033 
+
+                  dxrms                  xcomax                  xcorms                      q2 
+    0.13682342204790102   0.0072071187114787884  0.00099182630633963065      389.16792595884272 
+
+                    dq2                 betymax                   dymax                   dyrms 
+    -8.0586027539432603       5779.920860073169                      -0                       0 
+
+                 ycomax                  ycorms                  deltap                 synch_1 
+                      0                       0                       0                       0 
+
+                synch_2                 synch_3                 synch_4                 synch_5 
+                      0                       0                       0                       0 
+
+                synch_6                 synch_8                  nflips                   dqmin 
+                      0                       0                       0                    0 
+
+            dqmin_phase 
+                      0 
+
+
+! reset all tapering values 
+
+Taper, reset;
+
+All taper values have been reset to zero 
+
+
+
+! Alternative method still works
+
+Twiss, tapering, save, file="tapering.tfs";
+
+enter Twiss module
+ Initial tapering before entering Twiss 
+  
+iteration:   1 error:   2.134290E-10 deltap:   0.000000E+00
+orbit:  -3.018296E-13  5.695083E-13  0.000000E+00  0.000000E+00 -4.063248E-10 -6.183646E-12
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+ Tapering applied, proceeding to Twiss 
+  
+iteration:   1 error:   2.126608E-10 deltap:   0.000000E+00
+orbit:  -3.009189E-13  5.694534E-13  0.000000E+00  0.000000E+00 -4.455048E-10 -1.166410E-10
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+
+++++++ table: summ
+
+                 length                  orbit5                    alfa                 gammatr 
+     97756.072627066169  4.4550481064053768e-10  6.7368976041691593e-06      385.27428822113944 
+
+                     q1                     dq1                 betxmax                   dxmax 
+     389.05942327459911     0.97242839370930223      1619.4277922428787     0.53578797772048581 
+
+                  dxrms                  xcomax                  xcorms                      q2 
+    0.12379185857494912  6.6070669208248745e-11  1.8579076433169285e-11      389.17276467241521 
+
+                    dq2                 betymax                   dymax                   dyrms 
+   -0.81165641418174317      7121.1444419790932                      -0                       0 
+
+                 ycomax                  ycorms                  deltap                 synch_1 
+                      0                       0                       0                       0 
+
+                synch_2                 synch_3                 synch_4                 synch_5 
+                      0                       0                       0                       0 
+
+                synch_6                 synch_8                  nflips                   dqmin 
+                      0                       0                       0                    0 
+
+            dqmin_phase 
+                      0 
+! see if two consecutive runs alter the results
+
+Twiss, tapering, save; 
+
+enter Twiss module
+ Initial tapering before entering Twiss 
+  
+iteration:   1 error:   2.134290E-10 deltap:   0.000000E+00
+orbit:  -3.018296E-13  5.695083E-13  0.000000E+00  0.000000E+00 -4.063248E-10 -6.183646E-12
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+ Tapering applied, proceeding to Twiss 
+  
+iteration:   1 error:   2.126608E-10 deltap:   0.000000E+00
+orbit:  -3.009189E-13  5.694534E-13  0.000000E+00  0.000000E+00 -4.455048E-10 -1.166410E-10
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+
+++++++ table: summ
+
+                 length                  orbit5                    alfa                 gammatr 
+     97756.072627066169  4.4550481064053768e-10  6.7368976041691593e-06      385.27428822113944 
+
+                     q1                     dq1                 betxmax                   dxmax 
+     389.05942327459911     0.97242839370930223      1619.4277922428787     0.53578797772048581 
+
+                  dxrms                  xcomax                  xcorms                      q2 
+    0.12379185857494912  6.6070669208248745e-11  1.8579076433169285e-11      389.17276467241521 
+
+                    dq2                 betymax                   dymax                   dyrms 
+   -0.81165641418174317      7121.1444419790932                      -0                       0 
+
+                 ycomax                  ycorms                  deltap                 synch_1 
+                      0                       0                       0                       0 
+
+                synch_2                 synch_3                 synch_4                 synch_5 
+                      0                       0                       0                       0 
+
+                synch_6                 synch_8                  nflips                   dqmin 
+                      0                       0                       0                    0 
+
+            dqmin_phase 
+                      0 
+! See effect of deltap
+
+Twiss, tapering, deltap=1.e-3, save, file="tapering_dp.tfs";
+
+enter Twiss module
+ Initial tapering before entering Twiss 
+  
+iteration:   1 error:   2.134290E-10 deltap:   0.000000E+00
+orbit:  -3.018296E-13  5.695083E-13  0.000000E+00  0.000000E+00 -4.063248E-10 -6.183646E-12
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+ Tapering applied, proceeding to Twiss 
+  
+iteration:   1 error:   1.105442E-04 deltap:   1.000000E-03
+orbit:  -9.135213E-08  4.123017E-07  0.000000E+00  0.000000E+00  1.835133E-04 -7.030935E-05
+  
+iteration:   2 error:   6.193924E-07 deltap:   1.000000E-03
+orbit:  -1.224543E-07  4.132685E-07  0.000000E+00  0.000000E+00  1.823771E-04 -7.092048E-05
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+
+++++++ table: summ
+
+                 length                  orbit5                    alfa                 gammatr 
+     97756.072627066169  -0.0001823771135840327  6.7518035614361008e-06      384.84876819764207 
+
+                     q1                     dq1                 betxmax                   dxmax 
+     389.05994144350001      2.5267238136637333      1657.4217367204815      0.5445146982123148 
+
+                  dxrms                  xcomax                  xcorms                      q2 
+    0.12402080397082783  0.00049831653645338926  0.00011501432351449565      389.17726275310332 
+
+                    dq2                 betymax                   dymax                   dyrms 
+     7.3076027158167918      6848.9451700797408                      -0                       0 
+
+                 ycomax                  ycorms                  deltap                 synch_1 
+                      0                       0                   0.001                       0 
+
+                synch_2                 synch_3                 synch_4                 synch_5 
+                      0                       0                       0                       0 
+
+                synch_6                 synch_8                  nflips                   dqmin 
+                      0                       0                       0                    0 
+
+            dqmin_phase 
+                      0 
+
+
+! Tapering also applied as option for matching
+
+Beam, radiate=false;
+
+Taper, reset;
+
+All taper values have been reset to zero 
+
+lagca1save = lagca1;
+
+lagca1 = 0.5;
+
+++++++ info: lagca1 redefined
+Savebeta, label=B.IP, place=#s, sequence=FCC_E_RING;
+
+Twiss;
+
+enter Twiss module
+  
+iteration:   1 error:   7.873944E-18 deltap:   0.000000E+00
+orbit:   1.622361E-28 -1.216894E-28  0.000000E+00  0.000000E+00 -9.503297E-18  1.627222E-19
+
+++++++ table: summ
+
+                 length                  orbit5                    alfa                 gammatr 
+     97756.072627066169  9.5032970291684301e-18  6.4222910259019769e-06      394.59811759020351 
+
+                     q1                     dq1                 betxmax                   dxmax 
+      389.0860000197917     0.96792710790492442      1622.6651577726434     0.53578485365675088 
+
+                  dxrms                  xcomax                  xcorms                      q2 
+     0.1237701699650733  2.4746270323004801e-18  6.0958219546922438e-19      389.20000003940197 
+
+                    dq2                 betymax                   dymax                   dyrms 
+    -1.6439536764488987      7128.7280224577398                       0                       0 
+
+                 ycomax                  ycorms                  deltap                 synch_1 
+                      0                       0                       0                       0 
+
+                synch_2                 synch_3                 synch_4                 synch_5 
+                      0                       0                       0                       0 
+
+                synch_6                 synch_8                  nflips                   dqmin 
+                      0                       0                       0                    0 
+
+            dqmin_phase 
+                      0 
+lagca1 = lagca1save + 0.05;
+
+++++++ info: lagca1 redefined
+Beam, radiate=true;
+
+
+
+Match, sequence=FCC_E_RING, BETA0 = B.IP, tapering;
+
+START MATCHING
+
+number of sequences: 1
+sequence name: fcc_e_ring
+number of beta0s: 1
+BETA0 name: b.ip
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ 	Vary, name=LAGCA1, step=1.0E-7;
+
+!	Vary, name=LAGCA2, step=1.0E-7;
+
+	Constraint, sequence=FCC_E_RING, range=#e, PT=0.0;
+
+	Jacobian, tolerance=1.0E-16, calls=3000;
+
+number of variables:    1
+user given constraints: 1
+total constraints:      1
+
+START JACOBIAN:
+
+ JACOBIAN Strategy =           3
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+Initial Penalty Function =   0.2218013001060190E+01
+
+
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Solve system with            1 con,           1 var
+ Rank             1   Condition number    1.0000000000000000     
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Step length   0.11775834606836000     
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+call:     2 Dx =   0.11775835E+00  Penalty function =  0.3261253406528580E-01
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Solve system with            1 con,           1 var
+ Rank             1   Condition number    1.0000000000000000     
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Step length    1.9425459359170956E-002
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+call:     3 Dx =   0.19425459E-01  Penalty function =  0.2891742501967095E-04
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Solve system with            1 con,           1 var
+ Rank             1   Condition number    1.0000000000000000     
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Step length    6.1551705591195811E-004
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+call:     4 Dx =   0.61551706E-03  Penalty function =  0.3269670991480730E-10
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Solve system with            1 con,           1 var
+ Rank             1   Condition number    1.0000000000000000     
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Step length    6.5587159009688194E-007
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+call:     5 Dx =   0.65587159E-06  Penalty function =  0.1694055282701554E-15
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Solve system with            1 con,           1 var
+ Rank             1   Condition number    1.0000000000000000     
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Step length    1.4929700722291731E-009
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+call:     6 Dx =   0.14929701E-08  Penalty function =  0.8427647724778915E-21
+ ++++++++++ JACOBIAN ended: converged successfully
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ Final difference norm:  0.22360679579732221     
+Endmatch;
+
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+fcc_e_ring$end:1           pt           4     0.00000000E+00    -2.90304112E-13     8.42764772E-22
+
+
+Final Penalty Function =   8.42764772e-22
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+lagca1                    3.56701e-01  4.06701e-01 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   8.42764772e-22
+	
+
+Twiss, file="fcc_radiate.tfs", tapering;
+
+enter Twiss module
+ Initial tapering before entering Twiss 
+  
+iteration:   1 error:   8.151370E-11 deltap:   0.000000E+00
+orbit:  -3.003409E-13  5.691517E-13  0.000000E+00  0.000000E+00 -5.835406E-11 -1.068859E-10
+++++++ warning: TWCLORB:  Horizontal plane might be unstable More information with the debug flag on.                                                                                                                                                                               
+++++++ warning: TWCLORB:  Vertical plane might be unstable More information with the debug flag on.                                                                                                                                                                                 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+ Tapering applied, proceeding to Twiss 
+  
+iteration:   1 error:   1.611199E-10 deltap:   0.000000E+00
+orbit:  -3.002920E-13  5.690394E-13  0.000000E+00  0.000000E+00 -8.084385E-11 -2.212543E-10
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+
+++++++ table: summ
+
+                 length                  orbit5                    alfa                 gammatr 
+     97756.072627066169  8.0843846405569781e-11  6.7368976048368745e-06      385.27428820204659 
+
+                     q1                     dq1                 betxmax                   dxmax 
+     389.05942327458087     0.97242849740412107      1619.4277927354676     0.53578797743860773 
+
+                  dxrms                  xcomax                  xcorms                      q2 
+      0.123791858587985  6.7989248092383364e-11  1.8483993951337972e-11      389.17276467247484 
+
+                    dq2                 betymax                   dymax                   dyrms 
+   -0.81165615980673667      7121.1444417555012                      -0                       0 
+
+                 ycomax                  ycorms                  deltap                 synch_1 
+                      0                       0                       0                       0 
+
+                synch_2                 synch_3                 synch_4                 synch_5 
+                      0                       0                       0                       0 
+
+                synch_6                 synch_8                  nflips                   dqmin 
+                      0                       0                       0                    0 
+
+            dqmin_phase 
+                      0 
+Save, sequence=FCC_E_RING, file="tapered.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+Stop;
+
+
+  Number of warnings: 115
+7 in C and 108 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

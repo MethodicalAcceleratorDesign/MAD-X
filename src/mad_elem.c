@@ -862,6 +862,7 @@ el_par_vector(int* total, double* vect)
   for (i = 0; i < *total; i++) {
      if (i < elc->par->curr) {
         cp = parl->parameters[i];
+        if(cp == NULL) return 0;
         if (cp->type < 3) {
           if (cp->expr == NULL) val = cp->double_value;
           else val = expression_value(cp->expr, 2);

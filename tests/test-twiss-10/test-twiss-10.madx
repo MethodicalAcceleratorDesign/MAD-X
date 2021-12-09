@@ -86,6 +86,8 @@
  Option, info;
 
 Write, table=chromatic, file=chromatic.tfs;
+READTABLE, FILE="twiss1.ref", TABLE=newtwiss1;
+write, table=newtwiss1, FILE="newtwiss1.tfs";
 
 Stop;
 

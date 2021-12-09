@@ -40,6 +40,10 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     0.0009872457353
+@ DQMIN_PHASE      %le        -1.863538472
 @ TITLE            %51s "LHC 6.5 with errors and orbit correction using MADX"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "10/08/20"

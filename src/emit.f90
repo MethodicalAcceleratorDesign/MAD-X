@@ -253,7 +253,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: x1, y1, t1, px1, py1, pt1
   double precision :: x2, y2, t2, px2, py2, pt2
 
-  double precision :: el, tilt, bvk
+  double precision :: el, tilt, bvk, ktap
   double precision :: edg1, edg2, sk0, sk1, sk2, hgap, fint, sks, sksol, h, ct
   double precision :: corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
   double precision :: tedg1, fact1, dfact1_dx, rfac, rfac1, drfac1_dx, drfac1_dy
@@ -272,7 +272,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
   integer, external :: node_fd_errors
   double precision, external  :: node_value, get_value
-
 
   if (code .eq. code_multipole .or. code .eq. code_rfmultipole)  then
      !--- thin multipole and thin RF multipole
@@ -294,20 +293,23 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   select case (code)
 
      case (code_rbend, code_sbend) !---- DIPOLE
-        an = bvk * node_value('angle ') * el/node_value('l ')
+        an = bvk * node_value('angle ') * el/node_value('l ') ! ??? 
         tilt = -node_value('tilt ')
         edg1 = bvk * node_value('e1 ')
         edg2 = bvk * node_value('e2 ')
         sk0  = bvk * node_value('k0 ')
-        sk1 = bvk * (node_value('k1 ') + node_value('k1tap ')) 
-        sk2 = bvk * (node_value('k2 ') + node_value('k2tap '))
+        sk1 = bvk * node_value('k1 ')
+        sk2 = bvk * node_value('k2 ')
         hgap = node_value('hgap ')
         fint = node_value('fint ')
+        ktap = node_value('ktap ')
         sks = zero
-        h = an / el
-
-       if (sk0.ne.0)  h = sk0
-       
+        if (sk0.ne.0)  then
+           h = sk0 * (1 + ktap) ! tapering
+        else
+           h = an / el * (1 + ktap) ! tapering
+        endif
+     
         !---- Refer orbit and eigenvectors to magnet midplane.
         ct = cos(tilt)
         st = sin(tilt)
@@ -489,12 +491,12 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         sksol = zero
         select case (code)
         case (code_quadrupole)  !---- Quadrupole
-           sk1 = bvk * (node_value('k1 ') + node_value('k1tap ')) 
+           sk1 = bvk * node_value('k1 ') * (1 + node_value('ktap '))
            str  = sk1
            n    = 1
            twon = two
         case (code_sextupole)   !---- Sextupole
-           sk2 = bvk * (node_value('k2 ') + node_value('k2tap '))
+           sk2 = bvk * node_value('k2 ') * (1 + node_value('ktap '))
            str  = sk2 / two
            n    = 2
            twon = four
@@ -504,7 +506,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
            n    = 3
            twon = six
         case (code_solenoid)  !---- Solenoid
-           sksol = node_value('ks ');
+           sksol = node_value('ks ') / two;
            str   = zero
            n     = 0
            twon  = zero
@@ -816,6 +818,7 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
   use emitfi
   use math_constfi, only : zero, one, two, three, four, twopi
   use phys_constfi, only : clight, hbar
+  use io_units, only : stdout
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -848,7 +851,6 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
   double precision :: sigma(6,6), bstar(3,3), gstar(3,3), dummy(6,6)
 
   double precision, external :: get_value
-  integer, parameter :: iqpr2 = 6
   double precision, parameter :: ten3p=1.0d3, tenp6=1.0d6, tenp9=1.0d9
 
   SIGMA(:6,:6) = zero
@@ -926,22 +928,22 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
   !---- Summary output; header and global parameters.
 
   if (stabt) then !---- Dynamic case.
-     if (radiate) write (iqpr2, 910) ten3p * u0
-     write (iqpr2, 920) 1, 2, 3
-     write (iqpr2, 930) qx, qy, qs
-     if (radiate) write (iqpr2, 940) tune
-     write (iqpr2, 950) ((bstar(j,k), j = 1, 3), k = 1, 3), &
+     if (radiate) write (stdout, 910) ten3p * u0
+     write (stdout, 920) 1, 2, 3
+     write (stdout, 930) qx, qy, qs
+     if (radiate) write (stdout, 940) tune
+     write (stdout, 950) ((bstar(j,k), j = 1, 3), k = 1, 3), &
                         ((gstar(j,k), j = 1, 3), k = 1, 3), &
                         ((bmax(j,k), j = 1, 3), k = 1, 3),  &
                         ((gmax(j,k), j = 1, 3), k = 1, 3)
      if (radiate) then
-        write (iqpr2, 960) pdamp, alj, (tau(j), j = 1, 3), &
+        write (stdout, 960) pdamp, alj, (tau(j), j = 1, 3), &
                            ex*tenp6, ey*tenp6, et*tenp6
      endif
   else !---- Static case
-     write (iqpr2, 920) 1, 2
-     write (iqpr2, 930) qx, qy
-     write (iqpr2, 970) ((bstar(j,k), j = 1, 2), k = 1, 2), &
+     write (stdout, 920) 1, 2
+     write (stdout, 930) qx, qy
+     write (stdout, 970) ((bstar(j,k), j = 1, 2), k = 1, 2), &
                         ((gstar(j,k), j = 1, 2), k = 1, 2), &
                         ((bmax(j,k), j = 1, 2), k = 1, 2),  &
                         ((gmax(j,k), j = 1, 2), k = 1, 2)
@@ -971,7 +973,82 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
        ' '/' beta(max) [m]',t30,'x',t42,2e20.8/t30,'y',t42,2e20.8/       &
        ' '/' gamma(max) [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8)
 
+
+  call string_to_table_curr('emit ', 'parameter ', 'tune ')
+  call string_to_table_curr('emit ', 'type ', 'undamped ')
+  call double_to_table_curr('emit ', 'mode1 ',tunes(1))
+  call double_to_table_curr('emit ', 'mode2 ',tunes(2))
+  call double_to_table_curr('emit ', 'mode3 ',tunes(3))
+  call augment_count('emit ')
+
+  call string_to_table_curr('emit ', 'parameter ', 'tune ')
+  call string_to_table_curr('emit ', 'type ', 'damped ')
+  call double_to_table_curr('emit ', 'mode1 ',tunes(1))
+  call double_to_table_curr('emit ', 'mode2 ',tune(2))
+  call double_to_table_curr('emit ', 'mode3 ',tune(3))
+  call augment_count('emit ')
+
+  call write2table('beta* ','x ','m ',bstar,1)
+  call write2table('beta* ','y ','m ',bstar,2)
+  call write2table('beta* ','t ','m ',bstar,3)
+
+  call write2table('gamma* ','px ','1/m ',gstar,1)
+  call write2table('gamma* ','py ','1/m ',gstar,2)
+  call write2table('gamma* ','pt ','1/m ',gstar,3)
+
+  call write2table('beta_max ','x ','m ',bmax,1)
+  call write2table('beta_max ','y ','m ',bmax,2)
+  call write2table('beta_max ','t ','m ',bmax,3)
+
+  call write2table('gamma_max ','px ','1/m ',gmax,1)
+  call write2table('gamma_max ','py ','1/m ',gmax,2)
+  call write2table('gamma_max ','pt ','1/m ',gmax,3)
+  
+  call string_to_table_curr('emit ', 'parameter ', 'damping_partion ')
+  call double_to_table_curr('emit ', 'mode1 ',pdamp(1))
+  call double_to_table_curr('emit ', 'mode2 ',pdamp(2))
+  call double_to_table_curr('emit ', 'mode3 ',pdamp(3))
+  call augment_count('emit ')
+
+  call string_to_table_curr('emit ', 'parameter ', 'damping_constant ')
+  call string_to_table_curr('emit ', 'unit ', '1/s ')
+  call double_to_table_curr('emit ', 'mode1 ', alj(1))
+  call double_to_table_curr('emit ', 'mode2 ', alj(2))
+  call double_to_table_curr('emit ', 'mode3 ', alj(3))
+  call augment_count('emit ')
+
+  call string_to_table_curr('emit ', 'parameter ', 'damping_time ')
+  call string_to_table_curr('emit ', 'unit ', 's ')
+  call double_to_table_curr('emit ', 'mode1 ', tau(1))
+  call double_to_table_curr('emit ', 'mode2 ', tau(2))
+  call double_to_table_curr('emit ', 'mode3 ', tau(3))
+  call augment_count('emit ')
+
+  call string_to_table_curr('emit ', 'parameter ', 'emittance ')
+  call string_to_table_curr('emit ', 'unit ', 'pi_m ')
+  call double_to_table_curr('emit ', 'mode1 ', ex)
+  call double_to_table_curr('emit ', 'mode2 ', ey)
+  call double_to_table_curr('emit ', 'mode3 ', et)
+  call augment_count('emit ')
+
+
+!  "u0", "t0", "eta", "bcurrent", "f0", "alfa", "gamma_tr",
 end subroutine emsumm
+
+subroutine write2table(para, typ, unit, matrix, ind)
+   implicit none
+   double precision :: matrix(3,3)
+   character :: para, unit, typ
+   integer :: ind
+  call string_to_table_curr('emit ', 'parameter ', para)
+  call string_to_table_curr('emit ', 'type ', typ)
+  call string_to_table_curr('emit ', 'unit ', unit)
+  call double_to_table_curr('emit ', 'mode1 ',matrix(1,ind))
+  call double_to_table_curr('emit ', 'mode2 ',matrix(2,ind))
+  call double_to_table_curr('emit ', 'mode3 ',matrix(3,ind))
+  call augment_count('emit ')
+
+end subroutine write2table
 
 subroutine emce2i(stabt, em, ex, ey, et, sigma)
   implicit none

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:31:11      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.11.30 15:33:33      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -831,8 +831,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
        1.526297364       0.3728165258       0.5042000294        4.147872957 
 
-           synch_6            synch_8             nflips 
-       52.84960067        256.7869428                  0 
+           synch_6            synch_8             nflips              dqmin 
+       52.84960067        256.7869428                  0               0 
+
+       dqmin_phase 
+                 0 
 
 
 write, table=summ, file="leir.summ.twiss";
@@ -886,7 +889,7 @@ Determined SECTOR NMUL MAX :  2
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    9.2703622556200571E-015   0.0000000000000000       -7.5495165674510645E-015
+ After    end:   -3.9947103784576665E-014   0.0000000000000000       -6.9319550100033211E-015
 
 
 
@@ -940,7 +943,7 @@ obs_points pro_ptc_setswitch Done
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    1.6624710864072410E-010   3.9601240730009208E-011   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    1.6624812000730472E-010   3.9601264447589016E-011   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 ++++++ table: ptc_twiss_summary
 
@@ -975,22 +978,22 @@ obs_points pro_ptc_setswitch Done
       -9.086229285        9.086229285                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.662471086e-10 
+                 0                  0                  0      1.6624812e-10 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   3.960124073e-11                  0                  0                  0 
+   3.960126445e-11                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    1.817524825e-10                  0    4.758695862e-11 
+                 0    1.817531052e-10                  0    4.758710824e-11 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    3.901796602e-10 
+                 0                  0                  0     3.90180613e-10 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.720648045e-10                  0                 -0 
+                 0    1.720654619e-10                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -2.339719601e-14                  0   -1.720650678e-10 
+                 0   -2.258326899e-14                  0     -1.7206557e-10 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 

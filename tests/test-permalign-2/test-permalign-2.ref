@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.09.12 19:19:43      +
+  + Execution date: 2021.11.30 15:31:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 a = 0.1;
 
@@ -57,8 +57,11 @@ final orbit vector:     8.156298E-03  3.380874E-03 -1.525084E-02 -6.632170E-03 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009081139213 
+
+       dqmin_phase 
+       1.659969117 
 !save, sequence=myseq, file="myseq";
 
 select, flag=makethin, class=quadrupole, slice=3;
@@ -96,8 +99,11 @@ final orbit vector:     7.904734E-03  3.280324E-03 -1.524958E-02 -6.631611E-03 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0       0.1830020844 
+
+       dqmin_phase 
+       1.636547171 
 survey, file="test.survey", perm_align_survey;
 
 sixtrack;

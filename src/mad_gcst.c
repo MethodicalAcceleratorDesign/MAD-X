@@ -118,7 +118,27 @@ const char* const survey_table_cols[] =
   /*==*/
   " "  /* blank terminates */
 };
+const char* const emit_table_cols[] =
+{
+  "parameter", "type", "unit", "mode1", "mode2", "mode3",
+  /*==*/
+  " "  /* blank terminates */
+};
+const int emit_table_types[] =
+{
+  3, 3, 3, 2, 2, 2
+};
 
+const char* const emitsumm_table_cols[] =
+{
+  "u0", "ex", "exn", "ey", "eyn", "et", "sigt", "sige", "qs",
+  /*==*/
+  " "  /* blank terminates */
+};
+const int emitsumm_table_types[] =
+{
+  2, 2, 2, 2, 2, 2, 2, 2, 2
+};
 
 
 const int efield_table_types[] =
@@ -648,8 +668,8 @@ const int summ_table_types[] =
   2, 2, 2, 2, 
   //2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
-  2, 2,
-  2, //for nflips
+  2, 2,   2, //for nflips
+  2, 2
 };
 
 const char* const summ_table_cols[] =
@@ -661,7 +681,7 @@ const char* const summ_table_cols[] =
   //"synch_1","synch_2","synch_3","synch_4","synch_5",
   "synch_1","synch_2","synch_3","synch_4","synch_5",
   "synch_6","synch_8",
-   "nflips", //for nflips
+   "nflips","dqmin", "dqmin_phase", //for nflips
   " "  /* blank terminates */
 };
 

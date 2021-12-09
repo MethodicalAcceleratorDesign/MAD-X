@@ -1,6 +1,6 @@
 #include "madx.h"
 
-void  makerdtstwisstable(void);
+void makerdtstwisstable(void);
 void printpoly(int*, int );
 
 static void
@@ -1933,23 +1933,20 @@ pro_ptc_track(struct in_cmd* cmd)
 }
 /*_______________________________________________________*/
 
-void printpoly(int p[6], int dim )
+void printpoly(int *p, int dim )
 {
- int i;
+  int i;
 
- printf("f"); /*icase*/
+  printf("f"); /*icase*/
 
- for (i=0; i<dim; i++)
-  {
+  for (i=0; i<dim; i++)
     printf("%1d",p[i]); /*icase*/
-  }
 
- printf("\n");
-
+  printf("\n");
 }
 
 /*_______________________________________________________*/
-void makerdtstwisstable()
+void makerdtstwisstable(void)
 {
   int i;
 
