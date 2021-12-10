@@ -43,7 +43,7 @@
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
 @ DQMIN            %le                   0
-@ DQMIN_PHASE      %le        0.3219280005
+@ DQMIN_PHASE      %le        0.3219279708
 @ TITLE            %20s "test of rf-multipole"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "29/07/20"

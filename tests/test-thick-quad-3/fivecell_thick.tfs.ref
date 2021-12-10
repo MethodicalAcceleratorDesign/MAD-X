@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le     0.0001393635708
-@ DQMIN_PHASE      %le        -2.311873658
+@ DQMIN            %le      0.000139362666
+@ DQMIN_PHASE      %le        -2.311877287
 @ TITLE            %14s "Five cell test"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "29/07/20"

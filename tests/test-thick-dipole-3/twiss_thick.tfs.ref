@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                       0
 @ SYNCH_6          %le                       0
 @ SYNCH_8          %le                       0
-@ DQMIN            %le   3.139443932723205e-11
-@ DQMIN_PHASE      %le   2.957121970516904e-06
+@ DQMIN            %le   3.139443932766669e-11
+@ DQMIN_PHASE      %le   2.921360390768495e-06
 @ TITLE            %26s "thin_foc with edge effects"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "29/07/20"
