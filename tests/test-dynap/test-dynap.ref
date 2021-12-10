@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.02 17:19:53      +
+  + Execution date: 2021.12.10 13:03:37      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-info,-warn;
 
@@ -49,10 +49,10 @@ orbit:  -5.000000E-04 -1.042808E-15  6.691571E-15  1.425000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    1.991791893e-15 
+                 0                  0                  0    1.991836501e-15 
 
        dqmin_phase 
-       2.219658019 
+       2.219712741 
 enter Twiss module
   
 iteration:   1 error:   8.560154E-04 deltap:   0.000000E+00
@@ -85,10 +85,10 @@ orbit:   5.000000E-04 -5.185248E-14 -8.988607E-15 -1.425000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.279208814e-13 
+                 0                  0                  0    4.279208856e-13 
 
        dqmin_phase 
-      -3.100790017 
+      -3.100790196 
 assign,echo="temp.bb.install",truncate;
 
 
@@ -975,10 +975,10 @@ orbit:  -5.264405E-13  2.081183E-15 -8.137851E-13  9.047770E-15  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.081716152e-13 
+                 0                  0                  0      4.0817147e-13 
 
        dqmin_phase 
-     0.03434898118 
+     0.03434887712 
 !--- separation for halo collisions at IP2
 
 on_sep2 = 2.118 * sqrt(epsx * r2ip2->betx) / 0.0007999979093;
@@ -2146,7 +2146,7 @@ big=sqrt(1.-small^2);
 
 track;
 
-sec.s since start: 5   since last call: 5
+sec.s since start: 4   since last call: 4
 enter TRACK module
 xs=small; ys=small;
 
@@ -2156,7 +2156,7 @@ xs                 =               0.05 ;
 ys                 =               0.05 ;
 start,fx=xs,fy=ys;  // zero amplitude
 
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 nsigmax=6;
 
 n=1; // sigma multiplier
@@ -2195,133 +2195,133 @@ while (n <= nsigmax)
 
 xs                 =       0.9987492178 ;
 ys                 =               0.05 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =       0.9659258263 ;
 ys                 =       0.2588190451 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =       0.8660254038 ;
 ys                 =                0.5 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =       0.7071067812 ;
 ys                 =       0.7071067812 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =                0.5 ;
 ys                 =       0.8660254038 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =       0.2588190451 ;
 ys                 =       0.9659258263 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =               0.05 ;
 ys                 =       0.9987492178 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        1.997498436 ;
 ys                 =                0.1 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        1.931851653 ;
 ys                 =       0.5176380902 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        1.732050808 ;
 ys                 =                  1 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        1.414213562 ;
 ys                 =        1.414213562 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =                  1 ;
 ys                 =        1.732050808 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =       0.5176380902 ;
 ys                 =        1.931851653 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =                0.1 ;
 ys                 =        1.997498436 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        2.996247653 ;
 ys                 =               0.15 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        2.897777479 ;
 ys                 =       0.7764571353 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        2.598076211 ;
 ys                 =                1.5 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        2.121320344 ;
 ys                 =        2.121320344 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =                1.5 ;
 ys                 =        2.598076211 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =       0.7764571353 ;
 ys                 =        2.897777479 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =               0.15 ;
 ys                 =        2.996247653 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        3.994996871 ;
 ys                 =                0.2 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        3.863703305 ;
 ys                 =         1.03527618 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        3.464101615 ;
 ys                 =                  2 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        2.828427125 ;
 ys                 =        2.828427125 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =                  2 ;
 ys                 =        3.464101615 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =         1.03527618 ;
 ys                 =        3.863703305 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =                0.2 ;
 ys                 =        3.994996871 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        4.993746089 ;
 ys                 =               0.25 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        4.829629131 ;
 ys                 =        1.294095226 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        4.330127019 ;
 ys                 =                2.5 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        3.535533906 ;
 ys                 =        3.535533906 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =                2.5 ;
 ys                 =        4.330127019 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        1.294095226 ;
 ys                 =        4.829629131 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =               0.25 ;
 ys                 =        4.993746089 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        5.992495307 ;
 ys                 =                0.3 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        5.795554958 ;
 ys                 =        1.552914271 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        5.196152423 ;
 ys                 =                  3 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        4.242640687 ;
 ys                 =        4.242640687 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =                  3 ;
 ys                 =        5.196152423 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =        1.552914271 ;
 ys                 =        5.795554958 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 xs                 =                0.3 ;
 ys                 =        5.992495307 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
 dynap,fastune,turns=1024;
 
-sec.s since start: 5   since last call: 0
+sec.s since start: 4   since last call: 0
   
 iteration:   1 error:   8.750387E-04 deltap:   0.000000E+00
 orbit:  -4.912200E-04  1.221052E-05 -1.026011E-06  1.418253E-04  0.000000E+00  0.000000E+00
@@ -2868,22 +2868,22 @@ orbit:  -4.999994E-04  5.687249E-10 -4.737471E-10  1.424999E-04  0.000000E+00  0
   end dynap 
 endtrack;
 
-sec.s since start: 20   since last call: 15
+sec.s since start: 15   since last call: 11
 exit TRACK module
 
 write,table=dynap,file;
 
-sec.s since start: 20   since last call: 0
+sec.s since start: 15   since last call: 0
 write,table=dynaptune,file;
 
-sec.s since start: 20   since last call: 0
+sec.s since start: 15   since last call: 0
 !system,"foot < dynaptune > footprint";
 
 !stop;
 
 
   Number of warnings: 0
-sec.s since start: 20   since last call: 0
+sec.s since start: 15   since last call: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

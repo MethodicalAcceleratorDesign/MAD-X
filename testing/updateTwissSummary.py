@@ -14,6 +14,7 @@ def change_out(mypath, f_name):
 	new_f = mypath + "/" + f_name + '.ref'
 	if(os.path.exists(old_f) and os.path.exists(new_f)):
 		copyfile(old_f, new_f)
+		
 def update_cfg_twiss(out_file):
 	cfg_file = out_file + ".cfg"
 	cfg_file_tmp = out_file + ".cfg.tmp"
@@ -86,7 +87,7 @@ for folder in allfolders:
 		mypath = mypath + folder
 		print("myyyy", mypath)	
 		change_out(mypath, folder)
-		find_twiss_files(mypath)
+		#find_twiss_files(mypath)
 	
 		
 

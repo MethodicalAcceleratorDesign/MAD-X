@@ -2513,14 +2513,14 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error, currpos)
          Ctmp = matmul(Ga, matmul(Ctmp, invGb))
          detc = (Ctmp(1,1) * Ctmp(2,2) - Ctmp(1,2) * Ctmp(2,1))
          gamma = sqrt(1 - detc)
-         f1001 = complex((Ctmp(1,2) - Ctmp(2,1)), Ctmp(1,1) + Ctmp(2,2))/ 4d0 / gamma
-         f1010 = complex((-Ctmp(1,2) - Ctmp(2,1)), Ctmp(1,1) - Ctmp(2,2))/ 4d0 / gamma
+         f1001 = cmplx((Ctmp(1,2) - Ctmp(2,1)), Ctmp(1,1) + Ctmp(2,2))/ 4d0 / gamma
+         f1010 = cmplx((-Ctmp(1,2) - Ctmp(2,1)), Ctmp(1,1) - Ctmp(2,2))/ 4d0 / gamma
          !self.f1001.append(((C[0] + C[3]) * 1j + (C[1] - C[2])) / 4 / gamma)
          !self.f1010.append(((C[0] - C[3]) * 1j + (-C[1] - C[2])) / 4 / gamma)
          
          if (abs(f1001) .gt. eps) then
            deltas = currpos - prev_pos_s
-           dqmin_rdt = dqmin_rdt + deltas * f1001*exp(-(complex(0,amuy)-complex(0,amux))+complex(0,delta_tune_dqmin*currpos)) &
+           dqmin_rdt = dqmin_rdt + deltas * f1001*exp(-(cmplx(0d0,amuy)-cmplx(0d0,amux))+cmplx(0d0,delta_tune_dqmin*currpos)) &
            / (one + 4d0* abs(f1001)**2)
            dqmin_rdt_c = dqmin_rdt_c + 1
            prev_pos_s = currpos

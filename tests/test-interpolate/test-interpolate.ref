@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.02 17:00:43      +
+  + Execution date: 2021.12.10 13:03:14      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -413,10 +413,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    3.604052851e-06 
+                 0                  0                  1    3.604052855e-06 
 
        dqmin_phase 
-     -0.7893583872 
+     -0.7893583862 
 
 
 ! explicit at end
@@ -457,10 +457,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    6.770703777e-06 
+                 0                  0                  1    6.770703782e-06 
 
        dqmin_phase 
-     -0.7901000941 
+     -0.7901000852 
 
 
 ! single slice
@@ -501,10 +501,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    9.937356054e-06 
+                 0                  0                  1    9.937356059e-06 
 
        dqmin_phase 
-     -0.7903690942 
+     -0.7903690826 
 
 
 ! big step (bigger than any element)
@@ -545,10 +545,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1     1.31040087e-05 
+                 0                  0                  1    1.310400871e-05 
 
        dqmin_phase 
-     -0.7905080838 
+     -0.7905080706 
 
 
 
@@ -602,7 +602,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  1    1.588260586e-05 
 
        dqmin_phase 
-     -0.7907982253 
+     -0.7907982245 
 
 
 ! centre+end for quadrupole
@@ -643,10 +643,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    1.866120396e-05 
+                 0                  0                  1    1.866120395e-05 
 
        dqmin_phase 
-     -0.7910019643 
+     -0.7910019722 
 
 
 
@@ -697,10 +697,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    2.166781657e-05 
+                 0                  0                  1    2.166781658e-05 
 
        dqmin_phase 
-     -0.7911242976 
+     -0.7911243106 
 
 
 ! five-slice for quadrupole
@@ -741,10 +741,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    2.467442943e-05 
+                 0                  0                  1    2.467442944e-05 
 
        dqmin_phase 
-     -0.7912168179 
+     -0.7912168349 
 
 
 
@@ -795,10 +795,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    2.792409854e-05 
+                 0                  0                  1    2.792409856e-05 
 
        dqmin_phase 
-     -0.7915238229 
+     -0.7915238335 
 
 
 
@@ -849,10 +849,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    3.109075111e-05 
+                 0                  0                  1    3.109075113e-05 
 
        dqmin_phase 
-     -0.7914647923 
+     -0.7914648001 
 
 
 select, flag=interpolate, clear;
@@ -893,10 +893,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    3.425740376e-05 
+                 0                  0                  1    3.425740378e-05 
 
        dqmin_phase 
-      -0.791416675 
+     -0.7914166804 
 
 
 
@@ -945,10 +945,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    3.726401708e-05 
+                 0                  0                  1    3.726401711e-05 
 
        dqmin_phase 
-     -0.7914543472 
+     -0.7914543559 
 
 
 select, flag=interpolate, clear;
@@ -989,10 +989,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    4.027063045e-05 
+                 0                  0                  1    4.027063048e-05 
 
        dqmin_phase 
-     -0.7914863943 
+     -0.7914864056 
 
 
 
@@ -1051,10 +1051,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    4.307752238e-05 
+                 0                  0                  1    4.307752242e-05 
 
        dqmin_phase 
-     -0.7916517014 
+     -0.7916517125 
 
 
 ! selection stays intact after USE
@@ -1093,10 +1093,10 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    4.588441535e-05 
+                 0                  0                  1    4.588441538e-05 
 
        dqmin_phase 
-     -0.7917967837 
+     -0.7917967947 
 
   Number of warnings: 30
 0 in C and 30 in Fortran
