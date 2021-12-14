@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:08:48      +
+  + Execution date: 2021.12.14 12:07:05      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn, info, echo;
 
@@ -155,7 +155,6 @@ plot, file=plot1, table=trackone, trackfile=plot1, noversion, multiple,
 
 trackfile is: plot1
 looking for file plot1one 
-gnuplot: error while loading shared libraries: libQt5Core.so.5: cannot open shared object file: No such file or directory
 
 
 // repeat with onetable
@@ -289,7 +288,6 @@ looking for file plot2.obs0001.p0001
 looking for file plot2.obs0001.p0002 
 looking for file plot2.obs0001.p0003 
 looking for file plot2.obs0001.p0004 
-gnuplot: error while loading shared libraries: libQt5Core.so.5: cannot open shared object file: No such file or directory
 
 
 exit;
