@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.02 17:00:20      +
+  + Execution date: 2021.12.10 13:02:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -109,7 +109,7 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               0 
+                 0                  0                  0                  0 
 
        dqmin_phase 
                  0 
@@ -141,7 +141,7 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               0 
+                 0                  0                  0                  0 
 
        dqmin_phase 
                  0 
@@ -172,7 +172,7 @@ orbit:  -5.931563E-09  9.482611E-10  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               0 
+                 0                  0                  0                  0 
 
        dqmin_phase 
                  0 
@@ -522,10 +522,10 @@ orbit:   2.352913E-12  2.758769E-14  2.365867E-14 -6.018094E-16  4.833863E-10 -4
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    1.210433469e-07 
+                 0                  0                  0     1.21032432e-07 
 
        dqmin_phase 
-     -0.2712968446 
+     -0.2712287397 
 enter TRACK module
   
 iteration:   1 error:   4.115632E-11 deltap:   0.000000E+00

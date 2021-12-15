@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.11.30 15:30:38      +
+  + Execution date: 2021.12.10 13:03:54      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE;
 
@@ -35,10 +35,10 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    0.0001393635708 
+                 0                  0                  0     0.000139362666 
 
        dqmin_phase 
-      -2.311873658 
+      -2.311877287 
 makethin: style chosen : teapot
 makethin: slicing sequence : fivecell
 makethin: slicing sequence : ins
@@ -68,10 +68,10 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0      0.01120004217 
+                 0                  0                  0       0.0112000422 
 
        dqmin_phase 
-       1.516725972 
+       1.516725951 
   ++++++++++++++++++++++++++++
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++

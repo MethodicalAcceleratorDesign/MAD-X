@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.02 16:28:14      +
+  + Execution date: 2021.12.10 13:04:40      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs" ;
 
@@ -105,10 +105,10 @@ orbit:  -2.000002E-03 -6.829941E-10  3.774066E-11  1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    8.335127486e-10 
+                 0                  0                  0    8.334552298e-10 
 
        dqmin_phase 
-      -1.571965293 
+      -1.571990328 
 
 
 ! Initialize PTC

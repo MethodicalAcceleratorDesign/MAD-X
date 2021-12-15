@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.02 17:00:39      +
+  + Execution date: 2021.12.10 13:03:09      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -2809,7 +2809,7 @@ orbit:   2.502626E-06  2.178362E-05 -1.992044E-05 -5.056846E-06  0.000000E+00  0
   
 iteration:   2 error:   6.136206E-11 deltap:   0.000000E+00
 orbit:   2.502581E-06  2.178362E-05 -1.992047E-05 -5.056848E-06  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.185889E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.150010E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -2832,10 +2832,10 @@ orbit:   2.502581E-06  2.178362E-05 -1.992047E-05 -5.056848E-06  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    2.565893381e-10 
+                 0                  0                  0    2.655475071e-10 
 
        dqmin_phase 
-      -2.894672149 
+      -2.874257738 
 
 
 stop;

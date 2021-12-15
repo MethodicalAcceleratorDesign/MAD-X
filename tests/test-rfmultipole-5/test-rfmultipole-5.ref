@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.11.30 15:31:58      +
+  + Execution date: 2021.12.10 13:04:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -45,7 +45,7 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
                  0                  0                  2                  0 
 
        dqmin_phase 
-      0.3219280005 
+      0.3219279708 
 Assigned alignment errors to 4 elements
   ++++++++++++++++++++++++++++
   +   c6t version 2.0        +

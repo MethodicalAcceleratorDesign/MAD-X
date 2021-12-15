@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le     1.991791893e-15
-@ DQMIN_PHASE      %le         2.219658019
+@ DQMIN            %le     1.991836501e-15
+@ DQMIN_PHASE      %le         2.219712741
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "29/07/20"

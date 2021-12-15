@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.02 17:00:00      +
+  + Execution date: 2021.12.10 13:02:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Simple tracking test of tracking with a matrix.
 
@@ -39,7 +39,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               0 
+                 0                  0                  0                  0 
 
        dqmin_phase 
                  0 
@@ -93,7 +93,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               0 
+                 0                  0                  0                  0 
 
        dqmin_phase 
                  0 
@@ -214,7 +214,7 @@ final orbit vector:     9.569931E-04  3.268034E-06  0.000000E+00  0.000000E+00 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               0 
+                 0                  0                  0                  0 
 
        dqmin_phase 
                  0 
@@ -281,7 +281,7 @@ final orbit vector:     9.569931E-02  3.268034E-04  0.000000E+00  0.000000E+00 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0               0 
+                 0                  0                  0                  0 
 
        dqmin_phase 
                  0 

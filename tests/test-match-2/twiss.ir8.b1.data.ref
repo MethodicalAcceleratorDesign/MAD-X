@@ -42,8 +42,8 @@
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le     1.049077101e-08
-@ DQMIN_PHASE      %le         1.253561932
+@ DQMIN            %le     1.049075989e-08
+@ DQMIN_PHASE      %le         1.253562726
 @ TITLE            %54s "Matching an insertion of the LHC 6.5 lattice with MADX"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "10/08/20"
