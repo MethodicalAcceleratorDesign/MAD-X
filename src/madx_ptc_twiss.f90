@@ -268,7 +268,7 @@ contains
   subroutine equaltwiss(s1,theAscriptProbe8)
     implicit none
     type(twiss), intent(inout)::s1
-    type(probe_8), intent(inout), target ::theAscriptProbe8
+    type(probe_8),  target ::theAscriptProbe8
     type(real_8),pointer, dimension(:) :: A_script
     type(probe) :: theAscriptProbeBak
     real(dp)  :: amatrix(6,6) ! first order A_script
