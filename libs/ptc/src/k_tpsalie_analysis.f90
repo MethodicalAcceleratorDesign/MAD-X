@@ -28,6 +28,10 @@ module tpsalie_analysis
   private DFILT,FILT,reelflo_g
   !
   !
+
+
+
+
   private NRESO
 
   INTERFACE init_tpsalie
@@ -135,6 +139,26 @@ module tpsalie_analysis
   !END INTERFACE
 
 contains
+
+ subroutine set_3(NO1,ND21,ND1,NDPT1,NV1,np1)
+ implicit none
+ integer np1,NO1,ND1,ND21,NDPT1,NV1
+  np=np1
+  NO=no1
+  ND=nd1
+  ND2=nd21
+  NDPT=ndpt1
+  NV=nv1
+  if(NDPT/=0) then
+   ndc=1
+   ndc2=2
+    if(mod(NDPT,2)==0) then
+    ndt=  NDPT-1
+   else
+    ndt=  NDPT+1
+   endif
+ endif
+  end subroutine set_3
 
 !  FUNCTION one_map(S1,S2)
 !    implicit none

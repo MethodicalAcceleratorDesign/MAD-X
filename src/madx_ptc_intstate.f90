@@ -23,6 +23,7 @@ module madx_ptc_intstate_module
   public                            :: ptc_settotalpath
   public                            :: ptc_settime
   public                            :: ptc_setnocavity
+  public                            :: ptc_setspin
   public                            :: ptc_setstochastic
   public                            :: ptc_setenvelope
   public                            :: ptc_setfringe
@@ -262,6 +263,28 @@ contains
     call update_states
     if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setmodulation
+  !____________________________________________________________________________________________
+
+  subroutine ptc_setspin(flag)
+    implicit none
+    integer    :: flag
+
+    if (flag == 1) then
+       if (getdebug() > 1) then
+           print *, "Switching ON spin"
+       end if
+       intstate = intstate + spin0
+    else
+       if (getdebug() > 1) then
+           print *, "Switching OFF spin"
+       end if
+       intstate = intstate - spin0
+    endif
+
+    default = intstate
+    call update_states
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
+  end subroutine ptc_setspin
   !____________________________________________________________________________________________
 
   subroutine ptc_setstochastic(flag)

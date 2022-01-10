@@ -114,6 +114,11 @@ extern const char* const dynap_table_cols[];
 extern const int         dynaptune_table_types[];
 extern const char* const dynaptune_table_cols[];
 
+extern const int         emit_table_types[];
+extern const char* const emit_table_cols[];
+extern const int         emitsumm_table_types[];
+extern const char* const emitsumm_table_cols[];
+
 /* Definition of "select_ptc_normal" parameters for "ptc_normal"*/
 extern const char* const names[];
 extern const char* const atm[];

@@ -1,0 +1,9 @@
+@ NAME             %08s "EMITSUMM"
+@ TYPE             %08s "EMITSUMM"
+@ TITLE            %33s "ALBA-24                          "
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/11/21"
+@ TIME             %08s "10.41.33"
+*                 U0                 EX                EXN                 EY                EYN                 ET               SIGT               SIGE                 QS 
+$                %le                %le                %le                %le                %le                %le                %le                %le                %le 
+    0.0002542024335    1.125932593e-09    6.610185267e-06    5.233196536e-38    3.072333002e-34    9.569042029e-07    0.0008578397149     0.001115467806      0.01229083024

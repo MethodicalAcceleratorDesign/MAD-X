@@ -1,6 +1,6 @@
 #include "madx.h"
 
-void  makerdtstwisstable(void);
+void makerdtstwisstable(void);
 void printpoly(int*, int );
 
 static void
@@ -10,7 +10,7 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   int i, h_length = 100; /*39+3+1+1+6+4;  change when adding header lines ! - last 6 for the closed orbit */
   double dtmp;
   /*  struct table* s; */
-  static const int tmplen=16;
+  static const int tmplen=49;
   char tmp[tmplen];
   int row;
 
@@ -931,6 +931,19 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("stochastic is not present (keeping current value)\n");
    }
 
+/*spin SWITCH*/
+  found = command_par_value_user2("spin", cmd->clone, &switchvalue);
+  if (found)
+   {
+    if (debuglevel > 0) printf("spin is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setspin_(&i);
+   }
+  else
+   {
+    if (debuglevel > 10) printf("spin is not present (keeping current value)\n");
+   }
+   
   /*envelope SWITCH*/
   found = command_par_value_user2("envelope", cmd->clone, &switchvalue);
   if (found)
@@ -1920,23 +1933,20 @@ pro_ptc_track(struct in_cmd* cmd)
 }
 /*_______________________________________________________*/
 
-void printpoly(int p[6], int dim )
+void printpoly(int *p, int dim )
 {
- int i;
+  int i;
 
- printf("f"); /*icase*/
+  printf("f"); /*icase*/
 
- for (i=0; i<dim; i++)
-  {
+  for (i=0; i<dim; i++)
     printf("%1d",p[i]); /*icase*/
-  }
 
- printf("\n");
-
+  printf("\n");
 }
 
 /*_______________________________________________________*/
-void makerdtstwisstable()
+void makerdtstwisstable(void)
 {
   int i;
 

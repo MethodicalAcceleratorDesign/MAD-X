@@ -92,15 +92,15 @@ static void
 fill_twiss_header(struct table* t)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, h_length = 40; /* change adding header lines ! */
+  int i, h_length = 50; /* change adding header lines ! */
   struct table* s;
-  char tmp[NAME_L];
+  char tmp[NAME_L+1];
 
   if (t == NULL) return;
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
 
-  strncpy(tmp, t->org_sequ->name, NAME_L);
+  strncpy(tmp, t->org_sequ->name, sizeof tmp);
   table_add_header(t, "@ SEQUENCE         %%%02ds \"%s\"", strlen(tmp),stoupper(tmp));
   i = get_string("beam", "particle", tmp);
   table_add_header(t, "@ PARTICLE         %%%02ds \"%s\"", i, stoupper(tmp));
@@ -146,7 +146,10 @@ fill_twiss_header(struct table* t)
     table_add_header(t, "@ SYNCH_3          %%le  %F", col_data(s, "synch_3")[0]);
     table_add_header(t, "@ SYNCH_4          %%le  %F", col_data(s, "synch_4")[0]);
     table_add_header(t, "@ SYNCH_5          %%le  %F", col_data(s, "synch_5")[0]);
-    
+    table_add_header(t, "@ SYNCH_6          %%le  %F", col_data(s, "synch_6")[0]);
+    table_add_header(t, "@ SYNCH_8          %%le  %F", col_data(s, "synch_8")[0]);
+    table_add_header(t, "@ DQMIN            %%le  %F", col_data(s, "dqmin")[0]); 
+    table_add_header(t, "@ DQMIN_PHASE      %%le  %F", col_data(s, "dqmin_phase")[0]);    
   }
 }
 
@@ -492,7 +495,7 @@ set_twiss_deltas(struct command* comm)
 {
   char* string;
   int i, k = 0, n = 0;
-  double s, sign = one, ar[3];
+  double s, sign = one, ar[3]={0};
   twiss_deltas->curr = 1;
   twiss_deltas->a[0] = 0;
   string = command_par_string_user("deltap", comm);
@@ -607,6 +610,7 @@ complete_twiss_table(struct table* t)
     else if (strcmp(tmp, "yma") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "sigx") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "sigy") == 0) val =  el_par_value(tmp, c_node->p_elem); 
+    else if (strcmp(tmp, "ktap") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if(mult)
     {
       if(j<=twiss_mult_end)
@@ -774,7 +778,6 @@ pro_twiss(void)
     current_sequ->tw_centre=0;
     set_option("centre", &k);
     k = 1;
-
   }
 
   name = command_par_string_user("keeporbit", current_twiss);
@@ -869,6 +872,28 @@ pro_twiss(void)
     printf(" Initial orbit: %e %e %e %e %e %e\n", orbit0[0], orbit0[1], orbit0[2], orbit0[3], orbit0[4], orbit0[5]);
   // 2014-May-30  12:33:48  ghislain: end of modifications
 
+
+  // 2021-Sep-01 ghislain: if tapering=true, from TWISS or MATCH, call taper command
+  if (command_par_value("tapering", current_twiss) != 0) {
+    if (get_option("info"))
+      printf(" Initial tapering before entering Twiss \n");
+    int error = 0;
+    taperreset_(&error); /* reset all taper values to zero before adjusting probe */
+    double taper_orbit[6];
+    copy_double(orbit0,taper_orbit,6);
+    adjust_beam();
+    probe_beam = clone_command(current_beam);
+    adjust_probe_fp(0);
+    int iterate = 3; double stepsize = 0.0;
+    char* tapfilename;
+    tapfilename = mymalloc("tapering", 30 * sizeof *tapfilename);
+    strcpy(tapfilename,"no_taper_file");
+    taper_(taper_orbit, &iterate, &stepsize, tapfilename, &error); /* call taper module */
+    probe_beam = delete_command(probe_beam);    
+    if (get_option("info"))
+      printf(" Tapering applied, proceeding to Twiss \n");
+  }
+  
   // LD 2016.04.19
   adjust_beam();
   probe_beam = clone_command(current_beam);

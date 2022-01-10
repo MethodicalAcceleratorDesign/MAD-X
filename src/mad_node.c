@@ -392,9 +392,19 @@ void set_tt_multipoles(int *maxmul){
   for(int i=0;i<tmp_s;i++){
     current_node->p_elem->multip->ksl[i] = tmp_sv[i];
   }
-
-
 }
+double get_closed_orb_node(int *index){
+    if(current_node->closed_orbit==NULL) return 0;
+  return current_node->closed_orbit->a[*index-1]; // -1 since it is callled from FORTRAN
+}
+
+void set_closed_orb_node(int *index, double *pos){
+  if(current_node->closed_orbit==NULL){
+    current_node->closed_orbit = new_double_array(6);
+  }
+  current_node->closed_orbit->a[*index-1] = *pos; // -1 since it is callled from FORTRAN
+}
+
 
 void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl){
     nn[0]=current_node->p_elem->multip->nn;
@@ -527,21 +537,10 @@ store_node_value(const char* par, double* value)
   else if (strcmp(lpar, "k1") == 0) store_comm_par_value("k1",*value,el->def);
   else if (strcmp(lpar, "k2") == 0) store_comm_par_value("k2",*value,el->def);
   // The inform is to make sure they are written out to a new sequence. 
-  else if (strcmp(lpar, "k1tap") == 0) {
-    store_comm_par_value("k1tap",*value,el->def);
-    el->def->par_names->inform[9] = 1;
-  }
-  else if (strcmp(lpar, "k1stap") == 0) {
-    store_comm_par_value("k1stap",*value,el->def);
-    el->def->par_names->inform[10] = 1;
-  }
-  else if (strcmp(lpar, "k2tap") == 0){
-    store_comm_par_value("k2tap",*value,el->def);
-    el->def->par_names->inform[9] = 1;
-  }
-  else if (strcmp(lpar, "k2stap") == 0){
-    store_comm_par_value("k2stap",*value,el->def);
-    el->def->par_names->inform[10] = 1;
+  else if (strcmp(lpar, "ktap") == 0) {
+    store_comm_par_value("ktap",*value,el->def);
+    el->def->par_names->inform[9] = 1;  // for quads and sextupoles
+    el->def->par_names->inform[23] = 1; // for bends
   }
   else if (strcmp(lpar, "lagtap") == 0) {
     store_comm_par_value("lagtap",*value,el->def);
@@ -700,6 +699,14 @@ node_name(char* name, int* l)
   strfcpy(name, current_node->name, *l);
   stoupper(name);
 }
+void
+node_name_f_lower(char* name, int* l)
+  /* returns current node name in Fortran format */
+  /* l is max. allowed length in name */
+{
+  strfcpy(name, current_node->name, *l);
+}
+
 
 int
 get_node_count(struct node* node)
@@ -918,7 +925,6 @@ replace_one(struct node* node, struct element* el)
   strcpy(node->name, compound(el->name, k));
   add_to_node_list(node, 0, edit_sequ->nodes);
   node->p_elem = el;
-
   node->base_name = el->base_type->name;
   //strcpy(node->base_name, el->base_type->name);
   node->length = el->length;

@@ -1468,7 +1468,7 @@ convert_madx_to_c6t(struct node* p, int ncombined)
     c6t_elem->value[14] = el_par_value_recurse("sigx",p->p_elem);
     c6t_elem->value[15] = el_par_value_recurse("sigy",p->p_elem);
     c6t_elem->value[16] = el_par_value_recurse("charge",p->p_elem);
-    c6t_elem->value[17] = 0.0; /* npart */
+    c6t_elem->value[17] = el_par_value_recurse("npart",p->p_elem); /* npart */
   }
   else if((strcmp(p->base_name,"elseparator") == 0  ))
   {
@@ -1525,8 +1525,8 @@ convert_madx_to_c6t(struct node* p, int ncombined)
       c6t_elem->value[2] = current[ncombined];
       c6t_elem->value[3] = l_int[ncombined];
       c6t_elem->value[4] = l_phy[ncombined];
-      c6t_elem->value[5] = xma[ncombined]*1000;
-      c6t_elem->value[6] = yma[ncombined]*1000;
+      c6t_elem->value[5] = -xma[ncombined]*1000; //add a minus to be consictent with SixTrack
+      c6t_elem->value[6] = -yma[ncombined]*1000; //add a minus to be consictent with SixTrack
       c6t_elem->value[7] = 0;
       c6t_elem->value[8] = 0;
     }
@@ -2637,7 +2637,6 @@ read_sequ(void)
       double inorm [20];
       ncombined = element_vector(cnode->p_elem, "current", inorm);
       for(int i=0; i<ncombined; i++){
-        printf("nnwires %d \n", i);
         pro_elem(cnode, i);
       }
       cnode = cnode->next;
@@ -3456,7 +3455,8 @@ write_f3_mult(struct c6t_element* el)
         {
           if (eln->p_fd_err->a_dble[i] != zero)
           {
-            i_max = i; error_matrix[i] = 1.;
+            if (i > i_max){ i_max = i;}
+            error_matrix[i] = 1.;
           }
         }
       }

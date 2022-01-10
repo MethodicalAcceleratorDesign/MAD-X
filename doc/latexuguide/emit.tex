@@ -34,7 +34,17 @@ The attributes for the \texttt{EMIT} command are:
   (Default:~1.000001)  
 \end{madlist}
 
-
+\textbf{Output:}\\
+Traditionally the output from the \texttt{EMIT} module has only been 
+shown in the standard output. However, since 5.08.00 there output is also
+stored in the table : emit and emitsumm. They can be written to file using 
+the normal table commands.
+\textbf{Example:}
+\madxmp{
+Emit, DELTAP=0.0 ; \\
+write, table=emit, file="emittab.tfs" ; \\
+write, table=emitsumm, file="emitsums.tfs" ;
+}
 If the machine contains at least one RF cavity, and if synchrotron
 radiation is enabled with \hyperref[sec:beam]{\texttt{BEAM,
     RADIATE=true;}}, the 

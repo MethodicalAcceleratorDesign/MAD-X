@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 21:57:26      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.09 12:17:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! lhc2016_ats_v4.mask  ---  from Yannis
 
@@ -67,8 +67,11 @@ orbit:   1.702757E-15 -2.415443E-17  6.694399E-08  8.730785E-10  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    3.354849619e-09 
+
+       dqmin_phase 
+      -2.142368154 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -111,10 +114,14 @@ orbit:   1.702757E-15 -2.415443E-17  6.694399E-08  8.730785E-10  0.000000E+00  0
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     3.354849619e-09
+@ DQMIN_PHASE      %le        -2.142368154
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.57.39"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.04"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP5"                      6664.568433       0.2999133449       0.2999237948    0.0001765888208   -0.0001016414575   -1.020977057e-06    5.756130338e-06        15.01707165        14.32703074
@@ -148,8 +155,11 @@ orbit:   2.654863E-15  6.845785E-17 -8.755796E-08  9.374343E-10  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.789321649e-07 
+
+       dqmin_phase 
+     -0.7146854713 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -192,10 +202,14 @@ orbit:   2.654863E-15  6.845785E-17 -8.755796E-08  9.374343E-10  0.000000E+00  0
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     2.789321649e-07
+@ DQMIN_PHASE      %le       -0.7146854713
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.57.42"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.07"
 * NAME                                S               BETX               BETY               ALFX               ALFY                 DX                DPX                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP5"                      6664.873167       0.2999845742       0.2999533945   -0.0001922507394   -0.0004568962481    2.371804574e-06   -4.713061382e-06        15.20148798        14.32526466
@@ -232,8 +246,11 @@ orbit:  -6.686946E-07  1.079835E-08  8.311351E-07  1.005226E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    1.769698704e-06 
+
+       dqmin_phase 
+       2.149144008 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -276,10 +293,14 @@ orbit:  -6.686946E-07  1.079835E-08  8.311351E-07  1.005226E-08  0.000000E+00  0
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     1.769698704e-06
+@ DQMIN_PHASE      %le         2.149144008
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.57.45"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.11"
 * NAME                                S                  X                  Y                 PX                 PY 
 $ %s                                %le                %le                %le                %le                %le 
  "IP5"                      6664.568433   -3.694761537e-08    -0.001250005829    0.0001499744915    -9.20320366e-08
@@ -313,8 +334,11 @@ orbit:   1.930829E-07  1.921855E-10 -7.565033E-07  7.468622E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     2.80664931e-06 
+
+       dqmin_phase 
+     -0.6785341968 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -357,10 +381,14 @@ orbit:   1.930829E-07  1.921855E-10 -7.565033E-07  7.468622E-09  0.000000E+00  0
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le      2.80664931e-06
+@ DQMIN_PHASE      %le       -0.6785341968
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.57.48"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.14"
 * NAME                                S                  X                  Y                 PX                 PY 
 $ %s                                %le                %le                %le                %le                %le 
  "IP5"                      6664.873167   -3.079506887e-08    -0.002349989178   -0.0001500509265    1.029632478e-07
@@ -428,8 +456,11 @@ orbit:  -6.686946E-07  1.079835E-08  8.311351E-07  1.005226E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    1.769698704e-06 
+
+       dqmin_phase 
+       2.149144008 
 Set8 halo to 3.250945 sigma, the lumi is reduced from    2.808705373e+33 Hz/cm2 to              2e+32 Hz/cm2
 halo8/2.*sqrt(3.*epsx)*1e3 =      0.05017176433 ;
 enter Twiss module
@@ -461,8 +492,11 @@ orbit:  -6.686946E-07  1.079835E-08  8.311351E-07  1.005226E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    1.769854343e-06 
+
+       dqmin_phase 
+       2.149142235 
 Want to make named table: twissb1
 enter Twiss module
   
@@ -490,8 +524,11 @@ orbit:   1.930829E-07  1.921855E-10 -7.565033E-07  7.468622E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     2.80664931e-06 
+
+       dqmin_phase 
+     -0.6785341968 
 Want to make named table: twissb2
 sepr1              =        112.6891226 ;
 sepr2              =        35.48649078 ;
@@ -535,8 +572,11 @@ orbit:  -6.734732E-07  1.080684E-08  8.208859E-07  9.925571E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    1.746121987e-06 
+
+       dqmin_phase 
+       2.133248381 
 xnom1              =   -3.529655823e-08 ;
 xnom2              =    0.0001409138104 ;
 xnom5              =   -3.723648022e-08 ;
@@ -590,8 +630,11 @@ orbit:  -6.734714E-07  1.080682E-08  8.208882E-07  9.925602E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    1.746725292e-06 
+
+       dqmin_phase 
+       2.127819958 
 Want to make named table: twissb1
 enter Twiss module
   
@@ -619,8 +662,11 @@ orbit:   1.810459E-07  5.443644E-12 -7.602513E-07  7.343247E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.789030573e-06 
+
+       dqmin_phase 
+     -0.6994848673 
 Want to make named table: twissb2
 enter Twiss module
   
@@ -647,8 +693,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -674,8 +723,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -701,8 +753,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 Want to make named table: twissb1_crab
 enter Twiss module
   
@@ -729,8 +784,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 Want to make named table: twissb2_crab
 Number of parasitic encounter before D1
 npara0_1           =                 16 ;
@@ -766,8 +824,11 @@ orbit:  -6.734714E-07  1.080682E-08  8.208882E-07  9.925602E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    1.746571719e-06 
+
+       dqmin_phase 
+       2.127821256 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -810,10 +871,14 @@ orbit:  -6.734714E-07  1.080682E-08  8.208882E-07  9.925602E-09  0.000000E+00  0
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     1.746571719e-06
+@ DQMIN_PHASE      %le         2.127821256
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.58.21"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.48"
 *                  S NAME                             BETX               BETY               ALFX               ALFY                MUX                MUY                  X                  Y                 PX                 PY 
 $                %le %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
         6582.287929 "BBMK_PAR.L5B1_22"         2863.267487        4901.411129       -9.063096018       -37.66589772        14.76659206        14.07652235    -0.003643817074    0.0007151834889    -3.38446043e-05    -4.14507673e-05
@@ -933,8 +998,11 @@ orbit:   1.810459E-07  5.443644E-12 -7.602513E-07  7.343247E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.789030573e-06 
+
+       dqmin_phase 
+     -0.6994848673 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -977,10 +1045,14 @@ orbit:   1.810459E-07  5.443644E-12 -7.602513E-07  7.343247E-09  0.000000E+00  0
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     2.789030573e-06
+@ DQMIN_PHASE      %le       -0.6994848673
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.58.24"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.51"
 *                  S NAME                             BETX               BETY               ALFX               ALFY                MUX                MUY                  X                  Y                 PX                 PY 
 $                %le %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
         6582.592664 "BBMK_PAR.L5B2_22"         4900.419542        2862.899212       -37.65849424       -9.061133394        14.95096488        14.07468329     0.005205859514    0.0005588737181    5.427898998e-05   -5.965506041e-05
@@ -1103,8 +1175,11 @@ orbit:  -6.734714E-07  1.080682E-08  8.208882E-07  9.925602E-09  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    1.746571719e-06 
+
+       dqmin_phase 
+       2.127821256 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -1147,10 +1222,14 @@ orbit:  -6.734714E-07  1.080682E-08  8.208882E-07  9.925602E-09  0.000000E+00  0
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     1.746571719e-06
+@ DQMIN_PHASE      %le         2.127821256
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.58.27"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.54"
 *                  S NAME                             BETX               BETY               ALFX               ALFY                MUX                MUY                  X                  Y                 PX                 PY 
 $                %le %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
         6664.500933 "BB_HO.L5B1_5"            0.3151289077       0.3151019789       0.2252409259       0.2249545956        14.98184082         14.2917982   -1.016040986e-05    -0.001800000222    0.0001499729404   -9.091320167e-08
@@ -1208,8 +1287,11 @@ orbit:   1.702757E-15 -2.415443E-17  6.694399E-08  8.730785E-10  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     1.62648431e-07 
+
+       dqmin_phase 
+        2.19603241 
 beta.ip1           =       0.2999189105 ;
 enter Twiss module
   
@@ -1236,8 +1318,11 @@ orbit:   1.702757E-15 -2.415443E-17  6.694399E-08  8.730785E-10  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     1.62648431e-07 
+
+       dqmin_phase 
+        2.19603241 
 enter Twiss module
   
 iteration:   1 error:   8.264110E-08 deltap:   0.000000E+00
@@ -1263,8 +1348,11 @@ orbit:   1.702757E-15 -2.415443E-17  6.694399E-08  8.730785E-10  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     1.62648431e-07 
+
+       dqmin_phase 
+        2.19603241 
 
 
 
@@ -2816,8 +2904,11 @@ orbit:  -3.236713E-17  3.169455E-19 -3.525864E-17 -1.966761E-19  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.830053564e-16 
+
+       dqmin_phase 
+      -1.411203113 
 Close orbit of the weak beam at the wire location
 s_at_bbcw.b1       =         20170.3324 ;
 x_at_bbcw.b1       =    9.299330081e-08 ;
@@ -2918,8 +3009,11 @@ orbit:  -2.838071E-10  7.700556E-12 -1.236375E-05 -1.887343E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    4.056359037e-05 
+
+       dqmin_phase 
+     -0.7867213093 
 enter Twiss module
   
 iteration:   1 error:   9.573363E-17 deltap:   0.000000E+00
@@ -2946,8 +3040,11 @@ orbit:  -3.236713E-17  3.169455E-19 -3.525864E-17 -1.966761E-19  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.830053564e-16 
+
+       dqmin_phase 
+      -1.411203113 
 Close orbit of the weak beam at the wire location
 s_at_bbcw.b1       =         19848.2174 ;
 x_at_bbcw.b1       =   -3.588550807e-08 ;
@@ -3047,8 +3144,11 @@ orbit:   4.586533E-09 -7.469299E-11 -3.612516E-05 -5.282314E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.000121945448 
+
+       dqmin_phase 
+     -0.7353704268 
 enter Twiss module
   
 iteration:   1 error:   5.158747E-17 deltap:   0.000000E+00
@@ -3075,8 +3175,11 @@ orbit:  -3.236713E-17  3.169455E-19  4.929650E-17  6.904514E-19  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    4.126901856e-16 
+
+       dqmin_phase 
+       3.078790774 
 Close orbit of the weak beam at the wire location
 s_at_bbcw.b1       =         6814.59843 ;
 x_at_bbcw.b1       =     0.001527100759 ;
@@ -3178,8 +3281,11 @@ orbit:  -1.234276E-05  1.377585E-07 -2.947905E-05 -2.380218E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.000223856353 
+
+       dqmin_phase 
+     -0.5655382873 
 enter Twiss module
   
 iteration:   1 error:   5.158747E-17 deltap:   0.000000E+00
@@ -3206,8 +3312,11 @@ orbit:  -3.236713E-17  3.169455E-19  4.929650E-17  6.904514E-19  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    4.126901831e-16 
+
+       dqmin_phase 
+        3.07879077 
 Close orbit of the weak beam at the wire location
 s_at_bbcw.b1       =         6516.61843 ;
 x_at_bbcw.b1       =     -0.00142125639 ;
@@ -3306,8 +3415,11 @@ orbit:  -2.401019E-05  2.894225E-07 -2.413356E-05 -5.948385E-08  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    0.0006027653408 
+
+       dqmin_phase 
+     -0.4841096536 
 enter Twiss module
   
 iteration:   1 error:   5.158747E-17 deltap:   0.000000E+00
@@ -3334,8 +3446,11 @@ orbit:  -3.236713E-17  3.169455E-19  4.929650E-17  6.904514E-19  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    4.126901831e-16 
+
+       dqmin_phase 
+        3.07879077 
 START MATCHING
 
 ++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.454378E-11 (symplectifying R)                                                                                                               
@@ -3428,8 +3543,11 @@ orbit:  -3.437045E-05  3.934321E-07 -9.956671E-05 -9.417894E-07  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.002402364441 
+
+       dqmin_phase 
+     -0.2933274267 
 
 
 ON_BB_CHARGE:=1;
@@ -3494,8 +3612,11 @@ orbit:  -3.457201E-05  3.778151E-07 -9.895460E-05 -9.339065E-07  1.096859E-06  1
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.00318906974 
+
+       dqmin_phase 
+      0.1600125642 
 
 
 ! Table for the quadrupoles values (the one used in the matching...)
@@ -3562,8 +3683,11 @@ orbit:  -3.457201E-05  3.778151E-07 -9.895460E-05 -9.339065E-07  1.096859E-06  1
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.00318906974 
+
+       dqmin_phase 
+      0.1600125642 
 xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
 
 xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
@@ -3706,8 +3830,11 @@ orbit:  -3.457201E-05  3.778151E-07 -9.895460E-05 -9.339065E-07  1.096859E-06  1
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.00318906974 
+
+       dqmin_phase 
+      0.1600125642 
 
 
 

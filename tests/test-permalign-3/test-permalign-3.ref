@@ -1,0 +1,126 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:04:56      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+beam;
+
+q1:quadrupole,  k1=0.01, l=1; ; !hbu element class q1
+
+q2:quadrupole,  k1=0.01, l=2;
+
+q3:quadrupole,  k1=0.01, l=3;
+
+a=0.5;
+
+myseq: sequence, l=6;
+
+  q1, at:=a, dx=0.002, dtheta=0.01;
+
+  q2, at=2.0, dy= 0.003, dphi=0.02;
+
+  q3, at=4.5, ds = 0.005, dpsi=0.02;
+
+endsequence;
+
+use, sequence=myseq;
+
+select, flag=twiss, column=name,s, dx, x,px, y,;
+
+twiss, betx=1, bety=1, file="thick.dat";
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     3.604872E-04  6.128065E-05 -1.740245E-03 -4.928366E-04 -4.351790E-07  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 6                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2268952486                  0        32.56450813    0.0003436779852 
+
+             dxrms             xcomax             xcorms                 q2 
+   0.0002296266366    0.0003604871822    0.0002400124692       0.2206965782 
+
+               dq2            betymax              dymax              dyrms 
+                 0        41.91320601     0.001790819605     0.001142076651 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.001740244503     0.001109841256                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    0.0002493305127 
+
+       dqmin_phase 
+       1.690721255 
+select, flag=makethin, class=quadrupole, thick=true, slice=2;
+
+survey, perm_align_survey, file = "survey_thick.dat";
+
+
+
+makethin, sequence=myseq;
+
+makethin: slicing sequence : myseq
+use, sequence=myseq;
+
+twiss, betx=1, bety=1, file="sliced.dat";
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     3.604872E-04  6.128065E-05 -1.740245E-03 -4.928366E-04 -4.351790E-07  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 6                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.2268952486                  0        32.56450813    0.0003436779852 
+
+             dxrms             xcomax             xcorms                 q2 
+   0.0002060629715    0.0003604871822    0.0002144538205       0.2206965782 
+
+               dq2            betymax              dymax              dyrms 
+                 0        41.91320601     0.001790819605    0.0009745150374 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.001740244503    0.0009485002271                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.000249330507 
+
+       dqmin_phase 
+       1.690721254 
+survey, perm_align_survey, file = "survey_thin.dat";
+
+save, sequence=myseq, file="mysliced.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+
+
+ 
+
+
+  Number of warnings: 1
+1 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

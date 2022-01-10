@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.08.10 13:30:51      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:08:29      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -69,6 +69,7 @@ orbit:  -2.059069E-08  2.245009E-11  3.485269E-08  1.699968E-04  9.294858E-06  1
   
 iteration:   3 error:   1.327492E-10 deltap:   1.000000E-06
 orbit:  -2.050148E-08  3.107835E-11  3.474834E-08  1.699968E-04  9.294879E-06  1.465501E-06
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
 iteration:   1 error:   1.738108E-03 deltap:   0.000000E+00
@@ -79,6 +80,7 @@ orbit:  -1.320523E-08 -2.604463E-10  2.093720E-08  1.699982E-04  9.252398E-06  1
   
 iteration:   3 error:   1.327513E-10 deltap:   0.000000E+00
 orbit:  -1.311603E-08 -2.518183E-10  2.083286E-08  1.699982E-04  9.252419E-06  1.478902E-06
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
@@ -101,8 +103,11 @@ orbit:  -1.311603E-08 -2.518183E-10  2.083286E-08  1.699982E-04  9.252419E-06  1
            synch_2            synch_3            synch_4            synch_5 
     0.002244883795     7.99769003e-07    1.090641769e-06    2.114259331e-08 
 
-           synch_6            synch_8             nflips 
-       13.80516467       0.2515673143                  0 
+           synch_6            synch_8             nflips              dqmin 
+       13.80516467       0.2515673143                  0    1.046861418e-07 
+
+       dqmin_phase 
+      -1.226975427 
 
 
 ! reduce size of output table:
@@ -186,6 +191,7 @@ orbit:  -2.059069E-08  2.245009E-11  3.485269E-08  1.699968E-04  9.294858E-06  1
   
 iteration:   3 error:   1.327492E-10 deltap:   1.000000E-06
 orbit:  -2.050148E-08  3.107835E-11  3.474834E-08  1.699968E-04  9.294879E-06  1.465501E-06
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
 iteration:   1 error:   1.738108E-03 deltap:   0.000000E+00
@@ -196,6 +202,7 @@ orbit:  -1.320523E-08 -2.604463E-10  2.093720E-08  1.699982E-04  9.252398E-06  1
   
 iteration:   3 error:   1.327513E-10 deltap:   0.000000E+00
 orbit:  -1.311603E-08 -2.518183E-10  2.083286E-08  1.699982E-04  9.252419E-06  1.478902E-06
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 ++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
@@ -218,8 +225,11 @@ orbit:  -1.311603E-08 -2.518183E-10  2.083286E-08  1.699982E-04  9.252419E-06  1
            synch_2            synch_3            synch_4            synch_5 
     0.002244883795     7.99769003e-07    1.090641769e-06    2.114259331e-08 
 
-           synch_6            synch_8             nflips 
-       13.80516467       0.2515673143                  0 
+           synch_6            synch_8             nflips              dqmin 
+       13.80516467       0.2515673143                  0    1.046821045e-07 
+
+       dqmin_phase 
+       -1.22718283 
 
 
 select, flag=touschek, column= name, S, TLI, TLIW, TLITOT;
@@ -259,8 +269,8 @@ touschek,tolerance=1.e-7,file="touschek_c.dat";
  Touschek Lifetime            18832073.014637254      [seconds]   
                               5231.1313929547932      [hours]
 
-  Number of warnings: 4
-0 in C and 4 in Fortran
+  Number of warnings: 8
+0 in C and 8 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

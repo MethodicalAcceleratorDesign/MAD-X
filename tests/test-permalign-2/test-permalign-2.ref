@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.03.31 13:43:54      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:04:56      +
   ++++++++++++++++++++++++++++++++++++++++++++
 a = 0.1;
 
@@ -57,8 +57,11 @@ final orbit vector:     8.156298E-03  3.380874E-03 -1.525084E-02 -6.632170E-03 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.009081139193 
+
+       dqmin_phase 
+       1.659969125 
 !save, sequence=myseq, file="myseq";
 
 select, flag=makethin, class=quadrupole, slice=3;
@@ -66,10 +69,6 @@ select, flag=makethin, class=quadrupole, slice=3;
 makethin, sequence=myseq;
 
 makethin: slicing sequence : myseq
-++++++ warning: non-zero align_info dpsi   not yet converted just copied
-++++++ warning: non-zero align_info dpsi   not yet converted just copied
-++++++ warning: non-zero align_info dpsi   not yet converted just copied
-++++++ warning: non-zero align_info dpsi   not yet converted just copied
 use, sequence=myseq;
 
 twiss, file="twiss.tfs_thin", betx=1, bety=1;
@@ -100,8 +99,11 @@ final orbit vector:     7.904734E-03  3.280324E-03 -1.524958E-02 -6.631611E-03 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0       0.1830020804 
+
+       dqmin_phase 
+       1.636547187 
 survey, file="test.survey", perm_align_survey;
 
 sixtrack;
@@ -145,7 +147,7 @@ ptc_create_layout,model=1, method=2, nst=2, exact=true;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        3.0000000000000004     
+ After    end:    0.0000000000000000        0.0000000000000000        3.0000000000000000     
 ptc_align;
 
 ptc_setswitch, debuglevel=0, fringe=false,  time=false, totalpath=false, exact_mis=false;                                                
@@ -208,8 +210,7 @@ PTC_TWISS, table=twiss, icase=5, no=5, betx=1, bety=2, betz=10, x=xin, y=yin, t=
    -0.006631611308                 -0                  0 
 write, table=twiss, file="twiss.ptc.tfs";
 
-  Number of warnings: 4
-4 in C and 0 in Fortran
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

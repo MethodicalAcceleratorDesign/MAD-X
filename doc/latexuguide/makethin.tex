@@ -10,7 +10,7 @@ with similar functionality but composed of
 thin (zero length) element slices or simplified thick slices as required
 by \madx tracking or conversion to \texttt{SIXTRACK} input format.
 
-DISCLAIMER: Several \madx commands such as {\texttt{ELIGN}}, {\texttt{EFCOMP}} won't directly work on sequences produced by {\texttt{MAKETHIN}}. In order to use such commands on a thin sequence, it is advisable to save the sequence on a file, and then re-load it.
+DISCLAIMER: Several \madx commands such as {\texttt{ELIGN}}, {\texttt{EFCOMP}} won't directly work on sequences produced by {\texttt{MAKETHIN}}. In order to use such commands on a thin sequence, it is advisable to save the sequence on a file, and then re-load it. Also note that after \texttt{MAKETHIN} you will have to do a \texttt{USE} command.  
 
 \section{MAKETHIN}
 \label{sec:makethin}
@@ -26,7 +26,8 @@ The parameters are defined as:
    processed to thin slices. The sequence must be active, i.e. it should
    have been previously loaded with a \hyperref[sec:use]{\texttt{USE}} command.  
    The sequence must use the default positioning of elements
-   ({\texttt{REFER=centre}}). 
+   ({\texttt{REFER=centre}}). To use the sliced sequence you have to again use the command
+   \hyperref[sec:use]{\texttt{USE}} with the sequence name. 
 
    \ttitem{STYLE} the slicing style to be used for all active elements (excluding corrector magnets).
    The corrector magnets and the inactive elements are instead sliced so there is a slice in the 

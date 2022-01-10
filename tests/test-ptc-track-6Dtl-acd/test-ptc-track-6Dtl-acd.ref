@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:35:33      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:08:20      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example of PTC_TRACK command with 6D and totalpath true
 
@@ -34,6 +34,7 @@ enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 
 ++++++ table: summ
 
@@ -55,8 +56,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 rf1_spos           =        10.50643276 ;
 rf2_spos           =        20.51286551 ;
 rf2_spos-rf1_spos  =        10.00643276 ;
@@ -77,7 +81,7 @@ Determined SECTOR NMUL MAX :  2
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -1.1060596882828122E-014   0.0000000000000000        6.7723604502134549E-015
+ After    end:    7.9985605812293858E-014   0.0000000000000000       -9.1038288019262836E-015
 
 ++++++ table: ptc_twiss_summary
 
@@ -179,8 +183,8 @@ py_co              =                  0 ;
 pt_co              =    5.501533498e-07 ;
 betarel            =       0.9720997084 ;
 
-  Number of warnings: 1
-0 in C and 1 in Fortran
+  Number of warnings: 2
+0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

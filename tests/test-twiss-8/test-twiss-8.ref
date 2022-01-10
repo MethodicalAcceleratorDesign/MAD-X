@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:24:16      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:03:09      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ang:=-PI/2;             !     0.000974144    -0.00864182        before bug fix was   0.000974144       -1.41323
 
@@ -57,8 +57,11 @@ final orbit vector:     1.799465E-19  1.693624E-19  7.061250E-03 -2.776802E-03 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 
 
   select, flag=makethin, class=sbend, slice=100;
@@ -104,8 +107,11 @@ final orbit vector:     0.000000E+00  0.000000E+00  7.071038E-03 -2.773820E-03  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 
 
 save, sequence=SingleBend, file="thin.seq";

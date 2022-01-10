@@ -61,14 +61,14 @@ label: SBEND, \= L=real, ANGLE=real, TILT=real, \\
               \> K0=real, K1=real, K2=real, K1S=real,\\
               \> E1=real, E2=real, FINT=real, FINTX=real,\\
               \> HGAP=real, H1=real, H2=real,\\
-              \> THICK=logical;\\
+              \> KTAP=real, THICK=logical;\\
               \> \\
               \> \\
 label: RBEND, \> L=real, ANGLE=real, TILT=real, \\
               \> K0=real, K1=real, K2=real, K1S=real,\\
               \> E1=real, E2=real, FINT=real, FINTX=real, \\
               \> HGAP=real, H1=real, H2=real, \\
-              \> THICK=logical, \\
+              \> KTAP=real, THICK=logical, \\
               \> ADD\_ANGLE='array';
 }
 
@@ -108,14 +108,23 @@ Bending magnets have the following attributes:
      $K_1 = (1/B\rho) (\partial B_y / \partial x)$. \\
    A positive quadrupole strength implies horizontal focussing of particles,
    irrespective of their charge. K1 is taken into account in thick bend transfer map.
-   Only K0 and K1 are considered for think transfer map, not any other strengths (like K2, K1S).
+   Only K0 and K1 are considered for think transfer map, not any other
+   strengths (like K2, K1S). 
    % positively charged particles.  % Ghislain: sera changé dans le futur!
 
    \ttitem{E1} The rotation angle for the entrance pole face (Default: 0 rad).
    \ttitem{E2} The rotation angle for the exit pole face (Default: 0 rad). \\
    The pole face rotation angles are referred to the magnet model for
    \hyperref[F-RBND]{rectangular bend} and \hyperref[F-SBND]{sector
-     bend} respectively. If \texttt{E1} and \texttt{E2} are of the same sign as the bending angle, they reduce the external length (i.e. opposite to the centre of curvature) of the magnet. \texttt{E1} and \texttt{E2} must be specified as half of the bending angle of the magnet to get a \texttt{SBEND} with parallel faces, i.e. turning it into a \texttt{RBEND}. \texttt{E1} and \texttt{E2} must be specified as {\it minus} half of the bending angle of the magnet to get a \texttt{RBEND} with sector faces, i.e. turning it into a \texttt{SBEND}.
+     bend} respectively. If \texttt{E1} and \texttt{E2} are of the same
+   sign as the bending angle, they reduce the external length
+   (i.e. opposite to the centre of curvature) of the magnet. \texttt{E1}
+   and \texttt{E2} must be specified as half of the bending angle of the
+   magnet to get a \texttt{SBEND} with parallel faces, i.e. turning it
+   into a \texttt{RBEND}. \texttt{E1} and \texttt{E2} must be specified
+   as {\it minus} half of the bending angle of the magnet to get a
+   \texttt{RBEND} with sector faces, i.e. turning it into a
+   \texttt{SBEND}. 
 
    \ttitem{FINT} The fringe field integral at entrance and exit of the
    bend. (Default:  0).
@@ -150,12 +159,19 @@ Bending magnets have the following attributes:
    \ttitem{K0} Please take note that $K_0$ and $K_0S$ are left in the
    data base but are no longer used for the MAP of the bends,
    instead \texttt{ANGLE} and \texttt{TILT} are used exclusively. \\
-   However, \texttt{K0} is assignment of \textbf{relative} field errors to a bending magnet because
+   However, \texttt{K0} is assignment of \textbf{relative} field errors
+   to a bending magnet because 
    \texttt{K0} is used for the normalization instead of the
    \texttt{ANGLE}. (see \hyperref[sec:efcomp]{\texttt{EFCOMP}}).\\
    With $K_0 = (1 / B \rho) B_y$, one gets \texttt{K0 = ANGLE / arclength}.
 
-
+   \ttitem{KTAP} The relative change of the dipole strength (See
+   \texttt{K0} above) to account for energy change of the
+   reference particle due to RF cavities or synchrotron radiation. The
+   actual strength of the dipole is calculated as \texttt{K0 * L = ANGLE
+   * (1 + KTAP)}. See the \hyperref[chap:taper]{\texttt{TAPER}}
+   command. (Default:~0)  
+  
    \ttitem{THICK} If this logical flag is set to true the bending
    magnet is kept as a thick-element, instead of being
    converted into thin-lenses after MAKETHIN. Note that
@@ -163,10 +179,14 @@ Bending magnets have the following attributes:
    remain THICK even if this attribute is false.  \\
    (Default: false)
 
-   \ttitem{KILL\_ENT\_FRINGE} If this logical flag is set to true the fringe fields on the entrance of the element are not taken into account (not calculated). \\
+   \ttitem{KILL\_ENT\_FRINGE} If this logical flag is set to true the
+   fringe fields on the entrance of the element are not taken into
+   account (not calculated). \\ 
    (Default: false)
 
-   \ttitem{KILL\_EXI\_FRINGE} If this logical flag is set to true the fringe fields on the exit of the element are not taken into account (not calculated). \\
+   \ttitem{KILL\_EXI\_FRINGE} If this logical flag is set to true the
+   fringe fields on the exit of the element are not taken into account
+   (not calculated). \\ 
    (Default: false)
 \end{madlist}
 
@@ -267,11 +287,11 @@ A \texttt{DIPEDGE} has zero length and five attributes.
 
 \madbox{
 label: QUADRUPOLE, \= L=real, K1=real, K1S=real, TILT=real,\\
-                   \> THICK=logical;
+                   \> KTAP=real, THICK=logical;
 }
 
 
-A \texttt{QUADRUPOLE} has five attributes:
+A \texttt{QUADRUPOLE} has six attributes:
 \begin{madlist}
    \ttitem{L} The quadrupole length (default: 0 m).
    \ttitem{K1} The normal quadrupole coefficient:
@@ -299,12 +319,20 @@ A \texttt{QUADRUPOLE} has five attributes:
      about the actual meaning of the \texttt{TILT} attribute for
      various elements.}
 
-    \ttitem{THICK} If this logical flag is set to true the bending
+   \ttitem{KTAP} The relative change of the quadrupoles strengths (both
+   \texttt{K1} and \texttt{K1S}) to account for energy change of the
+   reference particle due to RF cavities or synchrotron radiation. The
+   actual strength of the quadrupole is calculated as \texttt{K1act = K1
+   * (1 + KTAP)}. See the \hyperref[chap:taper]{\texttt{TAPER}}
+   command. (Default:~0)  
+   
+   \ttitem{THICK} If this logical flag is set to true the bending
    magnet is kept as a thick-element, instead of being
    converted into thin-lenses after MAKETHIN. Note that
    if used in tracking without a MAKETHIN command it will
    remain THICK even if this attribute is false. \\
    (Default: false)
+
 \end{madlist}
 
 \textbf{Note also that $K_1$ or $K_{1s}$ can be considered as
@@ -317,11 +345,10 @@ A \texttt{QUADRUPOLE} has five attributes:
 Example:
 \madxmp{QF: QUADRUPOLE, L=1.5, K1=0.001, THICK=true;}
 
-%irina
-\textbf{Note:} Quadrupoles doesn't carry any attributes of the other orders magnets,
- for example, bend($K_0$) or sextupole($K_2$).In case these have to be considered
- in the element, please use multipole as a type of an element.
-
+\textbf{Note:} Quadrupoles cannot have any of the attributes of other
+magnetic elements, for example, bend (\texttt{K0}) or sextupole
+(\texttt{K2} opr \texttt{K2S}). If these have to be considered in
+the element, one should use the \texttt{MULTIPOLE} element. 
 
 \textbf{Note:} Additional attributes can be given to quadrupoles; They
 are useful for \ptc and are defined in \ref{sec:add-option-PTC}.
@@ -329,16 +356,15 @@ are useful for \ptc and are defined in \ref{sec:add-option-PTC}.
 The \hyperref[subsec:local-straight]{straight reference system} for
 a quadrupole is a Cartesian coordinate system.
 
-
 \section{Sextupole}
 \ttindex{sextupole}
 \label{sec:sextupole}
 
 \madbox{
-label: SEXTUPOLE, L=real, K2=real, K2S=real, TILT=real;
+label: SEXTUPOLE, L=real, K2=real, K2S=real, TILT=real, KTAP=real;
 }
 
-A \texttt{SEXTUPOLE} has four real attributes:
+A \texttt{SEXTUPOLE} has five real attributes:
 \begin{madlist}
     \ttitem{L} The sextupole length (default: 0 m).
     \ttitem{K2} The normal sextupole coefficient $K_2 = \frac{1}{B \rho}
@@ -368,6 +394,14 @@ A \texttt{SEXTUPOLE} has four real attributes:
         0~rad. This was needed to avoid the confusion in \madeight about
         the actual meaning of the \texttt{TILT} attribute for various
         elements.}
+
+      \ttitem{KTAP} The relative change of the sextupole strengths (both
+      \texttt{K2} and \texttt{K2S}) to account for energy change of the 
+      reference particle due to RF cavities or synchrotron radiation. The
+      actual strength of the sextupole is calculated as
+      \texttt{K2act = K2 * (1 + KTAP)}. See the \texttt{TAPER}
+      command.\ref{chap:taper}. (Default:~0) 
+
 \end{madlist}
 
 \textbf{Note also that $K_2$ or $K_{2s}$ can be considered as the normal
@@ -379,10 +413,10 @@ A \texttt{SEXTUPOLE} has four real attributes:
 Example:
 \madxmp{S: SEXTUPOLE, L=0.4, K2=0.00134;}
 
-%irina
-\textbf{Note:} Sextupole doesn't carry any attributes of other orders magnets,
-for example, bend($K_0$) or quadrupole($K_1, K1_S$). In case these have to be
-considered in the element, please use multipole as a type of an element.
+\textbf{Note:} Sextupoles cannot have any of the attributes of other
+magnetic elements, for example, bend (\texttt{K0}) or
+quadrupole (\texttt{K1} or \texttt{K1S}). If these have to be considered
+in the element, one should use the \texttt{MULTIPOLE} element. 
 
 
 \textbf{Note:} Additional attributes can be given to sextupoles; They
@@ -1471,7 +1505,7 @@ beam-beam interaction point:
 
 \madbox{
 label: BEAMBEAM, \= CHARGE=real, \\
-                 \> XMA=real, YMA=real, \\
+                 \> XMA=real, YMA=real, NPART=integer \\
                  \> SIGX=real, SIGY=real, WIDTH=real,\\
                  \> BBSHAPE=integer, BBDIR=integer;
 }
@@ -1490,6 +1524,9 @@ and extended by S.~Sorge (2007).
      \texttt{CHARGE} explicitly in the
      \hyperref[sec:beam]{\texttt{BEAM}} command as well as in the
      \texttt{BEAMBEAM} element.
+     
+   \ttitem{NPART} The number of particles. In case this attribute 
+   is not defined then MAD-X will use the NPART from the beam command.
 
    \ttitem{XMA}
      The horizontal displacement of the opposite beam with respect to
@@ -1615,23 +1652,32 @@ beam,   particle = positron, npart = 1.e12, energy = 50.0; \\
 bb:     beambeam, sigx = 1.e-3, sigy = 5.e-4, charge = 1.;
 }
 
-
-Example of a four-dimensional beam-beam element definition in an
-Electron cooler:
-\madxmp{
-gamma0 = 1.032;                          \= ! relativistic factor \\
-beta0 = sqrt(1.0-1.0/gamm0/gamma0);      \>  \\
-\> \\
-i\_e = 0.2;                              \> ! electron current \\
-re\_cool = 0.01;                         \> ! electron beam radius \\
-l\_cool = 5.0;                           \> ! cooling length \\
-\\
-nelect = i\_e*l\_cool/beta0/clight/qelect; ! electron number in e-cooler \\
-\\
-beam, particle=antiproton, gamma=gamma0, npart=nelect;  \\
-bb\_ecool: beambeam, sigx=re\_cool, sigy=re\_cool, bbshape=2, \\
-\hskip 4.2cm                     width=0.01, charge=-1, bbdir=1;
+\section{Wire}
+\label{sec:wire}
+\madbox{
+label: WIRE, \= CURRENT=\{real, \ldots \}, L=real,  \\
+               \> L\_INT=\{real, \ldots \}, L\_PHY=\{real, \ldots \}, \\
+               \> XMA=\{real, \ldots \}, ..., YMA=\{real, \ldots \};
 }
+
+The \texttt{WIRE} element allows defining one or several WIRE elements at once. 
+\begin{madlist}
+   \ttitem{L} The length of the element in the sequence.
+   \ttitem{CURRENT} The current for the wires in Amperes . 
+   \ttitem{L\_PHY} This should correspond to the actual physical length of the wires. 
+   \ttitem{L\_INT} The length where we stop integrating the effect of the field.
+   It needs to be larger or the same as \texttt{L\_PHY}.
+   \ttitem{XMA} This specifies the horizontal offset of the wire compared to the reference orbit. 
+   \ttitem{YMA} This specifies the vertical offset of the wire compared to the reference orbit. 
+\end{madlist}
+
+The WIRE as implemented in MAD-X is imlemented as a thin kick. However, it is still 
+possible to define a length of the wire but internally the element is 
+placed in the middle and drift spaces are placed on each side of the \texttt{WIRE}.
+Note also that the collimator element has the same attiributes as the \texttt{WIRE}
+and by defining it using the same parameters you can also get the collimator with a wire
+inside. 
+
 
 
 %  Changed by: Frank Schmidt, 25-June-2003

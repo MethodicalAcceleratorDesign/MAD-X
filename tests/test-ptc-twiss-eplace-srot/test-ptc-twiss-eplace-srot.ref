@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.24 14:44:23      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.02 16:50:47      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test for s-rotation with ptc_eplacement
 
@@ -61,6 +61,7 @@ select, flag=twiss, column=name,s,x,px,y,py, t, pt,
 
 ptc_create_universe;
 
+Determined SECTOR NMUL MAX :  2
  ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
 
  MAD-X Beam Parameters
@@ -79,7 +80,7 @@ ptc_create_universe;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -1.7758819045102521        0.0000000000000000        4.1276814958744428     
+ After    end:   -1.7758819045102510        0.0000000000000000        4.1276814958744428     
 
 
  ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
@@ -159,7 +160,7 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
     0.007507895427      0.04965352215                  0                0.1 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0                  0                  0                 -0 
+                 0                  0    4.207051374e-14                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0      0.07695042622     -0.05567315849     -0.01284762319 

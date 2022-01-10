@@ -38,8 +38,11 @@ WARNING: if errors are to be applied to a thin sequence produced by \hyperref[ch
 %  Changed by: Werner Herr, 02-Sep-2002 
 %  Changed by: Hans Grote, 25-Sep-2002 
 
-\section{EALIGN: Alignment Errors} %EALIGN: Define Misalignments} 
+\section{EALIGN: Alignment Errors and permanent misalignments} %EALIGN: Define Misalignments} 
 \label{sec:ealign}
+
+There are two ways of introducing misalignments in MAD-X.
+\subsection{EALIGN}
 
 Alignment errors are defined by the \texttt{EALIGN} command. 
 The misalignments refer to the
@@ -91,7 +94,24 @@ for elements selected by the
 	\label{F-XYDISP}
 \end{figure}
 
-
+\subsection{Permanent Misalignments}
+The second way of introducing misalignments in MAD-X is
+to define them directly in the creation of a sequence. The name 
+and effect of the orientation is the same as for the \texttt{EALIGN}. 
+In case EALIGN and permanent misalignment are used togheter the values 
+are added togheter component by component. The effect of the permanent misalignment
+is ignored by SURVEY by default but by adding the \text{PERM\_ALIGN\_SURVEY} the 
+start and end location of each element is given. The permanent misalignemnt need to 
+be defined in the creation of the sequence. An example is given below:
+\textbf{Examples:}
+\madxmp{
+a=0.06; \\
+q1:quadrupole, l=1, k1=0.01; \\
+myseq: sequence, l=10; \\
+q1, at=5, dtheta=0.1, dphi=0.2, dpsi=0.3, dx=0.04, dy=0.05, ds:=a; \\
+endsequence; \\
+}
+It is also possible to defined the permanet misalignments using defered expresions.
 %% \begin{figure}[ht]
 %% \centering
 %% \setlength{\unitlength}{1pt}
@@ -409,14 +429,21 @@ The error option command specifies different seeds for random values:
 
 \vspace{2mm}
 \madbox{
-EOPTION, SEED=real, ADD=logical;
+EOPTION, SEED=integer, ADD=logical;
 }\vspace{5mm}
 
 \begin{madlist}
-  \ttitem{SEED} Selects a particular sequence of random values. 
-  A \texttt{SEED} value is an integer in the range [0...999999999] (default:
-  123456789). Note that the seed set with this command is shared with the \hyperref[sec:track]{\texttt{TRACK}} and \hyperref[sec:coption]{\texttt{COPTION}} commands. See
-  also: \hyperref[subsubsec:random]{Random Values}. 
+  \ttitem{SEED} Seeds or starts a particular sequence of random values. 
+  A valid \texttt{SEED} value is an integer in the range [0...999999999] or
+  an expression that evaluates to an integer in the same range. 
+  (default: 123456789).\\
+  Internally the code takes as the effective seed the value
+  \texttt{ABS(seed)\%1.e10} hence normalizing the provided seed to an
+  appropriate value in the range irrespective of the provided value. \\ 
+  Note that the seed set with this command is shared with the
+  \hyperref[sec:track]{\texttt{TRACK}} and
+  \hyperref[sec:coption]{\texttt{COPTION}} commands.
+  See also: \hyperref[subsubsec:random]{Random Values}. 
 
   \ttitem{ADD} If this logical flag is set, an \texttt{EALIGN} or \texttt{EFCOMP} 
   causes the errors to be added on top of existing ones. If it is not set,

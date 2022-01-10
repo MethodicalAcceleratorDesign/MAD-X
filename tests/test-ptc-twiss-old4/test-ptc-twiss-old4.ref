@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:29:40      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:05:34      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -224,8 +224,11 @@ orbit:   3.260716E-04  2.596347E-06  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 
 
 SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)
@@ -289,7 +292,7 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
+ After    end:   -40.580758467025461        0.0000000000000000        532.53346053079542     
 ptc_align;
 
 
@@ -324,7 +327,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2,rmatrix;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607161327489868E-004   2.5963466777806038E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    3.2607153201649747E-004   2.5963453800881828E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 ++++++ table: ptc_twiss_summary
 
@@ -359,22 +362,22 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2,rmatrix;
      -0.0296661037      0.02965905227                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    0.0003260716133 
+                 0                  0                  0     0.000326071532 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596346678e-06                  0                  0                  0 
+    2.59634538e-06                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    0.0002136648615                  0    3.396649496e-06 
+                 0    0.0002136648469                  0    3.396649268e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003315825074 
+                 0                  0                  0    0.0003315824833 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.310271876e-06                  0                 -0 
+                 0    5.310272196e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0    -0.000152545614                  0   -6.256319151e-06 
+                 0   -0.0001525455348                  0   -6.256318517e-06 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
@@ -406,7 +409,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607161327489868E-004   2.5963466777806038E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    3.2607153201649747E-004   2.5963453800881828E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 
 ptc_end;
@@ -475,7 +478,7 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
+ After    end:   -40.580758467025461        0.0000000000000000        532.53346053079542     
 ptc_align;
 
                                     
@@ -594,16 +597,16 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
    2.596345986e-06                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    0.0002136648624                  0    3.396649557e-06 
+                 0    0.0002136648786                  0    3.396649844e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003315825475 
+                 0                  0                  0    0.0003315825432 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.310271716e-06                  0                 -0 
+                 0    5.310273009e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -0.0001525455658                  0   -6.256319471e-06 
+                 0   -0.0001525455545                  0    -6.25631944e-06 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 

@@ -11,7 +11,7 @@ endsequence;
 //-- strength can also be set after sequence definition
 beam;
 use, sequence=testseq;
-
+twiss, betx=1, bety=1, file="thick.twiss";
 select, flag = makethin, class=collimator,  slice=1	;
 select, flag = makethin, class=wire,  slice=2	;
 
@@ -19,7 +19,10 @@ makethin, sequence=testseq;
 use, sequence=testseq;
 
 twiss, betx=1, bety=1, file ="thin.twiss";
-
+track;
+start, x=0.001;
+run, turns=10;
+endtrack;
 sixtrack;
 
 save sequence=testseq, file="thin.seq";

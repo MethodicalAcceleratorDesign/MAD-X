@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:35:29      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:08:18      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !MADX test for rf lag handling in PTC
 
@@ -36,8 +36,11 @@ orbit:   1.839782E-06  5.524594E-13  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 makethin: style chosen : hybrid
 ++++++ warning: makethin: no selection list, slicing all to one thin lens.
 makethin: slicing sequence : c314
@@ -58,7 +61,7 @@ Determined SECTOR NMUL MAX :  0
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        2040.9999999999445     
+ After    end:    0.0000000000000000        0.0000000000000000        2040.9999999999332     
  Setting debug level to           1
 maxaccel is found and its value is 0.000000
 exact_mis is found and its value is 1.000000

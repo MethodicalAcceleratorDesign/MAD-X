@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 17:59:52      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:04:22      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'CELL matching with MAD-X';
 
@@ -17,30 +17,44 @@ START MATCHING
 
 number of sequences: 1
 sequence name: fivecell
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 number of variables:    2
 user given constraints: 2
 total constraints:      2
 
 START LMDIF:
 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 Initial Penalty Function =   0.24356070E-01
 
 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 call:       4   Penalty function =   0.26743395E-08
-call:       7   Penalty function =   0.81289905E-17
-call:      10   Penalty function =   0.20322043E-24
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+call:       7   Penalty function =   0.81289525E-17
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+call:      10   Penalty function =   0.19360619E-24
  ++++++++++ LMDIF ended: converged successfully
-call:      10   Penalty function =   0.20322043E-24
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+call:      10   Penalty function =   0.19360619E-24
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-fivecell$end:1             mux          4     1.27000000E+00     1.27000000E+00     4.43734259E-29
-fivecell$end:1             muy          4     1.77000000E+00     1.77000000E+00     2.03176057E-25
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+fivecell$end:1             mux          4     1.27000000E+00     1.27000000E+00     3.15544362E-28
+fivecell$end:1             muy          4     1.77000000E+00     1.77000000E+00     1.93290643E-25
 
 
-Final Penalty Function =   2.03220430e-25
+Final Penalty Function =   1.93606188e-25
 
 
 
@@ -53,11 +67,12 @@ kqd                      -1.09178e-02 -1.09257e-02 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   2.03220430e-25
+VARIABLE "TAR" SET TO   1.93606188e-25
 kqf                =     0.009138327024 ;
 kqd                =      -0.0109177935 ;
 
-  Number of warnings: 0
+  Number of warnings: 14
+0 in C and 14 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

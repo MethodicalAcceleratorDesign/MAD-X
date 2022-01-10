@@ -29,7 +29,8 @@ const char *const_constant_def =
 "const emass = 0.51099895000e-3; "
 "const mumass = 0.1056583755; "
 "const nmass = 0.93956542052; "
-"const pmass = 0.93827208816; "
+"const umass = 0.93149410242; "
+"const pmass = 0.93827208816; " 
 "const clight = 299792458; "
 "const qelect = 1.602176634e-19; "
 "const hbar = 6.582119569e-25; " /* GeV*s */
@@ -122,6 +123,8 @@ const char *const_command_def =
 "dpary    = [r, 0.273], "        /* fractional parasitic dispersion - vertical */
 "cor      = [r, 0.004], "        /* maximum radial closed orbit */
 "bbeat    = [r, 1.1], "          /* beta beating coefficient applying to beam size*/
+"bbeat_x  = [r, 1.1], "          /* beta beating coefficient applying to beam size*/
+"bbeat_y  = [r, 1.1], "          /* beta beating coefficient applying to beam size*/
 "nco      = [i, 5], "            /* number of azimuth for radial scan */
 "halo     = [r, {6., 8.4, 7.3, 7.3}], "  /* halo parameters: n, r, h, v */
 "interval = [r, 1.], "           /* length in meters between measurements */
@@ -761,6 +764,7 @@ const char *const_command_def =
 "maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
 "exact_mis  = [l, false, true], "  /* switch to ensure exact misaligment treatment */
 "totalpath  = [l, false, true], "  /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
+"spin       = [l, false, true], "  /*sets the spin switch/internal state of PTC*/
 "radiation  = [l, false, true], "  /*sets the radiation switch/internal state of PTC */
 "modulation = [l, false, true], "  /*sets the modulation switch/internal state of PTC */
 "stochastic = [l, false, true], "  /*sets the stochastic switch/internal state of PTC */
@@ -942,8 +946,14 @@ const char *const_command_def =
 "endedit: edit edit 2 0; "
 " "
 "emit: emit none 0 0 "
-"deltap   = [r, 0], "
-"tol      = [r, 1.000001, 0]; "
+"deltap         = [r, 0], "
+"tol            = [r, 1.000001, 0]; "
+" "
+"taper: taper none 0 0 "
+"iterate     = [i, 3], "
+"stepsize    = [r, 0], "
+"reset       = [l, false, true], "
+"file        = [s, taper.madx, taper.madx]; "
 " "
 "ealign: error none 0 0 "
 "dx       = [r, 0], "
@@ -1078,9 +1088,12 @@ const char *const_command_def =
 "keeporbit= [s, default, default], "
 "tolerance= [r, 1.e-6], "
 "deltap   = [s, none], "
+"exact = [l, false, true], "
 "eigenvector = [l, false, true], "
 "eigenfile = [s, eigenvectors, eigenvectors], "
 "tapering = [l, false, true], "
+"clorb_tol = [r, 0.0001], "
+"tap_itter = [i, 1000], "
 "notable  = [l, false, true]; "
 " "
 "match: match match 1 0 "
@@ -1111,6 +1124,7 @@ const char *const_command_def =
 "useorbit = [s, {default}, {default}], "
 "keeporbit= [s, {default}, {default}], "
 "vlength  = [l, false, true], "
+"tapering = [l, false, true], "
 "slow     = [l, false, true], "  /* makes match use the twiss table */
 "orbit    = [l, false, true]; "
 " "
@@ -1311,6 +1325,7 @@ const char *const_command_def =
 "ddq1     = [c, 0],   ddq2      = [c, 0], "
 "dq1de1   = [c, 0],   dq1de2    = [c, 0], "
 "dq2de2   = [c, 0],   gammatr   = [c, 0], "
+"dqmin   = [c, 0],    dqmin_phase   = [c, 0], "
 "alfa     = [c, 0],"
 "sequence = [s, none]; "
 " "
@@ -1320,6 +1335,8 @@ const char *const_command_def =
 "ddq1     = [r, 0.1], ddq2      = [r, 0.1], "
 "dq1de1   = [r, 0.1], dq1de2    = [r, 0.1], "
 "dq2de2   = [r, 1],   alfa      = [r, 1.0],"
+"dqmin   = [r, 10],   dqmin_phase   = [r, 10], "
+
 "gammatr   = [r, 1]; "
 " "
 "sequence: sequence none 0 0 "
@@ -1492,6 +1509,7 @@ const char *const_element_def =
 "fintx    = [r, -1.0], "
 "k3       = [r, 0],  "
 "k3s      = [r, 0],  "
+"ktap     = [r, 0],  "
 "fcsr     = [r, 0],  "
 "mech_sep = [r, 0], "
 "v_pos = [r, 0], "
@@ -1526,6 +1544,7 @@ const char *const_element_def =
 "dtheta   = [r, 0],  "
 "dphi     = [r, 0],  "
 "dpsi     = [r, 0],  "
+"slice_straight = [l, false, false], "
 "aper_tilt  = [r, 0], "
 "add_angle       = [r, {0,0,0,0,0}], "
 "comments = [s, none, none]; "
@@ -1554,6 +1573,7 @@ const char *const_element_def =
 "fintx    = [r, -1.0], "
 "k3       = [r, 0],  "  // ld: ignored
 "k3s      = [r, 0],  "  // ld: ignored
+"ktap     = [r, 0],  "
 "fcsr     = [r, 0],  "
 "mech_sep = [r, 0], "
 "v_pos = [r, 0], "
@@ -1586,6 +1606,7 @@ const char *const_element_def =
 "dtheta   = [r, 0],  "
 "dphi     = [r, 0],  "
 "dpsi     = [r, 0],  "
+"slice_straight = [l, false, false], "
 "aper_tilt  = [r, 0], "
 "comments = [s, none, none]; "
 " "
@@ -1717,8 +1738,7 @@ const char *const_element_def =
 "tilt     = [r, 0],  "
 "k1       = [r, 0],  "
 "k1s      = [r, 0],  "
-"k1tap    = [r, 0],  "
-"k1stap   = [r, 0],  "
+"ktap     = [r, 0],  "
 "mech_sep = [r, 0], "
 "v_pos = [r, 0], "
 "aperture = [r, {0}], "
@@ -1764,8 +1784,7 @@ const char *const_element_def =
 "tilt     = [r, 0],  "
 "k2       = [r, 0],  "
 "k2s      = [r, 0],  "
-"k2tap    = [r, 0],  "
-"k2stap   = [r, 0],  "
+"ktap     = [r, 0],  "
 "mech_sep = [r, 0], "
 "v_pos = [r, 0], "
 "aperture = [r, {0}], "
@@ -2533,6 +2552,7 @@ const char *const_element_def =
 "siges    = [r, 1],  "
 "cot      = [r, 0],  "
 "copt     = [r, 0],  "
+"npart    = [r, 0],  "
 "slice    = [i, 1],  "
 "spacecharge = [l, false, true],  "
 "apertype = [s, circle, circle], "
@@ -2976,6 +2996,7 @@ const char *const_element_def =
 "dtheta   = [r, 0],  "
 "dphi     = [r, 0],  "
 "dpsi     = [r, 0],  "
+"misexit  = [r, 0],  "
 "aper_tilt  = [r, 0], "
 "comments = [s, none, none]; "
 " "

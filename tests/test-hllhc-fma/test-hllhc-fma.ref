@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 21:53:24      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.09 12:17:40      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2009
 
@@ -393,8 +393,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 refbetxip1b1       = 6.00000696311818 ;
 refbetyip1b1       = 6.00000000025823 ;
 refbetxip5b1       = 6.00000857580692 ;
@@ -458,8 +461,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -502,10 +508,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  0
+@ DQMIN_PHASE      %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.53.42"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.08"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.5684327563 6.00000857580692 6.00000000016412 4.7183992894761e-06 1.18943709464912e-11 2.51017694686269e-07 5.87323269866069e-08 15.0983408225299 14.5331268901972
@@ -538,8 +548,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -582,10 +595,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  0
+@ DQMIN_PHASE      %le  0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.53.43"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.10"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.8731672437 5.99997370066488 5.99999999981848 -3.57164062478269e-06 -4.98715163136442e-12 1.84950996688772e-07 -1.16397080770831e-08 15.1373644428132 14.5337976415106
@@ -618,8 +635,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 3.72927434355795e-07 
+
+dqmin_phase 
+-1.47992765853268 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -662,10 +682,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  3.72927434355795e-07
+@ DQMIN_PHASE      %le  -1.47992765853268
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.53.45"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.11"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.5684327563 6.8940544701245e-08 0.0019999810501769 0.000295003163426264 -3.67961959238216e-09
@@ -701,8 +725,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.31268439417612e-05 
+
+dqmin_phase 
+-2.37678722650459 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -745,10 +772,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  1.31268439417612e-05
+@ DQMIN_PHASE      %le  -2.37678722650459
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.53.47"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.13"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.8731672437 1.20764185699033e-07 -0.00200462302084927 -0.000294999055610351 -1.95142007206673e-07
@@ -828,8 +859,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.46535053437621e-14 
+
+dqmin_phase 
+1.43371452756109 
 xnom1              = -0.00200000000002033 ;
 xnom2              = -0.00350000000000678 ;
 xnom5              = -1.93565866460355e-14 ;
@@ -879,8 +913,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.02886907213576e-13 
+
+dqmin_phase 
+1.53669438703404 
 Want to make named table: twissb1
 enter Twiss module
   
@@ -907,8 +944,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.64015308205796e-13 
+
+dqmin_phase 
+-1.05572153607937 
 Want to make named table: twissb2
 enter Twiss module
   
@@ -935,8 +975,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -962,8 +1005,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -989,8 +1035,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 Want to make named table: twissb1_crab
 enter Twiss module
   
@@ -1017,8 +1066,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0 
+
+dqmin_phase 
+0 
 Want to make named table: twissb2_crab
 Number of parasitic encounter before D1
 npara0_1           = 20 ;
@@ -1050,8 +1102,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.02869242990406e-13 
+
+dqmin_phase 
+1.53669385111413 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -1094,10 +1149,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  2.02869242990406e-13
+@ DQMIN_PHASE      %le  1.53669385111413
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.54.02"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.30"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6589.76797484384 "BBMK_PAR.L5B1_20"  232.152821909539 444.40605255872 0.119855803302629 -3.37079020790944 14.8578859657367 14.2797662852504 -0.00847570838825121 -2.11125877351268e-05 -0.000102596725854685 -2.6179531131159e-07
@@ -1208,8 +1267,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.64015308205796e-13 
+
+dqmin_phase 
+-1.05572153607937 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -1252,10 +1314,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  2.64015308205796e-13
+@ DQMIN_PHASE      %le  -1.05572153607937
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.54.04"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.32"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6590.07270933124 "BBMK_PAR.L5B2_20"  444.408065834102 232.153020272438 -3.370802095134 0.119860761280512 14.8840032844189 14.2933420228492 0.0128526464399329 -0.00109523043599441 0.000159367975721061 -1.32579168031851e-05
@@ -1366,8 +1432,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.02869242990406e-13 
+
+dqmin_phase 
+1.53669385111413 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -1410,10 +1479,14 @@ synch_6 synch_8 nflips
 @ SYNCH_3          %le  0
 @ SYNCH_4          %le  0
 @ SYNCH_5          %le  0
+@ SYNCH_6          %le  0
+@ SYNCH_8          %le  0
+@ DQMIN            %le  2.02869242990406e-13
+@ DQMIN_PHASE      %le  1.53669385111413
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "21.54.05"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "09/12/21"
+@ TIME             %08s "12.18.34"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6664.4514327563 "BB_HO.L5B1_5"      6.00229117764779 6.00228150046523 0.019504690537403 0.0194999999099732 15.0952376991283 14.5300237620878 -3.45149998584371e-05 0.00199999999990648 0.000295000000018246 2.44750267517919e-14
@@ -1493,8 +1566,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.02649561458379e-13 
+
+dqmin_phase 
+1.53679895403416 
 beta.ip1           = 6.0000069634938 ;
 enter Twiss module
   
@@ -1521,8 +1597,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.02649561458379e-13 
+
+dqmin_phase 
+1.53679895403416 
 enter Twiss module
   
 iteration:   1 error:   1.706994E-12 deltap:   0.000000E+00
@@ -1548,8 +1627,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 2.02649561458379e-13 
+
+dqmin_phase 
+1.53679895403416 
 Running survey for aligment calculations...
 mbrc_mech_sep      = 188 ;
 mbrd_mech_sep      = 186 ;
@@ -2039,8 +2121,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000372190269582006 
+
+dqmin_phase 
+2.70518556777095 
 enter Twiss module
   
 iteration:   1 error:   3.412357E-04 deltap:   0.000000E+00
@@ -2069,8 +2154,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000338815478733962 
+
+dqmin_phase 
+-3.06635224454052 
 enter Twiss module
   
 iteration:   1 error:   3.409784E-04 deltap:   0.000000E+00
@@ -2099,8 +2187,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000464296256123928 
+
+dqmin_phase 
+2.33983019043114 
 enter Twiss module
   
 iteration:   1 error:   3.412030E-04 deltap:   0.000000E+00
@@ -2129,8 +2220,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000338148939618545 
+
+dqmin_phase 
+3.07467485825897 
 enter Twiss module
   
 iteration:   1 error:   3.413586E-04 deltap:   0.000000E+00
@@ -2159,8 +2253,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000169306433507711 
+
+dqmin_phase 
+3.11274291595274 
 enter Twiss module
   
 iteration:   1 error:   3.410473E-04 deltap:   0.000000E+00
@@ -2189,8 +2286,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.00051530648324703 
+
+dqmin_phase 
+3.10435766175866 
 enter Twiss module
   
 iteration:   1 error:   3.415163E-04 deltap:   0.000000E+00
@@ -2219,8 +2319,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.00663161347568e-05 
+
+dqmin_phase 
+2.01287937094644 
 START MATCHING
 
 number of variables:    2
@@ -2429,8 +2532,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 1.00663161347568e-05 
+
+dqmin_phase 
+2.01287937094644 
 closest0           = 0.000366325909901377 ;
 closest1           = 1.17587692471943e-05 ;
 closest2           = 1.17587692471943e-05 ;
@@ -3482,8 +3588,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000673101778024363 
+
+dqmin_phase 
+-0.461456033567761 
 xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
 
 xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
@@ -3591,8 +3700,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0 0 0 0 
 
-synch_6 synch_8 nflips 
-0 0 0 
+synch_6 synch_8 nflips dqmin 
+0 0 0 0.000673101778024363 
+
+dqmin_phase 
+-0.461456033567761 
 stop;
 
 
