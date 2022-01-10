@@ -158,8 +158,8 @@ CONTAINS
           return
        endif
 
-       sector_nmul_max = maxnmul
-       sector_nmul     = maxnmul
+       sector_nmul_max = maxnmul + 1
+       sector_nmul     = maxnmul + 1
     else
        sector_nmul = get_value('ptc_create_universe ','sector_nmul ')
     endif
