@@ -716,6 +716,17 @@ const int tracksumm_table_types[] =
   1, 1, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
+const int mytracksumm_table_types[] =
+{
+  1, 1, 2, 2, 2, 2, 2, 2, 2, 2
+};  /* hrr Sep 2021 */
+
+const char* const mytracksumm_table_cols[] =
+{
+  "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
+  " "  /* blank terminates */
+};  /* hrr Sep 2021 */
+
 const char* const tracksumm_table_cols[] =
 {
   "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
@@ -740,6 +751,17 @@ const char* const trackloss_table_cols[] =
   "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e", "element",
   " "  /* blank terminates */
 };
+
+const int mytrackloss_table_types[] =
+{
+  1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3
+}; /* hrr Sep 2021 */
+
+const char* const mytrackloss_table_cols[] =
+{
+  "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e", "element",
+  " "  /* blank terminates */
+}; /* hrr Sep 2021 */
 
 const int dynap_table_types[] =
 {

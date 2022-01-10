@@ -1,3 +1,4 @@
+
 #include "madx.h"
 
 // private functions
@@ -100,11 +101,17 @@ track_run(struct in_cmd* cmd)
          buf_dxt, buf_dyt, buf3, buf4, &buf5, &e_flag, ibuf3, 
          buf6);
 
+  // mysummary /* hrr Sep 2021 replace tracksumm by permanent table mytracksumm */
+  t = find_table("mytracksumm");
+  if (get_option("info")) print_table(t);
+  if (get_option("track_dump")) track_tables_dump();
+
+/* Use only mytracksumm hrr Sep 2021
   // summary
   t = find_table("tracksumm");
   if (get_option("info")) print_table(t);
   if (get_option("track_dump")) track_tables_dump();
-
+*/
   probe_beam = delete_command(probe_beam); // LD: added 2016.02.17
 
   /* free buffers */
@@ -371,6 +378,17 @@ track_tables_create(struct in_cmd* cmd)
   if (ffile <= 0) ffile = 1;
   t_size = turns / ffile + 10;
 
+  if (table_exists("mytracksumm")) {
+/*  hrr Sep 2021 table mytracksumm is not cleaned so pre-existence printf is not needed. 
+      printf("Table mytracksumm does exist already\n"); hrr Sep 2021 */
+  }
+  else {
+    t = make_table("mytracksumm", "mytracksumm", mytracksumm_table_cols,
+                   mytracksumm_table_types, 2*stored_track_start->curr);
+    add_to_table_list(t, table_register);
+  }
+/* only use mytracksumm and mytrackloss hrr Sep 2021 */
+/*
   if (table_exists("tracksumm")) {
     printf("Table tracksumm does exist already\n");
   }
@@ -387,6 +405,19 @@ track_tables_create(struct in_cmd* cmd)
     else {
       t = make_table("trackloss", "trackloss", trackloss_table_cols,
                      trackloss_table_types, stored_track_start->curr*t_size);
+      add_to_table_list(t, table_register);
+    }
+  }
+*/
+  if (get_option("recloss"))
+  {
+    if (table_exists("mytrackloss")) {
+/*  hrr Sep 2021 table mytracksumm is not cleaned so pre-existence printf is not needed. 
+      printf("Table trackloss does exist already\n"); */
+    }
+    else {
+      t = make_table("mytrackloss", "mytrackloss", mytrackloss_table_cols,
+                     mytrackloss_table_types, stored_track_start->curr*t_size);
       add_to_table_list(t, table_register);
     }
   }
@@ -421,16 +452,19 @@ track_tables_delete(void)
 {
   int j;
   /*
-  tracksumm
-  */
+  tracksumm replaced by permanent mytracksumm hrr April 2020
   exec_delete_table("tracksumm");
+  */
   for (j = table_register->names->curr - 1; j >= 0; j--)
   {
 
     if (   strstr(table_register->names->names[j], "track.obs")
-        || (strcmp(table_register->names->names[j], "trackone") == 0)
+        || (strcmp(table_register->names->names[j], "trackone") == 0)) /* hrr Sep 2021 */
+/*  trackloss replaced by mytrackloss hrr Sep 2021
         || (strcmp(table_register->names->names[j], "trackloss") == 0))
+*/
     {
+
       exec_delete_table(table_register->names->names[j]);
     }
   }

@@ -185,8 +185,8 @@ module Inf_NaN_Detection
   !!
   implicit none
 
-  private
-
+! private
+  public !speedup hrr Nov 2021
   public :: isnan, isinf, isposinf, isneginf, sp, dp
 
   ! Order set-up
@@ -757,6 +757,8 @@ module SCdat
   integer, parameter :: idim=6,isigmatfit=50000,nptot=500000
   integer, parameter :: Nintegrate=1000000
   integer, parameter :: mmax=77,mmum=15,kmaxo=20;
+  integer, parameter :: mytracksumm_maxlineso=16000008; ! hrr Sep 2021
+! Note there is also a different (as a constant) definition of Pi in math_constfi
   double precision, parameter :: Pi = 4d0 * atan(1d0), EulerGamma =&
        & 0.57721566490153286060651209008240243104215933593992d0
   double precision, parameter :: dampf=0.85d0, dampeta=0.25d0, epsz=1d-15 !(* damping factor *)
@@ -2162,7 +2164,8 @@ double precision function lInt(n,r,u,v)
         result=result+scbinom(ii,j)*u**i1*v**i2
      enddo
      result=result+scbinom(ii,n+1)*v**i
-     lInt=lIntdfact(n)*(-1d0+r**2)**n*result
+!    lInt=lIntdfact(n)*(-1d0+r**2)**n*result
+     lInt=lIntdfact(n)*(-1d0+r*r)**n*result  !speedup hrr Nov 2021
   CASE DEFAULT
      call aafail('lInt: Fatal: ',                                     &
           'Out of range in function lInt: Program stops')
@@ -2189,7 +2192,8 @@ double precision function eInt(n,r,u,v)
         result=result+scbinom(i,j)*u**i1*v**i2
      enddo
      result=result+scbinom(i,n+1)*v**i
-     eInt=eIntdfact(n)*(-1d0+r**2)**n*u*result
+!    eInt=eIntdfact(n)*(-1d0+r**2)**n*u*result
+     eInt=eIntdfact(n)*(-1d0+r*r)**n*u*result  !speedu hrr Nov 2021
   CASE DEFAULT
      call aafail('eInt: Fatal: ',                                     &
           'Out of range in function eInt: Program stops')
@@ -2209,5 +2213,6 @@ double precision function bips(a, mmax1)
        &a*(1892352d0/dble(7+mmax1)+a*(-(1757184d0/dble(8+mmax1))+&
        &a*(1647360d0/dble(9+mmax1)+17d0*a*(-(91520d0/dble(10+mmax1))+19d0*&
        &a*(4576d0/dble(11+mmax1)+7d0*a*(-(624d0/dble(12+mmax1))+(598d0*&
-       &a)/dble(13+mmax1)-(575d0*a**2)/dble(14+mmax1)))))))))))))/8388608d0;
+       &a)/dble(13+mmax1)-(575d0*a*a)/dble(14+mmax1)))))))))))))/8388608d0;  !speedup hrr Nov 2021
+!      &a)/dble(13+mmax1)-(575d0*a**2)/dble(14+mmax1)))))))))))))/8388608d0;
 end function bips

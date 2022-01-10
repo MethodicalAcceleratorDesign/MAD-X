@@ -323,6 +323,10 @@ const char *const_command_def =
 "sc_3d_beamsize   = [l, false, true], " /* frs May 2019 */
 "sc_3d_periodic   = [l, false, true], " /* frs June 2018 */
 "sc_mult_ord      = [i, 10, 20], "      /* frs May 2019 */
+"sc_mytracksumm_maxlines = [i, 4000008,16000008], "      /* hrr Sep 2021 */
+"sc_mytracksumm_per_turns = [i, 1, 1000], "      /* hrr Sep 2021 */
+"sc_mytracksumm_start_particle = [i, 1], "      /* hrr Sep 2021 */
+"sc_mytracksumm_end_particle = [i, 0], "      /* hrr Sep 2021 */
 "sc_3d_kick_long  = [l, false, true]; " /* frs June 2018 */
 " "
 "plot: control none 0 0 "
