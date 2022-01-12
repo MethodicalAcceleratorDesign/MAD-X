@@ -68,6 +68,8 @@ int     command_par_value2(const char* parameter, const struct command*, double*
 struct double_array* command_par_array(const char* parameter, struct command*);
 int     command_par_vector(const char* parameter, struct command*, double* vector);
 void    set_command_par_value(const char* parameter, struct command*, double val);
+// set_command_par_expr: command will own expression
+void    set_command_par_expr(const char* parameter, struct command*, struct expression *);
 void    store_comm_par_value(const char* parameter, double val, struct command*);
 const char*   alias(char* par_string);
 void    fill_par_var_list(struct el_list*, struct command_parameter*, struct var_list*);

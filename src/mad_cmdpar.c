@@ -511,6 +511,24 @@ set_command_par_value(const char* parameter, struct command* cmd, double val)
   }
 }
 
+void
+set_command_par_expr(const char* parameter, struct command* cmd, struct expression* expr)
+{
+  struct command_parameter* cp;
+  int i;
+  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
+  {
+    cp = cmd->par->parameters[i];
+    if (cp->type < 3)
+    {
+      if (cp->expr != NULL) cp->expr = delete_expression(cp->expr);
+      cp->expr = expr;
+      cp->double_value = expression_value(cp->expr,2);
+      cmd->par_names->inform[i] = 1; /* mark as set */
+    }
+  }
+}
+
 struct command_parameter*
 store_comm_par_def(char* toks[], int start, int end)
 {

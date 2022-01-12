@@ -113,12 +113,21 @@ set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
   for (t_num = start; t_num < cmd->tok_list->curr; t_num++)
     if (*(cmd->tok_list->p[t_num]) == ',') break;
 
+  el = find_element(comm, element_list);
   exp_type = loc_expr(cmd->tok_list->p, t_num, start, &end);
 
   if (exp_type == 1) /* literal constant */
     val = simple_double(cmd->tok_list->p, start, end);
-  else if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0)
-    val = polish_value(deco, join(&cmd->tok_list->p[start], end + 1 - start));
+  else if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0) {
+    if (cmd->sub_type == 13 && el != NULL) {
+      set_command_par_expr(par, el->def,
+			   new_expression(join(&cmd->tok_list->p[start], end + 1 - start), deco) );
+      current_beam = keep_beam;
+      return;
+    }
+    else
+      val = polish_value(deco, join(&cmd->tok_list->p[start], end + 1 - start));
+  }
 
   if (strncmp(comm, "beam", 4) == 0) {
     command = current_beam = find_command("default_beam", beam_list);
@@ -128,7 +137,7 @@ set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
     }
     set_command_par_value(par, current_beam, val);
   }
-  else if ((el = find_element(comm, element_list)) != NULL)
+  else if (el != NULL)
     set_command_par_value(par, el->def, val);
   else if ((command = find_command(comm, stored_commands)) != NULL)
     set_command_par_value(par, command, val);
