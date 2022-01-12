@@ -1,5 +1,4 @@
 subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
-  use io_units, only : dynapout
   use deltrafi
   use wmaxmin0fi
   use dyntabfi
@@ -92,7 +91,7 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
 
      !---- Lyapunov exponent calculation
 
-     open(unit=dynapout,file="lyapunov.data")
+     open(50,file="lyapunov.data")
 
      do i = 1, turns
         TRACK = COORDS(:,i,k+1) 
@@ -109,7 +108,7 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
            if (dphi(j) .lt. -pi) dphi(j) = dphi(j) + twopi
         end do
         distvect(i) = sqrt(dot_product(dphi, dphi))
-        write(dynapout,*) i, distvect(i)
+        write(50,*) i, distvect(i)
      end do
 
      lyapunov = fitlyap(distvect,onelog,turnnumber,turns,deltax)
@@ -117,7 +116,6 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
 
   enddo
 
-  close(unit=dynapout, status='keep')
   write(*,*) ' end dynap '
 
 end subroutine trdynrun
@@ -443,8 +441,8 @@ double precision function fitlyap(distvect, onelog, turnnumber, nturn, deltax)
   if ( maxval(DELTALOG(4:6)) + 1.d0 .ge. dlmax ) & 
        fitlyap2 = maxval(DELTALOG(4:6))
   
-!  write(69,*) 'deltalogs: ', deltalog(1:6), 'fitlyaps: ', fitlyap, fitlyap2, & 
-!       ' nturn and i:', nturn, i
+   write(69,*) 'deltalogs: ', deltalog(1:6), 'fitlyaps: ', fitlyap, fitlyap2, &
+       ' nturn and i:', nturn, i
 end function fitlyap
 
 subroutine wmaxmin(track,eigen,znt)
