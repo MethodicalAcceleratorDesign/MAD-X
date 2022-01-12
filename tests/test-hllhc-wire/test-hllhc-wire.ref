@@ -3,7 +3,7 @@
   +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.09 12:17:31      +
+  + Execution date: 2022.01.11 21:40:58      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2009
 
@@ -512,8 +512,8 @@ dqmin_phase
 @ DQMIN_PHASE      %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "09/12/21"
-@ TIME             %08s "12.17.58"
+@ DATE             %08s "11/01/22"
+@ TIME             %08s "21.41.24"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.5684327563 0.150000000792417 0.14999999999774 4.56963895388558e-08 3.12481956538397e-11 -3.00094859267699e-10 5.19797138070879e-09 15.0109070352973 14.5393647705992
@@ -599,8 +599,8 @@ dqmin_phase
 @ DQMIN_PHASE      %le  0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "09/12/21"
-@ TIME             %08s "12.18.00"
+@ DATE             %08s "11/01/22"
+@ TIME             %08s "21.41.26"
 * NAME               S BETX BETY ALFX ALFY DX DPX MUX MUY 
 $ %s                 %le %le %le %le %le %le %le %le %le 
  "IP5"               6664.8731672437 0.149999995141886 0.149999999999552 2.96974407962579e-08 1.77484857230974e-12 7.57657057265898e-10 -3.83457101221391e-09 15.1385489606468 14.4448340932668
@@ -637,10 +637,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 8.17597209836863e-07 
+0 0 0 8.17467332139473e-07 
 
 dqmin_phase 
-2.79065596550715 
+2.79054607905759 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -685,12 +685,12 @@ dqmin_phase
 @ SYNCH_5          %le  0
 @ SYNCH_6          %le  0
 @ SYNCH_8          %le  0
-@ DQMIN            %le  8.17597209836863e-07
-@ DQMIN_PHASE      %le  2.79065596550715
+@ DQMIN            %le  8.17467332139473e-07
+@ DQMIN_PHASE      %le  2.79054607905759
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "09/12/21"
-@ TIME             %08s "12.18.02"
+@ DATE             %08s "11/01/22"
+@ TIME             %08s "21.41.27"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.5684327563 -2.82901667781991e-09 0.000749978480249974 0.00025010849452088 4.65249475680409e-08
@@ -727,10 +727,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 0.000131432033176358 
+0 0 0 0.00013143222676764 
 
 dqmin_phase 
-2.69529635627739 
+2.69529611259154 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -775,12 +775,12 @@ dqmin_phase
 @ SYNCH_5          %le  0
 @ SYNCH_6          %le  0
 @ SYNCH_8          %le  0
-@ DQMIN            %le  0.000131432033176358
-@ DQMIN_PHASE      %le  2.69529635627739
+@ DQMIN            %le  0.00013143222676764
+@ DQMIN_PHASE      %le  2.69529611259154
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "09/12/21"
-@ TIME             %08s "12.18.04"
+@ DATE             %08s "11/01/22"
+@ TIME             %08s "21.41.29"
 * NAME               S X Y PX PY 
 $ %s                 %le %le %le %le %le 
  "IP5"               6664.8731672437 -7.03201360400911e-09 -0.000749972214158974 -0.000250143361576922 -7.61144269306663e-08
@@ -861,10 +861,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 1.36134636433096e-13 
+0 0 0 1.36134667603595e-13 
 
 dqmin_phase 
-1.85196294270261 
+1.85196211099684 
 Set8 halo to 1.254210 sigma, the lumi is reduced from 2.9636101544506e+33 Hz/cm2 to 2e+33 Hz/cm2
 halo8              = 1.25421049490897 ;
 enter Twiss module
@@ -893,10 +893,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 1.3614650742156e-13 
+0 0 0 1.3614653859212e-13 
 
 dqmin_phase 
-1.85196342930483 
+1.85196259767103 
 Want to make named table: twissb1
 enter Twiss module
   
@@ -924,10 +924,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 2.82655301374944e-16 
+0 0 0 2.8265530202265e-16 
 
 dqmin_phase 
--2.6363979596696 
+-2.63639755395176 
 Want to make named table: twissb2
 sepr1              = 211.573004472955 ;
 sepr2              = 69.0994529252393 ;
@@ -969,10 +969,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 8.44473931655966e-15 
+0 0 0 8.44474121522845e-15 
 
 dqmin_phase 
-1.94824556720423 
+1.94824473139857 
 xnom1              = -1.24555107297869e-14 ;
 xnom2              = -0.000144718946013526 ;
 xnom5              = -1.36972681460956e-14 ;
@@ -1023,10 +1023,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 6.83983557085223e-12 
+0 0 0 6.8398367139829e-12 
 
 dqmin_phase 
-1.88349180661318 
+1.88349105794594 
 Want to make named table: twissb1
 enter Twiss module
   
@@ -1054,10 +1054,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 7.86560475510201e-12 
+0 0 0 7.8656053069883e-12 
 
 dqmin_phase 
-2.2746260029556 
+2.27462640872764 
 Want to make named table: twissb2
 enter Twiss module
   
@@ -1148,10 +1148,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 1.95995072770556e-05 
+0 0 0 1.95995218035726e-05 
 
 dqmin_phase 
-2.07496711653053 
+2.07496744116832 
 Want to make named table: twissb1_crab
 enter Twiss module
   
@@ -1182,10 +1182,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 1.18565573976671e-05 
+0 0 0 1.18565532268219e-05 
 
 dqmin_phase 
-2.31880450058593 
+2.31880368605374 
 Want to make named table: twissb2_crab
 Number of parasitic encounter before D1
 npara0_1           = 20 ;
@@ -1264,10 +1264,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 2.98243250445666e-05 
+0 0 0 2.98243330182228e-05 
 
 dqmin_phase 
--1.04922776668602 
+-1.04922790287446 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -1312,12 +1312,12 @@ dqmin_phase
 @ SYNCH_5          %le  0
 @ SYNCH_6          %le  0
 @ SYNCH_8          %le  0
-@ DQMIN            %le  2.98243250445666e-05
-@ DQMIN_PHASE      %le  -1.04922776668602
+@ DQMIN            %le  2.98243330182228e-05
+@ DQMIN_PHASE      %le  -1.04922790287446
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "09/12/21"
-@ TIME             %08s "12.18.27"
+@ DATE             %08s "11/01/22"
+@ TIME             %08s "21.41.48"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6589.76797484384 "BBMK_PAR.L5B1_20"  7622.79267873972 18878.7268115465 -27.9631314170753 -123.751987457866 14.7610980155191 14.2893001824243 -0.00819315712583501 0.00010150760876179 -9.8488298919745e-05 6.62592527038303e-07
@@ -1438,10 +1438,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 1.64530314884098e-05 
+0 0 0 1.64530297646555e-05 
 
 dqmin_phase 
--0.810861910758047 
+-0.810861856948946 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
@@ -1486,12 +1486,12 @@ dqmin_phase
 @ SYNCH_5          %le  0
 @ SYNCH_6          %le  0
 @ SYNCH_8          %le  0
-@ DQMIN            %le  1.64530314884098e-05
-@ DQMIN_PHASE      %le  -0.810861910758047
+@ DQMIN            %le  1.64530297646555e-05
+@ DQMIN_PHASE      %le  -0.810861856948946
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "09/12/21"
-@ TIME             %08s "12.18.29"
+@ DATE             %08s "11/01/22"
+@ TIME             %08s "21.41.49"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6590.07270933124 "BBMK_PAR.L5B2_20"  18878.9640377068 7621.00664448405 -123.753500776964 -27.9566348537238 14.8884782363789 14.1950566784004 0.0130388103648641 -6.48873599484348e-05 0.000162066648375159 -2.31783766151174e-07
@@ -1609,10 +1609,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 2.98243250445666e-05 
+0 0 0 2.98243330182228e-05 
 
 dqmin_phase 
--1.04922776668602 
+-1.04922790287446 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
@@ -1657,12 +1657,12 @@ dqmin_phase
 @ SYNCH_5          %le  0
 @ SYNCH_6          %le  0
 @ SYNCH_8          %le  0
-@ DQMIN            %le  2.98243250445666e-05
-@ DQMIN_PHASE      %le  -1.04922776668602
+@ DQMIN            %le  2.98243330182228e-05
+@ DQMIN_PHASE      %le  -1.04922790287446
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "09/12/21"
-@ TIME             %08s "12.18.31"
+@ DATE             %08s "11/01/22"
+@ TIME             %08s "21.41.51"
 * S NAME               BETX BETY ALFX ALFY MUX MUY X Y PX PY 
 $ %le %s                 %le %le %le %le %le %le %le %le %le %le 
  6664.5009327563 "BB_HO.L5B1_5"      0.180389279435029 0.180345388196951 0.450185941801743 0.449863375487957 14.9435763967769 14.4720923784923 5.73374968682055e-06 -2.04586880635513e-08 0.000250247395571573 -1.90710976176588e-06
@@ -1728,10 +1728,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 2.97632390317424e-05 
+0 0 0 2.97632495448111e-05 
 
 dqmin_phase 
--1.0468662775034 
+-1.04686626250214 
 Close orbite position of the weak beam at the wire compensator s position
 s_at_wire_c_l1.b1  = -195 ;
 x_at_wire_c_l1.b1  = -4.14393174650214e-05 ;
@@ -1808,10 +1808,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 2.97632390325313e-05 
+0 0 0 2.97632500496925e-05 
 
 dqmin_phase 
--1.04686627751386 
+-1.04686627490645 
 beta.ip1           = 0.150001759926586 ;
 enter Twiss module
   
@@ -1845,10 +1845,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 2.97632390325313e-05 
+0 0 0 2.97632500496925e-05 
 
 dqmin_phase 
--1.04686627751386 
+-1.04686627490645 
 enter Twiss module
   
 iteration:   1 error:   1.867748E-05 deltap:   0.000000E+00
@@ -1881,10 +1881,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 2.97632390325313e-05 
+0 0 0 2.97632500496925e-05 
 
 dqmin_phase 
--1.04686627751386 
+-1.04686627490645 
 Running survey for aligment calculations...
 mbrc_mech_sep      = 188 ;
 mbrd_mech_sep      = 186 ;
@@ -3865,10 +3865,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 6.71256653562992e-05 
+0 0 0 6.71256638923258e-05 
 
 dqmin_phase 
-1.18200474566441 
+1.18200482264767 
     cta0     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     closest0 = cta0;
@@ -3915,10 +3915,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 3.75427503267208e-05 
+0 0 0 3.75427519162012e-05 
 
 dqmin_phase 
-0.627679009414849 
+0.627678951876916 
     ctap     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     !value,ctap;
@@ -3963,10 +3963,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 8.67581477602078e-05 
+0 0 0 8.67581556379105e-05 
 
 dqmin_phase 
-1.32536340108023 
+1.32536346757275 
     ctam     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     !value,ctam;
@@ -4011,10 +4011,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 3.60619845994124e-05 
+0 0 0 3.60619831370344e-05 
 
 dqmin_phase 
-0.095152079133419 
+0.0951520934500784 
     cta0     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     !value,cta0;
@@ -4059,10 +4059,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 3.99378586303459e-05 
+0 0 0 3.99378516810302e-05 
 
 dqmin_phase 
-0.100599332154855 
+0.100599396060296 
     ctap     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     !value,ctap;
@@ -4107,10 +4107,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 1.57599241702522e-05 
+0 0 0 1.57599228498219e-05 
 
 dqmin_phase 
-0.741195781632055 
+0.741195918258441 
     ctam     = abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
     !value,ctam;
@@ -4155,10 +4155,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 1.85255482073901e-08 
+0 0 0 1.85256382609316e-08 
 
 dqmin_phase 
--1.63190283073475 
+-1.63190292930554 
 
 
     closest1 =abs(2*(qx-qy)-round(2*(qx-qy)))/2;
@@ -4505,10 +4505,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 1.85255482073901e-08 
+0 0 0 1.85256382609316e-08 
 
 dqmin_phase 
--1.63190283073475 
+-1.63190292930554 
 closest2=abs(2*(qx-qy)-round(2*(qx-qy)))/2;
 
 value, closest0, closest1, closest2, cmrskew, cmiskew;
@@ -8669,10 +8669,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 0.000803098492656774 
+0 0 0 0.000803098372575698 
 
 dqmin_phase 
-1.8235152385321 
+1.82351551060187 
 xnom1=table(twiss,IP1,x);pxnom1=table(twiss,IP1,px);ynom1=table(twiss,IP1,y);pynom1=table(twiss,IP1,py);
 
 xnom2=table(twiss,IP2,x);pxnom2=table(twiss,IP2,px);ynom2=table(twiss,IP2,y);pynom2=table(twiss,IP2,py);
@@ -8773,10 +8773,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 0.000803098492656774 
+0 0 0 0.000803098372575698 
 
 dqmin_phase 
-1.8235152385321 
+1.82351551060187 
   ++++++++++++++++++++++++++++
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
@@ -8821,10 +8821,10 @@ synch_2 synch_3 synch_4 synch_5
 0 0 0 0 
 
 synch_6 synch_8 nflips dqmin 
-0 0 0 0.000803098492656774 
+0 0 0 0.000803098372575698 
 
 dqmin_phase 
-1.8235152385321 
+1.82351551060187 
 
   Number of warnings: 1112
 117 in C and 995 in Fortran
