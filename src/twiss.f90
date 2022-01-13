@@ -1356,15 +1356,16 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
    R_EIG(1:2, 1:2) = E
    R_EIG(3:4, 3:4) = F
 
-write(6,*) " ";
-write(6,*) "  One Turn Map R";
-do i=1,6
- write(6,'(6(1x,g12.5))') ra(i,1:6)
-enddo
-write(6,*) "  Canonical transformation A";
-do i=1,6
- write(6,'(6(1x,g12.5))') r_eig(i,1:6)
-enddo
+! LD DEBUG
+!write(6,*) " ";
+!write(6,*) "  One Turn Map R";
+!do i=1,6
+! write(6,'(6(1x,g12.5))') ra(i,1:6)
+!enddo
+!write(6,*) "  Canonical transformation A";
+!do i=1,6
+! write(6,'(6(1x,g12.5))') r_eig(i,1:6)
+!enddo
 
   !---- Find eigenvectors at initial position.
   reval = zero
