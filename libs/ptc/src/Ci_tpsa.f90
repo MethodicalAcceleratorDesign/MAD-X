@@ -59,6 +59,7 @@ INTERNAL_STATE_zhe=>INTERNAL_STATE,ALLOC_TREE_zhe=>ALLOC_TREE
   logical(lp) :: c_mess_up_vector=.false. 
   real(dp) :: a_mess=0.d0 , b_mess=1.d0
   integer :: i_piotr(3)= (/0,0,0/)
+  integer :: ldfid = 0, ldfid0 ! LD Fortran debug file id
   logical :: c_skip_gofix=.false.
   PRIVATE null_it,Set_Up,de_Set_Up,LINE_L,RING_L,kill_DALEVEL,dealloc_DASCRATCH,set_up_level
   private insert_da,append_da,GETINTegrate,c_pek000,c_pok000,cDEQUALDACON
@@ -9191,6 +9192,7 @@ endif
     c_adjoint_vec%n=s1%n
     call c_assmap(c_adjoint_vec)
 
+    ! exp(x) => c_expflo_map(x) => i=1..n c_expflo(x[i],id[i])
     if(i==1) then
      c_adjoint_vec=exp(s1)*s2
      c_adjoint_vec=exp(-s1,c_adjoint_vec)
@@ -10078,7 +10080,7 @@ endif
     TYPE (c_taylor) c_bra_v_ct
     TYPE (c_vector_field), INTENT (IN) :: S1
     TYPE (c_taylor), INTENT (IN) ::  S2
-    TYPE (c_taylor)  S22 
+    TYPE (c_taylor)  S22,tt
  
     integer i
     integer localmaster
@@ -10088,23 +10090,37 @@ endif
      endif
     localmaster=c_master
 
- 
     call c_ASStaylor(c_bra_v_ct)
  
-    call alloc(s22 )
-    
+    call alloc(s22,tt)
 
     s22=(0.0_dp,0.0_dp)
 
-     do i=1,s1%n
- 
-     s22=s22 + s1%v(i)*(s2.d.i)
- 
+    if (ldfid > 0) then
+      write(ldfid+200,*) "d(0)="
+      call print(s2, ldfid+200)
+    endif
+
+    do i=1,s1%n
+      tt=s22
+      s22=s22 + s1%v(i)*(s2.d.i)
+
+      if (ldfid > 0) then
+        write(ldfid+200,*) "d(i)=", i
+        call print(s1%v(i), ldfid+200)
+        call print(tt     , ldfid+200) ! s22 before add
+        tt = s2.d.i
+        call print(tt     , ldfid+200)
+        tt = s1%v(i)*(s2.d.i)
+        call print(tt     , ldfid+200)
+        call print(s22    , ldfid+200)
+        call print(s22    , ldfid+100)
+      endif
     enddo
  
     c_bra_v_ct=s22
     
-    call kill(s22  )
+    call kill(s22,tt)
     c_master=localmaster
 
   END FUNCTION c_bra_v_ct
@@ -10705,7 +10721,7 @@ subroutine c_linear_a(xy,a1)
     integer i,j
     type(c_damap), intent(inout) ::  xy,a1 
     real(dp) reval(ndim2t),imval(ndim2t),vr(ndim2t,ndim2t),vi(ndim2t,ndim2t),vrt(ndim2t,ndim2t),vit(ndim2t,ndim2t)
-    real(dp) fm0(ndim2t,ndim2t),x(ndim2t/2),xx(ndim2t/2)
+    real(dp) fm0(ndim2t,ndim2t),x(ndim2t/2),xx(ndim2t/2),p
     integer idef(ndim2t/2)
     real(dp), allocatable :: fm(:,:),fmi(:,:),fmii(:,:)
     type(c_damap) s1
@@ -10713,14 +10729,21 @@ subroutine c_linear_a(xy,a1)
 
     if(.not.c_stable_da) return
 
- 
+write (ldfid0,*) "linear_a start"
+
     idef=0
  
     allocate(fm(xy%n,xy%n),fmi(xy%n,xy%n),fmii(xy%n,xy%n))
- 
+
+    call alloc(s1)
 
      fm=xy
      fm0=0
+
+c_verbose=.true.
+
+write (ldfid0,*) "fm="
+do i=1,nd2; write (ldfid0,'(*(ES23.16,1X))') fm(i,1:nd2); enddo
 
      !!! To understand this, it is better to first understand ndpt=0
      !!! in PTC ndpt=0 includes :    nd2=4 and nd2=6 (cavity on)
@@ -10788,16 +10811,25 @@ subroutine c_linear_a(xy,a1)
 ! Thus the Coasting beam is moved in the last plane  (nd2-1,nd2)
     
     endif
- 
+
+write (ldfid0,*) "fm0 (transpose otm)="
+do i=1,nd2harm; write (ldfid0,'(*(ES23.16,1X))') fm0(i,1:nd2harm); enddo
 
     call c_eig6(fm0,reval,imval,vr,vi)
+
+write (ldfid0,*) "eigval(reval±imval)="
+write (ldfid0,'(*(ES23.16,ES23.16,1X))') &
+   reval(1:nd2harm) + complex(0,1)*imval(1:nd2harm);
+
+write (ldfid0,*) "eigvec(vr±vi)="
+do i=1,nd2harm; write (ldfid0,'(*(ES23.16,ES23.16,1X))') &
+   vr(i,1:nd2harm) + complex(0,1)*vi(i,1:nd2harm); enddo
 
     !! This routine will locate the modulated plane
     !! It assumes that the modulated plane are rotations
     !! It will fail if some orbital planes are exactly rotations, say beta=1.00000000 and no coupling
     call  c_locate_modulated_magnet_planes(fm0,idef,reval)
 
-    call alloc(s1)
  
     if(.not.c_normal_auto) then
 
@@ -10836,7 +10868,7 @@ subroutine c_linear_a(xy,a1)
         endif
         
       endif
-    else
+    else ! c_normal_auto
       !!  c_locate_planes tries to locate the planes: important if there is little coupling
       !! I suppose that this routine can be refined
       call c_locate_planes(vr,vi,idef)
@@ -10877,21 +10909,27 @@ subroutine c_linear_a(xy,a1)
       !!! canonical transformation is symplectic.
 
       do j=1,ndharm  !ndt
-           x(i)=vr(2*j-1,idef(i))*vi(2*j,idef(i))-vr(2*j,idef(i))*vi(2*j-1,idef(i))+x(i)
+         x(i)=vr(2*j-1,idef(i))*vi(2*j,idef(i))-vr(2*j,idef(i))*vi(2*j-1,idef(i))+x(i)
       enddo
 
     enddo
+
+write (ldfid0,*) "x=" ; write (ldfid0,'(*(ES23.16,1X))') x(1:ndharm)
 
     do i=1,ndharm  !ndt
       if(x(i).lt.0.0_dp) xx(i)=-1.0_dp
       x(i)=SQRT(abs(x(i)))
     enddo
 
+write (ldfid0,*) "sqrt(x)=" ; write (ldfid0,'(*(ES23.16,1X))') x (1:ndharm)
+write (ldfid0,*) "xx="      ; write (ldfid0,'(*(ES23.16,1X))') xx(1:ndharm)
 
     fm=0
     do i=1,xy%n
       fm(i,i)=1.0_dp
     enddo
+
+write (ldfid0,*) "n=", xy%n, ", nd2harm=", nd2harm
 
     do i=1,nd2harm  !nd2t
       do j=1,ndharm  !ndt
@@ -10900,35 +10938,37 @@ subroutine c_linear_a(xy,a1)
       enddo
     enddo
     
-   
     a1 = fm
 
-!    call alloc(s1)
-    !if(courant_snyder_teng_edwards) then
-    !!!! Here starts the gymnastics that insures a Courant-Snyder/Teng-Edwards 
-    !!! choice A_12=A_34==0
-    !
-    !    s1=1
-    !
-    !       do i=1,ndharm  !ndt 
-    !          p=ATAN(-fm(2*i-1,2*i)/fm(2*i,2*i))
-    !          s1%v(2*i-1) =(COS(p).cmono.(2*i-1))+(sin(p).cmono.(2*i))
-    !          s1%v(2*i)   =(COS(p).cmono.(2*i))-(sin(p).cmono.(2*i-1))
-    !       enddo
-    !       a1=s1*a1
-    !       s1=1
-    !       fm=a1
-    !       ! adjust sa to have sa(1,1)>0 and sa(3,3)>0 rotate by pi if necessary.
-    !       do i=1,ndharm  !ndt
-    !          p=1.0_dp
-    !          if(fm(2*i-1,2*i-1).lt.0.0_dp) p=-1.0_dp
-    !           s1%v(2*i-1) = p.cmono.(2*i-1)
-    !           s1%v(2*i)   = p.cmono.(2*i)
-    !       enddo
-    !       a1=s1*a1
-    !endif
-    !!!!!  In the case of magnet modulations, planes are put back in their places.
+write (ldfid0,*) "fm1 (symplectic) ="
+do i=1,nd2harm; write (ldfid0,'(*(ES23.16,1X))') fm(i,1:nd2harm); enddo
 
+!    call alloc(s1)
+! LD: uncomment courant_snyder_teng_edwards
+    if(courant_snyder_teng_edwards) then
+    !!! Here starts the gymnastics that insures a Courant-Snyder/Teng-Edwards
+    !! choice A_12=A_34==0
+
+        s1=1
+           do i=1,ndharm  !ndt
+              p=ATAN(-fm(2*i-1,2*i)/fm(2*i,2*i)) ! -fm(1,2)/fm(2,2)
+              s1%v(2*i-1) =(COS(p).cmono.(2*i-1))+(sin(p).cmono.(2*i))
+              s1%v(2*i)   =(COS(p).cmono.(2*i))-(sin(p).cmono.(2*i-1))
+           enddo
+           a1=s1*a1
+           s1=1
+           fm=a1
+           ! adjust sa to have sa(1,1)>0 and sa(3,3)>0 rotate by pi if necessary.
+           do i=1,ndharm  !ndt
+              p=1.0_dp
+              if(fm(2*i-1,2*i-1).lt.0.0_dp) p=-1.0_dp
+               s1%v(2*i-1) = p.cmono.(2*i-1)
+               s1%v(2*i)   = p.cmono.(2*i)
+           enddo
+           a1=s1*a1
+    endif
+    !!!!  In the case of magnet modulations, planes are put back in their places.
+! LD: end of CS uncomment
     
     if(ndpt/=0) then
       fm=a1
@@ -10937,7 +10977,9 @@ subroutine c_linear_a(xy,a1)
       a1=fm
     endif
 
-
+fm=a1
+write (ldfid0,*) "fm2 (reschuffle coasting beam)="
+do i=1,nd2; write (ldfid0,'(*(ES23.16,1X))') fm(i,1:nd2); enddo
 
     !!! In the case of a symplectic map, without magnet modulation,
     !!! everything is done.
@@ -10948,7 +10990,12 @@ subroutine c_linear_a(xy,a1)
     a1%s=1
     a1%q=1.0_dp
     a1=a1**(-1)
-    
+
+fm=a1
+write (ldfid0,*) "fm3 (inversion) ="
+do i=1,nd2; write (ldfid0,'(*(ES23.16,1X))') fm(i,1:nd2); enddo
+
+   s1=0
 
     if(rf>0.and.ndpt>0.and.do_linear_ac_longitudinal) then 
     !  if(ndpt>0) then 
@@ -10961,6 +11008,7 @@ subroutine c_linear_a(xy,a1)
     call kill(s1)    
     deallocate(fm,fmi,fmii)   
 
+write (ldfid0,*) "linear_a end"
 
     return
   end subroutine c_linear_a
@@ -11336,27 +11384,26 @@ subroutine c_linear_ac_longitudinal(xy,a1,ac)
     real(dp), allocatable :: mt(:,:),mv(:)
     integer, allocatable :: je(:)
 
-    
+write(ldfid0,*) "gofix start"
+
   !  ndct=iabs(ndpt-ndptb)  ! 1 if coasting, otherwise 0
-  !  ndc2t=2*ndct  ! 2 if coasting, otherwise 0
-  !  nd2t=nd2-2*rf-ndc2t   !  size of harmonic oscillators minus modulated clocks
-  !  ndt=nd2t/2        ! ndt number of harmonic oscillators minus modulated clocks
-  !  nd2harm=nd2t+2*rf  !!!!  total dimension of harmonic phase space
-  !  ndharm=ndt+rf  !!!! total number of harmonic planes
-!   write(6,*) " nd2,ndct,ndc2t,nd2t,ndt,nd2harm,rf,ndpt "
-!   write(6,'(8(1x,i4))') nd2,ndct,ndc2t,nd2t,ndt,nd2harm,rf,ndpt
+  !  ndc2t=2*ndct           ! 2 if coasting, otherwise 0
+  !  nd2t=nd2-2*rf-ndc2t    ! size of harmonic oscillators minus modulated clocks
+  !  ndt=nd2t/2             ! ndt number of harmonic oscillators minus modulated clocks
+  !  nd2harm=nd2t+2*rf      ! total dimension of harmonic phase space
+  !  ndharm=ndt+rf          ! total number of harmonic planes
+   write(ldfid0,*) " nd2,ndct,ndc2t,nd2t,ndt,nd2harm,rf,ndpt "
+   write(ldfid0,'(8(1x,i4))') nd2,ndct,ndc2t,nd2t,ndt,nd2harm,rf,ndpt
 
   if(.not.c_stable_da) return
 
      ndloc=0
                  
-
     ! COMPUTATION OF A1 AND A1I USING DAINV
     rel%n=nv; w%n=nv; v%n=nv;x%n=nv
     call alloc(rel);call alloc(w);call alloc(v);call alloc(x);
     call alloc(t1);
 
-print *, "LD: gofix start"
 
     rel=1
     v=1
@@ -11371,16 +11418,21 @@ print *, "LD: gofix start"
       endif
     enddo
 
-print *, "LD: nv=", nv, ", nd2=", nd2, ", ndpt=", ndpt, ", ndptb=", ndptb, &
-         ", ndloc=", ndloc, ", dosymp=", dosymp, ", order_gofix=", order_gofix
+!order_gofix = 3
+     if (order_gofix > 1) dosymp = .true.
+dosymp = .true.
+
+write (ldfid0,*) "nv=", nv, ", nd2=", nd2, ", nd2t=", nd2t, &
+                 ", ndpt=", ndpt, ", ndptb=", ndptb, ", ndloc=", ndloc
+write (ldfid0,*) "dosymp=", dosymp, ", order_gofix=", order_gofix
 
     v=v.cut.(order_gofix+1)
 
-call print(v, 1011)
+call print(v, ldfid) ; ldfid=ldfid+1
 
     w=v**(-1)    !  W= (Map-1)**-1   
 
-call print(w, 1012)
+call print(w, ldfid) ; ldfid=ldfid+1
 
     x=0
     x%s=1    ! spin part is identity
@@ -11390,24 +11442,24 @@ call print(w, 1012)
     enddo
     if(ndpt/=0) x%v(ndpt)=1.0e0_dp.cmono.ndpt !  If coasting, then energy is a parameter
 
-call print(x, 1013)
+call print(x, ldfid) ; ldfid=ldfid+1
 
     v=w*x  ! v contains the fixed point, for example v(1)= eta_x * x_pt + ...
          
-call print(v, 1014)
-
     a1=v
 
-call print(a1, 1015)
+call print(a1, ldfid) ; ldfid=ldfid+1
 
   ! however a1 is not a  transformation, we must add the identity (done at the end) 
   ! also we must add some stuff to time to make it symplectic if coasting
   ! because the Lie operator which produces v(1)= eta_x * x_pt + ...
   ! is, within a sign, eta_x * x_pt * p_x-eta_x_prime * x_pt * x-...  which affects time
-   if(ndpt/=0) then
+   if(ndpt/=0) then ! has pt
       if(dosymp) then
       ! if(ndpt/=0) then 
          t1=0
+         v=0 ! LD
+         x=0 ! LD
          do i=1,nd
             if(i/=ndloc) then
                x%v(2*i)  =(-1)**(2*i-1)*(a1%v(2*i-1))
@@ -11416,6 +11468,9 @@ call print(a1, 1015)
                v%v(2*i-1)= x%v(2*i-1).d.ndpt
             endif
          enddo
+
+call print(x, ldfid) ; ldfid=ldfid+1
+call print(v, ldfid) ; ldfid=ldfid+1
 
          do i=1,nd
             if(i/=ndloc) then
@@ -11428,6 +11483,7 @@ call print(a1, 1015)
          enddo
 
          t1=(-1)**ndpt*t1
+
          a1%v(ndptb)=(1.0_dp.cmono.ndptb)+t1 !!! effect on  time added to identity map in the time-energy plane
          a1%v(ndpt)=1.0_dp.cmono.ndpt
 !!!! end of the coasting beam gymnastic !!!!!!!!!!!!!!
@@ -11437,10 +11493,12 @@ call print(a1, 1015)
             if(i/=ndptb.and.i/=ndpt) a1%v(i)=(1.0e0_dp.cmono.i)+a1%v(i)
          enddo
 
+!call print(a1, ldfid) ; ldfid=ldfid+1
+
 !call print(a1,6)
 !pause 333
 
-      else ! dosymp
+      else ! not dosymp
 
          v=xy
 
@@ -11481,6 +11539,7 @@ call print(a1, 1015)
          do i=1,nd2t
             a1%v(ndptb)=a1%v(ndptb)+mv(i)*(1.0e0_dp.cmono.i)
          enddo
+
          deallocate(mt,mv);deallocate(je);
          ! endif ! npdt/=0
       endif ! dosymp
@@ -11496,7 +11555,7 @@ call print(a1, 1015)
    call kill(t1);
    call kill(v);call kill(w);call kill(rel);call kill(x);
 
-print *, "LD: gofix end"
+write (ldfid0,*) "gofix end"
 
     return
   end subroutine c_gofix
@@ -12244,7 +12303,7 @@ endif
 
 end subroutine c_stochastic_kick
 
-    subroutine check_kernel(k,n,je,removeit)
+   subroutine check_kernel(k,n,je,removeit)
 !#internal: normal
 !# This routine identifies terms in an orbital vector field that
 !# are not in the kernel of a complete normalisation.
@@ -12262,24 +12321,24 @@ end subroutine c_stochastic_kick
       if(k/=0) je(k)=je(k)-1
       o=0
       do i=1,n,2
-         if(coast(i)) cycle 
-       o=o+je(i)+je(i+1)
-       t=t+abs(je(i)-je(i+1))
+        if(coast(i)) cycle
+        o=o+je(i)+je(i+1)
+        t=t+abs(je(i)-je(i+1))
       enddo
-        if(t==0.and.o==0) removeit=my_false
+      if(t==0.and.o==0) removeit=my_false
       if(k/=0) je(k)=je(k)+1
-     else
+    else
       removeit=my_true
       t=0
       if(k/=0) je(k)=je(k)-1
       do i=1,n,2
-         if(coast(i)) cycle 
-       t=t+abs(je(i)-je(i+1))
+        if(coast(i)) cycle
+        t=t+abs(je(i)-je(i+1))
       enddo
-        if(t==0) removeit=my_false
+      if(t==0) removeit=my_false
       if(k/=0) je(k)=je(k)+1
-     endif
-    end subroutine check_kernel
+    endif
+   end subroutine check_kernel
 
 
     subroutine check_kernel_spin(k,n,je,removeit)
@@ -13033,6 +13092,7 @@ prec=1.d-8
 
 
     do i=1,c_expflo_map%n
+     if (ldfid > 0) write (ldfid+200,*) "var(exp)=", i
      c_expflo_map%v(i)=texp(h,c_expflo_map%v(i))
     enddo
    if(use_quaternion) then
@@ -13085,7 +13145,9 @@ c_master=localmaster
         b2=coe*b1
  
 !       call dacmu(b1,coe,b2)
-        b1=h*b2
+        if (ldfid > 0) write (ldfid+200,*) "itr(*)=", i
+        b1=h*b2             ! * <= c_bra_v_ct
+        if (ldfid > 0) call print(b1, ldfid+200)
  
 !       call daflo(h,b2,b1)
         b3=b1+b4
@@ -14358,7 +14420,7 @@ function c_vector_field_quaternion(h,ds) ! spin routine
     !  imaginary part of vectors 1, 3, and 5 have +1 antisymmetric
     !  product:
     !      revec1 J aivec1 = 1 ; revec3 J aivec3 = 1 ;
-    !      revec5 J aivec5 = one
+    !      revec5 J aivec5 = 1
     !  the eigenvectors 2 ,4, and 6 have the opposite normalization.
     !  written by F. Neri, Feb 26 1986.
     !
@@ -14386,12 +14448,17 @@ function c_vector_field_quaternion(h,ds) ! spin routine
     call etyt(mdim,nn,ilo,ihi,aa,ort,vv)
     call ety2(mdim,nn,ilo,ihi,aa,reval,aieval,vv,info)
     
+    ! ety2(nm,n,low,igh,h,wr,wi,z,ierr) was http://www.netlib.org/eispack/hqr2.f
+
     if ( info .ne. 0 ) then
        write(6,*) '  ERROR IN C_EIG6'
        stop 999
     endif
     !      call neigv(vv,pbkt)
     
+print *, "LD: vv="
+do i=1,nd2harm; print '(*(ES23.16,1X))', vv(i,1:nd2harm); enddo
+
     do i=1,ndharm    !ndt !-ndct
        do jet=1,nd2harm   !nd2t !-ndc2t
           revec(jet,2*i-1)=vv(jet,2*i-1)
@@ -18112,8 +18179,8 @@ END FUNCTION FindDet
 !# The linear part of r is described in Chap.4 for the orbital part
 !# and in Chap.6 for the spin. The nonlinear parts are in Chap.5 and 6.
 !# Dospin must be set to .true. if spin is to be normalised.
-!# Resonances can be left in the map. Thir number is in n%nres.
-!# They are nres rosnances The kth resonance is n%m(i,k).Q_i+n%ms(k)=integer
+!# Resonances can be left in the map. Their number is in n%nres.
+!# There are nres resonances, the kth resonance is n%m(i,k).Q_i+n%ms(k)=integer
 
     implicit none
     type(c_damap) , intent(inout) :: xyso3
@@ -18134,6 +18201,8 @@ END FUNCTION FindDet
     type(c_spinor) n0,nr
     type(c_quaternion) qnr
     integer mker, mkers,mdiss,mdis,ndptbmad
+
+lielib_print(13)=1
     if(lielib_print(13)/=0) then
      call kanalnummer(mker,"kernel.txt")
      call kanalnummer(mdis,"distortion.txt")
@@ -18213,46 +18282,55 @@ inside_normal=.true.
 
     m1=xy
 
+    ldfid0 = 1000 ! LD: enable/disable cdamap debug
+    ldfid  = ldfid0+1
+
     ! Brings the map to the parameter dependent fixed point
     ! including the coasting beam gymnastic: time-energy is canonical
     ! but energy is constant. (Momentum compaction, phase slip etc.. falls from there)
  ! etienne
-   call print(m1, 1010)
 
-   c_skip_gofix = .false.
+   call print(m1, ldfid) ; ldfid=ldfid+1
+   write (ldfid0,*) "fid(ini)=", ldfid
+
    if(c_skip_gofix) then
      a1=1
    else
-     call  c_gofix(m1,a1)
+     call c_gofix(m1,a1)
    endif
 
-   call print(a1, 1020)
+   m1=c_simil(a1,m1,-1)
 
-     m1=c_simil(a1,m1,-1)
-
-   call print(m1, 1030)
+   call print(a1, ldfid) ; ldfid=ldfid+1
+   call print(m1, ldfid) ; ldfid=ldfid+1
+   write (ldfid0,*) "fid(gofix)=", ldfid
 
     ! Does the the diagonalisation into a rotation
     call c_linear_a(m1,a2)  
 
-
-   call print(a2, 1040)
-
     !!! Now the linear map is normalised
     m1=c_simil(a2,m1,-1)
 
-   call print(m1, 1050)
+   call print(a2, ldfid) ; ldfid=ldfid+1
+   call print(m1, ldfid) ; ldfid=ldfid+1
+   write (ldfid0,*) "fid(linear)=", ldfid
 
    !!! We go into the phasors' basis
    ri=from_phasor(-1)
    m1=c_simil(ri,m1,1)
 
-   call print(ri, 1060)
-   call print(m1, 1070)
+   call print(ri, ldfid) ; ldfid=ldfid+1
+   call print(m1, ldfid) ; ldfid=ldfid+1
+   write (ldfid0,*) "fid(phasor)=", ldfid
  
+   ri= (m1.sub.-1)
+   call print(ri, ldfid) ; ldfid=ldfid+1
+
     ri=(m1.sub.-1)**(-1) 
     ri%s=1  ! make spin identity
     ri%q=1.0_dp  ! make spin identity
+
+    call print(ri, ldfid) ; ldfid=ldfid+1
 
     !!! The tunes are stored for the nonlinear normal form recursive algorithm
     do k=1,xy%n
@@ -18265,9 +18343,15 @@ inside_normal=.true.
        endif  
     enddo
  
+   write(ldfid0,*) "tunes="
+   write(ldfid0,'(*(ES23.16,1X))') eg(:)
+
     n%ker=0  ! In case reusing normal form
 
     do i=2,not
+      write(ldfid0,*) "****************************************"
+      write(ldfid0,*) "Order ",i,", fid=", ldfid
+
       if(lielib_print(13)/=0) then
         write(mdis,*) " **************************************** " 
         write(mdis,*) "Order ",i
@@ -18278,9 +18362,12 @@ inside_normal=.true.
       nonl=(m1*ri)
       nonl= exp_inv(n%ker,nonl)
       nonl=nonl.sub.i
-
+      call print(nonl, ldfid) ; ldfid=ldfid+1
 
       do k=1,xy%n
+        write(ldfid0,*) "********************"
+        write(ldfid0,*) "Field ",k,", fid=", ldfid
+
         if(lielib_print(13)/=0) then
           write(mdis,*) " **************************************** " 
           write(mdis,*) "field component ",k
@@ -18296,13 +18383,35 @@ inside_normal=.true.
 
         do while(.true.) 
 
-           call  c_cycle(nonl%v(k),j,v ,je); if(j==0) exit;
+           call c_cycle(nonl%v(k),j,v ,je); if(j==0) exit;
            call check_kernel(k,xy%n,je,removeit)
+!      check_kernel(k,n,je,removeit)
+!      removeit=my_true
+!      t=0
+!      if(k/=0) je(k)=je(k)-1
+!      do i=1,n,2
+!        if(coast(i)) cycle
+!        t=t+abs(je(i)-je(i+1))
+!      enddo
+!      if(t==0) removeit=my_false
+!      if(k/=0) je(k)=je(k)+1
 
            if(n%nres>0.and.removeit) then 
              do kr=1,n%nres
                if(n%ms(kr)/=0) cycle  ! a spin resonance
                call check_resonance(k,xy%n,je,kr,n%m,removeit)
+!    removeit=my_true
+!    t1=0;    t2=0;
+!    je(k)=je(k)-1
+!    do i=1,n,2
+!       if(coast(i)) cycle
+!     j=(i+1)/2
+!     t1=t1+abs(je(i)-je(i+1)+m(j,kr))
+!     t2=t2+abs(je(i)-je(i+1)-m(j,kr))
+!    enddo
+!      if(t1==0.or.t2==0) removeit=my_false
+!    je(k)=je(k)+1
+
                if(.not.removeit) then
                  exit
                endif
@@ -18316,48 +18425,63 @@ inside_normal=.true.
             do l=1,xy%n 
               if(coast(l)) cycle 
               lam=lam*eg(l)**je(l)
+              write(ldfid0,'(2(I4),1X,*(ES23.16,1X))') l, je(l), eg(l)**je(l), lam
             enddo
 
             if(lielib_print(13)/=0) then
-                 write(mdis,*) k
-                 write(mdis,'(6(1x,i4))') je(1:nd2)
-                 write(mdis,*) v
-                 write(mdis,*) abs(v/(1-lam))
+                 write(mdis,'(*(i4))') je(:)
+                 write(mdis,*) "removeit lam=", lam, v, v/(1-lam)
             endif
 
             je(k)=je(k)+1
 
             n%g%f(i)%v(k)=n%g%f(i)%v(k)+(v.cmono.je)/(1.0_dp-lam)
 
-            write (1100,*) "1) i=", i, ", j=", j, ", k=", k, ", v=", v
+            write (ldfid0,'(*(i4))') je(:)
+            write (ldfid0,'(*(ES23.16,1X))') n%g%f(i)%v(k).sub.je
+            write (ldfid0,*) "rm) v=", v, ", v/(1-lam)=", v/(1-lam)
           else ! Put in the kernel
 
             if(lielib_print(13)/=0) then
                je(k)=je(k)-1
-               write(mker,*) k
-               write(mker,'(6(1x,i4))') je(1:nd2)
-               write(mker,*) v
-               write(mker,*) abs(v/(1-lam))
+               write(mker,'(*(i4))') je(:)
+               write(mker,*) "keepit (kernel)", v
                je(k)=je(k)+1
             endif
-               n%ker%f(i)%v(k)=n%ker%f(i)%v(k)+(v.cmono.je)
 
-               write (1100,*) "2) i=", i, ", j=", j, ", k=", k, ", v=", v
-            endif
+            n%ker%f(i)%v(k)=n%ker%f(i)%v(k)+(v.cmono.je)
+
+            write (ldfid0,'(*(i4))') je(:)
+            write (ldfid0,*) "kr) v=", v
+          endif
 
         enddo  ! over monomial
       enddo  ! over vector index
 
-      m1=c_simil(n%g%f(i),m1,-1)
+      n%a_t = exp(-n%g%f(i))
+      call print(n%a_t     , ldfid) ; ldfid=ldfid+1
+      n%a_t = n%a_t * m1
+      call print(n%a_t     , ldfid) ; ldfid=ldfid+1
+      n%a_t = exp(n%g%f(i), n%a_t)
+      call print(n%a_t     , ldfid) ; ldfid=ldfid+1
+      m1 = n%a_t
+!     m1=c_simil(n%g%f(i),m1,-1)
 
-      call print(n%g%f(i), 1100+i)
-      call print(m1, 1200+i)
+!     c_adjoint_vec=exp(-s1)*s2
+!     c_adjoint_vec=exp(s1,c_adjoint_vec)
 
+      call print(n%ker%f(i), ldfid) ; ldfid=ldfid+1
+      call print(n%g%f(i)  , ldfid) ; ldfid=ldfid+1
+      call print(m1        , ldfid) ; ldfid=ldfid+1
     enddo
 
     n%a_t=a1*a2*from_phasor()*texp(n%g)*from_phasor(-1)
 
-    call print(n%a_t, 1300)
+    call print(n%a_t, ldfid) ; ldfid=ldfid+1
+
+    write (ldfid0,*) "fid(a)=", ldfid
+
+! end of ldfid traces
 
     n%a1=a1
     n%a2=a2
