@@ -252,8 +252,7 @@ myregend(char* mypat, struct reg_token* start)
 {
   const char *rout_name = "myregend";
   struct reg_token *rp, *aux;
-  if (mypat != NULL) myfree(rout_name, mypat);
-  mypat = NULL;
+  if (mypat != NULL) myfree(rout_name, mypat), mypat = NULL;
   rp = start;
   while (rp != NULL)
   {
