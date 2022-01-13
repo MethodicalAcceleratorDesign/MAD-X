@@ -857,12 +857,22 @@ pro_ptc_setswitch(struct in_cmd* cmd)
   }
 
   /*MAPDUMP LEVEL*/
-  if ( name_list_pos("mapdump", nl) >=0 )
-  {
-    found = command_par_value2("mapdump", cmd->clone, &switchvalue);
+  found = command_par_value2("mapdump", cmd->clone, &switchvalue);
+  if (found) {
+    if (debuglevel > 0) printf("mapdump is found and its value is %f\n", switchvalue);
     int mapdump = (int)switchvalue;
     w_ptc_setmapdumplevel_(&mapdump);
-  }
+  } else
+    if (debuglevel > 0) printf("mapdump is not present (keeping current value)\n");
+
+  /*MADPRINT TPSA FORMAT*/
+  found = command_par_value2("madprint", cmd->clone, &switchvalue);
+  if (found) {
+    if (debuglevel > 0) printf("madprint is found and its value is %f\n", switchvalue);
+    int madprint = (int)switchvalue;
+    w_ptc_setmadprint_(&madprint);
+  } else
+    if (debuglevel > 0) printf("madprint is not present (keeping current value)\n");
 
   /*ACCELERATION SWITCH*/
   found = command_par_value_user2("maxacceleration", cmd->clone, &switchvalue);
