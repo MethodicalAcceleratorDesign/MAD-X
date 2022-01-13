@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:31:24      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:06:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -827,7 +827,7 @@ Determined SECTOR NMUL MAX :  2
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    9.2703622556200571E-015   0.0000000000000000       -7.5495165674510645E-015
+ After    end:   -3.9947103784576665E-014   0.0000000000000000       -6.9319550100033211E-015
 
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
@@ -874,25 +874,25 @@ Determined SECTOR NMUL MAX :  2
       -9.086229285        9.086229285                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.662471086e-10 
+                 0                  0                  0      1.6624812e-10 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   3.960124073e-11                  0                  0                  0 
+   3.960126445e-11                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    1.817524825e-10                  0    4.758695862e-11 
+                 0    1.817531052e-10                  0    4.758710824e-11 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    3.018277287e-10                  0    3.901796602e-10 
+                 0    3.018277976e-10                  0     3.90180613e-10 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.720648045e-10                  0    1.021969696e-10 
+                 0    1.720654619e-10                  0    1.021968725e-10 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -2.339719601e-14                  0   -1.720650678e-10 
+                 0   -2.258326899e-14                  0     -1.7206557e-10 
 
            pycomin             tcomin            ptcomin 
-                 0   -6.694023252e-10                  0 
+                 0   -6.694010485e-10                  0 
   write, table=twiss, file="leir.56dt.ptc.twiss";
 
   write, table=ptc_twiss_summary, file="leir.56dt.ptc.summ.twiss";

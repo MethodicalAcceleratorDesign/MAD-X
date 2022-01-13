@@ -214,6 +214,14 @@ subroutine w_ptc_setenvelope(method)
   call ptc_setenvelope(method)
 end subroutine w_ptc_setenvelope
 
+subroutine w_ptc_setspin(method)
+  use precision_constants
+  use madx_ptc_intstate_module
+  implicit none
+  integer method
+  call ptc_setspin(method)
+end subroutine w_ptc_setspin
+
 subroutine w_ptc_setstochastic(method)
   use precision_constants
   use madx_ptc_intstate_module

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:31:44      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:06:22      +
   ++++++++++++++++++++++++++++++++++++++++++++
 PTCNSTEPS=3;
 
@@ -84,7 +84,7 @@ Determined SECTOR NMUL MAX :  0
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        1.2000000000000002     
+ After    end:    0.0000000000000000        0.0000000000000000        1.2000000000000000     
    ptc_setswitch, debuglevel=0, nocavity=false, 
 
                   maxacceleration=true, fringe=true, exact_mis=true, time=true, totalpath=true;

@@ -1,0 +1,56 @@
+!example of 6D calculation on ALS (synchrotron light source)
+option, -echo;
+call, file="../share/ALS/als.seqx";
+option, echo;
+
+beam, particle = electron, energy = sqrt(1.5*1.5+emass*emass);  use, period=ALS;
+
+select,flag=ptc_twiss,clear;
+select, flag=ptc_twiss, column=name,s,Energy,x,y,pt,t,
+                          beta11,beta22,beta33,mu1,mu2,mu3,disp1,disp2,
+                          re11,re12,re13,re14,re15,re16,
+                          re21,re22,re23,re24,re25,re26,
+                          re31,re32,re33,re34,re35,re36,
+                          re41,re42,re43,re44,re45,re46,
+                          re51,re52,re53,re54,re55,re56,
+                          re61,re62,re63,re64,re65,re66;
+
+
+
+ptc_create_universe;
+  ptc_create_layout, model=1, method=2, nst=20, exact=false, closed_layout=true;
+
+!  ptc_printframes, file="ALS.C", format=rootmacro;!this prints my visualisation with ROOT
+
+  !!!!!       T I M E   T R U E ,   T O T P A T H  F A L S E
+  ptc_setswitch, debuglevel=3, exact_mis=true, time=true, totalpath=false, spin=true;
+  
+!  ptc_script, file="printflatfile.txt";
+  
+  ptc_twiss, icase=6, no=3, closed_orbit=true, rmatrix, x=0, y=0, t=0.15;
+!  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
+  
+!  plot, table=ptc_twiss, vaxis=beta11,beta22, haxis=s;
+!  plot, table=ptc_twiss, vaxis=mu3, haxis=s;
+!  plot, table=ptc_twiss, vaxis=energy, haxis=s;
+  
+  write, table=ptc_twiss, file="ALS.6D.ptc.twiss";
+  write, table=ptc_twiss_summary, file="ALS.6D.ptc.summ.twiss";
+  
+ptc_end;
+
+
+!mux_ptc = table(ptc_twiss, ALS$end, mu1);
+!muy_ptc = table(ptc_twiss, ALS$end, mu2);
+
+!value, mux_ptc, muy_ptc;
+!value, mux_tw, muy_tw;
+
+!plot, table=ptc_twiss, haxis=s, vaxis=beta11,beta22, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=disp1, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=disp2, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=disp3, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=disp4, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=x, colour=100;
+
+!removefile, file='ALS.C';
