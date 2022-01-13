@@ -255,13 +255,12 @@ contains
 
        c_Map = theTransferMap;
 
-       call  c_normal(c_Map,theNormalForm)       ! (4) !! HERE WE DO NORMAL FORM TYPE 1
+       call c_normal(c_Map,theNormalForm)       ! (4) !! HERE WE DO NORMAL FORM TYPE 1
 
-       write (*,*) "LD: theTransferMap="
-       call print(theTransferMap, 6)
-
-       write (*,*) "LD: theNormalForm="
-       call print(theNormalForm%a_t, 6)
+       write (6,*) "LD: theTransferMap="
+       call daprint(c_Map, 6)
+       write (6,*) "LD: theNormalForm="
+       call daprint(theNormalForm%a_t, 6)
 
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           write(whymsg,*) 'DA got unstable in Normal Form: PTC msg: ',messagelost
