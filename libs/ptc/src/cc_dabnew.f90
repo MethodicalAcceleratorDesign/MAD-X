@@ -3972,9 +3972,14 @@ contains
              j(i-1)=1
              ioa=1
           endif
-          write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,3X,18(1X,I2))') iout, &
+          if (madxprint) then
+            write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout, &
                      c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
-          if (.not.madxprint) write(iunit,*) c_clean_complex(c_cc(ipoa+i-1))
+          else
+            write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout, &
+                     c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
+            write(iunit,*) c_clean_complex(c_cc(ipoa+i-1))
+          endif
        enddo
     else
        if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT                                     ORDER   EXPONENTS'
@@ -3991,9 +3996,12 @@ contains
              ccc=a+(0.0_dp,1.0_dp)*b
                 !ETIENNE
                 iout = iout+1
-                write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout,ccc,ioa,(j(iii),iii=1,c_nvmax)
-                !ETIENNE + LD
-                if (.not.madxprint) write(iunit,*) c_cc(ii)
+                if (madxprint) then
+                  write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout, ccc,ioa,(j(iii),iii=1,c_nvmax)
+                else
+                  write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout, ccc,ioa,(j(iii),iii=1,c_nvmax)
+                  write(iunit,*) c_cc(ii)
+                endif
              endif
              !ETIENNE
              !
@@ -4009,7 +4017,7 @@ longprint=long
   end subroutine c_dapri
 
 function c_clean_complex(c)
-implicit none 
+implicit none
 complex(dp) c_clean_complex,c
 real(dp) cr,ci
 
@@ -4019,7 +4027,7 @@ ci=-i_*c
 if(abs(ci)<epsprint) ci=0
 c_clean_complex=cr+i_*ci
 
-end function c_clean_complex 
+end function c_clean_complex
 
 
   subroutine c_dapri77(ina,iunit)
@@ -4094,7 +4102,7 @@ end function c_clean_complex
              if(abs(aimag(c_cc(ii)))> epsprint) then
                b=aimag(c_cc(ii))
                imprime=.true.
-             endif 
+             endif
              ccc=a+(0.0_dp,1.0_dp)*b
 !             ccc=c_cc(ii)
              if(c_nomax.ne.1) then
@@ -4119,9 +4127,9 @@ end function c_clean_complex
                    write(iunit,503) ioa,ccc,(j(i),i=1,inva)
                 endif
              endif
-501          format(' ', i3,1x,es23.16,1x,es23.16,1x,100(1x,i2))
-503          format(' ', i3,1x,es23.16,1x,es23.16,1x,100(1x,i2))
-502          format(' ', i5,1x,es23.16,1x,es23.16,1x,100(1x,i2))
+501          format(' ', i3,1x,g23.16,1x,g23.16,1x,100(1x,i2))
+503          format(' ', i3,1x,g23.16,1x,g23.16,1x,100(1x,i2))
+502          format(' ', i5,1x,g23.16,1x,g23.16,1x,100(1x,i2))
           endif
           !ETIENNE
           !
@@ -4135,7 +4143,7 @@ end function c_clean_complex
     if(iout.eq.0) iout=1
     if(longprint.and.(.not.madxprint)) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
     if((.not.longprint).and.(.not.some)) write(iunit,*) " Complex Polynomial is zero "
-    !if((.not.longprint).and.(.not.madxprint)) write(iunit,*) " "
+    if((.not.longprint).and.(.not.madxprint)) write(6,*) " "
     !
     return
 longprint=long
@@ -4263,7 +4271,7 @@ longprint=long
     integer,dimension(c_lnv)::j
     complex(dp) c
     character(10) c10
- 
+
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
           write(6,*) "big problem in dabnew ", sqrt(crash)
@@ -4303,15 +4311,18 @@ longprint=long
     read(iunit,'(A10)') c10
     read(iunit,'(A10)') c10
     read(iunit,'(A10)') c10
-     
+
     !
     !
     iin = 0
     !
 10  continue
     iin = iin + 1
-!    read(iunit,'(I6,2X,G23.16,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
-    read(iunit,*) ii,c,io,(j(i),i=1,inva)
+    if (madxprint) then
+      read(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+    else
+      read(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+    endif
     !
     if(ii.eq.0) goto 20
     !ETIENNE
@@ -4356,7 +4367,6 @@ longprint=long
     if(c_nomax.ne.1) call dapac(ina)
     !
     return
- 
   end subroutine c_darea
   !FF
   !
