@@ -25,7 +25,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   double precision :: s0mat(6,6), eig_tol ! initial sigma matrix
   character(len=48) :: charconv
   character(len=150) :: warnstr
-  logical :: fast_error_func
+  logical :: fast_error_func, sc_setup
 
   double precision, external :: get_value
   integer, external :: get_option
@@ -73,6 +73,12 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   suml=zero; circ=zero; eta=zero; alfa=zero; gamtr=zero; wgt=zero
 
+  !---- Setup SC procedures
+  sc_setup = get_option('sc_setup ') .ne. 0
+  if(sc_setup) then
+     call SC_Setup_Procedure
+  endif
+  
   !---- Track chromatic functions
   chrom = get_option('twiss_chrom ')
 

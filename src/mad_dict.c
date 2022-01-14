@@ -321,6 +321,7 @@ const char *const_command_def =
 "fast_error_func  = [l, false, true], " /* frs */
 "exit_loss_turn   = [l, false, true], " /* frs */
 "bucket_swap      = [l, false, true], " /* frs Sep. 2017 */
+"sc_setup         = [l, false, true], " /* frs April 2021 */
 "sc_chrom_fix     = [l, true],        " /* frs Sep. 2017 */
 "sc_3d_kick       = [l, false, true], " /* frs June 2018 */
 "sc_3d_beamsize   = [l, false, true], " /* frs May 2019 */
