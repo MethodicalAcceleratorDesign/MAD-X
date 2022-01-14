@@ -15,6 +15,7 @@ module madx_ptc_intstate_module
   public                            :: setenforce6D
   public                            :: ptc_setdebuglevel
   public                            :: ptc_setmapdumplevel
+  public                            :: ptc_setmadprint
   public                            :: ptc_setseed
   public                            :: ptc_setaccel_method
   public                            :: ptc_setexactmis
@@ -141,6 +142,19 @@ contains
   !____________________________________________________________________________________________
 
 
+  subroutine ptc_setmadprint(level)
+    use precision_constants, only : madxprint ! LD:13.01.2022
+    implicit none
+    integer     :: level
+
+    if (level > 0) then
+        print *, "Setting madprint level to", level
+    end if
+    madxprint = level.ne.0
+
+  end subroutine ptc_setmadprint
+
+  !____________________________________________________________________________________________
   subroutine ptc_setseed(seed)
     USE gauss_dis
     implicit none
