@@ -3991,7 +3991,7 @@ contains
              ccc=a+(0.0_dp,1.0_dp)*b
                 !ETIENNE
                 iout = iout+1
-                write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,3X,18(1X,I2))') iout,ccc,ioa,(j(iii),iii=1,c_nvmax)
+                write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout,ccc,ioa,(j(iii),iii=1,c_nvmax)
                 !ETIENNE + LD
                 if (.not.madxprint) write(iunit,*) c_cc(ii)
              endif
@@ -4310,7 +4310,7 @@ longprint=long
     !
 10  continue
     iin = iin + 1
-!    read(iunit,'(I6,2X,ES23.16,I5,3X,18(1X,I2))') ii,c,io,(j(i),i=1,inva)
+!    read(iunit,'(I6,2X,G23.16,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
     read(iunit,*) ii,c,io,(j(i),i=1,inva)
     !
     if(ii.eq.0) goto 20
