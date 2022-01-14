@@ -217,7 +217,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !hbu--- init info for tables initial s position is 0
   spos=0 ; nlm=0 ; el_name='start           '
   mytracksumm_per_turns = get_option('sc_mytracksumm_per_turns ') ! hrr Sep 2021
-  print *," Info: mytracksumm_per_turns=", mytracksumm_per_turns ! hrr Sep 2021
+  !print *," Info: mytracksumm_per_turns=", mytracksumm_per_turns ! hrr Sep 2021
    mytracksumm_turns= mytracksumm_turns + 1 ! hrr Sep 2021
    if (mytracksumm_turns.ge.mytracksumm_per_turns) mytracksumm_turns= 0 ! hrr Sep 2021
    mytracksumm_start_particle = get_option('sc_mytracksumm_start_particle ') ! hrr Sep 2021
@@ -228,8 +228,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
    if(mytracksumm_end_particle.lt.1.or.mytracksumm_end_particle.gt.jmax) then ! hrr Sep 2021
    mytracksumm_end_particle= jmax ! hrr Sep 2021
    endif ! hrr Sep 2021
-   print *," Info: mytracksumm_start/end_particle=", &
-   mytracksumm_start_particle,mytracksumm_end_particle      ! hrr Sep 2021
+   !print *," Info: mytracksumm_start/end_particle=", &
+   !mytracksumm_start_particle,mytracksumm_end_particle      ! hrr Sep 2021
 
   if (first) then
      !--- enter start coordinates in summary table
