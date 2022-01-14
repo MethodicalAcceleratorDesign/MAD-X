@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:24:09      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:03:05      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Based on : ../../examples/twiss/job.sample.thin.new.madx
 
@@ -98,8 +98,11 @@ final orbit vector:     8.057460E-09  2.105015E-09  0.000000E+00  0.000000E+00 -
      synch_2      synch_3      synch_4      synch_5 
     0.000000     0.000000     0.000000     0.000000 
 
-     synch_6      synch_8       nflips 
-    0.000000     0.000000     0.000000 
+     synch_6      synch_8       nflips        dqmin 
+    0.000000     0.000000     0.000000     0.000000 
+
+ dqmin_phase 
+    0.000000 
 
 
  use,    period=lhcb2;
@@ -143,8 +146,11 @@ final orbit vector:     1.510210E-08 -5.869721E-09  0.000000E+00  0.000000E+00  
      synch_2      synch_3      synch_4      synch_5 
     0.000000     0.000000     0.000000     0.000000 
 
-     synch_6      synch_8       nflips 
-    0.000000     0.000000     0.000000 
+     synch_6      synch_8       nflips        dqmin 
+    0.000000     0.000000     0.000000     0.000000 
+
+ dqmin_phase 
+    0.000000 
 
 
 stop;

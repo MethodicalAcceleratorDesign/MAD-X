@@ -668,8 +668,8 @@ const int summ_table_types[] =
   2, 2, 2, 2, 
   //2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
-  2, 2,
-  2, //for nflips
+  2, 2,   2, //for nflips
+  2, 2
 };
 
 const char* const summ_table_cols[] =
@@ -681,7 +681,7 @@ const char* const summ_table_cols[] =
   //"synch_1","synch_2","synch_3","synch_4","synch_5",
   "synch_1","synch_2","synch_3","synch_4","synch_5",
   "synch_6","synch_8",
-   "nflips", //for nflips
+   "nflips","dqmin", "dqmin_phase", //for nflips
   " "  /* blank terminates */
 };
 

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2021.02.16 16:22:45      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:03:13      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=120.;
 
@@ -107,8 +107,11 @@ final orbit vector:     1.084826E-02  1.200508E-03  1.167583E-02  1.333103E-03  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 select, flag=ptc_twiss, column=name, s, x, y, pt,t, re11, re12, re15, re25, re56;
 
 ptc_create_universe;

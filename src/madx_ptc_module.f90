@@ -96,7 +96,7 @@ CONTAINS
     implicit none
     real(kind(1d0)) get_value
     integer maxnmul
-
+    
     use_quaternion=.true.
 
     piotr_freq=.true. ! PTC flag in cavity tracking to have correct phasing with time=false
@@ -158,8 +158,8 @@ CONTAINS
           return
        endif
 
-       sector_nmul_max = maxnmul
-       sector_nmul     = maxnmul
+       sector_nmul_max = maxnmul + 1
+       sector_nmul     = maxnmul + 1
     else
        sector_nmul = get_value('ptc_create_universe ','sector_nmul ')
     endif
@@ -3024,7 +3024,7 @@ CONTAINS
       call fort_warn("my_state ",  &
             "TIME=false with RF cavities gives approximative results valid only for fully relativistic beams (beta~1)")
     endif
-
+    
 
     call setintstate(default)
     CALL UPDATE_STATES

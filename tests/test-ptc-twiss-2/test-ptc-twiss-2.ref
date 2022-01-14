@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.08.10 13:28:11      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:05:10      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009" ;
 
@@ -42,8 +42,11 @@ orbit:  -2.000002E-03 -6.829941E-10  3.774066E-11  1.700000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    8.334552298e-10 
+
+       dqmin_phase 
+      -1.571990328 
 Determined SECTOR NMUL MAX :  2
  MAD-X Beam Parameters
                   Energy : 0.450001E+03
@@ -63,7 +66,7 @@ Determined SECTOR NMUL MAX :  2
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    1.2170347930495041E-004   2.9337307977728667E-014  -7.9690752521344166E-005
+ After    end:    1.2170350936169305E-004   7.5385703743776487E-014  -7.9690704044566019E-005
  HARMONIC NUMBER defined in the ring:    35640.000000000000     
 ++++++ warning: my_state:   no cavity - dimensionality reduced 6 -> 5 and 1/2
  ************ State Summary ****************
@@ -101,13 +104,13 @@ Determined SECTOR NMUL MAX :  2
       0.3100005974                  0                  0                 -0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       9.999993133        595.1201765        9.999993444        609.5257648 
+       9.999993137        595.1201765        9.999993444        609.5257649 
 
          beta11min          beta11max          beta12min          beta12max 
-       9.999993133        595.1201765    1.661415038e-11    1.037267073e-09 
+       9.999993137        595.1201765     1.66141498e-11    1.037267038e-09 
 
          beta13min          beta13max          beta21min          beta21max 
-                 0                  0    1.550358613e-11    1.201005042e-09 
+                 0                  0    1.550358546e-11    1.201005001e-09 
 
          beta22min          beta22max          beta23min          beta23max 
        9.999993444        609.5257648                  0                  0 
@@ -116,31 +119,31 @@ Determined SECTOR NMUL MAX :  2
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -2.745605013         2.81616644 
+                 0                  0       -2.745605011         2.81616644 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.04812305621       0.0503358699      -0.1856652094        0.145079719 
+    -0.04812305616      0.05033586996      -0.1856652095        0.145079719 
 
           disp4min           disp4max             deltap            orbit_x 
-   -0.005458864011     0.004780221989                  0    -0.002000001373 
+   -0.005458864012     0.004780221989                  0    -0.002000001386 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -7.053266099e-10   -6.470123592e-10    0.0001700000459                  0 
+  -7.065534585e-10   -6.470123436e-10    0.0001700000459                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    0.0007074557202     0.000713726789    2.376317578e-05 
+                 0    0.0007074557171     0.000713726789    2.376317574e-05 
 
            pycorms             tcorms            ptcorms             xcomax 
-   2.414012503e-05    6.321244863e-06                  0     0.007390728165 
+   2.414012503e-05    6.321244607e-06                  0     0.007390728208 
 
             ycomax            pxcomax            pycomax             tcomax 
-    0.008056958782    0.0004263337929    0.0004558719032    1.067987606e-05 
+    0.008056958782    0.0004263337886    0.0004558719032    1.067987683e-05 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0    -0.008477871351    -0.008499924562   -0.0004558708109 
+                 0    -0.008477871401    -0.008499924562   -0.0004558708136 
 
            pycomin             tcomin            ptcomin 
-  -0.0003912272041   -1.013624875e-05                  0 
+  -0.0003912272041   -1.013624764e-05                  0 
 
   Number of warnings: 1
 0 in C and 1 in Fortran

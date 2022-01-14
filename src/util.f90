@@ -35,6 +35,7 @@ module phys_constfi
   double precision, parameter ::  pmass  = 0.93827208816     ! GeV CODATA 2018
 
   double precision, parameter ::  nmass  = 0.93956542052      ! GeV CODATA 2018
+  double precision, parameter ::  umass  = 0.93149410242      ! GeV CODATA 2018
   double precision, parameter ::  mumass = 0.1056583755     ! GeV CODATA 2018
 
   ! Classical radius [m]
@@ -396,6 +397,7 @@ module twisscfi
   double precision :: synch_1=0.d0, synch_2=0.d0, synch_3=0.d0, synch_4=0.d0, synch_5=0.d0
   double precision :: synch_6=0.d0, synch_7=0.d0, synch_8=0.d0
   double precision :: gammacp=1.d0
+  double precision :: dqmin1=0.d0, dqmin2=0.d0
   integer :: nmode_flip=0
 end module twisscfi
 
@@ -405,6 +407,15 @@ module twissotmfi
   double precision :: rotm(6,6)=0.d0, rw(6,6)=0.d0, skick(6)=0.d0, sorb(6)=0.d0
   double precision :: srmat(6,6)=0.d0, stmat(6,6,6)=0.d0
 end module twissotmfi
+
+module twissdqmin
+  use math_constfi, only : zero
+  implicit none
+  public
+  double precision :: dqmin_det=zero, prev_pos_s = zero, tot_int_length=zero, delta_tune_dqmin = zero
+  double precision ::  dqmin_rdt_c=0, dqmin_det_c=0, diff_bigger_sum = 0;
+  double complex :: dqmin_rdt = zero
+end module twissdqmin
 
 module twissbeamfi
   use math_constfi, only : zero

@@ -29,6 +29,7 @@ const char *const_constant_def =
 "const emass = 0.51099895000e-3; "
 "const mumass = 0.1056583755; "
 "const nmass = 0.93956542052; "
+"const umass = 0.93149410242; "
 "const pmass = 0.93827208816; " 
 "const clight = 299792458; "
 "const qelect = 1.602176634e-19; "
@@ -754,11 +755,13 @@ const char *const_command_def =
 " "
 "ptc_setswitch: ptc_setswitch none 0 0 "
 "debuglevel = [i,1], "/*sets the level of debugging printout 0 none, 4 everything */
-"mapdump    = [i, 0], " /*sets the level of map dump printout in all tracking codes 0: none, 1: order 0, 2: order 1 */
+"mapdump    = [i, 0], " /*ld: sets the level of map dump printout in all tracking codes 0: none, 1: order 0, 2: order 1 */
+"madprint   = [l, false, true], " /*ld: sets map dump printout format*/
 "seed       = [i, 123456789], "
 "maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
 "exact_mis  = [l, false, true], "  /* switch to ensure exact misaligment treatment */
 "totalpath  = [l, false, true], "  /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
+"spin       = [l, false, true], "  /*sets the spin switch/internal state of PTC*/
 "radiation  = [l, false, true], "  /*sets the radiation switch/internal state of PTC */
 "modulation = [l, false, true], "  /*sets the modulation switch/internal state of PTC */
 "stochastic = [l, false, true], "  /*sets the stochastic switch/internal state of PTC */
@@ -1319,6 +1322,7 @@ const char *const_command_def =
 "ddq1     = [c, 0],   ddq2      = [c, 0], "
 "dq1de1   = [c, 0],   dq1de2    = [c, 0], "
 "dq2de2   = [c, 0],   gammatr   = [c, 0], "
+"dqmin   = [c, 0],    dqmin_phase   = [c, 0], "
 "alfa     = [c, 0],"
 "sequence = [s, none]; "
 " "
@@ -1328,6 +1332,8 @@ const char *const_command_def =
 "ddq1     = [r, 0.1], ddq2      = [r, 0.1], "
 "dq1de1   = [r, 0.1], dq1de2    = [r, 0.1], "
 "dq2de2   = [r, 1],   alfa      = [r, 1.0],"
+"dqmin   = [r, 10],   dqmin_phase   = [r, 10], "
+
 "gammatr   = [r, 1]; "
 " "
 "sequence: sequence none 0 0 "

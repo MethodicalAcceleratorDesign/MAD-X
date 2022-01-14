@@ -40,6 +40,10 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     8.334552298e-10
+@ DQMIN_PHASE      %le        -1.571990328
 @ TITLE            %58s "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs"
 @ ORIGIN           %16s "5.05.02 Linux 64"
 @ DATE             %08s "10/08/20"

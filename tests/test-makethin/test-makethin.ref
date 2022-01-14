@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 12:11:05      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:02:06      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! H. Burkhardt.  Updated for improved makethin select in summer 2005
 
@@ -56,8 +56,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.000139362666 
+
+       dqmin_phase 
+      -2.311877287 
 
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
@@ -96,8 +99,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.01127120866 
+
+       dqmin_phase 
+      -1.621331579 
 save,sequence=fivecell,file="fivecell_thin_collim.seq";
 
 ++++++ warning: SAVE makes all previous USE invalid !  
