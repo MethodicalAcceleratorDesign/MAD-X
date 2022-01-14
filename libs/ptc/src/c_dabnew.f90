@@ -4483,7 +4483,7 @@ contains
              j(i-1)=1
              ioa=1
           endif
-          write(iunit,'(I6,2X,ES23.16,I5,3X,18(1X,I2))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
+          write(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
           if (.not.madxprint) write(iunit,*) cc(ipoa+i-1)
        enddo
     else
@@ -4497,7 +4497,7 @@ contains
              if(abs(cc(ii)).gt.eps) then
                 !ETIENNE
                 iout = iout+1
-                write(iunit,'(I6,2X,ES23.16,I5,3X,18(1X,I2))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
+                write(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
                 !ETIENNE
                 if (.not.madxprint) write(iunit,*) cc(ii)
              endif
@@ -4781,7 +4781,8 @@ contains
     !
 10  continue
     iin = iin + 1
-    read(iunit,'(I6,2X,ES23.16,I5,3X,18(1X,i2))') ii,c,io,(j(i),i=1,inva)
+!    read(iunit,'(I6,2X,G23.16,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+    read(iunit,*) ii,c,io,(j(i),i=1,inva)
     !
     if(ii.eq.0) goto 20
     !ETIENNE
