@@ -4468,9 +4468,15 @@ contains
     ioa = 0
     if(inva.eq.0) then
        write(iunit,'(A)') '    I  VALUE  '
-       do i = ipoa,ipoa+illa-1
-          write(iunit,'(I6,2X,ES23.16)') i-ipoa, cc(i)
-       enddo
+       if (madxprint) then
+         do i = ipoa,ipoa+illa-1
+            write(iunit,'(I6,2X,ES23.16)') i-ipoa, cc(i)
+         enddo
+       else
+         do i = ipoa,ipoa+illa-1
+            write(iunit,'(I6,2X,G20.13)') i-ipoa, cc(i)
+         enddo
+       endif
     elseif(nomax.eq.1) then
        if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT             ORDER   EXPONENTS'
        if(illa.eq.0) write(iunit,'(A)') '         ALL COMPONENTS ZERO '
@@ -4483,8 +4489,12 @@ contains
              j(i-1)=1
              ioa=1
           endif
-          write(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
-          if (.not.madxprint) write(iunit,*) cc(ipoa+i-1)
+          if (madxprint) then
+            write(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
+          else
+            write(iunit,'(I6,2X,G20.13,I5,4X,18(2I2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
+            write(iunit,*) cc(ipoa+i-1)
+          endif
        enddo
     else
        if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT             ORDER   EXPONENTS'
@@ -4497,9 +4507,12 @@ contains
              if(abs(cc(ii)).gt.eps) then
                 !ETIENNE
                 iout = iout+1
-                write(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
-                !ETIENNE
-                if (.not.madxprint) write(iunit,*) cc(ii)
+                if (madxprint) then
+                  write(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
+                else
+                  write(iunit,'(I6,2X,G20.13,I5,4X,18(2I2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
+                  write(iunit,*) cc(ii)
+                endif
              endif
              !ETIENNE
              !
@@ -4594,9 +4607,9 @@ contains
                    write(iunit,503) ioa,cc(ii),(j(i),i=1,inva)
                 endif
              endif
-501          format(' ', i3,1x,es23.16,1x,100(1x,i2))
-503          format(' ', i3,1x,es23.16,1x,100(1x,i2))
-502          format(' ', i5,1x,es23.16,1x,100(1x,i2))
+501          format(' ', i3,1x,g23.16,1x,100(1x,i2))
+503          format(' ', i3,1x,g23.16,1x,100(1x,i2))
+502          format(' ', i5,1x,g23.16,1x,100(1x,i2))
           endif
           !ETIENNE
           !
@@ -4781,8 +4794,11 @@ contains
     !
 10  continue
     iin = iin + 1
-!    read(iunit,'(I6,2X,G23.16,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
-    read(iunit,*) ii,c,io,(j(i),i=1,inva)
+    if (madxprint) then
+      read(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+    else
+      read(iunit,'(I6,2X,G20.13,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+    endif
     !
     if(ii.eq.0) goto 20
     !ETIENNE
