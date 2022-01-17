@@ -1828,7 +1828,8 @@ contains
       ! to convert between Ripken and Edwards-Teng parametrization
       real(dp) :: kappa,u,ax,ay,kx,ky,kxy2,usqrt,bx,by,cx,cy,cosvp,sinvp,cosvm,sinvm,cosv2,sinv2,cosv1,sinv1
       real(dp) :: deltaeValue
-
+      logical :: scale_twiss
+      
       if (getdebug() > 2) then
          write(mf1,*) "##########################################"
          write(mf1,*) ""
@@ -1839,7 +1840,7 @@ contains
 
 
       deltae = getdeltae()
-
+      scale_twiss = get_value('ptc_twiss ','scale_with_pt ') .ne. 0
       call double_to_table_curr(table_name, 's ', suml)
 
       doublenum = deltae * startfen%energy
@@ -1942,14 +1943,15 @@ contains
 
       !deltap = A_script_probe%x(5).sub.'0'
       !deltae = deltae * (1.0 + deltap)
-      if(default%time) then
-        pt_ = A_script_probe%x(5).sub.'0'
-        onedp   = sqrt( one + two*pt_/relativisticBeta + (pt_**2))
-      else
-        onedp = one + A_script_probe%x(5).sub.'0'
+      onedp = one
+      if(scale_twiss) then
+        if(default%time) then
+          pt_ = A_script_probe%x(5).sub.'0'
+          onedp   = sqrt( one + two*pt_/relativisticBeta + (pt_**2))
+        else
+          onedp = one + A_script_probe%x(5).sub.'0'
+        endif
       endif
-      
-
 
       opt_fun(beta11)= tw%beta(1,1) * onedp ! beta11=1
       opt_fun(beta12)= tw%beta(1,2) * onedp

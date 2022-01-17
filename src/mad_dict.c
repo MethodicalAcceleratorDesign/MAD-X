@@ -685,6 +685,7 @@ const char *const_command_def =
 "re64     = [r, 0], re65     = [r, 0], re66     = [r, 1], "
 "betz     = [r, 0], alfz     = [r, 0], muz      = [r, 0], "
 "maptable = [l, false, true], "
+"scale_with_pt = [l, false, true], "
 "beta0    = [s, none, beta0]; "
 " "
 "ptc_moments: ptc_moments none 0 0 "
