@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:03:14      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:46:56      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -390,7 +390,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 6 location, out of 39 in total. The Dqmin estimate might be inaccurate.                                        
 
 ++++++ table: summ
 
@@ -413,7 +412,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    3.604052855e-06 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7893583862 
@@ -434,7 +433,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 17 location, out of 110 in total. The Dqmin estimate might be inaccurate.                                      
 
 ++++++ table: summ
 
@@ -457,7 +455,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    6.770703782e-06 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7901000852 
@@ -478,7 +476,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 23 location, out of 149 in total. The Dqmin estimate might be inaccurate.                                      
 
 ++++++ table: summ
 
@@ -501,7 +498,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    9.937356059e-06 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7903690826 
@@ -522,7 +519,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 29 location, out of 188 in total. The Dqmin estimate might be inaccurate.                                      
 
 ++++++ table: summ
 
@@ -545,7 +541,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    1.310400871e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7905080706 
@@ -576,7 +572,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 38 location, out of 239 in total. The Dqmin estimate might be inaccurate.                                      
 
 ++++++ table: summ
 
@@ -599,7 +594,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    1.588260586e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7907982245 
@@ -620,7 +615,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 47 location, out of 290 in total. The Dqmin estimate might be inaccurate.                                      
 
 ++++++ table: summ
 
@@ -643,7 +637,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    1.866120395e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7910019722 
@@ -674,7 +668,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 62 location, out of 359 in total. The Dqmin estimate might be inaccurate.                                      
 
 ++++++ table: summ
 
@@ -697,7 +690,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    2.166781658e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7911243106 
@@ -718,7 +711,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 77 location, out of 428 in total. The Dqmin estimate might be inaccurate.                                      
 
 ++++++ table: summ
 
@@ -741,7 +733,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    2.467442944e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7912168349 
@@ -772,7 +764,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 85 location, out of 557 in total. The Dqmin estimate might be inaccurate.                                      
 
 ++++++ table: summ
 
@@ -795,7 +786,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    2.792409856e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7915238335 
@@ -826,7 +817,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 91 location, out of 596 in total. The Dqmin estimate might be inaccurate.                                      
 
 ++++++ table: summ
 
@@ -849,7 +839,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    3.109075113e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7914648001 
@@ -870,7 +860,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 97 location, out of 635 in total. The Dqmin estimate might be inaccurate.                                      
 
 ++++++ table: summ
 
@@ -893,7 +882,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    3.425740378e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7914166804 
@@ -922,7 +911,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 112 location, out of 704 in total. The Dqmin estimate might be inaccurate.                                     
 
 ++++++ table: summ
 
@@ -945,7 +933,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    3.726401711e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7914543559 
@@ -966,7 +954,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 127 location, out of 773 in total. The Dqmin estimate might be inaccurate.                                     
 
 ++++++ table: summ
 
@@ -989,7 +976,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    4.027063048e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7914864056 
@@ -1028,7 +1015,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 139 location, out of 850 in total. The Dqmin estimate might be inaccurate.                                     
 
 ++++++ table: summ
 
@@ -1051,7 +1037,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    4.307752242e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7916517125 
@@ -1070,7 +1056,6 @@ initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
  Total number of modes flips is not even! Nflips =            1
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 151 location, out of 927 in total. The Dqmin estimate might be inaccurate.                                     
 
 ++++++ table: summ
 
@@ -1093,13 +1078,13 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  1    4.588441538e-05 
+                 0                  0                  1                  0 
 
        dqmin_phase 
      -0.7917967947 
 
-  Number of warnings: 30
-0 in C and 30 in Fortran
+  Number of warnings: 15
+0 in C and 15 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

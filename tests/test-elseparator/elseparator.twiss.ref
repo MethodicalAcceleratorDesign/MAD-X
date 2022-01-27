@@ -42,12 +42,12 @@
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le     7.380326759e-19
+@ DQMIN            %le                   0
 @ DQMIN_PHASE      %le        0.3080911965
 @ TITLE            %16s "test elseparator"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "16.23.26"
+@ ORIGIN           %16s "5.08.00 Linux 64"
+@ DATE             %08s "27/01/22"
+@ TIME             %08s "20.45.52"
 * NAME               KEYWORD                             S                  X                 PX                  Y                 PY               BETX               BETY                MUX                MUY 
 $ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TESTSEQ$START"     "MARKER"                             0                  0                  0                  0                  0                  1                  1                  0                  0

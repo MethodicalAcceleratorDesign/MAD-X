@@ -48,7 +48,7 @@ for line in Lines:
 	#	onlyfiles[i] = [mypath + onlyfiles[i]]
 
 	for f in onlyfiles:
-		if(f.endswith('.ref') and f.startswith("test-")):
+		if(f.endswith('.ref')):
 			oname = f[:-4]
 			print(oname, f)
 			if(isfile(oname)):

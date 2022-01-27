@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:03:31      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:47:14      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
@@ -84,10 +84,10 @@ orbit:   6.815788E-10 -1.536905E-07 -1.075601E-20 -1.724984E-21 -2.156961E-03 -2
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    5.715269373e-17 
+                 0                  0                  0    2.007956874e-16 
 
        dqmin_phase 
-      -3.108823747 
+       2.338605231 
 Emit, DELTAP=0.0 ;
 
 enter EMIT module
@@ -253,10 +253,10 @@ orbit:   8.623892E-10 -1.527012E-07 -2.720436E-20  3.363084E-21 -2.156963E-03 -2
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    2.099834089e-16 
+                 0                  0                  0    1.657534224e-16 
 
        dqmin_phase 
-      -2.072290455 
+      0.3790454771 
 Emit, DELTAP=0.0 ;
 
 enter EMIT module
@@ -385,10 +385,10 @@ orbit:   6.815788E-10 -1.536905E-07 -1.075601E-20 -1.724984E-21 -2.156961E-03 -2
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.296083576e-16 
+                 0                  0                  0    3.866283594e-16 
 
        dqmin_phase 
-      -2.577157207 
+       -3.04230137 
 
 
 stop;

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:05:10      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 22:43:33      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009" ;
 
@@ -43,10 +43,10 @@ orbit:  -2.000002E-03 -6.829941E-10  3.774066E-11  1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    8.334552298e-10 
+                 0                  0                  0    7.142973632e-08 
 
        dqmin_phase 
-      -1.571990328 
+        1.84139616 
 Determined SECTOR NMUL MAX :  2
  MAD-X Beam Parameters
                   Energy : 0.450001E+03

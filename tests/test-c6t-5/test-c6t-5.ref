@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:04:16      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:48:02      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=120.;
 
@@ -118,10 +118,10 @@ orbit:   4.733614E-03  2.906454E-04  1.382562E-01 -7.404873E-03 -9.455828E-04  2
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    2.348843597e-08 
+                 0                  0                  0      3.2621048e-08 
 
        dqmin_phase 
-      -3.108631952 
+      -1.643084735 
 
 
 dphix = 0.15;
@@ -200,10 +200,10 @@ orbit:   4.733614E-03  2.906454E-04  1.382562E-01 -7.404873E-03 -9.455828E-04  2
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    3.838844897e-08 
+                 0                  0                  0    4.018958487e-10 
 
        dqmin_phase 
-       2.165907138 
+       3.073733918 
 betxLOC.BIM=table(twiss,markLOC.BIM,betx);betyLOC.BIM=table(twiss,markLOC.BIM,bety);
 
 alfxLOC.BIM=table(twiss,markLOC.BIM,alfx);alfyLOC.BIM=table(twiss,markLOC.BIM,alfy);
@@ -301,10 +301,10 @@ orbit:   2.907156E-03  1.362662E-04  9.678030E-02 -8.782200E-03 -7.344539E-04  1
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    3.217590969e-08 
+                 0                  0                  0    4.439824994e-09 
 
        dqmin_phase 
-      -1.863483717 
+       3.014430198 
 sixtrack, CAVALL;	
 
   ++++++++++++++++++++++++++++
