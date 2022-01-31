@@ -2521,7 +2521,8 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error, currpos)
          if (abs(f1001) .gt. eps) then
            deltas = currpos - prev_pos_s
            dqmin_rdt = dqmin_rdt + deltas * &
-           f1001*exp(-(cmplx(0d0,amuy)-cmplx(0d0,amux))+cmplx(0d0,delta_tune_dqmin*currpos/circ)) &
+           f1001*exp(-(cmplx(0d0,amuy)-cmplx(0d0,amux))+ &
+            cmplx(0d0,delta_tune_dqmin*currpos/circ)) &
            / (one + 4d0* abs(f1001)**2)
            dqmin_rdt_c = dqmin_rdt_c + 1
            prev_pos_s = currpos
