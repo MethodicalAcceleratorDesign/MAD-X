@@ -183,6 +183,14 @@ jobs:
       - name: Build MAD-X
         run: make all-win${{ matrix.bits }}-gnu STATIC=no
 
+      - name: Upload artifact executable
+        uses: actions/upload-artifact@v2
+        with:
+          name: madx-windows
+          path: |
+            build
+            madx-win64-gnu.exe
+
       - name: Run tests
         # Skip 32bit build - it's broken and mind-boggelingly slow (>>2h)!
         if: matrix.bits != 32
@@ -192,11 +200,6 @@ jobs:
           .github/utils/make_tests \
               tests-to-rm="test-plot test-match-10 test-read-write-hex" \
               ARCH=${{ matrix.bits }}
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: madx-windows
-          path: build/
 
       - name: Upload failed tests output for inspection
         # Keep the redundant condition (see above)!
