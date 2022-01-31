@@ -192,6 +192,11 @@ jobs:
           .github/utils/make_tests \
               tests-to-rm="test-plot test-match-10 test-read-write-hex" \
               ARCH=${{ matrix.bits }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: madx-windows
+          path: build/
 
       - name: Upload failed tests output for inspection
         # Keep the redundant condition (see above)!
