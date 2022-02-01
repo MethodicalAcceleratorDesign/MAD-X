@@ -216,6 +216,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   call comm_para(tol_a, nint, ndble, nchar, int_arr, maxaper, char_a, char_l)
   !hbu--- init info for tables initial s position is 0
   spos=0 ; nlm=0 ; el_name='start           '
+  mytracksumm_maxlines = get_option('sc_mytracksumm_maxlines ') ! hrr Jan 2022
+  !print *," Info: mytracksumm_maxlines=", mytracksumm_maxlines ! hrr Jan 2022
   mytracksumm_per_turns = get_option('sc_mytracksumm_per_turns ') ! hrr Sep 2021
   !print *," Info: mytracksumm_per_turns=", mytracksumm_per_turns ! hrr Sep 2021
    mytracksumm_turns= mytracksumm_turns + 1 ! hrr Sep 2021
