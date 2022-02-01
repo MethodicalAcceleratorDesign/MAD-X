@@ -181,7 +181,7 @@ jobs:
             mingw-w64-${{ matrix.arch }}-toolchain
 
       - name: Build MAD-X
-        run: make all-win${{ matrix.bits }}-gnu STATIC=no
+        run: make all-win${{ matrix.bits }}-gnu
 
       - name: Upload artifact executable
         uses: actions/upload-artifact@v2
