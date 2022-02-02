@@ -2520,7 +2520,9 @@ SUBROUTINE twcptk_twiss(matx, maty, R, error, currpos)
          
          if (abs(f1001) .gt. eps) then
            deltas = currpos - prev_pos_s
-           dqmin_rdt = dqmin_rdt + deltas * f1001*exp(-(cmplx(0d0,amuy)-cmplx(0d0,amux))+cmplx(0d0,delta_tune_dqmin*currpos)) &
+           dqmin_rdt = dqmin_rdt + deltas * &
+           f1001*exp(-(cmplx(0d0,amuy)-cmplx(0d0,amux))+ &
+            cmplx(0d0,delta_tune_dqmin*currpos/circ)) &
            / (one + 4d0* abs(f1001)**2)
            dqmin_rdt_c = dqmin_rdt_c + 1
            prev_pos_s = currpos
@@ -3589,7 +3591,7 @@ SUBROUTINE tw_summ(rt,tt)
   !                    'use chrom option or manual calculation')
   ! endif
   
-  dqmin2 = 4d0*abs((qx-floor(qx))-(qy-floor(qy)))*(abs(dqmin_rdt)/tot_int_length)
+  dqmin2 = 4d0*abs(delta_tune_dqmin/twopi)*(abs(dqmin_rdt)/tot_int_length)
   dqmin_ph = atan2(aimag(dqmin_rdt), real(dqmin_rdt))
   if(diff_bigger_sum/dqmin_rdt_c .gt. 0.1 .and. dqmin2 .ge. 1e-8) then
          write (warnstr, '(a, I0, a, I0, a)') "The f1010 is bigger than the f1001 in: ", int(diff_bigger_sum), &

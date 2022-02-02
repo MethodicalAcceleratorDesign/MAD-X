@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:03:15      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:46:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -75,10 +75,10 @@ orbit:  -5.000009E-04 -2.550922E-09 -4.453829E-12 -3.996772E-12  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    3.247190655e-11 
+                 0                  0                  0    2.412687196e-09 
 
        dqmin_phase 
-      -2.024390708 
+      0.9013140907 
 
 
 // Now a machine with the bumps as a target orbit 
@@ -133,10 +133,10 @@ orbit:  -5.000008E-04 -2.358324E-09  8.002250E-12  1.425000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    2.107802246e-08 
+                 0                  0                  0    9.717485254e-10 
 
        dqmin_phase 
-      -1.230567365 
+      0.3313954679 
 !plot,table=my_target1,title="Target orbit 1 x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,table=my_target1,title="Target orbit 1 y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
@@ -195,10 +195,10 @@ orbit:  -5.000008E-04 -2.426804E-09  1.748509E-12  1.425000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    2.158957038e-08 
+                 0                  0                  0    1.019256948e-09 
 
        dqmin_phase 
-      -1.248414708 
+      0.2939793082 
 !plot,table=my_target2,title="Target orbit 2 x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,table=my_target2,title="Target orbit 2 y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
@@ -273,10 +273,10 @@ orbit:  -3.439240E-04 -7.343209E-05  2.348868E-04  2.504445E-05  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0     0.001914674538 
+                 0                  0                  0    5.765135445e-05 
 
        dqmin_phase 
-      0.3378494084 
+       1.939141988 
 !plot,table=my_orbit,title="Uncorrected orbit x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,table=my_orbit,title="Uncorrected orbit y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
@@ -2090,10 +2090,10 @@ orbit:  -2.464538E-06 -6.064157E-06  1.416704E-06  1.815024E-06  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    0.0009799720687 
+                 0                  0                  0     7.14063352e-05 
 
        dqmin_phase 
-      -1.912729364 
+     -0.2927926408 
 !plot,title="Corrected orbit x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,title="Corrected orbit y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
@@ -3906,10 +3906,10 @@ orbit:  -4.984996E-04 -8.661850E-06  4.787576E-06  1.384923E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0     0.001006315971 
+                 0                  0                  0     7.54848259e-05 
 
        dqmin_phase 
-      -1.861858101 
+     -0.2572873712 
 !plot,title="Corrected orbit target 1 x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,title="Corrected orbit target 1 y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
@@ -5740,10 +5740,10 @@ orbit:  -5.007148E-04 -7.334842E-06  4.787692E-06  1.383023E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0     0.001000367419 
+                 0                  0                  0      7.5018411e-05 
 
        dqmin_phase 
-      -1.856322472 
+     -0.2563681292 
 !plot,title="Corrected orbit target 2 x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,title="Corrected orbit target 2 y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;

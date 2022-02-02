@@ -1,9 +1,9 @@
 @ NAME             %19s "TRACK.OBS0002.P0001"
 @ TYPE             %08s "TRACKOBS"
 @ TITLE            %16s "test elseparator"
-@ ORIGIN           %17s "5.06.01 Darwin 64"
-@ DATE             %08s "17/02/21"
-@ TIME             %08s "17.49.19"
+@ ORIGIN           %16s "5.08.00 Linux 64"
+@ DATE             %08s "27/01/22"
+@ TIME             %08s "20.45.52"
 *     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
 $         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
           1          1    2.774424774e-09     2.52220434e-09   -1.513322604e-09    -2.52220434e-09                  0                  0                  0                 10

@@ -1,9 +1,9 @@
 @ NAME             %10s "STR.IP8.B1"
 @ TYPE             %04s "USER"
 @ TITLE            %54s "Matching an insertion of the LHC 6.5 lattice with MADX"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "10/08/20"
-@ TIME             %08s "13.27.31"
+@ ORIGIN           %16s "5.08.00 Linux 64"
+@ DATE             %08s "27/01/22"
+@ TIME             %08s "20.48.08"
 *                  N           KQ4.L8B1           KQ5.L8B1           KQ6.L8B1           KQ7.L8B1           KQ8.L8B1           KQ9.L8B1          KQ10.L8B1        KQTL11.L8B1         KQT12.L8B1         KQT13.L8B1           KQ4.R8B1           KQ5.R8B1           KQ6.R8B1           KQ7.R8B1           KQ8.R8B1           KQ9.R8B1          KQ10.R8B1        KQTL11.R8B1         KQT12.R8B1         KQT13.R8B1           BETA.IP8                TAR 
 $                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
                   0    -0.004315244057      0.00528621334    -0.005102859816     0.008251679018    -0.005855276038     0.007071125846    -0.006393113968    0.0007073975665    -0.003086497382     0.003785429713     0.004397280237    -0.004213830349     0.004059143412    -0.006659808401     0.006925705812    -0.007461543814      0.00755572696    -0.004789656209    -0.001742098683    -0.003614375937                 10                  0

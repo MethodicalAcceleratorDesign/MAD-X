@@ -42,12 +42,12 @@
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le       0.06399508735
-@ DQMIN_PHASE      %le        -2.711085202
+@ DQMIN            %le      0.009011661153
+@ DQMIN_PHASE      %le         2.493671019
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "16.24.25"
+@ ORIGIN           %16s "5.08.00 Linux 64"
+@ DATE             %08s "27/01/22"
+@ TIME             %08s "20.46.54"
 * NAME                                S               BETX             BETA11               BETY             BETA22             BETA12             BETA21                MU1                MU2 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "T_INSERTION.A$START"                   0        1.110269702       0.5553009487         10.4888701        5.246004198       0.5548341895        5.244137453                  0                  0

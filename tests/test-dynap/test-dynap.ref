@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:03:37      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:47:20      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-info,-warn;
 
@@ -49,10 +49,10 @@ orbit:  -5.000000E-04 -1.042808E-15  6.691571E-15  1.425000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    1.991836501e-15 
+                 0                  0                  0    1.345825452e-13 
 
        dqmin_phase 
-       2.219712741 
+      -1.149985943 
 enter Twiss module
   
 iteration:   1 error:   8.560154E-04 deltap:   0.000000E+00
@@ -85,10 +85,10 @@ orbit:   5.000000E-04 -5.185248E-14 -8.988607E-15 -1.425000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.279208856e-13 
+                 0                  0                  0    3.989424543e-14 
 
        dqmin_phase 
-      -3.100790196 
+      -2.073669114 
 assign,echo="temp.bb.install",truncate;
 
 
@@ -975,10 +975,10 @@ orbit:  -5.264405E-13  2.081183E-15 -8.137851E-13  9.047770E-15  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0      4.0817147e-13 
+                 0                  0                  0    3.040369735e-14 
 
        dqmin_phase 
-     0.03434887712 
+        1.98631543 
 !--- separation for halo collisions at IP2
 
 on_sep2 = 2.118 * sqrt(epsx * r2ip2->betx) / 0.0007999979093;
