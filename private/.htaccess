@@ -1,3 +1,25 @@
+# *** This htaccess file has been modified automatically ***
+# Due to the end-of-life of SLC6 and Apache 2.2, web sites get migrated to new web servers running
+# CC7 and Apache 2.4. There are incompatible differences in the web site configuration between these two versions.
+# This htaccess file contained such incompatibilities. Therefore it has been modified in a way that works on both
+# old and new infrastructures during the transition period (Nov/Dec 2020).
+
+<IfVersion >= 2.3>
+# This section contains the Apache configuration directives used for Apache 2.4 / CC7
+SSLRequireSSL # The modules only work using HTTPS
+AuthType shibboleth
+ShibRequireSession On
+
+ShibExportAssertion Off
+
+Require shib-attr ADFS_GROUP "mad-sup"
+
+</IfVersion>
+
+<IfVersion < 2.3>
+# This section contains the Apache configuration directives used in the legacy infrastructure running
+# Apache 2.2 on SLC6. It can be removed after mid-December 2020. 
+
 SSLRequireSSL # The modules only work using HTTPS
 AuthType shibboleth
 ShibRequireSession On
@@ -6,3 +28,5 @@ ShibExportAssertion Off
 
 Require valid-user
 Require ADFS_GROUP "mad-sup"
+
+</IfVersion>
