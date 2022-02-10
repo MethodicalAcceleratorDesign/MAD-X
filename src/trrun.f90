@@ -1185,8 +1185,8 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
      !----------- introduction of dipole focusing
      if (elrad.gt.zero .and. thin_foc) then
         !!! terms should scale with h_c k0 therefore (dipr-dbr) dipr
-        DXT(:ktrack) = dipr*dipr*TRACK(1,:ktrack)/elrad
-        DYT(:ktrack) = dipi*dipi*TRACK(3,:ktrack)/elrad
+        DXT(:ktrack) = (dipr-dbr)*dipr*TRACK(1,:ktrack)/elrad
+        DYT(:ktrack) = (dipi-dbi)*dipi*TRACK(3,:ktrack)/elrad
      endif
   !---- Accumulate multipole kick from highest multipole to quadrupole.
   else
@@ -1203,8 +1203,8 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
      enddo
      if (elrad.gt.zero .and. thin_foc) then
         !!! terms should scale with h_c k0 therefore (dipr-dbr) dipr
-        DXT(:ktrack) = DXT(:ktrack) + dipr*dipr*TRACK(1,:ktrack)/elrad
-        DYT(:ktrack) = DYT(:ktrack) + dipi*dipi*TRACK(3,:ktrack)/elrad
+        DXT(:ktrack) = DXT(:ktrack) + (dipr-dbr)*dipr*TRACK(1,:ktrack)/elrad
+        DYT(:ktrack) = DYT(:ktrack) + (dipi-dbi)*dipi*TRACK(3,:ktrack)/elrad
      endif
   endif
 
