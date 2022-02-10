@@ -44,6 +44,7 @@ module madx_ptc_twiss_module
      real(dp), dimension(6)   ::  disp_p3 ! third order derivatives of dispersion w.r.t delta_p
      real(dp), dimension(3)   ::  tune
      real(dp), dimension(6,6) ::  eigen
+     real(dp), dimension(3,7) ::  n_spin
   end type twiss
 
   interface assignment (=)
@@ -115,7 +116,7 @@ module madx_ptc_twiss_module
 
   character(48)           :: nl_table_name='nonlin'
   character(48)           :: rdt_table_name='twissrdt'
-
+  character(48)           :: spin_table_name='twiss_spin'
   !============================================================================================
   !  variables for spin treatment in equaltwiss subroutine
   type(c_damap)           :: tw_SpinUmap, tw_SpinUmapCanonic, tw_D, tw_A, tw_R, tw_f,  tw_b
@@ -425,7 +426,9 @@ contains
       write(6,format7) latticefun%s(3,1,0:6)
       write(6,format7) latticefun%s(3,2,0:6)
       write(6,format7) latticefun%s(3,3,0:6)
-      
+      s1%n_spin(1,1:7) = latticefun%s(2,1,0:6)
+      s1%n_spin(2,1:7) = latticefun%s(2,2,0:6)
+      s1%n_spin(3,1:7) = latticefun%s(2,3,0:6)
       theAscriptProbe8 = theAscriptProbeBak + tw_SpinUmapCanonic
       
     else
@@ -1284,6 +1287,7 @@ contains
             suml = s;
 
             call puttwisstable(theTransferMap%x)
+            if(dospin) call putspintable()
             if(doRDTtracking)   call putrdttable(current)
             if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
@@ -1307,6 +1311,7 @@ contains
           endif
 
           call puttwisstable(theTransferMap%x)
+          if (dospin) call putspintable()
           if(doRDTtracking)   call putrdttable(current)
           if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
@@ -1398,7 +1403,7 @@ contains
         endif
 
         !print*,"Skowron 6 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
-
+        if(dospin) call putspintable()
         if(doRDTtracking)   call putrdttable(current)
         if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x,A_script_probe%x)
 
@@ -1813,6 +1818,20 @@ contains
     end function getdeltae
     !____________________________________________________________________________________________
 
+    subroutine putspintable()
+        implicit none
+        real(dp) :: tmp_vector(6)
+        call string_to_table_curr(spin_table_name,"name ","name ")
+        call double_to_table_curr(spin_table_name, 's ', suml)
+        call double_to_table_curr(spin_table_name, 'n0x ', tw%n_spin(1,1))
+        call double_to_table_curr(spin_table_name, 'n0y ', tw%n_spin(2,1))
+        call double_to_table_curr(spin_table_name, 'n0z ', tw%n_spin(3,1))
+        call vector_to_table_curr(spin_table_name, 'n0xdx ',tw%n_spin(1,2:7), 6)
+        call vector_to_table_curr(spin_table_name, 'n0ydx ',tw%n_spin(2,2:7), 6)
+        call vector_to_table_curr(spin_table_name, 'n0zdx ',tw%n_spin(3,2:7), 6)
+        call augment_count(spin_table_name)
+
+    end subroutine
     subroutine puttwisstable(transfermap,transfermapSaved)
       implicit none
       include "madx_ptc_knobs.inc"

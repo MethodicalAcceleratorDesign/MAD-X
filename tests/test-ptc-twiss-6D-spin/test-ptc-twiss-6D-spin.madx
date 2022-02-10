@@ -36,7 +36,7 @@ ptc_create_universe;
   
   write, table=ptc_twiss, file="ALS.6D.ptc.twiss";
   write, table=ptc_twiss_summary, file="ALS.6D.ptc.summ.twiss";
-  
+  write, table=twiss_spin, file="spinTable.out";
 ptc_end;
 
 
