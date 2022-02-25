@@ -25,6 +25,10 @@ numdiff-*-*
 numdiff32
 numdiff64
 
+# Cmake
+CMakeCache.txt
+
+
 # Coverage
 *.gcda
 *.gcno
@@ -148,3 +152,5 @@ tests/test-twiss-10/twiss2
 tests/test-twiss-11/dec17i.lis
 tests/test-twiss-13/twiss.tsf
 tests/test-twiss-2/my_sect_file
+
+
