@@ -87,6 +87,7 @@ latexml uguide.tex --includestyles | latexmlpost --dest=$OPHYS/manual_temp.html 
 #$CURR/cleanupHTML.py $OPHYS
 #rm -v $OPHYS/*.html
 #echo "<?php header('Location: manual.php'); ?>" > $OPHYS/index.php
+cd ..
 ./postHtmlCreation.sh
 
 echo ""
