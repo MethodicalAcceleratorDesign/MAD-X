@@ -106,12 +106,12 @@ track_run(struct in_cmd* cmd)
   if (get_option("info")) print_table(t);
   if (get_option("track_dump")) track_tables_dump();
 
-/* Use only mytracksumm hrr Sep 2021
+/* Use also tracksumm hrr Feb 2022
+*/
   // summary
   t = find_table("tracksumm");
   if (get_option("info")) print_table(t);
   if (get_option("track_dump")) track_tables_dump();
-*/
   probe_beam = delete_command(probe_beam); // LD: added 2016.02.17
 
   /* free buffers */
@@ -379,16 +379,15 @@ track_tables_create(struct in_cmd* cmd)
   t_size = turns / ffile + 10;
 
   if (table_exists("mytracksumm")) {
-/*  hrr Sep 2021 table mytracksumm is not cleaned so pre-existence printf is not needed. 
-      printf("Table mytracksumm does exist already\n"); hrr Sep 2021 */
+/*  hrr Sep 2021 table mytracksumm is not cleaned so pre-existence printf is not needed.
+      printf("Table mytracksumm does exist already\n"); */
   }
   else {
     t = make_table("mytracksumm", "mytracksumm", mytracksumm_table_cols,
                    mytracksumm_table_types, 2*stored_track_start->curr);
     add_to_table_list(t, table_register);
   }
-/* only use mytracksumm and mytrackloss hrr Sep 2021 */
-/*
+/* also use tracksumm and trackloss hrr Feb 2022 */
   if (table_exists("tracksumm")) {
     printf("Table tracksumm does exist already\n");
   }
@@ -408,12 +407,11 @@ track_tables_create(struct in_cmd* cmd)
       add_to_table_list(t, table_register);
     }
   }
-*/
+/*  hrr Sep 2021 table mytrackloss is not cleaned so pre-existence printf is not needed.
+      printf("Table trackloss does exist already\n"); */
   if (get_option("recloss"))
   {
     if (table_exists("mytrackloss")) {
-/*  hrr Sep 2021 table mytracksumm is not cleaned so pre-existence printf is not needed. 
-      printf("Table trackloss does exist already\n"); */
     }
     else {
       t = make_table("mytrackloss", "mytrackloss", mytrackloss_table_cols,
@@ -452,16 +450,16 @@ track_tables_delete(void)
 {
   int j;
   /*
-  tracksumm replaced by permanent mytracksumm hrr April 2020
-  exec_delete_table("tracksumm");
+  tracksumm added to by permanent mytracksumm hrr Feb 2022
   */
+  exec_delete_table("tracksumm");
   for (j = table_register->names->curr - 1; j >= 0; j--)
   {
 
     if (   strstr(table_register->names->names[j], "track.obs")
-        || (strcmp(table_register->names->names[j], "trackone") == 0)) /* hrr Sep 2021 */
-/*  trackloss replaced by mytrackloss hrr Sep 2021
+        || (strcmp(table_register->names->names[j], "trackone") == 0) 
         || (strcmp(table_register->names->names[j], "trackloss") == 0))
+/*  trackloss added to by permanent mytrackloss table hrr Feb 2022
 */
     {
 

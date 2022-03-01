@@ -352,7 +352,7 @@ module SpaceCharge
 
   implicit none
   !!private
-  public ! hrr debug
+  public ! hrr Sep 2021
 
   logical :: bb_sxy_update, virgin_state, emittance_update
   logical :: checkpnt_restart, exit_loss_turn
@@ -367,8 +367,6 @@ module SpaceCharge
   double precision, save :: betx_start=1d0, bety_start=1d0
   double precision, save :: alfx_start=0d0, alfy_start=0d0
   double precision, save :: gamx_start=0d0, gamy_start=0d0
-! double precision, save :: dx_start=0d0,   dpx_start=0d0  !hrr debug
-! double precision, save :: dy_start=0d0,   dpy_start=0d0  !hrr debug
 
   !VVK 20100321 -------------------------------------------------
   integer :: i_part                     ! local counter
@@ -384,8 +382,8 @@ end module SpaceCharge
 
 module SpaceCharge2
 
-  double precision, save :: dx_start=0d0,   dpx_start=0d0 !hrr debug
-  double precision, save :: dy_start=0d0,   dpy_start=0d0 !hrr debug
+  double precision, save :: dx_start=0d0,   dpx_start=0d0 !hrr Sep 2021
+  double precision, save :: dy_start=0d0,   dpy_start=0d0 !hrr Sep 2021
 
 end module SpaceCharge2
 

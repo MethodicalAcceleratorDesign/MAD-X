@@ -15,7 +15,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   use code_constfi
   use SpaceCharge
   use track_enums
-  use SCdat, only: mytracksumm_maxlineso
+
+    use SCdat, only: mytracksumm_maxlineso
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -59,7 +60,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   integer :: n_align, nlm, j_tot, turn, nobs, lobs
   integer :: nint, ndble, nchar, char_l, tot_segm, int_arr(1)
   
-  double precision :: orbit(6), el, re(6,6), deltap, sum, spos
+  double precision :: tmp_d,orbit(6), el, re(6,6), deltap, sum, spos
   double precision :: al_errors(align_max), zz(6), maxaper(6), obs_orb(6)
     
   character(len=12) :: tol_a='maxaper ', char_a=' '
@@ -158,8 +159,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   if (mod(turns, ffile) .ne. 0) tot_segm = tot_segm + 1
 
   if (first) then
+! checkpoint_restart file existence check is in SC_Init !hrr Feb 2022
      if (checkpnt_restart) then
-! add pre-existence test later. hrr Sep 2021
         read(unit_chpt,END=100) jmax
         read(unit_chpt,END=100) Ex_rms0
         read(unit_chpt,END=100) Ey_rms0
@@ -217,21 +218,23 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !hbu--- init info for tables initial s position is 0
   spos=0 ; nlm=0 ; el_name='start           '
   mytracksumm_maxlines = get_option('sc_mytracksumm_maxlines ') ! hrr Jan 2022
-  !print *," Info: mytracksumm_maxlines=", mytracksumm_maxlines ! hrr Jan 2022
   mytracksumm_per_turns = get_option('sc_mytracksumm_per_turns ') ! hrr Sep 2021
-  !print *," Info: mytracksumm_per_turns=", mytracksumm_per_turns ! hrr Sep 2021
-   mytracksumm_turns= mytracksumm_turns + 1 ! hrr Sep 2021
-   if (mytracksumm_turns.ge.mytracksumm_per_turns) mytracksumm_turns= 0 ! hrr Sep 2021
-   mytracksumm_start_particle = get_option('sc_mytracksumm_start_particle ') ! hrr Sep 2021
-   if(mytracksumm_start_particle.lt.1.or.mytracksumm_start_particle.gt.jmax)then !hrr Sep 2021
-   mytracksumm_start_particle= 1 ! Sep 2021
-   endif ! hrr Sep 2021
-   mytracksumm_end_particle = get_option('sc_mytracksumm_end_particle ') ! hrr Sep 2021
-   if(mytracksumm_end_particle.lt.1.or.mytracksumm_end_particle.gt.jmax) then ! hrr Sep 2021
-   mytracksumm_end_particle= jmax ! hrr Sep 2021
-   endif ! hrr Sep 2021
-   !print *," Info: mytracksumm_start/end_particle=", &
-   !mytracksumm_start_particle,mytracksumm_end_particle      ! hrr Sep 2021
+  mytracksumm_turns= mytracksumm_turns + 1 ! hrr Sep 2021
+  if (mytracksumm_turns.ge.mytracksumm_per_turns) mytracksumm_turns= 0 ! hrr Sep 2021
+  mytracksumm_start_particle = get_option('sc_mytracksumm_start_particle ') ! hrr Sep 2021
+  if(mytracksumm_start_particle.lt.1.or.mytracksumm_start_particle.gt.jmax)then !hrr Sep 2021
+     mytracksumm_start_particle= 1 ! Sep 2021
+  endif ! hrr Sep 2021
+  mytracksumm_end_particle = get_option('sc_mytracksumm_end_particle ') ! hrr Sep 2021
+  if(mytracksumm_end_particle.lt.1.or.mytracksumm_end_particle.gt.jmax) then ! hrr Sep 2021
+     mytracksumm_end_particle= jmax ! hrr Sep 2021
+  endif ! hrr Sep 2021
+  if (get_option('info ') .ne. 0) then ! hrr Feb 2022
+  print *," Info: mytracksumm_maxlines=", mytracksumm_maxlines ! hrr Jan 2022
+  print *," Info: mytracksumm_per_turns=", mytracksumm_per_turns ! hrr Sep 2021
+  print *," Info: mytracksumm_start/end_particle=", &
+  mytracksumm_start_particle,mytracksumm_end_particle      ! hrr Sep 2021
+  endif
 
   if (first) then
      !--- enter start coordinates in summary table
@@ -253,7 +256,24 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            write(text, '(1p,d13.5,a1,i6)') pt_max,"p",i
            call fort_fail('TRACK_INITIAL: ','Fatal: PT-Coordinate larger than' // text)
         endif
-        enddo ! hrr Sep 2021 apply mytracksumm_start and end particles also to turn 0
+      enddo 
+
+     ! hrr Sep 2021 apply tracksumm start and end particles also to turn 0
+
+     do  i = 1,j_tot
+         tmp_d = i
+         call double_to_table_curr('tracksumm ', 'number ', tmp_d)
+         tmp_d = tot_turn
+         call double_to_table_curr('tracksumm ', 'turn ', tmp_d) 
+       do j = 1, 6
+            tmp_d = z(j,i) - orbit0(j)
+            call double_to_table_curr('tracksumm ', vec_names(j), tmp_d)
+         enddo
+         !hbu add s
+         call double_to_table_curr('tracksumm ',vec_names(7),spos) 
+         call augment_count('tracksumm ')
+      enddo
+
      do  i = mytracksumm_start_particle,mytracksumm_end_particle ! hrr Sep 2021
         call double_to_table_curr('mytracksumm ', 'number ', dble(i)) ! hrr Sep 2021
         call double_to_table_curr('mytracksumm ', 'turn ', dble(tot_turn)) ! hrr Sep 2021
@@ -500,17 +520,18 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   call BB_Write(jmax, orbit0, z);
   
   !--- enter last turn in summary table. 
-  ! Change from tracksumm, recreated each RUN call to permanent mytracksumm. ! hrr Sep 2021
-!  do  i = 1, j_tot
-!     call double_to_table_curr('tracksumm ', 'number ', dble(i))
-!     call double_to_table_curr('tracksumm ', 'turn ', dble(last_turn(i)))
-!     do j = 1, 6
-!        call double_to_table_curr('tracksumm ', vec_names(j), last_orbit(j,i) - orbit0(j))
-!     enddo
-!     spos = last_pos(i)
-!     call double_to_table_curr('tracksumm ',vec_names(7),spos)
-!     call augment_count('tracksumm ')
-!  enddo
+  ! Add as well as tracksumm recreated each RUN call new permanent table mytracksumm. ! hrr Feb 2022
+    do  i = 1, j_tot
+!   change index i to part_id(i) in this loop hrr Feb 2022
+     call double_to_table_curr('tracksumm ', 'number ', dble(part_id(i)))
+     call double_to_table_curr('tracksumm ', 'turn ', dble(last_turn(part_id(i))))
+     do j = 1, 6
+        call double_to_table_curr('tracksumm ', vec_names(j), last_orbit(j,part_id(i)) - orbit0(j))
+     enddo
+     spos = last_pos(part_id(i))
+     call double_to_table_curr('tracksumm ',vec_names(7),spos)
+     call augment_count('tracksumm ')
+  enddo
 
 !--- Enter last turn in summary table - mytracksumm is kept between trrun calls. hrr Sep 2021
 ! For the event of a lost particle in trkill must use part_id(i) not i and i=1,jmax. hrr Sep 2021
@@ -662,13 +683,10 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   endif
 
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
-  !     print *, "apint", apint, "ap_notset", ap_notset
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
     
      apint=node_apertype()
-     if(apint.eq.9) apint= 0 !hrr Sep 2021
-
      if(apint .eq. ap_notset) then
     ! make global check even if aperture is not defined
     lost_global =.false.
@@ -2759,7 +2777,8 @@ subroutine tt_ploss(npart,turn,spos,orbit,el_name)
 
   integer :: j
   double precision :: tmp, tt, tn, energy
-  character(len=120) :: table='mytrackloss' !hrr Sep 2021
+  character(len=120) :: mytable='mytrackloss' !hrr Feb 2022
+  character(len=120) :: table='trackloss' !hrr Feb 2022
   character(len=4) :: vec_names(7)
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt', 's' /
 
@@ -2772,20 +2791,27 @@ subroutine tt_ploss(npart,turn,spos,orbit,el_name)
 
   ! the number of the current particle
   call double_to_table_curr(table, 'number ', tn)
+  call double_to_table_curr(mytable, 'number ', tn)
   ! the number of the current turn
   call double_to_table_curr(table, 'turn ', tt)
+  call double_to_table_curr(mytable, 'turn ', tt)
 
   call double_to_table_curr(table,vec_names(7),spos)
+  call double_to_table_curr(mytable,vec_names(7),spos)
 
   do j = 1, 6
      tmp = orbit(j)
      call double_to_table_curr(table, vec_names(j), tmp)
+     call double_to_table_curr(mytable, vec_names(j), tmp)
   enddo
 
   call double_to_table_curr(table, 'e ', energy)
   call string_to_table_curr(table, 'element ', el_name//char(0)) !hrr Sep 2021 fortran to c needs null string
+  call double_to_table_curr(mytable, 'e ', energy)
+  call string_to_table_curr(mytable, 'element ', el_name//char(0)) !hrr Sep 2021 fortran to c needs null string
 
   call augment_count(table)
+  call augment_count(mytable)
 end subroutine tt_ploss
 
 subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
