@@ -926,7 +926,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
            write(tapout,'(a,t15,a,e20.12,a)') trim(el_name),", KTAP = ",node_value('ktap ')," ;"
         endif
         
-     case (code_quadrupole, code_sextupole)
+     case (code_quadrupole, code_sextupole, code_octupole, code_multipole)
         dpt = orbit(6)/beta
         if (iterate .ge. 1) then ! loop is only one pass
            ORBITTAP = ORBIT 

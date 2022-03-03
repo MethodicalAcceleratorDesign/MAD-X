@@ -431,7 +431,7 @@ sextupole is a Cartesian coordinate system.
 \label{sec:octupole}
 
 \madbox{
-label: OCTUPOLE, L=real, K3=real, K3S=real, TILT=real;
+label: OCTUPOLE, L=real, K3=real, K3S=real, TILT=real. KTAP=real;
 }
 
 An \texttt{OCTUPOLE} has four real attributes:
@@ -465,6 +465,13 @@ An \texttt{OCTUPOLE} has four real attributes:
        needed to avoid the confusion in \madeight about the actual meaning of
        the TILT attribute for various elements. }
 
+    \ttitem{KTAP} The relative change of the sextupole strengths (both
+     \texttt{K3} and \texttt{K3S}) to account for energy change of the 
+     reference particle due to RF cavities or synchrotron radiation. The
+     actual strength of the sextupole is calculated as
+     \texttt{K3act = K3 * (1 + KTAP)}.
+     See the \texttt{TAPER} command.\ref{chap:taper}. (Default:~0) 
+
 \end{madlist}
 
 \textbf{Note also that $K_3$ or $K_{3S}$ can be considered as the normal or
@@ -494,7 +501,7 @@ dipole component.
 
 \madbox{
 label: MULTIPOLE, \= LRAD=real, TILT=real, \\
-                  \> KNL=\{real, \ldots \}, KSL=\{real, \ldots \};
+                  \> KNL=\{real, \ldots \}, KSL=\{real, \ldots \}, KTAP=real;
 }
 
 The deflection imparted by a
@@ -536,7 +543,15 @@ They are both expressed in $[\mathrm{m}^{-n}]$.
 %     Hence the first argument of the array, the argument for a skew
 %     multipole of order zero, $K_0 L = B_0 . L / (B\rho)$ is equal to
 %    the skew or vertical rotation angle of the thin dipole.
+     
+    \ttitem{KTAP} The relative change of the multipole strengths (both
+     \texttt{KNL} and \texttt{KSL}) to account for energy change of the 
+     reference particle due to RF cavities or synchrotron radiation. The
+     actual strength of the multipole component is calculated as
+     \texttt{Kact = K * (1 + KTAP)}. See the \texttt{TAPER}
+     command.\ref{chap:taper}. (Default:~0) 
 
+     
 \end{madlist}
 
 Both \texttt{KNL} and \texttt{KSL} may be specified for the same multipole.

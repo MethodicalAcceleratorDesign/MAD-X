@@ -491,17 +491,17 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         sksol = zero
         select case (code)
         case (code_quadrupole)  !---- Quadrupole
-           sk1 = bvk * node_value('k1 ') * (1 + node_value('ktap '))
+           sk1 = bvk * node_value('k1 ') * (1 + node_value('ktap ')) ! tapering
            str  = sk1
            n    = 1
            twon = two
         case (code_sextupole)   !---- Sextupole
-           sk2 = bvk * node_value('k2 ') * (1 + node_value('ktap '))
+           sk2 = bvk * node_value('k2 ') * (1 + node_value('ktap ')) ! tapering
            str  = sk2 / two
            n    = 2
            twon = four
         case (code_octupole)   !---- Octupole
-           sk3 = bvk * node_value('k3 ')
+           sk3 = bvk * node_value('k3 ') * (1 + node_value('ktap ')) ! tapering
            str  = sk3 / six
            n    = 3
            twon = six
@@ -620,8 +620,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         !---- Other components and errors.
         nord = 0
         do i = 0, max(nn, ns, n_ferr/2-1)
-           f_errors(2*i)   = bvk * (normal(i) + f_errors(2*i))   / (one + deltap)
-           f_errors(2*i+1) = bvk * (skew(i)   + f_errors(2*i+1)) / (one + deltap)
+           f_errors(2*i)   = bvk * (normal(i) * (1 + ktap) + f_errors(2*i))   / (one + deltap) ! tapering
+           f_errors(2*i+1) = bvk * (skew(i)   * (1 + ktap) + f_errors(2*i+1)) / (one + deltap) ! tapering
            ! get the maximum effective order; loop runs over maximum of user given values
            if (f_errors(2*i) .ne. zero .or. f_errors(2*i+1) .ne. zero)  nord = i
         enddo

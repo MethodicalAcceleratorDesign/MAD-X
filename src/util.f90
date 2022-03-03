@@ -172,7 +172,8 @@ module track_enums
   integer, parameter :: enum_cvkick = 9
   integer, parameter :: enum_hkick = 10 
   integer, parameter :: enum_vkick = 11  
-  integer, parameter :: total_enums = 11
+  integer, parameter :: enum_ktap = 12
+  integer, parameter :: total_enums = 12
 end module track_enums
 
 module Inf_NaN_Detection
@@ -451,9 +452,9 @@ module twiss_elpfi
   !-sext
   integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9, s_ktap=10, s_max=10
   !-oct
-  integer, parameter :: o_tilt=7, o_k3=8, o_k3s=9, o_max=9
+  integer, parameter :: o_tilt=7, o_k3=8, o_k3s=9, 0_ktap=10, o_max=10
   !-mult
-  integer, parameter :: m_tilt=7, m_lrad=8, m_max=8
+  integer, parameter :: m_tilt=7, m_lrad=8, m_ktap=9, m_max=9
   !-sol
   integer, parameter :: so_lrad=7, so_ks=8, so_ksi=9, so_max=9
   !-rfc
