@@ -912,7 +912,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   logical :: fsec, ftrk, fmap
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
   integer, external :: Factorial
-  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0, ktap
   double precision :: dtmp, an, angle, tilt2, etahat
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -1060,7 +1060,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   logical ::  time_var,thin_foc
   integer :: iord, jtrk, nd, nord, i, j, n_ferr, nn, ns, noisemax, nn1, in, mylen
   integer :: nnt, nst
-  double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad
+  double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad, ktap
   double precision :: pt, px, py, rfac, x
   double precision :: f_errors(0:maxferr)
   double precision :: field(2,0:maxmul)

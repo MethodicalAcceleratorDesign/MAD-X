@@ -554,7 +554,6 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   integer, parameter :: itmax=20
 
   logical :: taperoutsave
-  ! double precision :: stepsizesave
   
   deltap = get_value('probe ','deltap ')
 
@@ -572,9 +571,6 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
   !---- Need tapering output on last iteration only
   taperoutsave = taperout
   taperout = .false.
-  !---- use the stepsize on last iteration also
-  ! stepsizesave = stepsize
-  ! stepsize = zero
   
   !---- Iteration for closed orbit.
   iterate: do itra = 1, itmax
@@ -628,7 +624,6 @@ SUBROUTINE tmclor(guess,fsec,ftrk, eig_tol, opt_fun0,rt,tt,eflag)
      if (err.lt.cotol) then
         save_opt = get_option('keeporbit ')
         taperout = taperoutsave  ! restore output flag for tapering
-        ! stepsize = stepsizesave  ! restore stepsize 
         call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,ithr_on)
         OPT_FUN0(9:14) = ORBIT0(1:6)
         GUESS = ORBIT0
@@ -723,7 +718,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use twisscfi
   use spch_bbfi
   use matrices, only : EYE, symp_thrd  ! , symp_thrd_orbit
-  use math_constfi, only : zero, one, two
+  use math_constfi, only : zero, one, two, half
   use code_constfi
   use taperfi
   use io_units
@@ -771,7 +766,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   integer, parameter :: max_rep=100
 
   double precision :: dpt ! for tapering
-  integer :: step_prev
+  integer :: nsteps
   
   debug = get_option('debug ')
   radiate = get_value('probe ','radiate ') .ne. zero
@@ -810,12 +805,13 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   i_spch = 0 !!!!!!!!!!
 
   ! initialise first tapering value to initial momentum offset
-  step_prev = int((orbit0(6)/beta)/stepsize)
+  nsteps = 0
+  if (stepsize .ne. zero) nsteps = int((orbit0(6)/beta)/stepsize + sign(half,orbit0(6)/beta))
 
   !---- Initiate the tapering output for command TAPER with RELATIVE option
   if (taperflag .and. (stepsize .ne. zero)) then
      print '(''initial orbit vector: '', 1p,6e14.6)', orbit
-     print '(''first taper value: '',1p,e14.6,1p,'' nsteps: '',1p,i8)', step_prev*stepsize, step_prev
+     print '(''first taper value: '',1p,e14.6,1p,'' nsteps: '',1p,i8)', nsteps*stepsize, nsteps
      print '('' '')' 
   endif
   
@@ -913,14 +909,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         enddo
         
         if (stepsize .ne. zero) then
-           ! count and add # of steps of size stepsize means adding integers which is more precise
-           ! than adding # of steps * stepsize which means adding small real values
-           step_prev = step_prev + int((dpt/stepsize-step_prev)*two)
-           call store_node_value('ktap ', step_prev*stepsize)
+           nsteps = int(dpt/stepsize + sign(half,dpt))
+           call store_node_value('ktap ', nsteps*stepsize)
         else 
            call store_node_value('ktap ', dpt)
         endif
-        
+       
         if (taperout) then
            call element_name(el_name,len(el_name))
            write(tapout,'(a,t15,a,e20.12,a)') trim(el_name),", KTAP = ",node_value('ktap ')," ;"
@@ -936,12 +930,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         endif
         
         if (stepsize .ne. zero) then
-           step_prev = step_prev + int((dpt/stepsize-step_prev)*two)
-           call store_node_value('ktap ', step_prev*stepsize)
+           nsteps = int(dpt/stepsize + sign(half,dpt))
+           call store_node_value('ktap ', nsteps*stepsize)
         else
            call store_node_value('ktap ', dpt)
         endif
-        
+
         if (taperout) then
            call element_name(el_name,len(el_name))
            write(tapout,'(a,t15,a,e20.12,a)') trim(el_name),", KTAP = ",node_value('ktap ')," ;"
@@ -1103,7 +1097,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   !---- Finish the tapering output for command TAPER with stepwise option
   if (taperflag .and. (stepsize .ne. zero)) then
      print '(''final orbit vector:     '', 1p,6e14.6)', orbit
-     print '(''last taper value:  '',1p,e14.6,1p,'' nsteps: '',1p,i8)', step_prev*stepsize, step_prev
+     print '(''last taper value:  '',1p,e14.6,1p,'' nsteps: '',1p,i8)', nsteps*stepsize, nsteps
   endif
   
 end SUBROUTINE tmfrst
@@ -5296,7 +5290,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   integer :: n_ferr, nord, iord, j, nd, nn, ns
   double precision :: f_errors(0:maxferr)
   double precision :: normal(0:maxmul), skew(0:maxmul)
-  double precision :: bi, pt, rfac, bvk, elrad, tilt, angle, an, anr, ani
+  double precision :: bi, pt, rfac, bvk, elrad, tilt, angle, an, anr, ani, ktap
   double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp
 
   integer, external :: get_option, node_fd_errors
@@ -5322,7 +5316,12 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   NORMAL = zero ; call get_node_vector('knl ',nn,normal)
   SKEW   = zero ; call get_node_vector('ksl ',ns,skew)
   tilt = node_value('tilt ')
+  ktap = node_value('ktap ')
 
+  !--- Apply tapering globally
+  NORMAL = NORMAL * (one + ktap)
+  SKEW = SKEW * (one + ktap)
+  
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !---- Angle (bvk applied later)
@@ -5570,8 +5569,8 @@ SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   n_ferr = node_fd_errors(f_errors)
 
   !---- Set up octupole strength.
-  sk3  = bvk * ( g_elpar(o_k3)  + f_errors(6)/el)
-  sk3s = bvk * ( g_elpar(o_k3s) + f_errors(7)/el)
+  sk3  = bvk * ( g_elpar(o_k3)  * (one + g_elpar(o_ktap)) + f_errors(6)/el)
+  sk3s = bvk * ( g_elpar(o_k3s) * (one + g_elpar(o_ktap)) + f_errors(7)/el)
   tilt4 = -four * node_value('tilt ')
 
   if (sk3s.ne.zero) then
@@ -5647,7 +5646,7 @@ SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   orbit(2) = orbit(2) - cr / two
   orbit(4) = orbit(4) + ci / two
 
-  !---- Half radiation effects.
+  !---- Half radiation effects at exit.
   if (radiate) then
      rfac = arad * gamma**3 * (cr**2 + ci**2) / (three * el)
      pt = orbit(6)

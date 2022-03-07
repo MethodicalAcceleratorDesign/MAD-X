@@ -1,0 +1,20 @@
+! Install short and inactive elements of type octupoles and multipoles
+! in order to test the tapering commands applied to these elements
+!
+! 2022-03-03  Ghislain Roy
+!
+
+OCT1: OCTUPOLE, L=0.1, K3=0;
+OCT2: OCTUPOLE, L=0.1, K3=0;
+
+MULT1: MULTIPOLE;
+MULT2: MULTIPOLE;
+
+Seqedit, SEQUENCE=FCC_E_RING;
+  Install, Element=OCT1,  AT=1.9, FROM=QRFR1.1 ;
+  Install, Element=MULT1, AT=2.0, FROM=QRFR1.1 ;
+  Install, Element=OCT2,  AT=26+0.2, FROM=BSEP.1 ;
+  Install, Element=MULT2, AT=26+0.4, FROM=BSEP.1 ;
+Endedit;
+
+Return;

@@ -2,9 +2,10 @@
 !
 ! 2021-08-13 Ghislain Roy
 
-Option, -echo;
+Option, -echo, -info;
 Call, file="FCCee_t_241_nosol_3.seq"; ! This sequence contains active RF cavities
-Option, echo;
+Call, file="installelements.madx";    ! This further installs octupoles and mutipoles
+Option, echo, info;
 
 Set, format="-20s","23.17g";
 
@@ -38,7 +39,7 @@ Taper;
 Twiss, deltap=1.e-3, save, file="taper_dp.tfs";
 
 ! relative tapering
-Taper, stepsize=1.e-3, file="test2.madx";
+Taper, stepsize=7.e-4, file="test2.madx";
 Twiss, save, file="taper_rel.tfs";
 
 ! reset all tapering values 

@@ -406,7 +406,7 @@ void set_closed_orb_node(int *index, double *pos){
 }
 
 
-void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl, double *ktap){
+void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl, double ktap){
     nn[0]=current_node->p_elem->multip->nn;
     ns[0]=current_node->p_elem->multip->ns;
     for(int i=0;i<*nn;i++){
