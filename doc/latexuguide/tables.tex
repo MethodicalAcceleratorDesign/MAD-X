@@ -168,7 +168,7 @@ WHILE \=(i < len) \{ \\
 The \texttt{SETVARS\_KNOB} command creates or manipulates the expression for the variables by adding a term \texttt{"+ val * knob"} where val is  extracted from the row of a table and knob from the command.
 
 \madbox{
-SETVARS, TABLE=tabname, ROW=integer, KNOB=knobname;
+SETVARS\_KNOB, TABLE=tabname, ROW=integer, KNOB=knobname;
 }
 
 The attributes of \texttt{SETVARS} are:
@@ -192,7 +192,7 @@ etc\ldots
 The \texttt{SETVARS\_CONST} sets the value for the variables to constant.
 
 \madbox{
-	SETVARS, TABLE=tabname, CONST=value;
+	SETVARS\_CONST, TABLE=tabname, CONST=value;
 }
 
 The attributes of \texttt{SETVARS} are:
