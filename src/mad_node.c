@@ -411,12 +411,12 @@ void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl, double ktap){
     ns[0]=current_node->p_elem->multip->ns;
     for(int i=0;i<*nn;i++){
       knl[i] = current_node->p_elem->multip->knl[i];
-      knl[i] = knl[i] * (1 + ktap);
+      knl[i] = knl[i] * (1 + ktap); // tapering
     }
     for(int i=0;i<*ns;i++){
       ksl[i] = current_node->p_elem->multip->ksl[i];
-      ksl[i] = ksl[i] * (1 + ktap);    }
-
+      ksl[i] = ksl[i] * (1 + ktap); // tapering
+    }
 
 }
 void alloc_tt_attrib(int *length){

@@ -827,7 +827,7 @@ CONTAINS
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1+node_value('ktap '))
+       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1.d0 + node_value('ktap '))
        
        !       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
        !       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
@@ -935,7 +935,7 @@ CONTAINS
        endif
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1+node_value('ktap '))
+       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1.d0 + node_value('ktap '))
 
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
@@ -1002,8 +1002,8 @@ CONTAINS
        sk0=node_value('k0 ') 
        
        ! quadrupole components
-       sk1= node_value('k1 ')  * (1 + node_value('ktap '))
-       sk1s=node_value('k1s ') * (1 + node_value('ktap '))
+       sk1= node_value('k1 ')  * (1.d0 + node_value('ktap '))
+       sk1s=node_value('k1s ') * (1.d0 + node_value('ktap '))
        tilt=node_value('tilt ')
        dum1=key%list%k(2)-normal_0123(1)
        dum2=key%list%ks(2)-skew_0123(1)
@@ -1049,8 +1049,8 @@ CONTAINS
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        ! sextupole components
-       sk2= node_value('k2 ')  * (1 + node_value('ktap '))
-       sk2s=node_value('k2s ') * (1 + node_value('ktap ')) 
+       sk2= node_value('k2 ')  * (1.d0 + node_value('ktap '))
+       sk2s=node_value('k2s ') * (1.d0 + node_value('ktap ')) 
        tilt=node_value('tilt ')
        dum1=key%list%k(3)-normal_0123(2)
        dum2=key%list%ks(3)-skew_0123(2)
@@ -1090,8 +1090,8 @@ CONTAINS
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        ! octupole components
-       sk3= node_value('k3 ')
-       sk3s=node_value('k3s ')
+       sk3= node_value('k3 ')  * (1.d0 + node_value('ktap '))
+       sk3s=node_value('k3s ')  * (1.d0 + node_value('ktap '))
        tilt=node_value('tilt ')
        dum1=key%list%k(4)-normal_0123(3)
        dum2=key%list%ks(4)-skew_0123(3)
@@ -1130,7 +1130,11 @@ CONTAINS
        enddo
        skew(0)=-skew(0) ! frs error found 30.08.2008
 
-       key%list%thin_h_angle=bvk*normal(0)
+       !--- tapering
+       normal(0) = normal(0) * (1.d0 + node_value('ktap '))
+       skew(0) = skew(0) * (1.d0 + node_value('ktap '))
+       
+       key%list%thin_h_angle=bvk*normal(0) 
        key%list%thin_v_angle=bvk*skew(0)
        lrad=node_value('lrad ')
        if(lrad.gt.zero) then
@@ -1145,7 +1149,7 @@ CONTAINS
 
           do i=1,nn
              !print*, "multipole normal ", i, " = ", normal(i)
-             key%list%k(i+1)=normal(i)
+             key%list%k(i+1)=normal(i)* (1.d0 + node_value('ktap ')) !-- w tapering
           enddo
        endif
 
@@ -1155,7 +1159,7 @@ CONTAINS
 
           do i=1,ns
              !print*, "multipole skew ", i, " = ", skew(i)
-             key%list%ks(i+1)=skew(i)
+             key%list%ks(i+1)=skew(i)* (1.d0 + node_value('ktap ')) !-- w tapering
           enddo
        endif
        FIELD = zero
@@ -3449,8 +3453,8 @@ CONTAINS
     if(code.eq.5) then
        ! quadrupole components code =  5
        k=2
-       sk= node_value('k1 ')  * (1 + node_value('ktap '))
-       sks=node_value('k1s ') * (1 + node_value('ktap '))
+       sk= node_value('k1 ')  * (1.d0 + node_value('ktap '))
+       sks=node_value('k1s ') * (1.d0 + node_value('ktap '))
        tilt=node_value('tilt ')
        b(k)=sk
 ! LD: 19.06.2019
@@ -3464,8 +3468,8 @@ CONTAINS
     elseif(code.eq.6) then
        ! sextupole components code = 6
        k=3
-       sk= node_value('k2 ')  * (1 + node_value('ktap '))
-       sks=node_value('k2s ') * (1 + node_value('ktap '))
+       sk= node_value('k2 ')  * (1.d0 + node_value('ktap '))
+       sks=node_value('k2s ') * (1.d0 + node_value('ktap '))
        tilt=node_value('tilt ')
        b(k)=sk
 ! LD: 19.06.2019

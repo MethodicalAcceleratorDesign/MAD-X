@@ -1105,7 +1105,6 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
 
   call get_tt_multipoles(nn,normal,ns,skew,ktap)
 
-
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !---- Angle (no bvk in track)
@@ -4321,8 +4320,8 @@ subroutine tttquad(track, ktrack)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = g_elpar(q_k1)  * (1 + g_elpar(q_ktap))
-  k1s = g_elpar(q_k1s) * (1 + g_elpar(q_ktap))
+  k1  = g_elpar(q_k1)  * (one + g_elpar(q_ktap))
+  k1s = g_elpar(q_k1s) * (one + g_elpar(q_ktap))
   
   if (length.ne.zero) then
      k1  = k1  + f_errors(2)/length
@@ -4522,7 +4521,7 @@ subroutine tttdipole(track, ktrack, code)
     k0 = h
   endif
 
-  k0 = k0 * (1+ktap) ! tapering to main field only
+  k0 = k0 * (one + ktap) ! tapering to main field only
  
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term

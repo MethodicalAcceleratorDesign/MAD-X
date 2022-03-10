@@ -305,9 +305,9 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         ktap = node_value('ktap ')
         sks = zero
         if (sk0.ne.0)  then
-           h = sk0 * (1 + ktap) ! tapering
+           h = sk0 * (one + ktap) ! tapering
         else
-           h = an / el * (1 + ktap) ! tapering
+           h = an / el * (one + ktap) ! tapering
         endif
      
         !---- Refer orbit and eigenvectors to magnet midplane.
@@ -489,19 +489,20 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         sk2 = zero
         sk3 = zero
         sksol = zero
+        ktap = node_value('ktap ')
         select case (code)
         case (code_quadrupole)  !---- Quadrupole
-           sk1 = bvk * node_value('k1 ') * (1 + node_value('ktap ')) ! tapering
+           sk1 = bvk * node_value('k1 ') * (one + ktap) ! tapering
            str  = sk1
            n    = 1
            twon = two
         case (code_sextupole)   !---- Sextupole
-           sk2 = bvk * node_value('k2 ') * (1 + node_value('ktap ')) ! tapering
+           sk2 = bvk * node_value('k2 ') * (one + ktap) ! tapering
            str  = sk2 / two
            n    = 2
            twon = four
         case (code_octupole)   !---- Octupole
-           sk3 = bvk * node_value('k3 ') * (1 + node_value('ktap ')) ! tapering
+           sk3 = bvk * node_value('k3 ') * (one + ktap) ! tapering
            str  = sk3 / six
            n    = 3
            twon = six
@@ -617,11 +618,13 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         an = node_value('angle ')
         if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
 
+        ktap = node_value('ktap ')
+        
         !---- Other components and errors.
         nord = 0
         do i = 0, max(nn, ns, n_ferr/2-1)
-           f_errors(2*i)   = bvk * (normal(i) * (1 + ktap) + f_errors(2*i))   / (one + deltap) ! tapering
-           f_errors(2*i+1) = bvk * (skew(i)   * (1 + ktap) + f_errors(2*i+1)) / (one + deltap) ! tapering
+           f_errors(2*i)   = bvk * (normal(i) * (one + ktap) + f_errors(2*i))   / (one + deltap) ! tapering
+           f_errors(2*i+1) = bvk * (skew(i)   * (one + ktap) + f_errors(2*i+1)) / (one + deltap) ! tapering
            ! get the maximum effective order; loop runs over maximum of user given values
            if (f_errors(2*i) .ne. zero .or. f_errors(2*i+1) .ne. zero)  nord = i
         enddo

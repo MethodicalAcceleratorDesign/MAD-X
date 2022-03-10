@@ -3308,7 +3308,7 @@ SUBROUTINE tw_synch_int()
   use twisslfi
   use twisscfi
   use twissbeamfi, only : beta
-  use math_constfi, only : zero, two
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3321,8 +3321,8 @@ SUBROUTINE tw_synch_int()
 
   !---- Initialisation
   blen = node_value('blen ')
-  rhoinv = node_value('rhoinv ') * (1+node_value('ktap ')) ! tapering
-  sk1 = node_value('k1 ')  * (1+node_value('ktap ')) ! tapering (issue if dipole has k1 component)
+  rhoinv = node_value('rhoinv ') * (one + node_value('ktap ')) ! tapering
+  sk1 = node_value('k1 ')  * (one + node_value('ktap ')) ! tapering (issue if dipole has k1 component)
   e1 = node_value('e1 ')
   e2 = node_value('e2 ')
   an = node_value('angle ')
