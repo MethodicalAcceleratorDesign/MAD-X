@@ -139,9 +139,14 @@ this list.
   parameters via a transformation from the Teng-Edwards Twiss
   parameters. Obviously this fails when the Teng-Edwards Twiss
   parameters are ill defined. In this case one has to rely on
-  \hyperref[chap:ptc-twiss]{\texttt{PTC\_TWISS}}.    
-  \item[MAKETHIN might invalidate a sequence]
-   Several \madx commands such as {\texttt{ELIGN}}, {\texttt{EFCOMP}} won't work on sequences produced by {\texttt{MAKETHIN}}. In order to use such commands on thin sequences, it is advisable to save the sequence on a file, and then re-load it.
+  \hyperref[chap:ptc-twiss]{\texttt{PTC\_TWISS}}.
+  
+\item[MAKETHIN might invalidate a sequence]
+   Several \madx commands such as {\texttt{EALIGN}}, {\texttt{EFCOMP}}
+   won't work on sequences produced by {\texttt{MAKETHIN}}. In order to
+   use such commands on thin sequences, it is advisable to save the
+   sequence on a file, and then re-load it.
+   
    
    
 \end{description}
