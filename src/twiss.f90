@@ -5313,15 +5313,15 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   fmap = .true.
 
   !---- Multipole components.
-  NORMAL = zero ; call get_node_vector('knl ',nn,normal)
-  SKEW   = zero ; call get_node_vector('ksl ',ns,skew)
+  NORMAL(0:maxmul) = zero ; call get_node_vector('knl ',nn,normal)
+  SKEW(0:maxmul)   = zero ; call get_node_vector('ksl ',ns,skew)
   tilt = node_value('tilt ')
   ktap = node_value('ktap ')
 
   !--- Apply tapering globally
-  NORMAL = NORMAL * (one + ktap)
-  SKEW = SKEW * (one + ktap)
-  
+  NORMAL(0:maxmul) = NORMAL(0:maxmul) * (one + ktap)
+  SKEW(0:maxmul)   = SKEW(0:maxmul)   * (one + ktap)
+
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !---- Angle (bvk applied later)
@@ -8482,11 +8482,11 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   bet0  =  get_value('beam ','beta ')
 
   !---- Zero the arrays
-  NORMAL = zero
-  SKEW = zero
-  PNL = zero
-  PSL = zero
-  F_ERRORS = zero
+  NORMAL(0:maxmul) = zero
+  SKEW(0:maxmul) = zero
+  PNL(0:maxmul) = zero
+  PSL(0:maxmul) = zero
+  F_ERRORS(0:maxferr) = zero
 
   !---- Read-in the parameters
   freq   = node_value('freq ');

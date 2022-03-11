@@ -1,0 +1,26 @@
+! Test/Demo file for TAPER and MAKETHIN
+!
+! 2022-03-09 Ghislain Roy
+
+Option, -echo, -info, -warn;
+Call, file="529thin.seq"; // tapered thin lattice with proper lag
+Option, echo, info, warn;
+
+Set, format="-20s","23.17g";
+
+Select, flag=twiss, column=name,keyword,s,x,px,y,py,t,pt;
+
+Beam, particle=electron, PC=182.5, radiate=true;
+
+Use, sequence = FCC_E_RING;
+
+Twiss; // thin lenses, thick lenses, with radiation, RF and tapering
+
+Taper, reset;
+
+Beam, radiate=false;
+voltca1=0; voltca2=0;
+
+Twiss; // thin lenses, no radiation, no RF, no tapering
+
+Stop;
