@@ -168,7 +168,7 @@ WHILE \=(i < len) \{ \\
 The \texttt{SETVARS\_KNOB} command creates or manipulates the expression for the variables by adding a term \texttt{"+ val * knob"} where val is  extracted from the row of a table and knob from the command.
 
 \madbox{
-SETVARS, TABLE=tabname, ROW=integer, KNOB=knobname;
+SETVARS\_KNOB, TABLE=tabname, ROW=integer, KNOB=knobname;
 }
 
 The attributes of \texttt{SETVARS} are:
@@ -192,7 +192,7 @@ etc\ldots
 The \texttt{SETVARS\_CONST} sets the value for the variables to constant.
 
 \madbox{
-	SETVARS, TABLE=tabname, CONST=value;
+	SETVARS\_CONST, TABLE=tabname, CONST=value;
 }
 
 The attributes of \texttt{SETVARS} are:
@@ -252,7 +252,7 @@ table using the variable \madxmp{TABLE(tablenanme, TABLELENGTH)}
 \label{sec:fill-knob}
 The \texttt{FILL\_KNOB} command fills a row of a table with the variation (multiplied by scaling factor) of all declared column variables of the table when the knob value change by 1.
 \madbox{
-FILL, TABLE=tabname, ROW=integer, KNOB=knobname, SCALE=scaling;
+FILL\_KNOB, TABLE=tabname, ROW=integer, KNOB=knobname, SCALE=scaling;
 }
 
 The \texttt{FILL} command takes two arguments:
