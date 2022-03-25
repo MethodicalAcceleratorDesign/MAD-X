@@ -7,14 +7,14 @@ m4:marker, at=7;
 m5:marker, at=9;
 endsequence;
 set,  format="13.11f";
-beam,particle=proton,energy=2;
+beam,particle=proton,energy=1;
 use, sequence=seq;
 option, sympl=false;
 px0 = 0.001;
 py0 = 0.02;
 betx0 = 1;
 bety0 = 2;
-select, flag = twiss, column=name,s,x,y,pt,betx,bety;
+select, flag = twiss, column=name,s,x,y,t, pt,betx,bety;
 
 twiss, file="madx.tfs", betx=betx0, bety=bety0, px=px0, py=py0, pt=pt0;
 twiss, file="madx_exact.tfs", betx=betx0, bety=bety0, px=px0, py=py0, exact;

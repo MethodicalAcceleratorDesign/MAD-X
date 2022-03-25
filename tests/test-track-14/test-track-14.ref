@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:03:02      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:46:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=120.;
 
@@ -136,7 +136,7 @@ final orbit vector:    -1.523064E-02 -1.123889E-03 -1.675578E-02  3.577352E-04 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0     0.001107898122 
+                 0                  0                  0                  0 
 
        dqmin_phase 
        3.141592609 
@@ -186,7 +186,6 @@ enter Twiss module
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   1.000000E-03  0.000000E+00  1.000000E-03  0.000000E+00  0.000000E+00  0.000000E+00
 final orbit vector:    -1.523261E-02 -1.124030E-03 -1.675448E-02  3.577539E-04 -4.261899E-04  8.541747E-09
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 12 location, out of 60 in total. The Dqmin estimate might be inaccurate.                                       
 
 ++++++ table: summ
 
@@ -209,7 +208,7 @@ final orbit vector:    -1.523261E-02 -1.124030E-03 -1.675448E-02  3.577539E-04 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0     0.001108181923 
+                 0                  0                  0                  0 
 
        dqmin_phase 
        3.141592601 
@@ -256,8 +255,7 @@ exit TRACK module
 stop;
 
 
-  Number of warnings: 1
-0 in C and 1 in Fortran
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

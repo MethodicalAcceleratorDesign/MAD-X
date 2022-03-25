@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:03:15      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:46:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=1.5;
 
@@ -71,7 +71,7 @@ final orbit vector:     1.002096E-02  4.192519E-05  2.004192E-02  8.385039E-05 -
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    7.547636006e-11 
+                 0                  0                  0                  0 
 
        dqmin_phase 
       -2.678545016 

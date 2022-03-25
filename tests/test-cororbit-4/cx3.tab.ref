@@ -1,9 +1,9 @@
 @ NAME             %04s "CORR"
 @ TYPE             %04s "CORR"
 @ TITLE            %51s "LHC 6.5 with errors and orbit correction using MADX"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "10/08/20"
-@ TIME             %08s "13.26.42"
+@ ORIGIN           %16s "5.08.00 Linux 64"
+@ DATE             %08s "27/01/22"
+@ TIME             %08s "20.47.12"
 * NAME                           PX.OLD             PY.OLD      PX.CORRECTION      PY.CORRECTION 
 $ %s                                %le                %le                %le                %le 
  "MCBXH.1R1"                          0                  0    -1.86723222e-15                  0

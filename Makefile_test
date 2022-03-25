@@ -93,7 +93,7 @@ test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 te
 test-line \
 test-plot test-plot-2 \
 test-setknob test-fillknob \
-test-coupling test-coupling-2 \
+test-coupling test-coupling-2 test-coupling-dqmin \
 test-machine-clear \
 \
 $(call onlx64,$(user-cases),)

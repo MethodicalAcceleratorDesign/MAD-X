@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:04:17      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:48:02      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -38,7 +38,6 @@ enter Twiss module
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 1 location, out of 4 in total. The Dqmin estimate might be inaccurate.                                         
 
 ++++++ table: summ
 
@@ -61,7 +60,7 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0     0.001200501769 
+                 0                  0                  0                  0 
 
        dqmin_phase 
       -3.111151212 
@@ -107,7 +106,7 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0     0.001270190581 
+                 0                  0                  0                  0 
 
        dqmin_phase 
       -3.112761891 
@@ -174,8 +173,8 @@ save sequence=testseq, file="thin.seq";
 
 ++++++ warning: SAVE makes all previous USE invalid !  
 
-  Number of warnings: 4
-1 in C and 3 in Fortran
+  Number of warnings: 3
+1 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

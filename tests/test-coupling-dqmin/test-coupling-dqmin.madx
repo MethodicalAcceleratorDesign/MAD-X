@@ -1,0 +1,14 @@
+option, warn,info;
+Option, -echo,-info;
+call,file="files/lhc_as-built.seq";
+call, file ="files/IR7-Run3seqedit.madx";
+call,file="files//opticsfile.181";
+
+beam, energy = 6800, bv=-1;
+use, sequence=lhcb2;
+i = 0;
+while(i < 11){
+    CMRS.b2_sq = 0.001*i;
+    i = i + 1;
+    twiss;
+}  

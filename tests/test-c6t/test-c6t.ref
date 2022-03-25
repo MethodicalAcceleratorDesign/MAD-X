@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:03:52      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:47:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Tracking test for 6-D closed orbit search with LHC thin seq V6.501
 
@@ -45,10 +45,10 @@ orbit:  -1.916441E-03 -1.261077E-04  6.460942E-04  3.861002E-05  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    0.0003932571849 
+                 0                  0                  0      0.01277907792 
 
        dqmin_phase 
-      0.8240176567 
+       2.681907206 
   ++++++++++++++++++++++++++++
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
