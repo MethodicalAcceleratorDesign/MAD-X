@@ -395,7 +395,7 @@ contains
           !!!!!!!!!!!!!!!!!!!!!!
           !Generating functions
 
-          !n%g is the vecotor field for the transformation
+          !n%g is the vector field for the transformation
           !from resonance basis (action angle coordinate system, (x+ipx),(x-ipx)) back to cartesion X,Y
           !the ndim polynomials need to be flattened to get RDT's
           call alloc(g_io);
@@ -432,6 +432,9 @@ contains
               return
            endif
 
+          write(2000,*) "[HAM] theNormalForm="
+          call print(theNormalForm_t2%a_t, 2000)  ! Ok, checked
+
           call alloc(a_CS)
           call c_canonise(theNormalForm_t2%a_t,a_CS)
           ! write(mft,*) "Courant Snyder transfo A_T (full nonlin) "
@@ -440,8 +443,14 @@ contains
           ! write(mft,*) " ++++++++++++++++++++++++ "
           ! write(mft,*) "  "
 
+          write(2001,*) "[HAM] a_CS="
+          call print(a_CS, 2001) ! Checked, almost identity with changes for some 5th order terms
+
           a_CS = a_CS.sub.1
           call c_canonise(a_CS,a_CS)
+
+          write(2002,*) "[HAM] a_CS1="
+          call print(a_CS, 2002) ! Checked, clear (invalid? unstable?) 5th order terms
 
           ! write(mft,*) "Courant Snyder transfo A_T truncated at 1st order"
           ! call print(a_CS,mft)
@@ -449,9 +458,14 @@ contains
           ! write(mft,*) " ++++++++++++++++++++++++ "
           ! write(mft,*) "  "
 
-
           call alloc(c_Map2)
           c_Map2 = a_CS**(-1)*c_Map*a_CS
+
+          write(2003,*) "[HAM] c_Map="
+          call print(c_Map, 2003)
+
+          write(2004,*) "[HAM] c_Map2="
+          call print(c_Map2, 2004)
 
           call alloc(vf_t2)
           call alloc(q_Map)
@@ -462,11 +476,30 @@ contains
           ! write(mft,*) " ++++++++++++++++++++++++ "
           ! write(mft,*) "  "
 
+          write(2005,*) "[HAM] q_Map="
+          call print(q_Map, 2005)
+
+          write(2006,*) "[HAM] vf_t2="
+          call print(vf_t2, 2006)
+
            ! move from phasor to complex C-S
           vf_t2=from_phasor()*vf_t2
 
+          write(2007,*) "[HAM] vf_t2 (phasor)="
+          call print(vf_t2, 2007)
+
           call alloc(nrmlzdPseudoHam)
           call equal_c_tayls(nrmlzdPseudoHam,cgetpb(vf_t2)) ! nrmlzdPseudoHam=cgetpb(vf_t2)
+
+          write(2008,*) "[HAM] nrmlzdPseudoHam="
+          call print(nrmlzdPseudoHam, 2008)
+
+          q_Map = from_phasor()
+          write(2009,*) "[HAM] from_phasor="
+          call print(q_Map, 2009)
+
+          write(2010,*) "[HAM] cgetpb="
+          call print(cgetpb(vf_t2), 2010)
 
          if (getdebug() > 2) then
            write(mft,*) "-----------------------------------------------------------------"

@@ -446,7 +446,6 @@ end subroutine zero_E_GENERAL_s
        endif
     ENDIF
 
-
   END SUBROUTINE TRANSR
 
   SUBROUTINE TRANSP(A,X,b,EXACT,ctime)
@@ -488,7 +487,6 @@ end subroutine zero_E_GENERAL_s
     ENDIF
 
     call PRTP("TRANS:1", X)
-
   END SUBROUTINE TRANSP
 
 
