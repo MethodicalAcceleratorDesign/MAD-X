@@ -216,11 +216,12 @@ CONTAINS
        return
     endif
 
-    cavsareset = get_value('ptc_setswitch ', 'maxacceleration ').eq.0
-    if (getdebug() > 1) then
-      print *, 'maxacceleration =', cavsareset
-    endif
-    cavsareset = .not. cavsareset
+    cavsareset = .false.
+!    cavsareset = get_value('ptc_setswitch ', 'maxacceleration ').eq.0
+!    if (getdebug() > 1) then
+!      print *, 'maxacceleration =', cavsareset
+!    endif
+!    cavsareset = .not. cavsareset
 
     mytime=get_value('ptc_create_layout ','time ').ne.0
 
