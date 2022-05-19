@@ -1,14 +1,13 @@
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and CERN
- 
- 
+
+
 
 
 MODULE S_DEF_KIND
-!  USE S_def_all_kinds   ! not needed because of things below
-!  use s_extend_poly, only : PRTP, PRTP1 ! LD: 22.03.2019
   use gauss_dis
   use sagan_WIGGLER
+  use s_extend_poly, only : PRTR, PRTP, PRTP1 ! LD: 22.03.2019
   public
   PRIVATE DRIFTP  !,DRIFT   ! ,DRIFTR
   PRIVATE SPARR,SPARP !,SPAR
@@ -140,7 +139,7 @@ MODULE S_DEF_KIND
  ! logical ::  ABELL_NEW=.TRUE.
   INTEGER :: metcav=0, nstcav=0
   real(dp) :: xcav(1:6)=0.001e0_dp, symplectic_check=1.d-10
-  integer :: n_wedge = 5 
+  integer :: n_wedge = 5
 
   ! stochastic radiation in straigth
   PRIVATE compute_f4r,compute_f4p,ZEROR_HE22,ZEROP_HE22
@@ -181,12 +180,12 @@ private rk4_teapot_prober,rk4_teapot_probep,rk6_teapot_prober,rk6_teapot_probep
 PRIVATE DIRECTION_VR,DIRECTION_VP   !,DIRECTION_V
   PRIVATE  B_PARA_PERPr,B_PARA_PERPp   !,B_PARA_PERP
   PRIVATE push_quaternionr,push_quaternionP
-  PRIVATE get_omega_spinR,get_omega_spinP   !,get_omega_spin 
+  PRIVATE get_omega_spinR,get_omega_spinP   !,get_omega_spin
   private radiate_2p,radiate_2r,radiate_2_prober,radiate_2_probep,radiate_2_probe  !,radiate_2
   private quaternion_8_to_matrix,crossp,RAD_SPIN_qua_PROBER,RAD_SPIN_qua_PROBEP
   logical :: do_d_sij=.false.
   !  INTEGER, PRIVATE :: ISPIN0P=0,ISPIN1P=3
-   ! oleksii 
+   ! oleksii
   real(dp) n_oleksii(3)
   real(dp) :: t_ns_oleksii=0,t_nb_oleksii=0,t_bks_approx=0, i_bks=0 ,theta_oleksii=0
   integer :: print_oleksii =0
@@ -222,73 +221,73 @@ type(work) w_bks
   INTERFACE TRACK_SLICE_sol5
      MODULE PROCEDURE INTE_sol5_prober
      MODULE PROCEDURE INTE_sol5_probep
-  END INTERFACE 
+  END INTERFACE
 
   INTERFACE TRACK_SLICE_dkd2
      MODULE PROCEDURE INTE_dkd2_prober
      MODULE PROCEDURE INTE_dkd2_probep
-  END INTERFACE 
+  END INTERFACE
    INTERFACE TRACK_SLICE_dkd2_OLD
      MODULE PROCEDURE INTER_dkd2
      MODULE PROCEDURE INTEP_dkd2
-  END INTERFACE 
+  END INTERFACE
 
   INTERFACE TRACK_SLICE_TKTF
      MODULE PROCEDURE INTE_TKTF_prober
      MODULE PROCEDURE INTE_TKTF_probep
-  END INTERFACE 
+  END INTERFACE
 
   INTERFACE TRACK_SLICE_CAV4
      MODULE PROCEDURE INTE_CAV4_PROBER
      MODULE PROCEDURE INTE_CAV4_PROBEP
-  END INTERFACE 
+  END INTERFACE
 
   INTERFACE feval_CAV_bmad_probe
      MODULE PROCEDURE feval_CAV_bmad_prober
      MODULE PROCEDURE feval_CAV_bmad_probep
-  END INTERFACE 
+  END INTERFACE
 
   INTERFACE rk2bmad_cav_probe
      MODULE PROCEDURE rk2bmad_cav_prober
      MODULE PROCEDURE rk2bmad_cav_probep
-  END INTERFACE 
+  END INTERFACE
 
   INTERFACE rk4bmad_cav_probe
      MODULE PROCEDURE rk4bmad_cav_prober
      MODULE PROCEDURE rk4bmad_cav_probep
-  END INTERFACE 
+  END INTERFACE
 
   INTERFACE rk6bmad_cav_probe
      MODULE PROCEDURE rk6bmad_cav_prober
      MODULE PROCEDURE rk6bmad_cav_probep
-  END INTERFACE 
+  END INTERFACE
 
 
   INTERFACE TRACK_SLICE_CAV4_OLD
      MODULE PROCEDURE track_slice4r
      MODULE PROCEDURE track_slice4p
-  END INTERFACE 
+  END INTERFACE
 
 
   INTERFACE TRACK_SLICE_TEAPOT
      MODULE PROCEDURE INTE_TEAPOT_prober
      MODULE PROCEDURE INTE_TEAPOT_probep
-  END INTERFACE 
+  END INTERFACE
   INTERFACE TRACK_SLICE_TEAPOT_OLD
      MODULE PROCEDURE INTER_TEAPOT
      MODULE PROCEDURE INTEP_TEAPOT
-  END INTERFACE 
+  END INTERFACE
 
 
 
   INTERFACE TRACK_SLICE_STREX
      MODULE PROCEDURE INTE_STREX_prober
      MODULE PROCEDURE INTE_STREX_probep
-  END INTERFACE 
+  END INTERFACE
   INTERFACE TRACK_SLICE_STREX_OLD
      MODULE PROCEDURE INTER_STREX
      MODULE PROCEDURE INTEP_STREX
-  END INTERFACE 
+  END INTERFACE
 
   INTERFACE TRACK_SLICE
 !     MODULE PROCEDURE INTER_CAV4
@@ -1079,7 +1078,7 @@ type(work) w_bks
      MODULE PROCEDURE GET_BE_CAVP
   END INTERFACE
 
- 
+
 
   INTERFACE B_PARA_PERP
      MODULE PROCEDURE B_PARA_PERPr
@@ -1686,6 +1685,8 @@ CONTAINS !----------------------------------------------------------------------
     integer,INTENT(IN):: J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTR("ADJTIME_CAVR4:0", X)
+
     IF(J==1) THEN
        EL%DELTA_E=X(5)
        CALL DRIFT(EL%h1,EL%h1,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
@@ -1710,6 +1711,8 @@ CONTAINS !----------------------------------------------------------------------
        EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
     ENDIF
 
+    call PRTR("ADJTIME_CAVR4:1", X)
+
   END SUBROUTINE ADJUST_TIME_CAV4R
 
   SUBROUTINE ADJUST_TIME_CAV4P(EL,X,k,J)
@@ -1718,7 +1721,7 @@ CONTAINS !----------------------------------------------------------------------
     TYPE(CAV4P),INTENT(INOUT):: EL
     integer,INTENT(IN):: J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-    real(dp) h 
+    real(dp) h
     call PRTP("ADJTIME_CAV4:0", X)
 
     IF(J==1) THEN
@@ -1858,14 +1861,14 @@ CONTAINS !----------------------------------------------------------------------
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL DRIFT(NDF(0),NDDF(0),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
 
        DO J=1,15
           CALL KICKCAV(EL,NDK(J),X,k)
           CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
        ENDDO
- 
+
 
 
     CASE DEFAULT
@@ -1889,7 +1892,7 @@ CONTAINS !----------------------------------------------------------------------
     real(dp) DDF(4)
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
     real(dp)  NDDF(0:15)
-    type(real_8) NDF(0:15),NDK(15) 
+    type(real_8) NDF(0:15),NDK(15)
     INTEGER I,J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     TYPE(INTERNAL_STATE) kt !,OPTIONAL :: K
@@ -1982,7 +1985,7 @@ CONTAINS !----------------------------------------------------------------------
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL DRIFT(NDF(0),NDDF(0),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
 
        DO J=1,15
@@ -2029,7 +2032,7 @@ CONTAINS !----------------------------------------------------------------------
 
     CALL ADJUST_TIME_CAV4(EL,X,k,1)
 !    IF(EL%N_BESSEL>0)
- CALL FRINGECAV(EL,X,k,1)
+    CALL FRINGECAV(EL,X,k,1)
 
     !    TOTALPATH_FLAG=k%TOTALPATH
     !    k%TOTALPATH=CAVITY_TOTALPATH
@@ -2043,7 +2046,7 @@ CONTAINS !----------------------------------------------------------------------
     !    k%TOTALPATH=TOTALPATH_FLAG
 
 !    IF(EL%N_BESSEL>0)
- CALL FRINGECAV(EL,X,k,2)
+    CALL FRINGECAV(EL,X,k,2)
     CALL ADJUST_TIME_CAV4(EL,X,k,2)
 
 
@@ -2167,10 +2170,11 @@ call print(m%v(5))
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call PRTP("CAVE:0", X)
 
     CALL ADJUST_TIME_CAV4(EL,X,k,1)
    ! IF(EL%N_BESSEL>0)
-CALL FRINGECAV(EL,X,k,1)
+    CALL FRINGECAV(EL,X,k,1)
     !    ! IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     !   TOTALPATH_FLAG=k%TOTALPATH
@@ -2184,15 +2188,16 @@ CALL FRINGECAV(EL,X,k,1)
     !    k%TOTALPATH=TOTALPATH_FLAG
 
   !  IF(EL%N_BESSEL>0)
-CALL FRINGECAV(EL,X,k,2)
+    CALL FRINGECAV(EL,X,k,2)
     CALL ADJUST_TIME_CAV4(EL,X,k,2)
 
+    call PRTP("CAVE:1", X)
 
   END SUBROUTINE CAVEP
   SUBROUTINE CAVITYR(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
- 
+
     TYPE(CAV4),INTENT(INOUT):: EL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) O,X1,X3,BBYTWT,BBYTW,BBXTW
@@ -2200,9 +2205,9 @@ CALL FRINGECAV(EL,X,k,2)
     real(dp) dir
     it=tot_t*k%totalpath+(1-tot_t)
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
- 
+
     !    EL%DELTA_E=x(5)
- 
+
 
        dir=EL%P%DIR*EL%P%CHARGE
        if(freq_redefine) then
@@ -2264,12 +2269,12 @@ CALL FRINGECAV(EL,X,k,2)
           X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*el%r*sin(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
        enddo
-     
 
- 
+
+
     !          IF(.NOT.PRESENT(MID)) x(5)=x(5)-HALF*EL%P%DIR*EL%P%CHARGE*EL%volt*c_1d_3*SIN(twopi*EL%freq*x(6)/CLIGHT+EL%PHAS+EL%phase0)/EL%P%P0C
     !    EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
- 
+
 
   END SUBROUTINE CAVITYR
 
@@ -2751,7 +2756,7 @@ CALL FRINGECAV(EL,X,k,2)
     !
      call ADJUST_ABELL(EL,X,k,ENT)
 
- 
+
     DO I=1,EL%P%NST
         call track_slice(el,x,k,i)
        ! IF(PRESENT(MID)) CALL XMID(MID,X,I)
@@ -3228,20 +3233,20 @@ CALL FRINGECAV(EL,X,k,2)
     real(dp), intent(inout) :: ti,h
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-              
+
 
     call feval_CAV_bmad(tI,y,k,f,gr)
- 
+
     do  j=1,ne
        a(j)=h*f(j)
     enddo
     do  j=1,ne
        yt(j)=y(j)+a(j)/2.0_dp
     enddo
- 
+
     tt=tI+h/2.0_dp
     call feval_CAV_bmad(tt,yt,k,f,gr)
- 
+
     do  j=1,ne
        b(j)=h*f(j)
     enddo
@@ -3769,6 +3774,8 @@ CALL FRINGECAV(EL,X,k,2)
      z=EL%L
     endif
 
+   call PRTR("FRNG_CAVR4:0", X)
+
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(.NOT.(k%FRINGE.or.EL%P%permfringe/=0.or.el%N_BESSEL==-1)) RETURN  ! 2012 forcing fringes if n_bessel > 0
     IF(EL%THIN) RETURN
@@ -3804,6 +3811,8 @@ CALL FRINGECAV(EL,X,k,2)
     x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
 
    enddo
+
+   call PRTR("FRNG_CAVR4:1", X)
 
   END SUBROUTINE FRINGECAVR
 
@@ -3895,6 +3904,8 @@ CALL FRINGECAV(EL,X,k,2)
     it=tot_t*k%totalpath+(1-tot_t)
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
+    call PRTR("KICKCAVR:0", X)
+
     DIR=EL%P%DIR*EL%P%CHARGE
 
        if(freq_redefine) then
@@ -3908,9 +3919,12 @@ CALL FRINGECAV(EL,X,k,2)
     endif
 
     VL=dir*YL*EL%volt*volt_c/EL%P%P0C
-     
+
     !print*,"skowron: ph:",EL%PHAS," ph0=",EL%phase0, EL%t," volt omega",VL,O
-    
+
+    ! Ph0 = Pi
+!    write (*,'(6(a,ES25.16))') '@ VL= ', VL, ' O= ', O, ' Ph= ', EL%PHAS, ' P0C=', EL%P%P0C, ' YL= ', YL, ' PH0= ', EL%phase0
+
     do ko=1,el%nf    ! over modes
 
        DF=0.0_dp
@@ -3985,6 +3999,8 @@ CALL FRINGECAV(EL,X,k,2)
        X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*EL%R*sin(ko*O*(x(6)+EL%t*it)+EL%PHAS+EL%PH(KO)+EL%phase0)
     enddo    ! over modes
 
+    call PRTR("KICKCAVR:1", X)
+
 END SUBROUTINE KICKCAVR
 
 SUBROUTINE KICKCAVP(EL,YL,X,k)
@@ -4020,7 +4036,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     VL=dir*YL*EL%volt*volt_c/EL%P%P0C
 
     ! Ph0 = Pi
-!    write (*,'(6(a,E25.16))') '@ VL= ', VL%r, ' O= ', O%r, ' Ph= ', EL%PHAS%r, 'P0C=', EL%P%P0C, ' YL= ', YL%r, ' PH0= ', EL%phase0
+!    write (*,'(6(a,ES25.16))') '@ VL= ', VL%r, ' O= ', O%r, ' Ph= ', EL%PHAS%r, &
+!             ' P0C=', EL%P%P0C, ' YL= ', YL%r, ' PH0= ', EL%phase0
+
+    call PRTP1("Ph=", EL%PHAS)
 
     do ko=1,el%nf    ! over modes
 
@@ -4114,6 +4133,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp) PZ,b
     logical(lp) EXACT,CTIME
 
+    call PRTR("DRIFTR:0", X)
+
     IF(EXACT) THEN
        if(CTIME) then
           PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
@@ -4142,6 +4163,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        endif
     ENDIF
 
+    call PRTR("DRIFTR:1", X)
+
   END SUBROUTINE DRIFTR
 
   SUBROUTINE DRIFTP(L,LD,b,T,EXACT,ctime,X)
@@ -4150,7 +4173,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(REAL_8),INTENT(IN):: L
     real(dp), INTENT(IN):: LD
     INTEGER,INTENT(IN):: T
-    TYPE(REAL_8) PZ
+    TYPE(REAL_8) PZ, L_PZ
     logical(lp) EXACT,ctime
     real(dp) b
 
@@ -4158,11 +4181,29 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     IF(EXACT) THEN
        CALL ALLOC(PZ)
+!       CALL ALLOC(L_PZ)
        if(ctime) then
+!          L_PZ = -X(6)
+!          print *,"B=", B
+!          print *,"X"  ; call print(X(1),6)
+!          print *,"PX" ; call print(X(2),6)
+!          print *,"Y"  ; call print(X(3),6)
+!          print *,"PY" ; call print(X(4),6)
+!          print *,"T"  ; call print(L_PZ,6)
+!          print *,"PT" ; call print(X(5),6)
+
           PZ=SQRT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
           X(1)=X(1)+L*X(2)/PZ
           X(3)=X(3)+L*X(4)/PZ
           X(6)=X(6)+L*(1.0_dp/b+X(5))/PZ-(1-T)*LD/b
+
+!          L_PZ = 1.0_dp+2.0_dp*X(5)/b+x(5)**2 ; print *,"(1+DP)^2"   ; call print(L_PZ,6)
+!          L_PZ = L_PZ-X(2)**2                 ; print *,"(1+DP)^2-PX^2" ; call print(L_PZ,6)
+!          L_PZ = L_PZ-X(4)**2                 ; print *,"(1+DP)^2-PX^2-PY^2" ; call print(L_PZ,6)
+!          L_PZ = SQRT(L_PZ)                   ; print *,"SQRT((1+DP)^2-PX^2-PY^2)" ; call print(L_PZ,6)
+!          L_PZ = L/PZ
+!          print *,"PZ"   ; call print(PZ  ,6)
+!          print *,"L_PZ" ; call print(L_PZ,6)
        else
           call PRTP("********* UNEXPECTED TIME=FALSE **********")
 
@@ -4172,6 +4213,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           X(6)=X(6)+L*(1.0_dp+X(5))/PZ-(1-T)*LD
        endif
        CALL KILL(PZ)
+!       CALL KILL(L_PZ)
     ELSE
        call PRTP("********* UNEXPECTED EXACT=FALSE **********")
        if(ctime) then
@@ -4189,7 +4231,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           X(3)=X(3)+L*X(4)/(1.0_dp+X(5))
 
          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+T*L
- 
+
        endif
     ENDIF
 
@@ -4200,7 +4242,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
   SUBROUTINE KICKTR(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(KICKT3),INTENT(IN):: EL
     real(dp) X1,X3,BBYTW,BBXTW,BBYTWT,pz,alfh
     INTEGER J,I
@@ -4231,7 +4273,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        alfh=-EL%thin_h_angle/2.0_dp
        call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
     endif
- 
+
        if(k%TIME) then
           PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
           X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-1.0_dp)  ! highly illegal additions by frs
@@ -4245,7 +4287,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
        X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW     ! BACKWARDS
        X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
-     
+
 
 !!!!!!!!!!!   solenoid
 
@@ -5228,7 +5270,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 !       WRITE(6,*) "ERROR 778"
 !       STOP 778
 !
-!    ENDIF 
+!    ENDIF
 
 !    call PRTP("EDGE_PARALLEL:1", X)
 
@@ -5677,14 +5719,14 @@ integer :: kkk=0
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL DRIFT(NDF(0),NDDF(0),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
 
        DO J=1,15
           CALL KICK (EL,NDK(J),X,k)
           CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
        ENDDO
- 
+
 
 
 
@@ -5707,7 +5749,7 @@ integer :: kkk=0
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp)  NDDF(0:15)
-    type(real_8) NDF(0:15),NDK(15) 
+    type(real_8) NDF(0:15),NDK(15)
 
     INTEGER I,J,pos,f1
 
@@ -5812,14 +5854,14 @@ integer :: kkk=0
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL DRIFT(NDF(0),NDDF(0),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
 
        DO J=1,15
           CALL KICK (EL,NDK(J),X,k)
           CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
        ENDDO
- 
+
        CALL KILL(NDF);CALL KILL(NDK);
 
     CASE DEFAULT
@@ -5870,7 +5912,7 @@ integer :: kkk=0
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(DKD2),INTENT(IN):: EL
-    
+
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
      CALL TRACK_FRINGE(EL=EL,X=X,k=k,J=1)
@@ -6260,14 +6302,14 @@ integer :: kkk=0
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL KICK_SOL(EL,NDF(0),X,k)
 
        DO J=1,15
           CALL KICKMUL(EL,NDK(J),X,k)
           CALL KICK_SOL(EL,NDF(J),X,k)
        ENDDO
- 
+
 
 
     CASE DEFAULT
@@ -6376,14 +6418,14 @@ integer :: kkk=0
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL KICK_SOL(EL,NDF(0),X,k)
 
        DO J=1,15
           CALL KICKMUL(EL,NDK(J),X,k)
           CALL KICK_SOL(EL,NDF(J),X,k)
        ENDDO
- 
+
        CALL KILL(NDF);CALL KILL(NDK);
 
     CASE DEFAULT
@@ -6400,7 +6442,7 @@ integer :: kkk=0
   SUBROUTINE INTESOLR(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(SOL5),INTENT(IN):: EL
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -6433,7 +6475,7 @@ integer :: kkk=0
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(SOL5),INTENT(INOUT):: EL
-    
+
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
      CALL TRACK_FRINGE(EL5=EL,X=X,k=k,J=1)
@@ -6479,6 +6521,8 @@ integer :: kkk=0
     INTEGER I,J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) dir
+
+    if (MAPDUMP .ge. 2) print*, "**** GETMATR CALLED ****"
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -7147,7 +7191,7 @@ integer :: kkk=0
   SUBROUTINE INTKTKR(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(KTK),INTENT(INOUT):: EL
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -7354,7 +7398,7 @@ integer :: kkk=0
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(KTK),INTENT(INOUT):: EL
-    
+
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
 
@@ -7395,6 +7439,8 @@ integer :: kkk=0
 !!!!  SPEED STUFF !!!
     real(dp) OMEGA, OMEGA2,C,S
     INTEGER S_OMEGA
+
+    call PRTP("GETMAT7R:0")
 
     IF(MOD(EL%P%METHOD,2)==1) THEN
        DH=(EL%L/EL%P%NST)  ! method=1,3,5
@@ -7448,6 +7494,9 @@ integer :: kkk=0
           EL%LX(3)=EL%MATX(1,3)*EL%P%B0*DH/3.0_dp
        ENDIF
 
+!       print*, "DH=", DH, "K0=", EL%BN(1), "K1=", EL%BN(2)
+!       print*, "W=", OMEGA, "WS=", S_OMEGA, ", C=", C, ", S=", S
+
        S_OMEGA=-1
        OMEGA2=-DIR*EL%BN(2)
 
@@ -7478,9 +7527,7 @@ integer :: kkk=0
           EL%MATY(2,2)=1.0_dp;EL%MATY(2,1)=0.0_dp;
        ENDIF
 
-
-
-
+!       print*, "W=", OMEGA, "WS=", S_OMEGA, ", C=", C, ", S=", S
 
     ELSE     !  SPEED FALSE OR KNOB TRUE
 
@@ -7504,15 +7551,7 @@ integer :: kkk=0
 
        CALL EXPCOSY7(HY,EL%MATY,EL%LX)
        CALL EXPCOSY7(HX,EL%MATX,EL%LX)
-
-
-
-
-
-
-
     ENDIF
-
 
     DIR=-1
     IF(SPEED) THEN
@@ -7612,18 +7651,25 @@ integer :: kkk=0
 
        CALL EXPCOSY7(HY,EL%RMATY,EL%RLX)
        CALL EXPCOSY7(HX,EL%RMATX,EL%RLX)
-
-
-
-
-
-
-
     ENDIF
 
+!    WRITE(*, '(a,ES25.16)') '@@ MX11', EL%MATX(1,1)
+!    WRITE(*, '(a,ES25.16)') '@@ MX12', EL%MATX(1,2)
+!    WRITE(*, '(a,ES25.16)') '@@ MX13', EL%MATX(1,3)
+!    WRITE(*, '(a,ES25.16)') '@@ MX21', EL%MATX(2,1)
+!    WRITE(*, '(a,ES25.16)') '@@ MX22', EL%MATX(2,2)
+!    WRITE(*, '(a,ES25.16)') '@@ MX23', EL%MATX(2,3)
+!    WRITE(*, '(a,ES25.16)') '@@ MY11', EL%MATY(1,1)
+!    WRITE(*, '(a,ES25.16)') '@@ MY12', EL%MATY(1,2)
+!    WRITE(*, '(a,ES25.16)') '@@ MY13', EL%MATY(1,3)
+!    WRITE(*, '(a,ES25.16)') '@@ MY21', EL%MATY(2,1)
+!    WRITE(*, '(a,ES25.16)') '@@ MY22', EL%MATY(2,2)
+!    WRITE(*, '(a,ES25.16)') '@@ MY23', EL%MATY(2,3)
+!    WRITE(*, '(a,ES25.16)') '@@ LX1 ', EL%LX(1)
+!    WRITE(*, '(a,ES25.16)') '@@ LX2 ', EL%LX(2)
+!    WRITE(*, '(a,ES25.16)') '@@ LX3 ', EL%LX(3)
 
-
-
+    call PRTP("GETMAT7R:1")
 
   END SUBROUTINE GETMAT7R
 
@@ -7932,17 +7978,6 @@ integer :: kkk=0
     !    T(2)=EL%MATX(2,1)*X(1)+EL%MATX(2,2)*X(2)+EL%MATX(2,3)*X(5)
     IF(EL%P%DIR*EL%P%CHARGE>0) THEN
        IF(k%TIME) THEN
-!        call PRTP1 ("MX11", EL%MATX(1,1))
-!        call PRTP1 ("MX12", EL%MATX(1,2))
-!        call PRTP1 ("MX13", EL%MATX(1,3))
-!        call PRTP1 ("MX21", EL%MATX(2,1))
-!        call PRTP1 ("MX22", EL%MATX(2,2))
-!        call PRTP1 ("MX23", EL%MATX(2,3))
-!        call PRTP1 ("MY11", EL%MATY(1,1))
-!        call PRTP1 ("MY12", EL%MATY(1,2))
-!        call PRTP1 ("MY21", EL%MATY(2,1))
-!        call PRTP1 ("MY22", EL%MATY(2,2))
-
           T(1)=EL%MATX(1,1)*X(1)+EL%MATX(1,2)*X(2)+EL%MATX(1,3)*X(5)/el%P%beta0
           T(2)=EL%MATX(2,1)*X(1)+EL%MATX(2,2)*X(2)+EL%MATX(2,3)*X(5)/el%P%beta0
           T(3)=EL%MATY(1,1)*X(3)+EL%MATY(1,2)*X(4)
@@ -8440,15 +8475,15 @@ integer :: kkk=0
        DK2=216.0_dp*dk   !  9/35
        DK4=27.0_dp*dk    !  9/280
        DK6=272.0_dp*dk  !   34/105
-       DK5=DK6/2.0_dp  !  
+       DK5=DK6/2.0_dp  !
        DK=41.0_dp*DK    !  41/840
- 
+
 
 
        CALL KICKTKT7(EL,DK,X,k)  ! NEW
- 
+
        CALL KICKPATH(EL,DK,X,k)
- 
+
 
        CALL PUSHTKT7(EL,X,k)
 
@@ -8485,7 +8520,7 @@ integer :: kkk=0
        CALL PUSHTKT7(EL,X,k)
 
        CALL KICKPATH(EL,DK2,X,k)
-       CALL KICKTKT7(EL,DK2,X,k)  
+       CALL KICKTKT7(EL,DK2,X,k)
 
        CALL PUSHTKT7(EL,X,k)
 
@@ -8702,9 +8737,9 @@ integer :: kkk=0
        DK2=216.0_dp*dk   !  9/35
        DK4=27.0_dp*dk    !  9/280
        DK6=272.0_dp*dk  !   34/105
-       DK5=DK6/2.0_dp  !  
+       DK5=DK6/2.0_dp  !
        DK=41.0_dp*DK    !  41/840
- 
+
 
 
        CALL KICKTKT7(EL,DK,X,k)  ! NEW
@@ -8734,7 +8769,7 @@ integer :: kkk=0
        CALL PUSHTKT7(EL,X,k)
 
        CALL KICKPATH(EL,DK2,X,k)
-       CALL KICKTKT7(EL,DK2,X,k)  
+       CALL KICKTKT7(EL,DK2,X,k)
 
        CALL PUSHTKT7(EL,X,k)
 
@@ -8755,7 +8790,7 @@ integer :: kkk=0
   SUBROUTINE INTTKT7R(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(TKTF),INTENT(INOUT):: EL
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -8814,7 +8849,7 @@ integer :: kkk=0
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(TKTF),INTENT(INOUT):: EL
-    
+
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     CALL TRACK_FRINGE(EL7=EL,X=X,k=k,J=1)
@@ -9022,7 +9057,7 @@ integer :: kkk=0
   subroutine push_Nsmi_r(el,x,k)
     implicit none
     TYPE (NSMI),INTENT(IN)::EL
-    
+
     real(dp) ,INTENT(INOUT)::x(6)
     real(dp) ekk,CRKVE,CIKVE,CRKVEUK,XL,ZL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -9685,7 +9720,7 @@ integer :: kkk=0
   subroutine push_Ssmi_r(el,x,k)
     implicit none
     TYPE (SSMI),INTENT(IN)::EL
-    
+
     real(dp) ,INTENT(INOUT)::x(6)
     real(dp) ekk,CRKVE,CIKVE,CRKVEUK,XL,ZL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -11004,7 +11039,7 @@ integer :: kkk=0
     E(2)=Ey*volt_c/EL%P%P0C
     E(3)=0.0_dp
     phi=phi*volt_c/EL%P%P0C
- 
+
     CALL KILL(X1,X3,BX,BY,BTX,BTY,BtYT)
     CALL KILL(phit,EX,ETX,EY,ETY,VMT)
 
@@ -11087,7 +11122,7 @@ integer :: kkk=0
      DIR=EL%P%DIR*EL%P%CHARGE
      call GETELECTRIC(EL,E,del,B,VM,X,kick=my_true)
      E(3)=del
- 
+
      IF(EL%P%EXACT) THEN
         if(k%TIME) then
            H=1.0_dp+EL%P%B0*X(1)
@@ -11761,7 +11796,7 @@ v=sin(a)*xi-cos(a)*ROOT(1.0_dp-xi**2)
 xt1=(sin(2*a)*x(2)+sin(a)**2*(2*pz-(DIR*EL%BN(1))*(x(1)+r)))*(x(1)+r)/pt**2/(w*root(1-zeta**2)-v*zeta)
 !xn(3)= ARCSIN(xt1/xt2)/De0IR/EL%BN(1)
 xn(3)= ARCSIN_x(xt1*DIR*EL%BN(1))*xt1
- 
+
 
  !      XN(3)=(A+ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/DIR/EL%BN(1)
        XN(6)=X(6)+XN(3)*(1.0_dp/b+x(5))
@@ -11865,7 +11900,7 @@ endif
     !   xn(1)=xn(1)-r
    !   write(31,format5) 4,xn(1:4)%r
 
- 
+
 
     else
        PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
@@ -12132,14 +12167,14 @@ endif
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL SSECH1(EL,NDF(0),NDDF(0),X,k)
 
        DO J=1,15
           CALL SKICK (EL,NDK(J),X,k)
           CALL SSECH1(EL,NDF(J),NDDF(J),X,k)
        ENDDO
- 
+
 
 
     CASE DEFAULT
@@ -12206,7 +12241,7 @@ endif
     real(dp) DDF(4)
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
     real(dp)  NDDF(0:15)
-    type(real_8) NDF(0:15),NDK(15) 
+    type(real_8) NDF(0:15),NDK(15)
     INTEGER I,J,f1
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     integer,optional :: pos
@@ -12296,7 +12331,7 @@ endif
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL SSECH1(EL,NDF(0),NDDF(0),X,k)
 
        DO J=1,15
@@ -12366,7 +12401,7 @@ endif
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(TEAPOT),INTENT(IN):: EL
-    
+
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -12824,7 +12859,7 @@ endif
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(TEAPOT),INTENT(IN):: EL
-    
+
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     call fringe_TEAPOT(EL,X,k,1)
@@ -12859,7 +12894,7 @@ endif
   SUBROUTINE MONTR(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(mon),INTENT(INOUT):: EL
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -12895,7 +12930,7 @@ endif
   SUBROUTINE MONTIR(EL,X,k,I)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(mon),INTENT(INOUT):: EL
     INTEGER, INTENT(IN) :: I
     real(dp) DH,DD
@@ -12959,7 +12994,7 @@ endif
   SUBROUTINE RCOLLIMATORR(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(RCOL),INTENT(INOUT):: EL
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -12992,7 +13027,7 @@ endif
   SUBROUTINE RCOLLIMATORiR(EL,X,k,i)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(RCOL),INTENT(INOUT):: EL
     real(dp) DH,DD
     logical(lp) aper
@@ -13074,7 +13109,7 @@ endif
   SUBROUTINE ECOLLIMATORR(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(ECOL),INTENT(INOUT):: EL
     !   logical(lp) aper
     !   real(dp) DH,DD
@@ -13143,7 +13178,7 @@ endif
   SUBROUTINE ECOLLIMATORiR(EL,X,k,i)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(ECOL),INTENT(INOUT):: EL
     real(dp) DH,DD
     logical(lp) aper
@@ -13261,7 +13296,7 @@ endif
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: XO(6)
     TYPE(ESEPTUM),INTENT(INOUT):: EL
-    
+
     real(dp) K1,SH_X,SH,CH,CHM,PZ,E1,XT(2),ARG, X(6),C1,S1
     REAL(DP) DH,DD
     integer, intent(IN) ::i
@@ -13512,7 +13547,7 @@ endif
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(ESEPTUM),INTENT(INOUT):: EL
-    
+
     integer i
     !    LOGICAL(LP) EXACT
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -13664,7 +13699,7 @@ endif
     call PRTP("KICKEX:1", X)
 
   END SUBROUTINE KICKEXP
- 
+
   SUBROUTINE INTER_STREX(EL,X,k,pos)
     IMPLICIT NONE
     TYPE(STREX),INTENT(IN):: EL
@@ -13753,7 +13788,7 @@ endif
              CALL KICKEX (EL,NDK(J),X,k)
              CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
        ENDDO
- 
+
        CASE DEFAULT
           !w_p=0
           !w_p%nc=1
@@ -13842,7 +13877,7 @@ endif
     real(dp) DDF(4)
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
     real(dp)  NDDF(0:15)
-    type(real_8) NDF(0:15),NDK(15) 
+    type(real_8) NDF(0:15),NDK(15)
     INTEGER I,J,f1,pos
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -13934,7 +13969,7 @@ endif
              CALL KICKEX (EL,NDK(J),X,k)
              CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
        ENDDO
- 
+
        CALL KILL(NDF);CALL KILL(NDK);
 
 
@@ -14016,7 +14051,7 @@ endif
              CALL KICKEX (EL,NDK(J),X,k)
              CALL SPAR(EL,NDF(J),NDDF(J),X,k)
        ENDDO
- 
+
        CALL KILL(NDF);CALL KILL(NDK);
        CASE DEFAULT
           !w_p=0
@@ -14094,7 +14129,7 @@ endif
              CALL  WEDGE(ANGH,X,k,EL1=EL)
  !          ELSE
 !  stop 8
-!             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(1),EL%HGAP(1),1,X,k) 
+!             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(1),EL%HGAP(1),1,X,k)
  !               IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
 !                IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
  !         ENDIF
@@ -14261,7 +14296,7 @@ endif
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(STREX),INTENT(IN):: EL
-    
+
     !etienne
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -14340,7 +14375,7 @@ if(old_thick_bend) then
     X(3)=XN(3)
     X(6)=XN(6)
 
-else    
+else
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -14640,17 +14675,17 @@ endif
        X(3)=XN(3)
        X(6)=XN(6)
     ENDIF
- 
+
     else
-   
+
       call wedge_int(x,a,b1,b,exact,time)
 
- 
- 
+
+
 
      endif
     !    CALL CHECK_STABILITY(X)
-  
+
   END SUBROUTINE wedger
 
     subroutine wedge_intr(x,a,b1,b,exact,time)
@@ -14667,27 +14702,27 @@ endif
       if(n_wedge<0) then
 
       do i=1,iabs(n_wedge)
-         X(2)=X(2)-at*wyoshid(0)*b1*x(1) !/2 
+         X(2)=X(2)-at*wyoshid(0)*b1*x(1) !/2
        do j=1,15
         call ROT_XZ(at*wyoshik(j),X,B,EXACT,time)
-         X(2)=X(2)-at*wyoshid(j)*b1*x(1) !/2  
+         X(2)=X(2)-at*wyoshid(j)*b1*x(1) !/2
 
        enddo
       enddo
     else
    do i=1,iabs(n_wedge)
     do j=7,0,-1
-      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2 
+      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2
       call ROT_XZ(at*wyosh(j),X,B,EXACT,time)
       X(2)=X(2)-at*wyosh(j)*b1*x(1)/2
      enddo
 
     do j=1,7
-      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2 
+      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2
       call ROT_XZ(at*wyosh(j),X,B,EXACT,time)
-      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2      
+      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2
    enddo
-      
+
   enddo
 
 endif
@@ -14706,27 +14741,27 @@ endif
       if(n_wedge<0) then
 
       do i=1,iabs(n_wedge)
-         X(2)=X(2)-at*wyoshid(0)*b1*x(1) !/2 
+         X(2)=X(2)-at*wyoshid(0)*b1*x(1) !/2
        do j=1,15
         call ROT_XZ(at*wyoshik(j),X,B,EXACT,time)
-         X(2)=X(2)-at*wyoshid(j)*b1*x(1) !/2  
+         X(2)=X(2)-at*wyoshid(j)*b1*x(1) !/2
 
        enddo
       enddo
     else
    do i=1,iabs(n_wedge)
     do j=7,0,-1
-      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2 
+      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2
       call ROT_XZ(at*wyosh(j),X,B,EXACT,time)
       X(2)=X(2)-at*wyosh(j)*b1*x(1)/2
      enddo
 
     do j=1,7
-      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2 
+      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2
       call ROT_XZ(at*wyosh(j),X,B,EXACT,time)
-      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2      
+      X(2)=X(2)-at*wyosh(j)*b1*x(1)/2
    enddo
-      
+
   enddo
 
 endif
@@ -14821,10 +14856,10 @@ endif
     endif
     CALL KILL(PZ,PZS,PT,B1)
     CALL KILL(XN,6)
- 
+
   call PRTP("WEDGE:1", X)
 
-   
+
   END SUBROUTINE wedgeP
 
   !  CAV_TRAV
@@ -14949,7 +14984,7 @@ endif
        else
        call rk4_cav_trav(z0,d1,el,X,k)
      endif
- 
+
 
     CASE(6)
 
@@ -15026,12 +15061,12 @@ endif
   SUBROUTINE CAVER_TRAV(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(CAV_TRAV),INTENT(INOUT):: EL
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-  
+
     CALL FRINGE_CAV_TRAV(EL,X,k,1)
 
     ! IF(PRESENT(MID)) CALL XMID(MID,X,0)
@@ -16684,7 +16719,7 @@ endif
     endif
 
 
-    acc%table(i)%energy=0 
+    acc%table(i)%energy=0
 
    enddo
 
@@ -18230,7 +18265,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
   SUBROUTINE INTPANCAKER(EL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    
+
     TYPE(PANCAKE),INTENT(INOUT):: EL
     INTEGER I,IS
     real(dp) h
@@ -18377,7 +18412,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
   subroutine feval_CAV_impr(z,zf,h,z0,ki,D,k) !(Z0,X,k,f,D)
     use my_own_linear_tpsa
     IMPLICIT NONE
-    integer ne 
+    integer ne
     parameter (ne=6)
     real(dp), INTENT(INout) :: z(ne),zf(ne)
     real(dp),INTENT(INOUT):: Z0,h
@@ -18387,7 +18422,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     type(my_linear_taylor) x(ne),f(ne)
     real(dp) m(ne/2,ne/2),v(ne/2),  vi(ne/2),ktotalpath
-    
+
      ktotalpath=k%totalpath
 
      if(ki==1) then
@@ -18397,13 +18432,13 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
         vi(i)=zf(2*i-1)
       enddo
      else
-     do i=1,ne/2 
+     do i=1,ne/2
         x(2*i-1)=z(2*i-1)
         x(2*i)=zf(2*i)+dxl(i)
         vi(i)=zf(2*i)
       enddo
     endif
-   
+
 
 
     A=0.0_dp;AD=0.0_dp;
@@ -18484,7 +18519,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
        else
          stop 999
        endif
-       
+
        if(ki==1) then
          do i=1,ne/2
            zf(2*i-1)=v(i)+zf(2*i-1)
@@ -18499,7 +18534,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
 
 
   END subroutine feval_CAV_impr
- 
+
 
 
 
@@ -18715,7 +18750,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
     A(2)=AD(1)*X(3)
     A(3)=-ELPDIR*V*(COS(EL%PSI)*S1+SIN(EL%PSI)*S2)
 
- 
+
 !if(herecav21) then
 !write(6,*)
 !write(6,format4) z0,x(6)-Z0,EL%p%nst,EL%P%P0C
@@ -18934,9 +18969,9 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
     real(dp), intent(inout) :: ti
     real(dp) TT
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
- 
+
     call feval_cav(tI,y,k,f,gr)
- 
+
 
     do  j=1,ne
        a(j)=h*f(j)
@@ -19001,10 +19036,10 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
     call alloc(b)
     call alloc(c)
     call alloc(d)
- 
+
 
     call feval_cav(tI,y,k,f,gr)
- 
+
 
     do  j=1,ne
        a(j)=h*f(j)
@@ -19831,7 +19866,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
 !!! newyoshida
     CASE(8)
 
- 
+
      stop 888
 
 
@@ -19954,7 +19989,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
 !!! newyoshida
     CASE(8)
 
- 
+
      stop 888
 
     CASE DEFAULT
@@ -20035,7 +20070,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     TYPE(HELICAL_DIPOLE),INTENT(INOUT):: EL
-    
+
     INTEGER I
     TYPE(INTERNAL_STATE)  K
 
@@ -20575,7 +20610,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
   end SUBROUTINE elliptical_b_p
 
 
-!!!!! field routine 
+!!!!! field routine
 
   subroutine get_fieldr(EL,B,E,phi,X,k,POS)
     implicit none
@@ -20642,7 +20677,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
 
     CASE(KIND21)     ! travelling wave cavity
 
-    
+
           IF(POS<0) THEN
              call get_Bfield_fringe(EL,B,E,X,pos,k)   ! fringe effect
           ELSE
@@ -20651,7 +20686,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
 
          call A_TRANS(EL%cav21,Z,X,k,A,AD,B,E)
        endif
- 
+
     CASE(kindabell)     ! travelling wave cavity
 
        CALL get_z_ab(EL%ab,POS,z)
@@ -20765,7 +20800,7 @@ call  step_symp_p_PANCAkE(hh,tI,y,k,GR)
        call A_TRANS(EL%cav21,Z,X,k,A,AD,B,E)
        call kill(a,3)
        call kill(ad,3)
- 
+
        endif
 
 
@@ -20925,14 +20960,14 @@ call alloc(vm,phi,z)
          B(2)= -E(1)   !x(1)*E(3)/4.0_dp
          B(3)=0.0_dp
             endif
-    
-      
- 
+
+
+
     call kill(a)
     call kill(ad)
 
 
-     
+
 
     case(kindabell)
             if(pos==-2) then
@@ -21354,7 +21389,7 @@ call kill(vm,phi,z)
 
   END SUBROUTINE GET_BE_CAVP
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!   B_PARA_PERP  and DIRECTION_V   !!!!!!!!!!!!!!!!!!!!!!!!!!! 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!   B_PARA_PERP  and DIRECTION_V   !!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
   subroutine B_PARA_PERPr(k,EL,X,B,BPA,BPE,XP,XPA,e,EF,EFB,EFD,POS)
@@ -21801,7 +21836,7 @@ call kill(vm,phi,z)
     del=x(5)
     CALL get_field(EL,B,E,phi,X,k,POS)
 
-    SELECT CASE(EL%KIND) 
+    SELECT CASE(EL%KIND)
     case(KIND2,kind3,kind5:kind7,kindwiggler) ! Straight for all practical purposes
        CALL B_PARA_PERP(k,EL,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
@@ -21979,7 +22014,7 @@ call kill(vm,phi,z)
 
     CALL get_field(EL,B,E,phi,X,k,POS)
 
-    SELECT CASE(EL%KIND) 
+    SELECT CASE(EL%KIND)
     case(KIND2,kind3,kind5:kind7,kindwiggler) ! Straight for all practical purposes
        CALL B_PARA_PERP(k,EL,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
@@ -22103,7 +22138,7 @@ call kill(vm,phi,z)
 
  !   CALL KILL(B,3)
   !  CALL KILL(ED,3)
- 
+
 
     CALL KILL(E,3)
     CALL KILL(efd,3)
@@ -22129,11 +22164,11 @@ call kill(vm,phi,z)
     real(dp),INTENT(INOUT) :: x(6) !,XP(2)
     real(dp), intent(in):: B2,dlds
     real(dp), intent(inout):: f(6)
-    real(dp)  st,z,av(3),t 
+    real(dp)  st,z,av(3),t
     type(internal_state) k
 
     IF(.NOT.CHECK_STABLE) return
- 
+
     el=>c%parent_fibre%mag
     if(k%TIME) then
        ST=root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
@@ -22143,7 +22178,7 @@ call kill(vm,phi,z)
 
   f=0
    f(5)=f(5)-CRADF(EL%P)*(1.0_dp+X(5))**3*B2*DLDS
- 
+
 
     if(el%kind/=kindpa) then
        IF(ASSOCIATED(EL%B_SOL)) THEN
@@ -22188,7 +22223,7 @@ call kill(vm,phi,z)
 
 
 
- 
+
 
   subroutine radiate_2_forcep(c,x,b2,dlds,k,POS,f)
     use gauss_dis
@@ -22219,7 +22254,7 @@ call kill(vm,phi,z)
      f(i)=0
     enddo
    f(5)=f(5)-CRADF(EL%P)*(1.0_dp+X(5))**3*B2*DLDS
- 
+
 
     if(el%kind/=kindpa) then
        IF(ASSOCIATED(EL%B_SOL)) THEN
@@ -22287,7 +22322,7 @@ call kill(vm,phi,z)
        ST=X(5)
     endif
 
-  
+
     if(K%radiation) X(5)=X(5)-CRADF(EL%P)*(1.0_dp+X(5))**3*B2*FAC*DS*DLDS
 
 
@@ -22351,31 +22386,31 @@ call kill(vm,phi,z)
     REAL(DP), INTENT(IN) :: FAC
     TYPE(REAL_8), intent(in):: B2,dlds
     TYPE(REAL_8) st,z,x(6),av(3)
- 
-    real(dp) b30,x1,x3,denf,denf0    
+
+    real(dp) b30,x1,x3,denf,denf0
     type(damap) xpmap
- 
+
     integer i,j   !,ja,ia
     type(internal_state) k
- 
- 
+
+
     IF(.NOT.CHECK_STABLE) return
- 
- 
+
+
     call alloc(x)
     x=p%x
 
     el=>c%parent_fibre%magp
- 
+
 
        denf=(1.0_dp+x(5))**5/SQRT((1.0_dp+X(5))**2-Xp(1)**2-Xp(2)**2)
- 
+
 
        b30=b2
        b30=b30**1.5e0_dp
        denf0=cflucf(el%p)
        denf=denf0*b30 *FAC*DS*denf
- 
+
        call alloc(xpmap)
 
        xpmap%v(1)=x(1)
@@ -22395,11 +22430,11 @@ call kill(vm,phi,z)
              X3=(xpmap%v(j)).sub.'000010'
              P%E_IJ(i,j)=p%E_IJ(i,j)+denf*x1*x3 ! In a code internally using BMAD units '000001' is needed!!!
           enddo
-       enddo    
+       enddo
        call kill(xpmap)
 ! new eq 15
- 
-       if(compute_stoch_kick) then 
+
+       if(compute_stoch_kick) then
         c%delta_rad_in=(denf)+c%delta_rad_in
         c%delta_rad_out=(denf)+c%delta_rad_out
        endif
@@ -22468,7 +22503,7 @@ call kill(vm,phi,z)
 
     p%x=x
     call kill(x)
- 
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   end subroutine radiate_2_probep
@@ -22499,7 +22534,7 @@ call kill(vm,phi,z)
        ST=X(5)
     endif
 
-  
+
     if(K%radiation) X(5)=X(5)-CRADF(EL%P)*(1.0_dp+X(5))**3*B2*FAC*DS*DLDS
     if(k%stochastic) then
        !         t=sqrt(12.e0_dp)*(bran(bran_init)-half)
@@ -22594,7 +22629,7 @@ call kill(vm,phi,z)
          ee(i)=e(i)
          bb(i)=b(i)
         enddo
- 
+
     call alloc(x)
     x=p%x
 
@@ -22636,13 +22671,13 @@ call kill(vm,phi,z)
              X3=(xpmap%v(j)).sub.'000010'
              P%E_IJ(i,j)=p%E_IJ(i,j)+denf*x1*x3 ! In a code internally using BMAD units '000001' is needed!!!
           enddo
-       enddo    
+       enddo
        call kill(xpmap)
 ! new eq 15
        if(k%spin.and.k%envelope) then
        if(p%use_q) then
-         q=p%q 
-    
+         q=p%q
+
          call makeso3(q,s)
          if(c_%no>=2.and.do_d_sij) then
           call alloc(smap)
@@ -22674,13 +22709,13 @@ call kill(vm,phi,z)
            DO J=1,3
               s(i,j)=p%S(J)%X(I)
            ENDDO
-        ENDDO         
+        ENDDO
        endif
  !!  lambda
         lambda=denf*24.0_dp*sqrt(3.0_dp)/(1.0_dp+x(5))**2/55.0_dp
 
         x1=5.0_dp*sqrt(3.0_dp)/8.0_dp*lambda
- 
+
         do i=1,3
          p%damps(i,i)=p%damps(i,i)-x1
         enddo
@@ -22693,7 +22728,7 @@ call kill(vm,phi,z)
 !! equation 15 of Barber in Chao's handbook
 
         theta_oleksii=(denf0/2.0_dp/11.0_dp)*18.0_dp !  comparing to tau_dep
- 
+
  if(c%parent_fibre%mag%p%b0/=0)         then
 ! yao etienne
 !w_bks=c%parent_fibre
@@ -22703,24 +22738,24 @@ endif
 
 
 !write(6,*) c%parent_fibre%mag%p%b0**2,b30t,denf
-!endif 
+!endif
 dspin=matmul(s,n_oleksii)
     t_ns_oleksii=t_ns_oleksii+(1.d0- 2.0_dp*  (ee(1)*dspin(1)+ee(2)*dspin(2)+ee(3)*dspin(3))**2/9.d0)*b30*FAC*DS
             x3= bb(1)**2+bb(2)**2+bb(3)**2
-            if(x3==0) then  
+            if(x3==0) then
                  x3=1
                else
                  x3=1.d0/sqrt(x3)
-            endif   
-  
+            endif
+
     t_nb_oleksii=t_nb_oleksii+ (bb(1)*dspin(1)+bb(2)*dspin(2)+bb(3)*dspin(3)) *b30*FAC*DS*x3
 
- 
+
 
         call crossp(ee,bb,a)
         call crossp(ee,a,dspin)
         x3=sqrt(a(1)**2+a(2)**2+a(3)**2)
-        
+
        if(x3>1.d-38) then
           x1=24.0_dp*sqrt(3.0_dp)/55.0_dp*lambda
           do i=1,3
@@ -22737,7 +22772,7 @@ dspin=matmul(s,n_oleksii)
 
 
         endif
- 
+
        endif
 
        if(compute_stoch_kick) c%delta_rad_out=root(denf)
@@ -22817,7 +22852,7 @@ dspin=matmul(s,n_oleksii)
        denf0=cflucf(el%p)
        denf=denf0*b30 *FAC*DS*denf
   !     if(doone) denf=0
- 
+
        call alloc(xpmap)
        xpmap%v(1)=x(1)
        xpmap%v(3)=x(3)
@@ -22838,10 +22873,10 @@ dspin=matmul(s,n_oleksii)
        call kill(xpmap)
        if(k%spin.and.k%envelope) then
         if(p%use_q) then
-  
-         q=p%q 
 
-  
+         q=p%q
+
+
          call makeso3(q,s)
 
          if(c_%no>=2.and.do_d_sij) then
@@ -22873,7 +22908,7 @@ dspin=matmul(s,n_oleksii)
            DO J=1,3
               s(i,j)=p%S(J)%X(I)
            ENDDO
-        ENDDO         
+        ENDDO
        endif
 
         x1=denf*9.0_dp/((1.0_dp+x(5))**2 *11.0_dp)
@@ -22888,21 +22923,21 @@ dspin=matmul(s,n_oleksii)
 !!  lambda
         lambda=denf*24.0_dp*sqrt(3.0_dp)/(1.0_dp+x(5))**2/55.0_dp
 !! equation 15 of Barber in Chao's handbook
- 
+
         theta_oleksii=(denf0/2.0_dp/11.0_dp)*18.0_dp !  comparing to tau_dep
-        
+
 ! if(c%parent_fibre%mag%p%b0/=0)         then
-  
+
 !write(6,*) c%parent_fibre%mag%p%b0**2,b30t,denf
-!endif 
+!endif
 dspin=matmul(s,n_oleksii)
     t_ns_oleksii=t_ns_oleksii+(1.d0- 2.0_dp*  (ee(1)*dspin(1)+ee(2)*dspin(2)+ee(3)*dspin(3))**2/9.d0)*b30*FAC*DS
             x3= bb(1)**2+bb(2)**2+bb(3)**2
-            if(x3==0) then  
+            if(x3==0) then
                  x3=1
                else
                  x3=1.d0/sqrt(x3)
-            endif            
+            endif
     t_nb_oleksii=t_nb_oleksii+ (bb(1)*dspin(1)+bb(2)*dspin(2)+bb(3)*dspin(3)) *b30*FAC*DS*x3
 
 
@@ -22910,7 +22945,7 @@ dspin=matmul(s,n_oleksii)
         call crossp(ee,bb,a)
         call crossp(ee,a,dspin)
         x3=sqrt(a(1)**2+a(2)**2+a(3)**2)
-        
+
        if(x3>1.d-38) then
           x1=24.0_dp*sqrt(3.0_dp)/55.0_dp*lambda
           do i=1,3
@@ -22926,13 +22961,13 @@ dspin=matmul(s,n_oleksii)
            enddo
 
         endif
- 
+
        endif
        if(compute_stoch_kick) c%delta_rad_in=root(denf)
     endif
     p%x=x
     call kill(x)
- 
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   end subroutine radiate_2p
@@ -22943,7 +22978,7 @@ dspin=matmul(s,n_oleksii)
     real(dp),INTENT(INOUT) ::a(3),b(3),c(3)
     real(dp) t(3)
 
- 
+
 
      t(1)=a(2)*b(3)-a(3)*b(2)
      t(2)=a(3)*b(1)-a(1)*b(3)
@@ -22951,9 +22986,9 @@ dspin=matmul(s,n_oleksii)
      c(1)=t(1)
      c(2)=t(2)
      c(3)=t(3)
-  
 
-  end subroutine crossp 
+
+  end subroutine crossp
 
   subroutine  quaternion_8_to_matrix(q,s)
     implicit none
@@ -22961,7 +22996,7 @@ dspin=matmul(s,n_oleksii)
     real(dp) s(3,3)
     integer i,j
     type(quaternion) sq,sf
-    
+
 
     s=0.0_dp
     do i=1,3
@@ -22978,7 +23013,7 @@ dspin=matmul(s,n_oleksii)
 
 
 !!!!!!!!!!!!!!! new bmad CAV4 !!!!!!!!!!!!!!
-!                                 (tI,y,q,k,f,q,c)    
+!                                 (tI,y,q,k,f,q,c)
   subroutine feval_CAV_bmad_prober(z0,x,qi,k,f,q,c)    !(Z0,X,k,f,D)   ! MODELLED BASED ON DRIFT
     IMPLICIT NONE
     TYPE(integration_node),pointer, INTENT(IN):: c
@@ -23039,10 +23074,10 @@ dspin=matmul(s,n_oleksii)
 
     X(2)=X(2)+A(1)
     X(4)=X(4)+A(2)
-!  
-!    
+!
+!
 if(k%radiation.or.k%spin) call RAD_SPIN_force_PROBE(c,x,q%x(1:3),k,f)
- 
+
 if(k%spin) then
  q%x(0)=0.0_dp
  q=q*qi
@@ -23063,10 +23098,10 @@ endif
     REAL(DP),intent(inout):: e_ij(6,6),denf
 
     d=>c%parent_fibre%magp%c4
-    
-    call alloc(a) 
-    call alloc(ad) 
-    call alloc(pz) 
+
+    call alloc(a)
+    call alloc(ad)
+    call alloc(pz)
 !    a=0
 !    ad=0
     CALL Abmad_TRANS(D,Z0,X,k,A,AD)
@@ -23114,20 +23149,20 @@ endif
 
     X(2)=X(2)+A(1)
     X(4)=X(4)+A(2)
-!  
+!
 
-!    
+!
 if(k%radiation.or.k%spin.or.k%envelope) call RAD_SPIN_force_PROBE(c,x,q%x(1:3),k,f,e_ij,denf)
 
- 
+
 if(k%spin) then
  q%x(0)=0.0_dp
  q=q*qi
 endif
 
-    call kill(a) 
-    call kill(ad) 
-    call kill(pz) 
+    call kill(a)
+    call kill(ad)
+    call kill(pz)
   END subroutine feval_CAV_bmad_probep
 
 
@@ -23151,9 +23186,9 @@ endif
 
     qy=p%q
     y=p%x
-               
-    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,c)   
- 
+
+    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,c)
+
     do  j=1,ne
        a(j)=h*f(j)
     enddo
@@ -23170,11 +23205,11 @@ endif
     do  j=1,ne
        yt(j)=y(j)+a(j)/2.0_dp
     enddo
- 
+
 
     tt=tI+h/2.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,c)
- 
+
     do  j=1,ne
        b(j)=h*f(j)
     enddo
@@ -23190,7 +23225,7 @@ endif
 
     if(k%spin) then
      do  j=0,3
-       p%q%x(j)=p%q%x(j)+qb%x(j) 
+       p%q%x(j)=p%q%x(j)+qb%x(j)
      enddo
     endif
 
@@ -23226,12 +23261,12 @@ endif
     y=p%x
     hr=h
    cr=0.5_dp
-               
-    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,de_ij,denf,c)   
 
-  if(compute_stoch_kick) then 
-  c%delta_rad_in=(hr*denf*cr)+c%delta_rad_in 
-  c%delta_rad_out=(hr*denf*cr)+c%delta_rad_out 
+    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,de_ij,denf,c)
+
+  if(compute_stoch_kick) then
+  c%delta_rad_in=(hr*denf*cr)+c%delta_rad_in
+  c%delta_rad_out=(hr*denf*cr)+c%delta_rad_out
   endif
 
 
@@ -23250,14 +23285,14 @@ endif
        yt(j)=y(j)+a(j)/2.0_dp
     enddo
      if(k%envelope)  then
-      e_ija =hr*de_ij  
+      e_ija =hr*de_ij
     endif
 
     tt=tI+h/2.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,c)
-  if(compute_stoch_kick) then 
-  c%delta_rad_in=(hr*denf*cr)+c%delta_rad_in 
-  c%delta_rad_out=(hr*denf*cr)+c%delta_rad_out 
+  if(compute_stoch_kick) then
+  c%delta_rad_in=(hr*denf*cr)+c%delta_rad_in
+  c%delta_rad_out=(hr*denf*cr)+c%delta_rad_out
   endif
     do  j=1,ne
        b(j)=h*f(j)
@@ -23268,7 +23303,7 @@ endif
      enddo
     endif
     if(k%envelope)  then
-      e_ijb =hr*de_ij  
+      e_ijb =hr*de_ij
       p%e_ij=p%e_ij+e_ijb
     endif
     do  j=1,ne
@@ -23277,10 +23312,10 @@ endif
 
     if(k%spin) then
      do  j=0,3
-       p%q%x(j)=p%q%x(j)+qb%x(j) 
+       p%q%x(j)=p%q%x(j)+qb%x(j)
      enddo
     endif
-     
+
 
 
     tI=ti+h
@@ -23309,13 +23344,13 @@ endif
     integer j
     real(dp), intent(inout) :: ti,h
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
- 
+
 
     qy=p%q
     y=p%x
-               
-    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,ct)   
- 
+
+    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,ct)
+
     do  j=1,ne
        a(j)=h*f(j)
     enddo
@@ -23330,11 +23365,11 @@ endif
     do  j=1,ne
        yt(j)=y(j)+a(j)/2.0_dp
     enddo
- 
+
 
     tt=tI+h/2.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,ct)
- 
+
 
     do  j=1,ne
        b(j)=h*f(j)
@@ -23352,7 +23387,7 @@ endif
     enddo
 
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,ct)
- 
+
 
     do  j=1,ne
        c(j)=h*f(j)
@@ -23362,7 +23397,7 @@ endif
        qc%x(j)=h*q%x(j)
      enddo
       do  j=0,3
-       qyt%x(j)=qy%x(j)+qc%x(j) 
+       qyt%x(j)=qy%x(j)+qc%x(j)
      enddo
     endif
     do  j=1,ne
@@ -23372,7 +23407,7 @@ endif
 
     tt=tI+h
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,ct)
- 
+
 
     do  j=1,ne
        d(j)=h*f(j)
@@ -23383,19 +23418,19 @@ endif
      enddo
     endif
 
- 
+
     do  j=1,ne
        p%x(j) = p%x(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
     enddo
- 
 
- 
+
+
     if(k%spin) then
      do  j=0,3
        p%q%x(j)=p%q%x(j)+(qa%x(j)+2.0_dp*qb%x(j)+2.0_dp*qc%x(j)+qd%x(j))/6.0_dp
      enddo
     endif
- 
+
 
 
     return
@@ -23418,7 +23453,7 @@ subroutine rk4bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     real(dp) de_ij(6,6),hr,denf,cr
 
 
-          
+
     do j=1,ne
      call alloc(y(j),yt(j),f(j),a(j),b(j),c(j),d(j))
     enddo
@@ -23430,10 +23465,10 @@ subroutine rk4bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     hr=h
    cr=0.25_dp
 
-    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,de_ij,denf,ct)   
-if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,de_ij,denf,ct)
+if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
 
@@ -23452,15 +23487,15 @@ if(compute_stoch_kick) then
        yt(j)=y(j)+a(j)/2.0_dp
     enddo
      if(k%envelope)  then
-      e_ija =hr*de_ij  
+      e_ija =hr*de_ij
     endif
- 
+
 
     tt=tI+h/2.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,ct)
- if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+ if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
 
@@ -23476,7 +23511,7 @@ if(compute_stoch_kick) then
      enddo
     endif
     if(k%envelope)  then
-      e_ijb =hr*de_ij  
+      e_ijb =hr*de_ij
     endif
 
     do  j=1,ne
@@ -23484,9 +23519,9 @@ if(compute_stoch_kick) then
     enddo
 
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,ct)
-   if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+   if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
 
@@ -23498,21 +23533,21 @@ if(compute_stoch_kick) then
        qc%x(j)=h*q%x(j)
      enddo
       do  j=0,3
-       qyt%x(j)=qy%x(j)+qc%x(j) 
+       qyt%x(j)=qy%x(j)+qc%x(j)
      enddo
     endif
     do  j=1,ne
        yt(j)=y(j)+c(j)
     enddo
     if(k%envelope)  then
-      e_ijc =hr*de_ij  
+      e_ijc =hr*de_ij
     endif
 
     tt=tI+h
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,ct)
- if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+ if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
 
@@ -23525,20 +23560,20 @@ if(compute_stoch_kick) then
      enddo
     endif
     if(k%envelope)  then
-      e_ijd =hr*de_ij  
+      e_ijd =hr*de_ij
     endif
- 
+
     do  j=1,ne
        p%x(j) = p%x(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
     enddo
- 
- 
+
+
     if(k%spin) then
      do  j=0,3
        p%q%x(j)=p%q%x(j)+(qa%x(j)+2.0_dp*qb%x(j)+2.0_dp*qc%x(j)+qd%x(j))/6.0_dp
      enddo
     endif
- 
+
 
     if(k%envelope)  then
       p%e_ij=p%e_ij+(e_ija+2.0_dp*e_ijb+2.0_dp*e_ijc+e_ijd)/6.0_dp
@@ -23568,12 +23603,12 @@ subroutine rk6bmad_cav_prober(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     integer j
     real(dp)  , intent(inout) :: ti,h
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
- 
+
 
     qy=p%q
     y=p%x
-    
-    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,ct)   
+
+    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,ct)
 
     do  j=1,ne
        a(j)=h*f(j)
@@ -23589,8 +23624,8 @@ subroutine rk6bmad_cav_prober(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     do  j=1,ne
        yt(j)=y(j)+a(j)/9.0_dp
     enddo
- 
- 
+
+
 
     tt=tI+h/9.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,ct)
@@ -23604,14 +23639,14 @@ subroutine rk6bmad_cav_prober(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
        qyt%x(j)=qy%x(j)+(qa%x(j) + 3.0_dp*qb%x(j))/24.0_dp
      enddo
     endif
- 
+
     do   j=1,ne
        yt(j)=y(j) + (a(j) + 3.0_dp*b(j))/24.0_dp
     enddo
 
 
 
-     
+
     tt=tI+h/6.0_dp
 
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,ct)
@@ -23628,12 +23663,12 @@ subroutine rk6bmad_cav_prober(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     do  j=1,ne
        yt(j)=y(j)+c(j)
     enddo
- 
+
 
     do  j=1,ne
        yt(j)=y(j)+(a(j)-3.0_dp*b(j)+4.0_dp*c(j))/6.0_dp
     enddo
- 
+
 
    tt=tI+h/3.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,ct)
@@ -23647,8 +23682,8 @@ subroutine rk6bmad_cav_prober(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
        qyt%x(j)=qy%x(j)+(-5.0_dp*qa%x(j) + 27.0_dp*qb%x(j) - 24.0_dp*qc%x(j) + 6.0_dp*qd%x(j))/8.0_dp
      enddo
     endif
- 
- 
+
+
     do  j=1,ne
        yt(j)=y(j) + (-5.0_dp*a(j) + 27.0_dp*b(j) - 24.0_dp*c(j) + 6.0_dp*d(j))/8.0_dp
     enddo
@@ -23670,7 +23705,7 @@ subroutine rk6bmad_cav_prober(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     do  j=1,ne
        yt(j)=y(j) + (221.0_dp*a(j) - 981.0_dp*b(j) + 867.0_dp*c(j)- 102.0_dp*d(j) + e(j))/9.0_dp
     enddo
- 
+
 
      tt = tI+2.0_dp*h/3.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,ct)
@@ -23689,7 +23724,7 @@ subroutine rk6bmad_cav_prober(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
               -66.0_dp*qd%x(j)+80.0_dp*qe%x(j)+3.0_dp*qg%x(j))/48.0_dp
      enddo
     endif
- 
+
 
     tt = tI + 5.0_dp*h/6.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,ct)
@@ -23707,7 +23742,7 @@ subroutine rk6bmad_cav_prober(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
         -454.0_dp*qe%x(j)-9.0_dp*qg%x(j)+72.0_dp*qo%x(j))/82.0_dp
      enddo
      endif
- 
+
 
     tt = tI + h
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,ct)
@@ -23720,13 +23755,13 @@ subroutine rk6bmad_cav_prober(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
        qp%x(j)=h*q%x(j)
      enddo
     endif
- 
+
 
     do  j=1,ne
        p%x(j) = p%x(j)+(41.0_dp*a(j)+216.0_dp*c(j)+27.0_dp*d(j)+272.0_dp*e(j)+27.0_dp*g(j)+216.0_dp*o(j)+41.0_dp*pt(j))/840.0_dp
     enddo
 
- 
+
     if(k%spin) then
      do  j=0,3
        p%q%x(j) = p%q%x(j)+(41.0_dp*qa%x(j)+216.0_dp*qc%x(j)+27.0_dp*qd%x(j) &
@@ -23735,7 +23770,7 @@ subroutine rk6bmad_cav_prober(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     endif
 
 
- 
+
 
 
     return
@@ -23758,7 +23793,7 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     real(dp) de_ij(6,6),hr,denf,cr
 
 
-          
+
     do j=1,ne
      call alloc(y(j),yt(j),f(j),a(j),b(j),c(j),d(j),e(j),g(j),o(j))
      call alloc(pt(j))
@@ -23771,10 +23806,10 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     y=p%x
     hr=h
    cr=0.125_dp
-    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,de_ij,denf,ct)   
- if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+    call feval_CAV_bmad_probe(tI,y,qy,k,f,q,de_ij,denf,ct)
+ if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
     do  j=1,ne
@@ -23792,15 +23827,15 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
        yt(j)=y(j)+a(j)/9.0_dp
     enddo
      if(k%envelope)  then
-      e_ija =hr*de_ij  
+      e_ija =hr*de_ij
     endif
- 
+
 
     tt=tI+h/9.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+  if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
   do  j=1,ne
        b(j)=h*f(j)
@@ -23812,7 +23847,7 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
      enddo
     endif
     if(k%envelope)  then
-      e_ijb =hr*de_ij  
+      e_ijb =hr*de_ij
       p%e_ij=p%e_ij+e_ijb
     endif
     do   j=1,ne
@@ -23821,13 +23856,13 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
 
 
 
-     
+
     tt=tI+h/6.0_dp
 
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,ct)
- if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+ if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
     do  j=1,ne
@@ -23843,19 +23878,19 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
        yt(j)=y(j)+c(j)
     enddo
     if(k%envelope)  then
-      e_ijc =hr*de_ij  
+      e_ijc =hr*de_ij
     endif
 
     do  j=1,ne
        yt(j)=y(j)+(a(j)-3.0_dp*b(j)+4.0_dp*c(j))/6.0_dp
     enddo
- 
+
 
    tt=tI+h/3.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,ct)
- if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+ if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
 
@@ -23869,18 +23904,18 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
      enddo
     endif
     if(k%envelope)  then
-      e_ijd =hr*de_ij  
+      e_ijd =hr*de_ij
     endif
- 
+
     do  j=1,ne
        yt(j)=y(j) + (-5.0_dp*a(j) + 27.0_dp*b(j) - 24.0_dp*c(j) + 6.0_dp*d(j))/8.0_dp
     enddo
 
    tt=tI+0.5_dp*h
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,ct)
- if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+ if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
     do  j=1,ne
        e(j)=h*f(j)
@@ -23897,14 +23932,14 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
        yt(j)=y(j) + (221.0_dp*a(j) - 981.0_dp*b(j) + 867.0_dp*c(j)- 102.0_dp*d(j) + e(j))/9.0_dp
     enddo
      if(k%envelope)  then
-      e_ije =hr*de_ij  
+      e_ije =hr*de_ij
     endif
 
      tt = tI+2.0_dp*h/3.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,ct)
- if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+ if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
     do   j=1,ne
@@ -23922,14 +23957,14 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
      enddo
     endif
      if(k%envelope)  then
-      e_ijg =hr*de_ij  
+      e_ijg =hr*de_ij
     endif
 
     tt = tI + 5.0_dp*h/6.0_dp
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,ct)
- if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+ if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
     do  j=1,ne
@@ -23946,14 +23981,14 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
      enddo
      endif
      if(k%envelope)  then
-      e_ijo =hr*de_ij  
+      e_ijo =hr*de_ij
     endif
 
     tt = tI + h
     call feval_CAV_bmad_probe(tt,yt,qyt,k,f,q,de_ij,denf,ct)
- if(compute_stoch_kick) then 
-  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in 
-  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out 
+ if(compute_stoch_kick) then
+  ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
+  ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
     do  j=1,ne
@@ -23965,7 +24000,7 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
      enddo
     endif
      if(k%envelope)  then
-      e_ijp =hr*de_ij  
+      e_ijp =hr*de_ij
     endif
 
     do  j=1,ne
@@ -23979,7 +24014,7 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     enddo
     endif
     if(k%envelope)  then
-      p%e_ij=p%e_ij+(41.0_dp*e_ija+216.0_dp*e_ijc+27.0_dp*e_ijd+272.0_dp*e_ije & 
+      p%e_ij=p%e_ij+(41.0_dp*e_ija+216.0_dp*e_ijc+27.0_dp*e_ijd+272.0_dp*e_ije &
              +27.0_dp*e_ijg+216.0_dp*e_ijo+41.0_dp*e_ijp)/840.0_dp
     endif
 
@@ -23995,7 +24030,7 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     return
   end  subroutine rk6bmad_cav_probep
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- 
+
 
 !!!!!!!!!!!!!!! new teapot  with quaternion !!!!!!!!!!!!!!
 
@@ -24016,7 +24051,7 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
     el=>fi%mag%tp10
 
      call GETELECTRIC(EL,Ef,phi,Bf,VM,X,bkick=b)
- 
+
      DIR=EL%P%DIR*EL%P%CHARGE
 
 
@@ -24074,10 +24109,10 @@ subroutine rk6bmad_cav_probep(ti,p,k,ct,h)   ! (ti,h,GR,y,k)
        Ef(I)=Ef(I)*EL%P%CHARGE
     ENDDO
 
-! patrice 
-!    
+! patrice
+!
 if(k%radiation.or.k%spin) call RAD_SPIN_force_PROBE(c,x,q%x(1:3),k,f)
- 
+
 if(k%spin) then
  q%x(0)=0.0_dp
  q=q*qi
@@ -24102,16 +24137,16 @@ endif
 
     fi=>c%parent_fibre
     el=>fi%magp%tp10
-   
+
     call alloc(PZ,DEL,H,VM,phi)
-    do i=1,3 
+    do i=1,3
      call alloc(b(i),Ef(i),Bf(i))
     enddo
- 
+
 
 
      call GETELECTRIC(EL,Ef,phi,Bf,VM,X,bkick=b)
- 
+
      DIR=EL%P%DIR*EL%P%CHARGE
 
 
@@ -24169,17 +24204,17 @@ endif
        Ef(I)=Ef(I)*EL%P%CHARGE
     ENDDO
 
-! patrice 
-!        
+! patrice
+!
 if(k%radiation.or.k%spin.or.k%envelope) call RAD_SPIN_force_PROBE(c,x,q%x(1:3),k,f,e_ij,denf)
- 
+
 if(k%spin) then
  q%x(0)=0.0_dp
  q=q*qi
 endif
-   
+
     call kill(PZ,DEL,H,VM,phi)
-    do i=1,3 
+    do i=1,3
      call kill(b(i),Ef(i),Bf(i))
     enddo
 
@@ -24237,7 +24272,7 @@ endif
 
     if(k%spin) then
      do  j=0,3
-       p%q%x(j)=p%q%x(j)+qb%x(j) 
+       p%q%x(j)=p%q%x(j)+qb%x(j)
      enddo
     endif
 
@@ -24297,7 +24332,7 @@ endif
 
     if(k%spin) then
      do  j=0,3
-       qyt%x(j)=qy%x(j)+qb%x(j)/2.0_dp 
+       qyt%x(j)=qy%x(j)+qb%x(j)/2.0_dp
      enddo
     endif
 
@@ -24316,7 +24351,7 @@ endif
     enddo
     if(k%spin) then
      do  j=0,3
-       qyt%x(j)=qy%x(j)+qc%x(j) 
+       qyt%x(j)=qy%x(j)+qc%x(j)
      enddo
     endif
 
@@ -24326,7 +24361,7 @@ endif
        d(j)=h*f(j)
     enddo
 
- 
+
 
     if(k%spin) then
      do  j=0,3
@@ -24514,7 +24549,7 @@ enddo
 
     call feval_teapot_qua(y,qy,k,f,q,de_ij,denf,c)
 
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   c%delta_rad_in=(hr*denf*cr)+c%delta_rad_in
   c%delta_rad_out=(hr*denf*cr)+c%delta_rad_out
   endif
@@ -24536,12 +24571,12 @@ enddo
      enddo
     endif
     if(k%envelope)  then
-      e_ija =hr*de_ij  
+      e_ija =hr*de_ij
     endif
 
 
     call feval_teapot_qua(yt,qyt,k,f,q,de_ij,denf,c)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   c%delta_rad_in=(hr*denf*cr)+c%delta_rad_in
   c%delta_rad_out=(hr*denf*cr)+c%delta_rad_out
   endif
@@ -24556,7 +24591,7 @@ enddo
      enddo
     endif
     if(k%envelope)  then
-      e_ijb =hr*de_ij  
+      e_ijb =hr*de_ij
       p%e_ij=p%e_ij+e_ijb
     endif
 
@@ -24566,7 +24601,7 @@ enddo
 
     if(k%spin) then
      do  j=0,3
-       p%q%x(j)=p%q%x(j)+qb%x(j) 
+       p%q%x(j)=p%q%x(j)+qb%x(j)
      enddo
     endif
     call kill(qa,qb,qyt,qy,q)
@@ -24590,9 +24625,9 @@ subroutine rk4_teapot_probep(p,k,ct,h)
     integer j
     type(real_8) , intent(inout) :: h
     real(dp) de_ij(6,6),hr,e_ija(6,6),e_ijb(6,6),e_ijc(6,6),e_ijd(6,6),denf,cr
- 
+
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
- 
+
     cr=0.25_dp
     call alloc(q,qa,qb,qyt,qy,qc,qd)
     do j=1,ne
@@ -24604,7 +24639,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
     hr=h
 
     call feval_teapot_qua(y,qy,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24620,7 +24655,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
        qa%x(j)=h*q%x(j)
      enddo
      do  j=0,3
-       qyt%x(j)=qy%x(j)+qa%x(j)/2.0_dp 
+       qyt%x(j)=qy%x(j)+qa%x(j)/2.0_dp
      enddo
     endif
     if(k%envelope)  then
@@ -24629,7 +24664,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
 
 
     call feval_teapot_qua(yt,qyt,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24646,7 +24681,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
        qb%x(j)=h*q%x(j)
      enddo
      do  j=0,3
-       qyt%x(j)=qy%x(j)+qb%x(j)/2.0_dp 
+       qyt%x(j)=qy%x(j)+qb%x(j)/2.0_dp
      enddo
     endif
     if(k%envelope)  then
@@ -24654,7 +24689,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
     endif
 
     call feval_teapot_qua(yt,qyt,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24664,14 +24699,14 @@ subroutine rk4_teapot_probep(p,k,ct,h)
        c(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + c(j) 
+       yt(j)=y(j) + c(j)
     enddo
     if(k%spin) then
      do  j=0,3
        qc%x(j)=h*q%x(j)
      enddo
      do  j=0,3
-       qyt%x(j)=qy%x(j)+qc%x(j) 
+       qyt%x(j)=qy%x(j)+qc%x(j)
      enddo
     endif
     if(k%envelope)  then
@@ -24679,17 +24714,17 @@ subroutine rk4_teapot_probep(p,k,ct,h)
     endif
 
     call feval_teapot_qua(yt,qyt,k,f,q,e_ijd,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
 
-  
+
 
     do  j=1,ne
        d(j)=h*f(j)
     enddo
- 
+
     if(k%spin) then
      do  j=0,3
        qd%x(j)=h*q%x(j)
@@ -24699,7 +24734,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
       e_ijd =hr*de_ij
     endif
 
- 
+
 
     do  j=1,ne
        p%x(j) = p%x(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
@@ -24749,7 +24784,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
     hr=h
     cr=0.125_dp
      call feval_teapot_qua(y,qy,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24771,7 +24806,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
     endif
 
      call feval_teapot_qua(yt,qyt,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24794,7 +24829,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
     endif
 
      call feval_teapot_qua(yt,qyt,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24815,7 +24850,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
       e_ijc =hr*de_ij
     endif
      call feval_teapot_qua(yt,qyt,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24836,7 +24871,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
       e_ijd =hr*de_ij
     endif
      call feval_teapot_qua(yt,qyt,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24857,7 +24892,7 @@ subroutine rk4_teapot_probep(p,k,ct,h)
       e_ije =hr*de_ij
     endif
      call feval_teapot_qua(yt,qyt,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24878,7 +24913,7 @@ enddo
       e_ijg =hr*de_ij
     endif
      call feval_teapot_qua(yt,qyt,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24901,7 +24936,7 @@ enddo
     endif
 
      call feval_teapot_qua(yt,qyt,k,f,q,de_ij,denf,ct)
-  if(compute_stoch_kick) then 
+  if(compute_stoch_kick) then
   ct%delta_rad_in=(hr*denf*cr)+ct%delta_rad_in
   ct%delta_rad_out=(hr*denf*cr)+ct%delta_rad_out
   endif
@@ -24941,7 +24976,7 @@ enddo
     return
   end  subroutine rk6_teapot_probep
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!    CAV4 PROBE     !!!!!!!!!!!!!!!!!!!!!!!!!!! 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!    CAV4 PROBE     !!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
 !
 
@@ -25089,7 +25124,7 @@ enddo
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
           NDKH(I)=NDK(I)/2.0_DP
        ENDDO
- 
+
           CALL DRIFT(NDF(0),NDDF(0),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
 
        DO J=1,15
@@ -25102,7 +25137,7 @@ enddo
         endif
           CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,P%X)
        ENDDO
- 
+
 
 
     CASE DEFAULT
@@ -25128,24 +25163,24 @@ enddo
         call rk2bmad_cav_probe(z0,p,k,c,d)
 
     CASE(4)
- 
+
 
         call rk4bmad_cav_probe(z0,p,k,c,d)
 
- 
+
 
     CASE(6)
 
- 
+
         call rk6bmad_cav_probe(z0,p,k,c,d)
 
  !!! newyoshida
     CASE(8)
- 
+
         call rk6bmad_cav_probe(z0,p,k,c,d)
 
 
- 
+
 
     CASE DEFAULT
        !w_p=0
@@ -25173,11 +25208,11 @@ enddo
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4),z0
     real(dp) DD1,DD2,DDF(4)
     type(real_8) DKH(4)
-    type(real_8)  NDKH(15) 
+    type(real_8)  NDKH(15)
     real(dp)   NDDF(0:15)
-    type(real_8) NDF(0:15),NDK(15) 
+    type(real_8) NDF(0:15),NDK(15)
 
- 
+
 
     INTEGER I,J,POS
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
@@ -25307,7 +25342,7 @@ enddo
        ENDDO
 
        CALL KILL(DF,4);CALL KILL(DK,4);
-       if(k%spin.or.k%radiation) CALL KILL(DKH,4); 
+       if(k%spin.or.k%radiation) CALL KILL(DKH,4);
 !!! newyoshida
     CASE(8)
   !  real(dp) NDF(0:15),NDK(15),NDDF(0:15)
@@ -25321,7 +25356,7 @@ enddo
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
           NDKH(I)=NDK(I)/2.0_DP
        ENDDO
- 
+
           CALL DRIFT(NDF(0),NDDF(0),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
 
        DO J=1,15
@@ -25334,7 +25369,7 @@ enddo
         endif
           CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,P%X)
        ENDDO
- 
+
    CALL KILL(NDF);CALL KILL(NDK);
    if(k%spin.or.k%radiation) CALL KILL(NDKH)
 
@@ -25373,7 +25408,7 @@ else
 
 
         call rk6bmad_cav_probe(z0,p,k,c,d)
- 
+
 !!! newyoshida
     CASE(8)
 
@@ -25396,7 +25431,7 @@ endif
 
   END SUBROUTINE INTE_CAV4_PROBEP
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!    TEAPOT PROBE     !!!!!!!!!!!!!!!!!!!!!!!!!!! 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!    TEAPOT PROBE     !!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
 !
   SUBROUTINE INTE_TEAPOT_prober(p,k,c)
@@ -25549,9 +25584,9 @@ endif
           NDF(I)=EL%L*wyoshid(I)/EL%P%NST
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDKH(I)=EL%L*wyoshik(I)/EL%P%NST/2.0_dp
-          NDK(I)=EL%L*wyoshik(I)/EL%P%NST 
+          NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL SSECH1(EL,NDF(0),NDDF(0),p%X,k)
 
        DO J=1,15
@@ -25564,7 +25599,7 @@ endif
         endif
           CALL SSECH1(EL,NDF(J),NDDF(J),p%X,k)
        ENDDO
- 
+
 
 
     CASE DEFAULT
@@ -25635,7 +25670,7 @@ endif
     real(dp) DDF(4)
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
     real(dp)  NDDF(0:15)
-    type(real_8) NDF(0:15),NDK(15) 
+    type(real_8) NDF(0:15),NDK(15)
     INTEGER I,J,f1
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 !    integer,optional :: pos
@@ -25643,7 +25678,7 @@ endif
     type(fibre), pointer :: f
     TYPE(REAL_8)  dk2h,dk1h
     type(real_8) DKH(4)
-    type(real_8)  NDKH(15) 
+    type(real_8)  NDKH(15)
 
 
     POS=c%POS_IN_FIBRE-2
@@ -25742,7 +25777,7 @@ endif
           DK(I)=EL%L*YOSK(I)/EL%P%NST
        ENDDO
        if(k%spin.or.k%radiation) then
-       CALL ALLOC(DKH,4); 
+       CALL ALLOC(DKH,4);
         do I =1,4
            DKH(I)=EL%L*YOSK(I)/EL%P%NST/2.d0
         enddo
@@ -25779,7 +25814,7 @@ endif
        ENDDO
 
        CALL KILL(DF,4);CALL KILL(DK,4);
-       if(k%spin.or.k%radiation) CALL KILL(DKH,4); 
+       if(k%spin.or.k%radiation) CALL KILL(DKH,4);
 !!! newyoshida
     CASE(8)
   !  real(dp) NDF(0:15),NDK(15),NDDF(0:15)
@@ -25866,8 +25901,8 @@ endif
   END SUBROUTINE INTE_TEAPOT_probep
 
 !!!!!!!!!!!!!!!!!  TKTF  probe  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- 
- 
+
+
 
   SUBROUTINE INTE_TKTF_prober(P,k,c,pos)
     IMPLICIT NONE
@@ -25937,7 +25972,7 @@ endif
            call RAD_SPIN_qua_PROBE(c,p,k,dk6)
         CALL KICKTKT7(EL,DK2,p%X,k)
         else
-          CALL KICKTKT7(EL,DK6,p%X,k)   
+          CALL KICKTKT7(EL,DK6,p%X,k)
         endif
 
           CALL KICKPATH(EL,DK2,p%X,k)
@@ -25949,7 +25984,7 @@ endif
            call RAD_SPIN_qua_PROBE(c,p,k,DK)
         CALL KICKTKT7(EL,DKh,p%X,k)
         else
-             CALL KICKTKT7(EL,DK,p%X,k)  
+             CALL KICKTKT7(EL,DK,p%X,k)
         endif
 
           endif
@@ -25960,7 +25995,7 @@ endif
            call RAD_SPIN_qua_PROBE(c,p,k,DK2)
         CALL KICKTKT7(EL,DK,p%X,k)
         else
-          CALL KICKTKT7(EL,DK2,p%X,k)   
+          CALL KICKTKT7(EL,DK2,p%X,k)
         endif
 !          CALL KICKTKT7(EL,DK2,p%X,k)    ! 1/3
           CALL KICKPATH(EL,DK,p%X,k)
@@ -25972,7 +26007,7 @@ endif
            call RAD_SPIN_qua_PROBE(c,p,k,DK)
         CALL KICKTKT7(EL,DKh,p%X,k)
         else
-          CALL KICKTKT7(EL,DK,p%X,k)   
+          CALL KICKTKT7(EL,DK,p%X,k)
         endif
           CALL KICKPATH(EL,DK,p%X,k)
           CALL PUSHTKT7(EL,p%X,k)
@@ -25985,7 +26020,7 @@ endif
            call RAD_SPIN_qua_PROBE(c,p,k,DK)
         CALL KICKTKT7(EL,DKh,p%X,k)
         else
-          CALL KICKTKT7(EL,DK,p%X,k)   
+          CALL KICKTKT7(EL,DK,p%X,k)
         endif
        else
           CALL PUSHTKT7(EL,p%X,k)
@@ -26017,7 +26052,7 @@ endif
         else
        CALL KICKTKT7(EL,DK6,p%X,k)
         endif
- 
+
 
        CALL KICKPATH(EL,DK2,p%X,k)
        CALL PUSHTKT7(EL,p%X,k)
@@ -26135,7 +26170,7 @@ endif
        DK6=12.0_dp*EL%L/EL%P%NST/90.0_dp  ! 12/90
        DK5=DK6/2.0_dp  ! 6/90
        DK=DK2/2.0_dp    ! 7/90
-       DKh=DK/2.0_dp   
+       DKh=DK/2.0_dp
        DK4h=DK4/2.0_dp
 !       CALL KICKTKT7(EL,DK,p%X,k)  ! NEW
         if(k%spin.or.k%radiation) then
@@ -26199,12 +26234,12 @@ endif
        DK2=216.0_dp*dk   !  9/35
        DK4=27.0_dp*dk    !  9/280
        DK6=272.0_dp*dk  !   34/105
-       DK5=DK6/2.0_dp  !  
+       DK5=DK6/2.0_dp  !
        DK=41.0_dp*DK    !  41/840
-       DKh=dk/2.0_dp  !  
-       DK2h=dk2/2.0_dp  !  
-       DK4h=dk4/2.0_dp  !  
- 
+       DKh=dk/2.0_dp  !
+       DK2h=dk2/2.0_dp  !
+       DK4h=dk4/2.0_dp  !
+
    !    CALL KICKTKT7(EL,DK,X,k)  ! NEW
         if(k%spin.or.k%radiation) then
         CALL KICKTKT7(EL,DKh,p%X,k)
@@ -26299,7 +26334,7 @@ endif
 
   END SUBROUTINE INTE_TKTF_prober
 
- 
+
 
   SUBROUTINE INTE_TKTF_probep(P,k,c,pos)
     IMPLICIT NONE
@@ -26373,7 +26408,7 @@ endif
            call RAD_SPIN_qua_PROBE(c,p,k,dk6)
         CALL KICKTKT7(EL,DK2,p%X,k)
         else
-          CALL KICKTKT7(EL,DK6,p%X,k)   
+          CALL KICKTKT7(EL,DK6,p%X,k)
         endif
 
           CALL KICKPATH(EL,DK2,p%X,k)
@@ -26385,7 +26420,7 @@ endif
            call RAD_SPIN_qua_PROBE(c,p,k,DK)
         CALL KICKTKT7(EL,DKh,p%X,k)
         else
-             CALL KICKTKT7(EL,DK,p%X,k)  
+             CALL KICKTKT7(EL,DK,p%X,k)
         endif
 
           endif
@@ -26396,7 +26431,7 @@ endif
            call RAD_SPIN_qua_PROBE(c,p,k,DK2)
         CALL KICKTKT7(EL,DK,p%X,k)
         else
-          CALL KICKTKT7(EL,DK2,p%X,k)   
+          CALL KICKTKT7(EL,DK2,p%X,k)
         endif
 !          CALL KICKTKT7(EL,DK2,p%X,k)    ! 1/3
           CALL KICKPATH(EL,DK,p%X,k)
@@ -26408,7 +26443,7 @@ endif
            call RAD_SPIN_qua_PROBE(c,p,k,DK)
         CALL KICKTKT7(EL,DKh,p%X,k)
         else
-          CALL KICKTKT7(EL,DK,p%X,k)   
+          CALL KICKTKT7(EL,DK,p%X,k)
         endif
           CALL KICKPATH(EL,DK,p%X,k)
           CALL PUSHTKT7(EL,p%X,k)
@@ -26421,7 +26456,7 @@ endif
            call RAD_SPIN_qua_PROBE(c,p,k,DK)
         CALL KICKTKT7(EL,DKh,p%X,k)
         else
-          CALL KICKTKT7(EL,DK,p%X,k)   
+          CALL KICKTKT7(EL,DK,p%X,k)
         endif
        else
           CALL PUSHTKT7(EL,p%X,k)
@@ -26455,7 +26490,7 @@ endif
         else
        CALL KICKTKT7(EL,DK6,p%X,k)
         endif
- 
+
 
        CALL KICKPATH(EL,DK2,p%X,k)
        CALL PUSHTKT7(EL,p%X,k)
@@ -26576,7 +26611,7 @@ endif
        DK6=12.0_dp*EL%L/EL%P%NST/90.0_dp  ! 12/90
        DK5=DK6/2.0_dp  ! 6/90
        DK=DK2/2.0_dp    ! 7/90
-       DKh=DK/2.0_dp   
+       DKh=DK/2.0_dp
        DK4h=DK4/2.0_dp
 !       CALL KICKTKT7(EL,DK,p%X,k)  ! NEW
         if(k%spin.or.k%radiation) then
@@ -26643,12 +26678,12 @@ endif
        DK2=216.0_dp*dk   !  9/35
        DK4=27.0_dp*dk    !  9/280
        DK6=272.0_dp*dk  !   34/105
-       DK5=DK6/2.0_dp  !  
+       DK5=DK6/2.0_dp  !
        DK=41.0_dp*DK    !  41/840
-       DKh=dk/2.0_dp  !  
-       DK2h=dk2/2.0_dp  !  
-       DK4h=dk4/2.0_dp  !  
- 
+       DKh=dk/2.0_dp  !
+       DK2h=dk2/2.0_dp  !
+       DK4h=dk4/2.0_dp  !
+
    !    CALL KICKTKT7(EL,DK,X,k)  ! NEW
         if(k%spin.or.k%radiation) then
         CALL KICKTKT7(EL,DKh,p%X,k)
@@ -26744,8 +26779,8 @@ endif
 
   END SUBROUTINE INTE_TKTF_probep
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!    STREX PROBE     !!!!!!!!!!!!!!!!!!!!!!!!!!! 
-! 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!    STREX PROBE     !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
   SUBROUTINE INTE_STREX_prober(p,k,c,pos)
     IMPLICIT NONE
     TYPE(STREX),pointer::  EL
@@ -26782,7 +26817,7 @@ endif
         call RAD_SPIN_qua_PROBE(c,p,k,d)
         endif
        ENDIF
-        
+
           CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
        CASE(2)
           DH=EL%L/2.0_dp/EL%P%NST
@@ -26797,7 +26832,7 @@ endif
          else
         CALL KICKEX (EL,D,p%X,k)
         endif
-          
+
           CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
 
        CASE(4)
@@ -26886,7 +26921,7 @@ endif
           NDF(I)=EL%L*wyoshid(I)/EL%P%NST
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDKH(I)=EL%L*wyoshik(I)/EL%P%NST/2.0_dp
-          NDK(I)=EL%L*wyoshik(I)/EL%P%NST 
+          NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
 
              CALL DRIFT(NDF(0),NDDF(0),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
@@ -26901,7 +26936,7 @@ endif
         endif
              CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
        ENDDO
- 
+
        CASE DEFAULT
           !w_p=0
           !w_p%nc=1
@@ -26948,7 +26983,7 @@ endif
              CALL KICKEX (EL,DK1,p%X,k)
             endif
           CALL SPAR(EL,D2,DD2,p%X,k)
- 
+
             if(k%spin.or.k%radiation) then
              CALL KICKEX (EL,DK2h,p%X,k)
              call RAD_SPIN_qua_PROBE(c,p,k,DK2)
@@ -26968,7 +27003,7 @@ endif
           CALL SPAR(EL,D1,DD1,p%X,k)
 
 
- 
+
        CASE(6)
 
 
@@ -26983,7 +27018,7 @@ endif
         enddo
        endif
 
- 
+
 
           DO J=4,2,-1
              CALL SPAR(EL,DF(J),DDF(J),p%X,k)
@@ -27027,7 +27062,7 @@ endif
           NDF(I)=EL%L*wyoshid(I)/EL%P%NST
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDKH(I)=EL%L*wyoshik(I)/EL%P%NST/2.0_dp
-          NDK(I)=EL%L*wyoshik(I)/EL%P%NST 
+          NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
              CALL SPAR(EL,NDF(0),NDDF(0),p%X,k)
        DO J=1,15
@@ -27064,13 +27099,13 @@ endif
     real(dp) DDF(4)
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
     real(dp)  NDDF(0:15)
-    type(real_8) NDF(0:15),NDK(15) 
+    type(real_8) NDF(0:15),NDK(15)
     INTEGER I,J,f1,pos
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     type(fibre), pointer :: f
     TYPE(REAL_8)  dk2h,dk1h
     type(real_8) DKH(4)
-    type(real_8)  NDKH(15) 
+    type(real_8)  NDKH(15)
 
     f=>c%parent_fibre
     el=> f%magp%k16
@@ -27165,7 +27200,7 @@ endif
              DK(I)=EL%L*YOSK(I)/EL%P%NST
           ENDDO
        if(k%spin.or.k%radiation) then
-       CALL ALLOC(DKH,4); 
+       CALL ALLOC(DKH,4);
         do I =1,4
            DKH(I)=EL%L*YOSK(I)/EL%P%NST/2.d0
         enddo
@@ -27200,7 +27235,7 @@ endif
              CALL DRIFT(DF(J),DDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
           ENDDO
           CALL KILL(DF,4);CALL KILL(DK,4);
-       if(k%spin.or.k%radiation) CALL KILL(DKH,4); 
+       if(k%spin.or.k%radiation) CALL KILL(DKH,4);
 !!! newyoshida
     CASE(8)
 !    real(dp)  NDDF(0:15)
@@ -27214,7 +27249,7 @@ endif
           NDF(I)=EL%L*wyoshid(I)/EL%P%NST
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDKH(I)=EL%L*wyoshik(I)/EL%P%NST/2.0_dp
-          NDK(I)=EL%L*wyoshik(I)/EL%P%NST 
+          NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
           CALL DRIFT(NDF(0),NDDF(0),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
 
@@ -27228,7 +27263,7 @@ endif
         endif
              CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
        ENDDO
- 
+
        CALL KILL(NDF);CALL KILL(NDK);
    if(k%spin.or.k%radiation) CALL KILL(NDKH)
 
@@ -27282,7 +27317,7 @@ endif
              CALL KICKEX (EL,DK1,p%X,k)
             endif
           CALL SPAR(EL,D2,DD2,p%X,k)
- 
+
             if(k%spin.or.k%radiation) then
              CALL KICKEX (EL,DK2h,p%X,k)
              call RAD_SPIN_qua_PROBE(c,p,k,DK2)
@@ -27309,7 +27344,7 @@ endif
              DK(I)=EL%L*YOSK(I)/EL%P%NST
           ENDDO
        if(k%spin.or.k%radiation) then
-       CALL ALLOC(DKH,4); 
+       CALL ALLOC(DKH,4);
         do I =1,4
            DKH(I)=EL%L*YOSK(I)/EL%P%NST/2.d0
         enddo
@@ -27345,7 +27380,7 @@ endif
              CALL SPAR(EL,DF(J),DDF(J),p%X,k)
           ENDDO
           CALL KILL(DF,4);CALL KILL(DK,4);
-       if(k%spin.or.k%radiation) CALL KILL(DKH,4); 
+       if(k%spin.or.k%radiation) CALL KILL(DKH,4);
 !!! newyoshida
     CASE(8)
 !    real(dp)  NDDF(0:15)
@@ -27359,7 +27394,7 @@ endif
           NDF(I)=EL%L*wyoshid(I)/EL%P%NST
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDKH(I)=EL%L*wyoshik(I)/EL%P%NST/2.0_dp
-          NDK(I)=EL%L*wyoshik(I)/EL%P%NST 
+          NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
              CALL SPAR(EL,NDF(0),NDDF(0),p%X,k)
 
@@ -27373,7 +27408,7 @@ endif
         endif
              CALL SPAR(EL,NDF(J),NDDF(J),p%X,k)
        ENDDO
- 
+
        CALL KILL(NDF);CALL KILL(NDK);
    if(k%spin.or.k%radiation) CALL KILL(NDKH)
        CASE DEFAULT
@@ -27391,7 +27426,7 @@ endif
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!    SOL5 probe     !!!!!!!!!!!!!!!!!!!!!!!!!!!
- 
+
   SUBROUTINE INTE_SOL5_prober(p,k,c)
     IMPLICIT NONE
     type(probe), INTENT(INOUT) :: p
@@ -27522,7 +27557,7 @@ endif
           NDKH(I)=EL%L*wyoshik(I)/EL%P%NST/2.0_dp
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL KICK_SOL(EL,NDF(0),p%X,k)
 
        DO J=1,15
@@ -27536,9 +27571,9 @@ endif
         endif
           CALL KICK_SOL(EL,NDF(J),p%X,k)
        ENDDO
- 
 
- 
+
+
 
 
 
@@ -27565,9 +27600,9 @@ endif
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
     real(dp) DD1,DD2,DDF(4)
     type(real_8) DKH(4)
-    type(real_8)  NDKH(15) 
+    type(real_8)  NDKH(15)
     real(dp)   NDDF(0:15)
-    type(real_8) NDF(0:15),NDK(15) 
+    type(real_8) NDF(0:15),NDK(15)
     INTEGER I,J,f1
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     integer pos
@@ -27655,7 +27690,7 @@ endif
     !      DDF(I)=EL%P%LD*YOSK(I)/2.0_dp/EL%P%NST
        ENDDO
        if(k%spin.or.k%radiation) then
-       CALL ALLOC(DKH,4); 
+       CALL ALLOC(DKH,4);
         do I =1,4
            DKH(I)=EL%L*YOSK(I)/EL%P%NST/2.d0
         enddo
@@ -27688,7 +27723,7 @@ endif
        ENDDO
 
        CALL KILL(DF,4);CALL KILL(DK,4);
-       if(k%spin.or.k%radiation) CALL KILL(DKH,4); 
+       if(k%spin.or.k%radiation) CALL KILL(DKH,4);
 
 !!! newyoshida
     CASE(8)
@@ -27704,7 +27739,7 @@ endif
           NDKH(I)=EL%L*wyoshik(I)/EL%P%NST/2.0_dp
           NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL KICK_SOL(EL,NDF(0),p%X,k)
 
        DO J=1,15
@@ -27718,9 +27753,9 @@ endif
         endif
           CALL KICK_SOL(EL,NDF(J),p%X,k)
        ENDDO
- 
 
- 
+
+
    CALL KILL(NDF);CALL KILL(NDK);
    if(k%spin.or.k%radiation) CALL KILL(NDKH)
 
@@ -27737,8 +27772,8 @@ endif
 
 
   END SUBROUTINE INTE_SOL5_probep
-!!!!!!!!!!!!!!!!!!!!!!!!!!!    DKD2 PROBE     !!!!!!!!!!!!!!!!!!!!!!!!!!! 
-! 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!    DKD2 PROBE     !!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
 
   SUBROUTINE INTE_dkd2_prober(p,k,c)
     IMPLICIT NONE
@@ -27805,7 +27840,7 @@ endif
            DK2h=EL%L*FK2/EL%P%NST/2.0_DP
        endif
 
- 
+
 
 
 
@@ -27872,7 +27907,7 @@ endif
         else
           CALL KICK (EL,DK(1),p%X,k)
         endif
-        
+
 
        CALL DRIFT(DF(1),DDF(1),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
        DO J=2,4
@@ -27895,9 +27930,9 @@ endif
           NDF(I)=EL%L*wyoshid(I)/EL%P%NST
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDKH(I)=EL%L*wyoshik(I)/EL%P%NST/2.0_dp
-          NDK(I)=EL%L*wyoshik(I)/EL%P%NST 
+          NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL DRIFT(NDF(0),NDDF(0),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
 
        DO J=1,15
@@ -27910,7 +27945,7 @@ endif
         endif
           CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
        ENDDO
- 
+
 
 
 
@@ -27925,12 +27960,12 @@ endif
 
 SUBROUTINE RAD_SPIN_force_PROBER(c,x,om,k,fo)
     real(dp), INTENT(INOUT) :: x(6),om(3)
-    real(dp),INTENT(INOUT) :: fo(6)    
+    real(dp),INTENT(INOUT) :: fo(6)
     TYPE(fibre),pointer ::  f
     TYPE(integration_node),pointer :: c
-    REAL(DP)  B(3),XP(2),XPA(2),ed(3) 
+    REAL(DP)  B(3),XP(2),XPA(2),ed(3)
     REAL(DP) b2,dlds,ff(6)
-    TYPE(INTERNAL_STATE) k 
+    TYPE(INTERNAL_STATE) k
      integer i,pos
 
      pos=C%POS_IN_FIBRE-2     !  unknown.... to be checked later
@@ -27940,8 +27975,8 @@ SUBROUTINE RAD_SPIN_force_PROBER(c,x,om,k,fo)
    do i=1,3
      om(i)=om(i)/2.0_dp
     enddo
- 
-    if(k%radiation) then 
+
+    if(k%radiation) then
      call radiate_2_force(c,x,b2,dlds,k,POS,ff)
      fo=fo+ff
     endif
@@ -27950,12 +27985,12 @@ SUBROUTINE RAD_SPIN_force_PROBER(c,x,om,k,fo)
 
  SUBROUTINE RAD_SPIN_force_PROBEp(c,x,om,k,fo,e_ij,denf)
     type(real_8), INTENT(INOUT) :: x(6),om(3)
-    type(real_8),INTENT(INOUT) :: fo(6)    
+    type(real_8),INTENT(INOUT) :: fo(6)
     TYPE(fibre),pointer ::  f
     TYPE(integration_node),pointer :: c
-    type(real_8)  B(3),XP(2),XPA(2),ed(3) 
+    type(real_8)  B(3),XP(2),XPA(2),ed(3)
     type(real_8)  b2,dlds ,ff(6)
-    TYPE(INTERNAL_STATE) k 
+    TYPE(INTERNAL_STATE) k
     real(dp),intent(inout) :: e_ij(6,6),denf
      integer i,pos
 
@@ -27966,14 +28001,14 @@ SUBROUTINE RAD_SPIN_force_PROBER(c,x,om,k,fo)
      call alloc(XPA)
      call alloc(ed)
 
- 
+
      pos=C%POS_IN_FIBRE-2     !  unknown.... to be checked later
      CALL get_omega_spin(c,OM,B2,dlds,XP,X,pos,k,Ed,B)
 
 
    do i=1,3
      om(i)=om(i)/2.0_dp
- 
+
     enddo
 
     if(k%radiation) then
@@ -27998,7 +28033,7 @@ SUBROUTINE RAD_SPIN_force_PROBER(c,x,om,k,fo)
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENTP), POINTER::EL
-    TYPE(REAL_8),INTENT(INOUT) ::XP(2) 
+    TYPE(REAL_8),INTENT(INOUT) ::XP(2)
     TYPE(REAL_8),INTENT(INOUT) :: xx(6)
     real(dp),INTENT(INOUT) :: e_ij(6,6)
     TYPE(REAL_8), intent(in):: B2,dlds
@@ -28006,26 +28041,26 @@ SUBROUTINE RAD_SPIN_force_PROBER(c,x,om,k,fo)
     type(quaternion) q
     real(dp) b30,x1,x3,denf  , denf0
     type(damap) xpmap
-    integer i,j 
+    integer i,j
     type(internal_state) k
     IF(.NOT.CHECK_STABLE) return
- 
+
     e_ij=0
 
- 
+
      x=xx
 
     el=>c%parent_fibre%magp
- 
+
 
        denf=(1.0_dp+x(5))**5/SQRT((1.0_dp+X(5))**2-Xp(1)**2-Xp(2)**2)
- 
+
 
        b30=b2
        b30=b30**1.5e0_dp
        denf0=cflucf(el%p)
        denf=denf0*b30 *denf
- 
+
        call alloc(xpmap)
 
        xpmap%v(1)=x(1)
@@ -28045,11 +28080,11 @@ SUBROUTINE RAD_SPIN_force_PROBER(c,x,om,k,fo)
              X3=(xpmap%v(j)).sub.'000010'
             E_IJ(i,j)=E_IJ(i,j)+denf*x1*x3 ! In a code internally using BMAD units '000001' is needed!!!
           enddo
-       enddo    
+       enddo
        call kill(xpmap)
- 
 
-   !    if(compute_stoch_kick) then 
+
+   !    if(compute_stoch_kick) then
    !     c%delta_rad_in=(denf)+c%delta_rad_in
    !     c%delta_rad_out=(denf)+c%delta_rad_out
    !    endif
@@ -28069,7 +28104,7 @@ SUBROUTINE RAD_SPIN_qua_PROBER(c,p,k,ds)
     real(dp), intent(inout) ::ds
     REAL(DP)  B(3),XP(2),XPA(2),ed(3)
     REAL(DP) om(3),b2,dlds,FAC
-     TYPE(INTERNAL_STATE) k 
+     TYPE(INTERNAL_STATE) k
       logical before
      integer i,pos
      FAC=0.5_dp
@@ -28082,12 +28117,12 @@ SUBROUTINE RAD_SPIN_qua_PROBER(c,p,k,ds)
 !       call radiate_2(c,DS,FAC,P,b2,dlds,before,k,pos)
     endif
 
-   if(k%spin) then   
+   if(k%spin) then
    do i=1,3
      om(i)=om(i)*ds/2.0_dp
     enddo
-   
-    
+
+
    call push_quaternion(p,om)
   endif
     if((k%radiation.or.k%envelope)) then
@@ -28105,7 +28140,7 @@ SUBROUTINE RAD_SPIN_qua_PROBEP(c,p,k,ds)
     TYPE(REAL_8), intent(inout) ::ds
     TYPE(REAL_8)  B(3),XP(2),XPA(2),ed(3),om(3),b2,dlds
     REAL(DP)  FAC
-     TYPE(INTERNAL_STATE) k 
+     TYPE(INTERNAL_STATE) k
    !   logical before
      integer i,pos
      pos=C%POS_IN_FIBRE-2     !  unknown.... to be checked later
@@ -28122,12 +28157,12 @@ SUBROUTINE RAD_SPIN_qua_PROBEP(c,p,k,ds)
        call radiate_2_probe(c,DS,FAC,P,b2,dlds,XP,k,pos,Ed,B)
 
     endif
-   if(k%spin) then 
+   if(k%spin) then
    do i=1,3
      om(i)=om(i)*ds/2.0_dp
     enddo
-   
-    
+
+
    call push_quaternion(p,om)
    endif
     if((k%radiation.or.k%envelope)) then
@@ -28154,7 +28189,7 @@ SUBROUTINE kick_stochastic_before(c,p)
        endif
           p%x(5)=p%x(5)+t*c%delta_rad_in
           p%x(5)=p%x(5)+t*c%delta_rad_out
-       
+
 end SUBROUTINE kick_stochastic_before
 
 SUBROUTINE kick_stochastic_after(c,p)
@@ -28171,7 +28206,7 @@ SUBROUTINE kick_stochastic_after(c,p)
        endif
 
           p%x(5)=p%x(5)+t*c%delta_rad_out
-       
+
 end SUBROUTINE kick_stochastic_after
 
    subroutine  clear_compute_stoch_kick(L)
@@ -28215,13 +28250,13 @@ end SUBROUTINE kick_stochastic_after
     TYPE(REAL_8) DH,D,D1,D2,DK1,DK2,DF(4),DK(4)
     real(dp) DD1,DD2,DDF(4)
     type(real_8) DKH(4)
-    type(real_8)  NDKH(15) 
+    type(real_8)  NDKH(15)
     real(dp)   NDDF(0:15)
-    type(real_8) NDF(0:15),NDK(15) 
+    type(real_8) NDF(0:15),NDK(15)
     INTEGER I,J,f1
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     integer pos
- 
+
     f=>c%parent_fibre
     el=> f%magP%k2
 
@@ -28275,7 +28310,7 @@ end SUBROUTINE kick_stochastic_after
            DK2h=EL%L*FK2/EL%P%NST/2.0_DP
        endif
 
- 
+
 
 
 
@@ -28318,7 +28353,7 @@ end SUBROUTINE kick_stochastic_after
            DK(I)=EL%L*YOSK(I)/EL%P%NST
        ENDDO
        if(k%spin.or.k%radiation) then
-       CALL ALLOC(DKH,4); 
+       CALL ALLOC(DKH,4);
         do I =1,4
            DKH(I)=EL%L*YOSK(I)/EL%P%NST/2.d0
         enddo
@@ -28346,7 +28381,7 @@ end SUBROUTINE kick_stochastic_after
         else
           CALL KICK (EL,DK(1),p%X,k)
         endif
-        
+
 
        CALL DRIFT(DF(1),DDF(1),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
        DO J=2,4
@@ -28360,7 +28395,7 @@ end SUBROUTINE kick_stochastic_after
           CALL DRIFT(DF(J),DDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
        ENDDO
        CALL KILL(DF,4);CALL KILL(DK,4);
-       if(k%spin.or.k%radiation) CALL KILL(DKH,4); 
+       if(k%spin.or.k%radiation) CALL KILL(DKH,4);
 !!! newyoshida
     CASE(8)
   !  real(dp) NDF(0:15),NDK(15),NDDF(0:15)
@@ -28373,9 +28408,9 @@ end SUBROUTINE kick_stochastic_after
           NDF(I)=EL%L*wyoshid(I)/EL%P%NST
           NDDF(I)=EL%P%LD*wyoshid(I)/EL%P%NST
           NDKH(I)=EL%L*wyoshik(I)/EL%P%NST/2.0_dp
-          NDK(I)=EL%L*wyoshik(I)/EL%P%NST 
+          NDK(I)=EL%L*wyoshik(I)/EL%P%NST
        ENDDO
- 
+
           CALL DRIFT(NDF(0),NDDF(0),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
 
        DO J=1,15
@@ -28388,7 +28423,7 @@ end SUBROUTINE kick_stochastic_after
         endif
           CALL DRIFT(NDF(J),NDDF(J),EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,p%X)
        ENDDO
- 
+
 
    CALL KILL(NDF);CALL KILL(NDK);
    if(k%spin.or.k%radiation) CALL KILL(NDKH)
@@ -28438,7 +28473,7 @@ TYPE(REAL_8) norm,stheta
         dq%x(2)=stheta*om(2)
         dq%x(3)=stheta*om(3)
         p%q=dq*p%q
- 
+
        call kill(norm,stheta)
        call kill(dq)
 
