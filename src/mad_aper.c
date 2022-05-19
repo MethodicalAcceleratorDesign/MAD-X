@@ -1117,7 +1117,7 @@ aper_calc(double p, double q, double* minhl,
     bbymin = fmin(bbymin,pipey[j]); bbymax = fmax(bbymax,pipey[j]);
   }
   bbxmax *= 1.01; bbymax *= 1.01; bbxmin *= 1.01; bbymin *= 1.01; // 1% clearance
-  if (bbxmin > 0) bbxmin*=0.98; //Trick if the defined aperture is uncemetrical around zero.
+  if (bbxmin > 0) bbxmin*=0.98; // Trick if the defined aperture is asymmetric around zero.
   if (bbymin > 0) bbymin*=0.98;
 
   /* not simply connex beampipes... adding apexes to the halo */
