@@ -1,3 +1,9 @@
+MAD-X master
+*   [PR 1081](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1108) Fix potential buffer overrun when node_name calls stoupper (S. Berg)
+*   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)
+*   [PR 1095](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1095) Implement more robust, optional, PTC DA map output (L. Deniau)
+*   [PR 1088](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1088) Additional explanation bv flag (J. Dilly)
+
 MAD-X release 5.08.01 (2022.02.25)
 
 *    Fix radiation of mulitpoles in TRACK. #1079. (Riccardo)
