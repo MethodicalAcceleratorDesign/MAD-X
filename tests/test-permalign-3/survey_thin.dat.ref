@@ -1,9 +1,9 @@
 @ NAME             %06s "SURVEY"
 @ TYPE             %06s "SURVEY"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.07.00 Linux 64"
-@ DATE             %08s "30/04/21"
-@ TIME             %08s "08.55.27"
+@ ORIGIN           %16s "5.08.00 Linux 64"
+@ DATE             %08s "27/01/22"
+@ TIME             %08s "20.48.44"
 * NAME               KEYWORD                             S                  L              ANGLE                  X                  Y                  Z              THETA                PHI                PSI         GLOBALTILT               TILT    SLOT_ID ASSEMBLY_ID           MECH_SEP              V_POS COMMENTS           
 $ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le         %d         %d                %le                %le %s                 
  "MYSEQ$START.ENT"   "MARKER"                             0                  0                  0                  0                  0                  0                  0                  0                  0                  0                  0          0          0                  0                  0 ""                 

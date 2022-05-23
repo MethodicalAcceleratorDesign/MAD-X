@@ -18209,12 +18209,13 @@ inside_normal=.true.
     ! but energy is constant. (Momentum compaction, phase slip etc.. falls from there)
  ! etienne
  
- if(c_skip_gofix) then
-  a1=1
-else
-    call  c_gofix(m1,a1) 
-endif 
-     m1=c_simil(a1,m1,-1)
+    if(c_skip_gofix) then
+      a1=1
+    else
+     call  c_gofix(m1,a1)
+    endif
+
+    m1=c_simil(a1,m1,-1)
  
     ! Does the the diagonalisation into a rotation
     call c_linear_a(m1,a2)  

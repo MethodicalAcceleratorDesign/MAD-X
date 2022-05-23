@@ -42,12 +42,12 @@
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le     8.334552298e-10
-@ DQMIN_PHASE      %le        -1.571990328
+@ DQMIN            %le     7.142973632e-08
+@ DQMIN_PHASE      %le          1.84139616
 @ TITLE            %30s "LHC Version 6.503 -  July 2009"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "10/08/20"
-@ TIME             %08s "13.26.21"
+@ ORIGIN           %16s "5.08.00 Linux 64"
+@ DATE             %08s "27/01/22"
+@ TIME             %08s "20.46.50"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "IP1"                                0        11.00000336        11.00000569

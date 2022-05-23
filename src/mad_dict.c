@@ -690,6 +690,7 @@ const char *const_command_def =
 "re64     = [r, 0], re65     = [r, 0], re66     = [r, 1], "
 "betz     = [r, 0], alfz     = [r, 0], muz      = [r, 0], "
 "maptable = [l, false, true], "
+"scale_with_pt = [l, true, false], "
 "beta0    = [s, none, beta0]; "
 " "
 "ptc_moments: ptc_moments none 0 0 "
@@ -760,7 +761,8 @@ const char *const_command_def =
 " "
 "ptc_setswitch: ptc_setswitch none 0 0 "
 "debuglevel = [i,1], "/*sets the level of debugging printout 0 none, 4 everything */
-"mapdump    = [i, 0], " /*sets the level of map dump printout in all tracking codes 0: none, 1: order 0, 2: order 1 */
+"mapdump    = [i, 0], " /*ld: sets the level of map dump printout in all tracking codes 0: none, 1: order 0, 2: order 1 */
+"madprint   = [l, false, true], " /*ld: sets map dump printout format*/
 "seed       = [i, 123456789], "
 "maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
 "exact_mis  = [l, false, true], "  /* switch to ensure exact misaligment treatment */

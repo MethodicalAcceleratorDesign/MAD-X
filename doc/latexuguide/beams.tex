@@ -252,29 +252,55 @@ BEAM, EX=2.E-5, EY=3.E-7, SIGE=4.E-3;
 \section{BV FLAG}
 \label{sec:bvflag}
 When reversing the direction ($\vec V$) of a particle in a magnetic field
-($\vec B$) while keeping its charge constant, the resulting force $\vec
-V \times \vec B$ changes sign. This is equivalent to flipping the field,
-but not the direction.  
+($\vec B$) while keeping its charge constant, 
+the resulting force $\vec V \times \vec B$ changes sign. 
+This is equivalent to flipping the field, but not the direction.
+Depending on the symmetry of the magnetic field upon $180^{\circ}$ rotation around the vertical axis,
+this can result in a sign change of the field's gradient and hence the sign of its field strength.
+E.g. Normal Quadrupoles, Skew Sextupoles, Normal Octupoles etc. change sign, while 
+Skew Quadrupoles, Normal Sextupoles, Skew Octupoles etc. are invariant.
 
-For practical reasons the properties of all elements of the LHC are
-defined in the \madx input as if they apply to a clockwise proton beam
-("LHC beam 1"). This allows a single definition for elements traversed
-by both beams. Their effects on a beam with identical particle charge
-but running in the opposite direction ("LHC beam 2") must then be
-reversed inside the program.  
+\textbf{Please note:} In the current implementation, this sign change is visible in the TWISS tables, yet not in the ERROR tables!
 
-In \madx this may be taken into account by setting the value of
-the BV attribute in the \texttt{BEAM} commands. In the case of LHC
-beam~1 (clockwise) and beam 2 (counter-clockwise), that are both treated
-in \madx as clockwise proton beams, the \texttt{BEAM} commands must look
-as follows:   
+\textbf{\underline{Usage of the BV-Flag in the LHC:}}\\ 
+For practical reasons the properties of all elements of the default LHC sequence file are
+defined in the \madx input as if they apply to a clockwise proton beam.
+This allows a single definition for elements traversed by both beams.
+For particles travelling in this direction (``LHC Beam 1''), the BV-flag needs to be positive.
+Effects on a beam with identical particle charge but running in the opposite direction (``LHC Beam 2'')
+must be reversed by a negative BV-flag, which is then taken into account in calculations. 
+
+
+The \texttt{BEAM} commands look therefore as follows:   
 
 \madxmp{
 BEAM, SEQUENCE=lhcb1, PARTICLE=proton, PC=450, BV = +1;\\
 \\
 BEAM, SEQUENCE=lhcb2, PARTICLE=proton, PC=450, BV = -1;}
 
+For ``LHC Beam 4'', which mirrors ``LHC Beam 2'' and can be found in a separate sequence file,
+the lattice itself is defined in counter-clockwise direction and the BV-flag is therefore positive:
 
+\madxmp{
+BEAM, SEQUENCE=lhcb2, PARTICLE=proton, PC=450, BV = +1;
+}
+
+\textbf{Please note:}
+With these definitions and the difference between TWISS and ERROR tables mentioned above, the following relations need to be taken into consideration for the LHC implementation.
+
+Always:
+\begin{itemize}
+\item LHCB2 and LHCB4 have opposite (D)X-Orbit in TWISS and ERROR.
+\end{itemize}
+
+For upon mirroring on the vertical axis anti-symmetric common-aperture magnets (K0SL, K1L, K2SL, K3L, K4SL, K5L ...):
+\begin{itemize}
+  \item LHCB4 circuits are implemented with "-" in the sequence, so that the value of the circuit itself can be identical for all beams.
+  \item LHCB2 and LHCB4 have the \textbf{same} sign KNL/KNSL-Values in TWISS, but the \textbf{opposite} in ERROR.
+  \item LHCB1 and LHCB2 have the \textbf{opposite} sign KNL/KNSL-Values in TWISS, but the \textbf{same} in ERROR.
+\end{itemize}
+
+For the other common magnets all beams have the same signs.
 %% EOF
 
 

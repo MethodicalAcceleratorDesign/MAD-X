@@ -83,7 +83,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, macos]
-        version: [master, v1.5.0]
+        version: [master, v1.9.3]
     env:
       MADXDIR: madx
 
@@ -115,8 +115,8 @@ jobs:
             export CC=gcc-9
           fi
           export X11=0 BLAS=1 LAPACK=1
-          pip install -e . \
-            --global-option build_ext --global-option -lm
+          python setup.py build_ext -lm
+          pip install -e .
 
       - name: Run tests
         run: |

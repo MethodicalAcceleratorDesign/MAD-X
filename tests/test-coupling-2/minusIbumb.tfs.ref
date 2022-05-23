@@ -2,13 +2,13 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %03s "SEQ"
 @ PARTICLE         %08s "POSITRON"
-@ MASS             %le     0.0005109989461
+@ MASS             %le       0.00051099895
 @ CHARGE           %le                   1
 @ ENERGY           %le                   1
 @ PC               %le        0.9999998694
-@ GAMMA            %le         1956.951198
+@ GAMMA            %le         1956.951184
 @ KBUNCH           %le                   1
-@ BCURRENT         %le     8.005339031e-13
+@ BCURRENT         %le     8.005339097e-13
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
 @ NPART            %le                   1
@@ -42,12 +42,12 @@
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le      0.003671625247
-@ DQMIN_PHASE      %le         1.789568699
+@ DQMIN            %le      0.004029640367
+@ DQMIN_PHASE      %le      -0.08326761734
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "11.53.58"
+@ ORIGIN           %16s "5.08.00 Linux 64"
+@ DATE             %08s "27/01/22"
+@ TIME             %08s "20.52.41"
 * NAME                                S               BETX               BETY                 DX                MUX                MUY                R11                R12                R21                R22               ALFX               ALFY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "SEQ$START"                          0        34.14662492        5.902228453                  0                  0                  0      -0.1469449757        2.081564625    8.326258501e-05      -0.1486102274       -2.430748097       0.5406558887

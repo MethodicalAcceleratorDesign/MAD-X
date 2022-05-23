@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:03:21      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:47:04      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option,  warn,info,echo;
 
@@ -276,10 +276,10 @@ orbit:  -2.814814E-05  8.594246E-05  7.406702E-05  5.662312E-06  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    1.118892754e-05 
+                 0                  0                  0    0.0009433100274 
 
        dqmin_phase 
-       2.715228712 
+       1.348551286 
 
 
 // calculate TWISS table for correction, beam 2 
@@ -315,10 +315,10 @@ orbit:   3.018542E-05 -1.061138E-04 -5.422462E-05  2.539827E-05  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    0.0005358280965 
+                 0                  0                  0    3.544246061e-05 
 
        dqmin_phase 
-      -2.721332618 
+      -2.010546174 
 
 
 Coption,print=1;
@@ -400,10 +400,10 @@ orbit:  -2.742691E-05 -6.551461E-07  7.390359E-05  5.661291E-06  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    0.0008664622834 
+                 0                  0                  0    5.589320539e-05 
 
        dqmin_phase 
-      -1.737999841 
+   -0.004795216736 
 TWISS, file=resultb2, sequence=lhcb2;
 
 enter Twiss module
@@ -435,10 +435,10 @@ orbit:   3.932085E-05 -8.379745E-07 -5.420823E-05  2.537128E-05  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    0.0005073255459 
+                 0                  0                  0    3.592259219e-05 
 
        dqmin_phase 
-      -2.872354643 
+      -2.139583112 
 
 
 removefile, file='fort.61';

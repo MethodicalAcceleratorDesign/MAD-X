@@ -1157,7 +1157,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   integer :: iord, jtrk, nd, nord, i, j, n_ferr, nn, ns, noisemax, nn1, in, mylen
   integer :: nnt, nst
   double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad
-  double precision :: pt, px, py, rfac
+  double precision :: pt, px, py, rfac, x
   double precision :: f_errors(0:maxferr)
   double precision :: field(2,0:maxmul)
   !double precision :: vals(2,0:maxmul)
@@ -1166,7 +1166,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   double precision :: bvk, node_value, ttt
   double precision :: npeak(100), nlag(100), ntune(100), temp, noise
   character(len=name_len) name
-  double precision :: beta_sqr, f_damp_t
+  double precision :: beta_sqr, f_damp_t,  delta_plus_1
 
   integer :: node_fd_errors, store_no_fd_err, get_option
   double precision , external:: get_tt_attrib  
@@ -1178,6 +1178,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
         ordinv(iord) = one / dble(iord)
      enddo
      const = arad * (betas * gammas)**3 / three
+     beti    = one / betas
      first = .false.
   endif
 
@@ -1285,9 +1286,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
      dyt(:ktrack) = zero
      !----------- introduction of dipole focusing
      if (elrad.gt.zero .and. thin_foc) then
-
-        DXT(:ktrack) = dipr*dipr*TRACK(1,:ktrack)/elrad
-        DYT(:ktrack) = dipi*dipi*TRACK(3,:ktrack)/elrad
+        !!! terms should scale with h_c k0 therefore (dipr-dbr) dipr
+        DXT(:ktrack) = (dipr-dbr)*dipr*TRACK(1,:ktrack)/elrad
+        DYT(:ktrack) = (dipi-dbi)*dipi*TRACK(3,:ktrack)/elrad
      endif
   !---- Accumulate multipole kick from highest multipole to quadrupole.
   else
@@ -1303,10 +1304,12 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
         enddo
      enddo
      if (elrad.gt.zero .and. thin_foc) then
-        DXT(:ktrack) = DXT(:ktrack) + dipr*dipr*TRACK(1,:ktrack)/elrad
-        DYT(:ktrack) = DYT(:ktrack) + dipi*dipi*TRACK(3,:ktrack)/elrad
+        !!! terms should scale with h_c k0 therefore (dipr-dbr) dipr
+        DXT(:ktrack) = DXT(:ktrack) + (dipr-dbr)*dipr*TRACK(1,:ktrack)/elrad
+        DYT(:ktrack) = DYT(:ktrack) + (dipi-dbi)*dipi*TRACK(3,:ktrack)/elrad
      endif
   endif
+
 
   !---- Radiation loss at entrance.
   if (radiate .and. elrad .ne. 0) then
@@ -1314,15 +1317,16 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
      if (damp) then
         do jtrk = 1,ktrack
            curv = sqrt((dipr + dxt(jtrk))**2 + (dipi + dyt(jtrk))**2) / elrad
+           pt = track(6,jtrk)
+           x = track(1,jtrk)
            if (quantum) then
               call trphot(elrad,curv,rfac,pt)
            else
-!             rfac = const * curv**2 * elrad
-              rfac = const * curv*curv * elrad  !speedup hrr Nov 2021
+              delta_plus_1 = sqrt(pt*pt + two*pt*beti + one);
+              rfac =  const * curv*curv * delta_plus_1 * elrad * (one + dipr/elrad * x)
            endif
            px = track(2,jtrk)
            py = track(4,jtrk)
-           pt = track(6,jtrk)
            beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            track(2,jtrk) = px * f_damp_t;
@@ -1333,8 +1337,10 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
      else
         !---- Store energy loss on closed orbit.
         ! 2016-Mar-16  18:45:41  ghislain: track(i,1) is not the closed orbit but the first particle!!!
-        rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
         pt = track(6,1)
+        x = track(6,1)
+        delta_plus_1 = sqrt(pt*pt + two*pt*beti + one);
+        rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2) * elrad * (one + dipr/elrad * x)
         beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
         TRACK(2,:ktrack) = TRACK(2,:ktrack) * f_damp_t;
@@ -1363,16 +1369,17 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
      !---- Full damping.
      if (damp) then
         do jtrk = 1,ktrack
+           x = track(1,jtrk)
+           pt = track(6,jtrk)
            curv = sqrt((dipr + dxt(jtrk))**2 + (dipi + dyt(jtrk))**2) / elrad
            if (quantum) then
               call trphot(elrad,curv,rfac,pt)
            else
-!             rfac = const * curv**2 * elrad
-              rfac = const * curv*curv * elrad  !speedup hrr Nov 2021
+              delta_plus_1 = sqrt(pt*pt + two*pt*beti + one);
+              rfac = const * curv*curv * delta_plus_1 * elrad * (one + dipr/elrad * x) !speedup hrr
            endif
            px = track(2,jtrk)
            py = track(4,jtrk)
-           pt = track(6,jtrk)
            beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
            f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
            track(2,jtrk) = px * f_damp_t;
@@ -1384,8 +1391,10 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
      else
 
         !---- Store energy loss on closed orbit.
-        rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
+        x = track(1,1)
         pt = track(6,1)
+        delta_plus_1 = sqrt(pt*pt + two*pt*beti + one);
+        rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2) * delta_plus_1 * (one + dipr/elrad * x)
         beta_sqr = (pt*pt + two*pt*beti + one) / (beti + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
         TRACK(2,:ktrack) = TRACK(2,:ktrack) * f_damp_t;
@@ -3644,7 +3653,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
                           call trphot(length,curv,rfac,track(6,i))
                        else
                           const = arad * (betas * gammas)**3 / three
-                          rfac = const * curv**2 * length
+                          rfac = const * curv*curv * length
                        endif
                        beta_sqr = (pt_*pt_ + two*pt_*beti + one) / (beti + pt_)**2;
                        f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
