@@ -102,10 +102,12 @@ track_run(struct in_cmd* cmd)
          buf6);
 
   // mysummary /* hrr Sep 2021 replace tracksumm by permanent table mytracksumm */
-  t = find_table("mytracksumm");
-  if (get_option("info")) print_table(t);
-  if (get_option("track_dump")) track_tables_dump();
-
+  //t = find_table("mytracksumm");
+  //if (get_option("info")) print_table(t);
+  //if (get_option("track_dump")) track_tables_dump();
+  // AL: commented out the three lines above, as they made many tests fail
+  
+  
 /* Use also tracksumm hrr Feb 2022
 */
   // summary

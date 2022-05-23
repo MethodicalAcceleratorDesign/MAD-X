@@ -229,12 +229,12 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   if(mytracksumm_end_particle.lt.1.or.mytracksumm_end_particle.gt.jmax) then ! hrr Sep 2021
      mytracksumm_end_particle= jmax ! hrr Sep 2021
   endif ! hrr Sep 2021
-  if (get_option('info ') .ne. 0) then ! hrr Feb 2022
-  print *," Info: mytracksumm_maxlines=", mytracksumm_maxlines ! hrr Jan 2022
-  print *," Info: mytracksumm_per_turns=", mytracksumm_per_turns ! hrr Sep 2021
-  print *," Info: mytracksumm_start/end_particle=", &
-  mytracksumm_start_particle,mytracksumm_end_particle      ! hrr Sep 2021
-  endif
+  !if (get_option('info ') .ne. 0) then ! hrr Feb 2022
+     !print *," Info: mytracksumm_maxlines=", mytracksumm_maxlines ! hrr Jan 2022
+     !print *," Info: mytracksumm_per_turns=", mytracksumm_per_turns ! hrr Sep 2021
+     !print *," Info: mytracksumm_start/end_particle=", &
+     !mytracksumm_start_particle,mytracksumm_end_particle      ! hrr Sep 2021
+  !endif
 
   if (first) then
      !--- enter start coordinates in summary table
