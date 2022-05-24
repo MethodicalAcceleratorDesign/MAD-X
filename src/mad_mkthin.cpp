@@ -1785,8 +1785,13 @@ element* SeqElList::create_bend_dipedge_element(const element* thick_elem,const 
 
     expression* l_par_expr=my_get_param_expression(thick_elem, "l"); // with this l_par_expr should not be NULL
     expression* angle_par_expr = my_get_param_expression(thick_elem,"angle");
+    expression* k0_par_expr = my_get_param_expression(thick_elem,"k0");
     command_parameter* hparam=new_command_parameter("h",k_double);
-    hparam->expr=compound_expr(angle_par_expr,0.,"/",l_par_expr,0,1); // this also updates the value
+    if (k0_par_expr){
+        hparam->expr=k0_par_expr;
+    } else {
+        hparam->expr=compound_expr(angle_par_expr,0.,"/",l_par_expr,0,1); // this also updates the value
+    };
 
     command* dipedge_cmd = new_cmdptr( find_element("dipedge", base_type_list) );
 
