@@ -40,8 +40,8 @@ TI2.END: marker;
 TI2.START: marker;
 
 Seqedit, sequence=TI2;
-   Install, element=ti2.start, at=0, from=TI2$START;
-   Install, element=ti2.end, at=0, from=TI2$END;
+   Install, element=ti2.start, at=0, from=TI2$START, last=false;
+   Install, element=ti2.end, at=0, from=TI2$END, last=false;
    Flatten;
 endedit;
 
