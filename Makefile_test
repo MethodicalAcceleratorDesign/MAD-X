@@ -89,7 +89,7 @@ test-ptc-track-polygonaper \
 test-ptc-trackline test-ptc-trackline-2 test-ptc-trackline-3 \
 test-ptc-align test-ptc-align-2 \
 test-touschek test-touschek-2 \
-test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 test-sequence-7 test-sequence-8 test-sequence-9\
+test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 test-sequence-7 test-sequence-8 test-sequence-9 test-sequence-10\
 test-line \
 test-plot test-plot-2 \
 test-setknob test-fillknob \
