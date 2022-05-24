@@ -27,6 +27,8 @@ numdiff-*-*
 numdiff32
 numdiff64
 
+#VS Code
+.vscode
 
 # Cmake
 CMakeCache.txt
