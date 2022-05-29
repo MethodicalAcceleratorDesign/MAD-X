@@ -13,6 +13,8 @@
 doc/latexuguide/1
 doc/latexuguide/*.ilg
 doc/latexuguide/*.ind
+doc/user_manual_temp
+doc/html/
 
 # Build/Binaries:
 *.o
@@ -25,8 +27,25 @@ numdiff-*-*
 numdiff32
 numdiff64
 
+#VS Code
+.vscode
+
 # Cmake
 CMakeCache.txt
+CMakeFiles/
+*.cmake
+build_cmake/
+dist/
+DartConfiguration.tcl
+doc/Makefile
+include/
+syntax/Makefile
+src/Makefile
+libs/DISTlib/Makefile
+libs/DISTlib/source/Makefile
+libs/ptc/src/Makefile
+install_manifest.txt
+tools/Makefile
 
 
 # Coverage
@@ -152,5 +171,12 @@ tests/test-twiss-10/twiss2
 tests/test-twiss-11/dec17i.lis
 tests/test-twiss-13/twiss.tsf
 tests/test-twiss-2/my_sect_file
+tests/test-beambeam-npart/trackbbone
+tests/test-beambeam-npart/trackbeamone
+tests/test-ptc-twiss-6D-ALS/end.map
+tests/test-ptc-twiss-6D-ALS/fort.17
+tests/test-ptc-twiss-6D-ALS/fort.19
+
+
 
 

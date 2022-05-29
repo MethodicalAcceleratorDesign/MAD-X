@@ -89,15 +89,11 @@ echo -e "\n===== Release number ====="
 cat VERSION
 
 echo -e "\n===== Gnu build ====="
-source /cvmfs/sft.cern.ch/lcg/contrib/gcc/9.2.0/x86_64-centos7/setup.sh
-#gcc      --version
-#g++      --version
-#gfortran --version
-
-#make all-linux32-gnu
-#check_error "make all-linux32-gnu failed" "no-exit"
 
 #source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/x86_64-slc6/setup.sh
+#source /cvmfs/sft.cern.ch/lcg/contrib/gcc/9.2.0/x86_64-centos7/setup.sh
+source /cvmfs/sft.cern.ch/lcg/contrib/gcc/11/x86_64-centos7/setup.sh
+
 gcc      --version
 g++      --version
 gfortran --version

@@ -24,9 +24,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-18.04
-          # TODO: enable this after debugging internal compiler error:
-          # - ubuntu-20.04
+          - ubuntu-20.04
+          - ubuntu-22.04
         flags:
           - i=1 STATIC=yes ONLINE=no NTPSA=yes USEGC=yes ARCH=64 X11=no
           - i=2 STATIC=no  ONLINE=no NTPSA=yes USEGC=yes ARCH=64 X11=yes

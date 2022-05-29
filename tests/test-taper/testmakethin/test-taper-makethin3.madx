@@ -10,9 +10,49 @@ Set, format="-20s","23.17g";
 
 Select, flag=twiss, column=name,keyword,s,x,px,y,py,t,pt;
 
-Beam, particle=electron, PC=182.5, radiate=true;
+Beam, particle=electron, PC=182.5, radiate=false;
 
 Use, sequence = FCC_E_RING;
+
+Taper, reset;
+
+// Save the voltage settings for the cavities for later use if needed
+voltca1save = voltca1;  voltca2save = voltca2; 
+// Turn off the cavities for ideal machine twiss and survey
+voltca1 = 0; voltca2 = 0;
+Show, voltca1save, voltca2save;
+
+
+// Place where the initial conditions are saved - used for RF matching later if needed
+Savebeta, label=B.IP, place=#s, sequence=FCC_E_RING;
+
+Twiss; ! Twiss without radiation and tapering
+
+// RF back on
+voltca1 = voltca1save;  voltca2 = voltca2save;
+
+// Turn the beam radiation on. N.B. This simple toggle works only if the sequence is not defined in the orginal beam command.
+Beam, radiate=true;
+
+Match, sequence=FCC_E_RING, BETA0 = B.IP, tapering;
+    Vary, name=LAGCA1, step=1.0E-7;
+    Vary, name=LAGCA2, step=1.0E-7;
+    Constraint, sequence=FCC_E_RING, range=#e, PT=0.0;
+    Jacobian, tolerance=1.0E-14, calls=3000;
+Endmatch;
+
+Stop;
+
+Use, sequence = FCC_E_RING;
+Taper, file="toto.dat"
+
+
+Twiss, tapering, save;
+Save, sequence=FCC_E_RING, FILE="b1thin.seq";
+
+Stop;
+
+!Taper, file="taperthin.madx";
 
 Twiss; // thin lenses, thick lenses, with radiation, RF and tapering
 
