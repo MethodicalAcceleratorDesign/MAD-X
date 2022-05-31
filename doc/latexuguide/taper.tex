@@ -1,5 +1,5 @@
 %%\title{TAPER}
-% Time-stamp: <15 October 2021 11:59:08 ghislain>
+% Time-stamp: <03 March 2022 17:45:29 ghislain>
 
 \chapter{TAPER: strength tapering for energy variation}
 \label{chap:taper}
@@ -20,8 +20,8 @@ The attributes for the \texttt{TAPER} command are:
   can cycle \texttt{ITERATE} times through the dipole map to converge to the 
   appropriate tapering value of the element corresponding to the energy
   loss through the adjusted bending magnet.  \\
-  For quadrupoles and sextupoles, a tracking through the map is
-  done only once for any positive non-zero value of
+  For quadrupoles, sextupoles, octupoles and multipoles, a tracking
+  through the map is done only once for any positive non-zero value of
   \texttt{ITERATE}. \\  
   If \texttt{ITERATE=0} is specified, the tapering is only calculated
   from the momentum deviation at the entrance of the element and no
@@ -73,7 +73,8 @@ the dipole calculated as \texttt{K0 * LENGTH = ANGLE * (1 + KTAP)}.
 
 The \texttt{KTAP} attribute can be calculated and stored, or applied
 from input file, for each node of type \texttt{BEND},
-\texttt{QUADRUPOLE} or \texttt{SEXTUPOLE} in the active sequence. 
+\texttt{QUADRUPOLE}, \texttt{SEXTUPOLE}, \texttt{OCTUPOLE} or
+\texttt{MULTIPOLE} in the active sequence.  
 
 If \texttt{STEPSIZE} is not specified or specfied as zero, the
 calculated value is stored and each node has a unique value 
