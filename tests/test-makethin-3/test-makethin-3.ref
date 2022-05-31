@@ -153,6 +153,7 @@ parameter: lrad   expression: ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) )
 double value:     2.362500
 parameter: knl   double array: -3.831264e-04 0.000000e+00 0.000000e+00 0.000000e+00 
 parameter: ksl   double array: 0.000000e+00 
+parameter: ktap   double value:     0.000000
 parameter: angle   expression: ( 0 - ad2.r2 ) / ( 4 )  :: value:    -0.000383
 double value:    -0.000383
 parameter: apertype   string: circle
@@ -210,6 +211,7 @@ parameter: lrad   expression: ( l.mqxb ) / ( 4 )  :: value:     1.375000
 double value:     1.375000
 parameter: knl   double array: 0.000000e+00 -1.307600e-02 0.000000e+00 0.000000e+00 
 parameter: ksl   double array: 0.000000e+00 
+parameter: ktap   double value:     0.000000
 parameter: angle   double value:     0.000000
 parameter: apertype   string: circle
 parameter: aperture   double array: 0.000000e+00 
