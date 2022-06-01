@@ -765,7 +765,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision, parameter :: orb_limit=1d1
   integer, parameter :: max_rep=100
 
-  double precision :: dpt ! for tapering
+  double precision :: dpt,ldpt ! for tapering
   integer :: nsteps
   
   debug = get_option('debug ')
@@ -806,7 +806,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   ! initialise first tapering value to initial momentum offset
   nsteps = 0
-  if (stepsize .ne. zero) nsteps = int((orbit0(6)/beta)/stepsize + sign(half,orbit0(6)/beta))
+  dpt= orbit0(6)/beta
+  if (stepsize .ne. zero) nsteps = int(dpt/stepsize + sign(half,dpt))
 
   !---- Initiate the tapering output for command TAPER with RELATIVE option
   if (taperflag .and. (stepsize .ne. zero)) then
@@ -900,19 +901,21 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      case (code_rbend, code_sbend)
         ! first take only account of momentum deviation at entrance of element
         dpt = orbit(6)/beta
+        
         ! then maybe loop track through element to take energy loss in element into account 
         do i = 1, iterate 
            ORBITTAP = ORBIT ! work on a temporary orbit vector
-           call store_node_value('ktap ', dpt) ! initial guess
+           ldpt = dpt ! leon ktap
+           call store_node_value('ktap ', ldpt) ! initial guess
            call tmmap(code,fsec,ftrk,orbittap,fmap,ek,re,te,.false.,el)
            dpt = (orbittap(6)+orbit(6))/(two*beta) 
         enddo
         
         if (stepsize .ne. zero) then
-           nsteps = int(dpt/stepsize + sign(half,dpt))
+           nsteps = int(ldpt/stepsize + sign(half,ldpt))
            call store_node_value('ktap ', nsteps*stepsize)
         else 
-           call store_node_value('ktap ', dpt)
+           call store_node_value('ktap ', ldpt)
         endif
        
         if (taperout) then
@@ -923,17 +926,18 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      case (code_quadrupole, code_sextupole, code_octupole, code_multipole)
         dpt = orbit(6)/beta
         if (iterate .ge. 1) then ! loop is only one pass
-           ORBITTAP = ORBIT 
-           call store_node_value('ktap ', dpt)
+           ORBITTAP = ORBIT
+           ldpt = 1/(1-dpt)-1 ! leon ktap 
+           call store_node_value('ktap ', ldpt)
            call tmmap(code,fsec,ftrk,orbittap,fmap,ek,re,te,.false.,el)  
            dpt = (orbittap(6)+orbit(6))/(two*beta)
         endif
         
         if (stepsize .ne. zero) then
-           nsteps = int(dpt/stepsize + sign(half,dpt))
+           nsteps = int(ldpt/stepsize + sign(half,ldpt))
            call store_node_value('ktap ', nsteps*stepsize)
         else
-           call store_node_value('ktap ', dpt)
+           call store_node_value('ktap ', ldpt)
         endif
 
         if (taperout) then

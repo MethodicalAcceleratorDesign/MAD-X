@@ -1,4 +1,5 @@
 MAD-X master
+*   [] Restore tapering correction form 5.07
 *   [PR 1081](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1108) Fix potential buffer overrun when node_name calls stoupper (S. Berg)
 *   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)
 *   [PR 1095](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1095) Implement more robust, optional, PTC DA map output (L. Deniau)
@@ -6,10 +7,10 @@ MAD-X master
 
 MAD-X release 5.08.01 (2022.02.25)
 
-*    Fix radiation of mulitpoles in TRACK. #1079. (Riccardo)
+*    Fix radiation of multipoles in TRACK. #1079. (Riccardo)
 *    Fix in exact drift transfer map in TWISS #1077. (Tobias)
 *    Allows disabling the scaling of TWISS in PTC by default but possible to activate it. #1073. (Tobias)
-*    Fixes a bug in the dqmin calculation. #1075. (Tobias) 
+*    Fixes a bug in the dqmin calculation. #1075. (Tobias)
 
 MAD-X release 5.08.00 (2022.01.17)
 
