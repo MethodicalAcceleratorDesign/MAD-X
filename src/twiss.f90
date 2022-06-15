@@ -7180,12 +7180,12 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
       re(1,2) = dl/sqrt(csq) + dl*px**2/c3sq
       re(1,4) = dl*px*py/c3sq
       re(1,6) = dl*px*(-pt - 1d0/beta)/c3sq
-      re(3,2) = dl*px*py/c3sq
+      re(3,2) = re(1,4)
       re(3,4) = dl/sqrt(csq) + dl*py**2/c3sq
       re(3,6) = dl*py*(-pt - 1d0/beta)/c3sq
-      re(5,2) = -dl*px*(beta + pt)/c3sq
-      re(5,4) = -dl*py*(beta + pt)/c3sq
-      re(5,6) = -dl/sqrt(csq) - dl*(beta + pt)*(-pt - 1d0/beta)/c3sq
+      re(5,2) = re(1,6)
+      re(5,4) = re(3,6)
+      re(5,6) = dl*((beta*gamma)**(-2)+px**2+py**2)/c3sq
 
       if (fsec) then
          te(1,2,2) = 3d0*dl*px/(2d0*c3sq) + 3d0*dl*px**3d0/(2d0*c52sq)
