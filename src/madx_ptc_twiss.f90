@@ -1883,8 +1883,8 @@ contains
           opt_fun( 7:12) = tmpa66(2,:)
           opt_fun(13:18) = tmpa66(3,:)
           opt_fun(19:24) = tmpa66(4,:)
-          opt_fun(31:36) = -tmpa66(5,:)
-          opt_fun(25:30) = tmpa66(6,:)
+          opt_fun(31:36) = tmpa66(5,:)
+          opt_fun(25:30) = -tmpa66(6,:)
 
         else
 
