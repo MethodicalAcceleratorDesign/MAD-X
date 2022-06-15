@@ -1876,14 +1876,14 @@ contains
 
           tmpa6 = tmpa66(:,6)
           tmpa66(:,6) = tmpa66(:,5)
-          tmpa66(:,5) = tmpa6
+          tmpa66(:,5) = -tmpa6
 
 
           opt_fun( 1:6 ) = tmpa66(1,:)
           opt_fun( 7:12) = tmpa66(2,:)
           opt_fun(13:18) = tmpa66(3,:)
           opt_fun(19:24) = tmpa66(4,:)
-          opt_fun(31:36) = tmpa66(5,:)
+          opt_fun(31:36) = -tmpa66(5,:)
           opt_fun(25:30) = tmpa66(6,:)
 
         else
@@ -1892,7 +1892,7 @@ contains
           opt_fun(2) = transfermap(1).sub.fo(2,:)
           opt_fun(3) = transfermap(1).sub.fo(3,:)
           opt_fun(4) = transfermap(1).sub.fo(4,:)
-          opt_fun(5) = transfermap(1).sub.fo(6,:)
+          opt_fun(5) = -transfermap(1).sub.fo(6,:)
           opt_fun(6) = transfermap(1).sub.fo(5,:)
 
 
@@ -1900,37 +1900,37 @@ contains
           opt_fun(8) = transfermap(2).sub.fo(2,:)
           opt_fun(9) = transfermap(2).sub.fo(3,:)
           opt_fun(10)= transfermap(2).sub.fo(4,:)
-          opt_fun(11)= transfermap(2).sub.fo(6,:)
+          opt_fun(11)= -transfermap(2).sub.fo(6,:)
           opt_fun(12)= transfermap(2).sub.fo(5,:)
 
           opt_fun(13)= transfermap(3).sub.fo(1,:)
           opt_fun(14)= transfermap(3).sub.fo(2,:)
           opt_fun(15)= transfermap(3).sub.fo(3,:)
           opt_fun(16)= transfermap(3).sub.fo(4,:)
-          opt_fun(17)= transfermap(3).sub.fo(6,:)
+          opt_fun(17)= -transfermap(3).sub.fo(6,:)
           opt_fun(18)= transfermap(3).sub.fo(5,:)
 
           opt_fun(19)= transfermap(4).sub.fo(1,:)
           opt_fun(20)= transfermap(4).sub.fo(2,:)
           opt_fun(21)= transfermap(4).sub.fo(3,:)
           opt_fun(22)= transfermap(4).sub.fo(4,:)
-          opt_fun(23)= transfermap(4).sub.fo(6,:)
+          opt_fun(23)= -transfermap(4).sub.fo(6,:)
           opt_fun(24)= transfermap(4).sub.fo(5,:)
 
 
-          opt_fun(25)= transfermap(6).sub.fo(1,:)
-          opt_fun(26)= transfermap(6).sub.fo(2,:)
-          opt_fun(27)= transfermap(6).sub.fo(3,:)
-          opt_fun(28)= transfermap(6).sub.fo(4,:)
+          opt_fun(25)= -transfermap(6).sub.fo(1,:)
+          opt_fun(26)= -transfermap(6).sub.fo(2,:)
+          opt_fun(27)= -transfermap(6).sub.fo(3,:)
+          opt_fun(28)= -transfermap(6).sub.fo(4,:)
           opt_fun(29)= transfermap(6).sub.fo(6,:)
-          opt_fun(30)= transfermap(6).sub.fo(5,:)
+          opt_fun(30)= -transfermap(6).sub.fo(5,:)
 
 
           opt_fun(31)= transfermap(5).sub.fo(1,:)
           opt_fun(32)= transfermap(5).sub.fo(2,:)
           opt_fun(33)= transfermap(5).sub.fo(3,:)
           opt_fun(34)= transfermap(5).sub.fo(4,:)
-          opt_fun(35)= transfermap(5).sub.fo(6,:)
+          opt_fun(35)= -transfermap(5).sub.fo(6,:)
           opt_fun(36)= transfermap(5).sub.fo(5,:)
 
         endif
