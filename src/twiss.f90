@@ -7160,6 +7160,7 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   double precision :: dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
   double precision :: px, py, pt, csq, l_pz, c3sq, c52sq
+  real(kind(1d0)) :: beti, dl3, dl5, pp2, ptb, ptot2, px2, py2, pz1i, pz3i, pz5i
 
   !---- Initialize.
   EK = zero
@@ -7171,21 +7172,33 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
       px = orbit(2)
       py = orbit(4)
       pt = orbit(6)
+      px2 = px*px
+      py2 = py*py
 
-      csq = 1 + 2*pt/beta + pt**2 - px**2 - py**2
+      beti = 1/beta
+      ptb = beti + pt
+      ptot2 = 1 + pt*(2*beti + pt)
+      pp2 = (beta*gamma)**(-2)+px2+py2
+      csq = ptot2 - px2 - py2
+      pz1i = 1.0 / sqrt(csq)
+      pz3i = pz1i / csq
+      pz5i = pz3i / csq
+      dl3 = dl*pz3i
+      dl5 = dl*pz5i
+
       l_pz = dl / sqrt(csq)
       c3sq = csq**(3d0/2d0)
       c52sq =csq**(5d0/2d0)
 
-      re(1,2) = dl/sqrt(csq) + dl*px**2/c3sq
-      re(1,4) = dl*px*py/c3sq
-      re(1,6) = dl*px*(-pt - 1d0/beta)/c3sq
+      re(1,2) = dl3*(ptot2 - py2)
+      re(1,4) = dl3*px*py
+      re(1,6) = -dl3*px*ptb
       re(3,2) = re(1,4)
-      re(3,4) = dl/sqrt(csq) + dl*py**2/c3sq
-      re(3,6) = dl*py*(-pt - 1d0/beta)/c3sq
+      re(3,4) = dl3*(ptot2 - px2)
+      re(3,6) = -dl3*py*ptb
       re(5,2) = re(1,6)
       re(5,4) = re(3,6)
-      re(5,6) = dl*((beta*gamma)**(-2)+px**2+py**2)/c3sq
+      re(5,6) = dl3*pp2
 
       if (fsec) then
          te(1,2,2) = 3d0*dl*px/(2d0*c3sq) + 3d0*dl*px**3d0/(2d0*c52sq)
