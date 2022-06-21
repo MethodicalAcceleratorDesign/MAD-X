@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:06:25      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.06.16 17:07:34      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! reads the user privided one turn matrix via command parameters
 
@@ -896,9 +896,9 @@ Determined SECTOR NMUL MAX :  2
 
             re46 =0 ,
 
-            re51 =7.933548575   ,
+            re51 =-7.933548575   ,
 
-            re52 =22.64988792  ,       
+            re52 =-22.64988792  ,
 
             re53 =0 ,
 
@@ -906,7 +906,7 @@ Determined SECTOR NMUL MAX :  2
 
             re55 =1 ,
 
-            re56 =-79.62566353 ,
+            re56 =+79.62566353 ,
 
             re61 =0 ,
 
