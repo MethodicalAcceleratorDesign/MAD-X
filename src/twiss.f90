@@ -7226,9 +7226,12 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
          te(5,6,6) = -3*dl5*pp2*ptb
       endif
 
-      orbit(1) = orbit(1) + px*l_pz
-      orbit(3) = orbit(3) + py*l_pz
-      orbit(5) = orbit(5) + l_pz*(pt*(2*beti+pt)/(gamma*gamma) - px2 - py2)/(beta*beta*(ptb + beti*pz))
+      ek(1) = px*l_pz
+      ek(3) = py*l_pz
+      ek(5) = dl*dtbyds + l_pz*(pt*(2*beti+pt)/(gamma*gamma) - px2 - py2)/(beta*beta*(ptb + beti*pz))
+
+      if (ftrk) orbit(1:5:2) = orbit(1:5:2) + ek(1:5:2)
+
   else
 
      re(1,2) = dl
