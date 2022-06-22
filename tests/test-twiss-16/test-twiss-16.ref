@@ -3,12 +3,16 @@
   +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2022.02.25               +
-  + Execution date: 2022.06.21 13:30:36      +
+  + Execution date: 2022.06.22 08:51:56      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -echo;
 
 enter Twiss module
  Found 3 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  1.000000E-02  0.000000E+00  1.300000E-02  0.000000E+00 -1.700000E-02
+final orbit vector:     5.099067E-02  1.000000E-02  6.628788E-02  1.300000E-02 -2.549399E-02 -1.700000E-02
 
 ++++++ table: summ
 
@@ -35,6 +39,47 @@ enter Twiss module
 
               dqmin_phase 
   0.00000000000000000e+00 
+Determined SECTOR NMUL MAX :  0
+ MAD-X Beam Parameters
+                  Energy : 0.200000E+01
+          Kinetic Energy : 0.106173E+01
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.176625E+01
+ Setting MADx with 
+     energy           2.0000000000000000     
+     method                   6
+     Num. of steps            5
+     charge           1.0000000000000000     
+  Length of machine:    5.0000000000000000     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        5.0000000000000000     
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps      5
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
 
@@ -133,48 +178,3 @@ table( ptc3 o ttdd )-table( mad3 o t566 ) =  -3.10862446895043831e-15 ;
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++
-  
-open line - error with deltap:   0.000000E+00
-initial orbit vector:   0.000000E+00  1.000000E-02  0.000000E+00  1.300000E-02  0.000000E+00 -1.700000E-02
-final orbit vector:     5.099067E-02  1.000000E-02  6.628788E-02  1.300000E-02 -2.549399E-02 -1.700000E-02
-Determined SECTOR NMUL MAX :  0
- MAD-X Beam Parameters
-                  Energy : 0.200000E+01
-          Kinetic Energy : 0.106173E+01
-      Particle Rest Mass : 0.938272E+00
-                Momentum : 0.176625E+01
- Setting MADx with 
-     energy           2.0000000000000000     
-     method                   6
-     Num. of steps            5
-     charge           1.0000000000000000     
-  Length of machine:    5.0000000000000000     
- The machine is a RING
- ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        5.0000000000000000     
- ************ State Summary ****************
- MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
-  Rectangular Bend: input arc length (rho alpha) 
-  Default integration method     6
-  Default integration steps      5
- This is a proton 
-       EXACT_MODEL =  TRUE 
-       TOTALPATH   =     0
-       RADIATION   =  FALSE
-       STOCHASTIC  =  FALSE
-       ENVELOPE    =  FALSE
-       NOCAVITY    =  TRUE 
-       TIME        =  TRUE 
-       FRINGE      =  FALSE
-       PARA_IN     =  FALSE
-       ONLY_2D     =  FALSE
-       ONLY_4D     =  FALSE
-       DELTA       =  FALSE
-       SPIN        =  FALSE
-       MODULATION  =  FALSE
-       RAMPING     =  FALSE
-       ACCELERATE  =  FALSE
- Reduced SUMM Table (Inital parameters specified)
