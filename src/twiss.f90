@@ -7105,33 +7105,80 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   logical :: ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  double precision :: angle, ca, sa, ta
+  double precision :: angle, ca, sa
   double precision :: node_value
   double precision :: al_errors(align_max)
+  real(kind(0d0)) :: beti,ca2,pl2,pm2,ps0,ps1,pt,ptb,px0,px1,py,sa2,x0,xsps1,xsps0ps12
 
   !---- Initialize.
-  angle = -node_value('angle ') !Note that we should have the negative angle here
+  angle = node_value('angle ') !Note that we should have the negative angle here
+  fmap = angle.ne.0
   if (angle .eq. 0) return
   !al_errors = 0d0
   angle = angle * node_value('other_bv ')
   !al_errors(5) = - angle
   !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
 
+  x0 = orbit(1)
+  px0 = orbit(2)
+  py = orbit(4)
+  pt = orbit(6)
+  
+  beti = 1/beta
+  ptb = beti+pt
+  pl2 = 1+(2*beti+pt)*pt
+  pm2 = pl2-py*py
+  ps0 = sqrt(pm2-px0*px0)
+
   !---- Kick.
   ca = cos(angle)
   sa = sin(angle)
-  ta = tan(angle)
 
-  ek(2) = sa
+  px1 = px0*ca - ps0*sa
+  ps1 = px0*sa + ps0*ca
+  xsps1 = x0*sa/ps1
+  xsps0ps12 = x0*sa/(ps0*ps1*ps1)
+
+  ca2 = cos(0.5d0*angle)
+  sa2 = sin(0.5d0*angle)
+
+  ek(1) = 2*sa2*x0*(ps0*sa2-px0*ca2)/ps1
+  ek(2) = -2*sa2*(ps0*ca2+px0*sa2)
+  ek(3) = -xsps1*py
+  ek(4) = 0
+  ek(5) = xsps1*ptb
+  ek(6) = 0
+
+  if (ftrk) then
+     orbit(1) = x0*ps0/ps1
+     orbit(2) = px1
+     orbit(3) = orbit(3) + ek(3)
+     orbit(5) = orbit(5) + ek(5)
+  end if
 
   !---- Transfer matrix.
-  re(1,1) = 1/ca
-  re(2,2) =   ca
-  re(2,6) =   sa/beta
-  re(5,1) =  -ta/beta
+  re = 0
+  re(1,1) = ps0/ps1
+  re(1,2) = -xsps0ps12*pm2
+  re(1,4) = -xsps0ps12*px0*py
+  re(1,6) = xsps0ps12*px0*ptb
+  re(2,2) = ps1/ps0
+  re(2,4) = sa*py/ps0
+  re(2,6) = -sa*ptb/ps0
+  re(3,1) = -sa*py/ps1
+  re(3,2) = -xsps0ps12*px1*py
+  re(3,3) = 1
+  re(3,4) = xsps0ps12*(px0*px1-pl2*ca)
+  re(3,6) = xsps0ps12*ca*py*ptb
+  re(4,4) = 1
+  re(5,1) = sa*ptb/ps1
+  re(5,2) = xsps0ps12*px1*ptb
+  re(5,4) = xsps0ps12*ca*py*ptb
+  re(5,5) = 1
+  re(5,6) = -xsps0ps12*(px0*px1+(1/(beta*beta*gamma*gamma)+py*py)*ca)
+  re(6,6) = 1
 
-  !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  te = 0
 
 end SUBROUTINE tmyrot
 
