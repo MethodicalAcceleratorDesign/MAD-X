@@ -3727,10 +3727,10 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmsrot(ftrk,orbit,fmap,ek,re,te)
 
      case (code_yrotation)
-        call tmyrot(fsec,ftrk,orbit,fmap,ek,re,te)
+        call tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,node_value('angle ')*node_value('other_bv '),1)
 
      case (code_xrotation)
-        call tmxrot(fsec,ftrk,orbit,fmap,ek,re,te)
+        call tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,-node_value('angle ')*node_value('other_bv '),2)
 
      case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
         call tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
@@ -7030,50 +7030,6 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmsrot
-
-subroutine tmxrot(fsec,ftrk,orbit,fmap,ek,re,te)
-  implicit none
-  logical :: fsec, ftrk, fmap
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     TRANSPORT map for rotation about Y-axis.                         *
-  !     Treated in a purely linear way.                                  *
-  !     Input:                                                           *
-  !     ftrk      (logical) if true, track orbit.                        *
-  !     Input/output:                                                    *
-  !     orbit(6)  (double)  closed orbit.                                *
-  !     Output:                                                          *
-  !     fmap      (logical) if true, element has a map.                  *
-  !     ek(6)     (double)  kick due to element.                         *
-  !     re(6,6)   (double)  transfer matrix.                             *
-  !     te(6,6,6) (double)  second-order terms.                          *
-  !----------------------------------------------------------------------*
-  double precision :: node_value
-  call tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,-node_value('angle ')*node_value('other_bv '),2)
-end subroutine tmxrot
-
-subroutine tmyrot(fsec,ftrk,orbit,fmap,ek,re,te)
-  implicit none
-  logical :: fsec, ftrk, fmap
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     TRANSPORT map for rotation about Y-axis.                         *
-  !     Treated in a purely linear way.                                  *
-  !     Input:                                                           *
-  !     ftrk      (logical) if true, track orbit.                        *
-  !     Input/output:                                                    *
-  !     orbit(6)  (double)  closed orbit.                                *
-  !     Output:                                                          *
-  !     fmap      (logical) if true, element has a map.                  *
-  !     ek(6)     (double)  kick due to element.                         *
-  !     re(6,6)   (double)  transfer matrix.                             *
-  !     te(6,6,6) (double)  second-order terms.                          *
-  !----------------------------------------------------------------------*
-  double precision :: node_value
-  call tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,node_value('angle ')*node_value('other_bv '),1)
-end subroutine tmyrot
 
 SUBROUTINE tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,angle,iplane)
   ! Common code for tmxrot and tmyrot
