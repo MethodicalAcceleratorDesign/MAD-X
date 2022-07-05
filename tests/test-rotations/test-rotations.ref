@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:03:14      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.07.05 16:28:54      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=2;
 
@@ -56,7 +56,7 @@ enter Twiss module
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   1.000000E-03  3.000000E-03  2.000000E-03  4.000000E-03  0.000000E+00  0.000000E+00
-final orbit vector:     1.998533E-03 -2.003017E-03  1.500525E-02  9.010429E-03 -1.880605E-04  0.000000E+00
+final orbit vector:     1.998476E-03 -2.002954E-03  1.500524E-02  9.010379E-03 -1.880604E-04  0.000000E+00
 
 ++++++ table: summ
 
@@ -64,16 +64,16 @@ final orbit vector:     1.998533E-03 -2.003017E-03  1.500525E-02  9.010429E-03 -
                  2                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-      0.1762161521                  0        4.996000813     0.008673074781 
+      0.1762166295                  0        4.996035788      0.01733551063 
 
              dxrms             xcomax             xcorms                 q2 
-    0.006634877681     0.004000050001     0.003222891644       0.1762002366 
+     0.01160708001              0.004     0.003222818831       0.1761984861 
 
                dq2            betymax              dymax              dyrms 
-                 0        5.004000812      0.03761058401      0.02199857504 
+                 0        5.004105957      0.02315207947       0.0154875694 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01500525419     0.009370377493                  0                  0 
+      0.0150052442      0.00937038025                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -82,7 +82,7 @@ final orbit vector:     1.998533E-03 -2.003017E-03  1.500525E-02  9.010429E-03 -
                  0                  0                  0                  0 
 
        dqmin_phase 
-                 0 
+       2.521344192 
 track, onepass, dump, onetable;
 
 enter TRACK module
