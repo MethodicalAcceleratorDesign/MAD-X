@@ -3727,7 +3727,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmsrot(ftrk,orbit,fmap,ek,re,te)
 
      case (code_yrotation)
-        call tmyrot(ftrk,orbit,fmap,ek,re,te)
+        call tmyrot(fsec,ftrk,orbit,fmap,ek,re,te)
 
      case (code_xrotation)
         call tmxrot(ftrk,orbit,fmap,ek,re,te)
@@ -7083,7 +7083,7 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
 
 end SUBROUTINE tmxrot
 
-SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
+SUBROUTINE tmyrot(fsec,ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   use twissbeamfi, only : beta, gamma
   use twiss0fi, only : align_max
@@ -7102,13 +7102,13 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: ftrk, fmap
+  logical :: fsec, ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   double precision :: angle, ca, sa
   double precision :: node_value
   double precision :: al_errors(align_max)
-  real(kind(0d0)) :: beti,ca2,pl2,pm2,ps0,ps1,pt,ptb,px0,px1,py,sa2,x0,xsps1,xsps0ps12
+  real(kind(0d0)) :: beti,bg2i,ca2,pl2,pm2,ps0,ps1,pt,ptb,px0,px02,px1,px12,py,py2,sa2,sps0ps12,x0,xsps1
 
   !---- Initialize.
   angle = node_value('angle ') !Note that we should have the negative angle here
@@ -7125,10 +7125,13 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   pt = orbit(6)
   
   beti = 1/beta
+  bg2i = 1/(beta*beta*gamma*gamma)
   ptb = beti+pt
   pl2 = 1+(2*beti+pt)*pt
-  pm2 = pl2-py*py
-  ps0 = sqrt(pm2-px0*px0)
+  py2 = py*py
+  pm2 = pl2-py2
+  px02 = px0*px0
+  ps0 = sqrt(pm2-px02)
 
   !---- Kick.
   ca = cos(angle)
@@ -7136,8 +7139,9 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
   px1 = px0*ca - ps0*sa
   ps1 = px0*sa + ps0*ca
+  px12 = px1*px1
   xsps1 = x0*sa/ps1
-  xsps0ps12 = x0*sa/(ps0*ps1*ps1)
+  sps0ps12 = 0.5d0*sa/(ps0*ps1*ps1)
 
   ca2 = cos(0.5d0*angle)
   sa2 = sin(0.5d0*angle)
@@ -7158,27 +7162,99 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
   !---- Transfer matrix.
   re = 0
-  re(1,1) = ps0/ps1
-  re(1,2) = -xsps0ps12*pm2
-  re(1,4) = -xsps0ps12*px0*py
-  re(1,6) = xsps0ps12*px0*ptb
   re(2,2) = ps1/ps0
   re(2,4) = sa*py/ps0
   re(2,6) = -sa*ptb/ps0
-  re(3,1) = -sa*py/ps1
-  re(3,2) = -xsps0ps12*px1*py
-  re(3,3) = 1
-  re(3,4) = xsps0ps12*(px0*px1-pl2*ca)
-  re(3,6) = xsps0ps12*ca*py*ptb
-  re(4,4) = 1
-  re(5,1) = sa*ptb/ps1
-  re(5,2) = xsps0ps12*px1*ptb
-  re(5,4) = xsps0ps12*ca*py*ptb
-  re(5,5) = 1
-  re(5,6) = -xsps0ps12*(px0*px1+(1/(beta*beta*gamma*gamma)+py*py)*ca)
-  re(6,6) = 1
 
-  te = 0
+  if (fsec) te = 0
+
+  ! Using te as scratch space to avoid excess copying when fsec is true
+  te(1,1,2) = -sps0ps12*pm2
+  te(1,1,4) = -sps0ps12*px0*py
+  te(1,1,6) = sps0ps12*px0*ptb
+  te(3,1,2) = -sps0ps12*px1*py
+  te(3,1,4) = sps0ps12*(px0*px1-pl2*ca)
+  te(3,1,6) = sps0ps12*ca*py*ptb
+  te(5,1,2) = sps0ps12*px1*ptb
+  te(5,1,4) = sps0ps12*ca*py*ptb
+  te(5,1,6) = -sps0ps12*(px0*px1+(bg2i+py2)*ca)
+
+  if (fsec) then
+     te(1:5:2,2:6:2,1) = te(1:5:2,1,2:6:2)
+     block
+       real(kind(0d0)) :: sps30,sps31,sps5
+       real(kind(0d0)) :: d0xx,d0xy,d0xt,d0yy,d0yt,d0tt
+       real(kind(0d0)) :: d0xxx,d0xxy,d0xxt,d0xyy,d0xyt,d0xtt,d0yyy,d0yyt,d0ytt,d0ttt
+
+       sps31 = sa/ps1**3
+       d0xx = -(pl2-py2)*sps31
+       d0xy = -px1*py*sps31
+       d0xt = px1*ptb*sps31
+       d0yy = -(pl2-px12)*sps31
+       d0yt = py*ptb*sps31
+       d0tt = -(bg2i+px12+py2)*sps31
+
+       sps5 = 0.5d0*sa/ps1**5
+       d0xxx = -3*px1*(pl2-py2)*sps5
+       d0xxy = -py*(pl2-py2+2*px12)*sps5
+       d0xxt = ptb*(pl2-py2+2*px12)*sps5
+       d0xyy = -px1*(pl2-px12+2*py2)*sps5
+       d0xyt = 3*px1*py*ptb*sps5
+       d0xtt = -px1*(2*ptb*ptb+bg2i+px12+py2)*sps5
+       d0yyy = -3*py*(pl2-px12)*sps5
+       d0yyt = ptb*(pl2-px12+2*py2)*sps5
+       d0ytt = -py*(2*ptb*ptb+bg2i+px12+py2)*sps5
+       d0ttt = 3*ptb*(bg2i+px12+py2)*sps5
+
+       sps30 = 0.5d0*sa/ps0**3
+       te(2,2,2) = (pl2-py2)*sps30
+       te(2,2,4) = px0*py*sps30
+       te(2,2,6) = -px0*ptb*sps30
+       te(2,4,2) = te(2,2,4)
+       te(2,4,4) = (pl2-px02)*sps30
+       te(2,4,6) = -py*ptb*sps30
+       te(2,6,2) = te(2,2,6)
+       te(2,6,4) = te(2,4,6)
+       te(2,6,6) = (bg2i+px02+py2)*sps30
+
+       te(1,2,2) = x0*(d0xxx*re(2,2)*re(2,2)+d0xx*te(2,2,2))
+       te(1,2,4) = x0*(d0xxy*re(2,2)+d0xxx*re(2,2)*re(2,4)+d0xx*te(2,2,4))
+       te(1,2,6) = x0*(d0xxt*re(2,2)+d0xxx*re(2,2)*re(2,6)+d0xx*te(2,2,6))
+       te(1,4,2) = te(1,2,4)
+       te(1,4,4) = x0*(d0xyy+2*d0xxy*re(2,4)+d0xxx*re(2,4)*re(2,4)+d0xx*te(2,4,4))
+       te(1,4,6) = x0*(d0xyt+d0xxy*re(2,6)+d0xxt*re(2,4)+d0xxx*re(2,4)*re(2,6)+d0xx*te(2,4,6))
+       te(1,6,2) = te(1,2,6)
+       te(1,6,4) = te(1,4,6)
+       te(1,6,6) = x0*(d0xtt+2*d0xxt*re(2,6)+d0xxx*re(2,6)*re(2,6)+d0xx*te(2,6,6))
+       te(3,2,2) = x0*(d0xxy*re(2,2)*re(2,2)+d0xy*te(2,2,2))
+       te(3,2,4) = x0*(d0xyy*re(2,2)+d0xxy*re(2,2)*re(2,4)+d0xy*te(2,2,4))
+       te(3,2,6) = x0*(d0xyt*re(2,2)+d0xxy*re(2,2)*re(2,6)+d0xy*te(2,2,6))
+       te(3,4,2) = te(3,2,4)
+       te(3,4,4) = x0*(d0yyy+2*d0xyy*re(2,4)+d0xxy*re(2,4)*re(2,4)+d0xy*te(2,4,4))
+       te(3,4,6) = x0*(d0yyt+d0xyy*re(2,6)+d0xyt*re(2,4)+d0xxy*re(2,4)*re(2,6)+d0xy*te(2,4,6))
+       te(3,6,2) = te(3,2,6)
+       te(3,6,4) = te(3,4,6)
+       te(3,6,6) = x0*(d0ytt+2*d0xyt*re(2,6)+d0xxy*re(2,6)*re(2,6)+d0xy*te(2,6,6))
+       te(5,2,2) = x0*(d0xxt*re(2,2)*re(2,2)+d0xt*te(2,2,2))
+       te(5,2,4) = x0*(d0xyt*re(2,2)+d0xxt*re(2,2)*re(2,4)+d0xt*te(2,2,4))
+       te(5,2,6) = x0*(d0xtt*re(2,2)+d0xxt*re(2,2)*re(2,6)+d0xt*te(2,2,6))
+       te(5,4,2) = te(5,2,4)
+       te(5,4,4) = x0*(d0yyt+2*d0xyt*re(2,4)+d0xxt*re(2,4)*re(2,4)+d0xt*te(2,4,4))
+       te(5,4,6) = x0*(d0ytt+d0xyt*re(2,6)+d0xtt*re(2,4)+d0xxt*re(2,4)*re(2,6)+d0xt*te(2,4,6))
+       te(5,6,2) = te(5,2,6)
+       te(5,6,4) = te(5,4,6)
+       te(5,6,6) = x0*(d0ttt+2*d0xtt*re(2,6)+d0xxt*re(2,6)*re(2,6)+d0xt*te(2,6,6))
+     end block
+  end if
+
+  re(1,1) = ps0/ps1
+  re(3,1) = -sa*py/ps1
+  re(3,3) = 1
+  re(4,4) = 1
+  re(5,5) = 1
+  re(5,1) = sa*ptb/ps1
+  re(6,6) = 1
+  re(1:5:2,2:6:2) = (2*x0)*te(1:5:2,1,2:6:2)
 
 end SUBROUTINE tmyrot
 
