@@ -3730,7 +3730,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmyrot(fsec,ftrk,orbit,fmap,ek,re,te)
 
      case (code_xrotation)
-        call tmxrot(ftrk,orbit,fmap,ek,re,te)
+        call tmxrot(fsec,ftrk,orbit,fmap,ek,re,te)
 
      case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
         call tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
@@ -7031,14 +7031,13 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
 
 end SUBROUTINE tmsrot
 
-SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
-  use twisslfi
-  use twissbeamfi, only : beta, gamma
-  use twiss0fi, only : align_max
+subroutine tmxrot(fsec,ftrk,orbit,fmap,ek,re,te)
   implicit none
+  logical :: fsec, ftrk, fmap
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
-  !     TRANSPORT map for rotation about X-axis.                         *
+  !     TRANSPORT map for rotation about Y-axis.                         *
   !     Treated in a purely linear way.                                  *
   !     Input:                                                           *
   !     ftrk      (logical) if true, track orbit.                        *
@@ -7050,38 +7049,9 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: ftrk, fmap
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: al_errors(align_max)
-  double precision :: angle, ca, sa, ta
   double precision :: node_value
-
-  !---- Initialize.
-  al_errors = 0d0
-
-  angle = node_value('angle ')
-  if (angle .eq. 0) return
-
-  angle = angle * node_value('other_bv ')
-  !al_errors(4) = -angle
-  !---- Kick.
-  ca = cos(angle)
-  sa = sin(angle)
-  ta = tan(angle)
-
-  ek(4) = sa
-
-  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
-  !---- Transfer matrix.
-  re(3,3) = 1/ca
-  re(4,4) =   ca
-  re(4,6) =   sa/beta
-  re(5,3) =  -ta/beta
-
-  !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-
-end SUBROUTINE tmxrot
+  call tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,-node_value('angle ')*node_value('other_bv '),2)
+end subroutine tmxrot
 
 subroutine tmyrot(fsec,ftrk,orbit,fmap,ek,re,te)
   implicit none
