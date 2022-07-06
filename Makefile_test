@@ -30,6 +30,8 @@
 #                added test-twiss-12 for sigma matrix calculation
 # 2021-Sep-02  20:59:00 ghislain:
 #                added test-taper
+# 2022-Jul-06  jsberg-bnl:
+#                added test comparing PTC to TWISS/TRACK for [XY]ROTATION
 #################################################
 # testsuite
 
@@ -56,7 +58,7 @@ test-track-acd test-track-rotations test-beambeam-npart \
 test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 \
 test-twiss-6 test-twiss-8 test-twiss-9 test-twiss-10 test-twiss-11 \
 test-twiss-12 test-twiss-13 test-twiss-14 test-twiss-15 test-twiss-exact test-translation test-crabcavity \
-test-xrotation test-yrotation test-rotations test-interpolate test-rf-fringe \
+test-xrotation test-yrotation test-rotations test-rotations-2 test-interpolate test-rf-fringe \
 test-cororbit test-cororbit-2 test-cororbit-3 test-cororbit-4 \
 test-emit test-emit-2 \
 test-ibs test-ibs-2 test-ibs-3 test-ibs-4 \
