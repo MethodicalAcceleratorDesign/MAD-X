@@ -6906,9 +6906,6 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
         te_s(5,6,1:4) = te_s(5,1:4,6)
         do i=1,4
            te_s(1:4,i,6) = (-0.5d0*ptb)*(vpi(i)*vtau + ms1(:,i))
-           write(*,'(i1)') i
-           write(*,'(sp,4(es25.17e3,1x))') -0.5d0*ptb*vpi(1)*vtau
-           write(*,'(sp,4(es25.17e3,1x))') -0.5d0*ptb*sk*ms1(:,i)
            te_s(1:4,6,i) = te_s(1:4,i,6)
            te_s(5,1:4,i) = (-1.5d0*elpsi5*ptb*vpi(i))*vpi - (0.5d0*elpsi3*ptb)*mpi(:,i)
            do j=1,4
