@@ -1,0 +1,296 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.07.15 17:09:59      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+option, -echo;
+
+enter Twiss module
+ Found 5 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   1.000000E-02  1.300000E-02  1.400000E-02  1.700000E-02  0.000000E+00  1.900000E-02
+final orbit vector:     9.537448E-02  1.624403E-02  7.298228E-02  1.230440E-02  2.472567E-02  1.900000E-02
+
+++++++ table: summ
+
+                   length                    orbit5                      alfa                   gammatr 
+  5.00000000000000000e+00  -0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00 
+
+                       q1                       dq1                   betxmax                     dxmax 
+  2.18704034896653188e-01   0.00000000000000000e+00   2.43401064061778456e+01   1.09493714719738677e-01 
+
+                    dxrms                    xcomax                    xcorms                        q2 
+  8.94012437017424610e-02   9.53744789313721170e-02   7.80866665162529283e-02   2.18695387693632309e-01 
+
+                      dq2                   betymax                     dymax                     dyrms 
+  0.00000000000000000e+00   2.43326552573112380e+01   3.81524869433619573e-02   3.11513751431447480e-02 
+
+                   ycomax                    ycorms                    deltap                   synch_1 
+  7.29822838230221593e-02   6.01354790010254631e-02   0.00000000000000000e+00   0.00000000000000000e+00 
+
+                  synch_2                   synch_3                   synch_4                   synch_5 
+  0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00 
+
+                  synch_6                   synch_8                    nflips                     dqmin 
+  0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00 
+
+              dqmin_phase 
+  0.00000000000000000e+00 
+Determined SECTOR NMUL MAX :  0
+ MAD-X Beam Parameters
+                  Energy : 0.200000E+01
+          Kinetic Energy : 0.106173E+01
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.176625E+01
+ Setting MADx with 
+     energy           2.0000000000000000     
+     method                   6
+     Num. of steps            1
+     charge           1.0000000000000000     
+  Length of machine:    5.0000000000000000     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        5.0000000000000000     
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps      1
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+                   length                   alpha_c                 alpha_c_p                alpha_c_p2 
+  5.00000000000000000e+00  -1.00000000000000000e+06  -1.00000000000000000e+06  -1.00000000000000000e+06 
+
+               alpha_c_p3                     eta_c                  gamma_tr                        q1 
+ -1.00000000000000000e+06  -1.00000000000000000e+06  -1.00000000000000000e+06   2.19273047247727865e-01 
+
+                       q2                       dq1                       dq2                        qs 
+  2.19264549291250194e-01  -1.00000000000000000e+06  -1.00000000000000000e+06  -1.00000000000000000e+06 
+
+               beta_x_min                beta_x_max                beta_y_min                beta_y_max 
+  1.00241866634220478e+00   2.52992194840024638e+01   1.00241866634220478e+00   2.52914552409712989e+01 
+
+                beta11min                 beta11max                 beta12min                 beta12max 
+  1.00241866634220478e+00   2.35078642319540805e+01   0.00000000000000000e+00   1.79379988253491773e+00 
+
+                beta13min                 beta13max                 beta21min                 beta21max 
+  0.00000000000000000e+00   1.20178706480956136e-02   0.00000000000000000e+00   1.78836269139960313e+00 
+
+                beta22min                 beta22max                 beta23min                 beta23max 
+  1.00241866634220478e+00   2.35006497496592424e+01   0.00000000000000000e+00   1.45913290034387923e-03 
+
+                beta31min                 beta31max                 beta32min                 beta32max 
+  0.00000000000000000e+00   5.78962341852844349e-03   0.00000000000000000e+00   8.24513939876675428e-03 
+
+                beta33min                 beta33max                  disp1min                  disp1max 
+  1.04087244880175800e+00   2.80586974580617632e+00  -1.08468116284788918e-01   0.00000000000000000e+00 
+
+                 disp2min                  disp2max                  disp3min                  disp3max 
+ -2.07873175232518642e-03   0.00000000000000000e+00  -3.77951227695487862e-02   0.00000000000000000e+00 
+
+                 disp4min                  disp4max                    deltap                   orbit_x 
+  0.00000000000000000e+00   5.96574639566339188e-03   0.00000000000000000e+00   1.00000000000000002e-02 
+
+                 orbit_px                   orbit_y                  orbit_py                  orbit_pt 
+  1.29999999999999994e-02   1.40000000000000003e-02   1.70000000000000012e-02   1.89999999999999995e-02 
+
+                  orbit_t                    xcorms                    ycorms                   pxcorms 
+  0.00000000000000000e+00   7.80866665162529422e-02   6.01354790010254561e-02   1.52396055947867752e-02 
+
+                  pycorms                    tcorms                   ptcorms                    xcomax 
+  1.40451260679773267e-02   2.01884238100383528e-02   1.89999999999999995e-02   9.53744789313721447e-02 
+
+                   ycomax                   pxcomax                   pycomax                    tcomax 
+  7.29822838230221455e-02   1.62440256102662113e-02   1.70000000000000012e-02   2.47256685228243178e-02 
+
+                  ptcomax                    xcomin                    ycomin                   pxcomin 
+  1.89999999999999995e-02   1.00000000000000002e-02   1.40000000000000003e-02   1.29999999999999994e-02 
+
+                  pycomin                    tcomin                   ptcomin 
+  1.23044036587745421e-02  -0.00000000000000000e+00   1.89999999999999995e-02 
+table( twiss s x )-table( ptc_twiss s x ) =  -2.77555756156289135e-17 ;
+table( twiss s px )-table( ptc_twiss s px ) =   6.93889390390722838e-18 ;
+table( twiss s y )-table( ptc_twiss s y ) =   1.38777878078144568e-17 ;
+table( twiss s py )-table( ptc_twiss s py ) =  -6.93889390390722838e-18 ;
+table( twiss s t )-table( ptc_twiss s t ) =  -1.30451205393455893e-15 ;
+table( twiss s re11 )-table( ptc_twiss s re11 ) =   4.44089209850062616e-16 ;
+table( twiss s re12 )-table( ptc_twiss s re12 ) =   8.88178419700125232e-16 ;
+table( twiss s re13 )-table( ptc_twiss s re13 ) =   2.77555756156289135e-16 ;
+table( twiss s re14 )-table( ptc_twiss s re14 ) =  -4.44089209850062616e-16 ;
+table( twiss s re16 )-table( ptc_twiss s re16 ) =  -2.77555756156289135e-17 ;
+table( twiss s re21 )-table( ptc_twiss s re21 ) =  -8.67361737988403547e-18 ;
+table( twiss s re22 )-table( ptc_twiss s re22 ) =   7.77156117237609578e-16 ;
+table( twiss s re23 )-table( ptc_twiss s re23 ) =  -2.60208521396521064e-18 ;
+table( twiss s re24 )-table( ptc_twiss s re24 ) =   2.22044604925031308e-16 ;
+table( twiss s re26 )-table( ptc_twiss s re26 ) =   2.60208521396521064e-18 ;
+table( twiss s re31 )-table( ptc_twiss s re31 ) =  -2.22044604925031308e-16 ;
+table( twiss s re32 )-table( ptc_twiss s re32 ) =   0.00000000000000000e+00 ;
+table( twiss s re33 )-table( ptc_twiss s re33 ) =   8.88178419700125232e-16 ;
+table( twiss s re34 )-table( ptc_twiss s re34 ) =   1.77635683940025046e-15 ;
+table( twiss s re36 )-table( ptc_twiss s re36 ) =  -6.93889390390722838e-18 ;
+table( twiss s re41 )-table( ptc_twiss s re41 ) =   1.30104260698260532e-18 ;
+table( twiss s re42 )-table( ptc_twiss s re42 ) =  -2.22044604925031308e-16 ;
+table( twiss s re43 )-table( ptc_twiss s re43 ) =  -6.93889390390722838e-18 ;
+table( twiss s re44 )-table( ptc_twiss s re44 ) =   4.44089209850062616e-16 ;
+table( twiss s re46 )-table( ptc_twiss s re46 ) =   0.00000000000000000e+00 ;
+table( twiss s re51 )-table( ptc_twiss s re51 ) =  -2.60208521396521064e-18 ;
+table( twiss s re52 )-table( ptc_twiss s re52 ) =  -1.38777878078144568e-17 ;
+table( twiss s re53 )-table( ptc_twiss s re53 ) =   0.00000000000000000e+00 ;
+table( twiss s re54 )-table( ptc_twiss s re54 ) =   2.77555756156289135e-17 ;
+table( twiss s re56 )-table( ptc_twiss s re56 ) =   2.88657986402540701e-15 ;
+table( mad3 s t111 )-table( ptc3 s t111 ) =   0.00000000000000000e+00 ;
+table( mad3 s t112 )-0.5*table( ptc3 s t112 ) =  -1.30104260698260532e-18 ;
+table( mad3 s t113 )-0.5*table( ptc3 s t113 ) =   5.42101086242752217e-20 ;
+table( mad3 s t114 )-0.5*table( ptc3 s t114 ) =   8.67361737988403547e-19 ;
+table( mad3 s t116 )-0.5*table( ptc3 s t116 ) =  -1.38777878078144568e-17 ;
+table( mad3 s t121 )-0.5*table( ptc3 s t112 ) =  -1.30104260698260532e-18 ;
+table( mad3 s t122 )-table( ptc3 s t122 ) =   5.55111512312578270e-17 ;
+table( mad3 s t123 )-0.5*table( ptc3 s t123 ) =   2.60208521396521064e-18 ;
+table( mad3 s t124 )-0.5*table( ptc3 s t124 ) =  -2.08166817117216851e-17 ;
+table( mad3 s t126 )-0.5*table( ptc3 s t126 ) =  -1.33226762955018785e-15 ;
+table( mad3 s t131 )-0.5*table( ptc3 s t113 ) =   5.42101086242752217e-20 ;
+table( mad3 s t132 )-0.5*table( ptc3 s t123 ) =   2.60208521396521064e-18 ;
+table( mad3 s t133 )-table( ptc3 s t133 ) =   3.79470760369926552e-19 ;
+table( mad3 s t134 )-0.5*table( ptc3 s t134 ) =   0.00000000000000000e+00 ;
+table( mad3 s t136 )-0.5*table( ptc3 s t136 ) =   8.32667268468867405e-17 ;
+table( mad3 s t141 )-0.5*table( ptc3 s t114 ) =   8.67361737988403547e-19 ;
+table( mad3 s t142 )-0.5*table( ptc3 s t124 ) =  -2.08166817117216851e-17 ;
+table( mad3 s t143 )-0.5*table( ptc3 s t134 ) =   0.00000000000000000e+00 ;
+table( mad3 s t144 )-table( ptc3 s t144 ) =  -2.77555756156289135e-17 ;
+table( mad3 s t146 )-0.5*table( ptc3 s t146 ) =   4.44089209850062616e-16 ;
+table( mad3 s t161 )-0.5*table( ptc3 s t116 ) =  -1.38777878078144568e-17 ;
+table( mad3 s t162 )-0.5*table( ptc3 s t126 ) =  -1.33226762955018785e-15 ;
+table( mad3 s t163 )-0.5*table( ptc3 s t136 ) =   8.32667268468867405e-17 ;
+table( mad3 s t164 )-0.5*table( ptc3 s t146 ) =   4.44089209850062616e-16 ;
+table( mad3 s t166 )-table( ptc3 s t166 ) =   2.77555756156289135e-17 ;
+table( mad3 s t211 )-table( ptc3 s t211 ) =  -8.47032947254300339e-21 ;
+table( mad3 s t212 )-0.5*table( ptc3 s t212 ) =  -6.77626357803440271e-21 ;
+table( mad3 s t213 )-0.5*table( ptc3 s t213 ) =  -3.59989002583077644e-21 ;
+table( mad3 s t214 )-0.5*table( ptc3 s t214 ) =   2.16840434497100887e-19 ;
+table( mad3 s t216 )-0.5*table( ptc3 s t216 ) =   1.73472347597680709e-18 ;
+table( mad3 s t221 )-0.5*table( ptc3 s t212 ) =  -6.77626357803440271e-21 ;
+table( mad3 s t222 )-table( ptc3 s t222 ) =  -1.73472347597680709e-18 ;
+table( mad3 s t223 )-0.5*table( ptc3 s t223 ) =  -1.35525271560688054e-19 ;
+table( mad3 s t224 )-0.5*table( ptc3 s t224 ) =   6.50521303491302660e-19 ;
+table( mad3 s t226 )-0.5*table( ptc3 s t226 ) =   1.38777878078144568e-17 ;
+table( mad3 s t231 )-0.5*table( ptc3 s t213 ) =  -3.59989002583077644e-21 ;
+table( mad3 s t232 )-0.5*table( ptc3 s t223 ) =  -1.35525271560688054e-19 ;
+table( mad3 s t233 )-table( ptc3 s t233 ) =  -8.04681299891585322e-21 ;
+table( mad3 s t234 )-0.5*table( ptc3 s t234 ) =   2.71050543121376109e-20 ;
+table( mad3 s t236 )-0.5*table( ptc3 s t236 ) =  -8.67361737988403547e-19 ;
+table( mad3 s t241 )-0.5*table( ptc3 s t214 ) =   2.16840434497100887e-19 ;
+table( mad3 s t242 )-0.5*table( ptc3 s t224 ) =   6.50521303491302660e-19 ;
+table( mad3 s t243 )-0.5*table( ptc3 s t234 ) =   2.71050543121376109e-20 ;
+table( mad3 s t244 )-table( ptc3 s t244 ) =  -4.33680868994201774e-18 ;
+table( mad3 s t246 )-0.5*table( ptc3 s t246 ) =   5.55111512312578270e-17 ;
+table( mad3 s t261 )-0.5*table( ptc3 s t216 ) =   1.73472347597680709e-18 ;
+table( mad3 s t262 )-0.5*table( ptc3 s t226 ) =   1.38777878078144568e-17 ;
+table( mad3 s t263 )-0.5*table( ptc3 s t236 ) =  -8.67361737988403547e-19 ;
+table( mad3 s t264 )-0.5*table( ptc3 s t246 ) =   5.55111512312578270e-17 ;
+table( mad3 s t266 )-table( ptc3 s t266 ) =  -4.22838847269346729e-18 ;
+table( mad3 s t311 )-table( ptc3 s t311 ) =   0.00000000000000000e+00 ;
+table( mad3 s t312 )-0.5*table( ptc3 s t312 ) =  -1.24683249835833010e-18 ;
+table( mad3 s t313 )-0.5*table( ptc3 s t313 ) =  -3.38813178901720136e-20 ;
+table( mad3 s t314 )-0.5*table( ptc3 s t314 ) =   8.67361737988403547e-19 ;
+table( mad3 s t316 )-0.5*table( ptc3 s t316 ) =   0.00000000000000000e+00 ;
+table( mad3 s t321 )-0.5*table( ptc3 s t312 ) =  -1.24683249835833010e-18 ;
+table( mad3 s t322 )-table( ptc3 s t322 ) =  -1.73472347597680709e-17 ;
+table( mad3 s t323 )-0.5*table( ptc3 s t323 ) =  -8.67361737988403547e-19 ;
+table( mad3 s t324 )-0.5*table( ptc3 s t324 ) =   2.25514051876984922e-17 ;
+table( mad3 s t326 )-0.5*table( ptc3 s t326 ) =   4.44089209850062616e-16 ;
+table( mad3 s t331 )-0.5*table( ptc3 s t313 ) =  -3.38813178901720136e-20 ;
+table( mad3 s t332 )-0.5*table( ptc3 s t323 ) =  -8.67361737988403547e-19 ;
+table( mad3 s t333 )-table( ptc3 s t333 ) =  -9.48676900924816380e-20 ;
+table( mad3 s t334 )-0.5*table( ptc3 s t334 ) =   1.30104260698260532e-18 ;
+table( mad3 s t336 )-0.5*table( ptc3 s t336 ) =  -8.32667268468867405e-17 ;
+table( mad3 s t341 )-0.5*table( ptc3 s t314 ) =   8.67361737988403547e-19 ;
+table( mad3 s t342 )-0.5*table( ptc3 s t324 ) =   2.25514051876984922e-17 ;
+table( mad3 s t343 )-0.5*table( ptc3 s t334 ) =   1.30104260698260532e-18 ;
+table( mad3 s t344 )-table( ptc3 s t344 ) =  -2.77555756156289135e-17 ;
+table( mad3 s t346 )-0.5*table( ptc3 s t346 ) =   4.44089209850062616e-16 ;
+table( mad3 s t361 )-0.5*table( ptc3 s t316 ) =   0.00000000000000000e+00 ;
+table( mad3 s t362 )-0.5*table( ptc3 s t326 ) =   4.44089209850062616e-16 ;
+table( mad3 s t363 )-0.5*table( ptc3 s t336 ) =  -8.32667268468867405e-17 ;
+table( mad3 s t364 )-0.5*table( ptc3 s t346 ) =   4.44089209850062616e-16 ;
+table( mad3 s t366 )-table( ptc3 s t366 ) =  -7.28583859910258980e-17 ;
+table( mad3 s t411 )-table( ptc3 s t411 ) =  -1.69406589450860068e-21 ;
+table( mad3 s t412 )-0.5*table( ptc3 s t412 ) =   1.08420217248550443e-19 ;
+table( mad3 s t413 )-0.5*table( ptc3 s t413 ) =   0.00000000000000000e+00 ;
+table( mad3 s t414 )-0.5*table( ptc3 s t414 ) =  -5.42101086242752217e-20 ;
+table( mad3 s t416 )-0.5*table( ptc3 s t416 ) =  -8.67361737988403547e-19 ;
+table( mad3 s t421 )-0.5*table( ptc3 s t412 ) =   1.08420217248550443e-19 ;
+table( mad3 s t422 )-table( ptc3 s t422 ) =  -6.07153216591882483e-18 ;
+table( mad3 s t423 )-0.5*table( ptc3 s t423 ) =   5.42101086242752217e-20 ;
+table( mad3 s t424 )-0.5*table( ptc3 s t424 ) =  -4.33680868994201774e-19 ;
+table( mad3 s t426 )-0.5*table( ptc3 s t426 ) =   5.55111512312578270e-17 ;
+table( mad3 s t431 )-0.5*table( ptc3 s t413 ) =   0.00000000000000000e+00 ;
+table( mad3 s t432 )-0.5*table( ptc3 s t423 ) =   5.42101086242752217e-20 ;
+table( mad3 s t433 )-table( ptc3 s t433 ) =  -3.38813178901720136e-21 ;
+table( mad3 s t434 )-0.5*table( ptc3 s t434 ) =  -8.13151629364128326e-20 ;
+table( mad3 s t436 )-0.5*table( ptc3 s t436 ) =   3.46944695195361419e-18 ;
+table( mad3 s t441 )-0.5*table( ptc3 s t414 ) =  -5.42101086242752217e-20 ;
+table( mad3 s t442 )-0.5*table( ptc3 s t424 ) =  -4.33680868994201774e-19 ;
+table( mad3 s t443 )-0.5*table( ptc3 s t434 ) =  -8.13151629364128326e-20 ;
+table( mad3 s t444 )-table( ptc3 s t444 ) =  -8.67361737988403547e-19 ;
+table( mad3 s t446 )-0.5*table( ptc3 s t446 ) =   0.00000000000000000e+00 ;
+table( mad3 s t461 )-0.5*table( ptc3 s t416 ) =  -8.67361737988403547e-19 ;
+table( mad3 s t462 )-0.5*table( ptc3 s t426 ) =   5.55111512312578270e-17 ;
+table( mad3 s t463 )-0.5*table( ptc3 s t436 ) =   3.46944695195361419e-18 ;
+table( mad3 s t464 )-0.5*table( ptc3 s t446 ) =   0.00000000000000000e+00 ;
+table( mad3 s t466 )-table( ptc3 s t466 ) =   5.20417042793042128e-18 ;
+table( mad3 s t511 )-table( ptc3 s t511 ) =   1.73472347597680709e-18 ;
+table( mad3 s t512 )-0.5*table( ptc3 s t512 ) =   1.04083408558608426e-17 ;
+table( mad3 s t513 )-0.5*table( ptc3 s t513 ) =  -5.64123942871364026e-19 ;
+table( mad3 s t514 )-0.5*table( ptc3 s t514 ) =   2.77555756156289135e-17 ;
+table( mad3 s t516 )-0.5*table( ptc3 s t516 ) =   4.33680868994201774e-18 ;
+table( mad3 s t521 )-0.5*table( ptc3 s t512 ) =   1.04083408558608426e-17 ;
+table( mad3 s t522 )-table( ptc3 s t522 ) =  -2.22044604925031308e-15 ;
+table( mad3 s t523 )-0.5*table( ptc3 s t523 ) =  -5.55111512312578270e-17 ;
+table( mad3 s t524 )-0.5*table( ptc3 s t524 ) =   8.28330459778925388e-17 ;
+table( mad3 s t526 )-0.5*table( ptc3 s t526 ) =  -1.38777878078144568e-17 ;
+table( mad3 s t531 )-0.5*table( ptc3 s t513 ) =  -5.64123942871364026e-19 ;
+table( mad3 s t532 )-0.5*table( ptc3 s t523 ) =  -5.55111512312578270e-17 ;
+table( mad3 s t533 )-table( ptc3 s t533 ) =  -3.46944695195361419e-18 ;
+table( mad3 s t534 )-0.5*table( ptc3 s t534 ) =   2.30799537467851756e-17 ;
+table( mad3 s t536 )-0.5*table( ptc3 s t536 ) =  -8.67361737988403547e-19 ;
+table( mad3 s t541 )-0.5*table( ptc3 s t514 ) =   2.77555756156289135e-17 ;
+table( mad3 s t542 )-0.5*table( ptc3 s t524 ) =   8.28330459778925388e-17 ;
+table( mad3 s t543 )-0.5*table( ptc3 s t534 ) =   2.30799537467851756e-17 ;
+table( mad3 s t544 )-table( ptc3 s t544 ) =  -8.88178419700125232e-16 ;
+table( mad3 s t546 )-0.5*table( ptc3 s t546 ) =  -5.55111512312578270e-17 ;
+table( mad3 s t561 )-0.5*table( ptc3 s t516 ) =   4.33680868994201774e-18 ;
+table( mad3 s t562 )-0.5*table( ptc3 s t526 ) =  -1.38777878078144568e-17 ;
+table( mad3 s t563 )-0.5*table( ptc3 s t536 ) =  -8.67361737988403547e-19 ;
+table( mad3 s t564 )-0.5*table( ptc3 s t546 ) =  -5.55111512312578270e-17 ;
+table( mad3 s t566 )-table( ptc3 s t566 ) =  -8.88178419700125232e-16 ;
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
