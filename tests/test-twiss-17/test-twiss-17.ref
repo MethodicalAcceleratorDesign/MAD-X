@@ -3,9 +3,27 @@
   +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2022.02.25               +
-  + Execution date: 2022.07.15 17:09:59      +
+  + Execution date: 2022.07.19 15:35:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -echo;
+
+enter TRACK module
+one pass is on
+
+++++++ table: tracksumm
+
+    number       turn                         x                        px 
+         1          0   1.00000000000000002e-02   1.29999999999999994e-02 
+         1          1   9.53744789313721308e-02   1.62440256102662217e-02 
+
+                        y                        py                         t                        pt 
+  1.40000000000000003e-02   1.70000000000000012e-02   0.00000000000000000e+00   1.89999999999999059e-02 
+  7.29822838230221732e-02   1.23044036587745369e-02   2.47256685228228953e-02   1.89999999999999059e-02 
+
+                        s                         e 
+  0.00000000000000000e+00   0.00000000000000000e+00 
+  5.00000000000000000e+00   0.00000000000000000e+00 
+exit TRACK module
 
 enter Twiss module
  Found 5 initial orbit vector values from twiss command. 
@@ -133,6 +151,11 @@ Determined SECTOR NMUL MAX :  0
 
                   pycomin                    tcomin                   ptcomin 
   1.23044036587745421e-02  -0.00000000000000000e+00   1.89999999999999995e-02 
+table( trackone x 2  )-table( ptc_twiss s x ) =  -1.38777878078144568e-17 ;
+table( trackone px 2  )-table( ptc_twiss s px ) =   1.04083408558608426e-17 ;
+table( trackone y 2  )-table( ptc_twiss s y ) =   2.77555756156289135e-17 ;
+table( trackone py 2  )-table( ptc_twiss s py ) =  -5.20417042793042128e-18 ;
+table( trackone t 2  )-table( ptc_twiss s t ) =  -1.42247325030098182e-15 ;
 table( twiss s x )-table( ptc_twiss s x ) =  -2.77555756156289135e-17 ;
 table( twiss s px )-table( ptc_twiss s px ) =   6.93889390390722838e-18 ;
 table( twiss s y )-table( ptc_twiss s y ) =   1.38777878078144568e-17 ;

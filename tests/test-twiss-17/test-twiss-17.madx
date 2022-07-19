@@ -144,6 +144,12 @@ y0=0.014;
 py0=0.017;
 pt0=0.019;
 
+track, onepass, onetable, file='test-twiss-17-mad1.tfs';
+start, x=x0, px=px0, y=y0, py=py0, pt=pt0;
+observe, place=s;
+run, turns=1;
+endtrack;
+
 twiss, exact, rmatrix, sectormap, sectortable=mad3, sectorfile='test-twiss-17-mad3.tfs',
  betx=1, bety=1, x=x0, px=px0, y=y0, py=py0, pt=pt0, file='test-twiss-17-mad2.tfs';
 
@@ -152,6 +158,12 @@ ptc_create_layout, exact, model=2, method=6, nst=1;
 ptc_twiss, icase=56, no=5, betx=1, bety=1, betz=1, rmatrix, x=x0, px=px0, y=y0, py=py0, pt=pt0, file='test-twiss-17-ptc2.tfs';
 ptc_end;
 write, table=ptc3, file='test-twiss-17-ptc3.tfs';
+
+value, table(trackone,x,2)-table(ptc_twiss,s,x);
+value, table(trackone,px,2)-table(ptc_twiss,s,px);
+value, table(trackone,y,2)-table(ptc_twiss,s,y);
+value, table(trackone,py,2)-table(ptc_twiss,s,py);
+value, table(trackone,t,2)-table(ptc_twiss,s,t);
 
 value, table(twiss,s,x) - table(ptc_twiss,s,x);
 value, table(twiss,s,px) - table(ptc_twiss,s,px);
