@@ -6952,7 +6952,6 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   if (ftrk) then
 
     if(abs(xtilt_rad) > ten5m) then
-      ! This case has not been adjusted for exact_expansion
       te_t1 = zero
       xtilt = -sin(xtilt_rad)
 
@@ -6964,9 +6963,19 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
       re_t1(5,2) = -pxbeta
       call tmtrak(ek_t1,re_t1,te_t1,orbit,orbit)
       call tmcat(.true.,re_t1,te_t1,re,te,re,te)
+    end if
 
-
+    if (exact_expansion) then
+      orbit(1:4) = matmul(re_s(1:4,1:4),orbit(1:4))
+      orbit(5) = orbit(5) + ek_s(5)
+      do i=1,4
+         re_s(1:4,i) = re_s(1:4,i) + vpi(i)*vmu
+      end do
+    else
       call tmtrak(ek_s,re_s,te_s,orbit,orbit) ! Calls the normal solenoid
+    endif
+
+    if(abs(xtilt_rad) > ten5m) then
       call tmcat(.true.,re_s,te_s,re,te,re,te)
 
       !To tilt it back
@@ -6980,23 +6989,12 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
       call tmtrak(ek_t2,re_t2,te_t1 ,orbit,orbit)
       call tmcat(.true.,re_t2,te_t1,re,te,re,te)
-
-    else if (exact_expansion) then
+    else
       ek = ek_s
       re = re_s
       te = te_s
-      orbit(1:4) = matmul(re_s(1:4,1:4),orbit(1:4))
-      orbit(5) = orbit(5) + ek(5)
-      do i=1,4
-         re(1:4,i) = re(1:4,i) + vpi(i)*vmu
-      end do
-    else
-      ek=ek_s
-      re=re_s
-      te=te_s
-      call tmtrak(ek,re,te,orbit,orbit)
-    endif
-  else
+    end if      
+  else ! ftrk == .false.
     ek=ek_s
     re=re_s
     te=te_s
