@@ -4121,10 +4121,12 @@ end function c_clean_complex
              !      WRITE(IUNIT,*) IOA,c_cc(II),(J(I),I=1,INVA)
              if(imprime) then
                  some=.true.
-                if(epsprint.gt.1e-37_dp) then
-                   write(iunit,501) ioa,ccc,(j(i),i=1,inva)
+                if (madxprint) then
+                  write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout, ccc,ioa,(j(i),i=1,inva)
+                elseif(epsprint.gt.1e-37_dp) then
+                  write(iunit,501) ioa,ccc,(j(i),i=1,inva)
                 else
-                   write(iunit,503) ioa,ccc,(j(i),i=1,inva)
+                  write(iunit,503) ioa,ccc,(j(i),i=1,inva)
                 endif
              endif
 501          format(' ', i3,1x,g23.16,1x,g23.16,1x,100(1x,i2))
@@ -4379,7 +4381,7 @@ longprint=long
     !-----------------------------------------------------------------------------
     !
     integer i,ic,iche,ii,ic_i_1,ic_i_2,iin,illa,ilma,ina,inoa,inva,ipoa,iunit,&
-         k,nojoh,nvjoh
+         k,nojoh,nvjoh,io
     integer,dimension(c_lnv)::j
     real(dp) cr,ci
     character(10) c10,k10
@@ -4425,7 +4427,11 @@ longprint=long
     !
 10  continue
     iin = iin + 1
-    read(iunit,*) ii,cr,ci,(j(k),k=1,nvjoh)
+    if (madxprint) then
+      read(iunit,*,end=20,err=20) ii,cr,ci,io,(j(k),k=1,nvjoh)
+    else
+      read(iunit,*) ii,cr,ci,(j(k),k=1,nvjoh)
+    endif
     if(ii.lt.0) goto 20
     do i=inva+1,nvjoh
        if(j(i).ne.0) goto 10

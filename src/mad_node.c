@@ -696,8 +696,10 @@ node_name(char* name, int* l)
   /* returns current node name in Fortran format */
   /* l is max. allowed length in name */
 {
+  int i;
   strfcpy(name, current_node->name, *l);
-  stoupper(name);
+  for (i=0 ; i < *l ; ++i)
+    name[i] = toupper(name[i]);
 }
 void
 node_name_f_lower(char* name, int* l)
