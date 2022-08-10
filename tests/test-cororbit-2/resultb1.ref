@@ -42,12 +42,12 @@
 @ SYNCH_5          %le                   0
 @ SYNCH_6          %le                   0
 @ SYNCH_8          %le                   0
-@ DQMIN            %le     5.589320539e-05
-@ DQMIN_PHASE      %le     -0.004795216736
+@ DQMIN            %le     0.0008807982516
+@ DQMIN_PHASE      %le         1.330576198
 @ TITLE            %62s "LHC 6.503 with errors and two beam orbit correction using MADX"
-@ ORIGIN           %16s "5.08.00 Linux 64"
-@ DATE             %08s "27/01/22"
-@ TIME             %08s "20.47.06"
+@ ORIGIN           %16s "5.08.01 Linux 64"
+@ DATE             %08s "10/08/22"
+@ TIME             %08s "02.01.47"
 * NAME                                S                  X                 PX                  Y                 PY               BETX               BETY               ALFX               ALFY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "LHCB1$START"                        0   -2.742690723e-05   -6.551460929e-07    7.390359315e-05    5.661291191e-06       0.5499365773       0.5500268277    0.0001306539108   -0.0001491748668

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.08.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2022.01.13               +
-  + Execution date: 2022.01.27 20:45:51      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.08.10 02:00:37      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! H. Burkhardt.  Updated for improved makethin select in summer 2005
 
@@ -98,10 +98,10 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    0.0004848535621 
+                 0                  0                  0      0.01131772694 
 
        dqmin_phase 
-       3.053104081 
+      -1.658929225 
 save,sequence=fivecell,file="fivecell_thin_options.seq";
 
 ++++++ warning: SAVE makes all previous USE invalid !  
