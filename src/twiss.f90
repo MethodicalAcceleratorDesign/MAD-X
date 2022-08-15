@@ -7159,7 +7159,8 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   logical :: fsec, ftrk, fmap
   double precision :: dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: px, py, pt, csq, l_pz, c3sq, c52sq
+  double precision :: px, py, pt, csq, l_pz
+  real(kind(1d0)) :: beti, dl3, dl5, pp2, ptb, ptot2, px2, py2, pz
 
   !---- Initialize.
   EK = zero
@@ -7171,56 +7172,66 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
       px = orbit(2)
       py = orbit(4)
       pt = orbit(6)
+      px2 = px*px
+      py2 = py*py
 
-      csq = 1 + 2*pt/beta + pt**2 - px**2 - py**2
-      l_pz = dl / sqrt(csq)
-      c3sq = csq**(3d0/2d0)
-      c52sq =csq**(5d0/2d0)
+      beti = 1/beta
+      ptb = beti + pt
+      ptot2 = 1 + pt*(2*beti + pt)
+      pp2 = (beta*gamma)**(-2)+px2+py2
+      csq = ptot2 - px2 - py2
+      pz = sqrt(csq)
+      l_pz = dl / pz
+      dl3 = l_pz / csq
 
-      re(1,2) = dl/sqrt(csq) + dl*px**2/c3sq
-      re(1,4) = dl*px*py/c3sq
-      re(1,6) = dl*px*(-pt - 1d0/beta)/c3sq
-      re(3,2) = dl*px*py/c3sq
-      re(3,4) = dl/sqrt(csq) + dl*py**2/c3sq
-      re(3,6) = dl*py*(-pt - 1d0/beta)/c3sq
-      re(5,2) = -dl*px*(beta + pt)/c3sq
-      re(5,4) = -dl*py*(beta + pt)/c3sq
-      re(5,6) = -dl/sqrt(csq) - dl*(beta + pt)*(-pt - 1d0/beta)/c3sq
+
+      re(1,2) = dl3*(ptot2 - py2)
+      re(1,4) = dl3*px*py
+      re(1,6) = -dl3*px*ptb
+      re(3,2) = re(1,4)
+      re(3,4) = dl3*(ptot2 - px2)
+      re(3,6) = -dl3*py*ptb
+      re(5,2) = re(1,6)
+      re(5,4) = re(3,6)
+      re(5,6) = dl3*pp2
 
       if (fsec) then
-         te(1,2,2) = 3d0*dl*px/(2d0*c3sq) + 3d0*dl*px**3d0/(2d0*c52sq)
-         te(1,2,4) = dl*py/(2d0*c3sq) + 3d0*dl*px**2d0*py/(2d0*c52sq)
-         te(1,2,6) = dl*(-pt - 1d0/beta)/(2d0*c3sq) + dl*px**2d0*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(1,4,2) = dl*py/(2d0*c3sq) + 3d0*dl*px**2d0*py/(2d0*c52sq)
-         te(1,4,4) = dl*px/(2d0*c3sq) + 3d0*dl*px*py**2d0/(2d0*c52sq)
-         te(1,4,6) = dl*px*py*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(1,6,2) = dl*(-pt - 1d0/beta)/(2d0*c3sq) + 3d0*dl*px**2d0*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(1,6,4) = 3d0*dl*px*py*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(1,6,6) = -dl*px/(2d0*c3sq) + dl*px*(-3d0*pt - 3d0/beta)*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(3,2,2) = dl*py/(2d0*c3sq) + 3d0*dl*px**2d0*py/(2d0*c52sq)
-         te(3,2,4) = dl*px/(2d0*c3sq) + 3d0*dl*px*py**2d0/(2d0*c52sq)
-         te(3,2,6) = dl*px*py*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(3,4,2) = dl*px/(2d0*c3sq) + 3d0*dl*px*py**2d0/(2d0*c52sq)
-         te(3,4,4) = 3d0*dl*py/(2d0*c3sq) + 3d0*dl*py**3d0/(2d0*c52sq)
-         te(3,4,6) = dl*(-pt - 1d0/beta)/(2d0*c3sq) + dl*py**2d0*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(3,6,2) = 3d0*dl*px*py*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(3,6,4) = dl*(-pt - 1d0/beta)/(2d0*c3sq) + 3d0*dl*py**2d0*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(3,6,6) = -dl*py/(2d0*c3sq) + dl*py*(-3d0*pt - 3d0/beta)*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(5,2,2) = -dl*(beta + pt)/(2d0*c3sq) - 3d0*dl*px**2d0*(beta + pt)/(2d0*c52sq)
-         te(5,2,4) = -3d0*dl*px*py*(beta + pt)/(2d0*c52sq)
-         te(5,2,6) = -dl*px/(2d0*c3sq) - dl*px*(beta + pt)*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(5,4,2) = -3d0*dl*px*py*(beta + pt)/(2d0*c52sq)
-         te(5,4,4) = -dl*(beta + pt)/(2d0*c3sq) - 3d0*dl*py**2d0*(beta + pt)/(2d0*c52sq)
-         te(5,4,6) = -dl*py/(2d0*c3sq) - dl*py*(beta + pt)*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(5,6,2) = -dl*px/(2d0*c3sq) - 3d0*dl*px*(beta + pt)*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(5,6,4) = -dl*py/(2d0*c3sq) - 3d0*dl*py*(beta + pt)*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(5,6,6) = dl*(beta + pt)/(2d0*c3sq) - dl*(-pt - 1d0/beta)/c3sq - &
-         dl*(beta + pt)*(-3d0*pt - 3d0/beta)*(-pt - 1d0/beta)/(2d0*c52sq)
+         dl5 = 0.5d0*dl3/csq
+         te(1,2,2) = 3*dl5*px*(ptot2 - py2)
+         te(1,2,4) = dl5*py*(ptot2 + 2*px2 - py2)
+         te(1,2,6) = -dl5*ptb*(ptot2 + 2*px2 - py2)
+         te(1,4,2) = te(1,2,4)
+         te(1,4,4) = dl5*px*(ptot2 - px2 + 2*py2)
+         te(1,4,6) = -3*dl5*px*py*ptb
+         te(1,6,2) = te(1,2,6)
+         te(1,6,4) = te(1,4,6)
+         te(1,6,6) = dl5*px*(2*ptb*ptb + pp2)
+         te(3,2,2) = te(1,2,4)
+         te(3,2,4) = te(1,4,4)
+         te(3,2,6) = te(1,4,6)
+         te(3,4,2) = te(3,2,4)
+         te(3,4,4) = 3*dl5*py*(ptot2 - px2)
+         te(3,4,6) = -dl5*ptb*(ptot2 - px2 + 2*py2)
+         te(3,6,2) = te(3,2,6)
+         te(3,6,4) = te(3,4,6)
+         te(3,6,6) = dl5*py*(2*ptb*ptb + pp2)
+         te(5,2,2) = te(1,2,6)
+         te(5,2,4) = te(1,4,6)
+         te(5,2,6) = te(1,6,6)
+         te(5,4,2) = te(5,2,4)
+         te(5,4,4) = te(3,4,6)
+         te(5,4,6) = te(3,6,6)
+         te(5,6,2) = te(5,2,6)
+         te(5,6,4) = te(5,4,6)
+         te(5,6,6) = -3*dl5*pp2*ptb
       endif
 
-      orbit(1) = orbit(1) + px*l_pz
-      orbit(3) = orbit(3) + py*l_pz
-      orbit(5) = orbit(5) + (dl/beta - (1d0/beta + pt) * l_pz)
+      ek(1) = px*l_pz
+      ek(3) = py*l_pz
+      ek(5) = dl*dtbyds + l_pz*(pt*(2*beti+pt)/(gamma*gamma) - px2 - py2)/(beta*beta*(ptb + beti*pz))
+
+      if (ftrk) orbit(1:5:2) = orbit(1:5:2) + ek(1:5:2)
+
   else
 
      re(1,2) = dl
