@@ -5,6 +5,7 @@ MAD-X master
 *   [PR 1088](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1088) Additional explanation bv flag (J. Dilly)
 *   [PR 1113](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1113) Introduce LAST option in INSTALL and MOVE and change default behaviour [Breaking change!]
 *   [PR 1131](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1131) Add spin table (P. Skowonronski)
+*   [PR 1093](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1093) Refine aperture refinement(T. Persson)
 
 MAD-X release 5.08.01 (2022.02.25)
 
