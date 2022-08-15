@@ -32,7 +32,8 @@
 #                added test-taper
 # 2022-Jul-06  jsberg-bnl:
 #                added test comparing PTC to TWISS/TRACK for [XY]ROTATION
-#################################################
+# 2022-Jun-21  jsberg-bnl:
+#                added test-twiss-16 for exact TWISS drift compared to PTC
 # testsuite
 
 # variables:
@@ -57,7 +58,7 @@ test-track-7 test-track-8 test-track-9 test-track-10 test-track-11 test-track-12
 test-track-acd test-track-rotations test-beambeam-npart \
 test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 \
 test-twiss-6 test-twiss-8 test-twiss-9 test-twiss-10 test-twiss-11 \
-test-twiss-12 test-twiss-13 test-twiss-14 test-twiss-15 test-twiss-exact test-translation test-crabcavity \
+test-twiss-12 test-twiss-13 test-twiss-14 test-twiss-15 test-twiss-16 test-twiss-exact test-translation test-crabcavity \
 test-xrotation test-yrotation test-rotations test-rotations-2 test-interpolate test-rf-fringe \
 test-cororbit test-cororbit-2 test-cororbit-3 test-cororbit-4 \
 test-emit test-emit-2 \
@@ -79,7 +80,7 @@ test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-r
 \
 test-ptc-elements \
 test-rfmultipole-ptc-1 \
-test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 test-ptc-twiss-4 \
+test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 test-ptc-twiss-4 test-ptc-twiss-6D-spin \
 test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 test-ptc-twiss-old7 \
 test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D test-ptc-twiss-6D-ALS \
 test-ptc-twiss-accel-56D test-ptc-twiss-56Dt-ini_map_man test-ptc-twiss-56Dt-ini_mtx_man test-ptc-twiss-56Dt-ini_mtx_tbl test-ptc-twiss-tilt \
@@ -91,7 +92,7 @@ test-ptc-track-polygonaper \
 test-ptc-trackline test-ptc-trackline-2 test-ptc-trackline-3 \
 test-ptc-align test-ptc-align-2 \
 test-touschek test-touschek-2 \
-test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 test-sequence-7 test-sequence-8 test-sequence-9\
+test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 test-sequence-7 test-sequence-8 test-sequence-9 test-sequence-10\
 test-line \
 test-plot test-plot-2 \
 test-setknob test-fillknob \
