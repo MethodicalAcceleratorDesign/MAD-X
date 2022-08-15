@@ -3007,6 +3007,7 @@ const char *const_element_def =
 "kmin     = [r, 0], "
 "calib    = [r, 0], "
 "dx     = [r, 0], dy    = [r, 0], ds    = [r, 0], "
+"exact           = [i, -1, 1], "
 "comments = [s, none, none]; "
 " "
 "crabcavity: element none 0 37 "
