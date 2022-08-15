@@ -1,4 +1,6 @@
 MAD-X master
+
+*   [PR 1125](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1125) Make TWISS treat [XY]ROTATION exactly, including the linear and second order map (J. S. Berg)
 *   [PR 1123](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1123) Fix errors in the time variable with EXACT flag to TWISS (J. S. Berg)
 *   [PR 1081](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1108) Fix potential buffer overrun when node_name calls stoupper (J. S. Berg)
 *   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)

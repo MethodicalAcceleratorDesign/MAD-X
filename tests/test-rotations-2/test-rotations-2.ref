@@ -1,0 +1,441 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.07.05 16:59:12      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+option, -echo;
+
+enter TRACK module
+one pass is on
+ TWDISP: Unable to compute intial dispersion --- dispersion set to zero.
+ TWDISP: Unable to compute intial dispersion --- dispersion set to zero.
+
+++++++ table: tracksumm
+
+    number       turn                         x                        px 
+         1          0   1.00000000000000002e-02   1.29999999999999994e-02 
+         1          1   1.00374174097102170e-02  -8.92439155754353175e-02 
+
+                        y                        py                         t                        pt 
+  0.00000000000000000e+00   1.70000000000000012e-02   0.00000000000000000e+00   2.09999999999999076e-02 
+ -1.66441359977504708e-05   1.70000000000000012e-02   1.12919826884707707e-03   2.09999999999999076e-02 
+
+                        s                         e 
+  0.00000000000000000e+00   0.00000000000000000e+00 
+  0.00000000000000000e+00   0.00000000000000000e+00 
+exit TRACK module
+
+enter Twiss module
+ Found 4 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   1.000000E-02  1.300000E-02  0.000000E+00  1.700000E-02  0.000000E+00  2.100000E-02
+final orbit vector:     1.003742E-02 -8.924392E-02 -1.664414E-05  1.700000E-02  1.129198E-03  2.100000E-02
+
+++++++ table: summ
+
+                   length                    orbit5                      alfa                   gammatr 
+  0.00000000000000000e+00  -0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00 
+
+                       q1                       dq1                   betxmax                     dxmax 
+ -1.55848413747730781e-04   0.00000000000000000e+00   1.00749844863789506e+00   1.40657978306762771e-05 
+
+                    dxrms                    xcomax                    xcorms                        q2 
+  1.14846758367678061e-05   1.00374174097102153e-02   1.00249604573369334e-02  -1.55866209192233497e-04 
+
+                      dq2                   betymax                     dymax                     dyrms 
+  0.00000000000000000e+00   1.00000095910015374e+00   1.83018435616296739e-05   1.49433926927447454e-05 
+
+                   ycomax                    ycorms                    deltap                   synch_1 
+  1.66441359977504607e-05   1.35898801346593366e-05   0.00000000000000000e+00   0.00000000000000000e+00 
+
+                  synch_2                   synch_3                   synch_4                   synch_5 
+  0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00 
+
+                  synch_6                   synch_8                    nflips                     dqmin 
+  0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00 
+
+              dqmin_phase 
+  0.00000000000000000e+00 
+Determined SECTOR NMUL MAX :  0
+ MAD-X Beam Parameters
+                  Energy : 0.200000E+01
+          Kinetic Energy : 0.106173E+01
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.176625E+01
+ Setting MADx with 
+     energy           2.0000000000000000     
+     method                   6
+     Num. of steps            5
+     charge           1.0000000000000000     
+  Length of machine:    0.0000000000000000     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps      5
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+                   length                   alpha_c                 alpha_c_p                alpha_c_p2 
+  0.00000000000000000e+00  -1.00000000000000000e+06  -1.00000000000000000e+06  -1.00000000000000000e+06 
+
+               alpha_c_p3                     eta_c                  gamma_tr                        q1 
+ -1.00000000000000000e+06  -1.00000000000000000e+06  -1.00000000000000000e+06  -1.59121228277880888e-04 
+
+                       q2                       dq1                       dq2                        qs 
+ -1.59139397425955842e-04  -1.00000000000000000e+06  -1.00000000000000000e+06  -1.00000000000000000e+06 
+
+               beta_x_min                beta_x_max                beta_y_min                beta_y_max 
+  1.00266247576491430e+00   1.01018092995073827e+00   1.00266247576491430e+00   1.00266347823219504e+00 
+
+                beta11min                 beta11max                 beta12min                 beta12max 
+  1.00266247576491430e+00   1.01018092995073827e+00   0.00000000000000000e+00   4.49280006235821111e-14 
+
+                beta13min                 beta13max                 beta21min                 beta21max 
+  0.00000000000000000e+00   1.98373430573810007e-10   0.00000000000000000e+00   2.77765053218414731e-06 
+
+                beta22min                 beta22max                 beta23min                 beta23max 
+  1.00266247576491430e+00   1.00266347823219504e+00   0.00000000000000000e+00   3.35849293921163589e-10 
+
+                beta31min                 beta31max                 beta32min                 beta32max 
+  0.00000000000000000e+00   1.27848459776307519e-02   0.00000000000000000e+00   3.50103073804471734e-10 
+
+                beta33min                 beta33max                  disp1min                  disp1max 
+  1.04521647389885275e+00   1.04521654303927103e+00   0.00000000000000000e+00   1.39203931115987971e-05 
+
+                 disp2min                  disp2max                  disp3min                  disp3max 
+ -1.11335931698117049e-01   0.00000000000000000e+00   0.00000000000000000e+00   1.81126488601478308e-05 
+
+                 disp4min                  disp4max                    deltap                   orbit_x 
+  0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00   1.00000000000000002e-02 
+
+                 orbit_px                   orbit_y                  orbit_py                  orbit_pt 
+  1.29999999999999994e-02   0.00000000000000000e+00   1.70000000000000012e-02   2.10000000000000013e-02 
+
+                  orbit_t                    xcorms                    ycorms                   pxcorms 
+  0.00000000000000000e+00   1.00249604573369334e-02   1.35898801346593417e-05   7.32528792027336284e-02 
+
+                  pycorms                    tcorms                   ptcorms                    xcomax 
+  1.70000000000000012e-02   9.21986525703145368e-04   2.10000000000000013e-02   1.00374174097102153e-02 
+
+                   ycomax                   pxcomax                   pycomax                    tcomax 
+  0.00000000000000000e+00   1.29999999999999994e-02   1.70000000000000012e-02   1.12919826884707686e-03 
+
+                  ptcomax                    xcomin                    ycomin                   pxcomin 
+  2.10000000000000013e-02   1.00000000000000002e-02  -1.66441359977504674e-05  -8.92439155754353175e-02 
+
+                  pycomin                    tcomin                   ptcomin 
+  1.70000000000000012e-02  -0.00000000000000000e+00   2.10000000000000013e-02 
+table( trackone x 2  )-table( ptc2 pry x ) =   1.73472347597680709e-18 ;
+table( trackone px 2  )-table( ptc2 pry px ) =   0.00000000000000000e+00 ;
+table( trackone y 2  )-table( ptc2 pry y ) =  -3.38813178901720136e-21 ;
+table( trackone t 2  )-table( ptc2 pry t ) =   2.16840434497100887e-19 ;
+table( twi2 pry x )-table( ptc2 pry x ) =   0.00000000000000000e+00 ;
+table( twi2 pry px )-table( ptc2 pry px ) =  -2.77555756156289135e-17 ;
+table( twi2 pry y )-table( ptc2 pry y ) =   6.77626357803440271e-21 ;
+table( twi2 pry t )-table( ptc2 pry t ) =  -4.33680868994201774e-19 ;
+table( twi2 pry re11 )-table( ptc2 pry re11 ) =   0.00000000000000000e+00 ;
+table( twi2 pry re12 )-table( ptc2 pry re12 ) =   2.16840434497100887e-19 ;
+table( twi2 pry re14 )-table( ptc2 pry re14 ) =   2.64697796016968856e-23 ;
+table( twi2 pry re16 )-table( ptc2 pry re16 ) =  -3.38813178901720136e-21 ;
+table( twi2 pry re22 )-table( ptc2 pry re22 ) =   1.11022302462515654e-16 ;
+table( twi2 pry re24 )-table( ptc2 pry re24 ) =   0.00000000000000000e+00 ;
+table( twi2 pry re26 )-table( ptc2 pry re26 ) =   0.00000000000000000e+00 ;
+table( twi2 pry re31 )-table( ptc2 pry re31 ) =   8.67361737988403547e-19 ;
+table( twi2 pry re32 )-table( ptc2 pry re32 ) =  -6.35274710440725254e-22 ;
+table( twi2 pry re34 )-table( ptc2 pry re34 ) =   2.16840434497100887e-19 ;
+table( twi2 pry re36 )-table( ptc2 pry re36 ) =  -6.77626357803440271e-21 ;
+table( twi2 pry re51 )-table( ptc2 pry re51 ) =  -4.16333634234433703e-17 ;
+table( twi2 pry re52 )-table( ptc2 pry re52 ) =   2.71050543121376109e-20 ;
+table( twi2 pry re54 )-table( ptc2 pry re54 ) =  -6.77626357803440271e-21 ;
+table( twi2 pry re56 )-table( ptc2 pry re56 ) =  -2.71050543121376109e-19 ;
+0.5*table( ptc3 pry txxp )-table( twi3 pry t112 ) =  -1.38777878078144568e-17 ;
+0.5*table( ptc3 pry txxq )-table( twi3 pry t114 ) =  -3.38813178901720136e-21 ;
+0.5*table( ptc3 pry txxd )-table( twi3 pry t116 ) =   2.16840434497100887e-19 ;
+table( ptc3 pry txpp )-table( twi3 pry t122 ) =   4.06575814682064163e-20 ;
+0.5*table( ptc3 pry txpq )-table( twi3 pry t124 ) =  -6.77626357803440271e-21 ;
+0.5*table( ptc3 pry txpd )-table( twi3 pry t126 ) =   4.33680868994201774e-19 ;
+0.5*table( ptc3 pry txpq )-table( twi3 pry t142 ) =  -6.77626357803440271e-21 ;
+table( ptc3 pry txqq )-table( twi3 pry t144 ) =   1.27054942088145051e-20 ;
+0.5*table( ptc3 pry txqd )-table( twi3 pry t146 ) =   4.23516473627150170e-22 ;
+0.5*table( ptc3 pry txpd )-table( twi3 pry t162 ) =   4.33680868994201774e-19 ;
+0.5*table( ptc3 pry txqd )-table( twi3 pry t164 ) =   4.23516473627150170e-22 ;
+table( ptc3 pry txdd )-table( twi3 pry t166 ) =  -6.77626357803440271e-21 ;
+table( ptc3 pry tppp )-table( twi3 pry t222 ) =   0.00000000000000000e+00 ;
+0.5*table( ptc3 pry tppq )-table( twi3 pry t224 ) =   3.38813178901720136e-21 ;
+0.5*table( ptc3 pry tppd )-table( twi3 pry t226 ) =  -3.25260651745651330e-19 ;
+0.5*table( ptc3 pry tppq )-table( twi3 pry t242 ) =   3.38813178901720136e-21 ;
+table( ptc3 pry tpqq )-table( twi3 pry t244 ) =   6.93889390390722838e-18 ;
+0.5*table( ptc3 pry tpqd )-table( twi3 pry t246 ) =  -3.25260651745651330e-19 ;
+0.5*table( ptc3 pry tppd )-table( twi3 pry t262 ) =  -3.25260651745651330e-19 ;
+0.5*table( ptc3 pry tpqd )-table( twi3 pry t264 ) =  -3.25260651745651330e-19 ;
+table( ptc3 pry tpdd )-table( twi3 pry t266 ) =  -8.67361737988403547e-18 ;
+0.5*table( ptc3 pry tyxp )-table( twi3 pry t312 ) =   2.71050543121376109e-20 ;
+0.5*table( ptc3 pry tyxq )-table( twi3 pry t314 ) =  -6.93889390390722838e-18 ;
+0.5*table( ptc3 pry tyxd )-table( twi3 pry t316 ) =   4.33680868994201774e-19 ;
+table( ptc3 pry typp )-table( twi3 pry t322 ) =  -5.08219768352580203e-21 ;
+0.5*table( ptc3 pry typq )-table( twi3 pry t324 ) =   5.42101086242752217e-20 ;
+0.5*table( ptc3 pry typd )-table( twi3 pry t326 ) =  -1.48230765769502559e-21 ;
+0.5*table( ptc3 pry typq )-table( twi3 pry t342 ) =   5.42101086242752217e-20 ;
+table( ptc3 pry tyqq )-table( twi3 pry t344 ) =  -2.71050543121376109e-20 ;
+0.5*table( ptc3 pry tyqd )-table( twi3 pry t346 ) =   5.42101086242752217e-19 ;
+0.5*table( ptc3 pry typd )-table( twi3 pry t362 ) =  -1.48230765769502559e-21 ;
+0.5*table( ptc3 pry tyqd )-table( twi3 pry t364 ) =   5.42101086242752217e-19 ;
+table( ptc3 pry tydd )-table( twi3 pry t366 ) =  -2.37169225231204095e-20 ;
+0.5*table( ptc3 pry ttxp )-table( twi3 pry t512 ) =  -1.73472347597680709e-18 ;
+0.5*table( ptc3 pry ttxq )-table( twi3 pry t514 ) =   3.25260651745651330e-19 ;
+0.5*table( ptc3 pry ttxd )-table( twi3 pry t516 ) =   1.73472347597680709e-18 ;
+table( ptc3 pry ttpp )-table( twi3 pry t522 ) =   3.25260651745651330e-19 ;
+0.5*table( ptc3 pry ttpq )-table( twi3 pry t524 ) =  -1.69406589450860068e-21 ;
+0.5*table( ptc3 pry ttpd )-table( twi3 pry t526 ) =   6.77626357803440271e-20 ;
+0.5*table( ptc3 pry ttpq )-table( twi3 pry t542 ) =  -1.69406589450860068e-21 ;
+table( ptc3 pry ttqq )-table( twi3 pry t544 ) =   5.42101086242752217e-19 ;
+0.5*table( ptc3 pry ttqd )-table( twi3 pry t546 ) =  -2.71050543121376109e-20 ;
+0.5*table( ptc3 pry ttpd )-table( twi3 pry t562 ) =   6.77626357803440271e-20 ;
+0.5*table( ptc3 pry ttqd )-table( twi3 pry t564 ) =  -2.71050543121376109e-20 ;
+table( ptc3 pry ttdd )-table( twi3 pry t566 ) =   3.25260651745651330e-19 ;
+enter TRACK module
+one pass is on
+
+++++++ table: tracksumm
+
+    number       turn                         x                        px 
+         1          0   0.00000000000000000e+00   1.29999999999999994e-02 
+         1          1   1.27653631347637113e-05   1.29999999999999994e-02 
+
+                        y                        py                         t                        pt 
+  1.00000000000000002e-02   1.70000000000000012e-02   0.00000000000000000e+00   2.09999999999999076e-02 
+  1.00669861662110206e-02   1.19094040533776091e-01  -1.13252472099007232e-03   2.09999999999999076e-02 
+
+                        s                         e 
+  0.00000000000000000e+00   0.00000000000000000e+00 
+  0.00000000000000000e+00   0.00000000000000000e+00 
+exit TRACK module
+
+enter Twiss module
+ Found 4 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  1.300000E-02  1.000000E-02  1.700000E-02  0.000000E+00  2.100000E-02
+final orbit vector:     1.276536E-05  1.300000E-02  1.006699E-02  1.190940E-01 -1.132525E-03  2.100000E-02
+
+++++++ table: summ
+
+                   length                    orbit5                      alfa                   gammatr 
+  0.00000000000000000e+00  -0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00 
+
+                       q1                       dq1                   betxmax                     dxmax 
+  1.56307562063513143e-04   0.00000000000000000e+00   1.00000096453944942e+00   1.40781064171693912e-05 
+
+                    dxrms                    xcomax                    xcorms                        q2 
+  1.14947257555554882e-05   1.27653631347637045e-05   1.04228753538354028e-05   1.56325422719337363e-04 
+
+                      dq2                   betymax                     dymax                     dyrms 
+  0.00000000000000000e+00   1.01344308243513415e+00   1.85022657301761378e-05   1.51070367081050525e-05 
+
+                   ycomax                    ycorms                    deltap                   synch_1 
+  1.00669861662110189e-02   1.00447070795414116e-02   0.00000000000000000e+00   0.00000000000000000e+00 
+
+                  synch_2                   synch_3                   synch_4                   synch_5 
+  0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00 
+
+                  synch_6                   synch_8                    nflips                     dqmin 
+  0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00   0.00000000000000000e+00 
+
+              dqmin_phase 
+  0.00000000000000000e+00 
+Determined SECTOR NMUL MAX :  0
+ MAD-X Beam Parameters
+                  Energy : 0.200000E+01
+          Kinetic Energy : 0.106173E+01
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.176625E+01
+ Setting MADx with 
+     energy           2.0000000000000000     
+     method                   6
+     Num. of steps            5
+     charge           1.0000000000000000     
+  Length of machine:    0.0000000000000000     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps      5
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+                   length                   alpha_c                 alpha_c_p                alpha_c_p2 
+  0.00000000000000000e+00  -1.00000000000000000e+06  -1.00000000000000000e+06  -1.00000000000000000e+06 
+
+               alpha_c_p3                     eta_c                  gamma_tr                        q1 
+ -1.00000000000000000e+06  -1.00000000000000000e+06  -1.00000000000000000e+06   1.59590018689188850e-04 
+
+                       q2                       dq1                       dq2                        qs 
+  1.59608254418038822e-04  -1.00000000000000000e+06  -1.00000000000000000e+06  -1.00000000000000000e+06 
+
+               beta_x_min                beta_x_max                beta_y_min                beta_y_max 
+  1.00266247576491430e+00   1.00266348391743643e+00   1.00266247576491430e+00   1.01614139168748552e+00 
+
+                beta11min                 beta11max                 beta12min                 beta12max 
+  1.00266247576491430e+00   1.00266348391743643e+00   0.00000000000000000e+00   1.63388581463644376e-06 
+
+                beta13min                 beta13max                 beta21min                 beta21max 
+  0.00000000000000000e+00   1.98720764566200517e-10   0.00000000000000000e+00   4.54597496930794752e-14 
+
+                beta22min                 beta22max                 beta23min                 beta23max 
+  1.00266247576491430e+00   1.01614139168748552e+00   0.00000000000000000e+00   3.43245292694973033e-10 
+
+                beta31min                 beta31max                 beta32min                 beta32max 
+  0.00000000000000000e+00   2.07154672535154668e-10   0.00000000000000000e+00   1.28602892372386805e-02 
+
+                beta33min                 beta33max                  disp1min                  disp1max 
+  1.04521647389885275e+00   1.04521654539822650e+00  -1.39325744584868251e-05   0.00000000000000000e+00 
+
+                 disp2min                  disp2max                  disp3min                  disp3max 
+ -1.11335931698117049e-01   0.00000000000000000e+00  -1.83109991711669021e-05   0.00000000000000000e+00 
+
+                 disp4min                  disp4max                    deltap                   orbit_x 
+  0.00000000000000000e+00   1.11335931698117049e-01   0.00000000000000000e+00   0.00000000000000000e+00 
+
+                 orbit_px                   orbit_y                  orbit_py                  orbit_pt 
+  1.29999999999999994e-02   1.00000000000000002e-02   1.70000000000000012e-02   2.10000000000000013e-02 
+
+                  orbit_t                    xcorms                    ycorms                   pxcorms 
+  0.00000000000000000e+00   1.04228753538354079e-05   1.00447070795414116e-02   1.29999999999999994e-02 
+
+                  pycorms                    tcorms                   ptcorms                    xcomax 
+  9.77339602890100884e-02   9.24702562504520729e-04   2.10000000000000013e-02   1.27653631347637096e-05 
+
+                   ycomax                   pxcomax                   pycomax                    tcomax 
+  1.00669861662110189e-02   1.29999999999999994e-02   1.19094040533776091e-01  -0.00000000000000000e+00 
+
+                  ptcomax                    xcomin                    ycomin                   pxcomin 
+  2.10000000000000013e-02   0.00000000000000000e+00   1.00000000000000002e-02   1.29999999999999994e-02 
+
+                  pycomin                    tcomin                   ptcomin 
+  1.70000000000000012e-02  -1.13252472099007210e-03   2.10000000000000013e-02 
+table( trackone x 2  )-table( ptc2 prx x ) =   1.69406589450860068e-21 ;
+table( trackone y 2  )-table( ptc2 prx y ) =   1.73472347597680709e-18 ;
+table( trackone py 2  )-table( ptc2 prx py ) =   0.00000000000000000e+00 ;
+table( trackone t 2  )-table( ptc2 prx t ) =  -2.16840434497100887e-19 ;
+table( twi2 prx x )-table( ptc2 prx x ) =  -5.08219768352580203e-21 ;
+table( twi2 prx y )-table( ptc2 prx y ) =   0.00000000000000000e+00 ;
+table( twi2 prx py )-table( ptc2 prx py ) =   2.77555756156289135e-17 ;
+table( twi2 prx t )-table( ptc2 prx t ) =   4.33680868994201774e-19 ;
+table( twi2 prx re12 )-table( ptc2 prx re12 ) =  -2.16840434497100887e-19 ;
+table( twi2 prx re13 )-table( ptc2 prx re13 ) =  -6.50521303491302660e-19 ;
+table( twi2 prx re14 )-table( ptc2 prx re14 ) =  -1.27054942088145051e-21 ;
+table( twi2 prx re16 )-table( ptc2 prx re16 ) =   1.18584612615602047e-20 ;
+table( twi2 prx re32 )-table( ptc2 prx re32 ) =  -1.85288457211878199e-22 ;
+table( twi2 prx re33 )-table( ptc2 prx re33 ) =   0.00000000000000000e+00 ;
+table( twi2 prx re34 )-table( ptc2 prx re34 ) =  -6.50521303491302660e-19 ;
+table( twi2 prx re36 )-table( ptc2 prx re36 ) =   1.35525271560688054e-20 ;
+table( twi2 prx re42 )-table( ptc2 prx re42 ) =   2.16840434497100887e-19 ;
+table( twi2 prx re44 )-table( ptc2 prx re44 ) =   2.22044604925031308e-16 ;
+table( twi2 prx re46 )-table( ptc2 prx re46 ) =   0.00000000000000000e+00 ;
+table( twi2 prx re52 )-table( ptc2 prx re52 ) =   8.47032947254300339e-21 ;
+table( twi2 prx re53 )-table( ptc2 prx re53 ) =   4.16333634234433703e-17 ;
+table( twi2 prx re54 )-table( ptc2 prx re54 ) =   1.35525271560688054e-19 ;
+table( twi2 prx re56 )-table( ptc2 prx re56 ) =   1.62630325872825665e-19 ;
+0.5*table( ptc3 prx txyp )-table( twi3 prx t132 ) =   2.77555756156289135e-17 ;
+0.5*table( ptc3 prx txyq )-table( twi3 prx t134 ) =   6.77626357803440271e-20 ;
+0.5*table( ptc3 prx txyd )-table( twi3 prx t136 ) =  -5.42101086242752217e-19 ;
+table( ptc3 prx txpp )-table( twi3 prx t122 ) =   3.04931861011548122e-20 ;
+0.5*table( ptc3 prx txpq )-table( twi3 prx t124 ) =   8.80914265144472353e-20 ;
+0.5*table( ptc3 prx txpd )-table( twi3 prx t126 ) =  -8.67361737988403547e-19 ;
+0.5*table( ptc3 prx txpq )-table( twi3 prx t142 ) =   8.80914265144472353e-20 ;
+table( ptc3 prx txqq )-table( twi3 prx t144 ) =   7.62329652528870305e-21 ;
+0.5*table( ptc3 prx txqd )-table( twi3 prx t146 ) =  -2.96461531539005119e-21 ;
+0.5*table( ptc3 prx txpd )-table( twi3 prx t162 ) =  -8.67361737988403547e-19 ;
+0.5*table( ptc3 prx txqd )-table( twi3 prx t164 ) =  -2.96461531539005119e-21 ;
+table( ptc3 prx txdd )-table( twi3 prx t166 ) =   2.71050543121376109e-20 ;
+0.5*table( ptc3 prx tyyp )-table( twi3 prx t332 ) =   8.47032947254300339e-21 ;
+0.5*table( ptc3 prx tyyq )-table( twi3 prx t334 ) =   4.16333634234433703e-17 ;
+0.5*table( ptc3 prx tyyd )-table( twi3 prx t336 ) =  -7.58941520739853104e-19 ;
+table( ptc3 prx typp )-table( twi3 prx t322 ) =   3.04931861011548122e-20 ;
+0.5*table( ptc3 prx typq )-table( twi3 prx t324 ) =   7.62329652528870305e-21 ;
+0.5*table( ptc3 prx typd )-table( twi3 prx t326 ) =  -9.52912065661087881e-22 ;
+0.5*table( ptc3 prx typq )-table( twi3 prx t342 ) =   7.62329652528870305e-21 ;
+table( ptc3 prx tyqq )-table( twi3 prx t344 ) =   1.35525271560688054e-19 ;
+0.5*table( ptc3 prx tyqd )-table( twi3 prx t346 ) =  -7.58941520739853104e-19 ;
+0.5*table( ptc3 prx typd )-table( twi3 prx t362 ) =  -9.52912065661087881e-22 ;
+0.5*table( ptc3 prx tyqd )-table( twi3 prx t364 ) =  -7.58941520739853104e-19 ;
+table( ptc3 prx tydd )-table( twi3 prx t366 ) =   1.35525271560688054e-20 ;
+table( ptc3 prx tqpp )-table( twi3 prx t422 ) =   0.00000000000000000e+00 ;
+0.5*table( ptc3 prx tqpq )-table( twi3 prx t424 ) =  -3.38813178901720136e-21 ;
+0.5*table( ptc3 prx tqpd )-table( twi3 prx t426 ) =   3.25260651745651330e-19 ;
+0.5*table( ptc3 prx tqpq )-table( twi3 prx t442 ) =  -3.38813178901720136e-21 ;
+table( ptc3 prx tqqq )-table( twi3 prx t444 ) =  -6.93889390390722838e-18 ;
+0.5*table( ptc3 prx tqqd )-table( twi3 prx t446 ) =   3.25260651745651330e-19 ;
+0.5*table( ptc3 prx tqpd )-table( twi3 prx t462 ) =   3.25260651745651330e-19 ;
+0.5*table( ptc3 prx tqqd )-table( twi3 prx t464 ) =   3.25260651745651330e-19 ;
+table( ptc3 prx tqdd )-table( twi3 prx t466 ) =   8.67361737988403547e-18 ;
+0.5*table( ptc3 prx ttyp )-table( twi3 prx t532 ) =  -4.33680868994201774e-19 ;
+0.5*table( ptc3 prx ttyq )-table( twi3 prx t534 ) =  -6.93889390390722838e-18 ;
+0.5*table( ptc3 prx ttyd )-table( twi3 prx t536 ) =  -6.93889390390722838e-18 ;
+table( ptc3 prx ttpp )-table( twi3 prx t522 ) =  -8.67361737988403547e-19 ;
+0.5*table( ptc3 prx ttpq )-table( twi3 prx t524 ) =  -2.96461531539005119e-21 ;
+0.5*table( ptc3 prx ttpd )-table( twi3 prx t526 ) =   3.38813178901720136e-20 ;
+0.5*table( ptc3 prx ttpq )-table( twi3 prx t542 ) =  -2.96461531539005119e-21 ;
+table( ptc3 prx ttqq )-table( twi3 prx t544 ) =  -5.42101086242752217e-19 ;
+0.5*table( ptc3 prx ttqd )-table( twi3 prx t546 ) =   1.35525271560688054e-19 ;
+0.5*table( ptc3 prx ttpd )-table( twi3 prx t562 ) =   3.38813178901720136e-20 ;
+0.5*table( ptc3 prx ttqd )-table( twi3 prx t564 ) =   1.35525271560688054e-19 ;
+table( ptc3 prx ttdd )-table( twi3 prx t566 ) =  -3.79470760369926552e-19 ;
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

@@ -3727,10 +3727,10 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmsrot(ftrk,orbit,fmap,ek,re,te)
 
      case (code_yrotation)
-        call tmyrot(ftrk,orbit,fmap,ek,re,te)
+        call tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,node_value('angle ')*node_value('other_bv '),1)
 
      case (code_xrotation)
-        call tmxrot(ftrk,orbit,fmap,ek,re,te)
+        call tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,-node_value('angle ')*node_value('other_bv '),2)
 
      case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
         call tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
@@ -7031,109 +7031,166 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
 
 end SUBROUTINE tmsrot
 
-SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
+SUBROUTINE tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,angle,iplane)
+  ! Common code for tmxrot and tmyrot
+  ! iplane=1 for YROTATION, iplane=2 for XROTATION
   use twisslfi
   use twissbeamfi, only : beta, gamma
-  use twiss0fi, only : align_max
   implicit none
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     TRANSPORT map for rotation about X-axis.                         *
-  !     Treated in a purely linear way.                                  *
-  !     Input:                                                           *
-  !     ftrk      (logical) if true, track orbit.                        *
-  !     Input/output:                                                    *
-  !     orbit(6)  (double)  closed orbit.                                *
-  !     Output:                                                          *
-  !     fmap      (logical) if true, element has a map.                  *
-  !     ek(6)     (double)  kick due to element.                         *
-  !     re(6,6)   (double)  transfer matrix.                             *
-  !     te(6,6,6) (double)  second-order terms.                          *
-  !----------------------------------------------------------------------*
-  logical :: ftrk, fmap
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: al_errors(align_max)
-  double precision :: angle, ca, sa, ta
-  double precision :: node_value
+  logical :: fsec, ftrk, fmap
+  integer :: iplane
+  double precision :: angle, orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  integer ix,ip,iy,iq
+  double precision :: ca, sa
+  real(kind(0d0)) :: beti,bg2i,ca2,pl2,pm2,ps0,ps1,pt,ptb,px0,px02,px1,px12,py,py2,sa2,sps0ps12,x0,xsps1
 
   !---- Initialize.
-  al_errors = 0d0
-
-  angle = node_value('angle ')
+  ix = 2*iplane-1
+  ip = 2*iplane
+  iy = 5-2*iplane
+  iq = 6-2*iplane
+  fmap = angle.ne.0
   if (angle .eq. 0) return
 
-  angle = angle * node_value('other_bv ')
-  !al_errors(4) = -angle
-  !---- Kick.
-  ca = cos(angle)
-  sa = sin(angle)
-  ta = tan(angle)
-
-  ek(4) = sa
-
-  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
-  !---- Transfer matrix.
-  re(3,3) = 1/ca
-  re(4,4) =   ca
-  re(4,6) =   sa/beta
-  re(5,3) =  -ta/beta
-
-  !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-
-end SUBROUTINE tmxrot
-
-SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
-  use twisslfi
-  use twissbeamfi, only : beta, gamma
-  use twiss0fi, only : align_max
-  implicit none
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     TRANSPORT map for rotation about Y-axis.                         *
-  !     Treated in a purely linear way.                                  *
-  !     Input:                                                           *
-  !     ftrk      (logical) if true, track orbit.                        *
-  !     Input/output:                                                    *
-  !     orbit(6)  (double)  closed orbit.                                *
-  !     Output:                                                          *
-  !     fmap      (logical) if true, element has a map.                  *
-  !     ek(6)     (double)  kick due to element.                         *
-  !     re(6,6)   (double)  transfer matrix.                             *
-  !     te(6,6,6) (double)  second-order terms.                          *
-  !----------------------------------------------------------------------*
-  logical :: ftrk, fmap
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-
-  double precision :: angle, ca, sa, ta
-  double precision :: node_value
-  double precision :: al_errors(align_max)
-
-  !---- Initialize.
-  angle = -node_value('angle ') !Note that we should have the negative angle here
-  if (angle .eq. 0) return
-  !al_errors = 0d0
-  angle = angle * node_value('other_bv ')
-  !al_errors(5) = - angle
-  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
+  x0 = orbit(ix)
+  px0 = orbit(ip)
+  py = orbit(iq)
+  pt = orbit(6)
+  
+  beti = 1/beta
+  bg2i = 1/(beta*beta*gamma*gamma)
+  ptb = beti+pt
+  pl2 = 1+(2*beti+pt)*pt
+  py2 = py*py
+  pm2 = pl2-py2
+  px02 = px0*px0
+  ps0 = sqrt(pm2-px02)
 
   !---- Kick.
   ca = cos(angle)
   sa = sin(angle)
-  ta = tan(angle)
 
-  ek(2) = sa
+  px1 = px0*ca - ps0*sa
+  ps1 = px0*sa + ps0*ca
+  px12 = px1*px1
+  xsps1 = x0*sa/ps1
+  sps0ps12 = 0.5d0*sa/(ps0*ps1*ps1)
+
+  ca2 = cos(0.5d0*angle)
+  sa2 = sin(0.5d0*angle)
+
+  ek(ix) = 2*sa2*x0*(ps0*sa2-px0*ca2)/ps1
+  ek(ip) = -2*sa2*(ps0*ca2+px0*sa2)
+  ek(iy) = -xsps1*py
+  ek(iq) = 0
+  ek(5) = xsps1*ptb
+  ek(6) = 0
+
+  if (ftrk) then
+     orbit(ix) = x0*ps0/ps1
+     orbit(ip) = px1
+     orbit(iy) = orbit(iy) + ek(iy)
+     orbit(5) = orbit(5) + ek(5)
+  end if
 
   !---- Transfer matrix.
-  re(1,1) = 1/ca
-  re(2,2) =   ca
-  re(2,6) =   sa/beta
-  re(5,1) =  -ta/beta
+  re = 0
+  re(ip,ip) = ps1/ps0
+  re(ip,iq) = sa*py/ps0
+  re(ip,6) = -sa*ptb/ps0
 
-  !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  if (fsec) te = 0
 
-end SUBROUTINE tmyrot
+  ! Using te as scratch space to avoid excess copying when fsec is true
+  te(ix,ix,ip) = -sps0ps12*pm2
+  te(ix,ix,iq) = -sps0ps12*px0*py
+  te(ix,ix,6) = sps0ps12*px0*ptb
+  te(iy,ix,ip) = -sps0ps12*px1*py
+  te(iy,ix,iq) = sps0ps12*(px0*px1-pl2*ca)
+  te(iy,ix,6) = sps0ps12*ca*py*ptb
+  te(5,ix,ip) = sps0ps12*px1*ptb
+  te(5,ix,iq) = sps0ps12*ca*py*ptb
+  te(5,ix,6) = -sps0ps12*(px0*px1+(bg2i+py2)*ca)
+
+  if (fsec) then
+     te(1:5:2,2:6:2,ix) = te(1:5:2,ix,2:6:2)
+     block
+       real(kind(0d0)) :: sps30,sps31,sps5
+       real(kind(0d0)) :: d0xx,d0xy,d0xt,d0yy,d0yt,d0tt
+       real(kind(0d0)) :: d0xxx,d0xxy,d0xxt,d0xyy,d0xyt,d0xtt,d0yyy,d0yyt,d0ytt,d0ttt
+
+       sps31 = sa/ps1**3
+       d0xx = -(pl2-py2)*sps31
+       d0xy = -px1*py*sps31
+       d0xt = px1*ptb*sps31
+       d0yy = -(pl2-px12)*sps31
+       d0yt = py*ptb*sps31
+       d0tt = -(bg2i+px12+py2)*sps31
+
+       sps5 = 0.5d0*sa/ps1**5
+       d0xxx = -3*px1*(pl2-py2)*sps5
+       d0xxy = -py*(pl2-py2+2*px12)*sps5
+       d0xxt = ptb*(pl2-py2+2*px12)*sps5
+       d0xyy = -px1*(pl2-px12+2*py2)*sps5
+       d0xyt = 3*px1*py*ptb*sps5
+       d0xtt = -px1*(2*ptb*ptb+bg2i+px12+py2)*sps5
+       d0yyy = -3*py*(pl2-px12)*sps5
+       d0yyt = ptb*(pl2-px12+2*py2)*sps5
+       d0ytt = -py*(2*ptb*ptb+bg2i+px12+py2)*sps5
+       d0ttt = 3*ptb*(bg2i+px12+py2)*sps5
+
+       sps30 = 0.5d0*sa/ps0**3
+       te(ip,ip,ip) = (pl2-py2)*sps30
+       te(ip,ip,iq) = px0*py*sps30
+       te(ip,ip,6) = -px0*ptb*sps30
+       te(ip,iq,ip) = te(ip,ip,iq)
+       te(ip,iq,iq) = (pl2-px02)*sps30
+       te(ip,iq,6) = -py*ptb*sps30
+       te(ip,6,ip) = te(ip,ip,6)
+       te(ip,6,iq) = te(ip,iq,6)
+       te(ip,6,6) = (bg2i+px02+py2)*sps30
+
+       te(ix,ip,ip) = x0*(d0xxx*re(ip,ip)*re(ip,ip)+d0xx*te(ip,ip,ip))
+       te(ix,ip,iq) = x0*(d0xxy*re(ip,ip)+d0xxx*re(ip,ip)*re(ip,iq)+d0xx*te(ip,ip,iq))
+       te(ix,ip,6) = x0*(d0xxt*re(ip,ip)+d0xxx*re(ip,ip)*re(ip,6)+d0xx*te(ip,ip,6))
+       te(ix,iq,ip) = te(ix,ip,iq)
+       te(ix,iq,iq) = x0*(d0xyy+2*d0xxy*re(ip,iq)+d0xxx*re(ip,iq)*re(ip,iq)+d0xx*te(ip,iq,iq))
+       te(ix,iq,6) = x0*(d0xyt+d0xxy*re(ip,6)+d0xxt*re(ip,iq)+d0xxx*re(ip,iq)*re(ip,6)+d0xx*te(ip,iq,6))
+       te(ix,6,ip) = te(ix,ip,6)
+       te(ix,6,iq) = te(ix,iq,6)
+       te(ix,6,6) = x0*(d0xtt+2*d0xxt*re(ip,6)+d0xxx*re(ip,6)*re(ip,6)+d0xx*te(ip,6,6))
+       te(iy,ip,ip) = x0*(d0xxy*re(ip,ip)*re(ip,ip)+d0xy*te(ip,ip,ip))
+       te(iy,ip,iq) = x0*(d0xyy*re(ip,ip)+d0xxy*re(ip,ip)*re(ip,iq)+d0xy*te(ip,ip,iq))
+       te(iy,ip,6) = x0*(d0xyt*re(ip,ip)+d0xxy*re(ip,ip)*re(ip,6)+d0xy*te(ip,ip,6))
+       te(iy,iq,ip) = te(iy,ip,iq)
+       te(iy,iq,iq) = x0*(d0yyy+2*d0xyy*re(ip,iq)+d0xxy*re(ip,iq)*re(ip,iq)+d0xy*te(ip,iq,iq))
+       te(iy,iq,6) = x0*(d0yyt+d0xyy*re(ip,6)+d0xyt*re(ip,iq)+d0xxy*re(ip,iq)*re(ip,6)+d0xy*te(ip,iq,6))
+       te(iy,6,ip) = te(iy,ip,6)
+       te(iy,6,iq) = te(iy,iq,6)
+       te(iy,6,6) = x0*(d0ytt+2*d0xyt*re(ip,6)+d0xxy*re(ip,6)*re(ip,6)+d0xy*te(ip,6,6))
+       te(5,ip,ip) = x0*(d0xxt*re(ip,ip)*re(ip,ip)+d0xt*te(ip,ip,ip))
+       te(5,ip,iq) = x0*(d0xyt*re(ip,ip)+d0xxt*re(ip,ip)*re(ip,iq)+d0xt*te(ip,ip,iq))
+       te(5,ip,6) = x0*(d0xtt*re(ip,ip)+d0xxt*re(ip,ip)*re(ip,6)+d0xt*te(ip,ip,6))
+       te(5,iq,ip) = te(5,ip,iq)
+       te(5,iq,iq) = x0*(d0yyt+2*d0xyt*re(ip,iq)+d0xxt*re(ip,iq)*re(ip,iq)+d0xt*te(ip,iq,iq))
+       te(5,iq,6) = x0*(d0ytt+d0xyt*re(ip,6)+d0xtt*re(ip,iq)+d0xxt*re(ip,iq)*re(ip,6)+d0xt*te(ip,iq,6))
+       te(5,6,ip) = te(5,ip,6)
+       te(5,6,iq) = te(5,iq,6)
+       te(5,6,6) = x0*(d0ttt+2*d0xtt*re(ip,6)+d0xxt*re(ip,6)*re(ip,6)+d0xt*te(ip,6,6))
+     end block
+  end if
+
+  re(ix,ix) = ps0/ps1
+  re(iy,ix) = -sa*py/ps1
+  re(iy,iy) = 1
+  re(iq,iq) = 1
+  re(5,5) = 1
+  re(5,ix) = sa*ptb/ps1
+  re(6,6) = 1
+  re(1:5:2,2:6:2) = (2*x0)*te(1:5:2,ix,2:6:2)
+
+end SUBROUTINE tmxyrot
 
 SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
