@@ -71,10 +71,14 @@ ifeq ($(COVERAGE),yes)
 FFLAGS += -fprofile-arcs -ftest-coverage
 endif
 
+ifeq ($(INITNAN),yes)
+FFLAGS += -finit-real=nan
+endif
+
 #
 # extra flags
 #
 
-FFLAGS += -pipe -fno-second-underscore -fall-intrinsics -fno-range-check -fmax-stack-var-size=65536 -J$(OBJDIR)
+FFLAGS += -pipe -fno-second-underscore -fall-intrinsics -fno-range-check -fmax-stack-var-size=65536 -J$(OBJDIR)  $(FFLAGS_EXTRA)
 
 # end of makefile
