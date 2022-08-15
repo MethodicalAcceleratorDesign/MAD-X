@@ -6742,6 +6742,7 @@ end SUBROUTINE tmsol
 
 SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twissbeamfi, only : radiate, deltap, beta, gamma, dtbyds, arad
+  use twisslfi
   use math_constfi, only : zero, one, two, three, six
     use matrices, only : EYE
   implicit none
@@ -6774,6 +6775,13 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: rfac, kx, ky
   double precision :: pt, bet0, bet_sqr, f_damp_t
 
+  integer :: i,j
+  real(kind(1d0)) :: beti,bg2iptr2,c2,elpsi1,elpsi3,elpsi5,ps,ps2,ptb,ptr2,s2
+  real(kind(1d0)), dimension(2) :: pk
+  real(kind(1d0)), dimension(4) :: vmu,vpi,vtau
+  real(kind(1d0)), dimension(4,4) :: ms1,mpi
+  real(kind(1d0)), external :: sinc ! defined in util.f90
+
   bet0  =  get_value('beam ','beta ')
 
   beta0   = get_value('probe ','beta ')
@@ -6802,23 +6810,53 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   bvk = node_value('other_bv ')
   sks = sks * bvk
 
+  pt = orbit(6)
   !---- Set up C's and S's.
   sk = sks / two / (one + deltap)
-  skl = sk * el
+  if (exact_expansion) then
+     beti = 1d0/beta
+     ptb = pt + beti
+     pk = [ orbit(2)+sk*orbit(3), orbit(4)-sk*orbit(1) ]
+     ptr2 = pk(1)**2 + pk(2)**2
+     ps2 = 1d0 + (2*beti + pt)*pt - ptr2
+     ps = sqrt(ps2)
+     bg2iptr2 = 1d0/(beta*gamma)**2 + ptr2
+     elpsi1 = el / ps
+     elpsi3 = elpsi1 / ps2
+     elpsi5 = elpsi3 / ps2
+     skl = sk * elpsi1
+     sibk = sinc(skl) * elpsi1
+     c2 = cos(2*skl)
+     s2 = sin(2*skl)
+     ms1 = elpsi3*reshape([ &
+          -sk*s2,    c2,     sk*c2,     s2,    &
+          -sk*sk*c2, -sk*s2, -sk*sk*s2, sk*c2, &
+          -sk*c2,    -s2,    -sk*s2,    c2,    &
+          sk*sk*s2,  -sk*c2, -sk*sk*c2, -sk*s2 &
+          ], [4,4], order=[2,1])
+     mpi = reshape([ &
+          sk*sk, 0d0, 0d0,   -sk, &
+          0d0,   1d0, sk,    0d0, &
+          0d0,   sk,  sk*sk, 0d0, &
+          -sk,   0d0, 0d0,   1d0  &
+          ], [4,4])
+     vmu(1) = elpsi3*(c2*pk(1)+s2*pk(2))
+     vmu(3) = elpsi3*(c2*pk(2)-s2*pk(1))
+     vmu(2) = sk*vmu(3)
+     vmu(4) = -sk*vmu(1)
+     vpi = [ -sk*pk(2), pk(1), sk*pk(1), pk(2) ]
+  else
+     skl = sk * el
+     sibk = sinc(skl) * el
+  end if
   co = cos(skl)
   si = sin(skl)
-  if (abs(skl) .lt. ten5m) then
-     sibk = (one - skl**2/six) * el
-  else
-     sibk = si/sk
-  endif
 
   !---- Half radiation effect at entry.
   if (radiate .and. ftrk) then
      kx = ((sk**2)*orbit(1)-sk*orbit(4))*el;
      ky = ((sk**2)*orbit(3)+sk*orbit(2))*el;
      rfac = (arad * gamma**3 / three) * (kx**2 + ky**2) / el;
-     pt = orbit(6);
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
      orbit(2) = orbit(2) * f_damp_t;
@@ -6844,41 +6882,68 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   re_s(3,2) = - re_s(1,4)
   re_s(4,1) = sk * si**2
   re_s(2,3) = - re_s(4,1)
-  re_s(5,6) = el/(beta*gamma)**2
-
-  ek_s(5) = el*dtbyds
+  if (exact_expansion) then
+     ! re_s(1:4,1:4) will be updated later
+     ek_s(1:4) = [ sibk*(co*pk(1)+si*pk(2)), si*(co*pk(2)-si*pk(1)), sibk*(co*pk(2)-si*pk(1)), -si*(co*pk(1)+si*pk(2)) ]
+     ek_s(5) = el*dtbyds + elpsi1 * ( pt*(2*beti+pt)/gamma**2 - ptr2 ) / ( beta**2 * (beti*ps+ptb) )
+     re_s(1:4,6) = -ptb*vmu
+     re_s(5,1:4) = -elpsi3*ptb*vpi
+     re_s(5,6) = elpsi3 * bg2iptr2
+  else
+     re_s(5,6) = el/(beta*gamma)**2
+     ek_s(5) = el*dtbyds
+  end if
 
   !---- Second-order terms.
   if (fsec) then
-     temp = el * co * si / beta
-     te_s(1,4,6) = - temp
-     te_s(3,2,6) =   temp
-     te_s(1,1,6) =   temp * sk
-     te_s(2,2,6) =   temp * sk
-     te_s(3,3,6) =   temp * sk
-     te_s(4,4,6) =   temp * sk
-     te_s(2,3,6) =   temp * sk**2
-     te_s(4,1,6) = - temp * sk**2
+     if (exact_expansion) then
+        vtau(1) = (3d0*vmu(1))/ps2 - 2d0*sk*elpsi3*elpsi3*(s2*pk(1)-c2*pk(2))
+        vtau(3) = (3d0*vmu(3))/ps2 - 2d0*sk*elpsi3*elpsi3*(c2*pk(1)+s2*pk(2))
+        vtau(2) = sk*vtau(3)
+        vtau(4) = -sk*vtau(1)
+        te_s(1:4,6,6) = 0.5d0*((ptb*ptb)*vtau - vmu)
+        te_s(5,1:4,6) = (0.5d0*elpsi5*(3*ptb*ptb-ps2))*vpi
+        te_s(5,6,1:4) = te_s(5,1:4,6)
+        do i=1,4
+           te_s(1:4,i,6) = (-0.5d0*ptb)*(vpi(i)*vtau + ms1(:,i))
+           te_s(1:4,6,i) = te_s(1:4,i,6)
+           te_s(5,1:4,i) = (-1.5d0*elpsi5*ptb*vpi(i))*vpi - (0.5d0*elpsi3*ptb)*mpi(:,i)
+           do j=1,4
+              te_s(1:4,i,j) = 0.5d0*(ms1(:,i)*vpi(j) + ms1(:,j)*vpi(i) + mpi(i,j)*vmu + (vpi(i)*vpi(j))*vtau)
+           end do
+        end do
+        te_s(5,6,6) = -1.5d0*elpsi5*ptb*bg2iptr2
+     else
+        temp = el * co * si / beta
+        te_s(1,4,6) = - temp
+        te_s(3,2,6) =   temp
+        te_s(1,1,6) =   temp * sk
+        te_s(2,2,6) =   temp * sk
+        te_s(3,3,6) =   temp * sk
+        te_s(4,4,6) =   temp * sk
+        te_s(2,3,6) =   temp * sk**2
+        te_s(4,1,6) = - temp * sk**2
 
-     temp = el * (co**2 - si**2) / (two * beta)
-     te_s(1,2,6) = - temp
-     te_s(3,4,6) = - temp
-     te_s(1,3,6) = - temp * sk
-     te_s(2,4,6) = - temp * sk
-     te_s(3,1,6) =   temp * sk
-     te_s(4,2,6) =   temp * sk
-     te_s(2,1,6) =   temp * sk**2
-     te_s(4,3,6) =   temp * sk**2
+        temp = el * (co**2 - si**2) / (two * beta)
+        te_s(1,2,6) = - temp
+        te_s(3,4,6) = - temp
+        te_s(1,3,6) = - temp * sk
+        te_s(2,4,6) = - temp * sk
+        te_s(3,1,6) =   temp * sk
+        te_s(4,2,6) =   temp * sk
+        te_s(2,1,6) =   temp * sk**2
+        te_s(4,3,6) =   temp * sk**2
 
-     temp = el / (two * beta)
-     te_s(5,2,2) = - temp
-     te_s(5,4,4) = - temp
-     te_s(5,1,4) =   temp * sk
-     te_s(5,2,3) = - temp * sk
-     te_s(5,1,1) = - temp * sk**2
-     te_s(5,3,3) = - temp * sk**2
-     te_s(5,6,6) = - three * re_s(5,6) / (two * beta)
-     call tmsymm(te_s)
+        temp = el / (two * beta)
+        te_s(5,2,2) = - temp
+        te_s(5,4,4) = - temp
+        te_s(5,1,4) =   temp * sk
+        te_s(5,2,3) = - temp * sk
+        te_s(5,1,1) = - temp * sk**2
+        te_s(5,3,3) = - temp * sk**2
+        te_s(5,6,6) = - three * re_s(5,6) / (two * beta)
+        call tmsymm(te_s)
+     end if
   endif
 
 
@@ -6898,9 +6963,19 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
       re_t1(5,2) = -pxbeta
       call tmtrak(ek_t1,re_t1,te_t1,orbit,orbit)
       call tmcat(.true.,re_t1,te_t1,re,te,re,te)
+    end if
 
-
+    if (exact_expansion) then
+      orbit(1:4) = matmul(re_s(1:4,1:4),orbit(1:4))
+      orbit(5) = orbit(5) + ek_s(5)
+      do i=1,4
+         re_s(1:4,i) = re_s(1:4,i) + vpi(i)*vmu
+      end do
+    else
       call tmtrak(ek_s,re_s,te_s,orbit,orbit) ! Calls the normal solenoid
+    endif
+
+    if(abs(xtilt_rad) > ten5m) then
       call tmcat(.true.,re_s,te_s,re,te,re,te)
 
       !To tilt it back
@@ -6914,17 +6989,20 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
       call tmtrak(ek_t2,re_t2,te_t1 ,orbit,orbit)
       call tmcat(.true.,re_t2,te_t1,re,te,re,te)
-
     else
-      ek=ek_s
-      re=re_s
-      te=te_s
-      call tmtrak(ek,re,te,orbit,orbit)
-    endif
-  else
+      ek = ek_s
+      re = re_s
+      te = te_s
+    end if      
+  else ! ftrk == .false.
     ek=ek_s
     re=re_s
     te=te_s
+    if (exact_expansion) then
+      do i=1,4
+         re(1:4,i) = re(1:4,i) + vpi(i)*vmu
+      end do
+    end if
   endif
 
 
@@ -9343,4 +9421,3 @@ SUBROUTINE twcptk_print(re,r0mat, e, f)
 
 
 end SUBROUTINE twcptk_print
-

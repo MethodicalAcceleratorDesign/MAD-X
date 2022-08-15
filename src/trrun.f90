@@ -3387,6 +3387,11 @@ subroutine trsol(track,ktrack,dxt,dyt)
   double precision :: curv, const, rfac
   double precision :: beta_sqr, f_damp_t
 
+  real(kind(0d0)), external :: sinc
+  real(kind(0d0)) :: ptr2,si
+  real(kind(0d0)), dimension(2) :: pk
+  real(kind(0d0)), dimension(4) :: rps
+
   !---- Get solenoid parameters
   elrad   = node_value('lrad ')
   bvk = node_value('other_bv ')
@@ -3491,18 +3496,18 @@ subroutine trsol(track,ktrack,dxt,dyt)
               pt_ = track(6,i)
 
               ! set up constants
-              onedp = sqrt(one + two*pt_*beti + pt_**2);
+              pk = [ px_+sk*y_, py_-sk*x_ ]
+              ptr2 = pk(1)**2 + pk(2)**2
+              onedp = sqrt(one + two*pt_*beti + pt_**2 - ptr2)
 
               ! set up constants
-              cosTh = cos(two*skl/onedp)
-              sinTh = sin(two*skl/onedp)
+              cosTh = cos(skl/onedp)
+              sinTh = sin(skl/onedp)
               omega = sk/onedp;
 
               ! Store the kick for radiation calculations
-              pxf_ = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
-              pyf_ = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
-              dxt(i) = pxf_ - track(2,i);
-              dyt(i) = pyf_ - track(4,i);
+              dxt(i) =  sinTh*(cosTh*pk(2)-sinTh*pk(1))
+              dyt(i) = -sinTh*(cosTh*pk(1)+sinTh*pk(2))
 
               if ((step.eq.1).or.(step.eq.3)) then
                  if (radiate .and. elrad .gt. zero) then
@@ -3532,17 +3537,14 @@ subroutine trsol(track,ktrack,dxt,dyt)
                     endif
                  endif
               else
-                 ! total path length traveled by the particle
-                 bet = onedp / (beti + pt_);
-                 length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
-                      two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
-
                  ! Thick transport
-                 track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
-                 track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
-                 track(2,i) = pxf_;
-                 track(4,i) = pyf_;
-                 track(5,i) = z_ + length*beti - length_/bet;
+                 si = sinc(skl/onedp)*length/onedp
+                 rps = [ cosTh*x_ + sinTh*y_, cosTh*px_ + sinTh*py_, cosTh*y_ - sinTh*x_, cosTh*py_ - sinTh*px_ ]
+                 track(1,i) = cosTh*rps(1) + si*rps(2)
+                 track(2,i) = cosTh*rps(2) - sk*sinTh*rps(1)
+                 track(3,i) = cosTh*rps(3) + si*rps(4)
+                 track(4,i) = cosTh*rps(4) - sk*sinTh*rps(3)
+                 track(5,i) = z_ + length*(pt_*(pt_+2d0*beti)/gammas**2-ptr2)/(betas*onedp*(1d0+onedp+betas*pt_))
               endif
            enddo ! step
 
