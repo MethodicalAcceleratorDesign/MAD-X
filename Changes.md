@@ -3,6 +3,7 @@ MAD-X master
 *   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)
 *   [PR 1095](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1095) Implement more robust, optional, PTC DA map output (L. Deniau)
 *   [PR 1088](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1088) Additional explanation bv flag (J. Dilly)
+*   [PR 1113](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1113) Introduce LAST option in INSTALL and MOVE and change default behaviour [Breaking change!]
 *   [PR 1131](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1131) Add spin table (P. Skowonronski)
 
 MAD-X release 5.08.01 (2022.02.25)
