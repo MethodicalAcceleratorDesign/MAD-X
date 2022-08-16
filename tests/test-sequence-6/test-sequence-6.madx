@@ -22,9 +22,9 @@ Option, debug;
 
 SEQEDIT,SEQUENCE=PR.BHT000001;
  FLATTEN;
- REPLACE, element=PR.BHT000001.corr3, by=aa;       
+ REPLACE, element=PR.BHT000001.corr3, by=aa;
  REMOVE, element=PR.BHT000001.corr1;
- INSTALL, ELEMENT=aa, AT= 2.985726e-01, FROM=pr.bht000001$start;
+ INSTALL, ELEMENT=aa, AT= 2.985726e-01, FROM=pr.bht000001$start,last=false;
  FLATTEN;
 ENDEDIT;
 

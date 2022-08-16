@@ -2252,6 +2252,7 @@ double precision function bips(a, mmax1)
        &a)/dble(13+mmax1)-(575d0*a*a)/dble(14+mmax1)))))))))))))/8388608d0;  !speedup hrr Nov 2021
 !      &a)/dble(13+mmax1)-(575d0*a**2)/dble(14+mmax1)))))))))))))/8388608d0;
 end function bips
+
 module sodd
 ! Copied from Frank Schmidt hrr March 2022
   implicit none
@@ -2294,3 +2295,15 @@ module sodd
        &table_size_76,table_size_77,table_size_78,                  &
        &table_size_79
 END module sodd
+
+! sin(x)/x, with prper handling of values near zero
+function sinc(x)
+  real(kind(1d0)), intent(in) :: x
+  real(kind(1d0)) :: sinc
+  real(kind(1d0)), parameter :: e = 1.5d0*sqrt(epsilon(1d0))
+  if (abs(x) < e) then
+     sinc = 1d0 - (x*x)/6d0
+  else
+     sinc = sin(x) / x
+  end if
+end function sinc
