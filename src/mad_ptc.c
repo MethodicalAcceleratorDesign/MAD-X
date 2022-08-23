@@ -1,6 +1,7 @@
 #include "madx.h"
 
 void makerdtstwisstable(void);
+void makerspintable(void);
 void printpoly(int*, int );
 
 static void
@@ -391,6 +392,9 @@ pro_ptc_twiss(void)
   current_node = current_sequ->ex_start;
   /* w_ptc_twiss_(tarr->i); */
 
+    
+     makerspintable();
+   
 
   if (command_par_value("trackrdts",current_twiss) != 0)
    {
@@ -1951,6 +1955,58 @@ void printpoly(int *p, int dim )
     printf("%1d",p[i]); /*icase*/
 
   printf("\n");
+}
+
+void makerspintable(void)
+{
+  int i;
+
+  struct table* spin_table;
+  char** table_cols;
+  int*  table_type;
+  int n_column = 40;
+  int max_l = 48;
+
+  table_cols = mymalloc_atomic("",n_column*sizeof(char*));
+  table_type = mymalloc_atomic("",n_column*sizeof(int));
+  char tmp[max_l];
+  for (i=0; i<n_column; i++)
+  {
+    table_cols[i] = mymalloc_atomic("",max_l*sizeof(char));
+    table_type[i] = 2;
+  }
+  table_type[0] = 3;
+
+  const char *coord_name[6] = { "dx", "dpx", "dy","dpy","dt","dpt"};
+  const char * s_name[3] = {"n0x","n0y", "n0z"};
+  strcpy(table_cols[0], "name");
+  strcpy(table_cols[1], "s"); /*can not be s becuase it will not plot than*/
+  strcpy(table_cols[2], s_name[0]);
+  strcpy(table_cols[3], s_name[1]);
+  strcpy(table_cols[4], s_name[2]);
+  int c = 4;
+  for(int j=0; j<3; j++){
+    for(int i=0; i<6; i++){
+      c++;
+      strcpy(tmp, "");
+      strcat(tmp, s_name[j]);
+      strcat(tmp, coord_name[i]);
+      strcpy(table_cols[c],tmp);
+    }
+  }
+  c++;
+  strcpy(table_cols[c], " ");
+
+
+  char name[] = "twiss_spin";
+
+  spin_table = make_table2(name, name, table_cols,
+                           table_type, current_sequ->n_nodes);
+  spin_table->dynamic = 1;
+  add_to_table_list(spin_table, table_register);
+  spin_table->org_sequ = current_sequ;
+  spin_table->curr = 0;
+
 }
 
 /*_______________________________________________________*/
