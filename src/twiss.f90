@@ -1250,7 +1250,9 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   dqmin_rdt_c=0
   dqmin_det_c=0
   diff_bigger_sum = 0
-  
+  prev_pos_s = 0
+  tot_int_length = zero
+
   !--- initialize deltap because twcpin can be called directly from mad_emit
   deltap = get_value('probe ','deltap ')
 
@@ -3590,7 +3592,6 @@ SUBROUTINE tw_summ(rt,tt)
   !     call fort_warn('Chromaticity calculation wrong due to coupling, ',&
   !                    'use chrom option or manual calculation')
   ! endif
-  
   dqmin2 = 4d0*abs(delta_tune_dqmin/twopi)*(abs(dqmin_rdt)/tot_int_length)
   dqmin_ph = atan2(aimag(dqmin_rdt), real(dqmin_rdt))
   if(diff_bigger_sum/dqmin_rdt_c .gt. 0.1 .and. dqmin2 .ge. 1e-8) then

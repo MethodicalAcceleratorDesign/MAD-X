@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.08.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2022.01.13               +
-  + Execution date: 2022.01.27 20:47:20      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.08.10 05:20:37      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-info,-warn;
 
@@ -85,10 +85,10 @@ orbit:   5.000000E-04 -5.185248E-14 -8.988607E-15 -1.425000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    3.989424543e-14 
+                 0                  0                  0    4.056751349e-13 
 
        dqmin_phase 
-      -2.073669114 
+    -0.04229404689 
 assign,echo="temp.bb.install",truncate;
 
 
@@ -975,10 +975,10 @@ orbit:  -5.264405E-13  2.081183E-15 -8.137851E-13  9.047770E-15  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    3.040369735e-14 
+                 0                  0                  0    4.180333957e-13 
 
        dqmin_phase 
-        1.98631543 
+       3.113732537 
 !--- separation for halo collisions at IP2
 
 on_sep2 = 2.118 * sqrt(epsx * r2ip2->betx) / 0.0007999979093;
@@ -2868,22 +2868,22 @@ orbit:  -4.999994E-04  5.687249E-10 -4.737471E-10  1.424999E-04  0.000000E+00  0
   end dynap 
 endtrack;
 
-sec.s since start: 15   since last call: 11
+sec.s since start: 16   since last call: 12
 exit TRACK module
 
 write,table=dynap,file;
 
-sec.s since start: 15   since last call: 0
+sec.s since start: 16   since last call: 0
 write,table=dynaptune,file;
 
-sec.s since start: 15   since last call: 0
+sec.s since start: 16   since last call: 0
 !system,"foot < dynaptune > footprint";
 
 !stop;
 
 
   Number of warnings: 0
-sec.s since start: 15   since last call: 0
+sec.s since start: 16   since last call: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.08.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2022.01.13               +
-  + Execution date: 2022.01.27 20:48:02      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.08.10 02:02:39      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=120.;
 
@@ -200,10 +200,10 @@ orbit:   4.733614E-03  2.906454E-04  1.382562E-01 -7.404873E-03 -9.455828E-04  2
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.018958487e-10 
+                 0                  0                  0      3.2621048e-08 
 
        dqmin_phase 
-       3.073733918 
+      -1.643084735 
 betxLOC.BIM=table(twiss,markLOC.BIM,betx);betyLOC.BIM=table(twiss,markLOC.BIM,bety);
 
 alfxLOC.BIM=table(twiss,markLOC.BIM,alfx);alfyLOC.BIM=table(twiss,markLOC.BIM,alfy);
@@ -301,10 +301,10 @@ orbit:   2.907156E-03  1.362662E-04  9.678030E-02 -8.782200E-03 -7.344539E-04  1
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    4.439824994e-09 
+                 0                  0                  0    3.082367563e-08 
 
        dqmin_phase 
-       3.014430198 
+       1.495395699 
 sixtrack, CAVALL;	
 
   ++++++++++++++++++++++++++++
