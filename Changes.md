@@ -13,6 +13,7 @@ MAD-X master
 *   [PR 1111](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1111) Ensure that exact_model is set before zero_key is called
 *   [PR 1125](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1125) Make TWISS treat [XY]ROTATION exactly, including the linear and second order map (J. S. Berg)
 *   [PR 1129](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1129) Make track/twiss able to treat a thick solenoid exactly
+*   [PR 1133](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1133) Fix the Dqmin calculation when the CHROM option was used. (T. Persson)
 
 MAD-X release 5.08.01 (2022.02.25)
 
