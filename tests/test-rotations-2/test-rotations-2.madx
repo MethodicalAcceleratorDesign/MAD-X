@@ -9,8 +9,7 @@ pt0 = 0.021;
 an = 0.1;
 prx: xrotation, angle=an;
 pry: yrotation, angle=an;
-tr_str = 1.5 ;
-prx: TRANSLATION, DX:=0.01*tr_str, DY:=0.002*tr_str, DS:=0.02*tr_str, exact=1;
+
 lx: line=(prx);
 ly: line=(pry);
 
