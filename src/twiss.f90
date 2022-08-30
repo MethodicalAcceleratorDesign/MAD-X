@@ -7025,10 +7025,12 @@ end SUBROUTINE tmsol0
 SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   use twissbeamfi, only : beta
+  use math_constfi, only : zero, one, two
+  use matrices, only : EYE
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
-  !     TRANSPORT map for translation.                         *
+  !     TRANSPORT map for translation.                                   *
   !     Treated in a purely linear way.                                  *
   !     Input:                                                           *
   !     ftrk      (logical) if true, track orbit.                        *
@@ -7043,23 +7045,101 @@ SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
   logical :: ftrk, fmap,fsec
   double precision :: orbit(6);
 
-  double precision :: x, y, z
+  double precision :: dx, dy, dz, pz, csq, csq32, csq52, beta_pt
   double precision :: node_value, ek(6), re(6,6), te(6,6,6)
+  double precision :: x, px, y, py, t, pt
 
+  RE=EYE
+  te=zero
+  !---- Get translation parameters
+  dx    = node_value('dx ')
+  dy    = node_value('dy ')
+  dz    = node_value('ds ')
+ 
+  x  = orbit(1)
+  px = orbit(2)
+  y  = orbit(3)
+  py = orbit(4)
+  t  = orbit(5)
+  pt = orbit(6)
+  
+  csq = one + two*pt/beta + pt**2 - px**2 - py**2
+  pz  = sqrt(csq)
+  csq32 = csq**(3d0/2d0)
+  csq52 = two*csq**(5d0/2d0)
+  beta_pt = pt + 1d0/beta
 
- !---- Get translation parameters
- x    = node_value('dx ')
- y    = node_value('dy ')
- z    = node_value('ds ')
+  orbit(1) = orbit(1) - dx + dz*px/pz
+  orbit(3) = orbit(3) - dy + dz*py/pz
+  orbit(5) = orbit(5) - dz*(one/beta + pt)/pz
 
- ek(1) = ek(1) - x
- ek(3) = ek(3) - y
- ek(5) = ek(5) - z/beta
+  fmap = .True.
+  re(1,2) = dz/pz + dz*px**2d0/csq32
+  re(1,4) = dz*px*py/csq32
+  re(1,6) = dz*px*(-pt - 1d0/beta)/csq32
+  re(3,2) = dz*px*py/csq32
+  re(3,4) = dz/pz + dz*py**2d0/csq32
+  re(3,6) = dz*py*(-pt - 1d0/beta)/csq32
+  re(5,2) = -dz*px*(beta_pt)/csq32
+  re(5,4) = -dz*py*(beta_pt)/csq32
+  re(5,6) = -dz/pz - dz*(-pt - 1d0/beta)*(beta_pt)/csq32
 
-  !---- Track orbit.
- if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  te(1,2,2) = 3d0*dz*px/(2d0*csq32) + & 
+ 3d0*dz*px**3d0/(csq52)
+te(1,2,4) = dz*py/(2d0*csq32) + & 
+ 3d0*dz*px**2d0*py/(csq52)
+te(1,2,6) = dz*(-pt - 1d0/beta)/(2d0*csq32) + & 
+ dz*px**2d0*(-3d0*pt - 3d0/beta)/(csq52)
+te(1,4,2) = dz*py/(2d0*csq32) + & 
+ 3d0*dz*px**2d0*py/(csq52)
+te(1,4,4) = dz*px/(2d0*csq32) + & 
+ 3d0*dz*px*py**2d0/(csq52)
+te(1,4,6) = dz*px*py*(-3d0*pt - 3d0/beta)/(csq52)
+te(1,6,2) = dz*(-pt - 1d0/beta)/(2d0*csq32) + & 
+ 3d0*dz*px**2d0*(-pt - 1d0/beta)/(csq52)
+te(1,6,4) = 3d0*dz*px*py*(-pt - 1d0/beta)/(csq52)
+te(1,6,6) = -dz*px/(2d0*csq32) + & 
+ dz*px*(-3d0*pt - 3d0/beta)*(-pt - 1d0/beta)/(csq52)
+te(3,2,2) = dz*py/(2d0*csq32) + & 
+ 3d0*dz*px**2d0*py/(csq52)
+te(3,2,4) = dz*px/(2d0*csq32) + & 
+ 3d0*dz*px*py**2d0/(csq52)
+te(3,2,6) = dz*px*py*(-3d0*pt - 3d0/beta)/(csq52)
+te(3,4,2) = dz*px/(2d0*csq32) + & 
+ 3d0*dz*px*py**2d0/(csq52)
+te(3,4,4) = 3d0*dz*py/(2d0*csq32) + & 
+ 3d0*dz*py**3d0/(csq52)
+te(3,4,6) = dz*(-pt - 1d0/beta)/(2d0*csq32) + & 
+ dz*py**2d0*(-3d0*pt - 3d0/beta)/(csq52)
+te(3,6,2) = 3d0*dz*px*py*(-pt - 1d0/beta)/(csq52)
+te(3,6,4) = dz*(-pt - 1d0/beta)/(2d0*csq32) + & 
+ 3d0*dz*py**2d0*(-pt - 1d0/beta)/(csq52)
+te(3,6,6) = -dz*py/(2d0*csq32) + & 
+ dz*py*(-3d0*pt - 3d0/beta)*(-pt - 1d0/beta)/(csq52)
+te(5,2,2) = -dz*(pt + & 
+ 1d0/beta)/(2d0*csq32) - 3d0*dz*px**2d0*(pt + & 
+ 1d0/beta)/(csq52)
+te(5,2,4) = -3d0*dz*px*py*(beta_pt)/(csq52)
+te(5,2,6) = -dz*px/(2d0*csq32) - dz*px*(-3d0*pt - 3d0/beta)*(pt + & 
+ 1d0/beta)/(csq52)
+te(5,4,2) = -3d0*dz*px*py*(beta_pt)/(csq52)
+te(5,4,4) = -dz*(pt + & 
+ 1d0/beta)/(2d0*csq32) - 3d0*dz*py**2d0*(pt + & 
+ 1d0/beta)/(csq52)
+te(5,4,6) = -dz*py/(2d0*csq32) - dz*py*(-3d0*pt - 3d0/beta)*(pt + & 
+ 1d0/beta)/(csq52)
+te(5,6,2) = -dz*px/(2d0*csq32) - 3d0*dz*px*(-pt - 1d0/beta)*(pt + & 
+ 1d0/beta)/(csq52)
+te(5,6,4) = -dz*py/(2d0*csq32) - 3d0*dz*py*(-pt - 1d0/beta)*(pt + & 
+ 1d0/beta)/(csq52)
+te(5,6,6) = -dz*(-pt - 1d0/beta)/csq32 + & 
+ dz*(pt + & 
+ 1d0/beta)/(2d0*csq32) - dz*(-3d0*pt - 3d0/beta)*(-pt - 1d0/beta)*(pt + & 
+ 1d0/beta)/(csq52)
+
 
 end SUBROUTINE tmtrans
+
 
 SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
