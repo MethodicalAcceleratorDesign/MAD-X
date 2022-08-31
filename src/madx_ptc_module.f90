@@ -564,6 +564,14 @@ CONTAINS
 
     ord_max = -1
 
+    exact1=node_value("exact ")
+
+    if(exact1.eq.0.or.exact1.eq.1) then
+       EXACT_MODEL = exact1 .ne. 0
+    else
+       EXACT_MODEL = exact0
+    endif
+
     call zero_key(key)
 
     !j=j+1
@@ -615,14 +623,6 @@ CONTAINS
        metd = method1
     else
        metd = method0
-    endif
-
-    exact1=node_value("exact ")
-
-    if(exact1.eq.0.or.exact1.eq.1) then
-       EXACT_MODEL = exact1 .ne. 0
-    else
-       EXACT_MODEL = exact0
     endif
 
     !special node keys

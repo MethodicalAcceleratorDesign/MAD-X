@@ -2247,3 +2247,15 @@ double precision function bips(a, mmax1)
        &a*(4576d0/dble(11+mmax1)+7d0*a*(-(624d0/dble(12+mmax1))+(598d0*&
        &a)/dble(13+mmax1)-(575d0*a**2)/dble(14+mmax1)))))))))))))/8388608d0;
 end function bips
+
+! sin(x)/x, with prper handling of values near zero
+function sinc(x)
+  real(kind(1d0)), intent(in) :: x
+  real(kind(1d0)) :: sinc
+  real(kind(1d0)), parameter :: e = 1.5d0*sqrt(epsilon(1d0))
+  if (abs(x) < e) then
+     sinc = 1d0 - (x*x)/6d0
+  else
+     sinc = sin(x) / x
+  end if
+end function sinc

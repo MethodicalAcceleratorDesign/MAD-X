@@ -44,6 +44,7 @@ module madx_ptc_twiss_module
      real(dp), dimension(6)   ::  disp_p3 ! third order derivatives of dispersion w.r.t delta_p
      real(dp), dimension(3)   ::  tune
      real(dp), dimension(6,6) ::  eigen
+     real(dp), dimension(3,7) ::  n_spin
   end type twiss
 
   interface assignment (=)
@@ -115,7 +116,7 @@ module madx_ptc_twiss_module
 
   character(48)           :: nl_table_name='nonlin'
   character(48)           :: rdt_table_name='twissrdt'
-
+  character(48)           :: spin_table_name='twiss_spin'
   !============================================================================================
   !  variables for spin treatment in equaltwiss subroutine
   type(c_damap)           :: tw_SpinUmap, tw_SpinUmapCanonic, tw_D, tw_A, tw_R, tw_f,  tw_b
@@ -425,7 +426,9 @@ contains
       write(6,format7) latticefun%s(3,1,0:6)
       write(6,format7) latticefun%s(3,2,0:6)
       write(6,format7) latticefun%s(3,3,0:6)
-      
+      s1%n_spin(1,1:7) = latticefun%s(2,1,0:6)
+      s1%n_spin(2,1:7) = latticefun%s(2,2,0:6)
+      s1%n_spin(3,1:7) = latticefun%s(2,3,0:6)
       theAscriptProbe8 = theAscriptProbeBak + tw_SpinUmapCanonic
       
     else
@@ -1284,6 +1287,7 @@ contains
             suml = s;
 
             call puttwisstable(theTransferMap%x)
+            if(dospin) call putspintable()
             if(doRDTtracking)   call putrdttable(current)
             if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
@@ -1307,6 +1311,7 @@ contains
           endif
 
           call puttwisstable(theTransferMap%x)
+          if (dospin) call putspintable()
           if(doRDTtracking)   call putrdttable(current)
           if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
@@ -1398,7 +1403,7 @@ contains
         endif
 
         !print*,"Skowron 6 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
-
+        if(dospin) call putspintable()
         if(doRDTtracking)   call putrdttable(current)
         if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x,A_script_probe%x)
 
@@ -1813,6 +1818,20 @@ contains
     end function getdeltae
     !____________________________________________________________________________________________
 
+    subroutine putspintable()
+        implicit none
+        real(dp) :: tmp_vector(6)
+        call string_to_table_curr(spin_table_name,"name ","name ")
+        call double_to_table_curr(spin_table_name, 's ', suml)
+        call double_to_table_curr(spin_table_name, 'n0x ', tw%n_spin(1,1))
+        call double_to_table_curr(spin_table_name, 'n0y ', tw%n_spin(2,1))
+        call double_to_table_curr(spin_table_name, 'n0z ', tw%n_spin(3,1))
+        call vector_to_table_curr(spin_table_name, 'n0xdx ',tw%n_spin(1,2:7), 6)
+        call vector_to_table_curr(spin_table_name, 'n0ydx ',tw%n_spin(2,2:7), 6)
+        call vector_to_table_curr(spin_table_name, 'n0zdx ',tw%n_spin(3,2:7), 6)
+        call augment_count(spin_table_name)
+
+    end subroutine
     subroutine puttwisstable(transfermap,transfermapSaved)
       implicit none
       include "madx_ptc_knobs.inc"
@@ -1876,7 +1895,7 @@ contains
 
           tmpa6 = tmpa66(:,6)
           tmpa66(:,6) = tmpa66(:,5)
-          tmpa66(:,5) = tmpa6
+          tmpa66(:,5) = -tmpa6
 
 
           opt_fun( 1:6 ) = tmpa66(1,:)
@@ -1884,7 +1903,7 @@ contains
           opt_fun(13:18) = tmpa66(3,:)
           opt_fun(19:24) = tmpa66(4,:)
           opt_fun(31:36) = tmpa66(5,:)
-          opt_fun(25:30) = tmpa66(6,:)
+          opt_fun(25:30) = -tmpa66(6,:)
 
         else
 
@@ -1892,7 +1911,7 @@ contains
           opt_fun(2) = transfermap(1).sub.fo(2,:)
           opt_fun(3) = transfermap(1).sub.fo(3,:)
           opt_fun(4) = transfermap(1).sub.fo(4,:)
-          opt_fun(5) = transfermap(1).sub.fo(6,:)
+          opt_fun(5) = -transfermap(1).sub.fo(6,:)
           opt_fun(6) = transfermap(1).sub.fo(5,:)
 
 
@@ -1900,37 +1919,37 @@ contains
           opt_fun(8) = transfermap(2).sub.fo(2,:)
           opt_fun(9) = transfermap(2).sub.fo(3,:)
           opt_fun(10)= transfermap(2).sub.fo(4,:)
-          opt_fun(11)= transfermap(2).sub.fo(6,:)
+          opt_fun(11)= -transfermap(2).sub.fo(6,:)
           opt_fun(12)= transfermap(2).sub.fo(5,:)
 
           opt_fun(13)= transfermap(3).sub.fo(1,:)
           opt_fun(14)= transfermap(3).sub.fo(2,:)
           opt_fun(15)= transfermap(3).sub.fo(3,:)
           opt_fun(16)= transfermap(3).sub.fo(4,:)
-          opt_fun(17)= transfermap(3).sub.fo(6,:)
+          opt_fun(17)= -transfermap(3).sub.fo(6,:)
           opt_fun(18)= transfermap(3).sub.fo(5,:)
 
           opt_fun(19)= transfermap(4).sub.fo(1,:)
           opt_fun(20)= transfermap(4).sub.fo(2,:)
           opt_fun(21)= transfermap(4).sub.fo(3,:)
           opt_fun(22)= transfermap(4).sub.fo(4,:)
-          opt_fun(23)= transfermap(4).sub.fo(6,:)
+          opt_fun(23)= -transfermap(4).sub.fo(6,:)
           opt_fun(24)= transfermap(4).sub.fo(5,:)
 
 
-          opt_fun(25)= transfermap(6).sub.fo(1,:)
-          opt_fun(26)= transfermap(6).sub.fo(2,:)
-          opt_fun(27)= transfermap(6).sub.fo(3,:)
-          opt_fun(28)= transfermap(6).sub.fo(4,:)
+          opt_fun(25)= -transfermap(6).sub.fo(1,:)
+          opt_fun(26)= -transfermap(6).sub.fo(2,:)
+          opt_fun(27)= -transfermap(6).sub.fo(3,:)
+          opt_fun(28)= -transfermap(6).sub.fo(4,:)
           opt_fun(29)= transfermap(6).sub.fo(6,:)
-          opt_fun(30)= transfermap(6).sub.fo(5,:)
+          opt_fun(30)= -transfermap(6).sub.fo(5,:)
 
 
           opt_fun(31)= transfermap(5).sub.fo(1,:)
           opt_fun(32)= transfermap(5).sub.fo(2,:)
           opt_fun(33)= transfermap(5).sub.fo(3,:)
           opt_fun(34)= transfermap(5).sub.fo(4,:)
-          opt_fun(35)= transfermap(5).sub.fo(6,:)
+          opt_fun(35)= -transfermap(5).sub.fo(6,:)
           opt_fun(36)= transfermap(5).sub.fo(5,:)
 
         endif
@@ -2345,36 +2364,36 @@ contains
       re(1,3) = get_value('ptc_twiss ','re13 ')
       re(1,4) = get_value('ptc_twiss ','re14 ')
       re(1,5) = get_value('ptc_twiss ','re16 ')
-      re(1,6) = get_value('ptc_twiss ','re15 ')
+      re(1,6) = -get_value('ptc_twiss ','re15 ')
       re(2,1) = get_value('ptc_twiss ','re21 ')
       re(2,2) = get_value('ptc_twiss ','re22 ')
       re(2,3) = get_value('ptc_twiss ','re23 ')
       re(2,4) = get_value('ptc_twiss ','re24 ')
       re(2,5) = get_value('ptc_twiss ','re26 ')
-      re(2,6) = get_value('ptc_twiss ','re25 ')
+      re(2,6) = -get_value('ptc_twiss ','re25 ')
       re(3,1) = get_value('ptc_twiss ','re31 ')
       re(3,2) = get_value('ptc_twiss ','re32 ')
       re(3,3) = get_value('ptc_twiss ','re33 ')
       re(3,4) = get_value('ptc_twiss ','re34 ')
       re(3,5) = get_value('ptc_twiss ','re36 ')
-      re(3,6) = get_value('ptc_twiss ','re35 ')
+      re(3,6) = -get_value('ptc_twiss ','re35 ')
       re(4,1) = get_value('ptc_twiss ','re41 ')
       re(4,2) = get_value('ptc_twiss ','re42 ')
       re(4,3) = get_value('ptc_twiss ','re43 ')
       re(4,4) = get_value('ptc_twiss ','re44 ')
       re(4,5) = get_value('ptc_twiss ','re46 ')
-      re(4,6) = get_value('ptc_twiss ','re45 ')
+      re(4,6) = -get_value('ptc_twiss ','re45 ')
       re(5,1) = get_value('ptc_twiss ','re61 ')
       re(5,2) = get_value('ptc_twiss ','re62 ')
       re(5,3) = get_value('ptc_twiss ','re63 ')
       re(5,4) = get_value('ptc_twiss ','re64 ')
       re(5,5) = get_value('ptc_twiss ','re66 ')
-      re(5,6) = get_value('ptc_twiss ','re65 ')
-      re(6,1) = get_value('ptc_twiss ','re51 ')
-      re(6,2) = get_value('ptc_twiss ','re52 ')
-      re(6,3) = get_value('ptc_twiss ','re53 ')
-      re(6,4) = get_value('ptc_twiss ','re54 ')
-      re(6,5) = get_value('ptc_twiss ','re56 ')
+      re(5,6) = -get_value('ptc_twiss ','re65 ')
+      re(6,1) = -get_value('ptc_twiss ','re51 ')
+      re(6,2) = -get_value('ptc_twiss ','re52 ')
+      re(6,3) = -get_value('ptc_twiss ','re53 ')
+      re(6,4) = -get_value('ptc_twiss ','re54 ')
+      re(6,5) = -get_value('ptc_twiss ','re56 ')
       re(6,6) = get_value('ptc_twiss ','re55 ')
 
     end subroutine readrematrix

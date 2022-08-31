@@ -1,0 +1,151 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.05.24 13:42:26      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+sslast: sequence, l=10;
+
+m1: marker, at=0;
+
+m2: marker, at=0;
+
+m3: marker, at=1;
+
+m4: marker, at=1;
+
+m5: marker, at=2;
+
+m6: marker, at=3;
+
+m7: marker, at=3;
+
+m8: marker, at=4;
+
+m9: marker, at=4;
+
+endsequence;
+
+
+
+n2: marker;
+
+n3: marker;
+
+n5: marker;
+
+n9: marker;
+
+
+
+
+
+seqedit,sequence=sslast;
+
+install,element=n2,at=0,last=true;
+
+install,element=n3,at=0,last=true;
+
+install,element=n5,at=2,last=true;
+
+install,element=n9,at=4,last=true;
+
+endedit;
+
+++++++ info: seqedit - number of elements installed:  4
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+
+
+save,sequence=sslast,file=sslast;
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+
+
+
+
+ssfirst: sequence, l=10;
+
+m1: marker, at=0;
+
+++++++ warning: implicit element re-definition ignored: m1
+m2: marker, at=0;
+
+++++++ warning: implicit element re-definition ignored: m2
+m3: marker, at=1;
+
+++++++ warning: implicit element re-definition ignored: m3
+m4: marker, at=1;
+
+++++++ warning: implicit element re-definition ignored: m4
+m5: marker, at=2;
+
+++++++ warning: implicit element re-definition ignored: m5
+m6: marker, at=3;
+
+++++++ warning: implicit element re-definition ignored: m6
+m7: marker, at=3;
+
+++++++ warning: implicit element re-definition ignored: m7
+m8: marker, at=4;
+
+++++++ warning: implicit element re-definition ignored: m8
+m9: marker, at=4;
+
+++++++ warning: implicit element re-definition ignored: m9
+endsequence;
+
+
+
+n2: marker;
+
+++++++ info: element redefined: n2
+n3: marker;
+
+++++++ info: element redefined: n3
+n5: marker;
+
+++++++ info: element redefined: n5
+n9: marker;
+
+++++++ info: element redefined: n9
+
+
+
+
+seqedit,sequence=ssfirst;
+
+install,element=n2,at=0,last=false;
+
+install,element=n3,at=0,last=false;
+
+install,element=n5,at=2,last=false;
+
+install,element=n9,at=4,last=false;
+
+endedit;
+
+++++++ info: seqedit - number of elements installed:  4
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+
+
+save,sequence=ssfirst,file=ssfirst;
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+
+
+
+  Number of warnings: 11
+11 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
