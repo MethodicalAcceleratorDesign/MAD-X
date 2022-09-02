@@ -6,7 +6,8 @@ cd build
 
 : ${PY:=/opt/python/cp37-cp37m/bin}
 
-$PY/pip install --upgrade cmake
+apt-get install cmake
+#$PY/pip install --upgrade cmake
 $PY/cmake .. \
     -DBUILD_SHARED_LIBS=OFF \
     -DMADX_STATIC=ON \
