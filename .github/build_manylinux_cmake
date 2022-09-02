@@ -4,7 +4,7 @@ set -ex
 mkdir build
 cd build
 
-: ${PY:=/opt/python/cp36-cp36m/bin}
+: ${PY:=/opt/python/cp37-cp37m/bin}
 
 $PY/pip install --upgrade cmake
 $PY/cmake .. \
