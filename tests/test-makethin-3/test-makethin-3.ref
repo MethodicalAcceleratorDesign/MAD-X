@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:02:09      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.09.02 21:31:12      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
@@ -161,10 +161,8 @@ parameter: aper_offset   double array: 0.000000e+00
 parameter: aper_tol   double array: 0.000000e+00 0.000000e+00 0.000000e+00 
 parameter: aper_vx   double array: -1.000000e+00 
 parameter: aper_vy   double array: -1.000000e+00 
-parameter: slot_id   expression: none :: value:     0.000000
-integer:          0
-parameter: assembly_id   expression: none :: value:     0.000000
-integer:          0
+parameter: slot_id   integer:          0
+parameter: assembly_id   integer:          0
 parameter: mech_sep   double value:    -0.188000
 parameter: v_pos   double value:     0.000000
 parameter: magnet   integer:          1
@@ -217,10 +215,8 @@ parameter: aper_offset   double array: 0.000000e+00
 parameter: aper_tol   double array: 0.000000e+00 0.000000e+00 0.000000e+00 
 parameter: aper_vx   double array: -1.000000e+00 
 parameter: aper_vy   double array: -1.000000e+00 
-parameter: slot_id   expression: none :: value:     0.000000
-integer:          0
-parameter: assembly_id   expression: none :: value:     0.000000
-integer:          0
+parameter: slot_id   integer:          0
+parameter: assembly_id   integer:          0
 parameter: mech_sep   double value:     0.000000
 parameter: v_pos   double value:     0.000000
 parameter: magnet   integer:          1

@@ -3,7 +3,6 @@ amb := 0.01;
 kmb = 0;
 ee1 = 0.001;
 ee2 = 0.0001;
-none = 0;
 lmb2 := lstraight;
 lstraight := lmb/factor;
 factor := amb/(2*sin(amb/2));
