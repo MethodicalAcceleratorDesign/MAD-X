@@ -28,7 +28,7 @@ jobs:
       matrix:
         buildtool: [make, cmake]
         manylinux:
-          - 1_i686
+          # - 1_i686 ## cmake installation fails
           - 1_x86_64
     env:
       ARCH: ${{ contains(matrix.manylinux, 'i686') && '32' || '64' }}
