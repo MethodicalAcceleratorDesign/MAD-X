@@ -45,8 +45,6 @@ beam, particle=positron, energy=2.86,bunched,npart=4.5E+11,
 
 call, file="input/tme-ibs.seq";
 
-none = 0;
-
 ksx1 = 0;
 
 kqfa = 2.492383104;

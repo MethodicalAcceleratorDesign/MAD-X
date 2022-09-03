@@ -4,10 +4,11 @@ set -ex
 mkdir build
 cd build
 
-: ${PY:=/opt/python/cp36-cp36m/bin}
+: ${PY:=/opt/python/cp37-cp37m/bin}
 
-$PY/pip install --upgrade cmake
-$PY/cmake .. \
+#$PY/pip install --upgrade cmake
+#$PY/cmake .. \
+cmake28 .. \
     -DBUILD_SHARED_LIBS=OFF \
     -DMADX_STATIC=ON \
     -DCMAKE_INSTALL_PREFIX=../dist \
@@ -20,7 +21,8 @@ $PY/cmake .. \
     -DMADX_FORCE_32=OFF \
     -DMADX_X11=OFF
 
-$PY/cmake --build . --target install
+##$PY/cmake --build . --target install
+cmake28 --build . --target install
 
 [[ $(arch) == i686 ]] && ARCH=32 || ARCH=64
 

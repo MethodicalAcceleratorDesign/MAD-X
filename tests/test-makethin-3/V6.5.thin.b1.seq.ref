@@ -1,5 +1,4 @@
 const l.omk = 0.000000;
-none = 0.000000;
 const l.mbas2 = 3.000000;
 abas := 2.0*clight/(7e12)*on_atlas;
 on_atlas := 0.000000;
