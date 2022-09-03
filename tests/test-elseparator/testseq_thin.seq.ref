@@ -1,4 +1,3 @@
-none = 0;
 qd11..1: multipole,lrad:= 0.13,knl:={ 0, -0.02658712316};
 qd11..2: multipole,lrad:= 0.13,knl:={ 0, -0.02658712316};
 qd11..3: multipole,lrad:= 0.13,knl:={ 0, -0.02658712316};
