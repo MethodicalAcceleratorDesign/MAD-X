@@ -321,11 +321,16 @@ const char *const_command_def =
 "fast_error_func  = [l, false, true], " /* frs */
 "exit_loss_turn   = [l, false, true], " /* frs */
 "bucket_swap      = [l, false, true], " /* frs Sep. 2017 */
+"sc_setup         = [l, false, true], " /* frs April 2021 */
 "sc_chrom_fix     = [l, true],        " /* frs Sep. 2017 */
 "sc_3d_kick       = [l, false, true], " /* frs June 2018 */
 "sc_3d_beamsize   = [l, false, true], " /* frs May 2019 */
 "sc_3d_periodic   = [l, false, true], " /* frs June 2018 */
 "sc_mult_ord      = [i, 10, 20], "      /* frs May 2019 */
+"sc_mytracksumm_maxlines = [i, 4000008,16000008], "      /* hrr Sep 2021 */
+"sc_mytracksumm_per_turns = [i, 1, 1000], "      /* hrr Sep 2021 */
+"sc_mytracksumm_start_particle = [i, 1], "      /* hrr Sep 2021 */
+"sc_mytracksumm_end_particle = [i, 0], "      /* hrr Sep 2021 */
 "sc_3d_kick_long  = [l, false, true]; " /* frs June 2018 */
 " "
 "plot: control none 0 0 "

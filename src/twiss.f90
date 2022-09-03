@@ -25,7 +25,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   double precision :: s0mat(6,6), eig_tol ! initial sigma matrix
   character(len=48) :: charconv
   character(len=150) :: warnstr
-  logical :: fast_error_func
+  logical :: fast_error_func, sc_setup
 
   double precision, external :: get_value
   integer, external :: get_option
@@ -73,6 +73,12 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   suml=zero; circ=zero; eta=zero; alfa=zero; gamtr=zero; wgt=zero
 
+  !---- Setup SC procedures
+  sc_setup = get_option('sc_setup ') .ne. 0
+  if(sc_setup) then
+     call SC_Setup_Procedure
+  endif
+  
   !---- Track chromatic functions
   chrom = get_option('twiss_chrom ')
 
@@ -3518,6 +3524,7 @@ SUBROUTINE tw_summ(rt,tt)
      ay0 = wy * sin(phiy)
      xiy = dmuy + frt(3,4) * (frt(3,4) * ay0 - tb * by0) / t2        &
           + (frt(3,3) * frtp(3,4) - frt(3,4) * frtp(3,3)) / bety
+!         print *," hrr xix 1 GIT= ",xix
      xiy = xiy / twopi
      alfa  = zero
      gamtr = zero
@@ -3528,15 +3535,18 @@ SUBROUTINE tw_summ(rt,tt)
   else
      sd = rt(5,6)
      sx = tt(1,1,6) + tt(2,2,6)
+!         print *," hrr xix 3 GIT= ",sx,tt(1,1,6),tt(2,2,6)
      sy = tt(3,3,6) + tt(4,4,6)
 
      do i = 1, 4
         sd = sd + rt(5,i) * disp(i)
+!         print *," hrr xix 4 GIT= ",i,sx,disp0(i)
         sx = sx + (tt(1,1,i) + tt(2,2,i)) * disp0(i)
         sy = sy + (tt(3,3,i) + tt(4,4,i)) * disp0(i)
      enddo
 
      xix = - sx / (twopi * sinmux)
+!         print *," hrr xix 2 GIT= ",xix,sx,twopi,sinmux
      xiy = - sy / (twopi * sinmuy)
      eta = - sd * beta**2 / suml
 
