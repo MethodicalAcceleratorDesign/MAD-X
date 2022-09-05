@@ -3697,6 +3697,7 @@ end subroutine trsol
 
 subroutine tttrans(track,ktrack)
   use trackfi, only : beti
+  use math_constfi, only : one, two
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3709,7 +3710,7 @@ subroutine tttrans(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: t_x, t_y, t_z
+  double precision :: t_x, t_y, t_z, pz
   double precision :: node_value
 
 
@@ -3723,15 +3724,17 @@ subroutine tttrans(track,ktrack)
  !$OMP PARALLEL PRIVATE(i)
  !$OMP DO
   do  i = 1, ktrack
+     pz = sqrt(one + two*track(6,i)*beti + track(6,i)**2 - track(2,i)**2 - track(4,i)**2)
      ! Add vector to particle coordinates
-     track(1,i) = track(1,i) - t_x
-     track(3,i) = track(3,i) - t_y
-     track(5,i) = track(5,i) - t_z*beti
+     track(1,i) = track(1,i) - t_x + t_z*track(2,i)/pz
+     track(3,i) = track(3,i) - t_y + t_z*track(4,i)/pz
+     track(5,i) = track(5,i) - t_z*(beti+track(6,i))/pz
   enddo
 
  !$OMP END DO
  !$OMP END PARALLEL
 end subroutine tttrans
+
 
 subroutine tttrak(ek,re,track,ktrack)
   implicit none
