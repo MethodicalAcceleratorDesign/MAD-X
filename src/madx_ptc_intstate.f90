@@ -15,6 +15,7 @@ module madx_ptc_intstate_module
   public                            :: setenforce6D
   public                            :: ptc_setdebuglevel
   public                            :: ptc_setmapdumplevel
+  public                            :: ptc_setmadprint
   public                            :: ptc_setseed
   public                            :: ptc_setaccel_method
   public                            :: ptc_setexactmis
@@ -23,6 +24,7 @@ module madx_ptc_intstate_module
   public                            :: ptc_settotalpath
   public                            :: ptc_settime
   public                            :: ptc_setnocavity
+  public                            :: ptc_setspin
   public                            :: ptc_setstochastic
   public                            :: ptc_setenvelope
   public                            :: ptc_setfringe
@@ -140,6 +142,19 @@ contains
   !____________________________________________________________________________________________
 
 
+  subroutine ptc_setmadprint(level)
+    use precision_constants, only : madxprint ! LD:13.01.2022
+    implicit none
+    integer     :: level
+
+    if (level > 0) then
+        print *, "Setting madprint level to", level
+    end if
+    madxprint = level.ne.0
+
+  end subroutine ptc_setmadprint
+
+  !____________________________________________________________________________________________
   subroutine ptc_setseed(seed)
     USE gauss_dis
     implicit none
@@ -262,6 +277,28 @@ contains
     call update_states
     if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setmodulation
+  !____________________________________________________________________________________________
+
+  subroutine ptc_setspin(flag)
+    implicit none
+    integer    :: flag
+
+    if (flag == 1) then
+       if (getdebug() > 1) then
+           print *, "Switching ON spin"
+       end if
+       intstate = intstate + spin0
+    else
+       if (getdebug() > 1) then
+           print *, "Switching OFF spin"
+       end if
+       intstate = intstate - spin0
+    endif
+
+    default = intstate
+    call update_states
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
+  end subroutine ptc_setspin
   !____________________________________________________________________________________________
 
   subroutine ptc_setstochastic(flag)

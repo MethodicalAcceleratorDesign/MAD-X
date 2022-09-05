@@ -441,7 +441,7 @@ double precision function fitlyap(distvect, onelog, turnnumber, nturn, deltax)
   if ( maxval(DELTALOG(4:6)) + 1.d0 .ge. dlmax ) & 
        fitlyap2 = maxval(DELTALOG(4:6))
   
-  write(69,*) 'deltalogs: ', deltalog(1:6), 'fitlyaps: ', fitlyap, fitlyap2, & 
+   write(69,*) 'deltalogs: ', deltalog(1:6), 'fitlyaps: ', fitlyap, fitlyap2, &
        ' nturn and i:', nturn, i
 end function fitlyap
 

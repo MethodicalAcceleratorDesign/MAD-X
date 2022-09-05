@@ -1,18 +1,18 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:08:54      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:08:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -echo;
 
 @ NAME             %03s "TTT"
 @ TYPE             %04s "USER"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "14/12/17"
-@ TIME             %08s "18.08.54"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "10/12/21"
+@ TIME             %08s "13.08.52"
 *                  A                  B 
 $                %le                %le 
                   1                 -2

@@ -11,9 +11,9 @@ struct char_p_array;
 double myatof(const char *instr);
 char* mycpy(char* sout, const char* sin);
 char* mystrchr(char* string, char c);
-void  mystrcpy(struct char_array* target, char* source);
+void  mystrcpy(struct char_array* target, const char *source);
 char* mystrstr(char* string, const char* s);
-void  myrepl(const char* in, const char* out, char* string_in, char* string_out);
+void  myrepl(const char* in, const char* out, const char* string_in, char* string_out);
 int   mysplit(char* buf, struct char_p_array* list);
 
 void  conv_char(const char* string, struct int_array* tint);

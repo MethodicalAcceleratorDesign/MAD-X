@@ -28,7 +28,12 @@
 #                added shrink tests in test-setvars_lin and renamed to test-table
 # 2016-Jun-16  14:25:56  Irina:
 #                added test-twiss-12 for sigma matrix calculation
-#################################################
+# 2021-Sep-02  20:59:00 ghislain:
+#                added test-taper
+# 2022-Jul-06  jsberg-bnl:
+#                added test comparing PTC to TWISS/TRACK for [XY]ROTATION
+# 2022-Jun-21  jsberg-bnl:
+#                added test-twiss-16 for exact TWISS drift compared to PTC
 # testsuite
 
 # variables:
@@ -44,15 +49,18 @@ tests-all = \
 test-table test-table-2 \
 test-memory test-control \
 \
-test-makethin test-makethin-2 test-makethin-3 test-makethin-4 test-elseparator\
+test-makethin test-makethin-2 test-makethin-3 test-makethin-4 \
+test-elseparator\
 test-survey test-survey-2 test-survey-3 test-survey-4 \
+test-taper \
 test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 \
 test-track-7 test-track-8 test-track-9 test-track-10 test-track-11 test-track-12 test-track-13 test-track-14 \
-test-track-acd test-track-rotations \
+test-track-acd test-track-rotations test-beambeam-npart \
 test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 \
-test-twiss-6 test-twiss-8 test-twiss-9 test-twiss-10 test-twiss-11 test-tapering \
-test-twiss-12 test-twiss-13 test-twiss-14 test-twiss-15 test-translation test-crabcavity \
-test-xrotation test-yrotation test-rotations test-interpolate test-rf-fringe \
+test-twiss-6 test-twiss-8 test-twiss-9 test-twiss-10 test-twiss-11 \
+test-twiss-12 test-twiss-13 test-twiss-14 test-twiss-15 test-twiss-16 test-twiss-17 \
+test-twiss-exact test-translation  test-translation-2 test-crabcavity \
+test-xrotation test-yrotation test-rotations test-rotations-2 test-interpolate test-rf-fringe \
 test-cororbit test-cororbit-2 test-cororbit-3 test-cororbit-4 \
 test-emit test-emit-2 \
 test-ibs test-ibs-2 test-ibs-3 test-ibs-4 \
@@ -66,18 +74,18 @@ test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 test-match-3 test-match-4 \
 test-match-5 test-match-6 test-match-7 test-match-8 test-match-9 test-match-10\
 test-aperture test-aperture-2 test-aperture-3 \
-test-beam test-addexpression test-read-write-hex test-save-state \
-test-permalign test-permalign-2 \
+test-beam test-addexpression test-read-write-hex \
+test-permalign test-permalign-2 test-permalign-3 test-permalign-4 \
 \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 test-rfmultipole-7 \
 \
 test-ptc-elements \
 test-rfmultipole-ptc-1 \
-test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 test-ptc-twiss-4 \
-test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 test-ptc-twiss-old6 test-ptc-twiss-old7 \
+test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 test-ptc-twiss-4 test-ptc-twiss-6D-spin \
+test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 test-ptc-twiss-old7 \
 test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D test-ptc-twiss-6D-ALS \
-test-ptc-twiss-accel-56D test-ptc-twiss-56Dt-ini_map_man test-ptc-twiss-56Dt-ini_mtx_man test-ptc-twiss-56Dt-ini_mtx_tbl \
-test-ptc-normal test-ptc-normal-5D-beambeam \
+test-ptc-twiss-accel-56D test-ptc-twiss-56Dt-ini_map_man test-ptc-twiss-56Dt-ini_mtx_man test-ptc-twiss-56Dt-ini_mtx_tbl test-ptc-twiss-tilt \
+test-ptc-normal test-ptc-normal-5D-beambeam test-ptc-twiss-rotations \
 test-ptc-twiss-normal-genfu test-ptc-twiss-normal-5D test-ptc-twiss-normal-6D test-ptc-twiss-maptable \
 test-ptc-track test-ptc-track-2 test-ptc-track-3 test-ptc-track-4 test-ptc-track-5 \
 test-ptc-track-acd test-ptc-track-acd-2 test-ptc-track-6Dtl-acd \
@@ -85,11 +93,11 @@ test-ptc-track-polygonaper \
 test-ptc-trackline test-ptc-trackline-2 test-ptc-trackline-3 \
 test-ptc-align test-ptc-align-2 \
 test-touschek test-touschek-2 \
-test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 test-sequence-7 test-sequence-8 test-sequence-9\
+test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 test-sequence-7 test-sequence-8 test-sequence-9 test-sequence-10\
 test-line \
 test-plot test-plot-2 \
 test-setknob test-fillknob \
-test-coupling test-coupling-2 \
+test-coupling test-coupling-2 test-coupling-dqmin \
 test-machine-clear \
 \
 $(call onlx64,$(user-cases),)
@@ -98,12 +106,13 @@ $(call onlx64,$(user-cases),)
 # to know the timing: make tests-all TIMER=time (on Unixes)
 tests-long = \
 test-memory \
+test-taper \
 test-track-7 test-track-8 test-track-10 test-track-11 \
 test-dynap \
 test-c6t-4 \
 test-match-6 test-match-7 \
 test-ptc-twiss-2 \
-test-ptc-twiss-old6 test-ptc-twiss-old7 \
+test-ptc-twiss-old7 \
 test-touschek test-touschek-2 \
 \
 $(call onlx64,$(user-cases),)
@@ -154,7 +163,7 @@ test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
 test-sequence:	     TESTSUITE := Sequence testsuite
 test-survey:         TESTSUITE := Survey testsuite
-test-table:	         TESTSUITE := Table testsuite
+test-table:	     TESTSUITE := Table testsuite
 test-thick-quad:     TESTSUITE := Thick Element testsuite
 test-touschek:       TESTSUITE := Touschek testsuite
 test-track:          TESTSUITE := Track testsuite

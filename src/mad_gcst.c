@@ -118,7 +118,27 @@ const char* const survey_table_cols[] =
   /*==*/
   " "  /* blank terminates */
 };
+const char* const emit_table_cols[] =
+{
+  "parameter", "type", "unit", "mode1", "mode2", "mode3",
+  /*==*/
+  " "  /* blank terminates */
+};
+const int emit_table_types[] =
+{
+  3, 3, 3, 2, 2, 2
+};
 
+const char* const emitsumm_table_cols[] =
+{
+  "u0", "ex", "exn", "ey", "eyn", "et", "sigt", "sige", "qs",
+  /*==*/
+  " "  /* blank terminates */
+};
+const int emitsumm_table_types[] =
+{
+  2, 2, 2, 2, 2, 2, 2, 2, 2
+};
 
 
 const int efield_table_types[] =
@@ -648,8 +668,8 @@ const int summ_table_types[] =
   2, 2, 2, 2, 
   //2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
-  2, 2,
-  2, //for nflips
+  2, 2,   2, //for nflips
+  2, 2
 };
 
 const char* const summ_table_cols[] =
@@ -661,7 +681,7 @@ const char* const summ_table_cols[] =
   //"synch_1","synch_2","synch_3","synch_4","synch_5",
   "synch_1","synch_2","synch_3","synch_4","synch_5",
   "synch_6","synch_8",
-   "nflips", //for nflips
+   "nflips","dqmin", "dqmin_phase", //for nflips
   " "  /* blank terminates */
 };
 
@@ -716,6 +736,17 @@ const int tracksumm_table_types[] =
   1, 1, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
+const int mytracksumm_table_types[] =
+{
+  1, 1, 2, 2, 2, 2, 2, 2, 2, 2
+};  /* hrr Sep 2021 */
+
+const char* const mytracksumm_table_cols[] =
+{
+  "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
+  " "  /* blank terminates */
+};  /* hrr Sep 2021 */
+
 const char* const tracksumm_table_cols[] =
 {
   "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
@@ -740,6 +771,17 @@ const char* const trackloss_table_cols[] =
   "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e", "element",
   " "  /* blank terminates */
 };
+
+const int mytrackloss_table_types[] =
+{
+  1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3
+}; /* hrr Sep 2021 */
+
+const char* const mytrackloss_table_cols[] =
+{
+  "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e", "element",
+  " "  /* blank terminates */
+}; /* hrr Sep 2021 */
 
 const int dynap_table_types[] =
 {

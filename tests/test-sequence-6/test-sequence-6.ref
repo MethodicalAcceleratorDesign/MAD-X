@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:08:43      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:08:47      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "test sequence manipulations";
 
@@ -134,11 +134,11 @@ SEQEDIT,SEQUENCE=PR.BHT000001;
 
 
 TOP Expand_sequence name pr.bht000001 with length 5.003185e+00, ref_flag 0
- REPLACE, element=PR.BHT000001.corr3, by=aa;       
+ REPLACE, element=PR.BHT000001.corr3, by=aa;
 
  REMOVE, element=PR.BHT000001.corr1;
 
- INSTALL, ELEMENT=aa, AT= 2.985726e-01, FROM=pr.bht000001$start;
+ INSTALL, ELEMENT=aa, AT= 2.985726e-01, FROM=pr.bht000001$start,last=false;
 
    in get_node_pos: name: pr.bht000001$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
 	 in get_node_pos: name: pr.bht000001$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 

@@ -596,7 +596,7 @@ contains
           nda_dab = nda_dab + 1
           ind=nda_dab
           if(nda_dab.gt.lda) then
-             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(line,'(a52)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,1'
              ipause=mypauses(8,line)
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -696,7 +696,7 @@ contains
              nda_dab = nda_dab + 1
              ind=nda_dab
              if(nda_dab.gt.lda) then
-                write(6,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+                write(6,'(a52)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,2'
                 !    ipause=mypauses(10,line)
                 call dadeb !(31,'ERR DAALL ',1)
                 stop 111
@@ -798,7 +798,7 @@ contains
           nda_dab = nda_dab + 1
           ind=nda_dab
           if(nda_dab.gt.lda) then
-             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(line,'(a52)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,3'
              ipause=mypauses(12,line)
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -900,7 +900,7 @@ contains
           nda_dab = nda_dab + 1
           ind=nda_dab
           if(nda_dab.gt.lda) then
-             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(line,'(a52)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,4'
              ipause=mypauses(12,line)
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -4468,12 +4468,18 @@ contains
     ioa = 0
     if(inva.eq.0) then
        write(iunit,'(A)') '    I  VALUE  '
-       do i = ipoa,ipoa+illa-1
-          write(iunit,'(I6,2X,G20.13)') i-ipoa, cc(i)
-       enddo
+       if (madxprint) then
+         do i = ipoa,ipoa+illa-1
+            write(iunit,'(I6,2X,ES23.16)') i-ipoa, cc(i)
+         enddo
+       else
+         do i = ipoa,ipoa+illa-1
+            write(iunit,'(I6,2X,G20.13)') i-ipoa, cc(i)
+         enddo
+       endif
     elseif(nomax.eq.1) then
-       if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
-       if(illa.eq.0) write(iunit,'(A)') '   ALL COMPONENTS ZERO '
+       if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT             ORDER   EXPONENTS'
+       if(illa.eq.0) write(iunit,'(A)') '         ALL COMPONENTS ZERO '
        do i=1,illa
           do k=1,inva
              j(k)=0
@@ -4483,12 +4489,16 @@ contains
              j(i-1)=1
              ioa=1
           endif
-          write(iunit,'(I6,2X,G20.13,I5,4X,18(2i2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
-          write(iunit,*) cc(ipoa+i-1)
+          if (madxprint) then
+            write(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
+          else
+            write(iunit,'(I6,2X,G20.13,I5,4X,18(2I2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
+            write(iunit,*) cc(ipoa+i-1)
+          endif
        enddo
     else
-       if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
-       if(illa.eq.0) write(iunit,'(A)') '   ALL COMPONENTS ZERO '
+       if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT             ORDER   EXPONENTS'
+       if(illa.eq.0) write(iunit,'(A)') '         ALL COMPONENTS ZERO '
        do ioa = 0,inoa
           do ii=ipoa,ipoa+illa-1
              if(ieo(ia1(i_1(ii))+ia2(i_2(ii))).ne.ioa) goto 100
@@ -4497,9 +4507,12 @@ contains
              if(abs(cc(ii)).gt.eps) then
                 !ETIENNE
                 iout = iout+1
-                write(iunit,'(I6,2X,G20.13,I5,4X,18(2i2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
-                !ETIENNE
-                write(iunit,*) cc(ii)
+                if (madxprint) then
+                  write(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
+                else
+                  write(iunit,'(I6,2X,G20.13,I5,4X,18(2I2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
+                  write(iunit,*) cc(ii)
+                endif
              endif
              !ETIENNE
              !
@@ -4549,16 +4562,18 @@ contains
        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
          '*********************************************'
     else
-        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') "Properties",', NO =',inoa,', NV =',inva,', INA =',ina,&
+       write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') "Properties",', NO =',inoa,', NV =',inva,', INA =',ina,&
          '*********************************************'
-    endif 
+    endif
    !
-    if(illa.ne.0.and.longprint) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
-    if(illa.eq.0.and.longprint) write(iunit,'(A)') '   ALL COMPONENTS ZERO '
+    if(illa.ne.0.and.longprint) write(iunit,'(A)') '     I   COEFFICIENT             ORDER   EXPONENTS'
+    if(illa.eq.0.and.longprint) write(iunit,'(A)') '         ALL COMPONENTS ZERO '
     !
-    c10='      NO ='
-    k10='      NV ='
-    if(longprint)write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
+    if (.not.madxprint) then
+       c10='      NO ='
+       k10='      NV ='
+       if(longprint)write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
+    endif
     iout = 0
     !
     !      DO 100 IOA = 0,INOA
@@ -4606,9 +4621,9 @@ contains
        j(i)=0
     enddo
     if(iout.eq.0) iout=1
-if(longprint) write(iunit,502) -iout,zero,(j(i),i=1,inva)
-if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero "
-!if(.not.longprint) write(iunit,*) " "
+    if(longprint.and.(.not.madxprint)) write(iunit,502) -iout,zero,(j(i),i=1,inva)
+    if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero "
+    !if((.not.longprint).and.(.not.madxprint)) write(iunit,*) " "
     !
     return
       end subroutine dapri77
@@ -4779,11 +4794,15 @@ if((.not.longprint).and.(.not.some)) write(iunit,*) 0," Real Polynomial is zero 
     !
 10  continue
     iin = iin + 1
-    read(iunit,'(I6,2X,G20.13,I5,4X,18(2i2,1X))') ii,c,io,(j(i),i=1,inva)
+    if (madxprint) then
+      read(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+    else
+      read(iunit,'(I6,2X,G20.13,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+    endif
     !
     if(ii.eq.0) goto 20
     !ETIENNE
-    read(iunit,*) c
+    if(.not.madxprint) read(iunit,*) c
     !ETIENNE
     if(ii.ne.iin) then
        iwarin = 1

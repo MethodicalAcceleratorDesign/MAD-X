@@ -31,7 +31,7 @@ from shutil import copyfile
 
 #copyfile(src, dst)
 mypath_orig = '../tests/'
-file1 = open('../myfail.txt', 'r') 
+file1 = open('../onlyfail.out', 'r') 
 Lines = file1.readlines() 
 loc = os.getcwd()
 count = 0
@@ -53,7 +53,7 @@ for line in Lines:
 			print(oname, f)
 			if(isfile(oname)):
 				copyfile(oname, f)
-		if(f.endswith(".out")):
+		if(f.endswith(".out") and f.startswith("test-")):
 			cpname = f[:-4] + ".ref"
 			copyfile(f, cpname)
 

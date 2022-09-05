@@ -223,7 +223,8 @@ parameters must be  used:
      imported from an external file (with the \texttt{READTABLE} command), for
      example to use measured BPM data. In that case, the imported twiss
      table is allowed to contain coordinate data only at the location of
-     the monitors.  
+     the monitors. Note that the list has to be in order and that you
+     cannot skip any locations of the monitors you have included. 
      
    \ttitem{NAME\_COL} The name of the column that contains the name of 
      monitors in the tables. (Default: "\texttt{name}")
@@ -396,11 +397,17 @@ In the orbit program monitors can be randomly disabled and the correct
 option command specifies different seeds for random values:  
 
 \begin{madlist}
-   \ttitem{SEED} Selects a particular seed for the sequence of random values. 
-     The attribute value is an integer in the range [0...999999999], or
-     an expression that evaluates to an integer in the same range 
-     (Default: 123456789). Note that the seed set with this command is shared with the \hyperref[sec:track]{\texttt{TRACK}} and \hyperref[sec:eoption]{\texttt{EOPTION}} commands.
-     See also: \hyperref[subsubsec:random]{Random values}.
+   \ttitem{SEED} Seeds or starts a particular sequence of random values. 
+   A valid \texttt{SEED} value is an integer in the range [0...999999999], or
+   an expression that evaluates to an integer in the same range 
+   (Default: 123456789).\\
+   Internally the code takes as the effective seed the value
+   \texttt{ABS(seed)\%1.e10} hence normalizing the provided seed to an
+   appropriate value in the range irrespective of the provided value. \\
+   Note that the seed set with this command is shared with the
+   \hyperref[sec:track]{\texttt{TRACK}}  and
+   \hyperref[sec:eoption]{\texttt{EOPTION}}  commands.
+   See also: \hyperref[subsubsec:random]{Random values}.
      
    \ttitem{PRINT} A flag taking integer values to control the printout. 
      \\ In general: the higher the value the more printout is produced.  

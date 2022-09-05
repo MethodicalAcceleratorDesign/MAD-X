@@ -12,6 +12,7 @@
  2018 : Thick solenoid slicing, write bend angle to multipole if different from k0*l
  2019 : New elements from element definition, all attributes enabled
  2020 : Tapering, wire compensation
+ 2021 : Permanent misalignment
 
  */
 
@@ -146,8 +147,8 @@ public:
   ~SeqElList(); // destructor
   void Print(std::ostream &StrOut = std::cout) const;
   void slice_node(); // decides what to do : nothing, slice_node_translate, slice_node_default
-  node* current_node() const { return thick_node;} // get
-  void  current_node(node* thisnode) { work_node=thick_node=thisnode; } // set
+  node* curr_node() const { return thick_node;} // get
+  void  curr_node(node* thisnode) { work_node=thick_node=thisnode; } // set
 private:
   double simple_at_shift(const int slices, const int slice_no) const;
   double teapot_at_shift(const int slices, const int slice_no) const;
@@ -155,8 +156,8 @@ private:
   double hybrid_at_shift(const int slices, const int slice_no) const;
   double at_shift(const int slices, const int slice_no,const std::string local_slice_style) const; // return at relative shifts from centre of unsliced magnet
   void kn_ks_from_thick_elem(const element* thick_elem,command_parameter* kn_pars[4],command_parameter* ks_pars[4]) const; // read k0-k3, k0s-k3s in thick_elem and put them in kn_pars, ks_pars
-  void add_ktap(command_parameter* k_param,const element* thick_elem);
-  void add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem);
+  //  void add_ktap(command_parameter* k_param,const element* thick_elem);
+  //  void add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem);
   command_parameter* make_k_list(const std::string parnam,command_parameter* k_pars[4]) const; // from k values 0-3 to  expr lists
   element*   new_marker_element(const std::string el_name, const element* el_inp);
   element*  create_wire_element(const element* thick_elem, int slice_no);
@@ -800,17 +801,8 @@ static command_parameter* par_scaled(const command_parameter* par_inp, const com
   {
     par_out=clone_command_parameter(par_inp); // start from clone of input parameter
     strcpy(par_out->name,new_par_name.c_str());
-    if (length_param->expr ) // first * l, expression or value
-    {
-      if(!par_out->expr) par_out->expr=my_get_param_expression(par_out);
-      par_out->expr = compound_expr(par_out->expr,par_out->double_value,"*",length_param->expr,length_param->double_value,1); // multiply expression with length
-    }
-    else
-    {
-      // if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " multiply par_out->double_value=" << par_out->double_value << '\n';
-      par_out->double_value *= length_param->double_value; // multiply value with length
-      // if(MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << "      now par_out->double_value=" << par_out->double_value << '\n';
-    }
+    if(par_out->expr||length_param->expr) par_out->expr = compound_expr(par_out->expr,par_out->double_value,"*",length_param->expr,length_param->double_value,1); // multiply parameter with length
+    else par_out->double_value*=length_param->double_value;
     if (nslices > 1) // 2nd step, divide by nslices, expression or number
     {
       if (par_out->expr) par_out->expr = compound_expr(par_out->expr,0.,"/",nullptr,nslices,1);
@@ -821,7 +813,7 @@ static command_parameter* par_scaled(const command_parameter* par_inp, const com
       par_out->double_value=my_get_expression_value(par_out->expr);
       par_out->expr=nullptr;
     }
-   }
+  }
   return par_out;
 }
 
@@ -1085,14 +1077,36 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const std::
 }
 
 static void copy_perm_misalign(const node* node,struct node* this_node)
-{ // copy misalign info
-  this_node->perm_misalign=node->perm_misalign;
-  this_node->perm_align=node->perm_align;
+{
+  double start_s_old = node->at_value-(node->length/2);
+  double angle;
+  angle = element_value(node, "angle");
+  double start_s_new =  my_get_expression_value(this_node->at_expr)-(this_node->length/2);
+  double pos_in_node = start_s_new -start_s_old;
+  this_node->perm_misalign=node->perm_misalign; // copy info if perm_misalign present
   if(this_node->perm_misalign>0 && node->perm_align)
-  { //--- warn that angles are currently only copied, not converted
+  {
+    double displace_vector[7];
+    locslice_(&pos_in_node, displace_vector, &angle); // subroutine locslice(spos, displ) in  survey.f90, uses global current_node
+    this_node->perm_align = new(align_info);
+    this_node->perm_align->dx_value    =displace_vector[0];
+    this_node->perm_align->dy_value    =displace_vector[1];
+    this_node->perm_align->ds_value    =displace_vector[2];
+    this_node->perm_align->dphi_value  =displace_vector[3];
+    this_node->perm_align->dtheta_value=displace_vector[4];
+    this_node->perm_align->dpsi_value  =displace_vector[5];
+    this_node->perm_align->dx_expr     =nullptr;
+    this_node->perm_align->dy_expr     =nullptr;
+    this_node->perm_align->ds_expr     =nullptr;
+    this_node->perm_align->dtheta_expr =nullptr;
+    this_node->perm_align->dphi_expr   =nullptr;
+    this_node->perm_align->dpsi_expr   =nullptr;
+    /*
+    //--- warn that angles are currently only copied, not converted
     if(node->perm_align->dtheta_value || my_get_expression_value(node->perm_align->dtheta_expr)) warning("non-zero align_info dtheta not yet converted","just copied");
     if(node->perm_align->dphi_value   || my_get_expression_value(node->perm_align->dphi_expr)  ) warning("non-zero align_info dphi   not yet converted","just copied");
     if(node->perm_align->dpsi_value   || my_get_expression_value(node->perm_align->dpsi_expr)  ) warning("non-zero align_info dpsi   not yet converted","just copied");
+    */
   }
 }
 
@@ -1683,29 +1697,30 @@ void SeqElList::kn_ks_from_thick_elem(const element* thick_elem,command_paramete
   for(unsigned int i=0;i<ks_name.size();++i) ks_pars[i] = (p=return_param_recurse(ks_name[i].c_str() ,thick_elem)) ? clone_command_parameter(p) : nullptr;
 }
 
-void SeqElList::add_ktap(command_parameter* k_param,const element* thick_elem)
-{
-  if(!k_param) return;
-  std::string k_param_name=k_param->name;
-  std::string k_name,ktap_name;
-  for(unsigned int i=1;i<3;++i)
-  {
-    k_name="k"+std::to_string(i); // k1, k2
-    if(k_param_name=="ksl") k_name=k_name+"s"; // or  k1s, k2s
-    ktap_name=k_name+"tap"; // corresponding tap attribute
-    add_ktap_i(i,k_param,k_name,ktap_name,thick_elem);
-  }
-}
+// void SeqElList::add_ktap(command_parameter* k_param,const element* thick_elem)
+// {
+//   if(!k_param) return;
+//   std::string k_param_name=k_param->name;
+//   std::string k_name,ktap_name;
+//   for(unsigned int i=1;i<3;++i)
+//     {
+//     // k_name="k"+std::to_string(i); // k1, k2
+//     // if(k_param_name=="ksl") k_name=k_name+"s"; // or  k1s, k2s
+//     // ktap_name=k_name+"tap"; // corresponding tap attribute
+//     ktap_name="ktap";
+//     add_ktap_i(i,k_param,k_name,ktap_name,thick_elem);
+//     }
+// }
 
-void SeqElList::add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem)
-{
-  if( command_parameter *p     = return_param_recurse(k_name.c_str(), thick_elem) )  // has k1n, or k1s, k2n, k2s
-    if( command_parameter *p_tap = return_param_recurse(ktap_name.c_str(), thick_elem) )// has corresponding tap
-    {
-      if(p->expr) k_param->expr_list->list[i] = compound_expr(p->expr,                          p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
-      else        k_param->expr_list->list[i] = compound_expr(expr_from_value(p->double_value), p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
-    }
-}
+// void SeqElList::add_ktap_i(const int i,command_parameter* k_param,const std::string k_name,const std::string ktap_name,const element* thick_elem)
+// {
+//   if( command_parameter *p     = return_param_recurse(k_name.c_str(), thick_elem) )  // has k1n, or k1s, k2n, k2s
+//     if( command_parameter *p_tap = return_param_recurse(ktap_name.c_str(), thick_elem) )// has corresponding tap
+//     {
+//       if(p->expr) k_param->expr_list->list[i] = compound_expr(p->expr,                          p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
+//       else        k_param->expr_list->list[i] = compound_expr(expr_from_value(p->double_value), p->double_value, "+", p_tap->expr, p_tap->double_value, 0);
+//     }
+// }
 
 command_parameter* SeqElList::make_k_list(const std::string parnam,command_parameter* k_pars[4]) const
 {
@@ -2085,8 +2100,8 @@ element* SeqElList::create_thin_slices(const element* thick_elem, int slice_no) 
     knl_param=make_k_list("knl",kn_pars); // make new knl 0,1,2,3 expr_list based on kn_pars from thick
     kns_param=make_k_list("ksl",ks_pars); // make new ksl 0,1,2,3 expr_list based on ks_pars from thick
 
-    add_ktap(knl_param,thick_elem);
-    add_ktap(kns_param,thick_elem);
+    //    add_ktap(knl_param,thick_elem);
+    //    add_ktap(kns_param,thick_elem);
 
     // multiply the k by length and divide by slice
     knl_param = scale_and_slice(knl_param,length_param,nslices,mult_with_length);
@@ -2539,6 +2554,7 @@ void SeqElList::slice_node() // main steering, decides how to split an individua
 
   if (thick_elem) // look at the element of this node to see what to do with slicing
   {
+    current_node=work_node; // only needed for locslice
     if(verbose>1) std::cout << " now see what to do with work_node=" << std::left << std::setw(MaTh::par_name_maxlen) << work_node->name <<  " depending on its base=" << std::setw(MaTh::par_name_maxlen) << work_node->base_name << std::right << '\n';
     const double eps=1.e-15; // used to check if a value is compatible with zero
     bool IsWireCollimator = ( strcmp(work_node->base_name,"collimator") == 0 && return_param_recurse("current",thick_elem) );
@@ -2765,20 +2781,20 @@ sequence* SequenceList::slice_sequence(const std::string slice_style,sequence* t
   else sliced_seq->crabcavities = new_el_list(100);
 
   SeqElList theSeqElList(sliced_seq_name, slice_style, sliced_seq, thick_sequ->start,this);
-  while(theSeqElList.current_node() != nullptr) // in current sequence, loop over nodes
+  while(theSeqElList.curr_node() != nullptr) // in current sequence, loop over nodes
   {
     theSeqElList.slice_node(); // decides what to do with current node :  slice_node_translate, slice_node_default or nothing
-    if (theSeqElList.current_node() == thick_sequ->end)
+    if (theSeqElList.curr_node() == thick_sequ->end)
     {
       break;
     }
-    if(theSeqElList.current_node()->p_elem!=nullptr){
-      if(strcmp(theSeqElList.current_node()->p_elem->base_type->name, "rfcavity")==0 &&
-        find_element(theSeqElList.current_node()->p_elem->name, sliced_seq->cavities) == nullptr){
-        add_to_el_list(&theSeqElList.current_node()->p_elem, 0, sliced_seq->cavities, 0);
+    if(theSeqElList.curr_node()->p_elem!=nullptr){
+      if(strcmp(theSeqElList.curr_node()->p_elem->base_type->name, "rfcavity")==0 &&
+        find_element(theSeqElList.curr_node()->p_elem->name, sliced_seq->cavities) == nullptr){
+        add_to_el_list(&theSeqElList.curr_node()->p_elem, 0, sliced_seq->cavities, 0);
       }
     }
-    theSeqElList.current_node(theSeqElList.current_node()->next); // set current_node
+    theSeqElList.curr_node(theSeqElList.curr_node()->next); // set curr_node
   }
   sliced_seq->end->next = sliced_seq->start;
 

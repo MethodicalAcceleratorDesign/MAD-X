@@ -1,0 +1,15 @@
+a = 0.5;
+q1_en: quadrupole,l:=( 1 ) * ( 0.5 ) ,k1:= 0.01,thick=true;
+q1_ex: quadrupole,l:=( 1 ) * ( 0.5 ) ,k1:= 0.01,thick=true;
+q2_en: quadrupole,l:=( 2 ) * ( 0.5 ) ,k1:= 0.01,thick=true;
+q2_ex: quadrupole,l:=( 2 ) * ( 0.5 ) ,k1:= 0.01,thick=true;
+q3_en: quadrupole,l:=( 3 ) * ( 0.5 ) ,k1:= 0.01,thick=true;
+q3_ex: quadrupole,l:=( 3 ) * ( 0.5 ) ,k1:= 0.01,thick=true;
+myseq: sequence, l = 6;
+q1_en, at = ( a ) + ( ( 1 ) * ( 0 - 0.25 ) ) , dx = 0.002 , dtheta = 0.01 ;
+q1_ex, at = ( a ) + ( ( 1 ) * ( 0.25 ) ) , dx = 0.006999916667 , ds = -2.499979167e-05 , dtheta = 0.01 ;
+q2_en, at = ( 2 ) + ( ( 2 ) * ( 0 - 0.25 ) ) , dy = 0.003 , dphi = 0.02 ;
+q2_ex, at = ( 2 ) + ( ( 2 ) * ( 0.25 ) ) , dy = 0.02299866669 , ds = -0.0001999933334 , dphi = 0.02 ;
+q3_en, at = ( 4.5 ) + ( ( 3 ) * ( 0 - 0.25 ) ) , ds = 0.005 , dpsi = 0.02 ;
+q3_ex, at = ( 4.5 ) + ( ( 3 ) * ( 0.25 ) ) , ds = 0.005 , dpsi = 0.02 ;
+endsequence;

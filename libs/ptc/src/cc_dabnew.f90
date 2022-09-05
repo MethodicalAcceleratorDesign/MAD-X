@@ -25,6 +25,7 @@ module c_dabnew
   logical(lp) C_STABLE_DA,C_watch_user,C_check_stable
   real(dp), private :: eps=1.d-38,epsprint=1.d-38
 !real(dp),public :: eps_clean=0
+  public c_print_c_nda_dab_c_lda
 complex(dp), private :: i_=(0.0_dp,1.0_dp)
 contains
   !******************************************************************************
@@ -584,7 +585,7 @@ contains
           c_nda_dab = c_nda_dab + 1
           ind=c_nda_dab
           if(c_nda_dab.gt.c_lda) then
-             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(line,'(a53)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,10'
              ipause=mypauses(8,line)
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -684,7 +685,7 @@ contains
              c_nda_dab = c_nda_dab + 1
              ind=c_nda_dab
              if(c_nda_dab.gt.c_lda) then
-                write(6,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+                write(6,'(a53)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,20'
                 !    ipause=mypauses(10,line)
                 call dadeb !(31,'ERR DAALL ',1)
                 stop 111
@@ -786,7 +787,7 @@ contains
           c_nda_dab = c_nda_dab + 1
           ind=c_nda_dab
           if(c_nda_dab.gt.c_lda) then
-             write(line,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(line,'(a53)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,30'
              ipause=mypauses(12,line)
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -842,6 +843,13 @@ contains
     return
   end subroutine daall1
 
+  subroutine c_print_c_nda_dab_c_lda(i)
+    implicit none
+     integer i
+     write(6,*) i,c_nda_dab,c_lda
+  end subroutine c_print_c_nda_dab_c_lda
+
+
   subroutine c_etall1(ic)
     implicit none
     integer ic
@@ -896,7 +904,7 @@ contains
           c_nda_dab = c_nda_dab + 1
           ind=c_nda_dab
           if(c_nda_dab.gt.c_lda) then
-             write(6,'(a50)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED'
+             write(6,'(a53)') 'ERROR IN DAALL, MAX NUMBER OF DA VECTORS EXHAUSTED,40'
              write(6,*) c_nda_dab,c_lda
              call dadeb !(31,'ERR DAALL ',1)
           endif
@@ -1263,6 +1271,7 @@ contains
     integer,dimension(c_lnv)::jj
     complex(dp) cjj
     !
+    cjj=0
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
           write(6,*) "big problem in dabnew ", sqrt(crash)
@@ -1344,9 +1353,11 @@ contains
        return
     elseif(ic.eq.icu) then
        cjj = c_cc(iu)
+
        return
     elseif(ic.eq.icz) then
        cjj = c_cc(iz)
+
        return
     elseif(ic.lt.icu.or.ic.gt.icz) then
        cjj = 0
@@ -1374,6 +1385,7 @@ contains
     return
 40  iz = i
     goto 10
+
     !
   end subroutine c_dapek
   !
@@ -3310,7 +3322,7 @@ contains
     return
   end subroutine c_dainv
 
-  subroutine dainvt(ma,ia,mb,ib)
+  subroutine dainvt(ma,ia,mb,ib,success)
     implicit none
     !     *****************************
     !
@@ -3325,6 +3337,8 @@ contains
     integer,dimension(:)::ma,mb
     complex(dp),dimension(c_lnv,c_lnv)::aa,ai
     complex(dp) amjj,amsjj,prod
+    logical, optional :: success
+    if(present(success)) success=.true.
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
           write(6,*) "big problem in dabnew ", sqrt(crash)
@@ -3353,6 +3367,8 @@ contains
     !etienne
     !
     if(ia.ne.ib) then
+    if(present(success)) success=.false.
+
        write(line,'(a26)')  'ERROR IN DAINV, IA .NE. IB'
        ipause=mypauses(35,line)
        call dadeb !(31,'ERR DAINV1',1)
@@ -3360,6 +3376,8 @@ contains
        write(line,'(a40)')  'ERROR IN DAINV, IA.NE.INVA.OR.IB.NE.INVB'
        ipause=mypauses(35,line)
        call dadeb !(31,'ERR DAINV2',1)
+    if(present(success)) success=.false.
+
     endif
     !
     !     ALLOCATING LOCAL VECTORS
@@ -3395,6 +3413,8 @@ contains
     call c_matinv(aa,ai,ia,c_lnv,ier)
     !
     if(ier.eq.132) then
+    if(present(success)) success=.false.
+
        if(check_da) then
           C_STABLE_DA=.false.
           C_check_stable=.false.
@@ -3420,6 +3440,8 @@ contains
           enddo
           if(i.eq.j) prod = prod - 1.0_dp
           if(abs(prod).gt.100.0_dp*epsmac) then
+          if(present(success)) success=.false.
+
              write(6,*) " abs(prod) > 100.0_dp*epsmac in dainvt",abs(prod), 100.0_dp*epsmac
              if(check_da) then
                 C_STABLE_DA=.false.
@@ -3936,11 +3958,11 @@ contains
     if(inva.eq.0) then
        write(iunit,'(A)') '    I  VALUE  '
        do i = ipoa,ipoa+illa-1
-          write(iunit,'(I6,2X,G20.13)') i-ipoa, c_clean_complex(c_cc(i))
+          write(iunit,'(I6,2X,ES23.16)') i-ipoa, c_clean_complex(c_cc(i))
        enddo
     elseif(c_nomax.eq.1) then
-       if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
-       if(illa.eq.0) write(iunit,'(A)') '   ALL COMPONENTS 0.0_dp '
+       if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT                                     ORDER   EXPONENTS'
+       if(illa.eq.0) write(iunit,'(A)') '         ALL COMPONENTS 0.0_dp '
        do i=1,illa
           do k=1,inva
              j(k)=0
@@ -3950,12 +3972,18 @@ contains
              j(i-1)=1
              ioa=1
           endif
-          write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout,c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
-          write(iunit,*) c_clean_complex(c_cc(ipoa+i-1))
+          if (madxprint) then
+            write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout, &
+                     c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
+          else
+            write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout, &
+                     c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
+            write(iunit,*) c_clean_complex(c_cc(ipoa+i-1))
+          endif
        enddo
     else
-       if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
-       if(illa.eq.0) write(iunit,'(A)') '   ALL COMPONENTS 0.0_dp '
+       if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT                                     ORDER   EXPONENTS'
+       if(illa.eq.0) write(iunit,'(A)') '         ALL COMPONENTS 0.0_dp '
        do ioa = 0,inoa
           do ii=ipoa,ipoa+illa-1
              if(c_ieo(c_ia1(c_i_1(ii))+c_ia2(c_i_2(ii))).ne.ioa) goto 100
@@ -3966,13 +3994,14 @@ contains
              if(abs(real(c_cc(ii)))> epsprint) a=c_cc(ii)
              if(abs(aimag(c_cc(ii)))> epsprint) b=aimag(c_cc(ii))
              ccc=a+(0.0_dp,1.0_dp)*b
-
                 !ETIENNE
-                
                 iout = iout+1
-                write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout,ccc,ioa,(j(iii),iii=1,c_nvmax)
-                !ETIENNE
-                write(iunit,*) c_cc(ii)
+                if (madxprint) then
+                  write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout, ccc,ioa,(j(iii),iii=1,c_nvmax)
+                else
+                  write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout, ccc,ioa,(j(iii),iii=1,c_nvmax)
+                  write(iunit,*) c_cc(ii)
+                endif
              endif
              !ETIENNE
              !
@@ -3988,7 +4017,7 @@ longprint=long
   end subroutine c_dapri
 
 function c_clean_complex(c)
-implicit none 
+implicit none
 complex(dp) c_clean_complex,c
 real(dp) cr,ci
 
@@ -3998,7 +4027,7 @@ ci=-i_*c
 if(abs(ci)<epsprint) ci=0
 c_clean_complex=cr+i_*ci
 
-end function c_clean_complex 
+end function c_clean_complex
 
 
   subroutine c_dapri77(ina,iunit)
@@ -4038,7 +4067,6 @@ end function c_clean_complex
     ilma = c_idalm(ina)
     illa = c_idall(ina)
     !
-
     if(longprint) then
        write(iunit,'(/1X,A10,A6,I5,A6,I5,A7,I5/1X,A/)') c_daname(ina),', NO =',inoa,', NV =',inva,', INA =',ina,&
          '*********************************************'
@@ -4047,12 +4075,14 @@ end function c_clean_complex
          '*********************************************'
     endif
     !
-    if(illa.ne.0.and.longprint) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
-    if(illa.eq.0.and.longprint) write(iunit,'(A)') '   ALL COMPONENTS 0.0_dp '
+    if(illa.ne.0.and.longprint) write(iunit,'(A)') '     I   COEFFICIENT                                     ORDER   EXPONENTS'
+    if(illa.eq.0.and.longprint) write(iunit,'(A)') '         ALL COMPONENTS 0.0_dp '
     !
-    c10='      NO ='
-    k10='      NV ='
-    if(longprint)write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
+    if (.not.madxprint) then
+       c10='      NO ='
+       k10='      NV ='
+       if(longprint) write(iunit,'(A10,I6,A10,I6)') c10,inoa,k10,inva
+    endif
     iout = 0
     !
     !      DO 100 IOA = 0,INOA
@@ -4072,7 +4102,7 @@ end function c_clean_complex
              if(abs(aimag(c_cc(ii)))> epsprint) then
                b=aimag(c_cc(ii))
                imprime=.true.
-             endif 
+             endif
              ccc=a+(0.0_dp,1.0_dp)*b
 !             ccc=c_cc(ii)
              if(c_nomax.ne.1) then
@@ -4091,10 +4121,12 @@ end function c_clean_complex
              !      WRITE(IUNIT,*) IOA,c_cc(II),(J(I),I=1,INVA)
              if(imprime) then
                  some=.true.
-                if(epsprint.gt.1e-37_dp) then
-                   write(iunit,501) ioa,ccc,(j(i),i=1,inva)
+                if (madxprint) then
+                  write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout, ccc,ioa,(j(i),i=1,inva)
+                elseif(epsprint.gt.1e-37_dp) then
+                  write(iunit,501) ioa,ccc,(j(i),i=1,inva)
                 else
-                   write(iunit,503) ioa,ccc,(j(i),i=1,inva)
+                  write(iunit,503) ioa,ccc,(j(i),i=1,inva)
                 endif
              endif
 501          format(' ', i3,1x,g23.16,1x,g23.16,1x,100(1x,i2))
@@ -4111,9 +4143,9 @@ end function c_clean_complex
        j(i)=0
     enddo
     if(iout.eq.0) iout=1
-if(longprint) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
+    if(longprint.and.(.not.madxprint)) write(iunit,502) -iout,0.0_dp,0.0_dp,(j(i),i=1,inva)
     if((.not.longprint).and.(.not.some)) write(iunit,*) " Complex Polynomial is zero "
-if(.not.longprint) write(6,*) " "
+    if((.not.longprint).and.(.not.madxprint)) write(6,*) " "
     !
     return
 longprint=long
@@ -4241,7 +4273,7 @@ longprint=long
     integer,dimension(c_lnv)::j
     complex(dp) c
     character(10) c10
- 
+
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
           write(6,*) "big problem in dabnew ", sqrt(crash)
@@ -4281,19 +4313,22 @@ longprint=long
     read(iunit,'(A10)') c10
     read(iunit,'(A10)') c10
     read(iunit,'(A10)') c10
-     
+
     !
     !
     iin = 0
     !
 10  continue
     iin = iin + 1
-!    read(iunit,'(I6,2X,G20.13,I5,4X,18(2i2,1X))') ii,c,io,(j(i),i=1,inva)
-    read(iunit,*) ii,c,io,(j(i),i=1,inva)
+    if (madxprint) then
+      read(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+    else
+      read(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+    endif
     !
     if(ii.eq.0) goto 20
     !ETIENNE
-    read(iunit,*) c
+    if (.not.madxprint) read(iunit,*) c
     !ETIENNE
     if(ii.ne.iin) then
        iwarin = 1
@@ -4334,7 +4369,6 @@ longprint=long
     if(c_nomax.ne.1) call dapac(ina)
     !
     return
- 
   end subroutine c_darea
   !FF
   !
@@ -4347,7 +4381,7 @@ longprint=long
     !-----------------------------------------------------------------------------
     !
     integer i,ic,iche,ii,ic_i_1,ic_i_2,iin,illa,ilma,ina,inoa,inva,ipoa,iunit,&
-         k,nojoh,nvjoh
+         k,nojoh,nvjoh,io
     integer,dimension(c_lnv)::j
     real(dp) cr,ci
     character(10) c10,k10
@@ -4393,7 +4427,11 @@ longprint=long
     !
 10  continue
     iin = iin + 1
-    read(iunit,*) ii,cr,ci,(j(k),k=1,nvjoh)
+    if (madxprint) then
+      read(iunit,*,end=20,err=20) ii,cr,ci,io,(j(k),k=1,nvjoh)
+    else
+      read(iunit,*) ii,cr,ci,(j(k),k=1,nvjoh)
+    endif
     if(ii.lt.0) goto 20
     do i=inva+1,nvjoh
        if(j(i).ne.0) goto 10

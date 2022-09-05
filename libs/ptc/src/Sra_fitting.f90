@@ -89,7 +89,7 @@ contains
     it=0
 100 continue
     it=it+1
-      call FIND_ORBIT_x(r,CLOSED,state,1.d-7,fibre1=1)
+      call FIND_ORBIT_x(r,CLOSED,state,1.0e-7_dp,fibre1=1)
  
     write(6,*) "closed orbit "
     write(6,*) CLOSED
@@ -189,8 +189,9 @@ contains
     deallocate(eq)
 
   end subroutine lattice_fit_TUNE_gmap_rad
- 
+ !!! my_default default0 (my units)
 subroutine find_time_patch(kekb,my_default,emax,bmadpatch,wipeout,kf,kb)
+! time patch for SAD
 implicit none
 type(layout), pointer :: kekb
 real(dp) closed_orbit(6),ee
@@ -3447,7 +3448,7 @@ call kill(yy); call kill(id);
          object_node1=>object_node1%next
       enddo 
       if(piotr_fix) then
-       call FIND_ORBIT_LAYOUT_noda_object(FIX,STATE,eps,TURNS,fibre1=object_fibre1,total=total)
+       call FIND_ORBIT_LAYOUT_noda_object(FIX,STATE,eps,TURNS,node1=object_node1,total=total)
        else
        call FIND_ORBIT_LAYOUT_noda_object_orig(FIX,STATE,eps,TURNS,node1=object_node1,total=total)
       endif
@@ -4451,6 +4452,7 @@ we=1
        !      IF(iteM==MAX_FIND_ITER+100) THEN
        !        write(6,*) " Unstable in find_orbit without TPSA"
        write(6,*) "Maximum number of iterations in find_orbit without TPSA"
+        check_Stable=.false.
         radfac=1
        return
        
@@ -4496,13 +4498,17 @@ subroutine taper(f1,fix,nsf,state,eps,file)
 
 implicit none
 !!!!!!  PTC stuff
-real(dp) x(6),fix(6),se,eps
+real(dp) x(6),fix(6),se,eps 
 type(layout), pointer :: ring
 type(internal_state) state
 integer i,mf,k,nsf
 type(fibre), pointer ::p,f1
 type(work) w,we
 character(*), optional :: file
+type(c_damap) id
+type(probe_8) rayp
+type(probe) ray
+type(c_normal_form) nf
 
 ring=>f1%parent_layout
 
@@ -4519,13 +4525,38 @@ ring=>f1%parent_layout
     
 x=fix
 
-do k=1,nsf
+do k=0,nsf
 radfac=k
 radfac=radfac/nsf
 
 write(6,*) "iteration ",k
 
 call FIND_ORBIT_tapering(x,eps,STATE,f1) 
+
+call init(state,1,0)
+
+call alloc(id)
+call alloc(nf)
+call alloc(rayp)
+id=1
+ray=x
+rayp=id+ray
+
+call propagate(rayp,state,fibre1=f1)
+id=rayp
+call c_normal(id,nf)
+
+write(6,*) " tunes in tapering "
+write(6,format3) nf%tune(1:3)
+
+ray=rayp
+call print(id%v(5))
+call print(id%v(6))
+write(6,format6) x
+write(6,format6) ray%x
+call kill(id)
+call kill(nf)
+call kill(rayp)
 
 if(.not.check_stable) then
 radfac=1
@@ -4760,7 +4791,7 @@ type(c_taylor) phase(3),phase_spin,betaxx,betaxy,x,c_spin_tune,d_CS,h,hb,pb_fiel
 type(fibre),pointer :: f,sf,ff
 integer, allocatable :: j1(:)
 real(dp) phaser(3),spin_tune(2),damping(3),betx(2),dnu_dko,phx,a(6,6),mux,betasfx
-type(q_linear)  q_c,q_ptc,q_rot
+type(c_linear_map)  q_cs,q_as,q_rot
 logical general
 type(c_spinor) e_y,isf
 type(c_vector_field) field
@@ -4819,7 +4850,7 @@ call alloc(e_y);call alloc(isf);
 
 FIX=0.0_DP  ! FIXED POINT
 fix(5)=0.00d0
-call find_orbit(ring,fix(1:6),1,state,1.d-5)   
+call find_orbit(ring,fix(1:6),1,state,1.e-5_dp)   
  write(6,*)
  write(6,'(a12,5(1x,g12.5))')"Closed Orbit",  FIX(1:5)
  write(6,*)
@@ -4848,7 +4879,7 @@ M=R
 
 
  if(state%spin) then
-    call clean(phase_spin,phase_spin,prec=1.d-10)
+    call clean(phase_spin,phase_spin,prec=1.e-10_dp)
     write(mf,*) " Spin tune "
    call print(phase_spin,mf)
  endif
@@ -4873,9 +4904,9 @@ hb=(1.0_dp.cmono.1)-i_*(1.0_dp.cmono.2)
 f=>ring%start
 r=a_cs+r0
 eval=1
-eval%v(3)=0.0d0
-eval%v(4)=0.0d0
-eval%v(5)=0.0d0
+eval%v(3)=0.0e0_dp
+eval%v(4)=0.0e0_dp
+eval%v(5)=0.0e0_dp
 
 d_CS=h*hb
 d_cs=d_cs*NORMAL%Atot**(-1)
@@ -4892,7 +4923,7 @@ if(general) then
  call c_full_canonise(a_cs,a_cs,a_spin, &
   disp,A_L,A_NL,phase=phase,nu_spin=phase_spin)
 else
- call c_fast_canonise(a_cs,a_cs,phaser,damping,q_c=q_c,q_ptc=q_ptc, &
+ call c_fast_canonise(a_cs,a_cs,phaser,damping,q_cs=q_cs,q_as=q_as, &
  q_rot=q_rot,spin_tune=spin_tune ,dospin=state%spin)
 endif
 
@@ -4923,21 +4954,21 @@ write(mf,*) " ISF "
  e_y=2
  call makeso3(a_spin)
  isf=a_spin%s*e_y
- call clean(isf,isf,prec=1.d-10)
+ call clean(isf,isf,prec=1.0e-10_dp)
  call print(isf,mf)
 
  betx(1)=betaxx
  write(mf,*) " phases  "
- call clean(phase(1:c_%nd),phase(1:c_%nd),prec=1.d-10)
+ call clean(phase(1:c_%nd),phase(1:c_%nd),prec=1.0e-10_dp)
  call print(phase(1:c_%nd),mf)
  if(state%spin) then
   write(mf,*) " spin tune "
-  call clean(phase_spin,phase_spin,prec=1.d-10)
+  call clean(phase_spin,phase_spin,prec=1.0e-10_dp)
   call print(phase_spin,mf)
  endif
 else
- betx(1)=q_ptc%mat(1,1)**2+q_ptc%mat(1,2)**2
- betx(2)=q_ptc%mat(1,3)**2+q_ptc%mat(1,3)**2
+ betx(1)=q_cs%mat(1,1)**2+q_cs%mat(1,2)**2
+ betx(2)=q_cs%mat(1,3)**2+q_cs%mat(1,3)**2
  write(mf,*) " Betax_1 , Betax_2"
  write(mf,*) betx
  write(mf,*) " Phases "
@@ -4947,7 +4978,7 @@ else
   write(mf,*) " spin tune "
   write(mf,*) spin_tune
   write(mf,*) " ISF "
-  call MAKESO3(q_c,s)
+  call MAKESO3(q_as,s)
 
   write(mf,'(10x,a4,15x,a7,16x,a9,12x,a7,15x,a9,11x,a11)') 'n0_x','dn_x/dx','dn_x/dp_x','dn_x/dy','dn_x/dp_y','dn_x/ddelta' 
   write(mf,'(6(1x,G21.14))') s(1,2,0:5)
@@ -4971,7 +5002,7 @@ Write(mf,*) " change in invariant due to octupole : TPSA "
 d_CS=(h*hb)*a_cs**(-1)
 d_cs=d_cs-(d_cs.cut.5)
 d_cs=(d_cs.o.eval).d.c_%nv
-call clean(d_cs,d_cs,prec=1.d-10)
+call clean(d_cs,d_cs,prec=1.0e-10_dp)
 call print(d_cs,mf)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -5001,7 +5032,7 @@ Write(mf,*) " phase, total phase and beta "
 
 write(6,*) "dnu_dko = ",dnu_dko
  write(mf,*) " <x^2> "
-   x=2.d0*(1d0.cmono.1)**2
+   x=2.0_dp*(1.0e0_dp.cmono.1)**2
    call average(x,a_l,x)
    call print(x,mf)
  

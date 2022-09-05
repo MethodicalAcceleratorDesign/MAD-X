@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 11:53:58      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:52:41      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=60.;
 
@@ -73,6 +73,7 @@ iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 ++++++ warning: TWCPTK:  Mode flip in the element sq1                                             , nflips up to now =   1                                                                                                       
 ++++++ warning: TWCPTK:  Mode flip in the element sq2                                             , nflips up to now =   2                                                                                                       
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 9 location, out of 14 in total. The Dqmin estimate might be inaccurate.                                        
 
 ++++++ table: summ
 
@@ -94,13 +95,16 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  2 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  2     0.004029640367 
+
+       dqmin_phase 
+    -0.08326761734 
 stop;
 
 
-  Number of warnings: 2
-0 in C and 2 in Fortran
+  Number of warnings: 3
+0 in C and 3 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

@@ -1,33 +1,43 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2020.10.12 17:44:41      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.08.30 13:31:38      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=2;
 
 beam, particle=proton, energy = 1;
 
+x0=0.001;
+
+px0 = 0.002;
+
+y0=0.003;
+
+py0 = 0.009;
+
+pt0=0.000;
 
 
 
-
-newquad:  MULTIPOLE, KNL={0.00, 0.001}, comments="testing the comments";
-
-trans: TRANSLATION, DX=0.01, DY=0.1, DS=0.1;
+tr_str = 0.3 ;
 
 
 
-seq: sequence, refer=center, l=circum;
+trans: TRANSLATION, DX:=0.01*tr_str, DY:=0.002*tr_str, DS:=0.02*tr_str;
+
+!trans : marker;
+
+m1: marker;
+
+seq: sequence, l=circum;
 
 trans, at=1.000;
 
-!newquad: newquad at=1.5;
+m1, at=1;
 
 endsequence;
-
-
 
 
 
@@ -35,14 +45,14 @@ use, sequence=seq;
 
 select, flag=twiss, column=name, s, x,px, y, py, PT, T;
 
-twiss,X=-0.0,Y=0.000, BETX=1, BETY=1, file="translation.twiss";
+twiss,x=x0, px=px0, y=y0, py=py0, pt=pt0, BETX=1, BETY=1, file="translation.twiss", exact, table=twissmad;
 
 enter Twiss module
- Found 2 initial orbit vector values from twiss command. 
+ Found 5 initial orbit vector values from twiss command. 
   
 open line - error with deltap:   0.000000E+00
-initial orbit vector:  -0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -1.000000E-02  0.000000E+00 -1.000000E-01  0.000000E+00 -2.891025E-01  0.000000E+00
+initial orbit vector:   1.000000E-03  2.000000E-03  3.000000E-03  9.000000E-03  0.000000E+00  0.000000E+00
+final orbit vector:     2.012171E-03  2.000000E-03  2.045477E-02  9.000000E-03 -1.759264E-02  0.000000E+00
 
 ++++++ table: summ
 
@@ -50,48 +60,49 @@ final orbit vector:    -1.000000E-02  0.000000E+00 -1.000000E-01  0.000000E+00 -
                  2                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-      0.1762081912                  0                  5                  0 
+      0.1764016748                  0         5.02441027      0.01160027101 
 
              dxrms             xcomax             xcorms                 q2 
-                 0               0.01     0.007745966692       0.1762081912 
+    0.007855565323     0.003000085005     0.001736781629       0.1764065679 
 
                dq2            betymax              dymax              dyrms 
-                 0                  5                  0                  0 
+                 0        5.025030103      0.05220121954      0.03535004395 
 
             ycomax             ycorms             deltap            synch_1 
-               0.1      0.07745966692                  0                  0 
+     0.02045476734      0.01444651087                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
-SURVEY, SEQUENCE=seq, FILE= survey.out, x0=0.01;
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+   5.139884641e-09 
 
 
 
 
-
-TRACK, file = "trackFile.out",ONEPASS, ONETABLE;
+TRACK, file = "madx_track",ONEPASS;
 
 enter TRACK module
 one pass is on
 OBSERVE, PLACE="trans";
 
-START,  x=0, y=0, t=0.0;
+START,  x=x0, px=px0, y=y0, py=py0, pt=pt0;
 
-run, turns=1;
+run, turns=2;
 
 
 ++++++ table: tracksumm
 
     number       turn                  x                 px 
-         1          0                  0                  0 
-         1          1              -0.01                  0 
+         1          0              0.001              0.002 
+         1          2     0.003024341042              0.002 
 
                  y                 py                  t                 pt 
-                 0                  0                  0                  0 
-              -0.1                  0      -0.2891024927                  0 
+             0.003              0.009                  0                  0 
+     0.03790953469              0.009     -0.03518527921                  0 
 
                  s                  e 
                  0                  0 
@@ -103,7 +114,7 @@ run, turns=1;
 ptc_create_universe;
 
 Determined SECTOR NMUL MAX :  0
-ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+ptc_create_layout,model=3, method=2, nst=1, exact=true, closed_layout=false;
 
  MAD-X Beam Parameters
                   Energy : 0.100000E+01
@@ -112,8 +123,8 @@ ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
                 Momentum : 0.345898E+00
  Setting MADx with 
      energy           1.0000000000000000     
-     method                   6
-     Num. of steps            5
+     method                   2
+     Num. of steps            1
      charge           1.0000000000000000     
   Length of machine:    2.0000000000000000     
  The machine is a LINE
@@ -121,12 +132,20 @@ ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    1.0000000000000000E-002  0.10000000000000001        2.1000000000000001     
+ After    end:    3.0000000000000001E-003   5.9999999999999995E-004   2.0060000000000002     
 
 
-ptc_setswitch, debuglevel=0, nocavity=true, fringe=false, exact_mis=true, time=true, totalpath=false;
+ptc_setswitch, debuglevel=0,  fringe=false, totalpath=false;
 
-PTC_TWISS, table=twiss, icase=56, no=1, betx=1, bety=1, betz=1, x=0, y=0, px=0, py=0, t=0.0, pt=0.0;
+
+
+!ptc_observe, place="trans";
+
+!ptc_track,  icase=56, element_by_element,  dump,  turns=2;
+
+!ptc_track_end;
+
+PTC_TWISS, table=ptctwiss, icase=56, no=3, betx=1, bety=1, betz=1, x=x0, px=px0, y=y0, py=py0, pt=pt0, scale_with_pt=false;
 
  Reduced SUMM Table (Inital parameters specified)
 
@@ -136,60 +155,195 @@ PTC_TWISS, table=twiss, icase=56, no=1, betx=1, bety=1, betz=1, x=0, y=0, px=0, 
                  2           -1000000           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000           -1000000           -1000000       0.1792684859 
+          -1000000           -1000000           -1000000       0.1764016748 
 
                 q2                dq1                dq2                 qs 
-      0.1792684859           -1000000           -1000000           -1000000 
+      0.1764065679           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-                 1               5.41                  1               5.41 
+                 1         5.02441027                  1        5.025030103 
 
          beta11min          beta11max          beta12min          beta12max 
-                 1               5.41                  0                  0 
+                 1         5.02441027                  0    1.304120186e-09 
 
          beta13min          beta13max          beta21min          beta21max 
-                 0                  0                  0                  0 
+                 0    0.0001345662875                  0    1.304120186e-09 
 
          beta22min          beta22max          beta23min          beta23max 
-                 1               5.41                  0                  0 
+                 1        5.025030103                  0     0.002724967322 
 
          beta31min          beta31max          beta32min          beta32max 
-                 0                  0                  0                  0 
+                 0    0.0001345662875                  0     0.002724967322 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1         239.759754                  0                  0 
+                 1        218.9240565     -0.01160027101                  0 
 
           disp2min           disp2max           disp3min           disp3max 
-                 0                  0                  0                  0 
+                 0                  0     -0.05220121954                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0                  0 
+                 0                  0                  0              0.001 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-                 0                  0                  0                  0 
+             0.002              0.003              0.009                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0     0.007745966692      0.07745966692                  0 
+                 0     0.001736781629      0.01444651087              0.002 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0       0.2239378279                  0                  0 
+             0.009      0.01431434181                  0     0.003000085005 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0                  0                  0                 -0 
+     0.02045476734              0.002              0.009                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0              -0.01               -0.1                  0 
+                 0    1.208551545e-05              0.003              0.002 
 
            pycomin             tcomin            ptcomin 
-                 0      -0.2891024927                  0 
-write, table=twiss, file="twiss.ptc.tfs";
+             0.009     -0.01759263961                  0 
+write, table=ptctwiss, file="twiss.ptc.tfs";
+
+
 
 ptc_end;
+
+
+
+SETVARS, table=TRACK.OBS0001.P0001, row=2;
+
+++++++ warning: ignored: attempt to redefine constant: e
+x_mad_tr = x;
+
+y_mad_tr = y;
+
+t_mad_tr = t;
+
+
+
+
+
+SETVARS, TABLE=twissmad, ROW=5;
+
+x_mad = x;
+
+px_mad = px;
+
+y_mad = y;
+
+py_mad = py;
+
+t_mad = t;
+
+betax_mad = betx;
+
+betay_mad = bety;
+
+s_mad = s;
+
+
+
+SETVARS, TABLE=ptctwiss, ROW=5;
+
+x_ptc = x;
+
+px_ptc = px;
+
+y_ptc = y;
+
+py_ptc = py;
+
+t_ptc = t;
+
+betax_ptc = betx;
+
+betay_ptc = bety;
+
+s_ptc = s;
+
+
+
+diff_x   = x_mad - x_ptc;
+
+diff_px  = px_mad - px_ptc;
+
+diff_y   = y_mad - y_ptc;
+
+diff_py  = py_mad - py_ptc;
+
+diff_t   = t_mad - t_ptc;
+
+diff_betax  = betax_mad - betax_ptc;
+
+diff_betay  = betay_mad - betay_ptc;
+
+diff_s = s_mad - s_ptc;
+
+
+
+
+
+mad_tr_diff_x = x_mad_tr - x_ptc;
+
+mad_tr_diff_y = y_mad_tr - y_ptc;
+
+mad_tr_diff_t = t_mad_tr - t_ptc;
+
+
+
+
+
+value,diff_x;
+
+diff_x             =                  0 ;
+value,diff_px;
+
+diff_px            =                  0 ;
+value,diff_y;
+
+diff_y             =                  0 ;
+value,diff_py;
+
+diff_py            =                  0 ;
+value,diff_t;
+
+diff_t             =     1.45716772e-16 ;
+value,diff_betax;
+
+diff_betax         =   -2.664535259e-15 ;
+value,diff_betay;
+
+diff_betay         =   -2.664535259e-15 ;
+value,diff_s;
+
+diff_s             =                  0 ;
+
+
+value, ptc_diff_x;
+
+ptc_diff_x         =                  0 ;
+value, ptc_diff_y;
+
+ptc_diff_y         =                  0 ;
+
+
+value, mad_tr_diff_x;
+
+mad_tr_diff_x      =                  0 ;
+value, mad_tr_diff_y;
+
+mad_tr_diff_y      =                  0 ;
+value, mad_tr_diff_t;
+
+mad_tr_diff_t      =    1.700029006e-16 ;
+
+
+
 
 stop;
 
 
-  Number of warnings: 0
+  Number of warnings: 1
+1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

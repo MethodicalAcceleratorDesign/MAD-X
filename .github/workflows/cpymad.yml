@@ -83,7 +83,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, macos]
-        version: [master, v1.5.0]
+        version: [master, v1.9.3]
     env:
       MADXDIR: madx
 
@@ -105,7 +105,9 @@ jobs:
           path: ${{ env.MADXDIR }}
 
       - name: Install python setup dependencies
-        run: pip install cython
+        run: |
+          pip install cython
+          pip install pytest
 
       - name: Build cpymad
         run: |
@@ -113,6 +115,7 @@ jobs:
             export CC=gcc-9
           fi
           export X11=0 BLAS=1 LAPACK=1
+          python setup.py build_ext -lm
           pip install -e .
 
       - name: Run tests

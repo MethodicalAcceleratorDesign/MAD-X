@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2020.09.25 14:31:24      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:04:56      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=15;
 
@@ -77,8 +77,11 @@ ycomax ycorms deltap synch_1
 synch_2 synch_3 synch_4 synch_5 
 0X0P+0 0X0P+0 0X0P+0 0X0P+0 
 
-synch_6 synch_8 nflips 
-0X0P+0 0X0P+0 0X0P+0 
+synch_6 synch_8 nflips dqmin 
+0X0P+0 0X0P+0 0X0P+0 0X0P+0 
+
+dqmin_phase 
+0X0P+0 
 
 
 save, sequence=seq, file=seq_hex.seq;
@@ -87,8 +90,6 @@ save, sequence=seq, file=seq_hex.seq;
 
 
 call, file="seq_hex.seq";
-
-none = 0X0P+0;
 
 rfcav: rfcavity,l:=0X1.999999999999AP-4,volt:=0X1.9P+6,lag:=0X1.999999929999AP-4,freq:=0X1.9P+6,fringe:= 1;
 

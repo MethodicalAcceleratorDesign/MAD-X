@@ -92,13 +92,19 @@ extern const char* const trackone_table_cols[];
 extern const int         track_table_types[];
 extern const char* const track_table_cols[];
 extern const int         track_table_cols_len;
+
 extern const int         tracksumm_table_types[];
 extern const char* const tracksumm_table_cols[];
+extern const int         mytracksumm_table_types[]; /* hrr Sep 2021 */
+extern const char* const mytracksumm_table_cols[];  /* hrr Sep 2021 */
+
 extern const int         ptcnodetrack_table_types[];
 extern const char* const ptcnodetrack_table_cols[];
 
 extern const int         trackloss_table_types[];
 extern const char* const trackloss_table_cols[];
+extern const int         mytrackloss_table_types[]; /* hrr Sep 2021 */
+extern const char* const mytrackloss_table_cols[];  /* hrr Sep 2021 */
 
 extern const char* const dist_table_cols[];
 extern const int         dist_table_types[];
@@ -107,6 +113,11 @@ extern const int         dynap_table_types[];
 extern const char* const dynap_table_cols[];
 extern const int         dynaptune_table_types[];
 extern const char* const dynaptune_table_cols[];
+
+extern const int         emit_table_types[];
+extern const char* const emit_table_cols[];
+extern const int         emitsumm_table_types[];
+extern const char* const emitsumm_table_cols[];
 
 /* Definition of "select_ptc_normal" parameters for "ptc_normal"*/
 extern const char* const names[];

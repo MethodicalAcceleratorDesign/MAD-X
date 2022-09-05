@@ -1,4 +1,3 @@
-none = 0X0P+0;
 rfcav: rfcavity,l:=0X1.999999999999AP-4,volt:=0X1.9P+6,lag:=0X1.999999929999AP-4,freq:=0X1.9P+6,fringe:= 1;
 rfcavi: rfcav;
 seq: sequence, l = 0X1.EP+3;

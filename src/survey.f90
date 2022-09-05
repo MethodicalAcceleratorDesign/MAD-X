@@ -24,7 +24,7 @@ subroutine survey
   double precision :: dphi, dpsi, dtheta, phi, phi0, psi, psi0, theta, theta0
   double precision :: sums, el, suml, tilt, globaltilt
   double precision :: v(3), v0(3), ve(3), w(3,3), w0(3,3), we(3,3), tx(3)
-  double precision :: add_angle(10), org_ang(100)
+  double precision :: add_angle(10), org_ang(100), bangle
 
   integer, external :: restart_sequ, advance_node, set_cont_sequence
   double precision, external :: proxim, node_value, get_value
@@ -79,7 +79,8 @@ subroutine survey
      !**** el is the arc length for all bends  ********
      ! LD: 2018.02.01, rbarc is computed by node_value (if needed)...
      el = node_value('l ')
-     call suelem(el, ve, we, tilt,code)
+     bangle = node_value('angle ')
+     call suelem(el, ve, we, tilt,code, bangle)
      suml = suml + el
      !**  Compute the coordinates at each point
      !call sutrak(v, w, ve, we)
@@ -149,7 +150,7 @@ subroutine elementloc
   double precision :: v(3), v0(3), ve(3), w(3,3), w0(3,3), we(3,3), tx(3), we_t(3,3)
   double precision :: we_b(3,3), v_t(3)
   double precision :: W_AL(3,3), V_AL(3)
-  double precision :: add_angle(10), org_ang(100)
+  double precision :: add_angle(10), org_ang(100), bangle
 
   integer, external :: restart_sequ, advance_node, set_cont_sequence, is_permalign, get_option
   double precision, external :: proxim, node_value, get_value
@@ -207,7 +208,8 @@ subroutine elementloc
      !**** el is the arc length for all bends  ********
      ! LD: 2018.02.01, rbarc is computed by node_value (if needed)...
      el = node_value('l ')
-     call suelem(el, VE, WE, tilt, code)
+     bangle = node_value('angle ')
+     call suelem(el, VE, WE, tilt, code,bangle)
      suml = suml + el
      !**  Compute the coordinates at each point
      !call sutrak(v, w, ve, we)
@@ -222,7 +224,6 @@ subroutine elementloc
             VE(1) =   node_value('dx ')
             VE(2) =   node_value('dy ')
             VE(3) =   node_value('ds ')
-
             V_AL = V_AL + matmul(W_AL,VE)
             dphi   = node_value('dphi ')
             dpsi   = node_value('dpsi ')
@@ -236,7 +237,8 @@ subroutine elementloc
 
           !**  Fill the survey table
           call sufill(suml-el,V_AL, theta, phi, psi,globaltilt,1)
-          call suelem(el, VE, WE, tilt, code)
+          bangle = node_value('angle ')
+          call suelem(el, VE, WE, tilt, code, bangle)
           ! This is the normal element
           V_AL = V_AL + matmul(W_AL,VE)
           W_AL = matmul(W_AL,WE)
@@ -283,20 +285,24 @@ subroutine elementloc
   dpsi = psi - proxim(psi0, psi)
 end subroutine elementloc
 
-subroutine locslice(spos, displ)
+subroutine locslice(spos, displ,angle)
+    use math_constfi, only : zero, one
     ! Purpose  :
     ! Give the correct slices locations for an element
     double precision, intent(IN) :: spos
     double precision, intent(OUT) :: displ(6)
 
-    double precision :: v_al(3), v_el(3), ve(3), w_el(3,3), w_al(3,3), w_tot(3,3)
-    double precision :: dphi, dpsi, dtheta, tilt
+    double precision :: v_al(3), v_el(3), ve(3), w_el(3,3), w_al(3,3), w_tot(3,3), angle
+    double precision :: dphi, dpsi, dtheta, tilt, dx_ref, ds_ref, tmp_x, tmp_y, tmp_z, slangle
 
     integer :: code
+    logical :: sstraight
     double precision, external :: proxim, node_value, get_value
+
 
      !**  Compute the coordinates at each point
      !call sutrak(v, w, ve, we)
+      sstraight = node_value('slice_straight ').ne.zero
 
       v_al(1) =   node_value('dx ')
       v_al(2) =   node_value('dy ')
@@ -305,18 +311,39 @@ subroutine locslice(spos, displ)
       dphi   = node_value('dphi ')
       dtheta = node_value('dtheta ')
       dpsi   = node_value('dpsi ')
-      
+ 
       call sumtrx(dtheta, dphi, dpsi, w_al)
       
+          
       code = node_value('mad8_type ') 
-      call suelem(spos, v_el, w_el, tilt, code)
 
-      w_tot = matmul(w_el,w_al) ! Is this the right way?
-      displ(1:3) = v_al + matmul(w_tot,v_el)
+      call suelem(spos, v_el, w_el, tilt, code,angle)
+
+      !w_tot = matmul(w_al, w_el) ! Is this the right way?
+
+      displ(1:3) = v_al + matmul(w_al,v_el)
       displ(4) = dphi
       displ(5) = dtheta
       displ(6) = dpsi
+      
 
+      if (sstraight) then
+        slangle = angle*spos/node_value('l ')
+        call suelem(spos, v_el, w_el, tilt, code,slangle)
+        
+        !call suelem(spos, v_al, w_el, tilt, code,angle)
+
+        tmp_x = displ(1)-v_el(1)
+        tmp_y = displ(2)-v_el(2)
+        tmp_z = displ(3)-v_el(3)
+        tmp_x = tmp_x*cos(tilt)
+        tmp_y = tmp_y*sin(tilt)
+
+        displ(1) = tmp_x*cos(slangle)+tmp_z*sin(slangle)
+        displ(3) = tmp_z*cos(slangle)-tmp_x*sin(slangle)
+      else
+        displ(3) = displ(3)-spos
+        endif
 end subroutine locslice
 
 
@@ -393,7 +420,7 @@ subroutine sumtrx(theta, phi, psi, w)
 
 end subroutine sumtrx
 
-subroutine suelem(el, ve, we, tilt, code)
+subroutine suelem(el, ve, we, tilt, code,angle)
   use twtrrfi
   use matrices, only : EYE
   use math_constfi, only : zero, one
@@ -426,7 +453,6 @@ subroutine suelem(el, ve, we, tilt, code)
   double precision, external :: node_value
 
   !---- Branch on subprocess code.
-  angle = zero
   dx = zero
   ds = zero
 
@@ -437,17 +463,18 @@ subroutine suelem(el, ve, we, tilt, code)
   bv   = node_value('other_bv ')
   tilt = node_value('tilt ') * bv
 
+  if (bv.eq. zero) bv = one;
   select case (code)
 
      case (code_rbend, code_sbend) !---- RBEND, SBEND
-        angle = node_value('angle ') * bv
+
+        angle = angle * bv
         if (abs(angle) .ge. 1d-13) then
            dx = el * (cos(angle)-one)/angle
            ds = el * sin(angle)/angle
         else
            ds = el
         endif
-
         cospsi = cos(tilt);  sinpsi = sin(tilt)
         costhe = cos(angle); sinthe = sin(angle)
 
@@ -469,7 +496,8 @@ subroutine suelem(el, ve, we, tilt, code)
      case (code_multipole) !---- MULTIPOLE (thin, no length)
         ! Must stay compatible with SBEND (makethin!), i.e. ignore ks0l
         ! LD 2017.11.20, attempt to add angle attribute precedence,
-        angle = node_value('angle ')
+        
+        
         if (angle .eq. 0) then
           normal(0) = 0
           call get_node_vector('knl ', nn, normal)
@@ -529,7 +557,6 @@ subroutine suelem(el, ve, we, tilt, code)
        ! all straight elements and catch all; use default VE and WE
 
      end select
-
 end subroutine suelem
 
 subroutine sufill(suml, v, theta, phi, psi, globaltilt,name_add)

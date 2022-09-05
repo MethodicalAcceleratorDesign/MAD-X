@@ -1,0 +1,57 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %05s "MYSEQ"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le       0.00051099895
+@ CHARGE           %le                   1
+@ ENERGY           %le                   1
+@ PC               %le        0.9999998694
+@ GAMMA            %le         1956.951184
+@ KBUNCH           %le                   1
+@ BCURRENT         %le     8.005339097e-12
+@ SIGE             %le               0.001
+@ SIGT             %le                   1
+@ NPART            %le                   1
+@ EX               %le                   1
+@ EY               %le                   1
+@ ET               %le               0.001
+@ BV_FLAG          %le                   1
+@ LENGTH           %le                   6
+@ ALFA             %le                   0
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le                   0
+@ Q1               %le          0.22550173
+@ Q2               %le        0.2220111623
+@ DQ1              %le                   0
+@ DQ2              %le                   0
+@ DXMAX            %le       0.03921379654
+@ DYMAX            %le                   0
+@ XCOMAX           %le      0.006777284362
+@ YCOMAX           %le                   0
+@ BETXMAX          %le         35.25026494
+@ BETYMAX          %le         38.80238928
+@ XCORMS           %le      0.004598346706
+@ YCORMS           %le                   0
+@ DXRMS            %le       0.02484195936
+@ DYRMS            %le                   0
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le                   0
+@ DQMIN_PHASE      %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.06.01 Linux 64"
+@ DATE             %08s "21/04/21"
+@ TIME             %08s "10.09.30"
+* NAME                                S                 DX                 DY               BETX               BETY                  X                 PX                  Y 
+$ %s                                %le                %le                %le                %le                %le                %le                %le                %le 
+ "MYSEQ$START"                        0                  0                  0                  1                  1              0.001              0.001                  0
+ "DRIFT_0"                 0.9999979167   -0.0009999980472                  0        1.999995833        1.999995833     0.001999997917              0.001                  0
+ "S1"                       2.000002083     0.003028374182                  0        4.927151827        5.073472306     0.002976710232    0.0009501440274                  0
+ "DRIFT_1"                            6      0.03921379654                  0        35.25026494        38.80238928     0.006777284362    0.0009501440274                  0
+ "MYSEQ$END"                          6      0.03921379654                  0        35.25026494        38.80238928     0.006777284362    0.0009501440274                  0

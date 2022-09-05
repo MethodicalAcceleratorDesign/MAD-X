@@ -116,6 +116,13 @@ subroutine w_ptc_setmapdumplevel(level)
   call ptc_setmapdumplevel(level)
 end subroutine w_ptc_setmapdumplevel
 
+subroutine w_ptc_setmadprint(level)
+  use madx_ptc_intstate_module
+  implicit none
+  integer level
+  call ptc_setmadprint(level)
+end subroutine w_ptc_setmadprint
+
 subroutine w_ptc_setseed(seed)
   use madx_ptc_intstate_module
   implicit none
@@ -206,6 +213,14 @@ subroutine w_ptc_setenvelope(method)
   integer method
   call ptc_setenvelope(method)
 end subroutine w_ptc_setenvelope
+
+subroutine w_ptc_setspin(method)
+  use precision_constants
+  use madx_ptc_intstate_module
+  implicit none
+  integer method
+  call ptc_setspin(method)
+end subroutine w_ptc_setspin
 
 subroutine w_ptc_setstochastic(method)
   use precision_constants

@@ -264,6 +264,7 @@ contains
 
          if (pushes(i)%pushtab) then
             coeff = e.sub.monstr
+            if ((mod(iachar(monstr(6:6))-iachar('0'),2).eq.1).neqv.(pushes(i)%element.eq.5)) coeff = -coeff
 
             if (getdebug()>3) then
                write(6,'(a21, a10, a3, f9.6, a10, i1, 5(a13), i3)') &

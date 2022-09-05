@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.08.10 13:26:37      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.08.10 02:01:48      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "LHC 6.5 with errors and orbit correction using MADX";
 
@@ -70,8 +70,11 @@ orbit:  -5.000009E-04 -2.550922E-09 -4.453829E-12 -3.996772E-12  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.412687196e-09 
+
+       dqmin_phase 
+      0.9013140907 
 
 
 // Now a machine with the bumps as a target orbit 
@@ -119,8 +122,11 @@ orbit:  -5.000008E-04 -2.358324E-09  8.002250E-12  1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.083008962e-08 
+
+       dqmin_phase 
+       1.861239221 
 
 
 // Now a machine with the modified bumps as another target orbit 
@@ -168,8 +174,11 @@ orbit:  -5.000008E-04 -2.426804E-09  1.748509E-12  1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.131673334e-08 
+
+       dqmin_phase 
+       1.842247831 
 
 
 // Switch off again the bumps and mis-align the machine
@@ -230,8 +239,11 @@ orbit:  -3.439240E-04 -7.343209E-05  2.348868E-04  2.504445E-05  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.001928753113 
+
+       dqmin_phase 
+      -2.833209211 
 
 
 // Prepare first correction to zero orbit
@@ -2025,8 +2037,11 @@ orbit:  -2.464539E-06 -6.064158E-06  1.416703E-06  1.815025E-06  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    0.0009816839926 
+
+       dqmin_phase 
+       1.158423139 
 
 
 !******************************************************************
@@ -3797,8 +3812,11 @@ orbit:  -5.000242E-04 -1.023773E-05  3.847989E-06  1.383022E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.00100091521 
+
+       dqmin_phase 
+        1.19859319 
 
 
 !******************************************************************
@@ -5577,8 +5595,11 @@ orbit:  -5.007148E-04 -7.334842E-06  4.787692E-06  1.383023E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     0.001001090442 
+
+       dqmin_phase 
+       1.199507824 
 
 
 !******************************************************************

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:29:14      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:05:25      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -42,8 +42,11 @@ orbit:   3.260716E-04  2.596347E-06  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 command: beta0  module: control
 parameter: betx   double value:        177.7010914
 parameter: alfx   double value:        -2.41257182
@@ -93,7 +96,7 @@ Determined SECTOR NMUL MAX :  2
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
+ After    end:   -40.580758467025461        0.0000000000000000        532.53346053079542     
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -116,7 +119,7 @@ Determined SECTOR NMUL MAX :  2
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    8.8928275451881912E-005   7.2772896895472756E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    8.8928263608289710E-005   7.2773018389883234E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 ++++++ table: ptc_twiss_summary
 
@@ -124,22 +127,22 @@ Determined SECTOR NMUL MAX :  2
              534.6    0.0004431145119           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003550790607        47.50529435       0.2546195015 
+          -1000000    0.0003550790607        47.50529435       0.2546195014 
 
                 q2                dq1                dq2                 qs 
       0.2546003528        1.051169737        1.046958093                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-        32.0497509        177.6889149        32.05081522        177.7045042 
+       32.04975092        177.6889149        32.05081524        177.7045042 
 
          beta11min          beta11max          beta12min          beta12max 
-        32.0497509        177.6889149                  0                  0 
+       32.04975092        177.6889149                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
                  0                  0                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
-       32.05081522        177.7045042                  0                  0 
+       32.05081524        177.7045042                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
                  0                  0                  0                  0 
@@ -148,25 +151,25 @@ Determined SECTOR NMUL MAX :  2
                  0                  0                  0        2.176305716 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.02964638027      0.02964631229                  0                  0 
+    -0.02964638027      0.02964631228                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    8.892827545e-05 
+                 0                  0                  0    8.892826361e-05 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-    7.27728969e-07                  0                  0                  0 
+   7.277301839e-07                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0    7.160124161e-05                  0    8.586224261e-07 
+                 0    7.160125798e-05                  0    8.586225705e-07 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    8.892842358e-05 
+                 0                  0                  0    8.892828948e-05 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    7.281198665e-07                  0                 -0 
+                 0    7.281183853e-07                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0    5.218804991e-05                  0   -1.674875983e-06 
+                 0     5.21880807e-05                  0   -1.674873825e-06 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
@@ -192,7 +195,7 @@ Determined SECTOR NMUL MAX :  2
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    8.8928275451881912E-005   7.2772896895472756E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    8.8928263608289710E-005   7.2773018389883234E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
   Number of warnings: 0
 

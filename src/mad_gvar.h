@@ -134,6 +134,8 @@ extern struct table* errors_total;
 extern struct table* errors_read;        /* table needed for IO of errors with PTC */
 
 extern struct table* survey_table;       /* current survey table */
+extern struct table* emit_table;         /* current emit table */
+extern struct table* emitsumm_table;         /* current emit table */
 extern struct table* corr_table;         /* corrector table after orbit correction */
 extern struct table* corr_table1;        /* corrector table after orbit correction, beam 1 for two rings */
 extern struct table* corr_table2;        /* corrector table after orbit correction, beam 2 for two rings */
@@ -193,6 +195,7 @@ extern char int_format[20],             /* current integer format */
 extern char blank[];
 extern char none[];
 extern char one_string[];
+
 // 2015-Jul-31  11:41:59  ghislain: aperture twiss file for output of twiss table ! not needed
 //extern char aptwfile[FNAME_L];
 extern char* aux_char_pt;               /* for debug purposes */

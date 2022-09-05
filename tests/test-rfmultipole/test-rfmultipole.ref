@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:28:00      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:40:12      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -40,8 +40,11 @@ final orbit vector:     1.000000E+00  4.214857E-03  0.000000E+00  1.041119E-01  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 @ NAME             %05s "TWISS"
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %09s "TEST_LINE"
@@ -84,10 +87,14 @@ final orbit vector:     1.000000E+00  4.214857E-03  0.000000E+00  1.041119E-01  
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le                   0
+@ DQMIN_PHASE      %le                   0
 @ TITLE            %20s "test of rf-multipole"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "29/07/20"
-@ TIME             %08s "16.28.00"
+@ ORIGIN           %16s "5.07.00 Linux 64"
+@ DATE             %08s "10/12/21"
+@ TIME             %08s "13.40.12"
 * NAME                                S                  L                  X                 PX                  Y                 PY                  T                 PT                K0L 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TEST_LINE$START"                    0                  0                  1                  0                  0                  0                  1                  0                  0
@@ -117,6 +124,7 @@ exit TRACK module
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
 
+++++++ info: c6t - long names flag selected 
 Reference radius set to : 0.017000
 warning while converting rfmultipole: components beyond octupole are ignored
 ++++++ info: MADX sequence converted to c6t internal. 

@@ -13,6 +13,8 @@
 doc/latexuguide/1
 doc/latexuguide/*.ilg
 doc/latexuguide/*.ind
+doc/user_manual_temp
+doc/html/
 
 # Build/Binaries:
 *.o
@@ -24,6 +26,27 @@ madx64
 numdiff-*-*
 numdiff32
 numdiff64
+
+#VS Code
+.vscode
+
+# Cmake
+CMakeCache.txt
+CMakeFiles/
+*.cmake
+build_cmake/
+dist/
+DartConfiguration.tcl
+doc/Makefile
+include/
+syntax/Makefile
+src/Makefile
+libs/DISTlib/Makefile
+libs/DISTlib/source/Makefile
+libs/ptc/src/Makefile
+install_manifest.txt
+tools/Makefile
+
 
 # Coverage
 *.gcda
@@ -82,16 +105,21 @@ tests/**/resultb[0-9]
 tests/**/result[0-9]
 tests/**/*.tab[0-9]
 tests/**/dummyone
+tests/**/*.outone
 
 tests/test-cororbit-2/cx12.tab_1
 tests/test-cororbit-2/cx12.tab_2
 tests/test-cororbit-2/plot.orb
+tests/test-crabcavity/fodo.ptc
 tests/test-dynap/dynap
 tests/test-dynap/dynaptune
 tests/test-dynap/fort.69
 tests/test-dynap/twiss-table-1
 tests/test-dynap/twiss-table-2
+tests/test-elseparator/testseq_thin.seq
 tests/test-emit-2/twiss1
+tests/test-error-4/esave.err
+tests/test-error-4/mye.err
 tests/test-error-2/err.file5ac
 tests/test-makethin-2/V6.5.thin.b1.seq
 tests/test-makethin-3/V6.5.thin.b1.seq
@@ -100,20 +128,38 @@ tests/test-makethin/fivecell_thin_collim.seq
 tests/test-makethin/fivecell_thin_options.seq
 tests/test-makethin/fivecell_thin_simple.seq
 tests/test-makethin/fivecell_thin_teapot.seq
+tests/test-makethin-4/fivecell_thin_options.seq
+tests/test-permalign-2/twiss.tfs_thin
+tests/test-permalign-3/mysliced.seq
+tests/test-permalign-4/mysliced.seq
 tests/test-plot-2/madx.ps
 tests/test-plot/plot1.ps
 tests/test-plot/plot1one
 tests/test-plot/plot2.ps
+tests/test-ptc-align-2/srot.C
+tests/test-ptc-align-2/thistableone
+tests/test-ptc-align/srot.C
+tests/test-ptc-elements/Cptc.tsf
+tests/test-ptc-elements/Cptc_cfg.tsf
+tests/test-ptc-normal-5D-beambeam/leir.ptc.normal
 tests/test-ptc-track/trackoneLag0
 tests/test-ptc-track/trackoneLag90
+tests/test-ptc-twiss-5D/leir.C
 tests/test-ptc-twiss-normal-genfu/transfer.map
 tests/test-ptc-twiss-old5/normal_results
 tests/test-ptc-twiss-old6/normal_results
 tests/test-ptc-twiss-old6/summaryMomentumCompaction
+tests/test-ptc-twiss-tilt/twiss.madx.simple
+tests/test-ptc-twiss-tilt/twiss.ptc.simple
+tests/test-read-write-hex/seq_ascii.seq
+tests/test-read-write-hex/seq_hex.seq
 tests/test-rfmultipole-ptc-1/trackone
 tests/test-rfmultipole/test1_flat.seq
 tests/test-sequence-3/ad.save
 tests/test-sequence-4/all_survey
+tests/test-sequence-8/zz.seq
+tests/test-survey-4/survey
+tests/test-tapering/taper2.seq
 tests/test-thick-quad-3/fivecell_thin.seq
 tests/test-track-3/out_done
 tests/test-track-3/out_fone
@@ -125,3 +171,12 @@ tests/test-twiss-10/twiss2
 tests/test-twiss-11/dec17i.lis
 tests/test-twiss-13/twiss.tsf
 tests/test-twiss-2/my_sect_file
+tests/test-beambeam-npart/trackbbone
+tests/test-beambeam-npart/trackbeamone
+tests/test-ptc-twiss-6D-ALS/end.map
+tests/test-ptc-twiss-6D-ALS/fort.17
+tests/test-ptc-twiss-6D-ALS/fort.19
+
+
+
+

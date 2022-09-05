@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:00:28      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:04:37      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'FIVECELL matching with MAD-X. Vlength option';
 
@@ -305,6 +305,7 @@ START MATCHING
 
 number of sequences: 1
 sequence name: fivecell
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
 constraint,sequence=fivecell,range=#e,mux=1.27,muy=1.77, betx=205.9;
 
 vary,name=mq->l, lower=0.1, upper=2.95, step=1.e-6;
@@ -321,103 +322,304 @@ total constraints:      3
 
 START JACOBIAN:
 
- reset parameter:mq->l                                           from   3.1000000000000001      to   2.9499980000000003
+ reset parameter:mq->l                                           from   3.1000000000000001      to   2.9499980000000003     
  JACOBIAN Strategy =           3
-Initial Penalty Function =   0.8571976411662916E+02
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+Initial Penalty Function =   0.8571976411659072E+02
 
 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    3.3507441744625967E-004
-call:     2 Dx =   0.33507442E-03  Penalty function =  0.1234185654269677E+02
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 72 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    3.3507441753049681E-004
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 72 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:     2 Dx =   0.33507442E-03  Penalty function =  0.1234185654424471E+02
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 72 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 72 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 72 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                  -Infinity
- Step length    9.7056937140593277E-005
-call:     3 Dx =   0.97056937E-04  Penalty function =  0.8737660271284874E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                     
+ Step length    9.7056937541582469E-005
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                     
+call:     3 Dx =   0.97056938E-04  Penalty function =  0.8737660259789395E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                     
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                     
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                     
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    2.7283158437869600E-004
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+ Step length    2.7283158571068646E-004
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 40 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Bisec iteration            1
-call:     4 Dx =   0.27283144E-03  Penalty function =  0.2107071319635884E+02
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 40 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:     4 Dx =   0.27283144E-03  Penalty function =  0.2107071343913402E+02
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 40 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 40 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 40 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    1.3532680073402088E-004
-call:     5 Dx =   0.13532680E-03  Penalty function =  0.7232243920913150E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                     
+ Step length    1.3532680159821758E-004
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                     
+call:     5 Dx =   0.13532680E-03  Penalty function =  0.7232243985090493E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                     
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                     
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 120 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                     
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    5.5977797725587182E-005
-call:     6 Dx =   0.55977798E-04  Penalty function =  0.5025520750024346E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 36 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    5.5977797671812293E-005
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 36 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:     6 Dx =   0.55977798E-04  Penalty function =  0.5025520797223091E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 36 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 36 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 36 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    2.8710609302193750E-005
-call:     7 Dx =   0.28710609E-04  Penalty function =  0.4318498031407400E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    2.8710609958261286E-005
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:     7 Dx =   0.28710610E-04  Penalty function =  0.4318498031492595E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    6.9148180679602402E-007
-call:     8 Dx =   0.69148181E-06  Penalty function =  0.4317998027649040E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    6.9148196081376431E-007
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:     8 Dx =   0.69148196E-06  Penalty function =  0.4317998027637795E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    1.6780997655873195E-007
-call:     9 Dx =   0.16780998E-06  Penalty function =  0.4317994194933886E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    1.6780976778189642E-007
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:     9 Dx =   0.16780977E-06  Penalty function =  0.4317994194928619E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    2.0140333245264267E-008
-call:    10 Dx =   0.20140333E-07  Penalty function =  0.4317994090479923E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    2.0140505260481599E-008
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    10 Dx =   0.20140505E-07  Penalty function =  0.4317994090474258E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    2.5072710247677046E-009
-call:    11 Dx =   0.25072710E-08  Penalty function =  0.4317994083220671E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    2.5070574909822782E-009
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    11 Dx =   0.25070575E-08  Penalty function =  0.4317994083214479E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    3.1058587613026774E-010
-call:    12 Dx =   0.31058588E-09  Penalty function =  0.4317994082408038E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    3.1076995283157793E-010
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    12 Dx =   0.31076995E-09  Penalty function =  0.4317994082404908E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    3.8571867339619009E-011
-call:    13 Dx =   0.38571867E-10  Penalty function =  0.4317994082309604E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    3.8313906879237778E-011
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    13 Dx =   0.38313907E-10  Penalty function =  0.4317994082304476E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    4.6543499767132811E-012
-call:    14 Dx =   0.46543500E-11  Penalty function =  0.4317994082295565E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    4.8484595901315357E-012
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    14 Dx =   0.48484596E-11  Penalty function =  0.4317994082290519E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    7.6821171881904333E-013
-call:    15 Dx =   0.76821172E-12  Penalty function =  0.4317994082293422E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    7.1789471147807427E-013
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    15 Dx =   0.71789471E-12  Penalty function =  0.4317994082288394E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    1.4270979945553059E-013
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    8.7842525020710200E-014
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Bisec iteration            1
-call:    16 Dx =   0.14270980E-12  Penalty function =  0.4317994082295435E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    16 Dx =   0.87842525E-13  Penalty function =  0.4317994082288204E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    6.7804699082765448E-014
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    7.4000771026918023E-014
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    17 Dx =   0.74000771E-13  Penalty function =  0.4317994082287330E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Solve system with            3 con,           3 var
+ Rank             2   Condition number                   Infinity
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    3.5742724520140874E-014
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Bisec iteration            1
-call:    17 Dx =   0.67804699E-13  Penalty function =  0.4317994082292794E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    18 Dx =   0.35742725E-13  Penalty function =  0.4317994082288806E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    1.4032466723683672E-013
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    9.2812557872578496E-014
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    19 Dx =   0.92812558E-13  Penalty function =  0.4317994082287870E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Solve system with            3 con,           3 var
+ Rank             2   Condition number                   Infinity
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Step length    6.9010144256310122E-014
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
  Bisec iteration            1
-call:    18 Dx =   0.14032467E-12  Penalty function =  0.4317994082294416E+01
- Solve system with            3 con,           3 var
- Rank             2   Condition number                   Infinity
- Step length    1.0290692511317495E-013
-call:    19 Dx =   0.10290693E-12  Penalty function =  0.4317994082293648E+01
- Solve system with            3 con,           3 var
- Rank             2   Condition number                   Infinity
- Step length    3.9333335670688860E-014
-call:    20 Dx =   0.39333336E-13  Penalty function =  0.4317994082293573E+01
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+call:    20 Dx =   0.69010144E-13  Penalty function =  0.4317994082288153E+01
  ++++++++++ JACOBIAN ended: call limit
- Final difference norm:   3.0112485695086236E-002
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+ Final difference norm:   3.0112485694760455E-002
 endmatch;
 
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-fivecell$end:1             betx         4     2.05900000E+02     2.05619799E+02     7.85127877E-02
+++++++ warning: TWCLORB:  Longitudinal plane might be unstable. Try change lag with 0.5. More information with the debug flag on.                                                                                                                                                   
+++++++ warning: TWCPTK:  The f1010 is bigger than the f1001 in: 28 location, out of 133 in total. The Dqmin estimate might be inaccurate.                                      
+fivecell$end:1             betx         4     2.05900000E+02     2.05619799E+02     7.85127878E-02
 fivecell$end:1             mux          4     1.27000000E+00     1.45955488E+00     3.59310524E+00
-fivecell$end:1             muy          4     1.77000000E+00     1.85039752E+00     6.46376053E-01
+fivecell$end:1             muy          4     1.77000000E+00     1.85039752E+00     6.46376054E-01
 
 
 Final Penalty Function =   4.31799408e+00
@@ -426,7 +628,7 @@ Final Penalty Function =   4.31799408e+00
 
 
 
-Variable                 Final Value  Initial Value Lower Limit  Upper Limit
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
 mq->l                     2.95000e+00  3.10000e+00  1.00000e-01  2.95000e+00
 kqf                       9.93185e-03  9.07757e-03 -1.00000e+20  1.00000e+20
@@ -440,7 +642,8 @@ VARIABLE "TAR" SET TO   4.31799408e+00
 stop;
 
 
-  Number of warnings: 0
+  Number of warnings: 202
+0 in C and 202 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

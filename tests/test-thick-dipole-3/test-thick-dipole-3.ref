@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:26:13      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:48:04      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -debug, -echo;
 
@@ -35,8 +35,11 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
                synch_2                synch_3                synch_4                synch_5 
                      0                      0                      0                      0 
 
-               synch_6                synch_8                 nflips 
-                     0                      0                      0 
+               synch_6                synch_8                 nflips                  dqmin 
+                     0                      0                      0                      0 
+
+           dqmin_phase 
+ 2.921360390768495e-06 
 ++++++ warning: SAVE makes all previous USE invalid !  
 makethin: style chosen : teapot
 makethin: slicing sequence : myseq
@@ -67,8 +70,11 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
                synch_2                synch_3                synch_4                synch_5 
                      0                      0                      0                      0 
 
-               synch_6                synch_8                 nflips 
-                     0                      0                      0 
+               synch_6                synch_8                 nflips                  dqmin 
+                     0                      0                      0                      0 
+
+           dqmin_phase 
+ 2.843352561002397e-06 
 enter TRACK module
 one pass is on
 

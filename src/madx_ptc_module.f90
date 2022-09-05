@@ -61,15 +61,15 @@ MODULE madx_ptc_module
      integer                 :: nelements = 0
      type(fibreptr)          :: elements(maxelperclock)
   end type clockdef
-  
-  
+
+
   integer, private, parameter:: nmaxclocks = 3
   type(clockdef),  dimension(nmaxclocks) :: clocks ! 3 pointers
   integer                                :: nclocks = 0
 
   real(dp) :: beta0start
   real(dp) :: my_ring_length
-  
+
   character(1000), private  :: whymsg
   external :: aafail, dcopy, get_node_vector, fort_warn
   external :: element_name, node_name, node_string
@@ -96,7 +96,7 @@ CONTAINS
     implicit none
     real(kind(1d0)) get_value
     integer maxnmul
-
+    
     use_quaternion=.true.
 
     piotr_freq=.true. ! PTC flag in cavity tracking to have correct phasing with time=false
@@ -158,8 +158,8 @@ CONTAINS
           return
        endif
 
-       sector_nmul_max = maxnmul
-       sector_nmul     = maxnmul
+       sector_nmul_max = maxnmul + 1
+       sector_nmul     = maxnmul + 1
     else
        sector_nmul = get_value('ptc_create_universe ','sector_nmul ')
     endif
@@ -217,6 +217,12 @@ CONTAINS
     endif
 
     cavsareset = .false.
+!    cavsareset = get_value('ptc_setswitch ', 'maxacceleration ').eq.0
+!    if (getdebug() > 1) then
+!      print *, 'maxacceleration =', cavsareset
+!    endif
+!    cavsareset = .not. cavsareset
+
     mytime=get_value('ptc_create_layout ','time ').ne.0
 
     if(mytime) then
@@ -256,6 +262,7 @@ CONTAINS
     use twtrrfi
     use twiss0fi
     use name_lenfi
+    use code_constfi
     implicit none
     logical(lp) particle,doneit,isclosedlayout
     integer i,j,k,code,nt,icount,nn,ns,nd,mg,napoffset,get_string
@@ -297,7 +304,7 @@ CONTAINS
     integer, parameter :: aplen=0
     REAL(DP), pointer, dimension (:) :: apx => null()
     REAL(DP), pointer, dimension (:) :: apy => null()
-    
+
 
 
     !real :: tstart, tfinish, tsum
@@ -335,13 +342,13 @@ CONTAINS
     beta0=e0f/ENERGY
 
 
-    if(abs(pma-pmae)/pmae<c_0_002) then
+    if(abs(pma-pmae)/pmae<0.0001_DP) then
        if (getdebug() > 1) then
            print *,'Executing MAKE_STATES(TRUE), i.e. ELECTRON beam'
        endif
        particle=.true.
        CALL MAKE_STATES(PARTICLE)
-    elseif(abs(pma-pmap)/pmap<c_0_002) then
+    elseif(abs(pma-pmap)/pmap<0.0001_DP) then
        if (getdebug() > 1) then
            print *,'Executing MAKE_STATES(FALSE), i.e. PROTON beam'
        endif
@@ -350,7 +357,7 @@ CONTAINS
     else
        muonfactor=pma/pmae
        if (getdebug() > 1) then
-           print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. PROTON beam'
+           print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. CUSTOM beam'
        endif
        CALL MAKE_STATES(muonfactor)
     endif
@@ -557,6 +564,14 @@ CONTAINS
 
     ord_max = -1
 
+    exact1=node_value("exact ")
+
+    if(exact1.eq.0.or.exact1.eq.1) then
+       EXACT_MODEL = exact1 .ne. 0
+    else
+       EXACT_MODEL = exact0
+    endif
+
     call zero_key(key)
 
     !j=j+1
@@ -610,14 +625,6 @@ CONTAINS
        metd = method0
     endif
 
-    exact1=node_value("exact ")
-
-    if(exact1.eq.0.or.exact1.eq.1) then
-       EXACT_MODEL = exact1 .ne. 0
-    else
-       EXACT_MODEL = exact0
-    endif
-
     !special node keys
     key%list%permfringe=node_value("fringe ") ! transfer(node_value("fringe ") .ne. zero, key%list%permfringe)
     key%list%bend_fringe=node_value("bend_fringe ") .ne. zero
@@ -629,11 +636,11 @@ CONTAINS
     APERTURE = zero
     nn = 0
     call get_node_vector('aperture ',nn,aperture)
-    
+
     apoffset = zero
     napoffset = 0
     call get_node_vector('aper_offset ',napoffset,apoffset)
-    
+
     if (getdebug() > 2) then
        print*,' Aperture type: >',aptype,'< ',nn,' parameters:'
        do i=1,nn
@@ -644,9 +651,9 @@ CONTAINS
          print*,'             ',i,' : ',apoffset(i)
        enddo
     endif
-    
-    
-    
+
+
+
     !print*, name,'madx_ptc_module: Got for aperture nn=',nn, aperture(1), aperture(2)
 
     if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then
@@ -716,14 +723,14 @@ CONTAINS
           write(whymsg,*) 'Aperture: <<',aptype,'>> at magnet ',name(:len_trim(name)),' is not implemented by PTC'
           call fort_warn('ptc_createlayout: ',whymsg(:len_trim(whymsg)))
           call aafail('ptc_input:','Aperture type not implemented. Program stops')
-          
+
         case("general") ! 2015-Mar-10  14:25:48  ghislain: kind was 6
           key%list%aperture_kind=8
           print*,"General aperture not implemented"
           call aafail('ptc_input:','General aperture not implemented. Program stops')
-        
+
         case DEFAULT
-          
+
           ! in case aperture is defined as file with arbitrary polygon points
           i = get_userdefined_geometry_len()
           if (i > 0) then
@@ -734,36 +741,36 @@ CONTAINS
               key%list%aperture_x=0
               key%list%aperture_y=0
             endif
-             
+
             allocate(apx(i))
             allocate(apy(i))
-            
+
             i = get_userdefined_geometry(apx,apy,i)
-            
+
             key%list%APERTURE_POLYGX => apx
             key%list%APERTURE_POLYGY => apy
-            
+
             key%list%aperture_on=.true.
             key%list%aperture_kind=6
-            
+
             if (getdebug()>1)  then
               print*, "Aperture defined as a polygon with ", i, " points "
             endif
-          
+
           else
-          
-          
+
+
             write(whymsg,*) 'Aperture: <<',aptype,'>> at magnet ',name(:len_trim(name)),' is not recognized by PTC'
             call fort_warn('ptc_createlayout: ',whymsg(:len_trim(whymsg)))
             call aafail('ptc_input:','Aperture type not implemented. Program stops')
           endif
        end select
-       
-       
+
+
        key%list%aperture_dx=apoffset(1)
        key%list%aperture_dy=apoffset(2)
-       
-       
+
+
   !  else
   !   if( .not. ((code.eq.1) .or. (code.eq.4)) ) then
   !     write(*,'(a10,1x,a16,1x,a14,1x,6f10.6)') 'Aperture: ',aptype(1:16),'aperture pars:', aperture(1:6)
@@ -781,14 +788,11 @@ CONTAINS
 
 
     select case(code)
-    case(0,25)
+
+    case(0, code_marker, code_beambeam) ! case(0,25,22)
        key%magnet="marker"
-    case(4)
-       call aafail('ptc_input:','PTC does not accept matrix elements. Program stops.')
-    case(22)
-       key%magnet="marker"
-    !case(1,11)
-    case(1,20,21,44)
+
+    case(code_drift, code_rcollimator, code_ecollimator, code_collimator) ! case(1,20,21,44)
        key%magnet="drift"
        CALL CONTEXT(key%list%name)
 
@@ -799,7 +803,27 @@ CONTAINS
           endif
        enddo
        ! end etienne Helical
-    case(2) ! PTC accepts mults
+
+       !  2015-Mar-05  13:13:35  ghislain: Warning !
+       !                         ecollimator and rcollimator replaced by collimator in MAD-X, with code 44
+       !  case(20)
+       !     key%magnet="ecollimator"
+       !     key%list%x_col=node_value('xsize ')
+       !     key%list%y_col=node_value('ysize ')
+       !     key%tiltd=node_value('tilt ')
+       !  case(21)
+       !     key%magnet="rcollimator"
+       !     key%list%x_col=node_value('xsize ')
+       !     key%list%y_col=node_value('ysize ')
+       !     key%tiltd=node_value('tilt ')
+
+       !case(20,21,44)
+       !        key%magnet="madcollimator"
+       !        key%list%x_col=1e3
+       !        key%list%y_col=1e3
+       !        key%tiltd=node_value('tilt ')
+
+    case(code_rbend) ! case(2) ! PTC accepts mults
        if(l.eq.zero) then
           key%magnet="marker"
           goto 100
@@ -809,7 +833,7 @@ CONTAINS
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+tempdp*l)
+       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1+node_value('ktap '))
 
        !       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
        !       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
@@ -859,8 +883,14 @@ CONTAINS
              truerbend=node_value('truerbend ').ne.0
              if(truerbend) then
                 key%magnet="TRUERBEND"
-                if(key%list%t2/=zero) then
+                if(key%list%t2/=zero .or. key%list%t1/=zero) then
                    write(6,*) " The true parallel face bend "
+                   if (key%list%t1/=zero) then
+                      write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                      write(6,*) " Piotr has to implement patches around it to tackle E1=/0  "
+                      write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   endif
+
                    write(6,*) " only accepts the total angle and e1 as an input "
                    write(6,*) " if e1=0, then the pipe angle to the entrance face is "
                    write(6,*) " angle/2. It is a normal rbend."
@@ -869,6 +899,7 @@ CONTAINS
                    write(6,*) " with the exit face."
                    write(6,*) " The offending non-zero t2 = (e2 - angle/2) is set to zero! "
                    write(6,*) " Make sure that this is what you want!!! "
+
                    !                write(6,*) " CHANGE YOUR LATTICE FILRE."
                    !                stop 666
                    key%list%t2=zero
@@ -886,8 +917,8 @@ CONTAINS
              call augment_count('errors_dipole ')
           endif
        endif
-    case(3) ! PTC accepts mults watch out sector_nmul defaulted to 22
 
+    case(code_sbend) ! case(3) ! PTC accepts mults watch out sector_nmul defaulted to 22
        if (getdebug()>2) print*,"Translating SBEND"
        if(l.eq.zero) then
           if (getdebug()>2) print*,"Length zero -> translating as MARKER"
@@ -910,7 +941,7 @@ CONTAINS
        endif
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+ tempdp*l)
+       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1+node_value('ktap '))
 
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
@@ -965,7 +996,7 @@ CONTAINS
          print*,"H2=", key%list%h2
        endif
 
-    case(5)
+    case(code_quadrupole) ! case(5)
        key%magnet="quadrupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
@@ -977,8 +1008,8 @@ CONTAINS
        sk0=node_value('k0 ')
 
        ! quadrupole components
-       sk1= node_value('k1 ')+node_value('k1tap ')
-       sk1s=node_value('k1s ')
+       sk1= node_value('k1 ')  * (1 + node_value('ktap '))
+       sk1s=node_value('k1s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
        dum1=key%list%k(2)-normal_0123(1)
        dum2=key%list%ks(2)-skew_0123(1)
@@ -1018,14 +1049,14 @@ CONTAINS
 ! LD: 19.06.2019
        key%list%k(1)=key%list%k(1)+bvk*sk0
 
-    case(6)
+    case(code_sextupole) ! case(6)
        key%magnet="sextupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        ! sextupole components
-       sk2= node_value('k2 ') + node_value('k2tap ')
-       sk2s=node_value('k2s ')
+       sk2= node_value('k2 ')  * (1 + node_value('ktap '))
+       sk2s=node_value('k2s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
        dum1=key%list%k(3)-normal_0123(2)
        dum2=key%list%ks(3)-skew_0123(2)
@@ -1059,7 +1090,7 @@ CONTAINS
           endif
        endif
 
-    case(7)
+    case(code_octupole) ! case(7)
        key%magnet="octupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
@@ -1087,7 +1118,7 @@ CONTAINS
 
        !================================================================
 
-    case(8)
+    case(code_multipole) ! case(8)
        if (getdebug()>2) print*,"Translating MULTIPOLE"
        key%magnet="multipole"
        !---- Multipole components.
@@ -1180,7 +1211,7 @@ CONTAINS
        endif
 
 
-    case(9) ! PTC accepts mults
+    case(code_solenoid) ! case(9) ! PTC accepts mults
        key%magnet="solenoid"
        ks=node_value('ks ')
        if(l.ne.zero) then
@@ -1200,7 +1231,7 @@ CONTAINS
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
-    case(10)
+    case(code_rfcavity) ! case(10)
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -1232,12 +1263,6 @@ CONTAINS
        !  endif
        endif
 
-       !  case(11)
-       !     key%magnet="elseparator"
-       !     key%list%volt=node_value('ex ')
-       !     key%list%lag=atan2(node_value('ey '),node_value('ex '))
-       !     key%tiltd=node_value('tilt ')
-
        m_u%end%HARMONIC_NUMBER=node_value('harmon ')   ! etienne_harmon
        no_cavity_totalpath=node_value('no_cavity_totalpath ').ne.0
        if(no_cavity_totalpath) then
@@ -1251,7 +1276,7 @@ CONTAINS
 
        modulationq = node_value('modulationq ')
        if (abs(modulationq) .gt. 1e-12) then
-         
+
          key%list%clockno_ac = getclockidx(modulationq)
 
          if (key%list%clockno_ac .lt. 0) then
@@ -1259,9 +1284,9 @@ CONTAINS
            'Too many AC Dipole clocks, PTC can accept max 3 clocks with given tune and ramp. Program stops.')
          endif
 
-       
-         key%list%n_ac = 1 
-         
+
+         key%list%n_ac = 1
+
          key%list%d_volt = node_value('volterr ')
          key%list%d_phas = node_value('lagerr ')
 
@@ -1279,7 +1304,7 @@ CONTAINS
 !                                    " harm: ", key%list%harmon, &
 !                                    " freq: ", key%list%freq0
 
-    case(11) ! LD: 04.07.2019
+    case(code_elseparator) ! case(11) ! LD: 04.07.2019
       key%magnet="elseparator"
       ex = node_value('ex ')
       ey = node_value('ey ')
@@ -1290,7 +1315,7 @@ CONTAINS
       key%list%volt=sqrt(ex**2 + ey**2)
       key%list%lag=atan2(ey,ex)
 
-    case(12)
+    case(code_srotation) ! case(12)
        ! actually our SROT element
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
@@ -1301,18 +1326,56 @@ CONTAINS
           key%list%ang(i)=patch_ang(i)
           key%list%t(i)=patch_trans(i)
        enddo
-    case(13)
-       ! actually our YROT element
+
+    case(code_xrotation) ! case(34) ! XROTATION
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
        PATCH_TRANS = zero
-       patch_ang(2)=node_value('angle ')
+       patch_ang(1)=node_value('angle ')
        key%list%patchg=2
        do i=1,3
           key%list%ang(i)=patch_ang(i)
           key%list%t(i)=patch_trans(i)
        enddo
-    case(14,15,16) ! PTC accepts mults
+
+    case(code_yrotation) ! case(13)
+       ! actually our YROT element
+       key%magnet="CHANGEREF"
+       PATCH_ANG = zero
+       PATCH_TRANS = zero
+       patch_ang(2)=-node_value('angle ')
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
+
+    case(code_changeref) ! case(35)
+       key%magnet="CHANGEREF"
+       PATCH_ANG = zero
+       PATCH_TRANS = zero
+       call get_node_vector('patch_ang ',3,patch_ang)
+       call get_node_vector('patch_trans ',3,patch_trans)
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
+       key%list%ang(2)=-patch_ang(2) ! Change the sign of the y-rotation to be the geometrical angle.
+
+    case(code_translation) ! case(36) ! TRANSLATION
+       key%magnet="CHANGEREF"
+       PATCH_ANG = zero
+       patch_trans(1)=node_value('dx ')
+       patch_trans(2)=node_value('dy ')
+       patch_trans(3)=node_value('ds ')
+       key%list%patchg=2
+       do i=1,3
+          key%list%ang(i)=patch_ang(i)
+          key%list%t(i)=patch_trans(i)
+       enddo
+
+    case(code_hkicker, code_kicker, code_vkicker) ! case(14,15,16) ! PTC accepts mults
        ! kickers (corrector magnets)
        F_ERRORS = zero
        n_ferr = node_fd_errors(f_errors)
@@ -1355,30 +1418,18 @@ CONTAINS
           endif
        endif
        key%tiltd=node_value('tilt ')
-    case(17)
+
+    case(code_hmonitor) ! case(17)
        key%magnet="hmonitor"
-    case(18)
+
+    case(code_monitor) ! case(18)
        key%magnet="monitor"
-    case(19)
+
+    case(code_vmonitor) ! case(19)
        key%magnet="vmonitor"
-       !  2015-Mar-05  13:13:35  ghislain: Warning !
-       !                         ecollimator and rcollimator replaced by collimator in MAD-X, with code 44
-       !  case(20)
-       !     key%magnet="ecollimator"
-       !     key%list%x_col=node_value('xsize ')
-       !     key%list%y_col=node_value('ysize ')
-       !     key%tiltd=node_value('tilt ')
-       !  case(21)
-       !     key%magnet="rcollimator"
-       !     key%list%x_col=node_value('xsize ')
-       !     key%list%y_col=node_value('ysize ')
-       !     key%tiltd=node_value('tilt ')
-    !case(20,21,44)
-    !        key%magnet="madcollimator"
-    !        key%list%x_col=1e3
-    !        key%list%y_col=1e3
-    !        key%tiltd=node_value('tilt ')
-    case(33)
+
+
+    case(code_dipedge) ! case(33)
        !---- This is the dipedge element
        edge= node_value('e1 ')
        hgap= node_value('hgap ')
@@ -1396,10 +1447,12 @@ CONTAINS
        else
           key%magnet="marker"
        endif
-    case(24)
+
+    case(code_instrument) ! case(24)
        key%magnet="instrument"
        key%tiltd=node_value('tilt ')
-    case(27)
+
+    case(code_twcavity) ! case(27)
        key%magnet="twcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -1414,39 +1467,9 @@ CONTAINS
        key%list%psi=node_value("psi ")
        key%list%harmon=one
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
-    case(34) ! XROTATION
-       key%magnet="CHANGEREF"
-       PATCH_ANG = zero
-       PATCH_TRANS = zero
-       patch_ang(1)=node_value('angle ')
-       key%list%patchg=2
-       do i=1,3
-          key%list%ang(i)=patch_ang(i)
-          key%list%t(i)=patch_trans(i)
-       enddo
-    case(35)
-       key%magnet="CHANGEREF"
-       PATCH_ANG = zero
-       PATCH_TRANS = zero
-       call get_node_vector('patch_ang ',3,patch_ang)
-       call get_node_vector('patch_trans ',3,patch_trans)
-       key%list%patchg=2
-       do i=1,3
-          key%list%ang(i)=patch_ang(i)
-          key%list%t(i)=patch_trans(i)
-       enddo
-    case(36) ! TRANSLATION
-       key%magnet="CHANGEREF"
-       PATCH_ANG = zero
-       patch_trans(1)=node_value('dx ')
-       patch_trans(2)=node_value('dy ')
-       patch_trans(3)=node_value('ds ')
-       key%list%patchg=2
-       do i=1,3
-          key%list%ang(i)=patch_ang(i)
-          key%list%t(i)=patch_trans(i)
-       enddo
-    case(37)!CRAB ??
+
+
+    case(code_crabcavity) ! case(37)
        key%magnet="rfcavity"
        key%list%volt=zero
        do i=1,NMAX
@@ -1475,8 +1498,7 @@ CONTAINS
 
     !RFMULTIPOLE, crab also falls here, but is made with special case where volt defines BN(1)
 
-    case(40)
-
+    case(code_hacdipole) ! case(40)
        key%magnet="hkicker"
        do i=1,NMAX
           key%list%k(i)=zero
@@ -1494,7 +1516,7 @@ CONTAINS
         if (getdebug() > 1) then
           print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
         endif
-        
+
         key%list%d_an(1) = zero
 
         key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
@@ -1513,8 +1535,7 @@ CONTAINS
         endif
 
 
-    case(41)
-
+    case(code_vacdipole) ! case(41)
        key%magnet="vkicker"
        do i=1,NMAX
           key%list%k(i)=zero
@@ -1527,11 +1548,11 @@ CONTAINS
         else
           key%list%d_an(1) =  0.3 * node_value('volt ')  / (beta0 * get_value('beam ','pc '))
         endif
-        
+
         if (getdebug() > 1) then
           print*,"VACD bn(1)=", key%list%d_an(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
         endif
-        
+
         key%list%d_bn(1) = zero
 
         key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
@@ -1550,7 +1571,7 @@ CONTAINS
         endif
 
 
-    case(43)
+    case(code_rfmultipole) ! case(43)
        key%magnet="rfcavity" ! RFMULTIPOLE
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
@@ -1656,11 +1677,15 @@ CONTAINS
 !                                    " freq: ", key%list%freq0
 
 
+    case(code_matrix) ! case(4)
+       call aafail('ptc_input:','PTC does not accept matrix elements. Program stops.')
 
     case default
        print*,"Element: ",name, "of type ",code," not implemented in PTC"
        call aafail('ptc_input:','Element not implemented in PTC. Program stops')
+
     end select
+
 100 continue
 
     !apply BVK f;ag
@@ -1680,7 +1705,7 @@ CONTAINS
       if (getdebug() > 1) then
          print*,"Adding Modulated Element: ",name, " of type ",code," to clock ",key%list%clockno_ac
       endif
-      
+
       call addelementtoclock(my_ring%end,key%list%clockno_ac)
     endif
 
@@ -1698,10 +1723,10 @@ CONTAINS
     if (getdebug() > 0) then
        print*,' Length of machine: ',l_machine
     endif
-    
+
     CALL GET_ENERGY(ENERGY,kin,BRHO,beta0,P0C)
     beta0start = beta0
-    
+
     isclosedlayout=get_value('ptc_create_layout ','closed_layout ') .ne. 0
 
     if (getdebug() > 0) then
@@ -1713,6 +1738,7 @@ CONTAINS
     endif
 
     MY_RING%closed=isclosedlayout
+
 
     doneit=.true.
     call ring_l(my_ring,doneit)
@@ -1732,6 +1758,7 @@ CONTAINS
        write(6,*) "Before   end: ",my_ring%end%chart%f%b
     endif
 
+    call make_node_layout(my_ring)
     call survey(my_ring)
 
     if (getdebug() > 0) then
@@ -1740,12 +1767,12 @@ CONTAINS
     endif
 
     call setintstate(default)
-    
+
     call get_length(my_ring,l)
     my_ring_length = l
     if(my_ring%HARMONIC_NUMBER>0) then
        print*,"HARMONIC NUMBER defined in the ring: ", my_ring%HARMONIC_NUMBER
-       
+
 
        j=restart_sequ()
        p=>my_ring%start
@@ -1909,7 +1936,7 @@ CONTAINS
           endif                                                !
        enddo                                                   !
     endif !====================================================!
-    if (key%magnet == 'sbend' .or. key%magnet == 'rbend') then 
+    if (key%magnet == 'sbend' .or. key%magnet == 'rbend') then
       bk0 = node_value('k0 ')
       if(bk0 .ne. 0) key%list%k(1) = key%list%k(1) + bk0 - node_value('angle ')/l
     endif
@@ -2138,7 +2165,7 @@ CONTAINS
     j=0
     f=>my_ring%start
 10  continue
-   
+
     j=j+1
     al_errors = 0
     n_align = node_al_errors(al_errors)
@@ -2298,22 +2325,26 @@ CONTAINS
 
   !_____________________________________________________
   subroutine misalign_element(f,al_errors)
-    use twiss0fi, only: align_max
-    TYPE(FIBRE),target,INTENT(INOUT):: f
-    REAL(DP),INTENT(IN) :: al_errors(align_max)
-    REAL(DP)             :: mis(align_max), omegat(3), basist(3,3)
+     use twiss0fi, only: align_max
+     TYPE(FIBRE),target,INTENT(INOUT):: f
+     REAL(DP),INTENT(IN) :: al_errors(align_max)
+     REAL(DP)             :: mis(align_max), omegat(3), basist(3,3)
 
-      mis=0
-      mis(4:6)=al_errors(4:6)
-      mis(4:5)=-mis(4:5)
+       mis=0
+       mis(4:6)=al_errors(4:6)
+       mis(4:5)=-mis(4:5)
 
-      OMEGAT=f%mag%p%f%a
-      basist=f%mag%p%f%ent
-      CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.false.) ! false to remove previous alignment
+       !OMEGAT=f%mag%p%f%a
+       !basist=f%mag%p%f%ent
 
-      mis=0
-      mis(1:3)=al_errors(1:3)
-      CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.true.)
+       OMEGAT=f%chart%f%a
+       basist=f%chart%f%ent
+
+       CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.false.) ! false to remove previous alignment
+
+       mis=0
+       mis(1:3)=al_errors(1:3)
+       CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.true.)
 
   end subroutine misalign_element
   !_________________________________________________________________
@@ -2994,7 +3025,7 @@ CONTAINS
       call fort_warn("my_state ",  &
             "TIME=false with RF cavities gives approximative results valid only for fully relativistic beams (beta~1)")
     endif
-
+    
 
     call setintstate(default)
     CALL UPDATE_STATES
@@ -3418,12 +3449,14 @@ CONTAINS
     a(:)=zero
 
     code=node_value('mad8_type ')
+
     if(code.ne.5.and.code.ne.6) goto 100
+
     if(code.eq.5) then
        ! quadrupole components code =  5
        k=2
-       sk= node_value('k1 ')
-       sks=node_value('k1s ')
+       sk= node_value('k1 ')  * (1 + node_value('ktap '))
+       sks=node_value('k1s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
        b(k)=sk
 ! LD: 19.06.2019
@@ -3433,11 +3466,12 @@ CONTAINS
           b(k)=sqrt(sk**2+sks**2)/abs(sk)*sk
           ! bug: sks not updated
        endif
+
     elseif(code.eq.6) then
        ! sextupole components code = 6
        k=3
-       sk= node_value('k2 ')+node_value('k2tap ')
-       sks=node_value('k2s ')
+       sk= node_value('k2 ')  * (1 + node_value('ktap '))
+       sks=node_value('k2s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
        b(k)=sk
 ! LD: 19.06.2019
@@ -3485,7 +3519,7 @@ CONTAINS
     implicit none
     real (dp) :: fk,dpp
     real (dp) :: gamma0,beta0,beta_dp,ptot,b_dir,arad,totch
-    real (dp) :: q,q_prime
+    real (dp) :: q,q_prime, npart_tmp
     integer   :: b_dir_int
     real(kind(1d0)) :: get_value
     real(kind(1d0)) :: get_variable
@@ -3497,7 +3531,10 @@ CONTAINS
 
     gamma0 = get_value('probe ','gamma ')
     arad=get_value('probe ', 'arad ')
-    totch=node_value('charge ') * get_value('probe ', 'npart ')
+    npart_tmp = node_value('npart ')
+
+    if (npart_tmp .lt. 1d0) npart_tmp = get_value('probe ', 'npart ')
+    totch=node_value('charge ') * npart_tmp
 
     if (getdebug()>1) then
       print*, 'getfk for beam-beam: charge npart ',node_value('charge '), get_value('probe ', 'npart ')
@@ -3685,7 +3722,7 @@ CONTAINS
     ! frequency is in fact tune
     ! kept like this on Rogelio request not to break the codes before LS2
     ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
-    
+
 
     r1 = node_value('ramp1 ')
     r2 = node_value('ramp2 ')
@@ -3723,7 +3760,7 @@ CONTAINS
     getclockidx = nclocks
 
     clocks(nclocks)%nelements = 0
-    
+
     if (getdebug() > 1) then
       print*,"getclockidx: Created new clock. nclocks = ", nclocks
     endif
@@ -3747,7 +3784,7 @@ CONTAINS
      elidx = clocks(c)%nelements
 
      clocks(c)%elements(elidx)%p=>p
-     
+
      ! sets amplitude of modulation to maximum for ptc_twiss
      ! (in track this parameter is ramped up and down)
      p%magp%d_ac = 1
@@ -3765,9 +3802,9 @@ CONTAINS
     integer  n,i
     real(dp) r
     type(fibre), pointer :: p
-    
+
     !print*,"acdipoleramping t=",t
-    
+
     do n=1,nclocks
 
       do i=1,clocks(n)%nelements
@@ -3807,10 +3844,10 @@ CONTAINS
         p%mag%d_ac = zero
 
       enddo
-     
+
 
     enddo
-    
+
     !print*,"acdipoleramping d_ac=",p%mag%d_ac
   end subroutine acdipoleramping
 

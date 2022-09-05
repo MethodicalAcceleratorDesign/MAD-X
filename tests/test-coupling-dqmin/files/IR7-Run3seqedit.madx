@@ -1,0 +1,19 @@
+mqwa.e5l7.b1, k1 := 0;
+mqwb.5l7.b1,  k1 := +kq5.lr7;
+mqwb.5r7.b1,  k1 := -kq5.lr7;
+mqwa.e5r7.b1, k1 := 0;
+
+
+if (mylhcbeam<3){
+  mqwa.e5l7.b2, k1 := 0;
+  mqwb.5l7.b2,  k1 := +kq5.lr7;
+  mqwb.5r7.b2,  k1 := -kq5.lr7;
+  mqwa.e5r7.b2, k1 := 0;
+};
+
+if (mylhcbeam>3){
+  mqwa.e5l7.b2, k1 := 0;
+  mqwb.5l7.b2,  k1 := -kq5.lr7;
+  mqwb.5r7.b2,  k1 := +kq5.lr7;
+  mqwa.e5r7.b2, k1 := 0;
+};

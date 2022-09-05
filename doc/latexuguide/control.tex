@@ -480,6 +480,21 @@ line can be are accessed by the variable ``sig1''.
 The \hyperref[chap:plot]{\texttt{PLOT}} command also accepts the new variable 
 in the table.  
 
+\section{Add2expr}
+\label{sec:add2expr}
+The \texttt{ADD2EXPR} command is used to add  a variable to an already defined deferred expression.
+\madbox{
+ADD2EXPR, \=var=string, expr=string \\
+} 
+An example of how it is used is given below. 
+\madbox{
+a := b + c;
+add2expr, var=a, expr=-d;
+show, a;
+a := b + c - d;
+}
+
+
 %% EOF
 
 

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.07.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.08.10 13:27:26      +
+  + Release   date: 2021.05.03               +
+  + Execution date: 2021.12.10 13:04:16      +
   ++++++++++++++++++++++++++++++++++++++++++++
 SET, FORMAT="12d", "-18.5e", "25s";
 
@@ -70,8 +70,11 @@ ycomax             ycorms             deltap             synch_1
 synch_2            synch_3            synch_4            synch_5            
 0.00000e+00        0.00000e+00        0.00000e+00        0.00000e+00        
 
-synch_6            synch_8            nflips             
-0.00000e+00        0.00000e+00        0.00000e+00        
+synch_6            synch_8            nflips             dqmin              
+0.00000e+00        0.00000e+00        0.00000e+00        0.00000e+00        
+
+dqmin_phase        
+0.00000e+00        
 
 
 select, flag=makethin, slice=1 ;
@@ -119,14 +122,18 @@ ycomax             ycorms             deltap             synch_1
 synch_2            synch_3            synch_4            synch_5            
 0.00000e+00        0.00000e+00        0.00000e+00        0.00000e+00        
 
-synch_6            synch_8            nflips             
-0.00000e+00        0.00000e+00        0.00000e+00        
+synch_6            synch_8            nflips             dqmin              
+0.00000e+00        0.00000e+00        0.00000e+00        0.00000e+00        
+
+dqmin_phase        
+0.00000e+00        
 sixtrack;
 
   ++++++++++++++++++++++++++++
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
 
+++++++ info: c6t - long names flag selected 
 Reference radius set to : 1.000000
 ++++++ info: MADX sequence converted to c6t internal. 
 

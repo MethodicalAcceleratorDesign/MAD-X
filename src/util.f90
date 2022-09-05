@@ -13,6 +13,7 @@ module math_constfi ! 2015-Aug-06 Ghislain
   double precision, parameter :: twopi = two*pi
   double precision, parameter :: degrad = 180d0/pi, raddeg = pi/180d0
   double precision, parameter :: e = 2.718281828459045235360287471352662497757247093699959574966967d0
+  double precision, parameter :: sqrt2 = sqrt(2.0d0)
 end module math_constfi
 
 module phys_constfi
@@ -34,6 +35,7 @@ module phys_constfi
   double precision, parameter ::  pmass  = 0.93827208816     ! GeV CODATA 2018
 
   double precision, parameter ::  nmass  = 0.93956542052      ! GeV CODATA 2018
+  double precision, parameter ::  umass  = 0.93149410242      ! GeV CODATA 2018
   double precision, parameter ::  mumass = 0.1056583755     ! GeV CODATA 2018
 
   ! Classical radius [m]
@@ -118,10 +120,31 @@ module code_constfi
   integer, parameter :: code_sixmarker = 46
 end module code_constfi
 
+module io_units ! 2021-Sep-02 Ghislain
+  implicit none
+  public
+  !--- Definition of IO unit number
+  integer, parameter :: stdout = 6
+  integer, parameter :: tapout = 18 ! main output file in taper.f90
+  integer, parameter :: dynapout = 50 ! main output file in dynap.f90
+  integer, parameter :: orbfout = 61 !
+  ! io units 70 to 79 are reserved for SODD
+  integer, parameter :: aftercleanout = 102   ! debug file in twiss.f90
+  integer, parameter :: aftercleantkout = 103 ! debug file in twiss.f90
+  !
+  ! files opened and accessed from C code
+  !
+  ! from mad_6track.c   : fc.2 fc.3 fc.3.aper fc.3.aux fc.8 fc.16 fc.34  
+  ! from mad_core.c     : madx.debug  madx.stamp    
+  ! from mad_orbit.c    : twiss.sum corr.out stren.out plot.orb cocu_in.opt   
+  ! from mad_plot.c     : tmpoldplot.ps gnu_plot.gp    
+  ! from mad_ptcknobs.c : currentvalues.txt   
+  ! 
+end module io_units
+
 module aperture_enums
   implicit none
   public
- 
   integer, parameter :: ap_circle = 0
   integer, parameter :: ap_ellipse = 1
   integer, parameter :: ap_rectangle = 2
@@ -134,6 +157,7 @@ module aperture_enums
   integer, parameter :: ap_notset = 9
   integer, parameter :: ap_custom_inter = 10
 end module aperture_enums
+
 module track_enums
   implicit none
   public
@@ -150,6 +174,7 @@ module track_enums
   integer, parameter :: enum_vkick = 11  
   integer, parameter :: total_enums = 11
 end module track_enums
+
 module Inf_NaN_Detection
 
   !!     Inf_NaN_Detection module
@@ -185,8 +210,8 @@ module Inf_NaN_Detection
   !!
   implicit none
 
-  private
-
+! private
+  public !speedup hrr Nov 2021
   public :: isnan, isinf, isposinf, isneginf, sp, dp
 
   ! Order set-up
@@ -314,7 +339,6 @@ module dyntabfi
   public
   double precision :: dynapfrac=0.d0, dktrturns=0.d0
   double precision :: xend=0.d0, pxend=0.d0, yend=0.d0, pyend=0.d0, tend=0.d0, ptend=0.d0
-  !double precision :: smear=0.d0, yapunov=0.d0
   double precision :: smear=0.d0, lyapunov=0.d0
 end module dyntabfi
 
@@ -337,7 +361,6 @@ module twiss0fi
   !integer, parameter :: align_max=14, fundim=74
   !IT increase fundim to 110 to fit in sigma matrices 6x6
   integer, parameter :: align_max=14, fundim=110
-
 end module twiss0fi
 
 module twissafi
@@ -352,10 +375,8 @@ module twisslfi
   public
   logical :: centre=.false., first
   logical :: rmatrix=.false., sectormap=.false., ripken=.false.
-  logical :: mode_flip=.false.
+  logical :: mode_flip=.false., exact_expansion=.false.
   logical :: ele_body=.false.
-
-
 end module twisslfi
 
 module twisscfi
@@ -376,6 +397,7 @@ module twisscfi
   double precision :: synch_1=0.d0, synch_2=0.d0, synch_3=0.d0, synch_4=0.d0, synch_5=0.d0
   double precision :: synch_6=0.d0, synch_7=0.d0, synch_8=0.d0
   double precision :: gammacp=1.d0
+  double precision :: dqmin1=0.d0, dqmin2=0.d0
   integer :: nmode_flip=0
 end module twisscfi
 
@@ -385,6 +407,15 @@ module twissotmfi
   double precision :: rotm(6,6)=0.d0, rw(6,6)=0.d0, skick(6)=0.d0, sorb(6)=0.d0
   double precision :: srmat(6,6)=0.d0, stmat(6,6,6)=0.d0
 end module twissotmfi
+
+module twissdqmin
+  use math_constfi, only : zero
+  implicit none
+  public
+  double precision :: dqmin_det=zero, prev_pos_s = zero, tot_int_length=zero, delta_tune_dqmin = zero
+  double precision ::  dqmin_rdt_c=0, dqmin_det_c=0, diff_bigger_sum = 0;
+  double complex :: dqmin_rdt = zero
+end module twissdqmin
 
 module twissbeamfi
   use math_constfi, only : zero
@@ -406,33 +437,35 @@ module twiss_elpfi
   public
   !---fixed positions for element parameters
   double precision :: g_elpar(50)=0.d0
+  ! 2021-07-09 Ghislain Roy: added parameters x_max so that el_par_vector can be called with x_max as first argument
+  ! Always add parameters before the x_max which must stay as last one in list.
   !-general
-  integer, parameter :: g_el=2, g_kmax=3, g_kmin=4, g_calib=5, g_polarity=6
+  integer, parameter :: g_el=2, g_kmax=3, g_kmin=4, g_calib=5, g_polarity=6, g_max=6
   !-bend
   integer, parameter :: b_angle=7, b_tilt=8, b_k0=9, b_k0s=10
   integer, parameter :: b_k1=11, b_k1s=12, b_e1=13 , b_e2=14, b_k2=15
   integer, parameter :: b_k2s=16, b_h1=17, b_h2=18, b_hgap=19
-  integer, parameter :: b_fint=20, b_fintx=21, b_k3=22, b_k3s=23
+  integer, parameter :: b_fint=20, b_fintx=21, b_k3=22, b_k3s=23, b_ktap=24, b_max=24
   !-quad
-  integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9, q_k1t=10, q_k1st=11
+  integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9, q_ktap=10, q_max=10
   !-sext
-  integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9, s_k2t=10, s_k2st=11
+  integer, parameter :: s_tilt=7, s_k2=8, s_k2s=9, s_ktap=10, s_max=10
   !-oct
-  integer, parameter :: o_tilt=7, o_k3=8, o_k3s=9
+  integer, parameter :: o_tilt=7, o_k3=8, o_k3s=9, o_max=9
   !-mult
-  integer, parameter :: m_tilt=7, m_lrad=8
+  integer, parameter :: m_tilt=7, m_lrad=8, m_max=8
   !-sol
-  integer, parameter :: so_lrad=7, so_ks=8, so_ksi=9
+  integer, parameter :: so_lrad=7, so_ks=8, so_ksi=9, so_max=9
   !-rfc
-  integer, parameter :: r_volt=7, r_lag=8, r_freq=9, r_lagt=10
+  integer, parameter :: r_volt=7, r_lag=8, r_freq=9, r_lagt=10, r_max=10
   !-elsep
-  integer, parameter :: e_tilt=7, e_ex=8, e_ey=9
+  integer, parameter :: e_tilt=7, e_ex=8, e_ey=9, e_max=9
   !-hkick
-  integer, parameter :: h_tilt=7, h_lrad=8, h_kick=9, h_hkick=10, h_chkick=11
+  integer, parameter :: h_tilt=7, h_lrad=8, h_kick=9, h_hkick=10, h_chkick=11, h_max=11
   !-vkick
-  integer, parameter :: v_tilt=7, v_lrad=8, v_kick=9, v_vkick=10, v_cvkick=11
+  integer, parameter :: v_tilt=7, v_lrad=8, v_kick=9, v_vkick=10, v_cvkick=11, v_max=11
   !-kick
-  integer, parameter :: k_tilt=7, k_lrad=8, k_hkick=9, k_vkick=10, k_chkick=11, k_cvkick=12
+  integer, parameter :: k_tilt=7, k_lrad=8, k_hkick=9, k_vkick=10, k_chkick=11, k_cvkick=12, k_max=12
 end module twiss_elpfi
 
 module emitfi
@@ -448,13 +481,16 @@ module twtrrfi
   integer, parameter :: maxmul=20, maxferr=50, maxnaper=100
 end module twtrrfi
 
-module twtapering
+module taperfi
   implicit none
   public
   !---- for tapering
-  integer :: totrfcav =0, orderrun=0
-  double precision ::  endpt=0
-end module twtapering
+  logical :: taperflag=.false.
+  integer :: iterate=3
+  double precision :: stepsize=0.d0
+  character(len=48) :: taperfile='taper.madx'
+  logical :: taperout=.false.
+end module taperfi
 
 module ibsdbfi
   implicit none
@@ -757,6 +793,8 @@ module SCdat
   integer, parameter :: idim=6,isigmatfit=50000,nptot=500000
   integer, parameter :: Nintegrate=1000000
   integer, parameter :: mmax=77,mmum=15,kmaxo=20;
+  integer, parameter :: mytracksumm_maxlineso=16000008; ! hrr Sep 2021
+! Note there is also a different (as a constant) definition of Pi in math_constfi
   double precision, parameter :: Pi = 4d0 * atan(1d0), EulerGamma =&
        & 0.57721566490153286060651209008240243104215933593992d0
   double precision, parameter :: dampf=0.85d0, dampeta=0.25d0, epsz=1d-15 !(* damping factor *)
@@ -2162,7 +2200,8 @@ double precision function lInt(n,r,u,v)
         result=result+scbinom(ii,j)*u**i1*v**i2
      enddo
      result=result+scbinom(ii,n+1)*v**i
-     lInt=lIntdfact(n)*(-1d0+r**2)**n*result
+!    lInt=lIntdfact(n)*(-1d0+r**2)**n*result
+     lInt=lIntdfact(n)*(-1d0+r*r)**n*result  !speedup hrr Nov 2021
   CASE DEFAULT
      call aafail('lInt: Fatal: ',                                     &
           'Out of range in function lInt: Program stops')
@@ -2189,7 +2228,8 @@ double precision function eInt(n,r,u,v)
         result=result+scbinom(i,j)*u**i1*v**i2
      enddo
      result=result+scbinom(i,n+1)*v**i
-     eInt=eIntdfact(n)*(-1d0+r**2)**n*u*result
+!    eInt=eIntdfact(n)*(-1d0+r**2)**n*u*result
+     eInt=eIntdfact(n)*(-1d0+r*r)**n*u*result  !speedu hrr Nov 2021
   CASE DEFAULT
      call aafail('eInt: Fatal: ',                                     &
           'Out of range in function eInt: Program stops')
@@ -2209,5 +2249,61 @@ double precision function bips(a, mmax1)
        &a*(1892352d0/dble(7+mmax1)+a*(-(1757184d0/dble(8+mmax1))+&
        &a*(1647360d0/dble(9+mmax1)+17d0*a*(-(91520d0/dble(10+mmax1))+19d0*&
        &a*(4576d0/dble(11+mmax1)+7d0*a*(-(624d0/dble(12+mmax1))+(598d0*&
-       &a)/dble(13+mmax1)-(575d0*a**2)/dble(14+mmax1)))))))))))))/8388608d0;
+       &a)/dble(13+mmax1)-(575d0*a*a)/dble(14+mmax1)))))))))))))/8388608d0;  !speedup hrr Nov 2021
+!      &a)/dble(13+mmax1)-(575d0*a**2)/dble(14+mmax1)))))))))))))/8388608d0;
 end function bips
+
+module sodd
+! Copied from Frank Schmidt hrr March 2022
+  implicit none
+  public
+  integer mh,icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,&
+       &iu_on,n1,n2,nblz,mmul,mmul2,mmult,mmultf,mmultw,mmultx
+  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
+       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,              &
+       &phi,pi,pi2,pihi,qx,qy,sbeta,sign,two,zero,pieni
+  real tlim,time0,time1,time2,time3,time4
+  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
+  integer j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
+  integer table_size_70,table_size_71,table_size_72,table_size_73,  &
+       &table_size_74,table_size_75,table_size_76,table_size_77,    &
+       &table_size_78,table_size_79
+  character*16 strn
+  character*18 comment
+  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
+  parameter(mmul2=mmul+1,mmult=8*mmul**2)
+  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
+  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
+  common/c1/ tlim,time0,time1,time2,time3,time4
+  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
+  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
+  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
+  common/c4q/ phi(2,-mmul:mmul,nblz)
+  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
+  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
+  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
+  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
+  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
+  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
+  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
+  common/c12/ ihv(mmultx),iplane(mmultx,2)
+  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
+  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
+  common/indeces/j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
+  common/table_sizes/table_size_70,table_size_71,table_size_72,     &
+       &table_size_73,table_size_74,table_size_75,                  &
+       &table_size_76,table_size_77,table_size_78,                  &
+       &table_size_79
+END module sodd
+
+! sin(x)/x, with prper handling of values near zero
+function sinc(x)
+  real(kind(1d0)), intent(in) :: x
+  real(kind(1d0)) :: sinc
+  real(kind(1d0)), parameter :: e = 1.5d0*sqrt(epsilon(1d0))
+  if (abs(x) < e) then
+     sinc = 1d0 - (x*x)/6d0
+  else
+     sinc = sin(x) / x
+  end if
+end function sinc

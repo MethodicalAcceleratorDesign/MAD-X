@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:24:56      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.08.10 02:01:55      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
@@ -83,8 +83,11 @@ orbit:   6.815788E-10 -1.536905E-07 -1.075601E-20 -1.724984E-21 -2.156961E-03 -2
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.007956874e-16 
+
+       dqmin_phase 
+       2.338605231 
 Emit, DELTAP=0.0 ;
 
 enter EMIT module
@@ -249,8 +252,11 @@ orbit:   8.623892E-10 -1.527012E-07 -2.720436E-20  3.363084E-21 -2.156963E-03 -2
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    3.269439703e-16 
+
+       dqmin_phase 
+      0.6688803693 
 Emit, DELTAP=0.0 ;
 
 enter EMIT module
@@ -378,8 +384,11 @@ orbit:   6.815788E-10 -1.536905E-07 -1.075601E-20 -1.724984E-21 -2.156961E-03 -2
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    2.007956874e-16 
+
+       dqmin_phase 
+       2.338605231 
 
 
 stop;

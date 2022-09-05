@@ -1,7 +1,6 @@
 ee1 = 0.001;
 amb := 0.01;
 lmb := 10;
-none = 0;
 kmb = 0;
 ee2 = 0.0001;
 lmb2 := lstraight;

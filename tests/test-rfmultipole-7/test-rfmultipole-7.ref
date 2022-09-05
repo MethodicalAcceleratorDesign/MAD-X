@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.05.02  (64 bit, Linux)       +
+  +     MAD-X 5.08.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2019.07.25               +
-  + Execution date: 2020.07.29 16:28:01      +
+  + Release   date: 2022.01.13               +
+  + Execution date: 2022.01.27 20:48:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=120;
 
@@ -154,8 +154,11 @@ orbit:   1.983622E-03  1.377589E-04 -2.259703E-03 -6.536889E-04 -9.552016E-03  2
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0      0.01151707771 
+
+       dqmin_phase 
+       1.569721055 
 TRACK, ONEPASS=true, FILE="element_testmad";
 
 enter TRACK module
@@ -189,6 +192,7 @@ sixtrack, CAVALL, six_version=50444;
   ++++++++++++++++++++++++++++
 
 ++++++ info: c6t - cavall flag selected 
+++++++ info: c6t - long names flag selected 
 SixTrack Version of (or higher is assumed): 50444.000000
 Reference radius set to : 1.000000
 ++++++ info: MADX sequence converted to c6t internal. 

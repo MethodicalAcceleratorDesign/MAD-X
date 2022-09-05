@@ -1,0 +1,57 @@
+sslast: sequence, l=10;
+m1: marker, at=0;
+m2: marker, at=0;
+m3: marker, at=1;
+m4: marker, at=1;
+m5: marker, at=2;
+m6: marker, at=3;
+m7: marker, at=3;
+m8: marker, at=4;
+m9: marker, at=4;
+endsequence;
+
+n2: marker;
+n3: marker;
+n5: marker;
+n9: marker;
+
+
+seqedit,sequence=sslast;
+install,element=n2,at=0,last=true;
+install,element=n3,at=0,last=true;
+install,element=n5,at=2,last=true;
+install,element=n9,at=4,last=true;
+endedit;
+
+save,sequence=sslast,file=sslast;
+
+
+
+ssfirst: sequence, l=10;
+m1: marker, at=0;
+m2: marker, at=0;
+m3: marker, at=1;
+m4: marker, at=1;
+m5: marker, at=2;
+m6: marker, at=3;
+m7: marker, at=3;
+m8: marker, at=4;
+m9: marker, at=4;
+endsequence;
+
+n2: marker;
+n3: marker;
+n5: marker;
+n9: marker;
+
+
+seqedit,sequence=ssfirst;
+install,element=n2,at=0,last=false;
+install,element=n3,at=0,last=false;
+install,element=n5,at=2,last=false;
+install,element=n9,at=4,last=false;
+endedit;
+
+save,sequence=ssfirst,file=ssfirst;
+
+

@@ -40,10 +40,14 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le      0.001001090442
+@ DQMIN_PHASE      %le         1.199507824
 @ TITLE            %51s "LHC 6.5 with errors and orbit correction using MADX"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "10/08/20"
-@ TIME             %08s "13.26.34"
+@ ORIGIN           %16s "5.08.01 Linux 64"
+@ DATE             %08s "10/08/22"
+@ TIME             %08s "02.01.45"
 * NAME                                S                  X                 PX                  Y                 PY               BETX               BETY               ALFX               ALFY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "LHCB1$START"                        0   -0.0005007148109   -7.334842244e-06    4.787692103e-06    0.0001383022599       0.5506409508       0.5495110803   -0.0003435926903    0.0008276076375

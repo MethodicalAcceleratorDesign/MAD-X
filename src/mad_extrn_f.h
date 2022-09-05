@@ -76,6 +76,8 @@
 #define advance_to_pos advance_to_pos_
 #define current_node_name current_node_name_
 #define node_name node_name_
+#define node_name node_name_
+#define node_name_f_lower node_name_f_lower_
 #define node_string node_string_
 #define node_value node_value_ // **
 #define retreat_node retreat_node_
@@ -98,6 +100,9 @@
 #define get_tt_attrib get_tt_attrib_
 #define set_tt_multipoles set_tt_multipoles_
 #define get_tt_multipoles get_tt_multipoles_
+
+#define get_closed_orb_node get_closed_orb_node_
+#define set_closed_orb_node set_closed_orb_node_
 // from mad_option.c
 #define get_option get_option_ // *
 #define set_option set_option_
@@ -279,7 +284,7 @@ void soddin_(F_INTEGER ierr);
 void survey_(void);
 void elementloc_(void);
 void survtest_(void);
-void locslice_(F_DOUBLE, F_DOUBLE);
+void locslice_(F_DOUBLE, F_DOUBLE, F_DOUBLE);
 
 // from toucheck.f90
 void touschek_(void);
@@ -331,7 +336,9 @@ void w_ptc_script_(F_INTEGER scriptname);
 void w_ptc_setaccel_method_(F_INTEGER method);
 void w_ptc_setdebuglevel_(F_INTEGER level);
 void w_ptc_setmapdumplevel_(F_INTEGER level);
+void w_ptc_setmadprint_(F_INTEGER level);
 void w_ptc_setseed_(F_INTEGER level);
+void w_ptc_setspin_(F_INTEGER method);
 void w_ptc_setstochastic_(F_INTEGER method);
 void w_ptc_setfieldcomp_(F_INTEGER fibreidx);
 void w_ptc_setexactmis_(F_INTEGER method);
@@ -355,5 +362,9 @@ int  w_ptc_getnmoments_(void);
 
 // from madx_ptc_knobs.f90
 void w_ptc_rviewer_(void);
+
+// from taper.f90
+void taper_(F_DOUBLE orbit0, F_INTEGER iterate, F_DOUBLE stepsize, F_CHARACTER filename, F_INTEGER error);
+void taperreset_(F_INTEGER error);
 
 #endif

@@ -40,10 +40,14 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     0.0001129494897
+@ DQMIN_PHASE      %le         1.241203019
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.06.00 Linux 64"
-@ DATE             %08s "31/08/20"
-@ TIME             %08s "16.53.55"
+@ ORIGIN           %16s "5.08.00 Linux 64"
+@ DATE             %08s "27/01/22"
+@ TIME             %08s "20.46.46"
 * NAME               PARENT             KEYWORD                             S               BETX               BETY                 DX                 DY                K1L               RE11               RE12               RE13               RE14 
 $ %s                 %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "QF.1"              "MQ"                "QUADRUPOLE"                      1.55        31.23677005         181.560803        -1.07029811     0.002893555093     -0.02705219067     -0.02949318876        31.22418317   -0.0002601310976      0.02643349274

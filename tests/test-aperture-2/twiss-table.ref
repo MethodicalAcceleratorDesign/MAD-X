@@ -40,10 +40,14 @@
 @ SYNCH_3          %le                   0
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
+@ SYNCH_6          %le                   0
+@ SYNCH_8          %le                   0
+@ DQMIN            %le     7.142973632e-08
+@ DQMIN_PHASE      %le          1.84139616
 @ TITLE            %58s "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs"
-@ ORIGIN           %16s "5.05.02 Linux 64"
-@ DATE             %08s "10/08/20"
-@ TIME             %08s "13.27.50"
+@ ORIGIN           %16s "5.08.00 Linux 64"
+@ DATE             %08s "27/01/22"
+@ TIME             %08s "23.17.56"
 * NAME                                S               BETX               BETY                  X                 PX                  Y                 PY APERTYPE                       APER_1            ON_ELEM 
 $ %s                                %le                %le                %le                %le                %le                %le                %le %s                                %le                %le 
  "TAS.1R1"                       20.915        50.76701356        50.76701002    -0.002000016307   -6.829940792e-10     0.003555549899    0.0001699999934 "CIRCLE"                             0                  0

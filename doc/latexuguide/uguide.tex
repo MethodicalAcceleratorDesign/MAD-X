@@ -7,9 +7,10 @@
   conventions, format, programflow, control, files, tables, beams, seqedit,
   definitions, elements, ranges, line, sequence,
   tfs, c6t, sxf, plot, index, rplot_index,
-  survey, twiss, match, emit, aperture, makethin, error, cororbit, sodd, touschek, ibs, thintrack,	
+  survey, twiss, match, emit, aperture, makethin, error, cororbit,
+  taper, sodd, touschek, ibs, thintrack,	
   ptc-general, ptc-track, ptc-twiss, ptc-normal, ptc-auxiliaries, 
-  defects, pitfalls
+  defects, ptdp, pitfalls
  }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,7 +45,7 @@
 %\addeditor{IT}
 
 \usepackage{versions}
-\markversion{5.06.01} % update coverpage.tex too
+\markversion{5.08.01} % update coverpage.tex too
 
 %\usepackage{comment}
 
@@ -120,6 +121,7 @@
 \include{makethin}      % MAKETHIN: Conversion to Thin Lens
 \include{error}         % EFCOMP, EALIGN: Field and alignment errors
 \include{cororbit}      % CORRECT: Orbit correction
+\include{taper}         % TAPER: tapers the element strengths
 \include{sodd}          % SODD: Second Order Detuning 
 \include{touschek}      % Touschek effect
 \include{ibs}           % IBS: Intra Beam Scattering
@@ -135,8 +137,10 @@
 \part{Trailing Material}
 \include{defects}       % Known Differences to Other Programs 
 \include{pitfalls}
+\include{ptdp}
 \include{contributors}
 \include{changelog}
+
 
 \bibliographystyle{unsrt}
 \bibliography{biblio-mad}

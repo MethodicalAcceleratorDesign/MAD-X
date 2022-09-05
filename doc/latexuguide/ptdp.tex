@@ -1,0 +1,61 @@
+\chapter{Relation between $p_t$ and $\delta _p$}
+\label{chap:pt_rel_dp}
+In this chapter we establish the exact relation of $p_t$ and $\delta _p$ and show how it can be approximated. 
+
+Note that for simplicity $c$ has been set to 1 in this document. This does not change the outcome of the derivations. 
+
+
+The definition of $p_t$ is the following:
+\begin{equation}
+    p_t = \frac{E-E_0}{P_0}
+        \label{eqn:pt}
+\end{equation}
+, where $E$ is the total energy of the particle, $E_0$ is the energy of the reference particle and $P_0$ is the momentum of the reference particle. 
+
+$\delta_p$ is defined as:
+\begin{equation}
+    \delta_p = \frac{P-P_0}{P_0}
+\end{equation}
+, where $P$ is the momentum of the particle. 
+We will use the following relation in several places in the following document:
+$E=\frac{P}{\beta} = \frac{P_0(1+\delta _p)}{\beta}$. 
+
+The following part is a derivation of the relation between $p_t$ and $\delta_p$ in the general case. 
+\begin{equation}
+    E = \sqrt{P^2+m_0^2}= \sqrt{P_0^2(1+\delta _p)^2+m_0^2}
+    \label{eqn:e1}
+\end{equation}
+, where $m_0$ is the rest mass of the particle. 
+Rearranging equation~\ref{eqn:pt} we can also write the energy as
+\begin{equation}
+    E = P_0 pt + E_0 = P_0 pt + \frac{P_0}{\beta _0}
+    \label{eqn:e2}
+\end{equation}
+, where we used the fact that $ E_0 =\frac{P_0}{\beta _0}$
+
+Squaring equation~\ref{eqn:e1} and equation~\ref{eqn:e2} we can write:
+\begin{eqnarray}
+ P_0^2(1+\delta _p)^2+m_0^2 =  (P_0pt + \frac{P_0}{\beta _0})^2 = P_0 ^2 p_t ^2 + \frac{2P_0^2 p_t}{\beta_0}+\frac{P_0^2}{\beta_0 ^2}
+ \label{eqn:squared_long}
+\end{eqnarray}
+We note that we can write $\beta _0 = \frac{P_0}{E_0} = \frac{P_0}{\sqrt{P_0^2+m_0^2}}$ which gives: 
+\begin{equation}
+    \frac{P_0^2}{\beta_0^2} = P_0^2 + m_0^2
+    \label{eqn:p0b0}
+\end{equation}
+Substituting equation~\ref{eqn:p0b0} in to equation \ref{eqn:squared_long} gives:
+\begin{eqnarray}
+ P_0^2(1+\delta _p)^2+m_0^2 =P_0 ^2 p_t ^2 + \frac{2P_0^2 p_t}{\beta_0}+P_0^2+m_0 ^2 .
+\end{eqnarray}
+We can now cancel $m_0$ on both sides, divide by $P_0^2$ and then finally we take the square root and we obtain the relation:  
+\begin{eqnarray}
+ 1+\delta _p =\sqrt{p_t ^2 + \frac{2p_t}{\beta_0}+1} 
+\end{eqnarray}
+If we now want an approximation to the above formula we again take the square and subtract 1 from both side and we get:
+\begin{eqnarray}
+ 2\delta _p+\delta _p^2 =p_t ^2 + \frac{2p_t}{\beta_0} 
+\end{eqnarray}
+In the normal cases $p_t << 1$ so $p_t >> p_t ^2$.  We then only use the leading order in $p_t$ and $\delta _p$, which gives us:  $\frac{2p_t}{\beta_0} \approx  2 \delta _p$   
+\begin{eqnarray}
+p_t \approx  \beta_0 \delta _p  
+\end{eqnarray}

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.06.01  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2020.09.01               +
-  + Execution date: 2020.10.12 18:12:56      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.07.05 16:28:54      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=3;
 
@@ -54,7 +54,7 @@ enter Twiss module
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     4.669141E-03 -2.479820E-04  0.000000E+00  0.000000E+00  1.246328E-05  0.000000E+00
+final orbit vector:    -4.669081E-03  2.479255E-04  0.000000E+00  0.000000E+00  1.246299E-05  0.000000E+00
 
 ++++++ table: summ
 
@@ -62,13 +62,13 @@ final orbit vector:     4.669141E-03 -2.479820E-04  0.000000E+00  0.000000E+00  
                  3                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-      0.2027601779                  0        8.487298275     0.004834559298 
+      0.2027593667                  0        8.487040492    0.0003283515194 
 
              dxrms             xcomax             xcorms                 q2 
-    0.003472950597     0.004917123319     0.003624467664       0.1953027287 
+   0.0001809663178     0.004917061855     0.003624422799        0.195302394 
 
                dq2            betymax              dymax              dyrms 
-                 0          11.690962                  0                  0 
+                 0        11.69077387                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -76,8 +76,11 @@ final orbit vector:     4.669141E-03 -2.479820E-04  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 SURVEY, SEQUENCE=seq, FILE= survey.out, x0=xin;
 
 
@@ -132,8 +135,11 @@ final orbit vector:    -3.309013E-04 -2.479257E-04  0.000000E+00  0.000000E+00 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
-           synch_6            synch_8             nflips 
-                 0                  0                  0 
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
 
 
 
@@ -165,7 +171,7 @@ ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -4.9999791666927081E-003   0.0000000000000000        2.9999875000260419     
+ After    end:    4.9999791666927081E-003   0.0000000000000000        2.9999875000260419     
 
 
 ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
