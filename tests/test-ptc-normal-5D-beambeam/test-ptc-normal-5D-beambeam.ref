@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.08.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2022.01.13               +
-  + Execution date: 2022.01.27 20:51:03      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.08.10 05:24:18      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !identical to test-ptc-normal-5D so beam-beam effect can be compared directly
 
@@ -863,10 +863,10 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        1.526297364       0.3728165258        0.480816357        4.297209132 
 
            synch_6            synch_8             nflips              dqmin 
-       52.84960067        260.4580979                  0     0.001427098642 
+       52.84960067        260.4580979                  0      0.03009364944 
 
        dqmin_phase 
-     -0.1606260792 
+       1.784097737 
 
 
 write, table=summ, file="leir.summ.twiss";

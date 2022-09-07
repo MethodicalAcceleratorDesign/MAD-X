@@ -1,4 +1,5 @@
 subroutine soddin(ierr)
+! Copied from Frank Schmidt hrr March 2022
   !---------------------------------------------------------------------
   !---------------------------------------------------------------------
   !  The name SODD stands for "Second Order Detuning and Distortion"
@@ -193,30 +194,13 @@ subroutine soddin(ierr)
   !      ----------------------------------------------------------------
   !
   !---------------------------------------------------------------------
-
+  use sodd
   implicit none
 
   integer ierr
 
-  integer ier,iprog,mh,mmul,mmul2,mmult,mmultf,mmultw,mmultx,       &
-       &n3,nblz
-  double precision etl20,pieni
-  integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
-       &iu_on,n1,n2
-  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
-       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,                    &
-       &phi,pi,pi2,pihi,qx,qy,sbeta,sign,two,zero
-  real tlim,time0,time1,time2,time3,time4
-  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  integer j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
-  integer table_size_70,table_size_71,table_size_72,table_size_73,  &
-       &table_size_74,table_size_75,table_size_76,table_size_77,          &
-       &table_size_78,table_size_79
-  character*16 strn
-  character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
-  parameter(mmul2=mmul+1,mmult=8*mmul**2)
-  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
+  integer ier,iprog,n3
+  double precision etl20
 
   !--- szcompar is the size of the arrays
   !--- returned by the routine comm_para
@@ -227,28 +211,6 @@ subroutine soddin(ierr)
   !--- returned by the routine comm_para
   integer szchara
   parameter (szchara = 400)
-
-  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
-  common/c1/ tlim,time0,time1,time2,time3,time4
-  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
-  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
-  common/c4q/ phi(2,-mmul:mmul,nblz)
-  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
-  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
-  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
-  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
-  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
-  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
-  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
-  common/c12/ ihv(mmultx),iplane(mmultx,2)
-  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
-  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
-  common/indeces/j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
-  common/table_sizes/table_size_70,table_size_71,table_size_72,     &
-       &table_size_73,table_size_74,table_size_75,                        &
-       &table_size_76,table_size_77,table_size_78,                        &
-       &table_size_79
 
   integer detun,disto1,disto2,prend,prblup
   integer nint, ndble, k, int_arr(szcompar), char_l(szcompar)
@@ -495,40 +457,12 @@ subroutine detune
   !-----------------------------------------------------------------------
   !--Program Detune
   !-----------------------------------------------------------------------
+  use sodd
   implicit none
   integer i,ia,iaa,iah,iamin,ib,ic,id,ih1,ii,imu,imuty,j,jj,jstep,k,&
-       &k1,k2,k3,l,l0,l1,l2,l3,m,mh,mmul,mmul2,mmult,mmultf,mmultw,       &
-       &mmultx,nblz
-  double precision betdx,betdxi,fac,facd0,facd1,phix,phiy,pieni,    &
+       &k1,k2,k3,l,l0,l1,l2,l3,m
+  double precision betdx,betdxi,fac,facd0,facd1,phix,phiy,          &
        &sigde,sinar,tij
-  integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
-       &iu_on,n1,n2
-  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
-       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,pihi,qx, &
-       &qy,sbeta,sign,two,zero
-  real tlim,time0,time1,time2,time3,time4
-  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  character*16 strn
-  character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
-  parameter(mmul2=mmul+1,mmult=8*mmul**2)
-  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
-  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
-  common/c1/ tlim,time0,time1,time2,time3,time4
-  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
-  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
-  common/c4q/ phi(2,-mmul:mmul,nblz)
-  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
-  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
-  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
-  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
-  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
-  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
-  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
-  common/c12/ ihv(mmultx),iplane(mmultx,2)
-  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
-  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
   dimension tij(0:mmul2,-mmul2:mmul2)
   dimension betdxi(mmultx),betdx(mmultx)
   dimension imu(2)
@@ -722,50 +656,14 @@ subroutine distort1
   !-----------------------------------------------------------------------
   !--Program Distort1 (first order)
   !-----------------------------------------------------------------------
+  use sodd
   implicit none
   integer i,ia,iadd,ib,ic,id,id1,id11,id110,id12,id120,idiff1,      &
-       &idiff2,ie,if,ii,iia,iia2,ivar,j,mh,mmul,mmul2,mmult,mmultf,mmultw,&
-       &mmultx,nblz
+       &idiff2,ie,if,ii,iia,iia2,ivar,j
   double precision distc,dists,dstc,dsts,facc,facs,fact1,factb1,    &
-       &factb2,fpre,hamc,hams,hmc,hms,pieni,signii,sinar,tc,ts
-  integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
-       &iu_on,n1,n2
-  integer j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
-  integer table_size_70,table_size_71,table_size_72,table_size_73,  &
-       &table_size_74,table_size_75,table_size_76,table_size_77,          &
-       &table_size_78,table_size_79
+       &factb2,fpre,hamc,hams,hmc,hms,signii,sinar,tc,ts,amp
   integer data_size
-  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
-       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,pihi,qx, &
-       &qy,sbeta,sign,two,zero,amp
-  real tlim,time0,time1,time2,time3,time4
-  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  character*16 strn,table_name
-  character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
-  parameter(mmul2=mmul+1,mmult=8*mmul**2)
-  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
-  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
-  common/c1/ tlim,time0,time1,time2,time3,time4
-  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
-  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
-  common/c4q/ phi(2,-mmul:mmul,nblz)
-  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
-  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
-  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
-  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
-  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
-  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
-  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
-  common/c12/ ihv(mmultx),iplane(mmultx,2)
-  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
-  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
-  common/indeces/j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
-  common/table_sizes/table_size_70,table_size_71,table_size_72,     &
-       &table_size_73,table_size_74,table_size_75,                        &
-       &table_size_76,table_size_77,table_size_78,                        &
-       &table_size_79
+  character*16 table_name
   integer int_to_write(11)
   double precision double_to_write(11)
 
@@ -1095,51 +993,15 @@ subroutine distort2
   !-----------------------------------------------------------------------
   !--Program Distort2 (second order)
   !-----------------------------------------------------------------------
+  use sodd
   implicit none
   integer i,ia,ia0,ib,ib0,ic,ic0,ic00,ica,ica2,id,id0,id00,ide,     &
-       &ii,imax,imuty,itij0,jj,k,k1,k2,l,l0,l3,l4,ll3,ll4,m,mde,mh,mmul,  &
-       &mmul2,mmult,mmultf,mmultw,mmultx,nblz,num
+       &ii,imax,imuty,itij0,jj,k,k1,k2,l,l0,l3,l4,ll3,ll4,m,mde,num
   double precision arg,argij,betdx,betdxi,dl12q,dl34q,efact,ephix1, &
        &ephiy1,esin34,etrgij,facc,facd0,facd1,facd10,facp,facs,ffff,phix1,&
-       &phix2,phix20,phiy1,phiy2,phiy20,pieni,sin34,spij,trgij
-  integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
-       &iu_on,n1,n2
-  integer j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
-  integer table_size_70,table_size_71,table_size_72,table_size_73,  &
-       &table_size_74,table_size_75,table_size_76,table_size_77,          &
-       &table_size_78,table_size_79
+       &phix2,phix20,phiy1,phiy2,phiy20,sin34,spij,trgij
   integer data_size
-  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
-       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,pihi,qx, &
-       &qy,sbeta,sign,two,zero
-  real tlim,time0,time1,time2,time3,time4
-  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  character*16 strn,table_name
-  character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
-  parameter(mmul2=mmul+1,mmult=8*mmul**2)
-  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
-  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
-  common/c1/ tlim,time0,time1,time2,time3,time4
-  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
-  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
-  common/c4q/ phi(2,-mmul:mmul,nblz)
-  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
-  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
-  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
-  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
-  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
-  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
-  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
-  common/c12/ ihv(mmultx),iplane(mmultx,2)
-  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
-  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
-  common/indeces/j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
-  common/table_sizes/table_size_70,table_size_71,table_size_72,     &
-       &table_size_73,table_size_74,table_size_75,                        &
-       &table_size_76,table_size_77,table_size_78,                        &
-       &table_size_79
+  character*16 table_name
   dimension efact(mmultx,mmult),ll3(mmultx,mmult),ll4(mmultx,mmult)
   dimension betdxi(mmultx),betdx(mmultx)
   dimension facd1(mmultx,mmult,2)
@@ -1604,41 +1466,13 @@ subroutine caldet2(ia,ib,imuty)
   !--Second order in the strength of the multipoles
   !--
   !---------------------------------------------------------------------
+  use sodd
   implicit none
   integer ia,ib,ic,id,ido,if2,ihoff,ihw,ii,ii1,ii11,iiend,iii,iii1, &
        &ijnu,ijnu1,imuty,ipl,iti,ivoff,jj,jj1,jj11,jjend,jjj,jjj1,k,k1,kk,&
-       &l,l1,m,mend,mexp,mh,mij,mm,mmul,mmul2,mmult,mmultf,mmultw,mmultx, &
-       &n,nblz,nend,nexp,nij,nn
-  double precision betl,betxp,fac,fac1,fac3,fcc2,fcc4,pieni,signii, &
+       &l,l1,m,mend,mexp,mij,mm,nend,nexp,nij,nn,n
+  double precision betl,betxp,fac,fac1,fac3,fcc2,fcc4,signii, &
        &signjj
-  integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
-       &iu_on,n1,n2
-  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
-       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,pihi,qx, &
-       &qy,sbeta,sign,two,zero
-  real tlim,time0,time1,time2,time3,time4
-  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  character*16 strn
-  character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
-  parameter(mmul2=mmul+1,mmult=8*mmul**2)
-  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
-  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
-  common/c1/ tlim,time0,time1,time2,time3,time4
-  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
-  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
-  common/c4q/ phi(2,-mmul:mmul,nblz)
-  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
-  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
-  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
-  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
-  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
-  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
-  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
-  common/c12/ ihv(mmultx),iplane(mmultx,2)
-  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
-  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
   !---------------------------------------------------------------------
   dimension betl(mmultx,4),betxp(2,mmultx,4)
   dimension ihw(2,mmult),ipl(2,mmult,2),iti(2,mmultx,mmult,6)
@@ -1986,43 +1820,15 @@ subroutine caldt2(ia,ib,imuty)
   !--Second order in the strength of the multipoles
   !--
   !---------------------------------------------------------------------
+  use sodd
   implicit none
   integer ia,ib,ic,ica,icol1,icol2,icol3,icol4,icol5,icol6,id,ido1, &
        &ido2,ido3,ido4,ihoff,ihoff1,ihoff2,ihvall,ii,ii1,iiend,iii,ijnu,  &
        &imuty,isiga,iti,ivoff,ivoff1,ivoff2,jj,jj1,jjend,jjj,k,k1,k2,k3,  &
        &k4,k41,k412s,k412s1,k412s2,k41s,k42,k42s,k43,k434s,k434s1,k434s2, &
-       &k44,k5,kk,l1,m,mh,mm,mmul,mmul2,mmult,mmultf,mmultw,mmultx,nblz,  &
-       &nn,nnanf,nnend,nsig
+       &k44,k5,kk,l1,m,mm,nn,nnanf,nnend,nsig
   double precision betl,diab,fac11,fac12,fac21,fac22,faca,facc,     &
-       &facc1,facc2,fcc2,fcc4,pieni,signii,signjj
-  integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
-       &iu_on,n1,n2
-  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
-       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,pihi,qx, &
-       &qy,sbeta,sign,two,zero
-  real tlim,time0,time1,time2,time3,time4
-  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  character*16 strn
-  character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
-  parameter(mmul2=mmul+1,mmult=8*mmul**2)
-  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
-  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
-  common/c1/ tlim,time0,time1,time2,time3,time4
-  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
-  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
-  common/c4q/ phi(2,-mmul:mmul,nblz)
-  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
-  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
-  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
-  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
-  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
-  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
-  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
-  common/c12/ ihv(mmultx),iplane(mmultx,2)
-  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
-  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
+       &facc1,facc2,fcc2,fcc4,signii,signjj
   dimension iti(2,mmultx,mmult,6),isiga(2,mmultx,mmult)
   dimension fcc2(2,mmultx),fcc4(2,mmultx,mmult)
   dimension betl(mmultx,4)
@@ -2284,37 +2090,9 @@ subroutine init
   !---------------------------------------------------------------------
   !--Initilisation
   !---------------------------------------------------------------------
+  use sodd
   implicit none
-  integer i,ii,j,k,mh,mmul,mmul2,mmult,mmultf,mmultw,mmultx,nblz
-  double precision pieni
-  integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
-       &iu_on,n1,n2
-  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
-       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,pihi,qx, &
-       &qy,sbeta,sign,two,zero
-  real tlim,time0,time1,time2,time3,time4
-  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  character*16 strn
-  character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
-  parameter(mmul2=mmul+1,mmult=8*mmul**2)
-  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
-  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
-  common/c1/ tlim,time0,time1,time2,time3,time4
-  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
-  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
-  common/c4q/ phi(2,-mmul:mmul,nblz)
-  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
-  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
-  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
-  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
-  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
-  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
-  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
-  common/c12/ ihv(mmultx),iplane(mmultx,2)
-  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
-  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
+  integer i,ii,j,k
   !---------------------------------------------------------------------
   tlim=1e7
   zero=dble(0d0)
@@ -2395,41 +2173,14 @@ subroutine readdat
   !--Reading Lattice Information from File # 34
   !--
   !---------------------------------------------------------------------
+  use sodd
   implicit none
-  integer i,ich1,ich2,ii,isize,itype,j,jj,mh,mmul,mmul2,mmult,      &
-       &mmultf,mmultw,mmultx,nblz,ndum,num
-  double precision betx,bety,et,phix0,phiy0,pieni,str
+  integer i,ich1,ich2,ii,isize,itype,j,jj,ndum,num
+  double precision betx,bety,et,phix0,phiy0,str
   character*16 name
   character*200 ch
   character*205 ch1
-  integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
-       &iu_on,n1,n2
-  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
-       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,pihi,qx, &
-       &qy,sbeta,sign,two,zero, factor
-  real tlim,time0,time1,time2,time3,time4
-  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  character*16 strn
-  character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
-  parameter(mmul2=mmul+1,mmult=8*mmul**2)
-  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
-  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
-  common/c1/ tlim,time0,time1,time2,time3,time4
-  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
-  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
-  common/c4q/ phi(2,-mmul:mmul,nblz)
-  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
-  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
-  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
-  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
-  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
-  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
-  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
-  common/c12/ ihv(mmultx),iplane(mmultx,2)
-  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
-  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
+  double precision factor
   !---------------------------------------------------------------------
 
   do i=1,nblz
@@ -2500,47 +2251,10 @@ subroutine detwri(icase,imu,ih1)
   !---------------------------------------------------------------------
   !--Organize Writing for Detune1
   !---------------------------------------------------------------------
+  use sodd
   implicit none
-  integer i,ic,icase,id,ih1,imu,j,k,mh,mmul,mmul2,mmult,mmultf,     &
-       &mmultw,mmultx,nblz
-  double precision pieni
-  integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
-       &iu_on,n1,n2
-  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
-       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,         &
-       &pihi,qx,qy,sbeta,sign,two,zero
-  real tlim,time0,time1,time2,time3,time4
-  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  integer j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
-  integer table_size_70,table_size_71,table_size_72,table_size_73,  &
-       &table_size_74,table_size_75,table_size_76,table_size_77,          &
-       &table_size_78,table_size_79
-  character*16 strn,table_name
-  character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
-  parameter(mmul2=mmul+1,mmult=8*mmul**2)
-  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
-  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
-  common/c1/ tlim,time0,time1,time2,time3,time4
-  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
-  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
-  common/c4q/ phi(2,-mmul:mmul,nblz)
-  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
-  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
-  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
-  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
-  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
-  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
-  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
-  common/c12/ ihv(mmultx),iplane(mmultx,2)
-  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
-  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
-  common/indeces/j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
-  common/table_sizes/table_size_70,table_size_71,table_size_72,     &
-       &table_size_73,table_size_74,table_size_75,                        &
-       &table_size_76,table_size_77,table_size_78,                        &
-       &table_size_79
+  integer i,ic,icase,id,ih1,imu,j,k
+  character*16 table_name
   integer int_to_write(11)
   double precision double_to_write(11)
   dimension imu(2)
@@ -2733,39 +2447,11 @@ subroutine sortres(icase,im1,ic)
   !--Order the resonance terms
   !--
   !---------------------------------------------------------------------
+  use sodd
   implicit none
   integer ic,icase,idum1,idum2,idum3,idum4,idum5,idum6,im,im1,is,   &
-       &is0,k0,k1,k2,k3,k4,l2,l4,m,mh,mmul,mmul2,mmult,mmultf,mmultw,     &
-       &mmultx,nblz
-  double precision dum1,dum2,dum3,dum4,pieni
-  integer icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,   &
-       &iu_on,n1,n2
-  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
-       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,phi,pi,pi2,pihi,qx, &
-       &qy,sbeta,sign,two,zero
-  real tlim,time0,time1,time2,time3,time4
-  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  character*16 strn
-  character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
-  parameter(mmul2=mmul+1,mmult=8*mmul**2)
-  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
-  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
-  common/c1/ tlim,time0,time1,time2,time3,time4
-  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
-  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
-  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
-  common/c4q/ phi(2,-mmul:mmul,nblz)
-  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
-  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
-  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
-  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
-  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
-  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
-  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
-  common/c12/ ihv(mmultx),iplane(mmultx,2)
-  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
-  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
+       &is0,k0,k1,k2,k3,k4,l2,l4,m
+  double precision dum1,dum2,dum3,dum4
   !---------------------------------------------------------------------
   im=iabs(im1)
   is0=0
@@ -3004,27 +2690,27 @@ subroutine write_table(table_name,table_type,int_to_write,        &
 1000 return
 end subroutine write_table
 
-subroutine timex(r1)
-  implicit none
-  real r1,timestart,timenow
-  common /mytimes/timestart
-  save
-  call timest(0.0)
-  call cpu_time(timenow)
-  r1=timenow-timestart
-  return
-end subroutine timex
+      subroutine timex(r1)
+        implicit none
+        real r1,timestart,timenow
+        common /mytimes/timestart
+        save
+        call timest(0.0)
+        call cpu_time(timenow)
+        r1=timenow-timestart
+        return
+      end subroutine timex
 
-subroutine timest(r1)
-  implicit none
-  real r1,timestart
-  logical start
-  common /mytimes/timestart
-  data start /.false./
-  save
-  if (.not.start) then
-     start=.true.
-     call cpu_time(timestart)
-  endif
-  return
-end subroutine timest
+      subroutine timest(r1)
+        implicit none
+        real r1,timestart
+        logical start
+        common /mytimes/timestart
+        data start /.false./
+        save
+        if (.not.start) then
+           start=.true.
+           call cpu_time(timestart)
+        endif
+        return
+      end subroutine timest

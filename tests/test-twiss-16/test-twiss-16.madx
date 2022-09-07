@@ -1,0 +1,97 @@
+option, -echo;
+set, format="10d", "25.17e", "-24s";
+
+lo = 5;
+o: drift, l=lo;
+l: line=(o);
+
+px0=+0.01;
+py0=+0.013;
+pt0=-0.017;
+
+beam, energy=2, particle=proton;
+
+select, flag=twiss, column=name,keyword,s,x,px,y,py,t,pt,dx,dpx,re12,re14,re16,re32,re34,re36,re52,re54,re56;
+select, flag=ptc_twiss, column=name,keyword,s,x,px,y,py,t,pt,disp1,disp2,re12,re14,re16,re32,re34,re36,re52,re54,re56;
+
+use, sequence=l;
+
+select, flag=mad3, column=name,
+ t122,t124,t126,t144,t146,t166,
+ t322,t324,t326,t344,t346,t366,
+ t522,t524,t526,t544,t546,t566;
+twiss, exact, rmatrix, sectormap, sectortable=mad3, sectorfile='test-twiss-16-mad3.tfs',
+ betx=1, bety=1, px=px0, py=py0, pt=pt0, file='test-twiss-16-twiss.tfs';
+
+create, table=ptc3, column=_name,
+ txpp,txpq,txpd,txqq,txqd,txdd,
+ typp,typq,typd,tyqq,tyqd,tydd,
+ ttpp,ttpq,ttpd,ttqq,ttqd,ttdd;
+ptc_select, table=ptc3, column=txpp, polynomial=1, monomial='020000';
+ptc_select, table=ptc3, column=txpq, polynomial=1, monomial='010100';
+ptc_select, table=ptc3, column=txpd, polynomial=1, monomial='010001';
+ptc_select, table=ptc3, column=txqq, polynomial=1, monomial='000200';
+ptc_select, table=ptc3, column=txqd, polynomial=1, monomial='000101';
+ptc_select, table=ptc3, column=txdd, polynomial=1, monomial='000002';
+ptc_select, table=ptc3, column=typp, polynomial=3, monomial='020000';
+ptc_select, table=ptc3, column=typq, polynomial=3, monomial='010100';
+ptc_select, table=ptc3, column=typd, polynomial=3, monomial='010001';
+ptc_select, table=ptc3, column=tyqq, polynomial=3, monomial='000200';
+ptc_select, table=ptc3, column=tyqd, polynomial=3, monomial='000101';
+ptc_select, table=ptc3, column=tydd, polynomial=3, monomial='000002';
+ptc_select, table=ptc3, column=ttpp, polynomial=5, monomial='020000';
+ptc_select, table=ptc3, column=ttpq, polynomial=5, monomial='010100';
+ptc_select, table=ptc3, column=ttpd, polynomial=5, monomial='010001';
+ptc_select, table=ptc3, column=ttqq, polynomial=5, monomial='000200';
+ptc_select, table=ptc3, column=ttqd, polynomial=5, monomial='000101';
+ptc_select, table=ptc3, column=ttdd, polynomial=5, monomial='000002';
+
+
+ptc_create_universe;
+ptc_create_layout, exact, model=2, method=6, nst=5;
+ptc_twiss, rmatrix, no=2, betx=1, bety=1, betz=1, px=px0, py=py0, pt=pt0, icase=56, no=5, file='test-twiss-16-ptc.tfs';
+ptc_end;
+
+write, table=ptc3, file='test-twiss-16-ptc3.tfs';
+
+value, table(twiss,o,x) - table(ptc_twiss,o,x);
+value, table(twiss,o,y) - table(ptc_twiss,o,y);
+value, table(twiss,o,t) - table(ptc_twiss,o,t);
+
+value, table(twiss,o,re12) - table(ptc_twiss,o,re12);
+value, table(twiss,o,re14) - table(ptc_twiss,o,re14);
+value, table(twiss,o,re16) - table(ptc_twiss,o,re16);
+value, table(twiss,o,re32) - table(ptc_twiss,o,re32);
+value, table(twiss,o,re34) - table(ptc_twiss,o,re34);
+value, table(twiss,o,re36) - table(ptc_twiss,o,re36);
+value, table(twiss,o,re52) - table(ptc_twiss,o,re52);
+value, table(twiss,o,re54) - table(ptc_twiss,o,re54);
+value, table(twiss,o,re56) - table(ptc_twiss,o,re56);
+
+value, table(ptc3,o,txpp) - table(mad3,o,t122);
+value, 0.5*table(ptc3,o,txpq) - table(mad3,o,t124);
+value, 0.5*table(ptc3,o,txpd) - table(mad3,o,t126);
+value, 0.5*table(ptc3,o,txpq) - table(mad3,o,t142);
+value, table(ptc3,o,txqq) - table(mad3,o,t144);
+value, 0.5*table(ptc3,o,txqd) - table(mad3,o,t146);
+value, 0.5*table(ptc3,o,txpd) - table(mad3,o,t162);
+value, 0.5*table(ptc3,o,txqd) - table(mad3,o,t164);
+value, table(ptc3,o,txdd) - table(mad3,o,t166);
+value, table(ptc3,o,typp) - table(mad3,o,t322);
+value, 0.5*table(ptc3,o,typq) - table(mad3,o,t324);
+value, 0.5*table(ptc3,o,typd) - table(mad3,o,t326);
+value, 0.5*table(ptc3,o,typq) - table(mad3,o,t342);
+value, table(ptc3,o,tyqq) - table(mad3,o,t344);
+value, 0.5*table(ptc3,o,tyqd) - table(mad3,o,t346);
+value, 0.5*table(ptc3,o,typd) - table(mad3,o,t362);
+value, 0.5*table(ptc3,o,tyqd) - table(mad3,o,t364);
+value, table(ptc3,o,tydd) - table(mad3,o,t366);
+value, table(ptc3,o,ttpp) - table(mad3,o,t522);
+value, 0.5*table(ptc3,o,ttpq) - table(mad3,o,t524);
+value, 0.5*table(ptc3,o,ttpd) - table(mad3,o,t526);
+value, 0.5*table(ptc3,o,ttpq) - table(mad3,o,t542);
+value, table(ptc3,o,ttqq) - table(mad3,o,t544);
+value, 0.5*table(ptc3,o,ttqd) - table(mad3,o,t546);
+value, 0.5*table(ptc3,o,ttpd) - table(mad3,o,t562);
+value, 0.5*table(ptc3,o,ttqd) - table(mad3,o,t564);
+value, table(ptc3,o,ttdd) - table(mad3,o,t566);

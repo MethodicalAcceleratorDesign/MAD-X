@@ -25,7 +25,8 @@ ifneq ($(OSTYPE),Windows)
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) $(if $(call eq,$(FCMAIN),no),-nofor-main,) -heap-arrays 65536
+#LDFLAGS = -m$(ARCH) -O$(NOPT) $(if $(call eq,$(FCMAIN),no),-nofor-main,) -heap-arrays 65536
+LDFLAGS = -m$(ARCH) -O$(NOPT) $(if $(call eq,$(FCMAIN),no),-nofor-main,) -heap-arrays 65536 -z muldefs
 LDLIBS  =
 
 #
@@ -59,7 +60,8 @@ LDLIBS  += -ldl
 endif
 
 ifeq ($(OPENMP),yes)
-LDFLAGS += -qopenmp $(if $(call eq,$(STATIC),yes),-qopenmp-link static,)
+#LDFLAGS += -qopenmp $(if $(call eq,$(STATIC),yes),-qopenmp-link static,)
+LDFLAGS +=  -Wl,-M=mymap -Wl,-cref -qopenmp $(if $(call eq,$(STATIC),yes),-qopenmp-link static,)
 endif
 
 endif # Unix Settings

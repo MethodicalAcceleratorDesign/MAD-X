@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.08.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2022.01.13               +
-  + Execution date: 2022.01.27 20:46:51      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.08.10 02:01:33      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Threader example
 
@@ -163,10 +163,10 @@ orbit:   2.578233E-03  3.848899E-05 -2.257435E-08 -3.834450E-10  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    1.542093924e-08 
+                 0                  0                  0    3.212198129e-08 
 
        dqmin_phase 
-      -2.880884588 
+       2.087392919 
 
   Number of warnings: 0
 
