@@ -810,7 +810,11 @@ export_sequence(struct sequence* sequ, FILE* file, int noexpr)
         strcat(c_dum->c, c_node->from_name);
       }
       if(c_node->perm_misalign==1) write_permalign_node(c_node);
-
+      //if(c_node->ktap!=0) {
+      //    strcat(c_dum->c, ", ktap = ");
+      //    sprintf(num, v_format("%F"), c_node->ktap);
+      //    strcat(c_dum->c, supp_tb(num));
+      //};
       if (exp_par_flag) export_el_def(c_node->p_elem, c_dum->c, noexpr);
       write_nice(c_dum->c, file);
     }
