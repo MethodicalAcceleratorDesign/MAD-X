@@ -5,6 +5,7 @@ module madx_ptc_normal_module
   ! updates by Piotr Skowronski (CERN)
   use madx_ptc_module
 
+
 !  use madx_ptc_twiss
   ! Algorithm to get binomial coeffs
   !https://wikimedia.org/api/rest_v1/media/math/render/svg/d4145e0326f57f563b59c943642928342a5a6b18
@@ -46,8 +47,8 @@ contains
     type(probe_8) theTransferMap
     type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
     type(c_damap)  :: c_Map, c_Map2, q_Map, a_CS, a_CS_1
-    type(c_vector_field) vf_kernel, vf, vf_t2
-    type(c_taylor)  :: g_io, nrmlzdPseudoHam
+    type(c_vector_field) vectorField, vf_t2, vf_kernel
+    type(c_taylor)  :: theRDTs, nrmlzdPseudoHam
     type(fibre), POINTER    :: current
     type(c_normal_form), target :: theNormalForm, theNormalForm_t2 ! normal from type 2 for hamiltonian terms
 
@@ -393,20 +394,22 @@ contains
           !n%g is the vecotor field for the transformation
           !from resonance basis (action angle coordinate system, (x+ipx),(x-ipx)) back to cartesion X,Y
           !the ndim polynomials need to be flattened to get RDT's
-          call alloc(g_io);
-          call alloc(vf);
+          call alloc(theRDTs);
+          call alloc(vectorField);
           call alloc(a_CS)
           call alloc(a_CS_1)
 
           call c_canonise(theNormalForm%atot,a_CS)
 
-          a_CS=to_phasor()*a_CS*from_phasor()
-          call c_factor_map(a_CS,a_CS_1,vf,0)
+          a_CS = to_phasor() * a_CS * from_phasor()
+          call c_factor_map(a_CS,a_CS_1,vectorField,0)
+          
+          !theRDTs = cgetpb(vectorField)
+          
+          call equal_c_tayls(theRDTs,cgetpb(vectorField))
 
-          call equal_c_tayls(g_io,cgetpb(vf))
 
-
-          call kill(vf)
+          call kill(vectorField)
           call kill(a_CS)
           call kill(a_CS_1)
 
@@ -538,7 +541,7 @@ contains
 
 
        if (n_gnfu > 0) then
-          call kill(g_io)
+          call kill(theRDTs)
        endif
 
        if (n_haml > 0) then
@@ -774,8 +777,8 @@ contains
               ind(4) = int(doublenum)
               ind(5) = 0
               ind(6) = 0
-              c_val = g_io.sub.ind
-              d_val = -real(c_val)
+              c_val = theRDTs.sub.ind
+              d_val = real(c_val)
 
            CASE ('gnfs')
               k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
@@ -788,8 +791,8 @@ contains
               ind(4) = int(doublenum)
               ind(5) = 0
               ind(6) = 0
-              c_val = g_io.sub.ind
-              d_val = -imag(c_val)
+              c_val = theRDTs.sub.ind
+              d_val = imag(c_val)
 
            CASE ('gnfa')
               k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
@@ -802,7 +805,7 @@ contains
               ind(4) = int(doublenum)
               ind(5) = 0
               ind(6) = 0
-              c_val = g_io.sub.ind
+              c_val = theRDTs.sub.ind
               d_val1 = imag(c_val)
               d_val2 = real(c_val)
               d_val = SQRT(d_val1**2 + d_val2**2)
