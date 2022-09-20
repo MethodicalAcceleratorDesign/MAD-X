@@ -29,7 +29,6 @@ module madx_ptc_twiss_module
 
   !PSk 2011.01.05 goes global to the modules so the slice tracking produces it for the summ table
   type(probe_8)            :: theTransferMap
-  type(probe_8)            :: theRDTs
   type(universal_taylor)   :: unimap(6)
 
   type twiss
