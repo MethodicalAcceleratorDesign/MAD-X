@@ -4181,8 +4181,8 @@ contains
     integer     :: i,o ! output file
     character(len=250)   :: fmt
     integer     	:: io,r, myn1,myn2,indexa(mnres,4),mynres,ind(10)
-    type(c_damap)  :: c_Map, c_Map2, q_Map, a_cs, a_cs_1
-    type(c_taylor)  :: nrmlzdPseudoHam, g_io
+    type(c_damap)  :: c_Map, a_cs, a_cs_1
+    type(c_taylor)  :: g_io
     type(c_vector_field) vf, vf_kernel
 
      !use_complex_in_ptc=my_true
@@ -4324,8 +4324,11 @@ contains
     enddo
 
 
-    !!!!!!!!!!!!!!!!!!!!!!
-    !Generating functions
+    !!!!!!!!!!!!!!!!!!!!!!              !!!!!!!!!!!!!!!
+    !Generating functions               !!!!!!!!!!!!!!!
+    !
+    ! and Normalised Pseudo-Hamiltonian !!!!!!!!!!!!!!!
+    !
 
     !n%g is the vecotor field for the transformation
     !from resonance basis (action angle coordinate system, (x+ipx),(x-ipx)) back to cartesion X,Y
@@ -4358,30 +4361,9 @@ contains
 
     g_io = cgetpb(vf)
 
-    call putGnormaltable(g_io)
+    call putGnormaltable(g_io, theNormalForm%tune)
 
 
-    !!!!!!!!!!!!!!!!!!!!!!
-    !HAMILTONIAN
-    !!!!!!!!!!!!!! Normalised Pseudo-Hamiltonian !!!!!!!!!!!!!!!
-
-    call c_canonise(theNormalForm%a_t,a_CS)
-
-    a_CS = a_CS.sub.1
-    call c_canonise(a_CS,a_CS)
-
-    call alloc(c_Map2)
-    c_Map2 = a_CS**(-1)*c_Map*a_CS
-
-    call alloc(q_Map)
-    call c_factor_map(c_Map2,q_Map,vf,dir=1)
-
-
-    vf=from_phasor()*vf
-
-    call alloc(nrmlzdPseudoHam)
-    nrmlzdPseudoHam = cgetpb(vf)
-    call putHnormaltable(nrmlzdPseudoHam)
 
     !!!!!!!!!!!!!!!!!!!!!!
     !ONE TURN MAP
@@ -4395,12 +4377,9 @@ contains
     call kill(g_io)
 
     call kill(c_Map)
-    call kill(c_Map2)
-    call kill(q_Map)
     call kill(a_CS)
     call kill(a_CS_1)
 
-    call kill(nrmlzdPseudoHam)
 
     call kill(theNormalForm)
    !if (icase.eq.5 .or. icase.eq.56) then
@@ -4632,129 +4611,33 @@ contains
       !print*, 'putDnormaltable DONE'
 
     end subroutine putDnormaltable
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-    !_________________________________________________
-    ! contained in ptc_twiss
-    subroutine putHnormaltable(nrmlzdPseudoHam)
-      implicit none
-      type(c_taylor) :: nrmlzdPseudoHam
-      type(taylor) :: sinham,cosham
-      integer      :: ind(10)
-      integer      :: order
-      character(len=17):: nn, nick, bv='HAMILTONIAN'
-      character(len=17):: hamiltsin='hamilt_sin'
-      character(len=17):: hamiltcos='hamilt_cos'
-      character(len=17):: hamiltamp='hamilt_amp'
-      integer     	:: i,r, myn1,myn2,indexa(mnres,4),mynres
-      complex(dp)   :: c_val
-      real(dp)    :: im_val, re_val, d_val, eps=1e-6
-      integer     :: maxorder,o
-      double precision :: get_value ! C-function
-
-      maxorder = get_value('ptc_twiss ', 'no ')
-
-      ind(:) = 0
-      myn1 = 0
-      myn2 = 0
-      mynres = 0
-      i=1
-      call c_taylor_cycle(nrmlzdPseudoHam,size=mynres)
-
-    do o=1,maxorder !print order by order, I don't know how to sort c_taylor (piotr)
-
-      do r=1,mynres
-
-        call c_taylor_cycle(nrmlzdPseudoHam,ii=r,value=c_val,j=ind(1:c_%nv))
-
-        order = sum(ind(1:6))
-
-        if ( order .ne. o) then
-          cycle
-        endif
-
-        re_val = real(c_val)
-        im_val = imag(c_val)
-        d_val  = hypot(re_val, im_val)
-
-        ! if amplitude is close to zero then it is not worth to output
-        if (d_val .lt. eps) then
-
-          if (getdebug()>2) then
-            print*,"putHnormaltable idx=",r," ",d_val," smaller then eps=",eps, " skipping "
-          endif
-
-          cycle
-
-        endif
-
-
-        !print*,"HAML order ",order, ind(:)
-        !print*,'       im=',im_val , ' re=',re_val  , ' amp=', d_val
-
-
-        !!!!!!!!!!!!!!!!!!!!!!!!
-        write(nn,'(a4,6(a1,i1))') 'hama','_',ind(1),'_',ind(2),'_',ind(3), &
-                                       '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a2,6(i1))') 'h_',ind(1),ind(2),ind(3), &
-                                      ind(4),ind(5),ind(6)
-
-        if (getdebug() > 2) then
-         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-	    d_val, order, ind(1:6)
-        endif
-
-        call puttonormaltable(nn,nick,hamiltamp,d_val,order,ind)
-
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        write(nn,'(a4,6(a1,i1))') 'hams','_',ind(1),'_',ind(2),'_',ind(3), &
-                                       '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a4,3(a1,SP,i2))') 'hams','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
-
-        write(nick,'(a2,6(i1),a3)') 'h_',ind(1),ind(2),ind(3),ind(4),ind(5),ind(6),'_IM'
-
-        if (getdebug() > 2) then
-         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-	    re_val, order, ind(1:6)
-        endif
-
-        call puttonormaltable(nn,nick,hamiltsin,im_val,order,ind)
-
-
-        write(nn,'(a4,6(a1,i1))') 'hamc','_',ind(1),'_',ind(2),'_',ind(3), &
-                                       '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a2,6(i1),a3)') 'h_',ind(1),ind(2),ind(3),ind(4),ind(5),ind(6),'_RE'
-
-        if (getdebug() > 2) then
-         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-	    im_val, order, ind(1:6)
-        endif
-
-        call puttonormaltable(nn,nick,hamiltcos,re_val,order,ind)
-
-      enddo
-     enddo
-    end subroutine putHnormaltable
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     !_________________________________________________
     ! contained in ptc_twiss
-    subroutine putGnormaltable(gen)
+    subroutine putGnormaltable(gen,tunes)
     !gets generating function that are the linear part of A_t
       implicit none
       type(c_taylor) :: gen
+      real(dp)     :: tunes(3)
       integer     :: order
       integer     :: ind(10), i
       character(len=17):: nn, nick
       character(len=17):: genfunsin='gen_fun_sin'
       character(len=17):: genfuncos='gen_fun_cos'
       character(len=17):: genfunamp='gen_fun_amp'
+      character(len=17):: bv='HAMILTONIAN'
+      character(len=17):: hamiltsin='hamilt_sin'
+      character(len=17):: hamiltcos='hamilt_cos'
+      character(len=17):: hamiltamp='hamilt_amp'
       logical skew
       integer     	:: r, myn1,myn2,indexa(mnres,4),mynres, illa
-      complex(dp)   :: c_val
+      complex(dp)   :: c_val, c_haml
+      complex(dp)   :: tunefactor ! exp(2pi*i((j-k)mux + (l-m)muy))
+      real(dp)      :: tunesum !  (j-k)mux + (l-m)muy)
       real(dp)    :: im_val, re_val, d_val,  eps=1e-6
       integer     :: maxorder
       double precision :: get_value ! C-function
-
+      
       maxorder = get_value('ptc_twiss ', 'no ')
 
       ind(:) = 0
@@ -4762,6 +4645,8 @@ contains
       myn2 = 0
       mynres = 0
       i=1
+      
+      
       call c_taylor_cycle(gen,size=mynres)
 
 
@@ -4795,14 +4680,6 @@ contains
 
           write(nick,'(a2,6(i1))') 'f_',ind(1),ind(2),ind(3), &
                     	ind(4),ind(5),ind(6)
-          !
-          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-          !               d_val, order, ind(1:6)
-
-          !write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',7,'(1x,i16))'
-          !write(6,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-          !               d_val, order, ind(1:6)
-
           call puttonormaltable(nn,nick,genfunamp,d_val,order,ind)
 
 
@@ -4811,17 +4688,52 @@ contains
                                           '_',ind(4),'_',ind(5),'_',ind(6)
           write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
                                            ind(4),ind(5),ind(6),'_im'
-          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-          !               im_val, order, ind(1:6)
           call puttonormaltable(nn,nick,genfunsin,im_val,order,ind)
 
           write(nn,'(a4,6(a1,i1))') 'gnfc','_',ind(1),'_',ind(2),'_',ind(3), &
                                           '_',ind(4),'_',ind(5),'_',ind(6)
           write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
                                            ind(4),ind(5),ind(6),'_re'
-          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-          !               re_val, order, ind(1:6)
           call puttonormaltable(nn,nick,genfuncos,re_val,order,ind)
+          
+
+
+          if ((ind(1) .eq. ind(2) ) .and. (ind(3) .eq. ind(4) ) .and. (abs(tunes(3)) .lt. TINY(ONE)) ) then
+             !print*," Longi gnf but no longi tune"
+             cycle
+          endif
+          
+          
+          tunesum = (ind(1) - ind(2))*tunes(1) + (ind(3) - ind(4))*tunes(2) + (ind(6) - ind(5))*tunes(3)
+          
+          tunefactor =  cmplx( cos(twopi*tunesum), sin(twopi*tunesum) )
+          tunefactor = 1.0 - tunefactor
+          
+          c_haml = c_val * tunefactor
+          
+          im_val = imag(c_haml)
+          re_val = real(c_haml)
+          d_val  = hypot(re_val, im_val)
+
+          write(nn,'(a4,6(a1,i1))') 'hama','_',ind(1),'_',ind(2),'_',ind(3), &
+                                           '_',ind(4),'_',ind(5),'_',ind(6)
+          write(nick,'(a2,6(i1))') 'h_',ind(1),ind(2),ind(3), &
+                    	ind(4),ind(5),ind(6)
+          call puttonormaltable(nn,nick,hamiltamp,d_val,order,ind)
+
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+          write(nn,'(a4,6(a1,i1))') 'hams','_',ind(1),'_',ind(2),'_',ind(3), &
+                                           '_',ind(4),'_',ind(5),'_',ind(6)
+          write(nick,'(a2,6(i1),a3)') 'h_',ind(1),ind(2),ind(3),ind(4),ind(5),ind(6),'_IM'
+          call puttonormaltable(nn,nick,hamiltsin,im_val,order,ind)
+
+
+          write(nn,'(a4,6(a1,i1))') 'hamc','_',ind(1),'_',ind(2),'_',ind(3), &
+                                           '_',ind(4),'_',ind(5),'_',ind(6)
+          write(nick,'(a2,6(i1),a3)') 'h_',ind(1),ind(2),ind(3),ind(4),ind(5),ind(6),'_RE'
+          call puttonormaltable(nn,nick,hamiltcos,re_val,order,ind)
+
 
         enddo
       enddo
@@ -4829,7 +4741,7 @@ contains
       myn1 = 0
       myn2 = 0
       mynres = 0
-
+      
 
     end subroutine putGnormaltable
    !_________________________________________________
