@@ -4632,8 +4632,6 @@ contains
       logical skew
       integer     	:: r, myn1,myn2,indexa(mnres,4),mynres, illa
       complex(dp)   :: c_val, c_haml
-      complex(dp)   :: tunefactor ! exp(2pi*i((j-k)mux + (l-m)muy))
-      real(dp)      :: tunesum !  (j-k)mux + (l-m)muy)
       real(dp)    :: im_val, re_val, d_val,  eps=1e-6
       integer     :: maxorder
       double precision :: get_value ! C-function
@@ -4704,12 +4702,7 @@ contains
           endif
           
           
-          tunesum = (ind(1) - ind(2))*tunes(1) + (ind(3) - ind(4))*tunes(2) + (ind(6) - ind(5))*tunes(3)
-          
-          tunefactor =  cmplx( cos(twopi*tunesum), sin(twopi*tunesum) )
-          tunefactor = 1.0 - tunefactor
-          
-          c_haml = c_val * tunefactor
+          c_haml = GnfToHam(c_val, ind, tunes)
           
           im_val = imag(c_haml)
           re_val = real(c_haml)
