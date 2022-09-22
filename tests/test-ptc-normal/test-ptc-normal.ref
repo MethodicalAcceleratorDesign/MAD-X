@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:06:30      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.09.22 11:35:49      +
   ++++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -261,9 +261,29 @@ Determined SECTOR NMUL MAX :  0
 
 !     select_ptc_normal, haml=1,0,0;
 
-!     select_ptc_normal, haml=3,0,0;
+     select_ptc_normal, haml= 3,0,0;
 
-!     select_ptc_normal, haml=1,2,0;
+     select_ptc_normal, haml=-3,0,0;
+
+     select_ptc_normal, haml= 4,0,0;
+
+     select_ptc_normal, haml=-4,0,0;
+
+     select_ptc_normal, haml= 5,0,0;
+
+     select_ptc_normal, haml=-5,0,0;
+
+
+
+     select_ptc_normal, gnfu=+3,0,0;
+
+     select_ptc_normal, gnfu=-3,0,0;
+
+     select_ptc_normal, gnfu=+4,0,0;
+
+     select_ptc_normal, gnfu=-4,0,0;
+
+     select_ptc_normal, gnfu=+5,0,0;
 
      select_ptc_normal, gnfu=-5,0,0;
 
