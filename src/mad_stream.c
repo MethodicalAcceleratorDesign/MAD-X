@@ -53,7 +53,8 @@ down_unit(char* file_name)
   
   if ((new = fopen(file_name, "r")) == NULL)
   {
-    if (interactive) warning("cannot open input file:", file_name);
+    int fatal_missing = get_option("missing_file_fatal"); // only for the interactive mode, in other cases always fatal. 
+    if (interactive && fatal_missing == 0)  warning("cannot open input file:", file_name);
     else             fatal_error("cannot open input file:", file_name);
     return 0;
   }
