@@ -5,21 +5,24 @@ MAD-X master
     *   [PR 1125](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1125) Make TWISS treat [XY]ROTATION exactly, including the linear and second order map (J. S. Berg)
     *   [PR 1129](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1129) Make track/twiss able to treat a thick solenoid exactly (J. S. Berg)
     *   [PR 1133](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1133) Fix the Dqmin calculation when the CHROM option was used. (T. Persson)
-    *   [PR 1136](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1136) Implements the exact translation in TWISS and TRACK (T. Persson **WIP**)
+    *   [PR 1136](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1136) Implements the exact translation in TWISS and TRACK (T. Persson)
     *   [PR 1119](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1119) Fix tapering issues (R. De Maria **WIP**)
 *   Track:
-    *   [PR 1109](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1109) Space charge (F. Schimdt, H. Renshal, A. Latina **WIP**)   
+    *   [PR 1109](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1109) Space charge (F. Schimdt, H. Renshal, A. Latina **review tests**)   
 *   PTC:
+    *   [PR 1142](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1142) Fix issue-1140 generating function wrong sign from ptc_normal (P. Skowonronski) 
     *   [PR 1111](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1111) Ensure that exact_model is set before zero_key is called in PTC (J. S. Berg)
     *   [PR 1095](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1095) Implement more robust, optional, PTC DA map output (L. Deniau)
     *   [PR 1131](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1131) Add spin table (T. Persson and P. Skowonronski)
     *   [PR 1114](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1114) Exact option in PTC translation (J. S. Berg)             
 *   Misc:
+    *   [PR 1139](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1139) Remove inform forcing for seq generation (R. De Maria)
+    *   [PR 1144](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1144) Flag to throw fatal error when missing file in interactive mode (T. Persson)
     *   [PR 1081](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1108) Fix potential buffer overrun when node_name calls stoupper (J. S. Berg)
     *   [PR 1093](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1093) More robust aperture refinement (T. Persson)
     *   [PR 1113](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1113) Introduce LAST option in INSTALL and MOVE and change default behaviour [Breaking change!] (R. De Maria)
     *   [PR 1078](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1078) Fix k0 in dipedge in makething (R. De Maria **WIP**)
-    *   [PR 1137](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1137) Remove `none` from mad_dict for numbers  (R. De Maria **WIP**)
+    *   [PR 1137](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1137) Remove `none` from mad_dict for numbers  (R. De Maria)
 *   Tests:
     *   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)
 *   Doc:
