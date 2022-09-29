@@ -531,7 +531,7 @@ store_node_value(const char* par, double* value)
 
   else if (strcmp(lpar, "k0") == 0) {
     store_comm_par_value("k0",*value,el->def);
-    el->def->par_names->inform[8] = 1;
+//    el->def->par_names->inform[8] = 1;
   }
   
   else if (strcmp(lpar, "k1") == 0) store_comm_par_value("k1",*value,el->def);
@@ -539,12 +539,12 @@ store_node_value(const char* par, double* value)
   // The inform is to make sure they are written out to a new sequence. 
   else if (strcmp(lpar, "ktap") == 0) {
     store_comm_par_value("ktap",*value,el->def);
-    el->def->par_names->inform[9] = 1;  // for quads and sextupoles
-    el->def->par_names->inform[23] = 1; // for bends
+//    el->def->par_names->inform[9] = 1;  // for quads and sextupoles
+//    el->def->par_names->inform[23] = 1; // for bends
   }
   else if (strcmp(lpar, "lagtap") == 0) {
     store_comm_par_value("lagtap",*value,el->def);
-    el->def->par_names->inform[9] = 1;
+//    el->def->par_names->inform[9] = 1;
   }
   else if (strcmp(lpar, "lag") == 0) store_comm_par_value("lag",*value,el->def);
 
