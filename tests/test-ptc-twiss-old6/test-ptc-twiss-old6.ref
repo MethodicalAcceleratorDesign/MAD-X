@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.08.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:05:42      +
+  + Release   date: 2022.02.25               +
+  + Execution date: 2022.09.21 16:56:04      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -124,10 +124,10 @@ orbit:  -2.499994E-03 -4.455023E-09 -8.182293E-08  1.600081E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    5.994041468e-09 
+                 0                  0                  0    2.134887523e-07 
 
        dqmin_phase 
-       1.098900213 
+      -1.095802254 
 
 
 SEEDSYS = 1;
@@ -254,24 +254,616 @@ orbit:  -2.499994E-03 -4.455021E-09 -8.182286E-08  1.600081E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
            synch_6            synch_8             nflips              dqmin 
-                 0                  0                  0    8.975736049e-07 
+                 0                  0                  0    9.108104365e-07 
 
        dqmin_phase 
-      -2.215774694 
+      0.8648077117 
 
 
 option,-echo,-info,warn;
 
 
-Something Went Wrong
-────────────────────
- x Could not update runtime installation
- x Could not request build for /#b6dae2e3-698e-4a61-b8ee-0917dde87a72
- x Build Failed: Recipe build failed: 1 build step failed
 
-Need More Help?
-───────────────
- • Run → `state exec --help` for general help
- • Visit the Forum →
-https://community.activestate.com/c/state-tool/
-+=+=+= fatal: cannot open input file: temp/MB.12.mad
+!------------------------------------------------------------------------
+
+!      Correct the average B3 using the 'MAGNETIC MEASUREMENTS'
+
+!               with the b3 spool-piece families
+
+!------------------------------------------------------------------------
+
+N_MCS = 154; ! number of sextupole spoole piece elements
+
+KCS.A12B1 := -b3sum_mb.12 /N_MCS / l.MCS;
+
+KCS.A23B1 := -b3sum_mb.23 /N_MCS / l.MCS;
+
+KCS.A34B1 := -b3sum_mb.34 /N_MCS / l.MCS;
+
+KCS.A45B1 := -b3sum_mb.45 /N_MCS / l.MCS;
+
+KCS.A56B1 := -b3sum_mb.56 /N_MCS / l.MCS;
+
+KCS.A67B1 := -b3sum_mb.67 /N_MCS / l.MCS;
+
+KCS.A78B1 := -b3sum_mb.78 /N_MCS / l.MCS;
+
+KCS.A81B1 := -b3sum_mb.81 /N_MCS / l.MCS;
+
+
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety,alfx,alfy;
+
+TWISS,sequence=lhcb1;
+
+enter Twiss module
+  
+iteration:   1 error:   3.025339E-03 deltap:   0.000000E+00
+orbit:  -2.486671E-03 -2.015413E-06 -1.003183E-04  1.597085E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.323505E-04 deltap:   0.000000E+00
+orbit:  -2.500015E-03 -1.838664E-09 -6.076318E-08  1.600067E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   6.779667E-08 deltap:   0.000000E+00
+orbit:  -2.499994E-03 -4.455013E-09 -8.182299E-08  1.600081E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003169509221        56.16994391 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000008        10.42036857        623.4250081        2.819837531 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.351561073     0.008235563016     0.000931680056        59.31000029 
+
+               dq2            betymax              dymax              dyrms 
+       -1.08470491        639.6101771        0.154176221       0.0433795907 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.008512322595    0.0009604994421                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    8.195150975e-07 
+
+       dqmin_phase 
+     -0.1671160056 
+
+
+!------------------------------------------------------------------------
+
+!      Correct the average B4 using the 'MAGNETIC MEASUREMENTS'
+
+!               with the b4 spool-piece families
+
+!------------------------------------------------------------------------
+
+N_MCO = 77; ! number of octupole spoole piece elements
+
+KCO.A12B1 := -b4sum_mb.12 /N_MCO / l.MCO;
+
+KCO.A23B1 := -b4sum_mb.23 /N_MCO / l.MCO;
+
+KCO.A34B1 := -b4sum_mb.34 /N_MCO / l.MCO;
+
+KCO.A45B1 := -b4sum_mb.45 /N_MCO / l.MCO;
+
+KCO.A56B1 := -b4sum_mb.56 /N_MCO / l.MCO;
+
+KCO.A67B1 := -b4sum_mb.67 /N_MCO / l.MCO;
+
+KCO.A78B1 := -b4sum_mb.78 /N_MCO / l.MCO;
+
+KCO.A81B1 := -b4sum_mb.81 /N_MCO / l.MCO;
+
+
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety,alfx,alfy;
+
+TWISS,sequence=lhcb1;
+
+enter Twiss module
+  
+iteration:   1 error:   3.027427E-03 deltap:   0.000000E+00
+orbit:  -2.484953E-03 -2.131804E-06 -1.002162E-04  1.597352E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.326299E-04 deltap:   0.000000E+00
+orbit:  -2.500014E-03 -1.796658E-09 -5.993221E-08  1.600066E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   6.823111E-08 deltap:   0.000000E+00
+orbit:  -2.499994E-03 -4.455013E-09 -8.182299E-08  1.600081E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003169509221        56.16994391 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000008        10.42036831        623.4250081        2.819837531 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.351561073     0.008235563016     0.000931680056        59.31000029 
+
+               dq2            betymax              dymax              dyrms 
+      -1.084704884        639.6101771        0.154176221       0.0433795907 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.008512322595    0.0009604994421                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0     8.19514641e-07 
+
+       dqmin_phase 
+     -0.1671171856 
+
+
+!------------------------------------------------------------------------
+
+!      Correct the average B5 using the 'MAGNETIC MEASUREMENTS'
+
+!               with the b5 spool-piece families
+
+!------------------------------------------------------------------------
+
+N_MCD = 77; ! number of decapole spoole piece elements
+
+KCD.A12B1 := -b5sum_mb.12 /N_MCD / l.MCD;
+
+KCD.A23B1 := -b5sum_mb.23 /N_MCD / l.MCD;
+
+KCD.A34B1 := -b5sum_mb.34 /N_MCD / l.MCD;
+
+KCD.A45B1 := -b5sum_mb.45 /N_MCD / l.MCD;
+
+KCD.A56B1 := -b5sum_mb.56 /N_MCD / l.MCD;
+
+KCD.A67B1 := -b5sum_mb.67 /N_MCD / l.MCD;
+
+KCD.A78B1 := -b5sum_mb.78 /N_MCD / l.MCD;
+
+KCD.A81B1 := -b5sum_mb.81 /N_MCD / l.MCD;
+
+
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety,alfx,alfy;
+
+TWISS,sequence=lhcb1;
+
+enter Twiss module
+  
+iteration:   1 error:   3.028669E-03 deltap:   0.000000E+00
+orbit:  -2.486884E-03 -2.188189E-06 -9.757900E-05  1.586651E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.121155E-04 deltap:   0.000000E+00
+orbit:  -2.500006E-03 -2.441538E-09 -7.070944E-08  1.600062E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   4.694622E-08 deltap:   0.000000E+00
+orbit:  -2.499994E-03 -4.455013E-09 -8.182300E-08  1.600081E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003169509221        56.16994391 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000008        10.42036835        623.4250081        2.819837531 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.351561073     0.008235563016     0.000931680056        59.31000029 
+
+               dq2            betymax              dymax              dyrms 
+      -1.084704957        639.6101771        0.154176221       0.0433795907 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.008512322595    0.0009604994421                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    8.195146472e-07 
+
+       dqmin_phase 
+     -0.1671171829 
+
+
+
+
+!---------------------------------------------------------------
+
+!      Adjust the chromaticity for Beam-1
+
+!---------------------------------------------------------------
+
+Title, " Chromaticity correction";
+
+match,sequence=lhcb1;
+
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+global, dQ1=QPRIME,dQ2=QPRIME;
+
+vary, name=KSF.B1, step=0.00001;
+
+vary, name=KSD.B1, step=0.00001;
+
+lmdif, tolerance=1.0E-7, calls=100;
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.80418008E+02
+
+
+call:       4   Penalty function =   0.68581685E-13
+ ++++++++++ LMDIF ended: converged successfully
+call:       4   Penalty function =   0.68581685E-13
+endmatch;
+
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         dq1          4     2.00000000E+00     2.00000026E+00     6.66496609E-14
+Global constraint:         dq2          4     2.00000000E+00     1.99999996E+00     1.93202419E-15
+
+
+Final Penalty Function =   6.85816851e-14
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+ksf.b1                    6.17987e-02  6.69836e-02 -1.00000e+20  1.00000e+20
+ksd.b1                   -1.09468e-01 -1.07933e-01 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   6.85816851e-14
+value, KSF.B1;
+
+ksf.b1             =      0.06179867366 ;
+value, KSD.B1;
+
+ksd.b1             =      -0.1094680406 ;
+
+
+!---------------------------------------------------------------
+
+!      Adjust the tune for Beam-1
+
+!---------------------------------------------------------------
+
+
+
+match,sequence=lhcb1;
+
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+constraint,sequence=lhcb1,range=#e,mux=QX0,muy=QY0;
+
+vary, name=KQTF.B1, step=1.0E-6;
+
+vary, name=KQTD.B1, step=1.0E-6;
+
+lmdif,calls=5000,tolerance=1.e-21;
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.93796821E-11
+
+
+call:       4   Penalty function =   0.26116459E-18
+call:       7   Penalty function =   0.20490189E-21
+ ++++++++++ LMDIF ended: converged successfully
+call:       7   Penalty function =   0.20490189E-21
+endmatch;
+
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+lhcb1$end:1                mux          4     6.42800000E+01     6.42800000E+01     1.86115638E-22
+lhcb1$end:1                muy          4     5.93100000E+01     5.93100000E+01     1.87862491E-23
+
+
+Final Penalty Function =   2.04901887e-22
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kqtf.b1                  -4.91348e-10  0.00000e+00 -1.00000e+20  1.00000e+20
+kqtd.b1                   1.12701e-09  0.00000e+00 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   2.04901887e-22
+value, KQTF.B1;
+
+kqtf.b1            =   -4.913478636e-10 ;
+value, KQTD.B1;
+
+kqtd.b1            =     1.12701076e-09 ;
+
+
+VRF400=16;
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety,alfx,alfy;
+
+TWISS,sequence=lhcb1;
+
+enter Twiss module
+  
+iteration:   1 error:   3.028320E-03 deltap:   0.000000E+00
+orbit:  -2.486622E-03 -2.214111E-06 -9.680412E-05  1.586634E-04  1.088927E-05  5.744431E-07
+  
+iteration:   2 error:   1.110480E-04 deltap:   0.000000E+00
+orbit:  -2.500028E-03 -2.248565E-09 -6.482195E-08  1.600047E-04  1.141307E-05  8.802769E-07
+  
+iteration:   3 error:   4.601430E-08 deltap:   0.000000E+00
+orbit:  -2.500017E-03 -4.219634E-09 -7.649123E-08  1.600066E-04  1.141440E-05  8.804674E-07
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832   -1.141440345e-05    0.0003167679379        56.18616514 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000176        1.998703106        623.4138805        2.819878402 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.351560267     0.008235628748    0.0009316839168        59.31000176 
+
+               dq2            betymax              dymax              dyrms 
+       1.998129293        639.6106014       0.1542170973      0.04338818706 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.008512310964    0.0009604958264                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0    1.288615987e-06 
+
+       dqmin_phase 
+      0.7404826745 
+emit;
+
+enter EMIT module
+ 
+ Global parameters for protons, radiate = F:
+
+ C                 26658.8832 m          f0             0.01124547507 MHz
+ T0               88.92465583 musecs     alfa         0.0003167666895 
+ eta          0.0003124192598            gamma(tr)        56.18627585 
+ Bcurrent     0.0001891805814 A/bunch    Kbunch             1 
+ Npart               1.05e+11 /bunch     Energy                   450 GeV 
+ gamma            479.6050162            beta            0.9999978263
+ dtbyds                     0
+ 
+                                                  M o d e   1         M o d e   2         M o d e   3
+ Fractional tunes            undamped              0.28000176          0.31000176          0.00794101
+ 
+ beta* [m]                   x                 0.17000131E+02      0.98267022E-08      0.39367178E-04
+                             y                 0.80351176E-08      0.16999700E+02      0.46332403E-04
+                             t                 0.38844372E-05      0.22041659E-06      0.16699674E+03
+ 
+ gamma* [1/m]                px                0.58823076E-01      0.20453752E-10      0.13246916E-11
+                             py                0.26632898E-10      0.58824568E-01      0.10146521E-11
+                             pt                0.43683348E-09      0.15573117E-07      0.59883574E-02
+ 
+ beta(max) [m]               x                 0.62341388E+03      0.36686484E-06      0.49632691E-01
+                             y                 0.37867865E-06      0.63961061E+03      0.62570348E-04
+                             t                 0.47618375E-01      0.14250937E-03      0.16709475E+03
+ 
+ gamma(max) [1/m]            px                0.76031382E+00      0.36360720E-09      0.13246916E-11
+                             py                0.35888918E-09      0.76030716E+00      0.10146521E-11
+                             pt                0.14836529E-04      0.90040014E-07      0.59883574E-02
+++++++ warning: EMIT: beam not updated, RADIATE is false or longitudinal stability not ensured. 
+
+ RF system: 
+ Cavity                      length[m]        voltage[MV]                lag          freq[MHz]             harmon
+ acnca.d5l4.b1                       0                  0                0.5        200.3943657              17820
+ acnca.c5l4.b1                       0                  0                0.5        200.3943657              17820
+ acnca.b5l4.b1                       0                  0                0.5        200.3943657              17820
+ acnca.a5l4.b1                       0                  0                0.5        200.3943657              17820
+ acsca.d5l4.b1                       0                  2                0.5        400.7887314              35640
+ acsca.c5l4.b1                       0                  2                0.5        400.7887314              35640
+ acsca.b5l4.b1                       0                  2                0.5        400.7887314              35640
+ acsca.a5l4.b1                       0                  2                0.5        400.7887314              35640
+ acsca.a5r4.b1                       0                  2                0.5        400.7887314              35640
+ acsca.b5r4.b1                       0                  2                0.5        400.7887314              35640
+ acsca.c5r4.b1                       0                  2                0.5        400.7887314              35640
+ acsca.d5r4.b1                       0                  2                0.5        400.7887314              35640
+
+
+!sixtrack, radius=rr;
+
+
+
+PTC_CREATE_UNIVERSE;
+
+Determined SECTOR NMUL MAX :  0
+PTC_CREATE_LAYOUT,model=2,method=6,nst=1;
+
+ MAD-X Beam Parameters
+                  Energy : 0.450000E+03
+          Kinetic Energy : 0.449062E+03
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.449999E+03
+ Setting MADx with 
+     energy           450.00000000000000     
+     method                   6
+     Num. of steps            1
+     charge           1.0000000000000000     
+  Length of machine:    26658.883200000000     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        26658.883200000000     
+
+
+SELECT, flag=ptc_twiss, clear;
+
+SELECT, flag=ptc_twiss, column=name,s,beta11,beta22,mu1,mu2,mu3,x,px,y,py,t,pt;
+
+ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCompaction"; ! jluc
+
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps      1
+ This is a proton 
+       EXACT_MODEL =  FALSE
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  FALSE
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Closed orbit:   -2.5000151695345461E-003  -3.5677283321660542E-009  -7.6491170088750353E-008   1.6000664229119899E-004   1.1414386724483901E-005   8.8048141008614885E-007
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+        26658.8832    0.0003167670908           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000    0.0003124196611        56.18624026       0.2800017429 
+
+                q2                dq1                dq2                 qs 
+       0.310001781                  0                  0     0.007940998705 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+       9.999904677        623.4144437        9.819046443        639.6111433 
+
+         beta11min          beta11max          beta12min          beta12max 
+       9.999904673        623.4144433    3.584972158e-09    3.803553122e-07 
+
+         beta13min          beta13max          beta21min          beta21max 
+   3.924847107e-09      0.04761849525    2.791541052e-09    3.686514692e-07 
+
+         beta22min          beta22max          beta23min          beta23max 
+       9.819046443         639.611143    6.372983124e-10    0.0001425093864 
+
+         beta31min          beta31max          beta32min          beta32max 
+   9.522644436e-09       0.0496327398    3.544342774e-07    6.257024793e-05 
+
+         beta33min          beta33max           disp1min           disp1max 
+       166.9905597        167.0946714       -2.819835563        2.814771571 
+
+          disp2min           disp2max           disp3min           disp3max 
+    -0.04768111781      0.04977511374      -0.1542660412       0.1071983296 
+
+          disp4min           disp4max             deltap            orbit_x 
+   -0.003875652784     0.002994346359                  0     -0.00250001517 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+  -3.567728332e-09   -7.649117009e-08    0.0001600066423    8.804814101e-07 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+   1.141438672e-05    0.0009316851209    0.0009604958264    3.079876774e-05 
+
+           pycorms             tcorms            ptcorms             xcomax 
+   3.139702411e-05    5.315969461e-06    8.804814104e-07     0.007226400175 
+
+            ycomax            pxcomax            pycomax             tcomax 
+    0.007641671572    0.0003940871055    0.0004529212793    1.285828248e-05 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+   8.804814106e-07    -0.008235647056    -0.008512310964   -0.0004423489589 
+
+           pycomin             tcomin            ptcomin 
+  -0.0003835866478   -2.529663284e-06    8.804814035e-07 
+
+
+select_ptc_normal, dq1,dq2;
+
+
+
+ptc_normal,closed_orbit,normal,icase=5,no=2;
+
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps      1
+ This a particle with    1836.1526734253     times the electron mass 
+       EXACT_MODEL =  FALSE
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  TRUE 
+       DELTA       =  TRUE 
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Closed orbit:   -2.4999927550697627E-003  -3.8031142802757280E-009  -8.1822968963343853E-008   1.6000806167795642E-004   0.0000000000000000     
+write, table=normal_results,file="normal_results";
+
+
+
+System,"rm -rf temp";
+
+stop;
+
+
+  Number of warnings: 1
+1 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
