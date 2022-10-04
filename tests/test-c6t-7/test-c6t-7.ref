@@ -36,10 +36,8 @@ parameter: aper_offset   double array: 0.000000e+00
 parameter: aper_tol   double array: 0.000000e+00 0.000000e+00 0.000000e+00 
 parameter: aper_vx   double array: -1.000000e+00 
 parameter: aper_vy   double array: -1.000000e+00 
-parameter: slot_id   expression: none :: value:                  0
-integer:          0
-parameter: assembly_id   expression: none :: value:                  0
-integer:          0
+parameter: slot_id   integer:          0
+parameter: assembly_id   integer:          0
 parameter: mech_sep   double value:                  0
 parameter: v_pos   double value:                  0
 parameter: model   integer:         -1
@@ -87,10 +85,8 @@ parameter: aper_offset   double array: 0.000000e+00
 parameter: aper_tol   double array: 0.000000e+00 0.000000e+00 0.000000e+00 
 parameter: aper_vx   double array: -1.000000e+00 
 parameter: aper_vy   double array: -1.000000e+00 
-parameter: slot_id   expression: none :: value:                  0
-integer:          0
-parameter: assembly_id   expression: none :: value:                  0
-integer:          0
+parameter: slot_id   integer:          0
+parameter: assembly_id   integer:          0
 parameter: mech_sep   double value:                  0
 parameter: v_pos   double value:                  0
 parameter: model   integer:         -1

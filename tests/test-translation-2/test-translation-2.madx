@@ -1,0 +1,179 @@
+option, -echo;
+set, format="10d", "25.17e", "-24s";
+
+x0 = 0.01;
+y0 = 0.01;
+px0 = 0.013;
+py0 = 0.017;
+pt0 = 0.021;
+an = 0.1;
+prx: xrotation, angle=an;
+pry: yrotation, angle=an;
+tr_str = 1.5 ;
+pry: TRANSLATION, DX:=0.01*tr_str, DY:=0.002*tr_str, DS:=0.02*tr_str, exact=1;
+
+ly: line=(pry);
+
+beam, energy=2, particle=proton;
+
+select, flag=twi2, column=name,x,px,y,py,t,pt,
+ re11,re12,re13,re14,re15,re16,
+ re21,re22,re23,re24,re25,re26,
+ re31,re32,re33,re34,re35,re36,
+ re41,re42,re43,re44,re45,re46,
+ re51,re52,re53,re54,re55,re56,
+ re61,re62,re63,re64,re65,re66;
+select, flag=twi3, column=name,
+ t112,t114,t116,t122,t124,t126,t132,t134,t136,t144,t146,t166,
+ t222,t224,t226,t244,t246,t266,
+ t312,t314,t316,t322,t324,t326,t332,t334,t336,t344,t346,t366,
+ t422,t424,t426,t444,t446,t466,
+ t512,t514,t516,t522,t524,t526,t532,t534,t536,t544,t546,t566;
+select, flag=ptc2, column=name,x,px,y,py,t,pt,
+ re11,re12,re13,re14,re15,re16,
+ re21,re22,re23,re24,re25,re26,
+ re31,re32,re33,re34,re35,re36,
+ re41,re42,re43,re44,re45,re46,
+ re51,re52,re53,re54,re55,re56,
+ re61,re62,re63,re64,re65,re66;
+create, table=ptc3, column=_name,
+ txxp,txxq,txxd,txpp,txpq,txpd,txyp,txyq,txyd,txqq,txqd,txdd,
+ tppp,tppq,tppd,tpqq,tpqd,tpdd,
+ tyxp,tyxq,tyxd,typp,typq,typd,tyyp,tyyq,tyyd,tyqq,tyqd,tydd,
+ tqpp,tqpq,tqpd,tqqq,tqqd,tqdd,
+ ttxp,ttxq,ttxd,ttpp,ttpq,ttpd,ttyp,ttyq,ttyd,ttqq,ttqd,ttdd;
+ptc_select, table=ptc3, column=txxp, polynomial=1, monomial='110000';
+ptc_select, table=ptc3, column=txxq, polynomial=1, monomial='100100';
+ptc_select, table=ptc3, column=txxd, polynomial=1, monomial='100001';
+ptc_select, table=ptc3, column=txpp, polynomial=1, monomial='020000';
+ptc_select, table=ptc3, column=txpq, polynomial=1, monomial='010100';
+ptc_select, table=ptc3, column=txpd, polynomial=1, monomial='010001';
+ptc_select, table=ptc3, column=txyp, polynomial=1, monomial='011000';
+ptc_select, table=ptc3, column=txyq, polynomial=1, monomial='001100';
+ptc_select, table=ptc3, column=txyd, polynomial=1, monomial='001001';
+ptc_select, table=ptc3, column=txqq, polynomial=1, monomial='000200';
+ptc_select, table=ptc3, column=txqd, polynomial=1, monomial='000101';
+ptc_select, table=ptc3, column=txdd, polynomial=1, monomial='000002';
+ptc_select, table=ptc3, column=tppp, polynomial=2, monomial='020000';
+ptc_select, table=ptc3, column=tppq, polynomial=2, monomial='010100';
+ptc_select, table=ptc3, column=tppd, polynomial=2, monomial='010001';
+ptc_select, table=ptc3, column=tpqq, polynomial=2, monomial='000200';
+ptc_select, table=ptc3, column=tpqd, polynomial=2, monomial='000101';
+ptc_select, table=ptc3, column=tpdd, polynomial=2, monomial='000002';
+ptc_select, table=ptc3, column=tyxp, polynomial=3, monomial='110000';
+ptc_select, table=ptc3, column=tyxq, polynomial=3, monomial='100100';
+ptc_select, table=ptc3, column=tyxd, polynomial=3, monomial='100001';
+ptc_select, table=ptc3, column=typp, polynomial=3, monomial='020000';
+ptc_select, table=ptc3, column=typq, polynomial=3, monomial='010100';
+ptc_select, table=ptc3, column=typd, polynomial=3, monomial='010001';
+ptc_select, table=ptc3, column=tyyp, polynomial=3, monomial='011000';
+ptc_select, table=ptc3, column=tyyq, polynomial=3, monomial='001100';
+ptc_select, table=ptc3, column=tyyd, polynomial=3, monomial='001001';
+ptc_select, table=ptc3, column=tyqq, polynomial=3, monomial='000200';
+ptc_select, table=ptc3, column=tyqd, polynomial=3, monomial='000101';
+ptc_select, table=ptc3, column=tydd, polynomial=3, monomial='000002';
+ptc_select, table=ptc3, column=tqpp, polynomial=4, monomial='020000';
+ptc_select, table=ptc3, column=tqpq, polynomial=4, monomial='010100';
+ptc_select, table=ptc3, column=tqpd, polynomial=4, monomial='010001';
+ptc_select, table=ptc3, column=tqqq, polynomial=4, monomial='000200';
+ptc_select, table=ptc3, column=tqqd, polynomial=4, monomial='000101';
+ptc_select, table=ptc3, column=tqdd, polynomial=4, monomial='000002';
+ptc_select, table=ptc3, column=ttxp, polynomial=5, monomial='110000';
+ptc_select, table=ptc3, column=ttxq, polynomial=5, monomial='100100';
+ptc_select, table=ptc3, column=ttxd, polynomial=5, monomial='100001';
+ptc_select, table=ptc3, column=ttpp, polynomial=5, monomial='020000';
+ptc_select, table=ptc3, column=ttpq, polynomial=5, monomial='010100';
+ptc_select, table=ptc3, column=ttpd, polynomial=5, monomial='010001';
+ptc_select, table=ptc3, column=ttyp, polynomial=5, monomial='011000';
+ptc_select, table=ptc3, column=ttyq, polynomial=5, monomial='001100';
+ptc_select, table=ptc3, column=ttyd, polynomial=5, monomial='001001';
+ptc_select, table=ptc3, column=ttqq, polynomial=5, monomial='000200';
+ptc_select, table=ptc3, column=ttqd, polynomial=5, monomial='000101';
+ptc_select, table=ptc3, column=ttdd, polynomial=5, monomial='000002';
+
+use, sequence=ly;
+
+track, onepass, onetable, file='yrot-tra1.tfs';
+start, x=x0, px=px0, py=py0, pt=pt0;
+observe, place=pry;
+run, turns=1;
+endtrack;
+twiss, exact, x=x0, px=px0, py=py0, pt=pt0, betx=1, bety=1, rmatrix, table=twi2, file='yrot-twi2.tfs',
+ sectormap, sectortable=twi3, sectorfile='yrot-twi3.tfs';
+
+ptc_create_universe;
+ptc_create_layout, exact, model=2, method=6, nst=5;
+ptc_twiss, x=x0, px=px0, py=py0, pt=pt0, betx=1, bety=1, betz=1, rmatrix, icase=56, no=5, table=ptc2, file='yrot-ptc2.tfs';
+ptc_end;
+
+write, table=ptc3, file='yrot-ptc3.tfs';
+
+value, table(trackone,x,2)-table(ptc2,pry,x);
+value, table(trackone,px,2)-table(ptc2,pry,px);
+value, table(trackone,y,2)-table(ptc2,pry,y);
+value, table(trackone,t,2)-table(ptc2,pry,t);
+value, table(twi2,pry,x)-table(ptc2,pry,x);
+value, table(twi2,pry,px)-table(ptc2,pry,px);
+value, table(twi2,pry,y)-table(ptc2,pry,y);
+value, table(twi2,pry,t)-table(ptc2,pry,t);
+value, table(twi2,pry,re11)-table(ptc2,pry,re11);
+value, table(twi2,pry,re12)-table(ptc2,pry,re12);
+value, table(twi2,pry,re14)-table(ptc2,pry,re14);
+value, table(twi2,pry,re16)-table(ptc2,pry,re16);
+value, table(twi2,pry,re22)-table(ptc2,pry,re22);
+value, table(twi2,pry,re24)-table(ptc2,pry,re24);
+value, table(twi2,pry,re26)-table(ptc2,pry,re26);
+value, table(twi2,pry,re31)-table(ptc2,pry,re31);
+value, table(twi2,pry,re32)-table(ptc2,pry,re32);
+value, table(twi2,pry,re34)-table(ptc2,pry,re34);
+value, table(twi2,pry,re36)-table(ptc2,pry,re36);
+value, table(twi2,pry,re51)-table(ptc2,pry,re51);
+value, table(twi2,pry,re52)-table(ptc2,pry,re52);
+value, table(twi2,pry,re54)-table(ptc2,pry,re54);
+value, table(twi2,pry,re56)-table(ptc2,pry,re56);
+
+value, 0.5*table(ptc3,pry,txxp) - table(twi3,pry,t112);
+value, 0.5*table(ptc3,pry,txxq) - table(twi3,pry,t114);
+value, 0.5*table(ptc3,pry,txxd) - table(twi3,pry,t116);
+value, table(ptc3,pry,txpp) - table(twi3,pry,t122);
+value, 0.5*table(ptc3,pry,txpq) - table(twi3,pry,t124);
+value, 0.5*table(ptc3,pry,txpd) - table(twi3,pry,t126);
+value, 0.5*table(ptc3,pry,txpq) - table(twi3,pry,t142);
+value, table(ptc3,pry,txqq) - table(twi3,pry,t144);
+value, 0.5*table(ptc3,pry,txqd) - table(twi3,pry,t146);
+value, 0.5*table(ptc3,pry,txpd) - table(twi3,pry,t162);
+value, 0.5*table(ptc3,pry,txqd) - table(twi3,pry,t164);
+value, table(ptc3,pry,txdd) - table(twi3,pry,t166);
+value, table(ptc3,pry,tppp) - table(twi3,pry,t222);
+value, 0.5*table(ptc3,pry,tppq) - table(twi3,pry,t224);
+value, 0.5*table(ptc3,pry,tppd) - table(twi3,pry,t226);
+value, 0.5*table(ptc3,pry,tppq) - table(twi3,pry,t242);
+value, table(ptc3,pry,tpqq) - table(twi3,pry,t244);
+value, 0.5*table(ptc3,pry,tpqd) - table(twi3,pry,t246);
+value, 0.5*table(ptc3,pry,tppd) - table(twi3,pry,t262);
+value, 0.5*table(ptc3,pry,tpqd) - table(twi3,pry,t264);
+value, table(ptc3,pry,tpdd) - table(twi3,pry,t266);
+value, 0.5*table(ptc3,pry,tyxp) - table(twi3,pry,t312);
+value, 0.5*table(ptc3,pry,tyxq) - table(twi3,pry,t314);
+value, 0.5*table(ptc3,pry,tyxd) - table(twi3,pry,t316);
+value, table(ptc3,pry,typp) - table(twi3,pry,t322);
+value, 0.5*table(ptc3,pry,typq) - table(twi3,pry,t324);
+value, 0.5*table(ptc3,pry,typd) - table(twi3,pry,t326);
+value, 0.5*table(ptc3,pry,typq) - table(twi3,pry,t342);
+value, table(ptc3,pry,tyqq) - table(twi3,pry,t344);
+value, 0.5*table(ptc3,pry,tyqd) - table(twi3,pry,t346);
+value, 0.5*table(ptc3,pry,typd) - table(twi3,pry,t362);
+value, 0.5*table(ptc3,pry,tyqd) - table(twi3,pry,t364);
+value, table(ptc3,pry,tydd) - table(twi3,pry,t366);
+value, 0.5*table(ptc3,pry,ttxp) - table(twi3,pry,t512);
+value, 0.5*table(ptc3,pry,ttxq) - table(twi3,pry,t514);
+value, 0.5*table(ptc3,pry,ttxd) - table(twi3,pry,t516);
+value, table(ptc3,pry,ttpp) - table(twi3,pry,t522);
+value, 0.5*table(ptc3,pry,ttpq) - table(twi3,pry,t524);
+value, 0.5*table(ptc3,pry,ttpd) - table(twi3,pry,t526);
+value, 0.5*table(ptc3,pry,ttpq) - table(twi3,pry,t542);
+value, table(ptc3,pry,ttqq) - table(twi3,pry,t544);
+value, 0.5*table(ptc3,pry,ttqd) - table(twi3,pry,t546);
+value, 0.5*table(ptc3,pry,ttpd) - table(twi3,pry,t562);
+value, 0.5*table(ptc3,pry,ttqd) - table(twi3,pry,t564);
+value, table(ptc3,pry,ttdd) - table(twi3,pry,t566);

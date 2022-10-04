@@ -1,9 +1,30 @@
 MAD-X master
-*   [] Restore tapering correction form 5.07
-*   [PR 1081](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1108) Fix potential buffer overrun when node_name calls stoupper (S. Berg)
-*   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)
-*   [PR 1095](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1095) Implement more robust, optional, PTC DA map output (L. Deniau)
-*   [PR 1088](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1088) Additional explanation bv flag (J. Dilly)
+
+*   Twiss
+    *   [PR 1123](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1123) Fix errors in the time variable with EXACT flag to TWISS (J. S. Berg)
+    *   [PR 1125](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1125) Make TWISS treat [XY]ROTATION exactly, including the linear and second order map (J. S. Berg)
+    *   [PR 1129](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1129) Make track/twiss able to treat a thick solenoid exactly (J. S. Berg)
+    *   [PR 1133](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1133) Fix the Dqmin calculation when the CHROM option was used. (T. Persson)
+    *   [PR 1136](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1136) Implements the exact translation in TWISS and TRACK (T. Persson)
+    *   [PR 1119](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1119) Fix tapering issues (R. De Maria **WIP**)
+*   Track:
+    *   [PR 1109](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1109) Space charge (F. Schimdt, H. Renshal, A. Latina)
+*   PTC:
+    *   [PR 1111](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1111) Ensure that exact_model is set before zero_key is called in PTC (J. S. Berg)
+    *   [PR 1095](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1095) Implement more robust, optional, PTC DA map output (L. Deniau)
+    *   [PR 1131](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1131) Add spin table (T. Persson and P. Skowonronski)
+    *   [PR 1114](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1114) Exact option in PTC translation (J. S. Berg)
+*   Misc:
+    *   [PR 1081](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1108) Fix potential buffer overrun when node_name calls stoupper (J. S. Berg)
+    *   [PR 1093](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1093) More robust aperture refinement (T. Persson)
+    *   [PR 1113](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1113) Introduce LAST option in INSTALL and MOVE and change default behaviour [Breaking change!] (R. De Maria)
+    *   [PR 1078](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1078) Fix k0 in dipedge in makething (R. De Maria **WIP**)
+    *   [PR 1137](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1137) Remove `none` from mad_dict for numbers  (R. De Maria)
+*   Tests:
+    *   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)
+*   Doc:
+    *   [PR 1088](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1088) Additional explanation bv flag (J. Dilly)
+
 
 MAD-X release 5.08.01 (2022.02.25)
 

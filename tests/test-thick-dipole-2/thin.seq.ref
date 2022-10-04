@@ -1,6 +1,5 @@
 amb := 0.01;
 lmb := 10;
-none = 0;
 mb1_den: dipedge,h:=( amb ) / ( lmb ) ,entrance=true;
 mb1: sbend,l:=lmb ,angle:=amb ,thick=true,kill_ent_fringe=true,kill_exi_fringe=true;
 mb1_dex: dipedge,h:=( amb ) / ( lmb ) ,entrance=false;
