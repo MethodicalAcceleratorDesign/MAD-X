@@ -8,7 +8,8 @@ MAD-X master
     *   [PR 1136](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1136) Implements the exact translation in TWISS and TRACK (T. Persson)
     *   [PR 1119](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1119) Fix tapering issues (R. De Maria **WIP**)
 *   Track:
-    *   [PR 1109](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1109) Space charge (F. Schimdt, H. Renshal, A. Latina **review tests**)   
+    *   [PR 1148](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1148) Fix to get Dynap to work with the ny space Charge module (T. Persson)
+    *   [PR 1109](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1109) Space charge (F. Schimdt, H. Renshal, A. Latina)   
 *   PTC:
     *   [PR 1142](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1142) Fix issue-1140 generating function wrong sign from ptc_normal (P. Skowonronski) 
     *   [PR 1111](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1111) Ensure that exact_model is set before zero_key is called in PTC (J. S. Berg)
