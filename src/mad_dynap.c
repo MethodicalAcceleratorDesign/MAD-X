@@ -17,6 +17,17 @@ dynap_tables_create(struct in_cmd* cmd)
   
   t = make_table("dynaptune", "dynaptune", dynaptune_table_cols, dynaptune_table_types, npart);
   add_to_table_list(t, table_register);
+  
+  if (table_exists("mytracksumm")) {
+  /*  hrr Sep 2021 table mytracksumm is not cleaned so pre-existence printf is not needed. 
+      printf("Table mytracksumm does exist already\n"); hrr Sep 2021 */
+  }
+  else {
+    t = make_table("mytracksumm", "mytracksumm", mytracksumm_table_cols,
+                   mytracksumm_table_types, 2*stored_track_start->curr);
+    add_to_table_list(t, table_register);
+  }
+
 }
 
 // public interface
