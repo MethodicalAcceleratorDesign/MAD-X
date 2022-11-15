@@ -42,7 +42,7 @@ pro_error_make_efield_table(const char *tablename, double save_all)
   int isset = 0 ;
   nanf = mysequ->ex_start;
   nend = mysequ->ex_end;
-  printf("before looppp \n");
+
 
       while (nanf != nend) {
         
@@ -94,14 +94,11 @@ pro_error_make_efield_table(const char *tablename, double save_all)
                   */
               }
            }
-           printf("before augument \n");
-           printf("taabbb %s \n", tablename);
+/* */
            augment_count(tablename);
         }
-        //printf("before next \n");
         nanf = nanf->next;
       }
-      printf("before iffff \n");
       if(isset!= 0 ) return 1;
       else return 0;
 }
@@ -264,18 +261,13 @@ error_seterr(struct in_cmd* cmd)
 int
 error_esave(struct in_cmd* cmd)
 {
-    printf("esave!!! \n");
     char *ef_table_file;
 /*  if(efield_table == NULL) { */
        efield_table = make_table("efield", "efield", efield_table_cols,
                                efield_table_types, 10000);
-       printf("after maketable!!! \n");
        add_to_table_list(efield_table, table_register);
-       printf("after addToTable!!! \n");
        double isfull = command_par_value("full",cmd->clone);
-       printf("after Full");
        int isset = pro_error_make_efield_table("efield", isfull);
-       printf("esave after isset!!! \n");
 /*  }                          */
     ef_table_file = command_par_string("file",cmd->clone);
     if(isset==1) out_table("efield",efield_table,ef_table_file);
