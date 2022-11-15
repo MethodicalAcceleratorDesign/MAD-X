@@ -825,6 +825,7 @@ table_get_header(char* table_name)
 void
 augment_count(const char* table) /* increase table occ. by 1, fill missing */
 {
+  printf("aaaa1 \n");
   struct table* t;
   mycpy(c_dum->c, table);
   if (!(t = find_table(c_dum->c))) {
@@ -833,20 +834,22 @@ augment_count(const char* table) /* increase table occ. by 1, fill missing */
   }
 
   if (strcmp(t->type, "twiss") == 0) complete_twiss_table(t);
-
+printf("aaaa2 \n");
   if (t->num_cols > t->org_cols)  add_vars_to_table(t,1);
-
+printf("aaaa3 \n");
   if (t->p_nodes != NULL)
     t->p_nodes[t->curr] = current_node->master ? current_node->master : current_node;
-
+printf("aaaa4 \n");
   if (t->node_nm != NULL)
   {
+    printf("aaaa5 \n");
     t->node_nm->p[t->curr] = current_node->name;
     t->node_nm->curr = t->curr;
   }
   if (++t->curr == t->max) grow_table(t);
+   printf("aaaaEnd \n");
 }
-
+ 
 void
 augmentcountonly(const char* table) /* increase table occ. by 1 */
 {
