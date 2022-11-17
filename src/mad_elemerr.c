@@ -43,7 +43,8 @@ pro_error_make_efield_table(const char *tablename, double save_all)
   nanf = mysequ->ex_start;
   nend = mysequ->ex_end;
 
-
+  current_node = current_sequ->ex_start; 
+	
       while (nanf != nend) {
         
         double e_val = nanf->p_elem->def->mad8_type;
