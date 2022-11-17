@@ -668,7 +668,7 @@ exec_setvars_knob_table(struct in_cmd* cmd)
   /* transform into positive values */
   if (row < 0) row = t->curr + 1 + row;
 
-  //current_node = NULL; /* to distinguish from other table fills, remament! */
+  current_node = NULL; /* to distinguish from other table fills, remament! */
 
   struct variable* var = NULL;
   for (int i = 0; i < t->num_cols; i++) {
@@ -716,7 +716,7 @@ exec_setvars_const_table(struct in_cmd* cmd)
   pos = name_list_pos("const", nl);
   double constant = pl->parameters[pos]->double_value;
 
-  //current_node = NULL; /* to distinguish from other table fills, remament! */
+  current_node = NULL; /* to distinguish from other table fills, remament! */
 
   for (int i = 0; i < t->num_cols; i++) {
     if (t->columns->inform[i] < 3) {
