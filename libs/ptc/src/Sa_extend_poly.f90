@@ -100,12 +100,12 @@ CONTAINS
     if (MAPDUMP .ge. 3 .and. index(S, ':1') .ne. 0) then
       ! @@ + elem + func + full DAMAP
       call alloc(T)
-      T =  X(1) ; call daprint(T)
-      T =  X(2) ; call daprint(T)
-      T =  X(3) ; call daprint(T)
-      T =  X(4) ; call daprint(T)
-      T =  X(5) ; call daprint(T)
-      T =  X(6) ; call daprint(T)
+      T = X(1) ; call daprint(T)
+      T = X(2) ; call daprint(T)
+      T = X(3) ; call daprint(T)
+      T = X(4) ; call daprint(T)
+      T = X(5) ; call daprint(T)
+      T = X(6) ; call daprint(T)
       call kill(T)
     endif
   END SUBROUTINE PRTP
