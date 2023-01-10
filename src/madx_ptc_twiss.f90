@@ -643,7 +643,7 @@ contains
     character(12)           :: tmfile='transfer.map'
     character(48)           :: charconv !routine
     real(dp)                :: BETA0
-    integer                 :: mapdumpbak ! LD: 04.06.2019
+    integer                 :: mapdumpA, mapdumpB, mapdumpT ! LD: 04.06.2019
     type(c_damap) id_s  ! dospin true
     
     if(universe.le.0.or.EXCEPTION.ne.0) then
@@ -1317,28 +1317,31 @@ contains
         endif
 
       else
+        mapdumpA = 0
+        mapdumpT = 0
+        mapdumpB = mapdump
+        if (mapdump .ge. 11) mapdumpA = modulo(mapdump, 10)
+        if (mapdump .le. 10) mapdumpT = mapdump
+
         ! ELEMENT AT ONCE MODE
         if (nda > 0 .or. dospin) then
-           if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-             mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-             call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
-             mapdump = mapdumpbak
-           endif
-           if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
-             call propagate(my_ring,theTransferMap,+default,fibre1=i,fibre2=i+1)
-           endif
+          mapdump = mapdumpA
+          call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
+
+          if (doTMtrack) then
+            mapdump = mapdumpT
+            call propagate(my_ring,theTransferMap,+default,fibre1=i,fibre2=i+1)
+          endif
         else
-           if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-             mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-             call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
-             mapdump = mapdumpbak
-           endif
-           if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
-             call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
-           endif
+          mapdump = mapdumpA
+          call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
 
+          if (doTMtrack) then
+            mapdump = mapdumpT
+            call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
+          endif
         endif
-
+        mapdump = mapdumpB
 
         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
 
@@ -1528,27 +1531,32 @@ contains
     !____________________________________________________________________________________________
 
     subroutine propagateswy()
-      implicit none
+        implicit none
+        mapdumpA = 0
+        mapdumpT = 0
+        mapdumpB = mapdump
 
-       if (nda > 0) then
-          if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-            mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-            call propagate(my_ring,A_script_probe,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
-            mapdump = mapdumpbak
-          endif
-          if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
+        if (mapdump .ge. 11) mapdumpA = modulo(mapdump, 10)
+        if (mapdump .le. 10) mapdumpT = mapdump
+
+        if (nda > 0) then
+          mapdump = mapdumpA
+          call propagate(my_ring,A_script_probe,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
+
+          if (doTMtrack) then
+            mapdump = mapdumpT
             call propagate(my_ring,theTransferMap,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
           endif
         else
-          if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-            mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-            call propagate(my_ring,A_script_probe,default,node1=nodePtr%pos,node2=nodePtr%pos+1)
-            mapdump = mapdumpbak
-          endif
-          if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
+          mapdump = mapdumpA
+          call propagate(my_ring,A_script_probe,default,node1=nodePtr%pos,node2=nodePtr%pos+1)
+
+          if (doTMtrack) then
+            mapdump = mapdumpT
             call propagate(my_ring,theTransferMap,default,node1=nodePtr%pos,node2=nodePtr%pos+1)
           endif
         endif
+        mapdump = mapdumpB
 
     end subroutine propagateswy
 
