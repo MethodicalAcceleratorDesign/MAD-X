@@ -3767,6 +3767,7 @@ subroutine tttrak(ek,re,track,ktrack)
 end subroutine tttrak
 
 subroutine trupdate(turn)
+  use, intrinsic :: iso_c_binding
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3775,14 +3776,21 @@ subroutine trupdate(turn)
   ! Input/output:                                                        *
   !   turn     (integer)    Current turn number.                         *
   !----------------------------------------------------------------------*
+  interface
+    subroutine pro_input(statement) bind(c,name='pro_input_')
+      use, intrinsic :: iso_c_binding
+      character(kind=c_char) :: statement
+    end subroutine pro_input
+  end interface
   integer       :: turn
-  character(len=25) :: cmd1
-  character(len=30) :: cmd2
+  character(len=25,kind=c_char) :: cmd1
+  character(len=30,kind=c_char) :: cmd2
 
   !---- call pro_input('TR$TURN := turn;')
-  write(cmd1, '(''tr$turni := '',i8,'' ; '')') turn
+  write(cmd1,'(i8)') turn
+  cmd1 = c_char_'tr$turni := '//trim(cmd1)//c_char_' ; '//c_null_char
   call pro_input(cmd1)
-  write(cmd2, '(''exec, tr$macro($tr$turni) ; '')')
+  cmd2 = c_char_'exec, tr$macro($tr$turni) ; '//c_null_char
   call pro_input(cmd2)
   call init_elements() ! added since now temporary variables are used and need to update
 end subroutine trupdate
