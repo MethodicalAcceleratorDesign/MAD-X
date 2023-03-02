@@ -2270,7 +2270,7 @@ module sodd
        &table_size_78,table_size_79
   character*16 strn
   character*18 comment
-  parameter(pieni=1d-34,nblz=4000,mmul=11,mh=100)
+  parameter(pieni=1d-34,nblz=40000,mmul=11,mh=100)
   parameter(mmul2=mmul+1,mmult=8*mmul**2)
   parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
   common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
