@@ -4601,7 +4601,9 @@ contains
              !      WRITE(IUNIT,*) IOA,CC(II),(J(I),I=1,INVA)
              if(abs(cc(ii)).gt.eps) then
                  some=.true.
-                if(eps.gt.c_1d_37) then
+                if (madxprint) then
+                  write(iunit,'(I6,2X,ES23.16,I5,4X,18(2I2,1X))') iout, cc(ii), ioa, (j(i),i=1,inva)
+                elseif(eps.gt.c_1d_37) then
                    write(iunit,501) ioa,cc(ii),(j(i),i=1,inva)
                 else
                    write(iunit,503) ioa,cc(ii),(j(i),i=1,inva)

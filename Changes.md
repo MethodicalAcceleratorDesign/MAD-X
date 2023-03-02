@@ -7,8 +7,14 @@ MAD-X master
     *   [PR 1133](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1133) Fix the Dqmin calculation when the CHROM option was used. (T. Persson)
     *   [PR 1136](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1136) Implements the exact translation in TWISS and TRACK (T. Persson)
     *   [PR 1119](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1119) Fix tapering issues (R. De Maria **WIP**)
+*   Track:
+    *   [PR 1148](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1148) Fix to get Dynap to work with the ny space Charge module (T. Persson)
     *   [PR 1109](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1109) Space charge (F. Schimdt, H. Renshal, A. Latina)
+    *   [PR_1159](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1159) Fix calls to pro_input from trupdate, adding null termination (S. Berg)
 *   PTC:
+    *   [PR 1153](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1153)
+    *   [PR 1154](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1154)
+    *   [PR 1156](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1156) Fix mdump for map debugging and sync with MAD-NG (L. Deniau)
     *   [PR 1142](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1142) Fix issue-1140 generating function wrong sign from ptc_normal (P. Skowonronski) 
     *   [PR 1111](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1111) Ensure that exact_model is set before zero_key is called in PTC (J. S. Berg)
     *   [PR 1095](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1095) Implement more robust, optional, PTC DA map output (L. Deniau)
@@ -20,7 +26,7 @@ MAD-X master
     *   [PR 1081](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1108) Fix potential buffer overrun when node_name calls stoupper (J. S. Berg)
     *   [PR 1093](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1093) More robust aperture refinement (T. Persson)
     *   [PR 1113](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1113) Introduce LAST option in INSTALL and MOVE and change default behaviour [Breaking change!] (R. De Maria)
-    *   [PR 1078](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1078) Fix k0 in dipedge in makething (R. De Maria **WIP**)
+    *   [PR 1078](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1078) Fix k0 in dipedge in makethin (R. De Maria **WIP**)
     *   [PR 1137](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1137) Remove `none` from mad_dict for numbers  (R. De Maria)
 *   Tests:
     *   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)

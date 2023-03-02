@@ -517,7 +517,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   endif
 
   !--- Write checkpoint_restart data
-  call BB_Write(jmax, orbit0, z);
+  call BB_Write(jmax, orbit0, z, dynap);
   
   !--- enter last turn in summary table. 
   ! Add as well as tracksumm recreated each RUN call new permanent table mytracksumm. ! hrr Feb 2022
@@ -3774,6 +3774,7 @@ subroutine tttrak(ek,re,track,ktrack)
 end subroutine tttrak
 
 subroutine trupdate(turn)
+  use, intrinsic :: iso_c_binding
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3782,14 +3783,21 @@ subroutine trupdate(turn)
   ! Input/output:                                                        *
   !   turn     (integer)    Current turn number.                         *
   !----------------------------------------------------------------------*
+  interface
+    subroutine pro_input(statement) bind(c,name='pro_input_')
+      use, intrinsic :: iso_c_binding
+      character(kind=c_char) :: statement
+    end subroutine pro_input
+  end interface
   integer       :: turn
-  character(len=25) :: cmd1
-  character(len=30) :: cmd2
+  character(len=25,kind=c_char) :: cmd1
+  character(len=30,kind=c_char) :: cmd2
 
   !---- call pro_input('TR$TURN := turn;')
-  write(cmd1, '(''tr$turni := '',i8,'' ; '')') turn
+  write(cmd1,'(i8)') turn
+  cmd1 = c_char_'tr$turni := '//trim(cmd1)//c_char_' ; '//c_null_char
   call pro_input(cmd1)
-  write(cmd2, '(''exec, tr$macro($tr$turni) ; '')')
+  cmd2 = c_char_'exec, tr$macro($tr$turni) ; '//c_null_char
   call pro_input(cmd2)
   call init_elements() ! added since now temporary variables are used and need to update
 end subroutine trupdate
@@ -5892,7 +5900,7 @@ end subroutine wzsub
 
   end subroutine BB_Update2
 
-  subroutine BB_Write(turn, orbit0, z)
+  subroutine BB_Write(turn, orbit0, z, dynap)
 
     use spch_bbfi
     use trackfi
@@ -5901,11 +5909,13 @@ end subroutine wzsub
     use SpaceCharge !hrr Oct 2021
 
     integer, intent(IN) :: turn
+    logical, intent(In) :: dynap
     integer :: i, j
 
     double precision, intent(IN) :: orbit0(6), z(6,N_macro_surv)
-
-!   if (bb_sxy_update) then !hrr Dec 2021 checkpoint_restart must not depend on bb_sxy_update
+   
+   !if (bb_sxy_update) !hrr Dec 2021 checkpoint_restart must not depend on bb_sxy_update   
+   if (.not. dynap) then 
        rewind unit_chpt
        write(unit_chpt) jmax
        write(unit_chpt) Ex_rms
@@ -5918,7 +5928,7 @@ end subroutine wzsub
        write(unit_chpt) sigma_t
        write(unit_chpt) mean_t
        write(unit_chpt) N_ini
-!   endif !hrr Dec 2021
+   endif
   end subroutine BB_Write
 
   subroutine table_input(betx_start, bety_start, &
