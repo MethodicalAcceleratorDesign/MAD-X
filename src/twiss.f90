@@ -6202,7 +6202,30 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
+  ! absorb pt in deltas
+  pt= orbit(6)
+  newdeltap=sqrt(pt**2+2*pt/bet0+1)-1
+  newbet0= (1+newdeltap)/ (1/bet0+pt)
+  ff= (one + deltap) / ( deltap+newdeltap) ! ratio
+  orbit(2)=orbit(2)*ff
+  orbit(4)=orbit(4)*ff
+  orbit(5)=0
+  sk1 =sk1*ff
+  ! start absorb pt in deltas
+
   call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
+
+  ! restore pt
+  sk1 =sk1/ff
+  orbit(2)=orbit(2)/ff
+  orbit(4)=orbit(4)/ff
+  orbit(5)=orbit(5)-dl/newbet0 + dl/bet0
+  ! end restore pt
+
+
+
+
+
   if (fcentre) return
 
   !---- Half radiation effect at exit.
