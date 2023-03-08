@@ -34,7 +34,7 @@ MAD-X master
 
 MAD-X release 5.08.01 (2022.02.25)
 
-*    Fix radiation of mulitpoles in TRACK. #1079. (Riccardo)
+*    Fix radiation of multipoles in TRACK. #1079. (Riccardo)
 *    Fix in exact drift transfer map in TWISS #1077. (Tobias)
 *    Allows disabling the scaling of TWISS in PTC by default but possible to activate it. #1073. (Tobias)
 *    Fixes a bug in the dqmin calculation. #1075. (Tobias) 

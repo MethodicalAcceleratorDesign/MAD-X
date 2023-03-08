@@ -406,16 +406,15 @@ void set_closed_orb_node(int *index, double *pos){
 }
 
 
-void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl){
+void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl, double ktap){
     nn[0]=current_node->p_elem->multip->nn;
     ns[0]=current_node->p_elem->multip->ns;
     for(int i=0;i<*nn;i++){
-      knl[i] = current_node->p_elem->multip->knl[i];
+      knl[i] = current_node->p_elem->multip->knl[i]* (1 + ktap);
     }
     for(int i=0;i<*ns;i++){
-      ksl[i] = current_node->p_elem->multip->ksl[i];
+      ksl[i] = current_node->p_elem->multip->ksl[i] * (1 + ktap);
     }
-
 
 }
 void alloc_tt_attrib(int *length){
