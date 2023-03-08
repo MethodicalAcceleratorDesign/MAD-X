@@ -6149,7 +6149,6 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   double precision, external :: node_value, get_value
   double precision :: bet0, bet_sqr, f_damp_t
 
-  !double precision :: newbet0, newdeltap, ff
   integer, external :: get_option
   character(len=name_len) el_name
   
@@ -6205,29 +6204,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
-  ! absorb pt in deltas
-  !pt= orbit(6)
-  !newdeltap=sqrt(pt**2+2*pt/bet0+1)-1
-  !newbet0= (1+newdeltap)/ (1/bet0+pt)
-  !ff= (one + deltap) / ( deltap+newdeltap) ! ratio
-  !orbit(2)=orbit(2)*ff
-  !orbit(4)=orbit(4)*ff
-  !orbit(6)=0
-  !sk1 =sk1*ff
-  ! start absorb pt in deltas
-
-  call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
-
-  ! restore pt
-  !sk1 =sk1/ff
-  !orbit(2)=orbit(2)/ff
-  !orbit(4)=orbit(4)/ff
-  !orbit(6)=pt
-  ! end restore pt
-
-
-
-
+  call qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,dl,ek,re,te)
 
   if (fcentre) return
 
@@ -6254,7 +6231,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
 
 end SUBROUTINE tmquad
 
-SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
+SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, four, six, ten3m
   implicit none
@@ -6276,13 +6253,23 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk
   double precision :: tilt, sk1, el
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: orbit(6), deltap, ek(6), re(6,6), te(6,6,6)
 
   double precision :: qk, qkl, qkl2
   double precision :: cx, sx, cy, sy, biby4
+  double precision :: newdeltappo, ff, newsk1,newbeta, newgamma, pt
+
+  pt= orbit(6)
+  newdeltappo=sqrt(pt**2+2*pt/beta+1)
+  newbeta  = newdeltappo/ (1/beta+pt)
+  newgamma = gamma*(newdeltappo)*beta/newbeta
+  ff= (one + deltap) / ( deltap+newdeltappo) ! ratio
+  orbit(6)=0
+  newsk1=sk1*ff
+
 
   !---- Set up c's and s's.
-  qk = sqrt(abs(sk1))
+  qk = sqrt(abs(newsk1))
   qkl = qk * el
   if (abs(qkl) .lt. ten3m) then
      qkl2 = sk1 * el**2
@@ -6305,51 +6292,54 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   !---- First-order terms.
   re(1,1) = cx
   re(1,2) = sx
-  re(2,1) = - sk1 * sx
+  re(2,1) = - newsk1 * sx
   re(2,2) = cx
   re(3,3) = cy
   re(3,4) = sy
-  re(4,3) = + sk1 * sy
+  re(4,3) = + newsk1 * sy
   re(4,4) = cy
-  re(5,6) = el/(beta*gamma)**2
+  re(5,6) = el/(newbeta*newgamma)**2
 
-  ek(5) = el*dtbyds
+  ek(5) = el*dtbyds ! to be checked
 
   !---- Second-order terms.
   if (fsec) then
-     biby4 = one / (four * beta)
+     biby4 = one / (four * newbeta)
 
-     te(1,1,6) = + sk1 * el * sx * biby4
+     te(1,1,6) = + newsk1 * el * sx * biby4
      te(1,6,1) = te(1,1,6)
      te(2,2,6) = te(1,1,6)
      te(2,6,2) = te(1,1,6)
      te(1,2,6) = - (sx + el*cx) * biby4
      te(1,6,2) = te(1,2,6)
-     te(2,1,6) = - sk1 * (sx - el*cx) * biby4
+     te(2,1,6) = - newsk1 * (sx - el*cx) * biby4
      te(2,6,1) = te(2,1,6)
 
-     te(3,3,6) = - sk1 * el * sy * biby4
+     te(3,3,6) = - newsk1 * el * sy * biby4
      te(3,6,3) = te(3,3,6)
      te(4,4,6) = te(3,3,6)
      te(4,6,4) = te(3,3,6)
      te(3,4,6) = - (sy + el*cy) * biby4
      te(3,6,4) = te(3,4,6)
-     te(4,3,6) = + sk1 * (sy - el*cy) * biby4
+     te(4,3,6) = + newsk1 * (sy - el*cy) * biby4
      te(4,6,3) = te(4,3,6)
 
-     te(5,1,1) = - sk1 * (el - sx*cx) * biby4
-     te(5,1,2) = + sk1 * sx**2 * biby4
+     te(5,1,1) = - newsk1 * (el - sx*cx) * biby4
+     te(5,1,2) = + newsk1 * sx**2 * biby4
      te(5,2,1) = te(5,1,2)
      te(5,2,2) = - (el + sx*cx) * biby4
-     te(5,3,3) = + sk1 * (el - sy*cy) * biby4
-     te(5,3,4) = - sk1 * sy**2 * biby4
+     te(5,3,3) = + newsk1 * (el - sy*cy) * biby4
+     te(5,3,4) = - newsk1 * sy**2 * biby4
      te(5,4,3) = te(5,3,4)
      te(5,4,4) = - (el + sy*cy) * biby4
      te(5,6,6) = (- six * re(5,6)) * biby4
   endif
 
+  orbit(6)=0
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  orbit(6)=pt
+
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
