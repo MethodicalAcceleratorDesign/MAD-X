@@ -875,7 +875,7 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   logical :: fsec, ftrk, fmap
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
   integer, external :: Factorial
-  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0, ktap
   double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle, tilt2
   double precision :: gstr, sstr, x, px0, y, py0, t0, pt0, deltapp
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
@@ -898,6 +898,9 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   elrad = get_tt_attrib(enum_lrad)
   an = get_tt_attrib(enum_angle)
   time_var = get_tt_attrib(enum_time_var) .ne. 0  
+
+    !----Tapering factor
+  ktap = get_tt_attrib(enum_ktap)
   
   !dbr = bvk * f_errors(0) !field(1,0)
   !dbi = bvk * f_errors(1) !field(2,0)
@@ -911,7 +914,7 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
 
-  call get_tt_multipoles(nn,normal,ns,skew)
+  call get_tt_multipoles(nn,normal,ns,skew,ktap)
 
   dipr = bvk * normal(0) !vals(1,0)
   dipi = bvk * skew(0)  
@@ -1007,7 +1010,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   logical :: fsec, ftrk, fmap
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
   integer, external :: Factorial
-  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0, ktap
   double precision :: dtmp, an, angle, tilt2, etahat
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -1025,16 +1028,19 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   n_ferr = node_fd_errors(f_errors)
 
   bvk = get_tt_attrib(enum_other_bv)
-    !---- Multipole length for radiation.
+  !---- Multipole length for radiation.
   elrad = get_tt_attrib(enum_lrad)
   an = get_tt_attrib(enum_angle)
   time_var = get_tt_attrib(enum_time_var) .ne. 0  
 
+  !----Tapering factor
+  ktap = get_tt_attrib(enum_ktap)
+ 
   !---- Multipole components.
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
   tilt2 = 0
-  call get_tt_multipoles(nn,normal,ns,skew)
+  call get_tt_multipoles(nn,normal,ns,skew,ktap)
 
   !---- Angle (no bvk in track)
   if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
@@ -1156,7 +1162,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   logical ::  time_var,thin_foc
   integer :: iord, jtrk, nd, nord, i, j, n_ferr, nn, ns, noisemax, nn1, in, mylen
   integer :: nnt, nst
-  double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad
+  double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad, ktap
   double precision :: pt, px, py, rfac, x
   double precision :: f_errors(0:maxferr)
   double precision :: field(2,0:maxmul)
@@ -1186,19 +1192,20 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   n_ferr = node_fd_errors(f_errors)
 
   bvk = get_tt_attrib(enum_other_bv)
-    !---- Multipole length for radiation.
+  !---- Multipole length for radiation.
   elrad = get_tt_attrib(enum_lrad)
   noise = get_tt_attrib(enum_noise)
   an = get_tt_attrib(enum_angle)
   time_var = get_tt_attrib(enum_time_var) .ne. 0  
 
-  
+  !----Tapering factor
+  ktap = get_tt_attrib(enum_ktap)
+ 
   !---- Multipole components.
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
 
-  call get_tt_multipoles(nn,normal,ns,skew)
-
+  call get_tt_multipoles(nn,normal,ns,skew,ktap)
 
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
@@ -4466,8 +4473,8 @@ subroutine tttquad(track, ktrack)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = g_elpar(q_k1)  * (1 + g_elpar(q_ktap))
-  k1s = g_elpar(q_k1s) * (1 + g_elpar(q_ktap))
+  k1  = g_elpar(q_k1)  * (one + g_elpar(q_ktap))
+  k1s = g_elpar(q_k1s) * (one + g_elpar(q_ktap))
   
   if (length.ne.zero) then
      k1  = k1  + f_errors(2)/length
@@ -4667,7 +4674,7 @@ subroutine tttdipole(track, ktrack, code)
     k0 = h
   endif
 
-  k0 = k0 * (1+ktap) ! tapering to main field only
+  k0 = k0 * (one + ktap) ! tapering to main field only
  
   k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term

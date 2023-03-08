@@ -28,7 +28,7 @@
 #define MAX_TAG 50          /* for SXF output */
 #define CHAR_BUFF_SIZE 100000 /* size of dynamic char_buff members */
 #define IN_BUFF_SIZE 500000 /* initial size of buffer for command groups */
-#define LINE_FILL 240        /* max. line length -2 for "save" output */
+#define LINE_FILL 2400       /* max. line length -2 for "save" output */
 #define LINE_F_MAD8 70      /* the same, for mad-8 format */
 #define MADX_LINE_MAX 78         /* for SXF output */
 #define MATCH_WORK 10       /* no. of work spaces in matching */
