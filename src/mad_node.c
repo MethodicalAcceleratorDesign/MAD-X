@@ -538,13 +538,10 @@ store_node_value(const char* par, double* value)
   else if (strcmp(lpar, "k2") == 0) store_comm_par_value("k2",*value,el->def);
   // The inform is to make sure they are written out to a new sequence. 
   else if (strcmp(lpar, "ktap") == 0) {
-    store_comm_par_value("ktap",*value,el->def);
-//    el->def->par_names->inform[9] = 1;  // for quads and sextupoles
-//    el->def->par_names->inform[23] = 1; // for bends
+    set_command_par_value("ktap",el->def, *value); //mark it set
   }
   else if (strcmp(lpar, "lagtap") == 0) {
-    store_comm_par_value("lagtap",*value,el->def);
-//    el->def->par_names->inform[9] = 1;
+      set_command_par_value("lagtap",el->def, *value); //mark it set
   }
   else if (strcmp(lpar, "lag") == 0) store_comm_par_value("lag",*value,el->def);
 
