@@ -6228,6 +6228,8 @@ end SUBROUTINE tmquad
 SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, four, six, ten3m, half
+  use twisslfi
+  use matrices, only : EYE
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6253,6 +6255,8 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   double precision :: cx, sx, cy, sy, biby4, delta_plus_1
 
   delta_plus_1 = sqrt(orbit(6)*orbit(6) + two*orbit(6)/beta + one)
+
+if (exact_expansion) then
   !---- Set up c's and s's.
   qk = sqrt(abs(sk1))
   qkl = qk * el
@@ -6274,7 +6278,7 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
      sy = sin(qkl) !/ qk
   endif
 
-print*, re(2,1)
+!print*, re(2,1)
 
 !---- First-order terms.
 !  re(1,1) = cx
@@ -6381,7 +6385,76 @@ print*, re(2,1)
      te(5,6,4) = (half/((delta_plus_1)**2)) * (orbit(3) * (one - cx**2))
      
   endif
+  
+else
+   !---- Set up c's and s's.
+  qk = sqrt(abs(sk1))
+  qkl = qk * el
+  if (abs(qkl) .lt. ten3m) then
+     qkl2 = sk1 * el**2
+     cx = (one - qkl2 / two)
+     sx = (one - qkl2 / six) * el
+     cy = (one + qkl2 / two)
+     sy = (one + qkl2 / six) * el
+  else if (sk1 .gt. zero) then
+     cx = cos(qkl)
+     sx = sin(qkl) / qk
+     cy = cosh(qkl)
+     sy = sinh(qkl) / qk
+  else
+     cx = cosh(qkl)
+     sx = sinh(qkl) / qk
+     cy = cos(qkl)
+     sy = sin(qkl) / qk
+  endif
+!---- First-order terms.
+  
+  re(1,1) = cx
+  re(1,2) = sx
+  re(2,1) = - sk1 * sx
+  re(2,2) = cx
+  re(3,3) = cy
+  re(3,4) = sy
+  re(4,3) = + sk1 * sy
+  re(4,4) = cy
+  re(5,6) = el/(beta*gamma)**2
 
+  ek(5) = el*dtbyds
+
+!---- Second-order terms.
+  if (fsec) then
+     biby4 = one / (four * beta)
+
+     te(1,1,6) = + sk1 * el * sx * biby4
+     te(1,6,1) = te(1,1,6)
+     te(2,2,6) = te(1,1,6)
+     te(2,6,2) = te(1,1,6)
+     te(1,2,6) = - (sx + el*cx) * biby4
+     te(1,6,2) = te(1,2,6)
+     te(2,1,6) = - sk1 * (sx - el*cx) * biby4
+     te(2,6,1) = te(2,1,6)
+
+     te(3,3,6) = - sk1 * el * sy * biby4
+     te(3,6,3) = te(3,3,6)
+     te(4,4,6) = te(3,3,6)
+     te(4,6,4) = te(3,3,6)
+     te(3,4,6) = - (sy + el*cy) * biby4
+     te(3,6,4) = te(3,4,6)
+     te(4,3,6) = + sk1 * (sy - el*cy) * biby4
+     te(4,6,3) = te(4,3,6)
+
+     
+     te(5,1,1) = - sk1 * (el - sx*cx) * biby4
+     te(5,1,2) = + sk1 * sx**2 * biby4
+     te(5,2,1) = te(5,1,2)
+     te(5,2,2) = - (el + sx*cx) * biby4
+     te(5,3,3) = + sk1 * (el - sy*cy) * biby4
+     te(5,3,4) = - sk1 * sy**2 * biby4
+     te(5,4,3) = te(5,3,4)
+     te(5,4,4) = - (el + sy*cy) * biby4
+     te(5,6,6) = (- six * re(5,6)) * biby4
+  endif
+endif
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
   !---- Apply tilt.
@@ -7312,7 +7385,7 @@ SUBROUTINE tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,angle,iplane)
   re(ip,6) = -sa*ptb/ps0
 
   if (fsec) te = 0
-print*, re(2,1)
+!print*, re(2,1)
   ! Using te as scratch space to avoid excess copying when fsec is true
   te(ix,ix,ip) = -sps0ps12*pm2
   te(ix,ix,iq) = -sps0ps12*px0*py
@@ -7400,7 +7473,7 @@ print*, re(2,1)
   re(5,ix) = sa*ptb/ps1
   re(6,6) = 1
   re(1:5:2,2:6:2) = (2*x0)*te(1:5:2,ix,2:6:2)
-print*, re(2,1)
+!print*, re(2,1)
 end SUBROUTINE tmxyrot
 
 SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
@@ -7508,7 +7581,7 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
      ek(5) = dl*dtbyds
 
-     print*, re(2,1)
+     !print*, re(2,1)
      !---- Second-order terms.
      if (fsec) then
         te(1,2,6) = - dl / (two * beta)
@@ -9536,7 +9609,7 @@ SUBROUTINE twcptk_print(re,r0mat, e, f)
   open (unit = aftercleantkout, file = "afterclean_twcptk.out")
   write(aftercleantkout,*) "After clean fort tk "
 
-print*, re(2,1)
+!print*, re(2,1)
   
   !-- symplecticity
   RA  = RE(1:4, 1:4)
@@ -9546,7 +9619,7 @@ print*, re(2,1)
 
   R0MAT_BAR =  matmul(matmul(-SMAT,transpose(R0MAT)),SMAT)
 
-print*, re(2,1)
+!print*, re(2,1)
   
   write(aftercleantkout,*) "check symplecticity RE(1:4,1:4) " , matmul(transpose(RA),matmul(SS,RA)) - SS
   write(aftercleantkout,*) "R0MAT = ", R0MAT
