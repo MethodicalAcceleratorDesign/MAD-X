@@ -115,6 +115,10 @@ jobs:
 
       - name: Setup gcc/gfortran
         run: |
+          gfortran-9 -v
+          gfortran-10 -v
+          gfortran-11 -v
+          gfortran -v
           set -ex
           sudo ln -s $(which gcc-9)      /usr/local/bin/gcc
           sudo ln -s $(which g++-9)      /usr/local/bin/g++
