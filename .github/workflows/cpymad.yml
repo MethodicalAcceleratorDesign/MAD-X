@@ -112,7 +112,7 @@ jobs:
       - name: Build cpymad
         run: |
           if [[ ${{ matrix.os }} == macos ]]; then
-            export CC=gcc-9
+            export CC=gcc-12
           fi
           export X11=0 BLAS=1 LAPACK=1
           python setup.py build_ext -lm
