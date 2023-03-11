@@ -6,7 +6,7 @@ MAD-X master
     *   [PR 1129](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1129) Make track/twiss able to treat a thick solenoid exactly (J. S. Berg)
     *   [PR 1133](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1133) Fix the Dqmin calculation when the CHROM option was used. (T. Persson)
     *   [PR 1136](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1136) Implements the exact translation in TWISS and TRACK (T. Persson)
-    *   [PR 1119](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1119) Fix tapering issues (R. De Maria **WIP**)
+    *   [PR 1161](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1161) Add tapering in multipole and octupoles (R. De Maria)
 *   Track:
     *   [PR 1148](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1148) Fix to get Dynap to work with the ny space Charge module (T. Persson)
     *   [PR 1109](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1109) Space charge (F. Schimdt, H. Renshal, A. Latina)
@@ -18,16 +18,20 @@ MAD-X master
     *   [PR 1095](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1095) Implement more robust, optional, PTC DA map output (L. Deniau)
     *   [PR 1131](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1131) Add spin table (T. Persson and P. Skowonronski)
     *   [PR 1114](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1114) Exact option in PTC translation (J. S. Berg)
+    *   [PR 1159](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1159) Fix random errors in trupdate due to missing null termination (J. S. Berg)
+
 *   Misc:
     *   [PR 1139](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1139) Remove inform forcing for seq generation (R. De Maria)
     *   [PR 1144](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1144) Flag to throw fatal error when missing file in interactive mode (T. Persson)
+    *   [PR 1150](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1150) Fix issue with ESAVE after using FILL_KNOB (T. Persson)
     *   [PR 1081](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1108) Fix potential buffer overrun when node_name calls stoupper (J. S. Berg)
     *   [PR 1093](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1093) More robust aperture refinement (T. Persson)
     *   [PR 1113](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1113) Introduce LAST option in INSTALL and MOVE and change default behaviour [Breaking change!] (R. De Maria)
-    *   [PR 1078](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1078) Fix k0 in dipedge in makethin (R. De Maria **WIP**)
+    *   [PR 1061](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1078) Fix k0 in dipedge in makethin (R. De Maria **WIP**)
     *   [PR 1137](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1137) Remove `none` from mad_dict for numbers  (R. De Maria)
 *   Tests:
-    *   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)
+    *   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107), [PR 1164](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1164) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)
+    
 *   Doc:
     *   [PR 1088](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1088) Additional explanation bv flag (J. Dilly)
 
