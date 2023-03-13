@@ -167,7 +167,7 @@ MODULE S_DEF_KIND
 private rk2abellr,rk4abellr,rk6abellr,rk2abellp,rk4abellp,rk6abellp,get_z_abr,get_z_abp
 private fx_newcr,fx_newcp,fx_newc,feval_CAV_impr,feval_CAV_imp,rk1bmad_cav_impr
 integer :: tot_t=1
-logical :: old_thick_bend = .false.
+logical :: old_thick_bend = .true. !.false.
 !logical :: old_electric = .false.
 PRIVATE get_fieldR,get_fieldp
 PRIVATE get_Bfield_fringeR,get_Bfield_fringeP !,get_Bfield_fringe
