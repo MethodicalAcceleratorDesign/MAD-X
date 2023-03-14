@@ -105,7 +105,6 @@ interpolate_node(int *nint)
     clone->master = backup.current_node;
     current_node = clone;
     current_node->other_bv = bvk;
-    printf("fasdfsa %g %g\n",  clone->length, command_par_value("hkick",  el->def));
   }
 
   backup.last_node = current_node;
