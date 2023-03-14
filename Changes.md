@@ -19,7 +19,8 @@ MAD-X master
     *   [PR 1131](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1131) Add spin table (T. Persson and P. Skowonronski)
     *   [PR 1114](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1114) Exact option in PTC translation (J. S. Berg)
     *   [PR 1159](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1159) Fix random errors in trupdate due to missing null termination (J. S. Berg)
-
+*   Aperture:
+    *   [PR 1168](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1168) Fix regression in aperture module resulting in wrong orbit in thick kickers (R. De Maria)
 *   Misc:
     *   [PR 1139](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1139) Remove inform forcing for seq generation (R. De Maria)
     *   [PR 1144](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1144) Flag to throw fatal error when missing file in interactive mode (T. Persson)
@@ -29,6 +30,7 @@ MAD-X master
     *   [PR 1113](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1113) Introduce LAST option in INSTALL and MOVE and change default behaviour [Breaking change!] (R. De Maria)
     *   [PR 1061](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1078) Fix k0 in dipedge in makethin (R. De Maria **WIP**)
     *   [PR 1137](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1137) Remove `none` from mad_dict for numbers  (R. De Maria)
+    *   [PR 1161](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1161) Fixing lines brake in save (R. De Maria, L. Deniau)
 *   Tests:
     *   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107), [PR 1164](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1164) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)
     
