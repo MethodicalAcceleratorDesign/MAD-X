@@ -1,0 +1,19 @@
+! Test interpolation in kickers
+
+el1: hkicker, kick=12e-3,l=10,aperture={.3};
+el2: vkicker, kick=12e-3,l=10,aperture={.3};
+el3: kicker, hkick=12e-3,vkick=24e-3,l=10,aperture={.3};
+
+ss: line=(el1,el2,el3);
+
+beam;
+
+use,sequence=ss;
+
+twiss,betx=1,bety=1;
+aperture,interval=0.2;
+select, flag=aperture, column=name,s,x,y;
+
+write,table=aperture;
+
+
