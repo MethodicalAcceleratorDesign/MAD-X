@@ -90,6 +90,8 @@ interpolate_node(int *nint)
   if (hvkicker_flag && clone->length > 0){
      kick=command_par_value("kick", el->def)/(*nint);
      store_comm_par_value("kick", kick, current_node->p_elem->def);
+     current_node->chkick/=*nint;
+     current_node->cvkick/=*nint;
   };
 
   if (kicker_flag && clone->length > 0){
@@ -97,6 +99,8 @@ interpolate_node(int *nint)
      store_comm_par_value("hkick", kick, current_node->p_elem->def);
      kick=command_par_value("vkick", el->def)/(*nint);
      store_comm_par_value("vkick", kick, current_node->p_elem->def);
+     current_node->chkick/=*nint;
+     current_node->cvkick/=*nint;
   };
 
   for (j = 2; j <= *nint; j++) {
