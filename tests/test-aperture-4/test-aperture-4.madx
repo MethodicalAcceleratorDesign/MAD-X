@@ -3,8 +3,9 @@
 el1: hkicker, kick=12e-3,l=10,aperture={.3};
 el2: vkicker, kick=12e-3,l=10,aperture={.3};
 el3: kicker, hkick=12e-3,vkick=24e-3,l=10,aperture={.3};
+el4: tkicker, hkick=12e-3,vkick=24e-3,l=10,aperture={.3};
 
-ss: line=(el1,el2,el3);
+ss: line=(el1,el2,el3,el4);
 
 beam;
 

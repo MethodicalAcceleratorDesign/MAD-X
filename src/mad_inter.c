@@ -40,7 +40,8 @@ interpolate_node(int *nint)
 
   hvkicker_flag = strcmp(el->base_type->name, "hkicker") == 0 ||
                   strcmp(el->base_type->name, "vkicker") == 0;
-  kicker_flag  = strcmp(el->base_type->name, "kicker") == 0;
+  kicker_flag  = strcmp(el->base_type->name, "kicker") == 0 ||
+                 strcmp(el->base_type->name, "tkicker") == 0 ;
 
   backup.bend_flag = bend_flag;
   backup.rbend_flag = rbend_flag;
