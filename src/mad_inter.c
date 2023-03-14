@@ -16,14 +16,17 @@ interpolate_node(int *nint)
   struct element* el;
   int j;
   double bvk, angle, e1, e2, h1, h2, fint, fintx, hgap;
+  double kick;
   double zero = 0.0;
   int rbend_flag, bend_flag = 0;
+  int hvkicker_flag, kicker_flag;
 
   /* Set up length, angle and e2 of the first slice
      (first node in the original sequence) */
 
   if (backup.current_node)
     fatal_error("interpolate_node: node interpolation ongoing, undefined behavior will follow", "");
+
 
   backup.current_node = current_node;
   backup.range_start = current_sequ->range_start;
@@ -35,12 +38,16 @@ interpolate_node(int *nint)
   rbend_flag = strcmp(el->base_type->name, "rbend") == 0;
   bend_flag  = strcmp(el->base_type->name, "sbend") == 0 || rbend_flag;
 
+  hvkicker_flag = strcmp(el->base_type->name, "hkicker") == 0 ||
+                  strcmp(el->base_type->name, "vkicker") == 0;
+  kicker_flag  = strcmp(el->base_type->name, "kicker") == 0;
+
   backup.bend_flag = bend_flag;
   backup.rbend_flag = rbend_flag;
 
   // create template node
   clone = clone_node(current_node,0);
-  if (bend_flag) {
+  if (bend_flag || hvkicker_flag) {
     clone->p_elem = el = clone_element(clone->p_elem);
     clone->p_elem->def = clone_command(clone->p_elem->def);
   }
@@ -79,6 +86,18 @@ interpolate_node(int *nint)
     store_node_value("hgap",  &zero);
   }
 
+  if (hvkicker_flag && clone->length > 0){
+     kick=command_par_value("kick", el->def)/(*nint);
+     store_comm_par_value("kick", kick, current_node->p_elem->def);
+  };
+
+  if (kicker_flag && clone->length > 0){
+     kick=command_par_value("hkick", el->def)/(*nint);
+     store_comm_par_value("hkick", kick, current_node->p_elem->def);
+     kick=command_par_value("vkick", el->def)/(*nint);
+     store_comm_par_value("vkick", kick, current_node->p_elem->def);
+  };
+
   for (j = 2; j <= *nint; j++) {
     clone = clone_node(current_node, 0);
     current_node->next = clone;
@@ -86,6 +105,7 @@ interpolate_node(int *nint)
     clone->master = backup.current_node;
     current_node = clone;
     current_node->other_bv = bvk;
+    printf("fasdfsa %g %g\n",  clone->length, command_par_value("hkick",  el->def));
   }
 
   backup.last_node = current_node;
