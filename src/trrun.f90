@@ -1966,7 +1966,7 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   integer :: i, n_ferr, code, bvk, sinkick
   double precision :: curv, dpx, dpy, pt, px, py, rfac, rpt
-  double precision :: rpx, rpy, xkick, ykick, div, temp
+  double precision :: rpx, rpy, xkick, ykick, temp
   double precision :: f_errors(0:maxferr), field(2)
   double precision :: dpxx, dpyy
   double precision :: sinpeak, sintune, sinphase
@@ -2001,26 +2001,19 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   F_ERRORS(0:maxferr) = zero ; n_ferr = node_fd_errors(f_errors)
 
-  if (el .eq. zero)  then
-     div = one
-     elrad = node_value('lrad ')
-  else
-     div = el
-     elrad = el
-  endif
-
-  FIELD(1:2) = zero
+  elrad = node_value('lrad ')
+  if (elrad .eq. zero)  elrad = el
 
   select case (code)
     case (code_hkicker)
-       xkick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_chkick)+field(1)/div)
+       xkick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_chkick)+field(1))
        ykick = zero
     case (code_kicker, code_tkicker)
-       xkick = bvk*(get_tt_attrib(enum_hkick)+get_tt_attrib(enum_chkick)+field(1)/div)
-       ykick = bvk*(get_tt_attrib(enum_vkick)+get_tt_attrib(enum_cvkick)+field(2)/div)
+       xkick = bvk*(get_tt_attrib(enum_hkick)+get_tt_attrib(enum_chkick)+field(1))
+       ykick = bvk*(get_tt_attrib(enum_vkick)+get_tt_attrib(enum_cvkick)+field(2))
     case (code_vkicker)
        xkick = zero
-       ykick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_cvkick)+field(2)/div)
+       ykick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_cvkick)+field(2))
     case default
        xkick = zero
        ykick = zero
