@@ -3545,6 +3545,8 @@ subroutine trsol(track,ktrack,dxt,dyt)
   sk  = bvk * node_value('ks ') / two
   length = node_value('l ')
 
+  const = arad * (betas * gammas)**3 / three
+
   if (length.eq.zero) then
 
      skl = bvk * node_value('ksi ') / two
@@ -3594,7 +3596,6 @@ subroutine trsol(track,ktrack,dxt,dyt)
                     if (quantum) then
                        call trphot(elrad,curv,rfac,track(6,i))
                     else
-                       const = arad * (betas * gammas)**3 / three
                        rfac = const * curv**2 * elrad
                     endif
                     pt_ = track(6,i)
