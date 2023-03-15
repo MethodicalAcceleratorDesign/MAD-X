@@ -273,12 +273,9 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   integer, external :: node_fd_errors
   double precision, external  :: node_value, get_value
 
-  if (code .eq. code_multipole .or. code .eq. code_rfmultipole)  then
-     !--- thin multipole and thin RF multipole
-     el = node_value('lrad ')
-  else
-     el = node_value('l ')
-  endif
+
+  el = node_value('lrad ')
+  if (el .eq. zero) el = node_value('l ')
 
   if (el.eq.zero .and. code.ne.code_rfcavity) return !- no damping
   ! RF cavities with zero length still accepted beyond this point
@@ -293,7 +290,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   select case (code)
 
      case (code_rbend, code_sbend) !---- DIPOLE
-        an = bvk * node_value('angle ') * el/node_value('l ') ! ??? 
+        an = bvk * node_value('angle ')
         tilt = -node_value('tilt ')
         edg1 = bvk * node_value('e1 ')
         edg2 = bvk * node_value('e2 ')
@@ -309,7 +306,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         else
            h = an / el * (one + ktap) ! tapering
         endif
-     
+
         !---- Refer orbit and eigenvectors to magnet midplane.
         ct = cos(tilt)
         st = sin(tilt)
@@ -696,8 +693,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
      case (code_hkicker, code_kicker, code_vkicker, code_tkicker) !---- Orbit correctors.
 
         n_ferr = node_fd_errors(f_errors)
-
-        FERROR(1:2) = zero
 
         if (n_ferr .gt. 0) FERROR(:2) = F_ERRORS(:min(2,n_ferr))
 

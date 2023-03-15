@@ -11,6 +11,7 @@ MAD-X master
     *   [PR 1148](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1148) Fix to get Dynap to work with the ny space Charge module (T. Persson)
     *   [PR 1109](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1109) Space charge (F. Schimdt, H. Renshal, A. Latina)
     *   [PR_1159](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1159) Fix calls to pro_input from trupdate, adding null termination (S. Berg)
+    *   [PR_1169](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1169) Fix undefined variable in solenoid tracking with radiation (R. De Maria)
 *   PTC:
     *   [PR 1153](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1153), [PR 1154](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1154), [PR 1156](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1156) Fix mdump for map debugging and sync with MAD-NG (L. Deniau)
     *   [PR 1142](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1142) Fix issue-1140 generating function wrong sign from ptc_normal (P. Skowonronski) 
