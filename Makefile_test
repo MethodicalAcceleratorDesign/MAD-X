@@ -73,7 +73,7 @@ test-thick-rbend test-thick-solenoid \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 test-match-3 test-match-4 \
 test-match-5 test-match-6 test-match-7 test-match-8 test-match-9 test-match-10\
-test-aperture test-aperture-2 test-aperture-3 \
+test-aperture test-aperture-2 test-aperture-3 test-aperture-4\
 test-beam test-addexpression test-read-write-hex \
 test-permalign test-permalign-2 test-permalign-3 test-permalign-4 \
 \
