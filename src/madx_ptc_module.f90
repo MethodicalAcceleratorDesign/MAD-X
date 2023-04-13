@@ -435,6 +435,8 @@ CONTAINS
        method0 = method
     CASE(6)
        method0 = method
+    CASE(8) !JG 13.04.2023 - added method 8
+       method0 = method
     CASE DEFAULT
        PRINT *, 'EXCEPTION occured: Can not recognize method order ',method
        EXCEPTION=1
@@ -619,7 +621,7 @@ CONTAINS
        key%model=keymod0
     endif
     method1=node_value("method ")
-    if(method1.eq.2.or.method1.eq.4.or.method1.eq.6) then
+    if(method1.eq.2.or.method1.eq.4.or.method1.eq.6.or.method1.eq.8) then ! JG 13.04.2023 - added method 8
        metd = method1
     else
        metd = method0
@@ -627,6 +629,12 @@ CONTAINS
 
     !special node keys
     key%list%permfringe=node_value("fringe ") ! transfer(node_value("fringe ") .ne. zero, key%list%permfringe)
+!JG 13.04.2023 - for MAD-NG compatibility i.e. you will get all the fringes of PTC if you set fringe > 3
+    if (key%list%permfringe .gt. 3) then 
+      key%list%permfringe = 3
+   endif
+!JG 13.04.2023 - Added fringe max for multipole fringe field
+    key%list%highest_fringe=node_value("fringe_max ")
     key%list%bend_fringe=node_value("bend_fringe ") .ne. zero
     key%list%kill_ent_fringe=node_value("kill_ent_fringe ") .ne. zero
     key%list%kill_exi_fringe=node_value("kill_exi_fringe ") .ne. zero
@@ -856,25 +864,18 @@ CONTAINS
           key%list%t2=node_value('e2 ')
           key%list%hgap=node_value('hgap ')
           !       key%list%fint=node_value('fint ')
-          fint=node_value('fint ')
+! JG: 13.04.2023 Added fringe features to rbend
+          fint =node_value('fint ')
           fintx=node_value('fintx ')
-          if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
-             print*," The fint and fintx must be the same at each end or each might be zero"
-             call aafail('ptc_input:','The fint and fintx must be the same at each end or each might be zero. Program stops.')
+          if (fintx.lt.0) then 
+               fintx = fint
           endif
-          if(fint.gt.zero) then
-             key%list%fint=fint
-             if(fintx.eq.zero) key%list%kill_exi_fringe=my_true
-          else
-             if(fintx.gt.zero) then
-                key%list%fint=fintx
-                key%list%kill_ent_fringe=my_true
-             else
-                key%list%fint=zero
-             endif
-          endif
+          key%list%fint =fint
+          key%list%fint2=fintx
           key%list%h1=node_value('h1 ')
           key%list%h2=node_value('h2 ')
+          key%list%va=node_value('f1 ')
+          key%list%vs=node_value('f2 ')
           key%tiltd=node_value('tilt ')
           if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
           ptcrbend=node_value('ptcrbend ').ne.0
@@ -955,25 +956,18 @@ CONTAINS
        key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
        !       key%list%fint=node_value('fint ')
-       fint=node_value('fint ')
+! JG: 13.04.2023 Added fringe features to sbend
+       fint =node_value('fint ')
        fintx=node_value('fintx ')
-       if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
-          print*," The fint and fintx must be the same at each end or each might be zero"
-          call aafail('ptc_input:','The fint and fintx must be the same at each end or each might be zero. Program stops')
-       endif
-       if(fint.gt.zero) then
-          key%list%fint=fint
-          if(fintx.eq.zero) key%list%kill_exi_fringe=my_true
-       else
-          if(fintx.gt.zero) then
-             key%list%fint=fintx
-             key%list%kill_ent_fringe=my_true
-          else
-             key%list%fint=zero
-          endif
-       endif
+       if (fintx.lt.0) then 
+            fintx = fint
+         endif
+       key%list%fint =fint
+       key%list%fint2=fintx
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
+       key%list%va=node_value('f1 ')
+       key%list%vs=node_value('f2 ')
        key%tiltd=node_value('tilt ')
        if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
        if(errors_out) then
@@ -1024,6 +1018,19 @@ CONTAINS
           sk1= sk1 +dum1                                          !
           sk1s=sk1s+dum2                                          !
 !       endif                                                      !
+! JG: 13.04.2023 Added fringe features to quadrupole
+         key%list%hgap=node_value('hgap ')
+         fint =node_value('fint ')
+         fintx=node_value('fintx ')
+         if (fintx.lt.0) then 
+              fintx = fint
+           endif
+         key%list%fint =fint
+         key%list%fint2=fintx
+         key%list%h1=node_value('h1 ')
+         key%list%h2=node_value('h2 ')
+         key%list%va=node_value('f1 ')
+         key%list%vs=node_value('f2 ')
 
 ! LD: 19.06.2019
        if (sk1s .ne. zero) then
@@ -1060,6 +1067,20 @@ CONTAINS
        tilt=node_value('tilt ')
        dum1=key%list%k(3)-normal_0123(2)
        dum2=key%list%ks(3)-skew_0123(2)
+! JG: 13.04.2023 Added fringe features to sextupole
+       key%list%hgap=node_value('hgap ')
+       fint =node_value('fint ')
+       fintx=node_value('fintx ')
+       if (fintx.lt.0) then 
+            fintx = fint
+       endif
+         print *, "fint ", fint, " fintx ", fintx
+       key%list%fint =fint
+       key%list%fint2=fintx
+       key%list%h1=node_value('h1 ')
+       key%list%h2=node_value('h2 ')
+       key%list%va=node_value('f1 ')
+       key%list%vs=node_value('f2 ')
 
 ! LD: 19.06.2019
 !       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
@@ -1114,6 +1135,20 @@ CONTAINS
        key%list%k(4) =sk3                                         !
        key%list%ks(4)= sk3s
 !       key%list%ks(4)=zero  ! added by VK                         !
+! JG: 13.04.2023 Added fringe features to octupole
+       key%list%hgap=node_value('hgap ')
+       fint =node_value('fint ')
+       fintx=node_value('fintx ')
+       if (fintx.lt.0) then 
+            fintx = fint
+       endif
+         print *, "fint ", fint, " fintx ", fintx
+       key%list%fint =fint
+       key%list%fint2=fintx
+       key%list%h1=node_value('h1 ')
+       key%list%h2=node_value('h2 ')
+       key%list%va=node_value('f1 ')
+       key%list%vs=node_value('f2 ')
        key%tiltd=tilt  !==========================================!
 
        !================================================================
@@ -1220,13 +1255,14 @@ CONTAINS
           ksi=node_value('ksi ')
           lrad=node_value('lrad ')
           if(lrad.eq.zero.and.ks.ne.zero) lrad=ksi/ks
-          if(ksi.eq.zero.or.lrad.eq.zero) then
-             key%magnet="marker"
-             print*,"Thin solenoid: ",name," has no strength - set to marker"
-          else
+! JG 13.04.2023: if lrad=0 and ks=0, then the solenoid should be a multipole instead of a marker
+          !if(ksi.eq.zero.or.lrad.eq.zero) then
+          !   key%magnet="marker"
+          !   print*,"Thin solenoid: ",name," has no strength - set to marker"
+          !else
              key%list%bsol=bvk*ksi/lrad
              key%list%ls=lrad
-          endif
+          !endif
        endif
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
