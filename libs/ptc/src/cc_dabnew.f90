@@ -3979,10 +3979,10 @@ contains
              ioa=1
           endif
           if (madxprint) then
-            write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout, &
+            write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,3X))') iout, &
                      c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
           else
-            write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout, &
+            write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,2X))') iout, &
                      c_clean_complex(c_cc(ipoa+i-1)),ioa,(j(iii),iii=1,c_nvmax)
             write(iunit,*) c_clean_complex(c_cc(ipoa+i-1))
           endif
@@ -4003,9 +4003,9 @@ contains
                 !ETIENNE
                 iout = iout+1
                 if (madxprint) then
-                  write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout, ccc,ioa,(j(iii),iii=1,c_nvmax)
+                  write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,3X))') iout, ccc,ioa,(j(iii),iii=1,c_nvmax)
                 else
-                  write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,1X))') iout, ccc,ioa,(j(iii),iii=1,c_nvmax)
+                  write(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2i2,2X))') iout, ccc,ioa,(j(iii),iii=1,c_nvmax)
                   write(iunit,*) c_cc(ii)
                 endif
              endif
@@ -4128,7 +4128,7 @@ end function c_clean_complex
              if(imprime) then
                  some=.true.
                 if (madxprint) then
-                  write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') iout, ccc,ioa,(j(i),i=1,inva)
+                  write(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,3X))') iout, ccc,ioa,(j(i),i=1,inva)
                 elseif(epsprint.gt.1e-37_dp) then
                   write(iunit,501) ioa,ccc,(j(i),i=1,inva)
                 else
@@ -4327,9 +4327,9 @@ longprint=long
 10  continue
     iin = iin + 1
     if (madxprint) then
-      read(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+      read(iunit,'(I6,2X,ES23.16,1x,ES23.16,I5,4X,18(2I2,3X))') ii,c,io,(j(i),i=1,inva)
     else
-      read(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
+      read(iunit,'(I6,2X,G20.13,1x,G20.13,I5,4X,18(2I2,3X))') ii,c,io,(j(i),i=1,inva)
     endif
     !
     if(ii.eq.0) goto 20
