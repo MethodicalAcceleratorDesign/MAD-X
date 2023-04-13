@@ -139,7 +139,7 @@ MODULE S_DEF_KIND
  ! logical ::  ABELL_NEW=.TRUE.
   INTEGER :: metcav=0, nstcav=0
   real(dp) :: xcav(1:6)=0.001e0_dp, symplectic_check=1.d-10
-  integer :: n_wedge = 5
+  integer :: n_wedge = 0
 
   ! stochastic radiation in straigth
   PRIVATE compute_f4r,compute_f4p,ZEROR_HE22,ZEROP_HE22
@@ -167,7 +167,7 @@ MODULE S_DEF_KIND
 private rk2abellr,rk4abellr,rk6abellr,rk2abellp,rk4abellp,rk6abellp,get_z_abr,get_z_abp
 private fx_newcr,fx_newcp,fx_newc,feval_CAV_impr,feval_CAV_imp,rk1bmad_cav_impr
 integer :: tot_t=1
-logical :: old_thick_bend = .false.
+logical :: old_thick_bend = .true.
 !logical :: old_electric = .false.
 PRIVATE get_fieldR,get_fieldp
 PRIVATE get_Bfield_fringeR,get_Bfield_fringeP !,get_Bfield_fringe
@@ -14242,7 +14242,7 @@ endif
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
   !        ELSE
   !              IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
-                IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
+               !  IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
   !           CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(2),EL%HGAP(2),2,X,k)
   !        ENDIF
 
