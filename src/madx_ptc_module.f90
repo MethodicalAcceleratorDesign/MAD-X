@@ -1005,8 +1005,9 @@ CONTAINS
        sk1= node_value('k1 ')  * (1 + node_value('ktap '))
        sk1s=node_value('k1s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
-       dum1=key%list%k(2)-normal_0123(1)
-       dum2=key%list%ks(2)-skew_0123(1)
+! JG 18.04.2023 Stopped the removal of knl[2] and ksl[2] from the strength list
+       dum1=key%list%k(2)!-normal_0123(1)
+       dum2=key%list%ks(2)!-skew_0123(1)
 
        !print*,'normal_0123', normal_0123
        !print*,'skew_0123', skew_0123
@@ -1065,8 +1066,9 @@ CONTAINS
        sk2= node_value('k2 ')  * (1 + node_value('ktap '))
        sk2s=node_value('k2s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
-       dum1=key%list%k(3)-normal_0123(2)
-       dum2=key%list%ks(3)-skew_0123(2)
+! JG 18.04.2023 Stopped the removal of knl[3] and ksl[3] from the strength list
+       dum1=key%list%k(3)!-normal_0123(2)
+       dum2=key%list%ks(3)!-skew_0123(2)
 ! JG: 13.04.2023 Added fringe features to sextupole
        key%list%hgap=node_value('hgap ')
        fint =node_value('fint ')
@@ -1094,6 +1096,11 @@ CONTAINS
        key%list%k(3) =sk2                                         !
        key%list%ks(3) =sk2s                                         !
 !       key%list%ks(3)=zero  ! added by VK                         !
+       
+!JG: 18.04.2023 Allowed k0 and k0s for sextupole
+       key%list%k(1)=key%list%k(1)+normal_0123(0)
+! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
+       key%list%ks(1)=key%list%ks(1)-skew_0123(0)
        key%tiltd=tilt  !==========================================!
 
        !================================================================
