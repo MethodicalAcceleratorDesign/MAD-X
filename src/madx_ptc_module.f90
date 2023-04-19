@@ -1372,6 +1372,7 @@ CONTAINS
       endif
       key%list%volt=sqrt(ex**2 + ey**2)
       key%list%lag=atan2(ey,ex)
+      key%tiltd = node_value('tilt ')
 
     case(code_srotation) ! case(12)
        ! actually our SROT element
