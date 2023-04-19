@@ -1690,6 +1690,7 @@ CONTAINS
           key%list%thin_h_foc=normal(0)*normal(0)/lrad
           key%list%thin_v_foc=skew(0)*skew(0)/lrad
        endif
+       skew(0)=-skew(0) ! WHY NEGATE IT? just change the single place its required?
 
        do i=0,nn
           key%list%k(i+1)=normal(i)
