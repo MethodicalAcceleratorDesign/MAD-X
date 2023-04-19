@@ -1186,6 +1186,18 @@ CONTAINS
           key%list%thin_v_foc=skew(0)*skew(0)/lrad
        endif
 
+! JG 18.04.2023 Added solenoid to multipole
+       ksi=node_value('ksi ')
+       if (ksi.ne.zero.and.lrad.ne.zero) then 
+         key%list%bsol=bvk*ksi/lrad
+         key%list%ls=lrad
+       elseif (ksi.ne.zero) then
+         write(6,*) " Solenoid component ignored as lrad=0"
+         write(6,*) " This feature was added for MAD-NG compatibility"
+         write(6,*) "so the combination of ks and ksi is not supported in a multipole"
+         write(6,*) " Please use the SOLENOID element instead, with knl and ksl"
+      endif
+
 
        if(nn.gt.0) then
          ! should be like this but apparently for MADX compatibility it was left out
