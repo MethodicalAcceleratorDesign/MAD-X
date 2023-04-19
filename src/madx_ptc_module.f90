@@ -876,7 +876,7 @@ CONTAINS
           key%list%h2=node_value('h2 ')
           key%list%va=node_value('f1 ')
           key%list%vs=node_value('f2 ')
-          key%tiltd=node_value('tilt ')
+          key%list%tilt=node_value('tilt ')
           if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
           ptcrbend=node_value('ptcrbend ').ne.0
           if(ptcrbend) then
