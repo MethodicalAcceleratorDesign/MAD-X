@@ -802,6 +802,7 @@ CONTAINS
 
     case(code_drift, code_rcollimator, code_ecollimator, code_collimator) ! case(1,20,21,44)
        key%magnet="drift"
+       key%list%tilt = node_value('tilt ')
        CALL CONTEXT(key%list%name)
 
        do ihelit=1,helit

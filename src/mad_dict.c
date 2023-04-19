@@ -1461,6 +1461,7 @@ const char *const_element_def =
 "drift: element none 0 1 "
 "at       = [r, 1.e20], "
 "l        = [r, 0], "
+"tilt     = [r, 0], " // JG: A tilted drift for ptc
 "kmax     = [r, 0], "
 "kmin     = [r, 0], "
 "calib    = [r, 0], "
