@@ -3099,6 +3099,8 @@ const char *const_element_def =
 "bend_fringe     = [l, false, true], "
 "kill_ent_fringe = [l, false, true], "
 "kill_exi_fringe = [l, false, true], "
+/* JG for PTC (should have same attributes as rfcavity) */
+"no_cavity_totalpath = [l, false, true], " 
 "dx       = [r, 0],  "
 "dy       = [r, 0],  "
 "ds       = [r, 0],  "
@@ -3389,6 +3391,7 @@ const char *const_element_def =
 "harmon     = [i, 0], "   // RF-Multipole
 "pnl        = [r, {0}], " // RF-Multipole
 "psl        = [r, {0}], " // RF-Multipole
+"no_cavity_totalpath = [l, false, true], " // RF-Multipole for ptc (JG)
 "comments = [s, none, none]; "
 " "
 "collimator: element none 0 44 "

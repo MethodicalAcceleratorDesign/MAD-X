@@ -1192,10 +1192,12 @@ CONTAINS
          key%list%bsol=bvk*ksi/lrad
          key%list%ls=lrad
        elseif (ksi.ne.zero) then
+         write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
          write(6,*) " Solenoid component ignored as lrad=0"
          write(6,*) " This feature was added for MAD-NG compatibility"
-         write(6,*) "so the combination of ks and ksi is not supported in a multipole"
+         write(6,*) " the combination of ks and ksi is not supported in a multipole"
          write(6,*) " Please use the SOLENOID element instead, with knl and ksl"
+         write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
       endif
 
 
@@ -1538,6 +1540,18 @@ CONTAINS
        !
        freq=c_1d6*node_value('freq ')
        key%list%lag=-node_value('lag ')*twopi+pih
+
+! JG 19.04.2023 - added no_cavity_totalpath for crab cavities
+       no_cavity_totalpath=node_value('no_cavity_totalpath ').ne.0
+       if(no_cavity_totalpath) then
+          key%list%cavity_totalpath=0
+       else
+          key%list%cavity_totalpath=1
+          ! correction for time of flight through cavity
+          ! we want particle with t=0 to be not accelerated
+          key%list%lag = key%list%lag + twopi*freq*(l/2d0)/(clight*beta0)
+       endif
+
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
           default = getintstate()
@@ -1644,6 +1658,17 @@ CONTAINS
        key%list%freq0=freq
        key%list%n_bessel=node_value('n_bessel ')
        key%list%harmon=one ! it is ignored by PTC because it does not know the circumference
+
+! JG 19.04.2023 - added no_cavity_totalpath for rf multipole
+       no_cavity_totalpath=node_value('no_cavity_totalpath ').ne.0
+       if(no_cavity_totalpath) then
+          key%list%cavity_totalpath=0
+       else
+          key%list%cavity_totalpath=1
+          ! correction for time of flight through cavity
+          ! we want particle with t=0 to be not accelerated
+          key%list%lag = key%list%lag + twopi*freq*(l/2d0)/(clight*beta0)
+       endif
 
        key%list%k(:)=zero
        key%list%ks(:)=zero
