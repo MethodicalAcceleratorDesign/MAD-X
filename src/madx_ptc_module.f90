@@ -1029,6 +1029,8 @@ CONTAINS
            endif
          key%list%fint =fint
          key%list%fint2=fintx
+         key%list%t1=node_value('e1 ')
+         key%list%t2=node_value('e2 ')
          key%list%h1=node_value('h1 ')
          key%list%h2=node_value('h2 ')
          key%list%va=node_value('f1 ')
@@ -1080,6 +1082,8 @@ CONTAINS
          print *, "fint ", fint, " fintx ", fintx
        key%list%fint =fint
        key%list%fint2=fintx
+       key%list%t1=node_value('e1 ')
+       key%list%t2=node_value('e2 ')
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%list%va=node_value('f1 ')
