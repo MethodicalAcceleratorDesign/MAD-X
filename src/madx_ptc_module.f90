@@ -1132,8 +1132,8 @@ CONTAINS
        sk3= node_value('k3 ')
        sk3s=node_value('k3s ')
        tilt=node_value('tilt ')
-       dum1=key%list%k(4)-normal_0123(3)
-       dum2=key%list%ks(4)-skew_0123(3)
+       dum1=key%list%k(4)!-normal_0123(3)
+       dum2=key%list%ks(4)!-skew_0123(3)
 
 ! ! LD: 19.06.2019
 !       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
@@ -1154,14 +1154,22 @@ CONTAINS
        if (fintx.lt.0) then 
             fintx = fint
        endif
-         print *, "fint ", fint, " fintx ", fintx
+
        key%list%fint =fint
        key%list%fint2=fintx
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
+       key%list%t1=node_value('e1 ')
+       key%list%t2=node_value('e2 ')
        key%list%va=node_value('f1 ')
        key%list%vs=node_value('f2 ')
-       key%tiltd=tilt  !==========================================!
+       key%tiltd=tilt  
+
+!JG: 20.04.2023 Allowed k0 and k0s for octupole
+       key%list%k(1)=key%list%k(1)+normal_0123(0)
+! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
+       key%list%ks(1)=key%list%ks(1)-skew_0123(0)
+       !==========================================!
 
        !================================================================
 
@@ -1197,12 +1205,12 @@ CONTAINS
          key%list%bsol=bvk*ksi/lrad
          key%list%ls=lrad
        elseif (ksi.ne.zero) then
-         write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
          write(6,*) " Solenoid component ignored as lrad=0"
          write(6,*) " This feature was added for MAD-NG compatibility"
          write(6,*) " the combination of ks and ksi is not supported in a multipole"
-         write(6,*) " Please use the SOLENOID element instead, with knl and ksl"
-         write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         write(6,*) " Please use the SOLENOID element with knl and ksl or specify lrad"
+         write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
       endif
 
 
@@ -1274,24 +1282,31 @@ CONTAINS
 
     case(code_solenoid) ! case(9) ! PTC accepts mults
        key%magnet="solenoid"
+      !VK
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
        ks=node_value('ks ')
-       if(l.ne.zero) then
+       if(l.ne.zero) then ! JG 21.04.2023 L != 0 means thick solenoid
           key%list%bsol=bvk*ks
-       else
+          !JG: 18.04.2023 Allowed k0 and k0s for solenoid
+          key%list%k(1)=key%list%k(1)+normal_0123(0)
+          ! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
+          key%list%ks(1)=key%list%ks(1)-skew_0123(0)
+       else 
+         ! JG 21.04.2023 L = 0 means thin solenoid, therefore needs multipole 
+         ! thin_h_angle, thin_v_angle, thin_h_foc, thin_v_foc
           ksi=node_value('ksi ')
           lrad=node_value('lrad ')
           if(lrad.eq.zero.and.ks.ne.zero) lrad=ksi/ks
-! JG 13.04.2023: if lrad=0 and ks=0, then the solenoid should be a multipole instead of a marker
-          !if(ksi.eq.zero.or.lrad.eq.zero) then
-          !   key%magnet="marker"
-          !   print*,"Thin solenoid: ",name," has no strength - set to marker"
-          !else
+          key%list%thin_h_angle=bvk*normal_0123(0)
+          key%list%thin_v_angle=bvk*skew_0123(0)
+          if(lrad.gt.zero) then
+             key%list%thin_h_foc=normal_0123(0)*normal_0123(0)/lrad
+             key%list%thin_v_foc=skew_0123(0)*skew_0123(0)/lrad
              key%list%bsol=bvk*ksi/lrad
-             key%list%ls=lrad
-          !endif
+         endif
+! JG 13.04.2023: if lrad=0 and ks=0, then the solenoid should be a multipole instead of a marker
+          key%list%ls=lrad
        endif
-       !VK
-       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
     case(code_rfcavity) ! case(10)
        key%magnet="rfcavity"
