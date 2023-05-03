@@ -13,6 +13,7 @@
  2019 : New elements from element definition, all attributes enabled
  2020 : Tapering, wire compensation
  2021 : Permanent misalignment
+ 2023 : k0 in dipedge
 
  */
 
@@ -1780,17 +1781,21 @@ element* SeqElList::create_bend_dipedge_element(const element* thick_elem,const 
     std::string dipedge_cmd_name="dipedge";
     if(Entry) dipedge_cmd_name+="_l_"; else dipedge_cmd_name+="_r_";
     dipedge_cmd_name+="cmd";
-
-    const double eps=1.e-15;
-
-    expression* l_par_expr=my_get_param_expression(thick_elem, "l"); // with this l_par_expr should not be NULL
-    expression* angle_par_expr = my_get_param_expression(thick_elem,"angle");
-    command_parameter* hparam=new_command_parameter("h",k_double);
-    hparam->expr=compound_expr(angle_par_expr,0.,"/",l_par_expr,0,1); // this also updates the value
-
     command* dipedge_cmd = new_cmdptr( find_element("dipedge", base_type_list) );
+    const command_parameter* k0_par = return_param_recurse("k0",thick_elem);
+    if(k0_par)
+    { // k0 is there, used it
+      SetParameter_in_cmd(dipedge_cmd,k0_par,"h",1); // copy k0 from thick bend as dipedge h
+    }
+    else // otherwise h = angle / l
+    {
+      command_parameter* hparam=new_command_parameter("h",k_double);
+      expression* l_par_expr=my_get_param_expression(thick_elem, "l"); // with this l_par_expr should not be NULL
+      expression* angle_par_expr = my_get_param_expression(thick_elem,"angle");
+      hparam->expr=compound_expr(angle_par_expr,0.,"/",l_par_expr,0,1); // this also updates the value
+      SetParameter_in_cmd(dipedge_cmd,hparam,"h",1);
+    }
 
-    SetParameter_in_cmd(dipedge_cmd,hparam,"h",1);
     if(dipedge_h1_h2_fl)
     {
       if(Entry) SetParameter_in_cmd(dipedge_cmd, return_param_recurse("h1",thick_elem), "he",1); // at entry, copy h1 from thick bend as dipedge he
