@@ -1,5 +1,8 @@
 MAD-X master
 
+
+MAD-X release 5.09.00 (2023.05.05)
+
 *   Twiss
     *   [PR 1123](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1123) Fix errors in the time variable with EXACT flag to TWISS (J. S. Berg)
     *   [PR 1125](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1125) Make TWISS treat [XY]ROTATION exactly, including the linear and second order map (J. S. Berg)
