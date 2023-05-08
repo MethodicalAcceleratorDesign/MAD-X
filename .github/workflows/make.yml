@@ -31,7 +31,7 @@ jobs:
           - i=2 STATIC=no  ONLINE=no NTPSA=yes USEGC=yes ARCH=64 X11=yes
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
@@ -104,7 +104,7 @@ jobs:
           - i=2 STATIC=yes ONLINE=no NTPSA=yes USEGC=yes ARCH=64 X11=no
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
@@ -171,7 +171,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: msys2/setup-msys2@v2
         with:
           update: true
