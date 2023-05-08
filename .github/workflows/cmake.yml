@@ -156,7 +156,7 @@ jobs:
       - name: Upload test outputs for inspection
         # Keep the redundant condition (see main.yml)!
         if: failure() && steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: failures-cmake-${{ matrix.name }}
           path: |
