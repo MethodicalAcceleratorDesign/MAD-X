@@ -885,25 +885,25 @@ CONTAINS
              truerbend=node_value('truerbend ').ne.0
              if(truerbend) then
                 key%magnet="TRUERBEND"
-                if(key%list%t2/=zero .or. key%list%t1/=zero) then
+                if(key%list%t2/=zero .and. key%list%t1/=zero) then
+                   write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                    write(6,*) " The true parallel face bend "
-                   if (key%list%t1/=zero) then
-                      write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                      write(6,*) " Piotr has to implement patches around it to tackle E1=/0  "
-                      write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                   endif
-
-                   write(6,*) " only accepts the total angle and e1 as an input "
-                   write(6,*) " if e1=0, then the pipe angle to the entrance face is "
-                   write(6,*) " angle/2. It is a normal rbend."
+                   write(6,*) " only accepts the total angle and e1 or e2 as an input "
+                   write(6,*) " if e1=0 and e2/=0, then the pipe angle to the entrance face is "
+                   write(6,*) " angle/2-e2 and the exit pipe makes an angle angle/2+e2."
                    write(6,*) " If e1/=0, then the pipe angle to the entrance face is "
                    write(6,*) ' angle/2+e1 and the exit pipe makes an angle "angle/2-e1" '
                    write(6,*) " with the exit face."
-                   write(6,*) " The offending non-zero t2 = (e2 - angle/2) is set to zero! "
+                   write(6,*) " You have entered a value for e1 and e2, this is not allowed for the truerbend flag. "
+                   write(6,*) " Instead, your rbend has been converted to a madlike rbend where this is allowed. "
                    write(6,*) " Make sure that this is what you want!!! "
-
-                   !                write(6,*) " CHANGE YOUR LATTICE FILRE."
-                   !                stop 666
+                   write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                  key%magnet="WEDGRBEND"
+                elseif (key%list%t1==zero.and.key%list%t2==zero) then
+                  key%magnet="WEDGRBEND"
+                elseif (key%list%t2/=zero) then
+                   !Convert e2 to an e1 (simplifies sp_keywords)
+                   key%list%t1=node_value('angle ')-key%list%t2 !To keep parallel faces, e1 = angle - e2
                    key%list%t2=zero
                 endif
              else
