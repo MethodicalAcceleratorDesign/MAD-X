@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.09.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2022.01.10 12:50:04      +
+  + Release   date: 2023.03.08               +
+  + Execution date: 2023.05.04 11:42:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test case for coupling calculations
 
@@ -280,7 +280,7 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       86.33884601    4.357888887e-05           -1000000           -1000000 
+       86.33884601    4.357888886e-05           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
           -1000000    4.357163553e-05        151.4823115       0.3113833114 
@@ -304,13 +304,13 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0   -9.639454819e-06       0.0377924083 
+                 0                  0    -9.63945443e-06       0.0377924083 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.01483622117      0.01483622117   -1.247665701e-05    1.254878708e-05 
+    -0.01483622117      0.01483622117    -1.24766562e-05    1.254878599e-05 
 
           disp4min           disp4max             deltap            orbit_x 
-  -1.265999584e-05    1.265999448e-05                  0                  0 
+  -1.265999348e-05    1.265999487e-05                  0                  0 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 

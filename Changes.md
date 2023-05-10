@@ -1,5 +1,8 @@
 MAD-X master
 
+
+MAD-X release 5.09.00 (2023.05.05)
+
 *   Twiss
     *   [PR 1123](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1123) Fix errors in the time variable with EXACT flag to TWISS (J. S. Berg)
     *   [PR 1125](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1125) Make TWISS treat [XY]ROTATION exactly, including the linear and second order map (J. S. Berg)
@@ -14,12 +17,13 @@ MAD-X master
     *   [PR_1169](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1169) Fix undefined variable in solenoid tracking with radiation (R. De Maria)
 *   PTC:
     *   [PR 1153](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1153), [PR 1154](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1154), [PR 1156](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1156) Fix mdump for map debugging and sync with MAD-NG (L. Deniau)
-    *   [PR 1142](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1142) Fix issue-1140 generating function wrong sign from ptc_normal (P. Skowonronski) 
+    *   [PR 1142](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1142) Fix issue-1140 generating function wrong sign from ptc_normal (P. Skowonronski)
     *   [PR 1111](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1111) Ensure that exact_model is set before zero_key is called in PTC (J. S. Berg)
     *   [PR 1095](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1095) Implement more robust, optional, PTC DA map output (L. Deniau)
     *   [PR 1131](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1131) Add spin table (T. Persson and P. Skowonronski)
     *   [PR 1114](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1114) Exact option in PTC translation (J. S. Berg)
     *   [PR 1159](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1159) Fix random errors in trupdate due to missing null termination (J. S. Berg)
+    *   [PR 1175](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1175) Revert to old PTC bend (L. Deniau, R. De Maria)
 *   Aperture:
     *   [PR 1168](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1168) Fix regression in aperture module resulting in wrong orbit in thick kickers (R. De Maria)
 *   Misc:
@@ -29,12 +33,11 @@ MAD-X master
     *   [PR 1081](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1108) Fix potential buffer overrun when node_name calls stoupper (J. S. Berg)
     *   [PR 1093](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1093) More robust aperture refinement (T. Persson)
     *   [PR 1113](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1113) Introduce LAST option in INSTALL and MOVE and change default behaviour [Breaking change!] (R. De Maria)
-    *   [PR 1061](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1078) Fix k0 in dipedge in makethin (R. De Maria **WIP**)
+    *   [PR 1061](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1078) Fix k0 in dipedge in makethin (H. Burkhardt, R. De Maria)
     *   [PR 1137](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1137) Remove `none` from mad_dict for numbers  (R. De Maria)
     *   [PR 1161](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1161) Fixing lines brake in save (R. De Maria, L. Deniau)
 *   Tests:
     *   [PR 1107](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1107), [PR 1164](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1164) Stabizes few tests due to compiler dependent numerical noise (R. De Maria)
-    
 *   Doc:
     *   [PR 1088](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1088) Additional explanation bv flag (J. Dilly)
 
