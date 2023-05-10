@@ -26,7 +26,7 @@ module Mad_like
   PRIVATE GET_GAM,HELICALTILT
   logical(lp),PRIVATE ::  MADX= .FALSE.,MADX_MAGNET_ONLY=.FALSE.
 
-  logical(lp),private::LIKEMAD =.false.,mad_list_killed =.true.,setmad = .false.,verbose=.FALSE.,&
+  logical(lp),private::LIKEMAD =.true.,mad_list_killed =.true.,setmad = .false.,verbose=.FALSE.,&
        madkick=.false.,circular=.false.,makeit=.false.
   logical(lp)::DRIFT_KICK =.true.
   logical(lp),TARGET ::FIBRE_flip=.true.
@@ -2967,16 +2967,16 @@ CONTAINS
        s2%CAV21%PSI=s1%PSI
     ENDIF
 
-    if(LIKEMAD) then
-       if(S2%KIND/=KIND16) then
+    if(LIKEMAD.and.S2%KIND==KIND16) then
+      !  if(S2%KIND/=KIND16) then
           !w_p=0
           !w_p%nc=1
           !w_p%fc='((1X,a72))'
           !w_p%c(1)= " Likemad is true and element is not STREX "
           ! call !write_e(kind16)
-       endif
+      !  endif
       s2%k16%likemad=LIKEMAD
-       S2%KIND=KIND20
+      S2%KIND=KIND20
        LIKEMAD=.false.
     endif
 
