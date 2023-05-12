@@ -892,7 +892,34 @@ static void force_consistent_slices(el_list* the_element_list) // hbu 10/2005 lo
         child->double_value=slices;
         parent->double_value=slices_parent;
         int el_thick_pos = name_list_pos("thick",nl);
-        if(el_thick_pos > -1) el->parent->def->par->parameters[el_thick_pos]->double_value = el_def->par->parameters[el_thick_pos]->double_value; // copy thick flag from child to parent
+        if(el_thick_pos > -1) el->parent->def->par->parameters[el_thick_pos]->double_value = el_def->par->parameters[el_thick_pos]->double_value; // copy slice number from child to parent
+      }
+    }
+  }
+}
+
+static void zero_length_elements_1_slice(el_list* the_element_list)
+// zero length elements will not be sliced
+// the can still get a slice number > 1 from select,flag=makethin which can be confusing, avoided here by assuring the default slice=1
+{
+  for(int i=0; i< the_element_list->curr; ++i) // loop over the_element_list
+  {
+    element* el = the_element_list->elem[i];
+    bool found;
+    double el_length=my_get_int_or_double_value(el,"l",found);
+    const command* el_def=el->def;
+    name_list* nl=el_def->par_names;
+    const int ei=name_list_pos("slice",nl);
+    if(ei > -1 && el->parent!=nullptr && el != el->parent )
+    {
+      bool found_parent;
+      double el_parent_length=my_get_int_or_double_value(el->parent,"l",found_parent);
+      command_parameter*  child=el_def->par->parameters[ei];
+      command_parameter* parent=el->parent->def->par->parameters[ei];
+      if(!found || fmax(el_length,el_parent_length)<1.e-10) // element and its parent have zero length, remove slice number
+      { // assure that zero length elements have the default slice=1
+        child->double_value=1;
+        parent->double_value=1;
       }
     }
   }
@@ -1342,6 +1369,7 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
   {
     int iret=set_selected_elements(element_list); // makethin selection -- modifies global element_list
     if (MaTh::Verbose&& iret) std::cout << "after set_selected_elements iret=" << iret << std::endl;
+    zero_length_elements_1_slice(element_list);
   }
   else  warning("makethin: no selection list,","slicing all to one thin lens.");
 
@@ -2506,7 +2534,7 @@ void SeqElList::finish_make_sliced_elem(element*& sliced_elem, const element* th
   theSliceList->put_slice(thick_elem,sliced_elem);
 }
 
-node* SeqElList::copy_thin(node* work_node) // this copies an element node and sets the length to zero and lrad to the length to be used for "copying" optically neutral elements
+node* SeqElList::copy_thin(node* work_node) // this copies an element node, when L>0 sets the length to zero and lrad to the length to be used for "copying" optically neutral elements
 {
   if ( MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << "  " << std::setw(MaTh::par_name_maxlen) << work_node->name << " " << std::setw(MaTh::el_type_maxlen) << work_node->base_name << " thin_node->length=" << work_node->length << " l=" << el_par_value("l",work_node->p_elem) << std::endl;
   node* thin_node = nullptr;
@@ -2518,6 +2546,8 @@ node* SeqElList::copy_thin(node* work_node) // this copies an element node and s
   }
   thin_node->length=0;
   thin_node->p_elem->length=0;
+  ParameterRemove("slice",thin_node->p_elem); // slicing done, no need to keep slice number
+  ParameterRemove("thick",thin_node->p_elem); // slicing done, no need to keep thick
   return thin_node;
 }
 
