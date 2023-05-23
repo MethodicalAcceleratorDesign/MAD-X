@@ -1309,12 +1309,12 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
   name_list* nl = incmd->clone->par_names;
   command_parameter_list* pl = incmd->clone->par;
 
-  static std::string LastSequenceSliced,LastStyle="teapot";
-  static SequenceList sliced_seqlist;
-
   MaTh::Verbose=0;
   if(get_option("debug")) MaTh::Verbose=1;
   if(get_option("verbose")) MaTh::Verbose=2;
+
+  static std::string LastSequenceSliced,LastStyle="teapot";
+  static SequenceList sliced_seqlist;
 
   const int ipos_style = name_list_pos("style", nl);
   std::string slice_style;
@@ -1369,10 +1369,9 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
   {
     int iret=set_selected_elements(element_list); // makethin selection -- modifies global element_list
     if (MaTh::Verbose&& iret) std::cout << "after set_selected_elements iret=" << iret << std::endl;
-    zero_length_elements_1_slice(element_list);
   }
   else  warning("makethin: no selection list,","slicing all to one thin lens.");
-
+  zero_length_elements_1_slice(element_list);
   if(iMakeConsistent) force_consistent_slices(element_list);
 
   const int ipos_seq = name_list_pos("sequence", nl);
@@ -1403,7 +1402,7 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
 }
 
 //--------  SliceDistPos
-SliceDistPos::SliceDistPos(const int n,const bool teapot_fl) : delta(0.5), Delta(0),delta_str("1/2"),delta_half_str("1/4"),Delta_str("0"),Delta_half_str("0")
+SliceDistPos::SliceDistPos(const int n,const bool teapot_fl) : delta(0.5), Delta(1),delta_str("1/2"),delta_half_str("1/4"),Delta_str("1"),Delta_half_str("0")
 { // typically called with    slice_style==std::string("teapot")    which is true for teapot  and false for simple
   // note that n = number of cuts = number of thin slices = number of thick slices -1
   // called for thick slices, positions of thin slices are calculated with simple_at_shift teapot_at_shift
@@ -2304,8 +2303,9 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   {
     if(nslices==1) // single thick
     {
-      en = thick_elem; // full slice as entry, no body/exit
-      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create thick slices _en, _bo, _ex thick_elem->name=" << thick_elem->name << " here single slice just entry, not body, exit" << '\n';
+      en = thick_elem; // full slice
+      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create single thick_elem->name=" << thick_elem->name << " single body between dipedges with gringe fields"<< '\n';
+      en = create_thick_slice(thick_elem,1);
     }
     else // nslices>1
     {
@@ -2341,7 +2341,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
 
     if(ThickSLice) // fill space between slices
     {
-      if(i==1)           place_thick_slice(thick_elem,en,i); // place entry  slice
+      if(i==1)           place_thick_slice(thick_elem,en,i); // place entry or single thick slice
       else if(i<nslices) place_thick_slice(thick_elem,bo,i); // place body/middle slice
       else               place_thick_slice(thick_elem,ex,i); // place exit slice
       // place exit body after loop
