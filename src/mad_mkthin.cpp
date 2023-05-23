@@ -2304,7 +2304,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
     if(nslices==1) // single thick
     {
       en = thick_elem; // full slice
-      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create single thick_elem->name=" << thick_elem->name << " single body between dipedges with gringe fields"<< '\n';
+      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create single thick_elem->name=" << thick_elem->name << " single body between dipedges with fringe fields"<< '\n';
       en = create_thick_slice(thick_elem,1);
     }
     else // nslices>1
