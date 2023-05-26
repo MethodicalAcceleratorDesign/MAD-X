@@ -1,4 +1,6 @@
 MAD-X master
+*  Track
+    * [PR 1182](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1182) Fix thick dipole tracking
 
 
 MAD-X release 5.09.00 (2023.05.05)
