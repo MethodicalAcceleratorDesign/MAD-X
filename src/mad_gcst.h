@@ -92,13 +92,19 @@ extern const char* const trackone_table_cols[];
 extern const int         track_table_types[];
 extern const char* const track_table_cols[];
 extern const int         track_table_cols_len;
+
 extern const int         tracksumm_table_types[];
 extern const char* const tracksumm_table_cols[];
+extern const int         mytracksumm_table_types[]; /* hrr Sep 2021 */
+extern const char* const mytracksumm_table_cols[];  /* hrr Sep 2021 */
+
 extern const int         ptcnodetrack_table_types[];
 extern const char* const ptcnodetrack_table_cols[];
 
 extern const int         trackloss_table_types[];
 extern const char* const trackloss_table_cols[];
+extern const int         mytrackloss_table_types[]; /* hrr Sep 2021 */
+extern const char* const mytrackloss_table_cols[];  /* hrr Sep 2021 */
 
 extern const char* const dist_table_cols[];
 extern const int         dist_table_types[];

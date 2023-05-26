@@ -19,7 +19,8 @@ jobs:
           sudo apt-get install -qy \
             texlive-latex-base \
             texlive-latex-extra \
-            texlive-fonts-recommended
+            texlive-fonts-recommended \
+            texlive-font-utils
 
       - name: Build userguide
         run: |

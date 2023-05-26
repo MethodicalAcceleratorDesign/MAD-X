@@ -564,6 +564,14 @@ CONTAINS
 
     ord_max = -1
 
+    exact1=node_value("exact ")
+
+    if(exact1.eq.0.or.exact1.eq.1) then
+       EXACT_MODEL = exact1 .ne. 0
+    else
+       EXACT_MODEL = exact0
+    endif
+
     call zero_key(key)
 
     !j=j+1
@@ -615,14 +623,6 @@ CONTAINS
        metd = method1
     else
        metd = method0
-    endif
-
-    exact1=node_value("exact ")
-
-    if(exact1.eq.0.or.exact1.eq.1) then
-       EXACT_MODEL = exact1 .ne. 0
-    else
-       EXACT_MODEL = exact0
     endif
 
     !special node keys
@@ -3940,6 +3940,25 @@ CONTAINS
 
 
   end  function getmaxnmul
+
+
+  function GnfToHam(f,ind,tunes)
+    implicit none
+    complex(dp) :: GnfToHam
+    complex(dp), intent(in) :: f ! value of the generating function
+    integer,intent(in) :: ind(6) ! index of the generating function
+    real(dp), intent(in) :: tunes(3)
+    complex(dp)   :: tunefactor ! exp(2pi*i((j-k)mux + (l-m)muy))
+    real(dp)      :: tunesum !  (j-k)mux + (l-m)muy)
+
+    tunesum = (ind(1) - ind(2))*tunes(1) + (ind(3) - ind(4))*tunes(2) + (ind(6) - ind(5))*tunes(3)
+
+    tunefactor =  cmplx( cos(twopi*tunesum), sin(twopi*tunesum) )
+    tunefactor = 1.0 - tunefactor
+
+    GnfToHam = f * tunefactor
+
+  end function GnfToHam
 
 
 END MODULE madx_ptc_module

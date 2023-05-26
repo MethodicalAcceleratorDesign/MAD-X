@@ -134,11 +134,11 @@ SEQEDIT,SEQUENCE=PR.BHT000001;
 
 
 TOP Expand_sequence name pr.bht000001 with length 5.003185e+00, ref_flag 0
- REPLACE, element=PR.BHT000001.corr3, by=aa;       
+ REPLACE, element=PR.BHT000001.corr3, by=aa;
 
  REMOVE, element=PR.BHT000001.corr1;
 
- INSTALL, ELEMENT=aa, AT= 2.985726e-01, FROM=pr.bht000001$start;
+ INSTALL, ELEMENT=aa, AT= 2.985726e-01, FROM=pr.bht000001$start,last=false;
 
    in get_node_pos: name: pr.bht000001$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
 	 in get_node_pos: name: pr.bht000001$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 

@@ -3957,9 +3957,15 @@ contains
     ioa = 0
     if(inva.eq.0) then
        write(iunit,'(A)') '    I  VALUE  '
-       do i = ipoa,ipoa+illa-1
-          write(iunit,'(I6,2X,ES23.16)') i-ipoa, c_clean_complex(c_cc(i))
-       enddo
+       if (madxprint) then
+         do i = ipoa,ipoa+illa-1
+            write(iunit,'(I6,2X,ES23.16,1x,ES23.16)') i-ipoa, c_clean_complex(c_cc(i))
+         enddo
+       else
+         do i = ipoa,ipoa+illa-1
+            write(iunit,'(I6,2X,G20.13,1x,G20.13)') i-ipoa, c_clean_complex(c_cc(i))
+         enddo
+       endif
     elseif(c_nomax.eq.1) then
        if(illa.ne.0) write(iunit,'(A)') '     I   COEFFICIENT                                     ORDER   EXPONENTS'
        if(illa.eq.0) write(iunit,'(A)') '         ALL COMPONENTS 0.0_dp '

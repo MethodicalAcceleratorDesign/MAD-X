@@ -26,12 +26,12 @@ CONTAINS
 
     ! special case: display only string without X
     if (.not. PRESENT(X)) then
-      WRITE(*, '(a,a)') '@@ ', S
+      WRITE(*, '(a,a)') '@: ', S
       return
     endif
 
     ! @@ + elem + func + 6 columns
-    WRITE(*, '(a,a15,a,a15,6ES25.16)') '@@ ', ELEM_NAME, ' ', S &
+    WRITE(*, '(a,a15,a,a15,6ES25.16)') '@: ', ELEM_NAME, ' ', S &
       , X(1), X(2), X(3), X(4), -X(6), X(5)
   END SUBROUTINE PRTR
 
@@ -48,7 +48,7 @@ CONTAINS
     if (X%KIND /= 1) then
       if (MAPDUMP .ge. 2) then
         ! @@ + elem + func + 7 columns
-        WRITE(*, '(a,a15,a,a15,7ES25.16)') '@@ ', ELEM_NAME, ' ', S, X.sub.'000000'&
+        WRITE(*, '(a,a15,a,a15,7ES25.16)') '@: ', ELEM_NAME, ' ', S, X.sub.'000000'&
                                    , X.sub.'100000', X.sub.'010000', X.sub.'001000'&
                                    , X.sub.'000100',-X.sub.'000001', X.sub.'000010'
       endif
@@ -59,7 +59,7 @@ CONTAINS
       endif
     else
       ! @@ + elem + func + 1 columns
-      WRITE(*, '(a,a15,a,a15,1ES25.16)') '@@ ', ELEM_NAME, ' ', S, X%R
+      WRITE(*, '(a,a15,a,a15,1ES25.16)') '@: ', ELEM_NAME, ' ', S, X%R
     endif
   END SUBROUTINE PRTP1
 
@@ -75,7 +75,7 @@ CONTAINS
 
     ! special case: display only string without X
     if (.not. PRESENT(X)) then
-      WRITE(*, '(a,a)') '@@ ', S
+      WRITE(*, '(a,a)') '@: ', S
       return
     endif
 
@@ -100,12 +100,12 @@ CONTAINS
     if (MAPDUMP .ge. 3 .and. index(S, ':1') .ne. 0) then
       ! @@ + elem + func + full DAMAP
       call alloc(T)
-      T =  X(1) ; call daprint(T)
-      T =  X(2) ; call daprint(T)
-      T =  X(3) ; call daprint(T)
-      T =  X(4) ; call daprint(T)
-      T =  X(5) ; call daprint(T)
-      T =  X(6) ; call daprint(T)
+      T = X(1) ; call daprint(T)
+      T = X(2) ; call daprint(T)
+      T = X(3) ; call daprint(T)
+      T = X(4) ; call daprint(T)
+      T = X(5) ; call daprint(T)
+      T = X(6) ; call daprint(T)
       call kill(T)
     endif
   END SUBROUTINE PRTP

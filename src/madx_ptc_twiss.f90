@@ -29,7 +29,6 @@ module madx_ptc_twiss_module
 
   !PSk 2011.01.05 goes global to the modules so the slice tracking produces it for the summ table
   type(probe_8)            :: theTransferMap
-  type(probe_8)            :: theRDTs
   type(universal_taylor)   :: unimap(6)
 
   type twiss
@@ -44,6 +43,7 @@ module madx_ptc_twiss_module
      real(dp), dimension(6)   ::  disp_p3 ! third order derivatives of dispersion w.r.t delta_p
      real(dp), dimension(3)   ::  tune
      real(dp), dimension(6,6) ::  eigen
+     real(dp), dimension(3,7) ::  n_spin
   end type twiss
 
   interface assignment (=)
@@ -115,7 +115,7 @@ module madx_ptc_twiss_module
 
   character(48)           :: nl_table_name='nonlin'
   character(48)           :: rdt_table_name='twissrdt'
-
+  character(48)           :: spin_table_name='twiss_spin'
   !============================================================================================
   !  variables for spin treatment in equaltwiss subroutine
   type(c_damap)           :: tw_SpinUmap, tw_SpinUmapCanonic, tw_D, tw_A, tw_R, tw_f,  tw_b
@@ -425,7 +425,9 @@ contains
       write(6,format7) latticefun%s(3,1,0:6)
       write(6,format7) latticefun%s(3,2,0:6)
       write(6,format7) latticefun%s(3,3,0:6)
-      
+      s1%n_spin(1,1:7) = latticefun%s(2,1,0:6)
+      s1%n_spin(2,1:7) = latticefun%s(2,2,0:6)
+      s1%n_spin(3,1:7) = latticefun%s(2,3,0:6)
       theAscriptProbe8 = theAscriptProbeBak + tw_SpinUmapCanonic
       
     else
@@ -641,7 +643,7 @@ contains
     character(12)           :: tmfile='transfer.map'
     character(48)           :: charconv !routine
     real(dp)                :: BETA0
-    integer                 :: mapdumpbak ! LD: 04.06.2019
+    integer                 :: mapdumpA, mapdumpB, mapdumpT ! LD: 04.06.2019
     type(c_damap) id_s  ! dospin true
     
     if(universe.le.0.or.EXCEPTION.ne.0) then
@@ -1284,6 +1286,7 @@ contains
             suml = s;
 
             call puttwisstable(theTransferMap%x)
+            if(dospin) call putspintable()
             if(doRDTtracking)   call putrdttable(current)
             if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
@@ -1307,34 +1310,38 @@ contains
           endif
 
           call puttwisstable(theTransferMap%x)
+          if (dospin) call putspintable()
           if(doRDTtracking)   call putrdttable(current)
           if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
         endif
 
       else
+        mapdumpA = 0
+        mapdumpT = 0
+        mapdumpB = mapdump
+        if (mapdump .ge. 11) mapdumpA = modulo(mapdump, 10)
+        if (mapdump .le. 10) mapdumpT = mapdump
+
         ! ELEMENT AT ONCE MODE
         if (nda > 0 .or. dospin) then
-           if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-             mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-             call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
-             mapdump = mapdumpbak
-           endif
-           if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
-             call propagate(my_ring,theTransferMap,+default,fibre1=i,fibre2=i+1)
-           endif
+          mapdump = mapdumpA
+          call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
+
+          if (doTMtrack) then
+            mapdump = mapdumpT
+            call propagate(my_ring,theTransferMap,+default,fibre1=i,fibre2=i+1)
+          endif
         else
-           if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-             mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-             call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
-             mapdump = mapdumpbak
-           endif
-           if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
-             call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
-           endif
+          mapdump = mapdumpA
+          call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
 
+          if (doTMtrack) then
+            mapdump = mapdumpT
+            call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
+          endif
         endif
-
+        mapdump = mapdumpB
 
         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
 
@@ -1398,7 +1405,7 @@ contains
         endif
 
         !print*,"Skowron 6 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
-
+        if(dospin) call putspintable()
         if(doRDTtracking)   call putrdttable(current)
         if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x,A_script_probe%x)
 
@@ -1524,27 +1531,32 @@ contains
     !____________________________________________________________________________________________
 
     subroutine propagateswy()
-      implicit none
+        implicit none
+        mapdumpA = 0
+        mapdumpT = 0
+        mapdumpB = mapdump
 
-       if (nda > 0) then
-          if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-            mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-            call propagate(my_ring,A_script_probe,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
-            mapdump = mapdumpbak
-          endif
-          if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
+        if (mapdump .ge. 11) mapdumpA = modulo(mapdump, 10)
+        if (mapdump .le. 10) mapdumpT = mapdump
+
+        if (nda > 0) then
+          mapdump = mapdumpA
+          call propagate(my_ring,A_script_probe,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
+
+          if (doTMtrack) then
+            mapdump = mapdumpT
             call propagate(my_ring,theTransferMap,+default,node1=nodePtr%pos,node2=nodePtr%pos+1)
           endif
         else
-          if (mapdump .eq. 0 .or. mapdump .ge. 11) then ! mapdump = 0,11,12
-            mapdumpbak = mapdump ; mapdump = modulo(mapdump, 10)
-            call propagate(my_ring,A_script_probe,default,node1=nodePtr%pos,node2=nodePtr%pos+1)
-            mapdump = mapdumpbak
-          endif
-          if (doTMtrack .and. mapdump .ge. 0 .and. mapdump .le. 2) then ! mapdump = 0,1,2
+          mapdump = mapdumpA
+          call propagate(my_ring,A_script_probe,default,node1=nodePtr%pos,node2=nodePtr%pos+1)
+
+          if (doTMtrack) then
+            mapdump = mapdumpT
             call propagate(my_ring,theTransferMap,default,node1=nodePtr%pos,node2=nodePtr%pos+1)
           endif
         endif
+        mapdump = mapdumpB
 
     end subroutine propagateswy
 
@@ -1813,6 +1825,20 @@ contains
     end function getdeltae
     !____________________________________________________________________________________________
 
+    subroutine putspintable()
+        implicit none
+        real(dp) :: tmp_vector(6)
+        call string_to_table_curr(spin_table_name,"name ","name ")
+        call double_to_table_curr(spin_table_name, 's ', suml)
+        call double_to_table_curr(spin_table_name, 'n0x ', tw%n_spin(1,1))
+        call double_to_table_curr(spin_table_name, 'n0y ', tw%n_spin(2,1))
+        call double_to_table_curr(spin_table_name, 'n0z ', tw%n_spin(3,1))
+        call vector_to_table_curr(spin_table_name, 'n0xdx ',tw%n_spin(1,2:7), 6)
+        call vector_to_table_curr(spin_table_name, 'n0ydx ',tw%n_spin(2,2:7), 6)
+        call vector_to_table_curr(spin_table_name, 'n0zdx ',tw%n_spin(3,2:7), 6)
+        call augment_count(spin_table_name)
+
+    end subroutine
     subroutine puttwisstable(transfermap,transfermapSaved)
       implicit none
       include "madx_ptc_knobs.inc"
@@ -1876,7 +1902,7 @@ contains
 
           tmpa6 = tmpa66(:,6)
           tmpa66(:,6) = tmpa66(:,5)
-          tmpa66(:,5) = tmpa6
+          tmpa66(:,5) = -tmpa6
 
 
           opt_fun( 1:6 ) = tmpa66(1,:)
@@ -1884,7 +1910,7 @@ contains
           opt_fun(13:18) = tmpa66(3,:)
           opt_fun(19:24) = tmpa66(4,:)
           opt_fun(31:36) = tmpa66(5,:)
-          opt_fun(25:30) = tmpa66(6,:)
+          opt_fun(25:30) = -tmpa66(6,:)
 
         else
 
@@ -1892,7 +1918,7 @@ contains
           opt_fun(2) = transfermap(1).sub.fo(2,:)
           opt_fun(3) = transfermap(1).sub.fo(3,:)
           opt_fun(4) = transfermap(1).sub.fo(4,:)
-          opt_fun(5) = transfermap(1).sub.fo(6,:)
+          opt_fun(5) = -transfermap(1).sub.fo(6,:)
           opt_fun(6) = transfermap(1).sub.fo(5,:)
 
 
@@ -1900,37 +1926,37 @@ contains
           opt_fun(8) = transfermap(2).sub.fo(2,:)
           opt_fun(9) = transfermap(2).sub.fo(3,:)
           opt_fun(10)= transfermap(2).sub.fo(4,:)
-          opt_fun(11)= transfermap(2).sub.fo(6,:)
+          opt_fun(11)= -transfermap(2).sub.fo(6,:)
           opt_fun(12)= transfermap(2).sub.fo(5,:)
 
           opt_fun(13)= transfermap(3).sub.fo(1,:)
           opt_fun(14)= transfermap(3).sub.fo(2,:)
           opt_fun(15)= transfermap(3).sub.fo(3,:)
           opt_fun(16)= transfermap(3).sub.fo(4,:)
-          opt_fun(17)= transfermap(3).sub.fo(6,:)
+          opt_fun(17)= -transfermap(3).sub.fo(6,:)
           opt_fun(18)= transfermap(3).sub.fo(5,:)
 
           opt_fun(19)= transfermap(4).sub.fo(1,:)
           opt_fun(20)= transfermap(4).sub.fo(2,:)
           opt_fun(21)= transfermap(4).sub.fo(3,:)
           opt_fun(22)= transfermap(4).sub.fo(4,:)
-          opt_fun(23)= transfermap(4).sub.fo(6,:)
+          opt_fun(23)= -transfermap(4).sub.fo(6,:)
           opt_fun(24)= transfermap(4).sub.fo(5,:)
 
 
-          opt_fun(25)= transfermap(6).sub.fo(1,:)
-          opt_fun(26)= transfermap(6).sub.fo(2,:)
-          opt_fun(27)= transfermap(6).sub.fo(3,:)
-          opt_fun(28)= transfermap(6).sub.fo(4,:)
+          opt_fun(25)= -transfermap(6).sub.fo(1,:)
+          opt_fun(26)= -transfermap(6).sub.fo(2,:)
+          opt_fun(27)= -transfermap(6).sub.fo(3,:)
+          opt_fun(28)= -transfermap(6).sub.fo(4,:)
           opt_fun(29)= transfermap(6).sub.fo(6,:)
-          opt_fun(30)= transfermap(6).sub.fo(5,:)
+          opt_fun(30)= -transfermap(6).sub.fo(5,:)
 
 
           opt_fun(31)= transfermap(5).sub.fo(1,:)
           opt_fun(32)= transfermap(5).sub.fo(2,:)
           opt_fun(33)= transfermap(5).sub.fo(3,:)
           opt_fun(34)= transfermap(5).sub.fo(4,:)
-          opt_fun(35)= transfermap(5).sub.fo(6,:)
+          opt_fun(35)= -transfermap(5).sub.fo(6,:)
           opt_fun(36)= transfermap(5).sub.fo(5,:)
 
         endif
@@ -2345,36 +2371,36 @@ contains
       re(1,3) = get_value('ptc_twiss ','re13 ')
       re(1,4) = get_value('ptc_twiss ','re14 ')
       re(1,5) = get_value('ptc_twiss ','re16 ')
-      re(1,6) = get_value('ptc_twiss ','re15 ')
+      re(1,6) = -get_value('ptc_twiss ','re15 ')
       re(2,1) = get_value('ptc_twiss ','re21 ')
       re(2,2) = get_value('ptc_twiss ','re22 ')
       re(2,3) = get_value('ptc_twiss ','re23 ')
       re(2,4) = get_value('ptc_twiss ','re24 ')
       re(2,5) = get_value('ptc_twiss ','re26 ')
-      re(2,6) = get_value('ptc_twiss ','re25 ')
+      re(2,6) = -get_value('ptc_twiss ','re25 ')
       re(3,1) = get_value('ptc_twiss ','re31 ')
       re(3,2) = get_value('ptc_twiss ','re32 ')
       re(3,3) = get_value('ptc_twiss ','re33 ')
       re(3,4) = get_value('ptc_twiss ','re34 ')
       re(3,5) = get_value('ptc_twiss ','re36 ')
-      re(3,6) = get_value('ptc_twiss ','re35 ')
+      re(3,6) = -get_value('ptc_twiss ','re35 ')
       re(4,1) = get_value('ptc_twiss ','re41 ')
       re(4,2) = get_value('ptc_twiss ','re42 ')
       re(4,3) = get_value('ptc_twiss ','re43 ')
       re(4,4) = get_value('ptc_twiss ','re44 ')
       re(4,5) = get_value('ptc_twiss ','re46 ')
-      re(4,6) = get_value('ptc_twiss ','re45 ')
+      re(4,6) = -get_value('ptc_twiss ','re45 ')
       re(5,1) = get_value('ptc_twiss ','re61 ')
       re(5,2) = get_value('ptc_twiss ','re62 ')
       re(5,3) = get_value('ptc_twiss ','re63 ')
       re(5,4) = get_value('ptc_twiss ','re64 ')
       re(5,5) = get_value('ptc_twiss ','re66 ')
-      re(5,6) = get_value('ptc_twiss ','re65 ')
-      re(6,1) = get_value('ptc_twiss ','re51 ')
-      re(6,2) = get_value('ptc_twiss ','re52 ')
-      re(6,3) = get_value('ptc_twiss ','re53 ')
-      re(6,4) = get_value('ptc_twiss ','re54 ')
-      re(6,5) = get_value('ptc_twiss ','re56 ')
+      re(5,6) = -get_value('ptc_twiss ','re65 ')
+      re(6,1) = -get_value('ptc_twiss ','re51 ')
+      re(6,2) = -get_value('ptc_twiss ','re52 ')
+      re(6,3) = -get_value('ptc_twiss ','re53 ')
+      re(6,4) = -get_value('ptc_twiss ','re54 ')
+      re(6,5) = -get_value('ptc_twiss ','re56 ')
       re(6,6) = get_value('ptc_twiss ','re55 ')
 
     end subroutine readrematrix
@@ -4163,8 +4189,8 @@ contains
     integer     :: i,o ! output file
     character(len=250)   :: fmt
     integer     	:: io,r, myn1,myn2,indexa(mnres,4),mynres,ind(10)
-    type(c_damap)  :: c_Map, c_Map2, q_Map, a_cs, a_cs_1
-    type(c_taylor)  :: nrmlzdPseudoHam, g_io
+    type(c_damap)  :: c_Map, a_cs, a_cs_1
+    type(c_taylor)  :: g_io
     type(c_vector_field) vf, vf_kernel
 
      !use_complex_in_ptc=my_true
@@ -4306,8 +4332,11 @@ contains
     enddo
 
 
-    !!!!!!!!!!!!!!!!!!!!!!
-    !Generating functions
+    !!!!!!!!!!!!!!!!!!!!!!              !!!!!!!!!!!!!!!
+    !Generating functions               !!!!!!!!!!!!!!!
+    !
+    ! and Normalised Pseudo-Hamiltonian !!!!!!!!!!!!!!!
+    !
 
     !n%g is the vecotor field for the transformation
     !from resonance basis (action angle coordinate system, (x+ipx),(x-ipx)) back to cartesion X,Y
@@ -4340,30 +4369,9 @@ contains
 
     g_io = cgetpb(vf)
 
-    call putGnormaltable(g_io)
+    call putGnormaltable(g_io, theNormalForm%tune)
 
 
-    !!!!!!!!!!!!!!!!!!!!!!
-    !HAMILTONIAN
-    !!!!!!!!!!!!!! Normalised Pseudo-Hamiltonian !!!!!!!!!!!!!!!
-
-    call c_canonise(theNormalForm%a_t,a_CS)
-
-    a_CS = a_CS.sub.1
-    call c_canonise(a_CS,a_CS)
-
-    call alloc(c_Map2)
-    c_Map2 = a_CS**(-1)*c_Map*a_CS
-
-    call alloc(q_Map)
-    call c_factor_map(c_Map2,q_Map,vf,dir=1)
-
-
-    vf=from_phasor()*vf
-
-    call alloc(nrmlzdPseudoHam)
-    nrmlzdPseudoHam = cgetpb(vf)
-    call putHnormaltable(nrmlzdPseudoHam)
 
     !!!!!!!!!!!!!!!!!!!!!!
     !ONE TURN MAP
@@ -4377,12 +4385,9 @@ contains
     call kill(g_io)
 
     call kill(c_Map)
-    call kill(c_Map2)
-    call kill(q_Map)
     call kill(a_CS)
     call kill(a_CS_1)
 
-    call kill(nrmlzdPseudoHam)
 
     call kill(theNormalForm)
    !if (icase.eq.5 .or. icase.eq.56) then
@@ -4614,129 +4619,31 @@ contains
       !print*, 'putDnormaltable DONE'
 
     end subroutine putDnormaltable
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-    !_________________________________________________
-    ! contained in ptc_twiss
-    subroutine putHnormaltable(nrmlzdPseudoHam)
-      implicit none
-      type(c_taylor) :: nrmlzdPseudoHam
-      type(taylor) :: sinham,cosham
-      integer      :: ind(10)
-      integer      :: order
-      character(len=17):: nn, nick, bv='HAMILTONIAN'
-      character(len=17):: hamiltsin='hamilt_sin'
-      character(len=17):: hamiltcos='hamilt_cos'
-      character(len=17):: hamiltamp='hamilt_amp'
-      integer     	:: i,r, myn1,myn2,indexa(mnres,4),mynres
-      complex(dp)   :: c_val
-      real(dp)    :: im_val, re_val, d_val, eps=1e-6
-      integer     :: maxorder,o
-      double precision :: get_value ! C-function
-
-      maxorder = get_value('ptc_twiss ', 'no ')
-
-      ind(:) = 0
-      myn1 = 0
-      myn2 = 0
-      mynres = 0
-      i=1
-      call c_taylor_cycle(nrmlzdPseudoHam,size=mynres)
-
-    do o=1,maxorder !print order by order, I don't know how to sort c_taylor (piotr)
-
-      do r=1,mynres
-
-        call c_taylor_cycle(nrmlzdPseudoHam,ii=r,value=c_val,j=ind(1:c_%nv))
-
-        order = sum(ind(1:6))
-
-        if ( order .ne. o) then
-          cycle
-        endif
-
-        re_val = real(c_val)
-        im_val = imag(c_val)
-        d_val  = hypot(re_val, im_val)
-
-        ! if amplitude is close to zero then it is not worth to output
-        if (d_val .lt. eps) then
-
-          if (getdebug()>2) then
-            print*,"putHnormaltable idx=",r," ",d_val," smaller then eps=",eps, " skipping "
-          endif
-
-          cycle
-
-        endif
-
-
-        !print*,"HAML order ",order, ind(:)
-        !print*,'       im=',im_val , ' re=',re_val  , ' amp=', d_val
-
-
-        !!!!!!!!!!!!!!!!!!!!!!!!
-        write(nn,'(a4,6(a1,i1))') 'hama','_',ind(1),'_',ind(2),'_',ind(3), &
-                                       '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a2,6(i1))') 'h_',ind(1),ind(2),ind(3), &
-                                      ind(4),ind(5),ind(6)
-
-        if (getdebug() > 2) then
-         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-	    d_val, order, ind(1:6)
-        endif
-
-        call puttonormaltable(nn,nick,hamiltamp,d_val,order,ind)
-
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        write(nn,'(a4,6(a1,i1))') 'hams','_',ind(1),'_',ind(2),'_',ind(3), &
-                                       '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a4,3(a1,SP,i2))') 'hams','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
-
-        write(nick,'(a2,6(i1),a3)') 'h_',ind(1),ind(2),ind(3),ind(4),ind(5),ind(6),'_IM'
-
-        if (getdebug() > 2) then
-         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-	    re_val, order, ind(1:6)
-        endif
-
-        call puttonormaltable(nn,nick,hamiltsin,im_val,order,ind)
-
-
-        write(nn,'(a4,6(a1,i1))') 'hamc','_',ind(1),'_',ind(2),'_',ind(3), &
-                                       '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a2,6(i1),a3)') 'h_',ind(1),ind(2),ind(3),ind(4),ind(5),ind(6),'_RE'
-
-        if (getdebug() > 2) then
-         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-	    im_val, order, ind(1:6)
-        endif
-
-        call puttonormaltable(nn,nick,hamiltcos,re_val,order,ind)
-
-      enddo
-     enddo
-    end subroutine putHnormaltable
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     !_________________________________________________
     ! contained in ptc_twiss
-    subroutine putGnormaltable(gen)
+    subroutine putGnormaltable(gen,tunes)
     !gets generating function that are the linear part of A_t
       implicit none
       type(c_taylor) :: gen
+      real(dp)     :: tunes(3)
       integer     :: order
       integer     :: ind(10), i
       character(len=17):: nn, nick
       character(len=17):: genfunsin='gen_fun_sin'
       character(len=17):: genfuncos='gen_fun_cos'
       character(len=17):: genfunamp='gen_fun_amp'
+      character(len=17):: bv='HAMILTONIAN'
+      character(len=17):: hamiltsin='hamilt_sin'
+      character(len=17):: hamiltcos='hamilt_cos'
+      character(len=17):: hamiltamp='hamilt_amp'
       logical skew
       integer     	:: r, myn1,myn2,indexa(mnres,4),mynres, illa
-      complex(dp)   :: c_val
+      complex(dp)   :: c_val, c_haml
       real(dp)    :: im_val, re_val, d_val,  eps=1e-6
       integer     :: maxorder
       double precision :: get_value ! C-function
-
+      
       maxorder = get_value('ptc_twiss ', 'no ')
 
       ind(:) = 0
@@ -4744,6 +4651,8 @@ contains
       myn2 = 0
       mynres = 0
       i=1
+      
+      
       call c_taylor_cycle(gen,size=mynres)
 
 
@@ -4777,14 +4686,6 @@ contains
 
           write(nick,'(a2,6(i1))') 'f_',ind(1),ind(2),ind(3), &
                     	ind(4),ind(5),ind(6)
-          !
-          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-          !               d_val, order, ind(1:6)
-
-          !write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',7,'(1x,i16))'
-          !write(6,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-          !               d_val, order, ind(1:6)
-
           call puttonormaltable(nn,nick,genfunamp,d_val,order,ind)
 
 
@@ -4793,17 +4694,47 @@ contains
                                           '_',ind(4),'_',ind(5),'_',ind(6)
           write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
                                            ind(4),ind(5),ind(6),'_im'
-          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-          !               im_val, order, ind(1:6)
           call puttonormaltable(nn,nick,genfunsin,im_val,order,ind)
 
           write(nn,'(a4,6(a1,i1))') 'gnfc','_',ind(1),'_',ind(2),'_',ind(3), &
                                           '_',ind(4),'_',ind(5),'_',ind(6)
           write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
                                            ind(4),ind(5),ind(6),'_re'
-          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-          !               re_val, order, ind(1:6)
           call puttonormaltable(nn,nick,genfuncos,re_val,order,ind)
+          
+
+
+          if ((ind(1) .eq. ind(2) ) .and. (ind(3) .eq. ind(4) ) .and. (abs(tunes(3)) .lt. TINY(ONE)) ) then
+             !print*," Longi gnf but no longi tune"
+             cycle
+          endif
+          
+          
+          c_haml = GnfToHam(c_val, ind, tunes)
+          
+          im_val = imag(c_haml)
+          re_val = real(c_haml)
+          d_val  = hypot(re_val, im_val)
+
+          write(nn,'(a4,6(a1,i1))') 'hama','_',ind(1),'_',ind(2),'_',ind(3), &
+                                           '_',ind(4),'_',ind(5),'_',ind(6)
+          write(nick,'(a2,6(i1))') 'h_',ind(1),ind(2),ind(3), &
+                    	ind(4),ind(5),ind(6)
+          call puttonormaltable(nn,nick,hamiltamp,d_val,order,ind)
+
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+          write(nn,'(a4,6(a1,i1))') 'hams','_',ind(1),'_',ind(2),'_',ind(3), &
+                                           '_',ind(4),'_',ind(5),'_',ind(6)
+          write(nick,'(a2,6(i1),a3)') 'h_',ind(1),ind(2),ind(3),ind(4),ind(5),ind(6),'_IM'
+          call puttonormaltable(nn,nick,hamiltsin,im_val,order,ind)
+
+
+          write(nn,'(a4,6(a1,i1))') 'hamc','_',ind(1),'_',ind(2),'_',ind(3), &
+                                           '_',ind(4),'_',ind(5),'_',ind(6)
+          write(nick,'(a2,6(i1),a3)') 'h_',ind(1),ind(2),ind(3),ind(4),ind(5),ind(6),'_RE'
+          call puttonormaltable(nn,nick,hamiltcos,re_val,order,ind)
+
 
         enddo
       enddo
@@ -4811,7 +4742,7 @@ contains
       myn1 = 0
       myn2 = 0
       mynres = 0
-
+      
 
     end subroutine putGnormaltable
    !_________________________________________________

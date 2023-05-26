@@ -5,6 +5,7 @@ module madx_ptc_normal_module
   ! updates by Piotr Skowronski (CERN)
   use madx_ptc_module
 
+
 !  use madx_ptc_twiss
   ! Algorithm to get binomial coeffs
   !https://wikimedia.org/api/rest_v1/media/math/render/svg/d4145e0326f57f563b59c943642928342a5a6b18
@@ -45,11 +46,11 @@ contains
     character(len = 16) name_var
     type(probe_8) theTransferMap
     type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
-    type(c_damap)  :: c_Map, c_Map2, q_Map, a_CS, a_CS_1
-    type(c_vector_field) vf_kernel, vf, vf_t2
-    type(c_taylor)  :: g_io, nrmlzdPseudoHam
+    type(c_damap)  :: c_Map, a_CS, a_CS_1
+    type(c_vector_field) vectorField, vf_kernel
+    type(c_taylor)  :: theRDTs
     type(fibre), POINTER    :: current
-    type(c_normal_form), target :: theNormalForm, theNormalForm_t2 ! normal from type 2 for hamiltonian terms
+    type(c_normal_form), target :: theNormalForm
 
     !--------------------------------------------------------;----------------------
 
@@ -72,7 +73,7 @@ contains
            'Order of calculation (parameter no) is not sufficient to calculate required parameters')
       return
     endif
-
+    
     call cleartables() !defined in madx_ptc_knobs
 
     nda=0
@@ -292,7 +293,6 @@ contains
        !! for GENFU (generationg function) and HAML ( hamiltonian terms)
        !! which kept resonances in the rotation part
        !! now we just copy the normalform object
-       call alloc(theNormalForm_t2)
 
        nres = 0
        n_haml = 0
@@ -315,71 +315,6 @@ contains
              endif
           enddo
 
-          ! not needed now, keep inside if ever needed again
-          if (n_haml > 0) then
-
-
-             do j1 =1,n_haml
-                row = row_haml(j1)
-                k = double_from_table_row("normal_results ", "value ", row, doublenum)
-                mynres = int(doublenum)
-                row = row_haml(j1) - 3*mynres + 2
-                starti = 1
-
-                if (j1 .eq. 1) then
-                   ! the first one - special treatment
-                   k = double_from_table_row("normal_results ", "order1 ", row, doublenum) !ordrer in X
-                   indexa(1) = int(doublenum)
-                   k = double_from_table_row("normal_results ", "order2 ", row, doublenum) !ordrer in PX
-                   indexa(2) = int(doublenum)
-                   k = double_from_table_row("normal_results ", "order3 ", row, doublenum) !ordrer in Y
-                   indexa(3) = int(doublenum)
-                   k = double_from_table_row("normal_results ", "order4 ", row, doublenum) !ordrer in PY
-                   indexa(4) = int(doublenum)
-
-                   index1(1,1) = indexa(1) - indexa(2)
-                   index1(1,2) = indexa(3) - indexa(4)
-
-
-                   theNormalForm_t2%m(1,1)= index1(1,1)
-                   theNormalForm_t2%m(2,1)= index1(1,2)
-                   if(c_%nd2.eq.6) theNormalForm_t2%m(3,1)= indexa(3)
-
-                   nres = 1
-                   starti = 2
-                endif
-                !============ nres is the number of resonances to be set
-
-                if (mynres .ge. starti) then
-                   do i = starti,mynres
-                      ii = row + 3*(i-1)
-                      k = double_from_table_row("normal_results ", "order1 ", ii, doublenum)
-                      indexa(1) = int(doublenum)
-                      k = double_from_table_row("normal_results ", "order2 ", ii, doublenum)
-                      indexa(2) = int(doublenum)
-                      k = double_from_table_row("normal_results ", "order3 ", ii, doublenum)
-                      indexa(3) = int(doublenum)
-                      k = double_from_table_row("normal_results ", "order4 ", ii, doublenum)
-                      indexa(4) = int(doublenum)
-                      n1 = indexa(1) - indexa(2)
-                      n2 = indexa(3) - indexa(4)
-                      do l = 1,nres
-                         if (n1 .eq. index1(l,1) .and. n2 .eq. index1(l,2)) goto 100
-                      enddo
-                      nres = nres + 1
-                      index1(nres,1) = n1
-                      index1(nres,2) = n2
-                      theNormalForm_t2%m(1,nres)= n1
-                      theNormalForm_t2%m(2,nres)= n2
-                      if(c_%nd2.eq.6) theNormalForm_t2%m(3,nres)= indexa(3)
-
-100                   continue
-                   enddo
-                endif
-             enddo
-
-             theNormalForm_t2%nres = nres
-          endif
 
        endif
        !------------------------------------------------------------------------
@@ -393,20 +328,22 @@ contains
           !n%g is the vecotor field for the transformation
           !from resonance basis (action angle coordinate system, (x+ipx),(x-ipx)) back to cartesion X,Y
           !the ndim polynomials need to be flattened to get RDT's
-          call alloc(g_io);
-          call alloc(vf);
+          call alloc(theRDTs);
+          call alloc(vectorField);
           call alloc(a_CS)
           call alloc(a_CS_1)
 
           call c_canonise(theNormalForm%atot,a_CS)
 
-          a_CS=to_phasor()*a_CS*from_phasor()
-          call c_factor_map(a_CS,a_CS_1,vf,0)
+          a_CS = to_phasor() * a_CS * from_phasor()
+          call c_factor_map(a_CS,a_CS_1,vectorField,0)
+          
+          !theRDTs = cgetpb(vectorField)
+          
+          call equal_c_tayls(theRDTs,cgetpb(vectorField))
 
-          call equal_c_tayls(g_io,cgetpb(vf))
 
-
-          call kill(vf)
+          call kill(vectorField)
           call kill(a_CS)
           call kill(a_CS_1)
 
@@ -414,98 +351,7 @@ contains
 
        if (n_haml > 0) then
 
-
-           theNormalForm_t2 = theNormalForm
-          ! call  c_normal(c_Map,theNormalForm_t2) ! in the non Complex PTC had to leave resonance in the rotation
-
-           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-              write(whymsg,*) 'DA got unstable in Normal Form: PTC msg: ',messagelost
-              call fort_warn('ptc_normal: ',whymsg)
-              call seterrorflag(10,"ptc_normal ",whymsg)
-              return
-           endif
-
-          call alloc(a_CS)
-          call c_canonise(theNormalForm_t2%a_t,a_CS)
-          ! write(mft,*) "Courant Snyder transfo A_T (full nonlin) "
-          ! call print(a_CS,mft)
-          ! write(mft,*) "  "
-          ! write(mft,*) " ++++++++++++++++++++++++ "
-          ! write(mft,*) "  "
-
-          a_CS = a_CS.sub.1
-          call c_canonise(a_CS,a_CS)
-
-          ! write(mft,*) "Courant Snyder transfo A_T truncated at 1st order"
-          ! call print(a_CS,mft)
-          ! write(mft,*) "  "
-          ! write(mft,*) " ++++++++++++++++++++++++ "
-          ! write(mft,*) "  "
-
-
-          call alloc(c_Map2)
-          c_Map2 = a_CS**(-1)*c_Map*a_CS
-
-          call alloc(vf_t2)
-          call alloc(q_Map)
-          call c_factor_map(c_Map2,q_Map,vf_t2,dir=1)
-          ! write(mft,*) "Vector Field "
-          ! call print(vf_t2,mft)
-          ! write(mft,*) "  "
-          ! write(mft,*) " ++++++++++++++++++++++++ "
-          ! write(mft,*) "  "
-
-           ! move from phasor to complex C-S
-          vf_t2=from_phasor()*vf_t2
-
-          call alloc(nrmlzdPseudoHam)
-          call equal_c_tayls(nrmlzdPseudoHam,cgetpb(vf_t2)) ! nrmlzdPseudoHam=cgetpb(vf_t2)
-
-         if (getdebug() > 2) then
-           write(mft,*) "-----------------------------------------------------------------"
-           write(mft,*) "HAMILTONIAN in linear complex Courant Snyder (linear phasor)"
-           call print(nrmlzdPseudoHam,mft)
-           write(mft,*) "-----------------------------------------------------------------"
-
-           close(mft)
-
-         endif
-
-         call kill(a_CS)
-         call kill(c_Map2)
-
-         call kill(vf_t2)
-         call kill(q_Map)
-
-
-
-           ! ALTERNATIVE ALGORITHM, but result starts at ordrer 3
-           !  type(damap)    :: r_Map
-           !  type(DRAGTFINN):: df_Map
-           !  type(pbresonance) pb_Resonance !Poisson Bracket Resonance
-           !
-           !  call alloc(r_Map)
-           !  r_Map = c_Map2
-           !
-           !  !write(mft,*) "RMAP "
-           !  !call print(r_Map,mft)
-           !  !write(mft,*) "  "
-           !  !write(mft,*) " ++++++++++++++++++++++++ "
-           !  !write(mft,*) "  "
-           !
-           !  call alloc(df_Map)
-           !  df_Map = r_Map
-           !
-           !  call alloc(pb_Resonance)
-           !  pb_Resonance = df_Map%pb  ! this is the hamiltonian
-           !
-           !  write(mft,*) "PBR "
-           !  call print(pb_Resonance,mft)
-           !  write(mft,*) "  "
-           !  write(mft,*) " ++++++++++++++++++++++++ "
-           !  write(mft,*) "  "
-
-
+          continue
 
        endif
 
@@ -516,11 +362,11 @@ contains
              name_var=" "
              k = string_from_table_row("normal_results ", "name ", row, name_var)
 
-             if (name_var(:3) .eq. 'ham') then
-               val_ptc = double_from_normal_t2(name_var, row, icase)  !!! HERE IS THE RETRIVAL
-             else
-               val_ptc = double_from_normal_t1(name_var, row, icase)  !!! HERE IS THE RETRIVAL
-             endif
+             !if (name_var(:3) .eq. 'ham') then
+             !  val_ptc = double_from_normal_t2(name_var, row, icase)  !!! HERE IS THE RETRIVAL
+             !endif
+
+             val_ptc = double_from_normal_t1(name_var, row, icase)  !!! HERE IS THE RETRIVAL
 
              if (name_var(:4) .ne. 'haml' .and. name_var(:4) .ne. 'gnfu') then
                k = double_to_table_row("normal_results ", "value ", row, val_ptc)
@@ -538,11 +384,7 @@ contains
 
 
        if (n_gnfu > 0) then
-          call kill(g_io)
-       endif
-
-       if (n_haml > 0) then
-          call kill(nrmlzdPseudoHam)
+          call kill(theRDTs)
        endif
 
 
@@ -764,48 +606,42 @@ contains
              if(mytime.and.i2.eq.6) double_from_normal_t1 = -double_from_normal_t1
              RETURN
            CASE ('gnfc')
-              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-              ind(1) = int(doublenum)
-              k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-              ind(2) = int(doublenum)
-              k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-              ind(3) = int(doublenum)
-              k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-              ind(4) = int(doublenum)
-              ind(5) = 0
-              ind(6) = 0
-              c_val = g_io.sub.ind
-              d_val = -real(c_val)
+              ind = getMonomialCodeFromRowInNormalTable(row)
+              c_val = theRDTs.sub.ind
+              d_val = real(c_val)
 
            CASE ('gnfs')
-              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-              ind(1) = int(doublenum)
-              k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-              ind(2) = int(doublenum)
-              k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-              ind(3) = int(doublenum)
-              k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-              ind(4) = int(doublenum)
-              ind(5) = 0
-              ind(6) = 0
-              c_val = g_io.sub.ind
-              d_val = -imag(c_val)
+              ind = getMonomialCodeFromRowInNormalTable(row)
+              c_val = theRDTs.sub.ind
+              d_val = imag(c_val)
 
            CASE ('gnfa')
-              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-              ind(1) = int(doublenum)
-              k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-              ind(2) = int(doublenum)
-              k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-              ind(3) = int(doublenum)
-              k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-              ind(4) = int(doublenum)
-              ind(5) = 0
-              ind(6) = 0
-              c_val = g_io.sub.ind
+              ind = getMonomialCodeFromRowInNormalTable(row)
+              c_val = theRDTs.sub.ind
               d_val1 = imag(c_val)
               d_val2 = real(c_val)
               d_val = SQRT(d_val1**2 + d_val2**2)
+
+           CASE ('hamc')
+              ind = getMonomialCodeFromRowInNormalTable(row)
+              c_val = GnfToHam(theRDTs.sub.ind, ind, theNormalForm%tune)
+              d_val = real(c_val)
+
+           CASE ('hams')
+              ind = getMonomialCodeFromRowInNormalTable(row)
+              c_val = GnfToHam(theRDTs.sub.ind, ind, theNormalForm%tune)
+              d_val = imag(c_val)
+
+           CASE ('hama')
+              ind = getMonomialCodeFromRowInNormalTable(row)
+              c_val = GnfToHam(theRDTs.sub.ind, ind, theNormalForm%tune)
+              d_val1 = imag(c_val)
+              d_val2 = real(c_val)
+              d_val = SQRT(d_val1**2 + d_val2**2)
+
+           CASE ('haml')
+              double_from_normal_t1 = zero ! should never arrive here
+              RETURN
 
            CASE ('gnfu')
               double_from_normal_t1 = zero ! should never arrive here
@@ -833,83 +669,25 @@ contains
      END FUNCTION double_from_normal_t1
    !________________________________________________
    !Extraction of normal type 2 variables: hamiltonian and generating functions
+     FUNCTION getMonomialCodeFromRowInNormalTable(row)
+       IMPLICIT NONE
+       integer, intent(in) :: row
+       integer :: getMonomialCodeFromRowInNormalTable(6)
+               
+       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+       getMonomialCodeFromRowInNormalTable(1) = int(doublenum)
+       k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+       getMonomialCodeFromRowInNormalTable(2) = int(doublenum)
+       k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+       getMonomialCodeFromRowInNormalTable(3) = int(doublenum)
+       k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+       getMonomialCodeFromRowInNormalTable(4) = int(doublenum)
+       getMonomialCodeFromRowInNormalTable(5) = 0
+       getMonomialCodeFromRowInNormalTable(6) = 0
 
-     FUNCTION double_from_normal_t2(name_var,row,icase)
-       USE ptc_results
-       implicit none
-       logical(lp) name_l
-       integer,intent(IN) ::  row,icase
-       real(dp) double_from_normal_t2, d_val, d_val1, d_val2
-       integer ii,i1,i2,jj
-       integer j,k,ind(6)
-       integer double_from_table_row
-       character(len = 4)  name_var
-       character(len = 2)  name_var1
-       character(len = 3)  name_var2
-       complex(dp) :: c_val
+    end FUNCTION getMonomialCodeFromRowInNormalTable
 
-       double_from_normal_t2 = zero
-
-       name_var1 = name_var
-
-      ! if (LEN_TRIM(name_var))
-
-       SELECT CASE (name_var)
-       CASE ('hamc')
-          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-          ind(1) = int(doublenum)
-          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-          ind(2) = int(doublenum)
-          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-          ind(3) = int(doublenum)
-          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-          ind(4) = int(doublenum)
-          ind(5) = 0
-          ind(6) = 0
-          c_val = nrmlzdPseudoHam.sub.ind
-          d_val = real(c_val)
-
-       CASE ('hams')
-          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-          ind(1) = int(doublenum)
-          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-          ind(2) = int(doublenum)
-          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-          ind(3) = int(doublenum)
-          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-          ind(4) = int(doublenum)
-          ind(5) = 0
-          ind(6) = 0
-          c_val = nrmlzdPseudoHam.sub.ind
-          d_val = imag(c_val)
-       CASE ('hama')
-          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-          ind(1) = int(doublenum)
-          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-          ind(2) = int(doublenum)
-          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-          ind(3) = int(doublenum)
-          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-          ind(4) = int(doublenum)
-          ind(5) = 0
-          ind(6) = 0
-
-          c_val = nrmlzdPseudoHam.sub.ind
-
-          d_val1 = imag(c_val)
-          d_val2 = real(c_val)
-          d_val = SQRT(d_val1**2 + d_val2**2)
-
-       CASE ('haml')
-          double_from_normal_t2 = zero
-          RETURN
-       CASE DEFAULT
-          print *,"--Error in the table normal_results-- Unknown input: ",name_var
-       END SELECT
-
-       double_from_normal_t2 = d_val
-
-     END FUNCTION double_from_normal_t2
+    
 
   END subroutine ptc_normal
 !_________________________________________________________________

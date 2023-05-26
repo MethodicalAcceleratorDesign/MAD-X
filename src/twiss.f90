@@ -25,7 +25,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   double precision :: s0mat(6,6), eig_tol ! initial sigma matrix
   character(len=48) :: charconv
   character(len=150) :: warnstr
-  logical :: fast_error_func
+  logical :: fast_error_func, sc_setup
 
   double precision, external :: get_value
   integer, external :: get_option
@@ -73,6 +73,12 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   suml=zero; circ=zero; eta=zero; alfa=zero; gamtr=zero; wgt=zero
 
+  !---- Setup SC procedures
+  sc_setup = get_option('sc_setup ') .ne. 0
+  if(sc_setup) then
+     call SC_Setup_Procedure
+  endif
+  
   !---- Track chromatic functions
   chrom = get_option('twiss_chrom ')
 
@@ -1248,7 +1254,9 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   dqmin_rdt_c=0
   dqmin_det_c=0
   diff_bigger_sum = 0
-  
+  prev_pos_s = 0
+  tot_int_length = zero
+
   !--- initialize deltap because twcpin can be called directly from mad_emit
   deltap = get_value('probe ','deltap ')
 
@@ -3514,6 +3522,7 @@ SUBROUTINE tw_summ(rt,tt)
      ay0 = wy * sin(phiy)
      xiy = dmuy + frt(3,4) * (frt(3,4) * ay0 - tb * by0) / t2        &
           + (frt(3,3) * frtp(3,4) - frt(3,4) * frtp(3,3)) / bety
+!         print *," hrr xix 1 GIT= ",xix
      xiy = xiy / twopi
      alfa  = zero
      gamtr = zero
@@ -3524,15 +3533,18 @@ SUBROUTINE tw_summ(rt,tt)
   else
      sd = rt(5,6)
      sx = tt(1,1,6) + tt(2,2,6)
+!         print *," hrr xix 3 GIT= ",sx,tt(1,1,6),tt(2,2,6)
      sy = tt(3,3,6) + tt(4,4,6)
 
      do i = 1, 4
         sd = sd + rt(5,i) * disp(i)
+!         print *," hrr xix 4 GIT= ",i,sx,disp0(i)
         sx = sx + (tt(1,1,i) + tt(2,2,i)) * disp0(i)
         sy = sy + (tt(3,3,i) + tt(4,4,i)) * disp0(i)
      enddo
 
      xix = - sx / (twopi * sinmux)
+!         print *," hrr xix 2 GIT= ",xix,sx,twopi,sinmux
      xiy = - sy / (twopi * sinmuy)
      eta = - sd * beta**2 / suml
 
@@ -3588,7 +3600,6 @@ SUBROUTINE tw_summ(rt,tt)
   !     call fort_warn('Chromaticity calculation wrong due to coupling, ',&
   !                    'use chrom option or manual calculation')
   ! endif
-  
   dqmin2 = 4d0*abs(delta_tune_dqmin/twopi)*(abs(dqmin_rdt)/tot_int_length)
   dqmin_ph = atan2(aimag(dqmin_rdt), real(dqmin_rdt))
   if(diff_bigger_sum/dqmin_rdt_c .gt. 0.1 .and. dqmin2 .ge. 1e-8) then
@@ -3725,10 +3736,10 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
         call tmsrot(ftrk,orbit,fmap,ek,re,te)
 
      case (code_yrotation)
-        call tmyrot(ftrk,orbit,fmap,ek,re,te)
+        call tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,node_value('angle ')*node_value('other_bv '),1)
 
      case (code_xrotation)
-        call tmxrot(ftrk,orbit,fmap,ek,re,te)
+        call tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,-node_value('angle ')*node_value('other_bv '),2)
 
      case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
         call tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
@@ -4482,7 +4493,7 @@ end SUBROUTINE tmtilt
 SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   use twtrrfi
   use math_constfi, only : zero, one, two, three, half
-  use twissbeamfi, only : radiate, deltap, gamma, arad
+  use twissbeamfi, only : radiate, deltap, gamma, arad, beta
   use code_constfi
   implicit none
   !----------------------------------------------------------------------*
@@ -4510,13 +4521,16 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   integer :: i, code, n_ferr
   double precision :: f_errors(0:maxferr)
   double precision :: rfac, pt, tilt, bvk
-  double precision :: xkick, ykick, dpx, dpy, xau, div
+  double precision :: xkick, ykick, dpx, dpy, xau
 
   integer, external :: node_fd_errors
   double precision, external :: node_value, get_value
-  double precision :: bet0, bet_sqr, f_damp_t
+  double precision :: bet_sqr, f_damp_t, elrad
 
-  bet0  =  get_value('beam ','beta ')
+
+  elrad = node_value('lrad ')
+
+  if (elrad .eq. 0) elrad=el
 
   !--- Initialization
   rfac=0.d0
@@ -4528,7 +4542,6 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   else
      !---- Tracking desired, use corrector map.
      !---- Initialize.
-     div = el ; if (el .eq. zero) div = one
      bvk = node_value('other_bv ')
      tilt = -node_value('tilt ')
 
@@ -4557,8 +4570,8 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      end select
 
-     xkick=xkick+bvk*(f_errors(0)/div);
-     ykick=ykick+bvk*(f_errors(1)/div);
+     xkick=xkick+bvk*(f_errors(0));
+     ykick=ykick+bvk*(f_errors(1));
 
      xau = xkick
      xkick = xkick*cos(tilt)+ykick*sin(tilt)
@@ -4574,14 +4587,14 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      orbit(4) = orbit(4) + half * dpy
 
      !---- Half radiation effects at entrance.
-     if (radiate  .and.  el.ne.zero) then
-        rfac = arad * gamma**3 * (dpx**2 + dpy**2) / (three * el)
+     if (radiate  .and.  elrad.ne.zero) then
+        rfac = arad * gamma**3 * (dpx**2 + dpy**2) / (three * elrad)
         pt = orbit(6)
-        bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+        bet_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / beta;
      endif
 
      !---- Drift to end.
@@ -4591,10 +4604,10 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      endif
 
      !---- Half radiation effects at exit.
-     if (radiate  .and.  el.ne.zero) then
+     if (radiate  .and.  elrad.ne.zero) then
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / beta;
      endif
 
      !---- Half kick at exit.
@@ -6191,7 +6204,8 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
-  call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
+  call qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,dl,ek,re,te)
+
   if (fcentre) return
 
   !---- Half radiation effect at exit.
@@ -6217,7 +6231,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
 
 end SUBROUTINE tmquad
 
-SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
+SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, four, six, ten3m
   implicit none
@@ -6758,6 +6772,7 @@ end SUBROUTINE tmsol
 
 SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twissbeamfi, only : radiate, deltap, beta, gamma, dtbyds, arad
+  use twisslfi
   use math_constfi, only : zero, one, two, three, six
     use matrices, only : EYE
   implicit none
@@ -6790,6 +6805,13 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: rfac, kx, ky
   double precision :: pt, bet0, bet_sqr, f_damp_t
 
+  integer :: i,j
+  real(kind(1d0)) :: beti,bg2iptr2,c2,elpsi1,elpsi3,elpsi5,ps,ps2,ptb,ptr2,s2
+  real(kind(1d0)), dimension(2) :: pk
+  real(kind(1d0)), dimension(4) :: vmu,vpi,vtau
+  real(kind(1d0)), dimension(4,4) :: ms1,mpi
+  real(kind(1d0)), external :: sinc ! defined in util.f90
+
   bet0  =  get_value('beam ','beta ')
 
   beta0   = get_value('probe ','beta ')
@@ -6818,23 +6840,53 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   bvk = node_value('other_bv ')
   sks = sks * bvk
 
+  pt = orbit(6)
   !---- Set up C's and S's.
   sk = sks / two / (one + deltap)
-  skl = sk * el
+  if (exact_expansion) then
+     beti = 1d0/beta
+     ptb = pt + beti
+     pk = [ orbit(2)+sk*orbit(3), orbit(4)-sk*orbit(1) ]
+     ptr2 = pk(1)**2 + pk(2)**2
+     ps2 = 1d0 + (2*beti + pt)*pt - ptr2
+     ps = sqrt(ps2)
+     bg2iptr2 = 1d0/(beta*gamma)**2 + ptr2
+     elpsi1 = el / ps
+     elpsi3 = elpsi1 / ps2
+     elpsi5 = elpsi3 / ps2
+     skl = sk * elpsi1
+     sibk = sinc(skl) * elpsi1
+     c2 = cos(2*skl)
+     s2 = sin(2*skl)
+     ms1 = elpsi3*reshape([ &
+          -sk*s2,    c2,     sk*c2,     s2,    &
+          -sk*sk*c2, -sk*s2, -sk*sk*s2, sk*c2, &
+          -sk*c2,    -s2,    -sk*s2,    c2,    &
+          sk*sk*s2,  -sk*c2, -sk*sk*c2, -sk*s2 &
+          ], [4,4], order=[2,1])
+     mpi = reshape([ &
+          sk*sk, 0d0, 0d0,   -sk, &
+          0d0,   1d0, sk,    0d0, &
+          0d0,   sk,  sk*sk, 0d0, &
+          -sk,   0d0, 0d0,   1d0  &
+          ], [4,4])
+     vmu(1) = elpsi3*(c2*pk(1)+s2*pk(2))
+     vmu(3) = elpsi3*(c2*pk(2)-s2*pk(1))
+     vmu(2) = sk*vmu(3)
+     vmu(4) = -sk*vmu(1)
+     vpi = [ -sk*pk(2), pk(1), sk*pk(1), pk(2) ]
+  else
+     skl = sk * el
+     sibk = sinc(skl) * el
+  end if
   co = cos(skl)
   si = sin(skl)
-  if (abs(skl) .lt. ten5m) then
-     sibk = (one - skl**2/six) * el
-  else
-     sibk = si/sk
-  endif
 
   !---- Half radiation effect at entry.
   if (radiate .and. ftrk) then
      kx = ((sk**2)*orbit(1)-sk*orbit(4))*el;
      ky = ((sk**2)*orbit(3)+sk*orbit(2))*el;
      rfac = (arad * gamma**3 / three) * (kx**2 + ky**2) / el;
-     pt = orbit(6);
      bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
      f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
      orbit(2) = orbit(2) * f_damp_t;
@@ -6860,41 +6912,68 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   re_s(3,2) = - re_s(1,4)
   re_s(4,1) = sk * si**2
   re_s(2,3) = - re_s(4,1)
-  re_s(5,6) = el/(beta*gamma)**2
-
-  ek_s(5) = el*dtbyds
+  if (exact_expansion) then
+     ! re_s(1:4,1:4) will be updated later
+     ek_s(1:4) = [ sibk*(co*pk(1)+si*pk(2)), si*(co*pk(2)-si*pk(1)), sibk*(co*pk(2)-si*pk(1)), -si*(co*pk(1)+si*pk(2)) ]
+     ek_s(5) = el*dtbyds + elpsi1 * ( pt*(2*beti+pt)/gamma**2 - ptr2 ) / ( beta**2 * (beti*ps+ptb) )
+     re_s(1:4,6) = -ptb*vmu
+     re_s(5,1:4) = -elpsi3*ptb*vpi
+     re_s(5,6) = elpsi3 * bg2iptr2
+  else
+     re_s(5,6) = el/(beta*gamma)**2
+     ek_s(5) = el*dtbyds
+  end if
 
   !---- Second-order terms.
   if (fsec) then
-     temp = el * co * si / beta
-     te_s(1,4,6) = - temp
-     te_s(3,2,6) =   temp
-     te_s(1,1,6) =   temp * sk
-     te_s(2,2,6) =   temp * sk
-     te_s(3,3,6) =   temp * sk
-     te_s(4,4,6) =   temp * sk
-     te_s(2,3,6) =   temp * sk**2
-     te_s(4,1,6) = - temp * sk**2
+     if (exact_expansion) then
+        vtau(1) = (3d0*vmu(1))/ps2 - 2d0*sk*elpsi3*elpsi3*(s2*pk(1)-c2*pk(2))
+        vtau(3) = (3d0*vmu(3))/ps2 - 2d0*sk*elpsi3*elpsi3*(c2*pk(1)+s2*pk(2))
+        vtau(2) = sk*vtau(3)
+        vtau(4) = -sk*vtau(1)
+        te_s(1:4,6,6) = 0.5d0*((ptb*ptb)*vtau - vmu)
+        te_s(5,1:4,6) = (0.5d0*elpsi5*(3*ptb*ptb-ps2))*vpi
+        te_s(5,6,1:4) = te_s(5,1:4,6)
+        do i=1,4
+           te_s(1:4,i,6) = (-0.5d0*ptb)*(vpi(i)*vtau + ms1(:,i))
+           te_s(1:4,6,i) = te_s(1:4,i,6)
+           te_s(5,1:4,i) = (-1.5d0*elpsi5*ptb*vpi(i))*vpi - (0.5d0*elpsi3*ptb)*mpi(:,i)
+           do j=1,4
+              te_s(1:4,i,j) = 0.5d0*(ms1(:,i)*vpi(j) + ms1(:,j)*vpi(i) + mpi(i,j)*vmu + (vpi(i)*vpi(j))*vtau)
+           end do
+        end do
+        te_s(5,6,6) = -1.5d0*elpsi5*ptb*bg2iptr2
+     else
+        temp = el * co * si / beta
+        te_s(1,4,6) = - temp
+        te_s(3,2,6) =   temp
+        te_s(1,1,6) =   temp * sk
+        te_s(2,2,6) =   temp * sk
+        te_s(3,3,6) =   temp * sk
+        te_s(4,4,6) =   temp * sk
+        te_s(2,3,6) =   temp * sk**2
+        te_s(4,1,6) = - temp * sk**2
 
-     temp = el * (co**2 - si**2) / (two * beta)
-     te_s(1,2,6) = - temp
-     te_s(3,4,6) = - temp
-     te_s(1,3,6) = - temp * sk
-     te_s(2,4,6) = - temp * sk
-     te_s(3,1,6) =   temp * sk
-     te_s(4,2,6) =   temp * sk
-     te_s(2,1,6) =   temp * sk**2
-     te_s(4,3,6) =   temp * sk**2
+        temp = el * (co**2 - si**2) / (two * beta)
+        te_s(1,2,6) = - temp
+        te_s(3,4,6) = - temp
+        te_s(1,3,6) = - temp * sk
+        te_s(2,4,6) = - temp * sk
+        te_s(3,1,6) =   temp * sk
+        te_s(4,2,6) =   temp * sk
+        te_s(2,1,6) =   temp * sk**2
+        te_s(4,3,6) =   temp * sk**2
 
-     temp = el / (two * beta)
-     te_s(5,2,2) = - temp
-     te_s(5,4,4) = - temp
-     te_s(5,1,4) =   temp * sk
-     te_s(5,2,3) = - temp * sk
-     te_s(5,1,1) = - temp * sk**2
-     te_s(5,3,3) = - temp * sk**2
-     te_s(5,6,6) = - three * re_s(5,6) / (two * beta)
-     call tmsymm(te_s)
+        temp = el / (two * beta)
+        te_s(5,2,2) = - temp
+        te_s(5,4,4) = - temp
+        te_s(5,1,4) =   temp * sk
+        te_s(5,2,3) = - temp * sk
+        te_s(5,1,1) = - temp * sk**2
+        te_s(5,3,3) = - temp * sk**2
+        te_s(5,6,6) = - three * re_s(5,6) / (two * beta)
+        call tmsymm(te_s)
+     end if
   endif
 
 
@@ -6914,9 +6993,19 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
       re_t1(5,2) = -pxbeta
       call tmtrak(ek_t1,re_t1,te_t1,orbit,orbit)
       call tmcat(.true.,re_t1,te_t1,re,te,re,te)
+    end if
 
-
+    if (exact_expansion) then
+      orbit(1:4) = matmul(re_s(1:4,1:4),orbit(1:4))
+      orbit(5) = orbit(5) + ek_s(5)
+      do i=1,4
+         re_s(1:4,i) = re_s(1:4,i) + vpi(i)*vmu
+      end do
+    else
       call tmtrak(ek_s,re_s,te_s,orbit,orbit) ! Calls the normal solenoid
+    endif
+
+    if(abs(xtilt_rad) > ten5m) then
       call tmcat(.true.,re_s,te_s,re,te,re,te)
 
       !To tilt it back
@@ -6930,17 +7019,20 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
       call tmtrak(ek_t2,re_t2,te_t1 ,orbit,orbit)
       call tmcat(.true.,re_t2,te_t1,re,te,re,te)
-
     else
-      ek=ek_s
-      re=re_s
-      te=te_s
-      call tmtrak(ek,re,te,orbit,orbit)
-    endif
-  else
+      ek = ek_s
+      re = re_s
+      te = te_s
+    end if      
+  else ! ftrk == .false.
     ek=ek_s
     re=re_s
     te=te_s
+    if (exact_expansion) then
+      do i=1,4
+         re(1:4,i) = re(1:4,i) + vpi(i)*vmu
+      end do
+    end if
   endif
 
 
@@ -6962,10 +7054,12 @@ end SUBROUTINE tmsol0
 SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   use twissbeamfi, only : beta
+  use math_constfi, only : zero, one, two
+  use matrices, only : EYE
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
-  !     TRANSPORT map for translation.                         *
+  !     TRANSPORT map for translation.                                   *
   !     Treated in a purely linear way.                                  *
   !     Input:                                                           *
   !     ftrk      (logical) if true, track orbit.                        *
@@ -6980,23 +7074,80 @@ SUBROUTINE tmtrans(fsec,ftrk,orbit,fmap,ek,re,te)
   logical :: ftrk, fmap,fsec
   double precision :: orbit(6);
 
-  double precision :: x, y, z
+  double precision :: dx, dy, dz, pz, csq, csq32, csq52, beta_pt
   double precision :: node_value, ek(6), re(6,6), te(6,6,6)
+  double precision :: x, px, y, py, t, pt
 
+  RE=EYE
+  !---- Get translation parameters
+  dx    = node_value('dx ')
+  dy    = node_value('dy ')
+  dz    = node_value('ds ')
+ 
+  x  = orbit(1)
+  px = orbit(2)
+  y  = orbit(3)
+  py = orbit(4)
+  t  = orbit(5)
+  pt = orbit(6)
 
- !---- Get translation parameters
- x    = node_value('dx ')
- y    = node_value('dy ')
- z    = node_value('ds ')
+  fmap = .True.
+  csq = one + two*pt/beta + pt**2 - px**2 - py**2
+  pz  = sqrt(csq)
+  csq32 = csq**(3d0/2d0)
+  csq52 = two*csq**(5d0/2d0)
+  beta_pt = pt + 1d0/beta
 
- ek(1) = ek(1) - x
- ek(3) = ek(3) - y
- ek(5) = ek(5) - z/beta
-
-  !---- Track orbit.
- if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  if(ftrk) then
+     orbit(1) = orbit(1) - dx + dz*px/pz
+     orbit(3) = orbit(3) - dy + dz*py/pz
+     orbit(5) = orbit(5) - dz*(beta_pt)/pz
+  endif
+  
+  
+  re(1,2) = dz/pz + dz*px**2/csq32
+  re(1,4) = dz*px*py/csq32
+  re(1,6) = -dz*px*(beta_pt)/csq32
+  re(3,2) = dz*px*py/csq32
+  re(3,4) = dz/pz + dz*py**2/csq32
+  re(3,6) = -dz*py*(beta_pt)/csq32
+  re(5,2) = -dz*px*(beta_pt)/csq32
+  re(5,4) = -dz*py*(beta_pt)/csq32
+  re(5,6) = -dz/pz + dz*beta_pt**2/csq32
+  
+  if (fsec) then 
+     te = zero
+     te(1,2,2) = 3d0*dz*px/(2d0*csq32) + 3d0*dz*px**3/(csq52)
+     te(1,2,4) = dz*py/(2d0*csq32) + 3d0*dz*px**2*py/(csq52)
+     te(1,2,6) = -dz*(beta_pt)/(2d0*csq32) - dz*px**2*3d0*(beta_pt)/(csq52)
+     te(1,4,2) = te(1,2,4)
+     te(1,4,4) = dz*px/(2d0*csq32) + 3d0*dz*px*py**2/(csq52)
+     te(1,4,6) = -3d0*dz*px*py*(beta_pt)/(csq52)
+     te(1,6,2) = te(1,2,6)
+     te(1,6,4) = te(1,4,6)
+     te(1,6,6) = -dz*px/(2d0*csq32) - dz*px*3d0*(-beta_pt)*(beta_pt)/(csq52)
+     te(3,2,2) = dz*py/(2d0*csq32) + 3d0*dz*px**2*py/(csq52)
+     te(3,2,4) = dz*px/(2d0*csq32) + 3d0*dz*px*py**2/(csq52)
+     te(3,2,6) = -3d0*dz*px*py*(beta_pt)/(csq52)
+     te(3,4,2) = te(3,2,4)
+     te(3,4,4) = 3d0*dz*py/(2d0*csq32) + 3d0*dz*py**3/(csq52)
+     te(3,4,6) = -dz*(beta_pt)/(2d0*csq32) - dz*py**2*3d0*(beta_pt)/(csq52)
+     te(3,6,2) =  te(3,2,6)
+     te(3,6,4) =  te(3,4,6)
+     te(3,6,6) = -dz*py/(2d0*csq32) + dz*py*3d0*beta_pt**2/(csq52)
+     te(5,2,2) = -dz*(beta_pt)/(2d0*csq32) - 3d0*dz*px**2*(beta_pt)/(csq52)
+     te(5,2,4) = -3d0*dz*px*py*(beta_pt)/(csq52)
+     te(5,2,6) = -dz*px/(2d0*csq32) + dz*px*3d0*beta_pt**2/(csq52)
+     te(5,4,2) =  te(5,2,4)
+     te(5,4,4) = -dz*(beta_pt)/(2d0*csq32) - 3d0*dz*py**2*(beta_pt)/(csq52)
+     te(5,4,6) = -dz*py/(2d0*csq32) + dz*py*3d0*beta_pt**2/(csq52)
+     te(5,6,2) =  te(5,2,6)
+     te(5,6,4) =  te(5,4,6)
+     te(5,6,6) =  dz*(beta_pt)/csq32 + dz*(beta_pt)/(2d0*csq32) - dz*3d0*beta_pt**3/(csq52)
+  endif
 
 end SUBROUTINE tmtrans
+
 
 SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
@@ -7047,109 +7198,166 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
 
 end SUBROUTINE tmsrot
 
-SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
+SUBROUTINE tmxyrot(fsec,ftrk,orbit,fmap,ek,re,te,angle,iplane)
+  ! Common code for tmxrot and tmyrot
+  ! iplane=1 for YROTATION, iplane=2 for XROTATION
   use twisslfi
   use twissbeamfi, only : beta, gamma
-  use twiss0fi, only : align_max
   implicit none
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     TRANSPORT map for rotation about X-axis.                         *
-  !     Treated in a purely linear way.                                  *
-  !     Input:                                                           *
-  !     ftrk      (logical) if true, track orbit.                        *
-  !     Input/output:                                                    *
-  !     orbit(6)  (double)  closed orbit.                                *
-  !     Output:                                                          *
-  !     fmap      (logical) if true, element has a map.                  *
-  !     ek(6)     (double)  kick due to element.                         *
-  !     re(6,6)   (double)  transfer matrix.                             *
-  !     te(6,6,6) (double)  second-order terms.                          *
-  !----------------------------------------------------------------------*
-  logical :: ftrk, fmap
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: al_errors(align_max)
-  double precision :: angle, ca, sa, ta
-  double precision :: node_value
+  logical :: fsec, ftrk, fmap
+  integer :: iplane
+  double precision :: angle, orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  integer ix,ip,iy,iq
+  double precision :: ca, sa
+  real(kind(0d0)) :: beti,bg2i,ca2,pl2,pm2,ps0,ps1,pt,ptb,px0,px02,px1,px12,py,py2,sa2,sps0ps12,x0,xsps1
 
   !---- Initialize.
-  al_errors = 0d0
-
-  angle = node_value('angle ')
+  ix = 2*iplane-1
+  ip = 2*iplane
+  iy = 5-2*iplane
+  iq = 6-2*iplane
+  fmap = angle.ne.0
   if (angle .eq. 0) return
 
-  angle = angle * node_value('other_bv ')
-  !al_errors(4) = -angle
-  !---- Kick.
-  ca = cos(angle)
-  sa = sin(angle)
-  ta = tan(angle)
-
-  ek(4) = sa
-
-  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
-  !---- Transfer matrix.
-  re(3,3) = 1/ca
-  re(4,4) =   ca
-  re(4,6) =   sa/beta
-  re(5,3) =  -ta/beta
-
-  !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-
-end SUBROUTINE tmxrot
-
-SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
-  use twisslfi
-  use twissbeamfi, only : beta, gamma
-  use twiss0fi, only : align_max
-  implicit none
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     TRANSPORT map for rotation about Y-axis.                         *
-  !     Treated in a purely linear way.                                  *
-  !     Input:                                                           *
-  !     ftrk      (logical) if true, track orbit.                        *
-  !     Input/output:                                                    *
-  !     orbit(6)  (double)  closed orbit.                                *
-  !     Output:                                                          *
-  !     fmap      (logical) if true, element has a map.                  *
-  !     ek(6)     (double)  kick due to element.                         *
-  !     re(6,6)   (double)  transfer matrix.                             *
-  !     te(6,6,6) (double)  second-order terms.                          *
-  !----------------------------------------------------------------------*
-  logical :: ftrk, fmap
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-
-  double precision :: angle, ca, sa, ta
-  double precision :: node_value
-  double precision :: al_errors(align_max)
-
-  !---- Initialize.
-  angle = -node_value('angle ') !Note that we should have the negative angle here
-  if (angle .eq. 0) return
-  !al_errors = 0d0
-  angle = angle * node_value('other_bv ')
-  !al_errors(5) = - angle
-  !call tmali1(orbit,al_errors,beta,gamma,orbit,re)
+  x0 = orbit(ix)
+  px0 = orbit(ip)
+  py = orbit(iq)
+  pt = orbit(6)
+  
+  beti = 1/beta
+  bg2i = 1/(beta*beta*gamma*gamma)
+  ptb = beti+pt
+  pl2 = 1+(2*beti+pt)*pt
+  py2 = py*py
+  pm2 = pl2-py2
+  px02 = px0*px0
+  ps0 = sqrt(pm2-px02)
 
   !---- Kick.
   ca = cos(angle)
   sa = sin(angle)
-  ta = tan(angle)
 
-  ek(2) = sa
+  px1 = px0*ca - ps0*sa
+  ps1 = px0*sa + ps0*ca
+  px12 = px1*px1
+  xsps1 = x0*sa/ps1
+  sps0ps12 = 0.5d0*sa/(ps0*ps1*ps1)
+
+  ca2 = cos(0.5d0*angle)
+  sa2 = sin(0.5d0*angle)
+
+  ek(ix) = 2*sa2*x0*(ps0*sa2-px0*ca2)/ps1
+  ek(ip) = -2*sa2*(ps0*ca2+px0*sa2)
+  ek(iy) = -xsps1*py
+  ek(iq) = 0
+  ek(5) = xsps1*ptb
+  ek(6) = 0
+
+  if (ftrk) then
+     orbit(ix) = x0*ps0/ps1
+     orbit(ip) = px1
+     orbit(iy) = orbit(iy) + ek(iy)
+     orbit(5) = orbit(5) + ek(5)
+  end if
 
   !---- Transfer matrix.
-  re(1,1) = 1/ca
-  re(2,2) =   ca
-  re(2,6) =   sa/beta
-  re(5,1) =  -ta/beta
+  re = 0
+  re(ip,ip) = ps1/ps0
+  re(ip,iq) = sa*py/ps0
+  re(ip,6) = -sa*ptb/ps0
 
-  !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  if (fsec) te = 0
 
-end SUBROUTINE tmyrot
+  ! Using te as scratch space to avoid excess copying when fsec is true
+  te(ix,ix,ip) = -sps0ps12*pm2
+  te(ix,ix,iq) = -sps0ps12*px0*py
+  te(ix,ix,6) = sps0ps12*px0*ptb
+  te(iy,ix,ip) = -sps0ps12*px1*py
+  te(iy,ix,iq) = sps0ps12*(px0*px1-pl2*ca)
+  te(iy,ix,6) = sps0ps12*ca*py*ptb
+  te(5,ix,ip) = sps0ps12*px1*ptb
+  te(5,ix,iq) = sps0ps12*ca*py*ptb
+  te(5,ix,6) = -sps0ps12*(px0*px1+(bg2i+py2)*ca)
+
+  if (fsec) then
+     te(1:5:2,2:6:2,ix) = te(1:5:2,ix,2:6:2)
+     block
+       real(kind(0d0)) :: sps30,sps31,sps5
+       real(kind(0d0)) :: d0xx,d0xy,d0xt,d0yy,d0yt,d0tt
+       real(kind(0d0)) :: d0xxx,d0xxy,d0xxt,d0xyy,d0xyt,d0xtt,d0yyy,d0yyt,d0ytt,d0ttt
+
+       sps31 = sa/ps1**3
+       d0xx = -(pl2-py2)*sps31
+       d0xy = -px1*py*sps31
+       d0xt = px1*ptb*sps31
+       d0yy = -(pl2-px12)*sps31
+       d0yt = py*ptb*sps31
+       d0tt = -(bg2i+px12+py2)*sps31
+
+       sps5 = 0.5d0*sa/ps1**5
+       d0xxx = -3*px1*(pl2-py2)*sps5
+       d0xxy = -py*(pl2-py2+2*px12)*sps5
+       d0xxt = ptb*(pl2-py2+2*px12)*sps5
+       d0xyy = -px1*(pl2-px12+2*py2)*sps5
+       d0xyt = 3*px1*py*ptb*sps5
+       d0xtt = -px1*(2*ptb*ptb+bg2i+px12+py2)*sps5
+       d0yyy = -3*py*(pl2-px12)*sps5
+       d0yyt = ptb*(pl2-px12+2*py2)*sps5
+       d0ytt = -py*(2*ptb*ptb+bg2i+px12+py2)*sps5
+       d0ttt = 3*ptb*(bg2i+px12+py2)*sps5
+
+       sps30 = 0.5d0*sa/ps0**3
+       te(ip,ip,ip) = (pl2-py2)*sps30
+       te(ip,ip,iq) = px0*py*sps30
+       te(ip,ip,6) = -px0*ptb*sps30
+       te(ip,iq,ip) = te(ip,ip,iq)
+       te(ip,iq,iq) = (pl2-px02)*sps30
+       te(ip,iq,6) = -py*ptb*sps30
+       te(ip,6,ip) = te(ip,ip,6)
+       te(ip,6,iq) = te(ip,iq,6)
+       te(ip,6,6) = (bg2i+px02+py2)*sps30
+
+       te(ix,ip,ip) = x0*(d0xxx*re(ip,ip)*re(ip,ip)+d0xx*te(ip,ip,ip))
+       te(ix,ip,iq) = x0*(d0xxy*re(ip,ip)+d0xxx*re(ip,ip)*re(ip,iq)+d0xx*te(ip,ip,iq))
+       te(ix,ip,6) = x0*(d0xxt*re(ip,ip)+d0xxx*re(ip,ip)*re(ip,6)+d0xx*te(ip,ip,6))
+       te(ix,iq,ip) = te(ix,ip,iq)
+       te(ix,iq,iq) = x0*(d0xyy+2*d0xxy*re(ip,iq)+d0xxx*re(ip,iq)*re(ip,iq)+d0xx*te(ip,iq,iq))
+       te(ix,iq,6) = x0*(d0xyt+d0xxy*re(ip,6)+d0xxt*re(ip,iq)+d0xxx*re(ip,iq)*re(ip,6)+d0xx*te(ip,iq,6))
+       te(ix,6,ip) = te(ix,ip,6)
+       te(ix,6,iq) = te(ix,iq,6)
+       te(ix,6,6) = x0*(d0xtt+2*d0xxt*re(ip,6)+d0xxx*re(ip,6)*re(ip,6)+d0xx*te(ip,6,6))
+       te(iy,ip,ip) = x0*(d0xxy*re(ip,ip)*re(ip,ip)+d0xy*te(ip,ip,ip))
+       te(iy,ip,iq) = x0*(d0xyy*re(ip,ip)+d0xxy*re(ip,ip)*re(ip,iq)+d0xy*te(ip,ip,iq))
+       te(iy,ip,6) = x0*(d0xyt*re(ip,ip)+d0xxy*re(ip,ip)*re(ip,6)+d0xy*te(ip,ip,6))
+       te(iy,iq,ip) = te(iy,ip,iq)
+       te(iy,iq,iq) = x0*(d0yyy+2*d0xyy*re(ip,iq)+d0xxy*re(ip,iq)*re(ip,iq)+d0xy*te(ip,iq,iq))
+       te(iy,iq,6) = x0*(d0yyt+d0xyy*re(ip,6)+d0xyt*re(ip,iq)+d0xxy*re(ip,iq)*re(ip,6)+d0xy*te(ip,iq,6))
+       te(iy,6,ip) = te(iy,ip,6)
+       te(iy,6,iq) = te(iy,iq,6)
+       te(iy,6,6) = x0*(d0ytt+2*d0xyt*re(ip,6)+d0xxy*re(ip,6)*re(ip,6)+d0xy*te(ip,6,6))
+       te(5,ip,ip) = x0*(d0xxt*re(ip,ip)*re(ip,ip)+d0xt*te(ip,ip,ip))
+       te(5,ip,iq) = x0*(d0xyt*re(ip,ip)+d0xxt*re(ip,ip)*re(ip,iq)+d0xt*te(ip,ip,iq))
+       te(5,ip,6) = x0*(d0xtt*re(ip,ip)+d0xxt*re(ip,ip)*re(ip,6)+d0xt*te(ip,ip,6))
+       te(5,iq,ip) = te(5,ip,iq)
+       te(5,iq,iq) = x0*(d0yyt+2*d0xyt*re(ip,iq)+d0xxt*re(ip,iq)*re(ip,iq)+d0xt*te(ip,iq,iq))
+       te(5,iq,6) = x0*(d0ytt+d0xyt*re(ip,6)+d0xtt*re(ip,iq)+d0xxt*re(ip,iq)*re(ip,6)+d0xt*te(ip,iq,6))
+       te(5,6,ip) = te(5,ip,6)
+       te(5,6,iq) = te(5,iq,6)
+       te(5,6,6) = x0*(d0ttt+2*d0xtt*re(ip,6)+d0xxt*re(ip,6)*re(ip,6)+d0xt*te(ip,6,6))
+     end block
+  end if
+
+  re(ix,ix) = ps0/ps1
+  re(iy,ix) = -sa*py/ps1
+  re(iy,iy) = 1
+  re(iq,iq) = 1
+  re(5,5) = 1
+  re(5,ix) = sa*ptb/ps1
+  re(6,6) = 1
+  re(1:5:2,2:6:2) = (2*x0)*te(1:5:2,ix,2:6:2)
+
+end SUBROUTINE tmxyrot
 
 SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
@@ -7175,7 +7383,8 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   logical :: fsec, ftrk, fmap
   double precision :: dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: px, py, pt, csq, l_pz, c3sq, c52sq
+  double precision :: px, py, pt, csq, l_pz
+  real(kind(1d0)) :: beti, dl3, dl5, pp2, ptb, ptot2, px2, py2, pz
 
   !---- Initialize.
   EK = zero
@@ -7187,56 +7396,66 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
       px = orbit(2)
       py = orbit(4)
       pt = orbit(6)
+      px2 = px*px
+      py2 = py*py
 
-      csq = 1 + 2*pt/beta + pt**2 - px**2 - py**2
-      l_pz = dl / sqrt(csq)
-      c3sq = csq**(3d0/2d0)
-      c52sq =csq**(5d0/2d0)
+      beti = 1/beta
+      ptb = beti + pt
+      ptot2 = 1 + pt*(2*beti + pt)
+      pp2 = (beta*gamma)**(-2)+px2+py2
+      csq = ptot2 - px2 - py2
+      pz = sqrt(csq)
+      l_pz = dl / pz
+      dl3 = l_pz / csq
 
-      re(1,2) = dl/sqrt(csq) + dl*px**2/c3sq
-      re(1,4) = dl*px*py/c3sq
-      re(1,6) = dl*px*(-pt - 1d0/beta)/c3sq
-      re(3,2) = dl*px*py/c3sq
-      re(3,4) = dl/sqrt(csq) + dl*py**2/c3sq
-      re(3,6) = dl*py*(-pt - 1d0/beta)/c3sq
-      re(5,2) = -dl*px*(beta + pt)/c3sq
-      re(5,4) = -dl*py*(beta + pt)/c3sq
-      re(5,6) = -dl/sqrt(csq) - dl*(beta + pt)*(-pt - 1d0/beta)/c3sq
+
+      re(1,2) = dl3*(ptot2 - py2)
+      re(1,4) = dl3*px*py
+      re(1,6) = -dl3*px*ptb
+      re(3,2) = re(1,4)
+      re(3,4) = dl3*(ptot2 - px2)
+      re(3,6) = -dl3*py*ptb
+      re(5,2) = re(1,6)
+      re(5,4) = re(3,6)
+      re(5,6) = dl3*pp2
 
       if (fsec) then
-         te(1,2,2) = 3d0*dl*px/(2d0*c3sq) + 3d0*dl*px**3d0/(2d0*c52sq)
-         te(1,2,4) = dl*py/(2d0*c3sq) + 3d0*dl*px**2d0*py/(2d0*c52sq)
-         te(1,2,6) = dl*(-pt - 1d0/beta)/(2d0*c3sq) + dl*px**2d0*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(1,4,2) = dl*py/(2d0*c3sq) + 3d0*dl*px**2d0*py/(2d0*c52sq)
-         te(1,4,4) = dl*px/(2d0*c3sq) + 3d0*dl*px*py**2d0/(2d0*c52sq)
-         te(1,4,6) = dl*px*py*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(1,6,2) = dl*(-pt - 1d0/beta)/(2d0*c3sq) + 3d0*dl*px**2d0*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(1,6,4) = 3d0*dl*px*py*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(1,6,6) = -dl*px/(2d0*c3sq) + dl*px*(-3d0*pt - 3d0/beta)*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(3,2,2) = dl*py/(2d0*c3sq) + 3d0*dl*px**2d0*py/(2d0*c52sq)
-         te(3,2,4) = dl*px/(2d0*c3sq) + 3d0*dl*px*py**2d0/(2d0*c52sq)
-         te(3,2,6) = dl*px*py*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(3,4,2) = dl*px/(2d0*c3sq) + 3d0*dl*px*py**2d0/(2d0*c52sq)
-         te(3,4,4) = 3d0*dl*py/(2d0*c3sq) + 3d0*dl*py**3d0/(2d0*c52sq)
-         te(3,4,6) = dl*(-pt - 1d0/beta)/(2d0*c3sq) + dl*py**2d0*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(3,6,2) = 3d0*dl*px*py*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(3,6,4) = dl*(-pt - 1d0/beta)/(2d0*c3sq) + 3d0*dl*py**2d0*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(3,6,6) = -dl*py/(2d0*c3sq) + dl*py*(-3d0*pt - 3d0/beta)*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(5,2,2) = -dl*(beta + pt)/(2d0*c3sq) - 3d0*dl*px**2d0*(beta + pt)/(2d0*c52sq)
-         te(5,2,4) = -3d0*dl*px*py*(beta + pt)/(2d0*c52sq)
-         te(5,2,6) = -dl*px/(2d0*c3sq) - dl*px*(beta + pt)*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(5,4,2) = -3d0*dl*px*py*(beta + pt)/(2d0*c52sq)
-         te(5,4,4) = -dl*(beta + pt)/(2d0*c3sq) - 3d0*dl*py**2d0*(beta + pt)/(2d0*c52sq)
-         te(5,4,6) = -dl*py/(2d0*c3sq) - dl*py*(beta + pt)*(-3d0*pt - 3d0/beta)/(2d0*c52sq)
-         te(5,6,2) = -dl*px/(2d0*c3sq) - 3d0*dl*px*(beta + pt)*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(5,6,4) = -dl*py/(2d0*c3sq) - 3d0*dl*py*(beta + pt)*(-pt - 1d0/beta)/(2d0*c52sq)
-         te(5,6,6) = dl*(beta + pt)/(2d0*c3sq) - dl*(-pt - 1d0/beta)/c3sq - &
-         dl*(beta + pt)*(-3d0*pt - 3d0/beta)*(-pt - 1d0/beta)/(2d0*c52sq)
+         dl5 = 0.5d0*dl3/csq
+         te(1,2,2) = 3*dl5*px*(ptot2 - py2)
+         te(1,2,4) = dl5*py*(ptot2 + 2*px2 - py2)
+         te(1,2,6) = -dl5*ptb*(ptot2 + 2*px2 - py2)
+         te(1,4,2) = te(1,2,4)
+         te(1,4,4) = dl5*px*(ptot2 - px2 + 2*py2)
+         te(1,4,6) = -3*dl5*px*py*ptb
+         te(1,6,2) = te(1,2,6)
+         te(1,6,4) = te(1,4,6)
+         te(1,6,6) = dl5*px*(2*ptb*ptb + pp2)
+         te(3,2,2) = te(1,2,4)
+         te(3,2,4) = te(1,4,4)
+         te(3,2,6) = te(1,4,6)
+         te(3,4,2) = te(3,2,4)
+         te(3,4,4) = 3*dl5*py*(ptot2 - px2)
+         te(3,4,6) = -dl5*ptb*(ptot2 - px2 + 2*py2)
+         te(3,6,2) = te(3,2,6)
+         te(3,6,4) = te(3,4,6)
+         te(3,6,6) = dl5*py*(2*ptb*ptb + pp2)
+         te(5,2,2) = te(1,2,6)
+         te(5,2,4) = te(1,4,6)
+         te(5,2,6) = te(1,6,6)
+         te(5,4,2) = te(5,2,4)
+         te(5,4,4) = te(3,4,6)
+         te(5,4,6) = te(3,6,6)
+         te(5,6,2) = te(5,2,6)
+         te(5,6,4) = te(5,4,6)
+         te(5,6,6) = -3*dl5*pp2*ptb
       endif
 
-      orbit(1) = orbit(1) + px*l_pz
-      orbit(3) = orbit(3) + py*l_pz
-      orbit(5) = orbit(5) + (dl/beta - (1d0/beta + pt) * l_pz)
+      ek(1) = px*l_pz
+      ek(3) = py*l_pz
+      ek(5) = dl*dtbyds + l_pz*(pt*(2*beti+pt)/(gamma*gamma) - px2 - py2)/(beta*beta*(ptb + beti*pz))
+
+      if (ftrk) orbit(1:5:2) = orbit(1:5:2) + ek(1:5:2)
+
   else
 
      re(1,2) = dl
@@ -9291,4 +9510,3 @@ SUBROUTINE twcptk_print(re,r0mat, e, f)
 
 
 end SUBROUTINE twcptk_print
-

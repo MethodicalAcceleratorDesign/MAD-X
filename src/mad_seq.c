@@ -357,7 +357,7 @@ expand_line(struct char_p_array* l_buff)
       if (b_level->i[i] == level && (pos = lbpos->i[i]) > 1) {
         if (*l_buff->p[pos-1] == '*') {
           sscanf(l_buff->p[pos-2], "%d", &rep);
-	  add = rep - 1;
+          add = rep - 1;
           number = rbpos->i[i] - pos - 1; /* inside bracket */
           n = number * add; /* extra tokens */
           while (l_buff->curr + n >= l_buff->max) grow_char_p_array(l_buff);
@@ -481,7 +481,7 @@ expand_sequence(struct sequence* sequ, int flag)
 
   if (debug)
     printf("\n\nTOP Expand_sequence name %s with length %e, ref_flag %d\n",
-	   sequ->name, sequ->length, sequ->ref_flag);
+           sequ->name, sequ->length, sequ->ref_flag);
 
   p = sequ->ex_start = clone_node(sequ->start, 0);
   add_to_node_list(p, 0, sequ->ex_nodes);
@@ -496,25 +496,25 @@ expand_sequence(struct sequence* sequ, int flag)
     if (p->p_sequ == NULL) { // simple element, not a subsequence
       // 2015-Jun-09  14:14:24  ghislain: guard added for negative element length
       if (p->length < 0)
-	fatal_error("trying to add node with negative length to current sequence:", p->name);
+        fatal_error("trying to add node with negative length to current sequence:", p->name);
 
       add_to_node_list(p, 0, sequ->ex_nodes);
     }
     else { // subsequence
       if (p->p_sequ->refpos != NULL) { // REFPOS given for subsequence, ignore REFER of current sequence
-	if (debug)
-	  printf("\n\n Expand sub-sequence %s with initial position %e, final position %e, length %e, ref_flag %d, refpos '%s'\n",
-		 p->name, p->position, p->position - sequ->ref_flag*p->p_sequ->length/2.,
-		 p->length, sequ->ref_flag, p->p_sequ->refpos);
-	p = expand_node(p, sequ, sequ, p->position - sequ->ref_flag*p->p_sequ->length/2. );
-	if (debug) printf("\n\n");
+        if (debug)
+          printf("\n\n Expand sub-sequence %s with initial position %e, final position %e, length %e, ref_flag %d, refpos '%s'\n",
+                 p->name, p->position, p->position - sequ->ref_flag*p->p_sequ->length/2.,
+                 p->length, sequ->ref_flag, p->p_sequ->refpos);
+        p = expand_node(p, sequ, sequ, p->position - sequ->ref_flag*p->p_sequ->length/2. );
+        if (debug) printf("\n\n");
       }
       else { // no REFPOS given
-	if (debug)
-	  printf("\n\n Expand sub-sequence %s with position %e, length %e, ref_flag %d\n",
-		 p->name, p->position, p->length, sequ->ref_flag);
-	p = expand_node(p, sequ, sequ, p->position);
-	if (debug) printf("\n\n");
+        if (debug)
+          printf("\n\n Expand sub-sequence %s with position %e, length %e, ref_flag %d\n",
+                 p->name, p->position, p->length, sequ->ref_flag);
+        p = expand_node(p, sequ, sequ, p->position);
+        if (debug) printf("\n\n");
       }
     }
   }
@@ -578,20 +578,32 @@ seq_flatten(struct sequence* sequ)
 }
 
 static void
-insert_elem(struct sequence* sequ, struct node* node)
-  /* inserts an element in a sequence as function of its position */
+insert_elem(struct sequence* sequ, struct node* node, int last)
+  /* inserts an element in a sequence as function of its position
+   * if there is another element in the same localtion, if last is True */
 {
   struct node* c_node = sequ->start->next;
 
-  while (c_node != NULL) {
-    if (node->position <= c_node->position || c_node == sequ->end) break;
-    c_node = c_node->next;
-  }
+  if (last)
+      for(; c_node && c_node != sequ->end && node->position >= c_node->position; c_node = c_node->next );
+  else
+      for(; c_node && c_node != sequ->end && node->position > c_node->position; c_node = c_node->next );
+
+  //while (c_node != NULL) {
+  //  if (node->position <= c_node->position || c_node == sequ->end) break;
+  //  c_node = c_node->next;
+  //}
+
+//  if (last)
+//      for(; c_node && (c_node != sequ->end || node->position >= c_node->position); c_node = c_node->next );
+//  else
+//      for(; c_node && (c_node != sequ->end || node->position > c_node->position); c_node = c_node->next );
+
   link_in_front(node, c_node);
 }
 
 static struct node*
-install_one(struct element* el, char* from_name, double at_value, struct expression* at_expr, double position)
+install_one(struct element* el, char* from_name, double at_value, struct expression* at_expr, double position, int last)
   /* adds an element to a sequence */
 {
   struct node* node;
@@ -611,7 +623,7 @@ install_one(struct element* el, char* from_name, double at_value, struct express
   node->at_expr = at_expr;
   node->from_name = from_name;
   set_command_par_value("at", el->def, position);
-  insert_elem(edit_sequ, node);
+  insert_elem(edit_sequ, node, last);
   return node;
 }
 
@@ -625,7 +637,7 @@ make_sequ_from_line(char* name)
   int mpos = name_list_pos("marker", defined_commands->list);
   struct command* clone = clone_command(defined_commands->commands[mpos]);
   struct element* el;
-  
+
   if (pos < 0) fatal_error("unknown line: ", name);
   line = line_list->macros[pos];
   line->dead = 1;   /* prevent line from further conversion to sequence */
@@ -658,10 +670,10 @@ make_sequ_from_line(char* name)
   current_sequ->end = current_node;
   current_sequ->start->previous = current_sequ->end;
   current_sequ->end->next = current_sequ->start;
-  
+
   /*current_sequ->line = 1;  remember origin of sequence */
   //printf("skowron: warning make_sequ_from_line line=0 \n");
-  current_sequ->line = 0; // remember origin of sequence 
+  current_sequ->line = 0; // remember origin of sequence
 
   if(line_buffer) delete_char_p_array(line_buffer,1);
 }
@@ -798,7 +810,11 @@ export_sequence(struct sequence* sequ, FILE* file, int noexpr)
         strcat(c_dum->c, c_node->from_name);
       }
       if(c_node->perm_misalign==1) write_permalign_node(c_node);
-
+      //if(c_node->ktap!=0) {
+      //    strcat(c_dum->c, ", ktap = ");
+      //    sprintf(num, v_format("%F"), c_node->ktap);
+      //    strcat(c_dum->c, supp_tb(num));
+      //};
       if (exp_par_flag) export_el_def(c_node->p_elem, c_dum->c, noexpr);
       write_nice(c_dum->c, file);
     }
@@ -916,7 +932,7 @@ seq_cycle(struct in_cmd* cmd)
         strcpy(clone->p_elem->name, c_dum->c);
 
         /* IA 29.11.07 : fixes a bug with aperture module */
-	     /* Removed HG 11.10.2009 */
+             /* Removed HG 11.10.2009 */
         /* sprintf(c_dum->c, " ");
            set_command_par_string("apertype", clone->p_elem->def,c_dum->c); */
 
@@ -979,9 +995,12 @@ seq_install(struct in_cmd* cmd)
   double at, from = zero;
   char name[NAME_L], *pname, *name_e = NULL, *name_c = NULL, *from_name = NULL;
   int k, any = 0;
+  int last; // if last is true, an element at the same location is installed in the end
 
   name_e = command_par_string_user("element", cmd->clone);
   name_c = command_par_string_user("class", cmd->clone);
+
+  last = command_par_value("last", cmd->clone);
 
   if (name_e) {
     if (name_c) {
@@ -1016,26 +1035,26 @@ seq_install(struct in_cmd* cmd)
     if (strcmp(from_name, "selected") == 0) {
       if (seqedit_select->curr == 0) {
         warning("no active select commands:", "ignored");
-	return;
+        return;
       }
       if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) == 0) any = 1;
       c_node = edit_sequ->start;
       while (c_node != NULL) {
-	if (any || name_list_pos(c_node->name, selected_ranges->list) > -1) {
-	  for (k = 0; k < seqedit_select->curr; k++) {
-	    myrepl(":", "[", c_node->name, name);
-	    strcat(name, "]");
-	    if (strchr(name, '$') == NULL && pass_select_el(c_node->p_elem, seqedit_select->commands[k])) break;
-	  }
-	  if (k < seqedit_select->curr) {
-	    from = get_node_pos(c_node, edit_sequ);
-	    pname = permbuff(name);
-	    install_one(el, pname, at, expr, at+from);
-	    seqedit_install++;
-	  }
-	}
-	if (c_node == edit_sequ->end) break;
-	c_node = c_node->next;
+        if (any || name_list_pos(c_node->name, selected_ranges->list) > -1) {
+          for (k = 0; k < seqedit_select->curr; k++) {
+            myrepl(":", "[", c_node->name, name);
+            strcat(name, "]");
+            if (strchr(name, '$') == NULL && pass_select_el(c_node->p_elem, seqedit_select->commands[k])) break;
+          }
+          if (k < seqedit_select->curr) {
+            from = get_node_pos(c_node, edit_sequ);
+            pname = permbuff(name);
+            install_one(el, pname, at, expr, at+from, last);
+            seqedit_install++;
+          }
+        }
+        if (c_node == edit_sequ->end) break;
+        c_node = c_node->next;
       }
 
     } else {
@@ -1044,11 +1063,11 @@ seq_install(struct in_cmd* cmd)
         warning("ignoring 'from' reference to unknown element:", from_name);
         return;
       }
-      install_one(el, from_name, at, expr, at+from);
+      install_one(el, from_name, at, expr, at+from, last);
       seqedit_install++;
     }
   } else {
-    install_one(el, from_name, at, expr, at);
+    install_one(el, from_name, at, expr, at, last);
     seqedit_install++;
   }
 }
@@ -1064,8 +1083,10 @@ seq_move_noexpression(struct in_cmd* cmd)
   struct element* el;
   int pos;
   char tmp[2*NAME_L];
+  int last;
 
   name = command_par_string_user("element", cmd->clone);
+  last = command_par_value("last", cmd->clone);
   if (name)
   {
     if (strcmp(name, "selected") == 0)
@@ -1098,7 +1119,7 @@ seq_move_noexpression(struct in_cmd* cmd)
             if (any
                 || name_list_pos(node->name, selected_ranges->list) > -1)
             {
-              
+
               name = NULL;
               for (k = 0; k < seqedit_select->curr; k++)
               {
@@ -1114,7 +1135,7 @@ seq_move_noexpression(struct in_cmd* cmd)
 
                 if (remove_one(node) > 0)
                 {
-                  node = install_one(el, NULL, at, NULL, at);
+                  node = install_one(el, NULL, at, NULL, at,last);
                   node->moved = 1;
                   seqedit_move++;
                 }
@@ -1131,7 +1152,7 @@ seq_move_noexpression(struct in_cmd* cmd)
                   el = node->p_elem;
                   if (remove_one(node) > 0)
                   {
-                    node = install_one(el, NULL, at, NULL, at);
+                    node = install_one(el, NULL, at, NULL, at,last);
                     node->moved = 1;
                     seqedit_move++;
                   }
@@ -1176,10 +1197,10 @@ seq_move_noexpression(struct in_cmd* cmd)
 
         }
         el = node->p_elem;
-       
+
         if (remove_one(node) > 0)
         {
-          install_one(el, NULL, at, NULL, at);
+          install_one(el, NULL, at, NULL, at,last);
           seqedit_move++;
         }
       }
@@ -1196,15 +1217,14 @@ seq_move_expression(struct in_cmd* cmd)
       struct node *node, *next, *node2, *next2;
       struct element* el;
       int pos, is_ref_from_moved,max_c=100;
-      struct expression* tmp = NULL; 
+      struct expression* tmp = NULL;
       struct expression* expr = NULL;
       struct expression* newexp = NULL;
-      struct name_list* movelist;  
-     
-
-
+      struct name_list* movelist;
+      int last;
 
       name = command_par_string_user("element", cmd->clone);
+      last = command_par_value("last", cmd->clone);
       if (name)
       {
         if (strcmp(name, "selected") == 0)
@@ -1266,7 +1286,7 @@ seq_move_expression(struct in_cmd* cmd)
                       free(result);
                     }
                     if(tmp==NULL)
-                    { 
+                    {
                      char *result = malloc(max_c * sizeof(char));
                      sprintf(result, "%.16f", node->position);
                      tmp = new_expression(result,NULL);
@@ -1300,12 +1320,12 @@ seq_move_expression(struct in_cmd* cmd)
                             if (node2->p_elem != NULL) name = node2->p_elem->name;
                             if (name != NULL && strchr(name, '$') == NULL &&
                               pass_select_el(node2->p_elem,
-                                seqedit_select->commands[k])) 
+                                seqedit_select->commands[k]))
                             {
                               if(strcmp(from_name, name)==0)
                               {
                                 is_ref_from_moved=1;
-                                
+
                               }
                                 break;
                             }
@@ -1337,7 +1357,7 @@ seq_move_expression(struct in_cmd* cmd)
                       expr = clone_expression(command_par_expr("by", cmd->clone));
                       tmp = clone_expression(node->at_expr);
                         if(expr==NULL)
-                        { 
+                        {
 
                           char *result = malloc(max_c * sizeof(char));
                           sprintf(result, "%.16f", by);
@@ -1345,7 +1365,7 @@ seq_move_expression(struct in_cmd* cmd)
                           free(result);
                         }
                         if(tmp==NULL)
-                        { 
+                        {
                           char *result = malloc(max_c * sizeof(char));
                           sprintf(result, "%.16f", node->at_value);
 
@@ -1358,13 +1378,13 @@ seq_move_expression(struct in_cmd* cmd)
                         //printf("heeeereee %e %e\n", expression_value(tmp, 2), expression_value(expr, 2));
                         //printf("heeeereeea %.16e, %.16e \n", expression_value(newexp, 2), at);
                         //dump_expression(newexp);
-                      
+
                     }
                   }
 
                   if (remove_one(node) > 0)
-                  { 
-                     install_one(el, from_name, at, newexp, at);
+                  {
+                     install_one(el, from_name, at, newexp, at, last);
 
                     node->moved = 1;
                     seqedit_move++;
@@ -1409,7 +1429,7 @@ seq_move_expression(struct in_cmd* cmd)
 
             }
             if(from_name==NULL) newexp = clone_expression(command_par_expr("to", cmd->clone));
-            
+
             from_name = NULL;
             at = to + from;
           }
@@ -1421,17 +1441,17 @@ seq_move_expression(struct in_cmd* cmd)
             tmp = clone_expression(node->at_expr);
             expr = clone_expression(command_par_expr("by", cmd->clone));
             if(expr==NULL)
-            { 
+            {
 
               char *result = malloc(max_c * sizeof(char));
               sprintf(result, "%.16f", by);
               expr = new_expression(result,NULL);
               free(result);
-              
+
             }
             if(tmp==NULL)
-            { 
-              
+            {
+
               char *result = malloc(max_c * sizeof(char));
               sprintf(result, "%.16f", node->at_value);
               tmp = new_expression(result,NULL);
@@ -1443,7 +1463,7 @@ seq_move_expression(struct in_cmd* cmd)
           el = node->p_elem;
           if (remove_one(node) > 0)
           {
-            install_one(el, from_name, at, newexp, at);
+            install_one(el, from_name, at, newexp, at, last);
             seqedit_move++;
           }
         }
@@ -1595,16 +1615,16 @@ seq_replace(struct in_cmd* cmd)
     c_node = edit_sequ->start;
     while (c_node != NULL) {
       if (any || name_list_pos(c_node->name, selected_ranges->list) > -1) {
-	name = NULL;
-	for (k = 0; k < seqedit_select->curr; k++) {
-	  if (c_node->p_elem != NULL) name = c_node->p_elem->name;
-	  if (name != NULL && strchr(name, '$') == NULL &&
-	      pass_select_el(c_node->p_elem, seqedit_select->commands[k]) ) break;
-	}
-	if (k < seqedit_select->curr) {
-	  rep_els[rep_cnt] = el;
-	  rep_nodes[rep_cnt++] = c_node;
-	}
+        name = NULL;
+        for (k = 0; k < seqedit_select->curr; k++) {
+          if (c_node->p_elem != NULL) name = c_node->p_elem->name;
+          if (name != NULL && strchr(name, '$') == NULL &&
+              pass_select_el(c_node->p_elem, seqedit_select->commands[k]) ) break;
+        }
+        if (k < seqedit_select->curr) {
+          rep_els[rep_cnt] = el;
+          rep_nodes[rep_cnt++] = c_node;
+        }
       }
       if (c_node == edit_sequ->end) break;
       c_node = c_node->next;
@@ -1622,11 +1642,11 @@ seq_replace(struct in_cmd* cmd)
       node = edit_sequ->nodes->nodes[pos];
       name = command_par_string_user("by", cmd->clone);
       if (name) {
-	if ((el = find_element(name, element_list)) != NULL) {
-	  rep_els[rep_cnt] = el;
-	  rep_nodes[rep_cnt++] = node;
-	}
-	else warning("ignoring unknown 'by' element: ",name);
+        if ((el = find_element(name, element_list)) != NULL) {
+          rep_els[rep_cnt] = el;
+          rep_nodes[rep_cnt++] = node;
+        }
+        else warning("ignoring unknown 'by' element: ",name);
       }
       else warning("'by' missing, ","ignored");
     }
@@ -1677,7 +1697,7 @@ add_drifts(struct node* c_node, struct node* end,struct sequence* sequ)
 
   int debug;
   debug = get_option("debug");
-  double sequencelength = sequence_length(sequ); 
+  double sequencelength = sequence_length(sequ);
   if (!c_node) return 0;
 
   for (cnt=1; c_node != end && c_node->next; c_node = c_node->next, cnt++) {
@@ -1685,7 +1705,7 @@ add_drifts(struct node* c_node, struct node* end,struct sequence* sequ)
     double drift_end = c_node->next->position - c_node->next->length / 2;
     double drift_len = drift_end-drift_beg;
 
-    if(fabs((drift_len) + sequencelength) < tol){ //If the drift is exactly -length of the accelerator -> do nothing. 
+    if(fabs((drift_len) + sequencelength) < tol){ //If the drift is exactly -length of the accelerator -> do nothing.
       (void)0;
     }
     else if (drift_len < -tol) {
@@ -1693,10 +1713,10 @@ add_drifts(struct node* c_node, struct node* end,struct sequence* sequ)
       sprintf(buf, " %s and %s, length %e", c_node->name, c_node->next->name, drift_len);
 
       if (debug) {
-	printf("\ncurrent node name %s position: %e length %e \n",
-	       c_node->name, c_node->position, c_node->length);
-	printf("next    node name %s position: %e length %e \n\n",
-	       c_node->next->name, c_node->next->position, c_node->next->length);
+        printf("\ncurrent node name %s position: %e length %e \n",
+               c_node->name, c_node->position, c_node->length);
+        printf("next    node name %s position: %e length %e \n\n",
+               c_node->next->name, c_node->next->position, c_node->next->length);
       }
 
      fatal_error("negative drift between elements", buf);
@@ -1708,7 +1728,7 @@ add_drifts(struct node* c_node, struct node* end,struct sequence* sequ)
       link_in_front(drift_node, c_node->next);
       drift_node->position = drift_beg + drift_len / 2;
       if (debug) printf("inserting a drift of length %e at position %e \n \n",
-			drift_len,drift_beg + drift_len / 2);
+                        drift_len,drift_beg + drift_len / 2);
       c_node = c_node->next;    // avoid double counting implicit drifts
       cnt++;
     }
@@ -1767,7 +1787,7 @@ use_sequ(struct in_cmd* cmd)
          pro_use_survey();
          if (par_present("survtest", cmd->clone)) survtest_();
          exec_delete_table("survey");
-     	}
+        }
     }
     else warning("unknown sequence skipped:", name);
   }
@@ -1936,11 +1956,11 @@ enter_sequence(struct in_cmd* cmd)
   else if (strcmp(toks[aux_pos+2], "sequence") == 0) {
     for (i = aux_pos+3; i < cmd->tok_list->curr; i++) {
       if (strcmp(toks[i], "refer") == 0) {
-	if (i+2 < cmd->tok_list->curr) {
-	  if      (strcmp(toks[i+2], "entry") == 0)  k = 1;
-	  else if (strcmp(toks[i+2], "exit")  == 0)  k = -1;
-	}
-	break;
+        if (i+2 < cmd->tok_list->curr) {
+          if      (strcmp(toks[i+2], "entry") == 0)  k = 1;
+          else if (strcmp(toks[i+2], "exit")  == 0)  k = -1;
+        }
+        break;
       }
     }
 
@@ -2081,7 +2101,7 @@ exec_save(struct in_cmd* cmd)
       store_orbit_correctors();
     }
   }
-  
+
   //store_orbit_correctors();
 
   filename = command_par_string_user("file", cmd->clone);
@@ -2154,7 +2174,7 @@ exec_save(struct in_cmd* cmd)
     while (c_node != NULL) {
       if ((el = c_node->p_elem) != NULL && strchr(el->name, '$') == NULL
           && strcmp(el->base_type->name, "drift") != 0) {
-         
+
 
         while (el->base_type != el) {
           add_to_el_list(&el, 0, ell, 0);
@@ -2331,7 +2351,7 @@ expand_curr_sequ(int flag)
 
 int get_nnodes(void){
   return current_sequ->n_nodes;
-} 
+}
 
 void
 reset_errors(struct sequence* sequ)

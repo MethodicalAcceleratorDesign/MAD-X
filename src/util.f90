@@ -13,7 +13,7 @@ module math_constfi ! 2015-Aug-06 Ghislain
   double precision, parameter :: twopi = two*pi
   double precision, parameter :: degrad = 180d0/pi, raddeg = pi/180d0
   double precision, parameter :: e = 2.718281828459045235360287471352662497757247093699959574966967d0
-  double precision, parameter :: sqrt2 = sqrt(2.d0)
+  double precision, parameter :: sqrt2 = sqrt(2.0d0)
 end module math_constfi
 
 module phys_constfi
@@ -211,8 +211,8 @@ module Inf_NaN_Detection
   !!
   implicit none
 
-  private
-
+! private
+  public !speedup hrr Nov 2021
   public :: isnan, isinf, isposinf, isneginf, sp, dp
 
   ! Order set-up
@@ -794,6 +794,8 @@ module SCdat
   integer, parameter :: idim=6,isigmatfit=50000,nptot=500000
   integer, parameter :: Nintegrate=1000000
   integer, parameter :: mmax=77,mmum=15,kmaxo=20;
+  integer, parameter :: mytracksumm_maxlineso=16000008; ! hrr Sep 2021
+! Note there is also a different (as a constant) definition of Pi in math_constfi
   double precision, parameter :: Pi = 4d0 * atan(1d0), EulerGamma =&
        & 0.57721566490153286060651209008240243104215933593992d0
   double precision, parameter :: dampf=0.85d0, dampeta=0.25d0, epsz=1d-15 !(* damping factor *)
@@ -2199,7 +2201,8 @@ double precision function lInt(n,r,u,v)
         result=result+scbinom(ii,j)*u**i1*v**i2
      enddo
      result=result+scbinom(ii,n+1)*v**i
-     lInt=lIntdfact(n)*(-1d0+r**2)**n*result
+!    lInt=lIntdfact(n)*(-1d0+r**2)**n*result
+     lInt=lIntdfact(n)*(-1d0+r*r)**n*result  !speedup hrr Nov 2021
   CASE DEFAULT
      call aafail('lInt: Fatal: ',                                     &
           'Out of range in function lInt: Program stops')
@@ -2226,7 +2229,8 @@ double precision function eInt(n,r,u,v)
         result=result+scbinom(i,j)*u**i1*v**i2
      enddo
      result=result+scbinom(i,n+1)*v**i
-     eInt=eIntdfact(n)*(-1d0+r**2)**n*u*result
+!    eInt=eIntdfact(n)*(-1d0+r**2)**n*u*result
+     eInt=eIntdfact(n)*(-1d0+r*r)**n*u*result  !speedu hrr Nov 2021
   CASE DEFAULT
      call aafail('eInt: Fatal: ',                                     &
           'Out of range in function eInt: Program stops')
@@ -2246,5 +2250,61 @@ double precision function bips(a, mmax1)
        &a*(1892352d0/dble(7+mmax1)+a*(-(1757184d0/dble(8+mmax1))+&
        &a*(1647360d0/dble(9+mmax1)+17d0*a*(-(91520d0/dble(10+mmax1))+19d0*&
        &a*(4576d0/dble(11+mmax1)+7d0*a*(-(624d0/dble(12+mmax1))+(598d0*&
-       &a)/dble(13+mmax1)-(575d0*a**2)/dble(14+mmax1)))))))))))))/8388608d0;
+       &a)/dble(13+mmax1)-(575d0*a*a)/dble(14+mmax1)))))))))))))/8388608d0;  !speedup hrr Nov 2021
+!      &a)/dble(13+mmax1)-(575d0*a**2)/dble(14+mmax1)))))))))))))/8388608d0;
 end function bips
+
+module sodd
+! Copied from Frank Schmidt hrr March 2022
+  implicit none
+  public
+  integer mh,icc,icd,ifacd2,ifact4,ifacta,ihv,iplane,isig,itij,ityc,&
+       &iu_on,n1,n2,nblz,mmul,mmul2,mmult,mmultf,mmultw,mmultx
+  double precision beta,betexp,bstr,cosav,det,det1,etl,etl1,etl2,   &
+       &fac2,fac4,facd2,fact,fact0,factb,four,ham,one,              &
+       &phi,pi,pi2,pihi,qx,qy,sbeta,sign,two,zero,pieni
+  real tlim,time0,time1,time2,time3,time4
+  real tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
+  integer j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
+  integer table_size_70,table_size_71,table_size_72,table_size_73,  &
+       &table_size_74,table_size_75,table_size_76,table_size_77,    &
+       &table_size_78,table_size_79
+  character*16 strn
+  character*18 comment
+  parameter(pieni=1d-34,nblz=40000,mmul=11,mh=100)
+  parameter(mmul2=mmul+1,mmult=8*mmul**2)
+  parameter(mmultw=2*mmul,mmultx=mmult/7,mmultf=2*mmultx*mmult)
+  common/c0/ pi,pi2,pihi,zero,one,two,four,comment(-mmul:mmul)
+  common/c1/ tlim,time0,time1,time2,time3,time4
+  common/c2/ tim1,tim2,tim3,tim4,tim5,tim6,tim7,tim8
+  common/c3/ bstr(-mmul:mmul,nblz),strn(-mmul:mmul,nblz)
+  common/c4/ beta(2,-mmul:mmul,nblz),sbeta(2,-mmul:mmul,nblz)
+  common/c4q/ phi(2,-mmul:mmul,nblz)
+  common/c5/ etl(-mmul:mmul,nblz),ityc(-mmul:mmul)
+  common/c6/ etl1,etl2,qx,qy,iu_on,n1,n2
+  common/c7/ icc,icd(mmultx),itij(mmultx,mmult,6),isig(mmultx,mmult)
+  common/c8/ betexp(mmultx,4),fac4(mmultx,mmult),fac2(mmultx)
+  common/c9/ fact(0:mmul,0:mmul2),sign(4,4),cosav(0:mmul)
+  common/c10/ ifacd2(4,mmultf),facd2(2,mmultf),ham(2,mmultf)
+  common/c11/ det1(2,0:mmul),det(2,-mmul:mmul,0:mmul,0:mmul)
+  common/c12/ ihv(mmultx),iplane(mmultx,2)
+  common/c13/ fact0(-mmul:mmul,mh),factb(2,-mmul:mmul,mh)
+  common/c14/ ifacta(2,-mmul:mmul,mh),ifact4(4,-mmul:mmul,mh)
+  common/indeces/j70,j71,j72,j73,j74,j75,j76,j77,j78,j79
+  common/table_sizes/table_size_70,table_size_71,table_size_72,     &
+       &table_size_73,table_size_74,table_size_75,                  &
+       &table_size_76,table_size_77,table_size_78,                  &
+       &table_size_79
+END module sodd
+
+! sin(x)/x, with prper handling of values near zero
+function sinc(x)
+  real(kind(1d0)), intent(in) :: x
+  real(kind(1d0)) :: sinc
+  real(kind(1d0)), parameter :: e = 1.5d0*sqrt(epsilon(1d0))
+  if (abs(x) < e) then
+     sinc = 1d0 - (x*x)/6d0
+  else
+     sinc = sin(x) / x
+  end if
+end function sinc

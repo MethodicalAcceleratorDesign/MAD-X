@@ -43,6 +43,8 @@ ifneq ($(OSTYPE),Windows)
 #
 
 FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -warn nointerfaces -c
+#FFLAGS = -m$(ARCH) -O$(NOPT) -list -warn all -warn nounused -warn nointerfaces -c
+#FFLAGS = -m$(ARCH) -O$(NOPT) -traceback -warn all -warn nounused -warn nointerfaces -c
 
 #FFLAGS += -std95 -diag-disable 7342,7346
 
