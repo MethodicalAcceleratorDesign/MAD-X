@@ -4495,7 +4495,7 @@ end SUBROUTINE tmtilt
 SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   use twtrrfi
   use math_constfi, only : zero, one, two, three, half
-  use twissbeamfi, only : radiate, deltap, gamma, arad
+  use twissbeamfi, only : radiate, deltap, gamma, arad, beta
   use code_constfi
   implicit none
   !----------------------------------------------------------------------*
@@ -4523,13 +4523,16 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   integer :: i, code, n_ferr
   double precision :: f_errors(0:maxferr)
   double precision :: rfac, pt, tilt, bvk
-  double precision :: xkick, ykick, dpx, dpy, xau, div
+  double precision :: xkick, ykick, dpx, dpy, xau
 
   integer, external :: node_fd_errors
   double precision, external :: node_value, get_value
-  double precision :: bet0, bet_sqr, f_damp_t
+  double precision :: bet_sqr, f_damp_t, elrad
 
-  bet0  =  get_value('beam ','beta ')
+
+  elrad = node_value('lrad ')
+
+  if (elrad .eq. 0) elrad=el
 
   !--- Initialization
   rfac=0.d0
@@ -4541,7 +4544,6 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   else
      !---- Tracking desired, use corrector map.
      !---- Initialize.
-     div = el ; if (el .eq. zero) div = one
      bvk = node_value('other_bv ')
      tilt = -node_value('tilt ')
 
@@ -4570,8 +4572,8 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      end select
 
-     xkick=xkick+bvk*(f_errors(0)/div);
-     ykick=ykick+bvk*(f_errors(1)/div);
+     xkick=xkick+bvk*(f_errors(0));
+     ykick=ykick+bvk*(f_errors(1));
 
      xau = xkick
      xkick = xkick*cos(tilt)+ykick*sin(tilt)
@@ -4587,14 +4589,14 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      orbit(4) = orbit(4) + half * dpy
 
      !---- Half radiation effects at entrance.
-     if (radiate  .and.  el.ne.zero) then
-        rfac = arad * gamma**3 * (dpx**2 + dpy**2) / (three * el)
+     if (radiate  .and.  elrad.ne.zero) then
+        rfac = arad * gamma**3 * (dpx**2 + dpy**2) / (three * elrad)
         pt = orbit(6)
-        bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+        bet_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / beta;
      endif
 
      !---- Drift to end.
@@ -4604,10 +4606,10 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      endif
 
      !---- Half radiation effects at exit.
-     if (radiate  .and.  el.ne.zero) then
+     if (radiate  .and.  elrad.ne.zero) then
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / beta;
      endif
 
      !---- Half kick at exit.

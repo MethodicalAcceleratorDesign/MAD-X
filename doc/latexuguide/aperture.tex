@@ -96,7 +96,7 @@ The minimum aperture definition uses the following two attributes:
     \texttt{RECTELLIPSE} & 4 & half width and half height of rectangle, 
     horizontal and vertical semi-axes of ellipse \\
     \hline
-    \texttt{RACETRACK} & 4 & half width and half height along main axes, 
+    \texttt{RACETRACK} & 4 & full half width and full half height along main axes, 
     and horizontal and vertical semi-axes of ellipse for the rounding 
     of the corners \\
     \hline
@@ -165,15 +165,15 @@ of how to use it can be found:
      introduce! 
 
 
-	\item The \texttt{RECTELLIPSE}  and \texttt{RACETRACK} shapes are fundamental 
-	in the sense that both can properly model the other \texttt{CIRCLE}, 
-	\texttt{ELLIPSE} and \texttt{RECTANGLE} shapes, and that \texttt{RECTCIRCLE} 
-	and \texttt{LHCSCREEN} shapes are a particular of \texttt{RECTELLIPSE}
+%	\item The \texttt{RECTELLIPSE}  and \texttt{RACETRACK} shapes are fundamental 
+%	in the sense that both can properly model the other \texttt{CIRCLE}, 
+%	\texttt{ELLIPSE} and \texttt{RECTANGLE} shapes, and that \texttt{RECTCIRCLE} 
+%	and \texttt{LHCSCREEN} shapes are a particular of \texttt{RECTELLIPSE}
 
 	\item It is considered good practice to always set the first two 
 	\texttt{APERTURE} parameters for predefined shapes to be the maximum
 	horizontal and vertical extents. This proves useful when trying to 
-	plot horizontal and vertical beam stay-clear. 
+	plot horizontal and vertical beam stay-clear.
 	For example, it is better to use
 	\madxmp{
 ..., APERTYPE=rectellipse, APERTURE={APX, APY, APX, APY};
@@ -228,7 +228,7 @@ the maximal error margin of errors in the element body which
 causes a decrease of aperture, and the alignment tolerance is a 
 misalignment of the element in the accelerator, which also causes a 
 decrease of aperture. The tolerance is given in the transverse plane 
-as a racetrack, like in picture \ref{fig:aperture-tol} below. 
+like in picture \ref{fig:aperture-tol} below. 
 
 \begin{figure}[htb]
   \centering
@@ -702,18 +702,18 @@ is equivalent to
 SELECT, FLAG=aperture, COLUMN=apertype, aper\_1, aper\_2, aper\_3, aper\_4;
 }
 
-aper\_\# means for all apertypes but racetrack:
+aper\_\# means for rectellipse:
 \\ aper\_1 = half width rectangle
 \\ aper\_2 = half heigth rectangle
 \\ aper\_3 = half horizontal axis ellipse (or radius if circle)
 \\ aper\_4 = half vertical axis ellipse
 
-For racetrack, the aperture parameters will have the same meaning as the
-tolerances: 
-\\ aper\_1 and xtol = horizontal displacement of radial part 
-\\ aper\_2 and ytol = vertical displacement of radial part 
-\\ aper\_3 and rtol = radius 
-\\ aper\_4 = not used 
+%For racetrack, the aperture parameters will have the same meaning as the
+%tolerances: 
+%\\ aper\_1 and xtol = horizontal displacement of radial part 
+%\\ aper\_2 and ytol = vertical displacement of radial part 
+%\\ aper\_3 and rtol = radius 
+%\\ aper\_4 = not used 
 
 \texttt{ON\_ELEM} indicates whether the node is an element or a drift, and
 \texttt{ON\_AP} whether it has a valid aperture. The Twiss parameters are the

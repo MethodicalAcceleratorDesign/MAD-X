@@ -77,9 +77,9 @@ jobs:
           elif [[ ${{ matrix.os }} == macos ]]; then
             $(pwd)/cmake-dist/bin/cmake .. "\$@" \
               -DCMAKE_OSX_ARCHITECTURES=x86_64 \
-              -DCMAKE_C_COMPILER=gcc-9 \
-              -DCMAKE_CXX_COMPILER=g++-9 \
-              -DCMAKE_Fortran_COMPILER=gfortran-9
+              -DCMAKE_C_COMPILER=gcc-12 \
+              -DCMAKE_CXX_COMPILER=g++-12 \
+              -DCMAKE_Fortran_COMPILER=gfortran-12
           else
             $(pwd)/cmake-dist/bin/cmake .. "\$@"
           fi

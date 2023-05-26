@@ -1966,7 +1966,7 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   integer :: i, n_ferr, code, bvk, sinkick
   double precision :: curv, dpx, dpy, pt, px, py, rfac, rpt
-  double precision :: rpx, rpy, xkick, ykick, div, temp
+  double precision :: rpx, rpy, xkick, ykick, temp
   double precision :: f_errors(0:maxferr), field(2)
   double precision :: dpxx, dpyy
   double precision :: sinpeak, sintune, sinphase
@@ -2001,26 +2001,19 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   F_ERRORS(0:maxferr) = zero ; n_ferr = node_fd_errors(f_errors)
 
-  if (el .eq. zero)  then
-     div = one
-     elrad = node_value('lrad ')
-  else
-     div = el
-     elrad = el
-  endif
-
-  FIELD(1:2) = zero
+  elrad = node_value('lrad ')
+  if (elrad .eq. zero)  elrad = el
 
   select case (code)
     case (code_hkicker)
-       xkick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_chkick)+field(1)/div)
+       xkick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_chkick)+field(1))
        ykick = zero
     case (code_kicker, code_tkicker)
-       xkick = bvk*(get_tt_attrib(enum_hkick)+get_tt_attrib(enum_chkick)+field(1)/div)
-       ykick = bvk*(get_tt_attrib(enum_vkick)+get_tt_attrib(enum_cvkick)+field(2)/div)
+       xkick = bvk*(get_tt_attrib(enum_hkick)+get_tt_attrib(enum_chkick)+field(1))
+       ykick = bvk*(get_tt_attrib(enum_vkick)+get_tt_attrib(enum_cvkick)+field(2))
     case (code_vkicker)
        xkick = zero
-       ykick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_cvkick)+field(2)/div)
+       ykick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_cvkick)+field(2))
     case default
        xkick = zero
        ykick = zero
@@ -3545,6 +3538,8 @@ subroutine trsol(track,ktrack,dxt,dyt)
   sk  = bvk * node_value('ks ') / two
   length = node_value('l ')
 
+  const = arad * (betas * gammas)**3 / three
+
   if (length.eq.zero) then
 
      skl = bvk * node_value('ksi ') / two
@@ -3594,7 +3589,6 @@ subroutine trsol(track,ktrack,dxt,dyt)
                     if (quantum) then
                        call trphot(elrad,curv,rfac,track(6,i))
                     else
-                       const = arad * (betas * gammas)**3 / three
                        rfac = const * curv**2 * elrad
                     endif
                     pt_ = track(6,i)
@@ -4668,15 +4662,14 @@ subroutine tttdipole(track, ktrack, code)
   !---- Apply errors
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
+  ! tapering on the main field is applied consistently
+  ! with twiss, but needs to be revised
   if (k0.ne.0) then
-    f_errors(0) = f_errors(0) + k0*length - angle
+    k0 = k0 * (one + ktap) + f_errors(0)/length
   else
-    k0 = h
+    k0 = h * (one + ktap) + f_errors(0)/length
   endif
 
-  k0 = k0 * (one + ktap) ! tapering to main field only
- 
-  k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
   if (k0.eq.zero .and. k1.eq.zero) then
