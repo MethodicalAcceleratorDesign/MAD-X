@@ -4662,12 +4662,13 @@ subroutine tttdipole(track, ktrack, code)
   !---- Apply errors
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
+  ! tapering on the main field is applied consistently
+  ! with twiss, but needs to be revised
   if (k0.ne.0) then
-    k0 = k0 + f_errors(0)/length
+    k0 = k0 * (one + ktap) + f_errors(0)/length
   else
-    k0 = h + f_errors(0)/length
+    k0 = h * (one + ktap) + f_errors(0)/length
   endif
-  k0 = k0 * (one + ktap) ! tapering to main field only
 
   k1 = k1 + f_errors(2) / length ! quad term
 
