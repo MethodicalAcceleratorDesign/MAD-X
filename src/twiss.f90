@@ -6259,19 +6259,18 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
 
   double precision :: qk, qkl, qkl2
   double precision :: cx, sx, cy, sy, biby4
-  double precision :: newdeltas, ff, newsk1,newbeta, newgamma, pt
+  double precision :: newdeltasplusone, ff, newsk1,newbeta, newgamma, pt
 
   ! calculate  a new deltas such that pt(deltas)=0
   pt= orbit(6)
-  newdeltas=sqrt(pt**2+2*pt/beta+1)
-  newbeta  = newdeltas/ (1/beta+pt)
-  newgamma = gamma*(newdeltas)*beta/newbeta
-  ff= (one + deltap) / ( deltap+newdeltas) ! ratio
+  newdeltasplusone=sqrt(pt**2+2*pt/beta+1)
+  newbeta  = newdeltasplusone/ (1/beta+pt)
+  newgamma = gamma*(newdeltasplusone)*beta/newbeta
   orbit(6)=0
-  ! rewrite sk1, px(deltas), py(deltas) using new 
-  newsk1=sk1*ff
-  orbit(2)=orbit(2)*ff;
-  orbit(4)=orbit(4)*ff;
+  ! rewrite sk1, px(deltas), py(deltas) using new deltas
+  newsk1=sk1/newdeltasplusone
+  orbit(2)=orbit(2)/newdeltasplusone;
+  orbit(4)=orbit(4)/newdeltasplusone;
 
   !---- Set up c's and s's.
   qk = sqrt(abs(newsk1))
@@ -6343,9 +6342,11 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
   orbit(6)=0
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
+  ! restore pt, px(deltas), py(deltas) using old deltap
   orbit(6)=pt
-  orbit(2)=orbit(2)/ff;
-  orbit(4)=orbit(4)/ff;
+  orbit(2)=orbit(2)*newdeltasplusone;
+  orbit(4)=orbit(4)*newdeltasplusone;
 
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
