@@ -4120,7 +4120,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,orbit,deltap,sk1,sk2,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
-  logical, intentIN) :: fsec
+  logical, intent(IN) :: fsec
   double precision :: el, h, dh, sk1, sk2
   double precision :: orbit(6), deltap, ek(6), re(6,6), te(6,6,6)
 
