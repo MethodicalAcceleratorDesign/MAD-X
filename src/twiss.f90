@@ -4100,7 +4100,7 @@ else
 endif
 end subroutine
 
-SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
+SUBROUTINE tmsect(fsec,el,h,dh,orbit,deltap,sk1,sk2,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
   use matrices, only: EYE
   use math_constfi, only : zero, one, two, three, four, six, nine, twelve, fifteen
@@ -4120,9 +4120,9 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
-  logical, intent(IN) :: fsec
+  logical, intentIN) :: fsec
   double precision :: el, h, dh, sk1, sk2
-  double precision :: ek(6), re(6,6), te(6,6,6)
+  double precision :: orbit(6), deltap, ek(6), re(6,6), te(6,6,6)
 
   double precision :: bi, bi2, bi2gi2
   double precision :: cm, cp, cx, cy, cyy, dd, difsq, dm, dp, dx, dyy
@@ -4132,6 +4132,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   double precision :: xk, xkl, xklsq, xksq, xs6
   double precision :: y0, y1, y2, y2klsq, y2ksq, yk, ykl, yklsq, yksq, ys2
   double precision :: zc, zd, zf, zs
+  double precision :: newdeltasplusone, ff, newsk1, newsk2, newbeta, newgamma, pt
 
   double precision, parameter :: twty=20d0, twty2=22d0, twty4=24d0, thty=30d0
   double precision, parameter :: foty2=42d0, fvty6=56d0, svty2=72d0, httwty=120d0
@@ -4149,8 +4150,19 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   bi2 = bi * bi
   bi2gi2 = one / (beta * gamma) ** 2
 
+  pt= orbit(6)
+  newdeltasplusone=sqrt(pt**2+2*pt/beta+1)
+  newbeta  = newdeltasplusone/ (1/beta+pt)
+  newgamma = gamma*(newdeltasplusone)*beta/newbeta
+  orbit(6)=0
+
+  newsk1=sk1/newdeltasplusone
+  newsk2=sk2/newdeltasplusone
+  orbit(2)=orbit(2)/newdeltasplusone
+  orbit(4)=orbit(4)/newdeltasplusone
+
   !---- Horizontal.
-  xksq = h**2 + sk1
+  xksq = h**2 + newsk1
   xk = sqrt(abs(xksq))
   xkl = xk * el
   xklsq = xksq * el**2
@@ -4191,7 +4203,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   ek(5) =   h*dh*fx*bi + el*dtbyds
 
   !---- Vertical.
-  yksq = - sk1
+  yksq = - newsk1
   yk = sqrt(abs(yksq))
   ykl = yk*el
   yklsq = yksq*el**2
@@ -4218,8 +4230,8 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   !---- Second-order terms.
   if (fsec) then
      !---- Pure horizontal terms.
-     xs6 = (sk2 + two*h*sk1) / six
-     ys2 = (sk2 +     h*sk1) / two
+     xs6 = (newsk2 + two*h*newsk1) / six
+     ys2 = (newsk2 +     h*newsk1) / two
      h2 = h / two
 
      t116 = xs6 * (three*sx*fx - dx**2) - h * sx**2
@@ -4228,31 +4240,31 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
      t216 = xs6 * (three*cx*fx + sx*dx)
      t226 = xs6 * (three*sx*fx + dx**2)
      t266 = xs6 * (sx*dx**2 - two*cx*gx)
-     t516 = h * xs6 * (three*dx*fx - four*gx) + (sk1/two) * (fx + sx*dx)
-     t526 = h * xs6 * (dx**3 - two*sx*gx) + (sk1/two) * dx**2
-     t566 = h * xs6 * (three*hx - two*dx*gx) + (sk1/two) * gx - fx
+     t516 = h * xs6 * (three*dx*fx - four*gx) + (newsk1/two) * (fx + sx*dx)
+     t526 = h * xs6 * (dx**3 - two*sx*gx) + (newsk1/two) * dx**2
+     t566 = h * xs6 * (three*hx - two*dx*gx) + (newsk1/two) * gx - fx
 
-     t1 = (sk1/two) * (dx**2 - sx*fx) - dx
-     t2 = (sk1/two) * (el*dx - fx)
-     t5 = fx - sk1 * (gx - fx*dx / two)
+     t1 = (newsk1/two) * (dx**2 - sx*fx) - dx
+     t2 = (newsk1/two) * (el*dx - fx)
+     t5 = fx - newsk1 * (gx - fx*dx / two)
 
      te(1,1,1) = - xs6 * (sx**2 + dx) - h2*xksq*sx**2
      te(1,1,2) = (- xs6*dx + h2*cx) * sx
      te(1,2,2) = (- xs6*dx + h2*cx) * dx
-     te(1,1,6) = (- h2*t116 + (sk1/four)*el*sx) * bi
-     te(1,2,6) = (- h2*t126 + (sk1/four) * (el*dx - fx) - sx/two) *bi
+     te(1,1,6) = (- h2*t116 + (newsk1/four)*el*sx) * bi
+     te(1,2,6) = (- h2*t126 + (newsk1/four) * (el*dx - fx) - sx/two) *bi
      te(1,6,6) = (- h**2*t166 + h*t1) * bi2 - h2 * dx * bi2gi2
      te(2,1,1) = - xs6 * (one + two*cx) * sx
      te(2,1,2) = - xs6 * (one + two*cx) * dx
      te(2,2,2) = - (two*xs6*dx + h2) * sx
-     te(2,1,6) = (- h2*t216 - (sk1/four) * (sx - el*cx)) * bi
-     te(2,2,6) = (- h2*t226 + (sk1/four) * el * sx) * bi
+     te(2,1,6) = (- h2*t216 - (newsk1/four) * (sx - el*cx)) * bi
+     te(2,2,6) = (- h2*t226 + (newsk1/four) * el * sx) * bi
      te(2,6,6) = (- h**2*t266 + h*t2) * bi2 - h2 * sx * bi2gi2
-     te(5,1,1) = (h2*xs6 * (sx*dx + three*fx) - (sk1/four) * (el - cx*sx)) * bi
-     te(5,1,2) = (h2*xs6*dx**2 + (sk1/four)*sx**2) * bi
+     te(5,1,1) = (h2*xs6 * (sx*dx + three*fx) - (newsk1/four) * (el - cx*sx)) * bi
+     te(5,1,2) = (h2*xs6*dx**2 + (newsk1/four)*sx**2) * bi
      te(5,2,2) = (h*xs6*gx - sk1 * (fx - sx*dx) / four - sx/two) * bi
-     te(5,1,6) = h2 * ((t516 - sk1 * (el*dx - fx) / two) * bi2 + sx * bi2gi2)
-     te(5,2,6) = h2 * ((t526 - sk1 * (dx**2 - sx*fx) / two) * bi2 + dx * bi2gi2)
+     te(5,1,6) = h2 * ((t516 - newsk1 * (el*dx - fx) / two) * bi2 + sx * bi2gi2)
+     te(5,2,6) = h2 * ((t526 - newsk1 * (dx**2 - sx*fx) / two) * bi2 + dx * bi2gi2)
      te(5,6,6) = (h**2 * (t566 + t5) * bi2 + (three/two) * (h**2*fx - el) * bi2gi2) * bi
 
      !---- Mixed terms.
@@ -4290,27 +4302,27 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
         endif
      endif
 
-     t336 = sk2 * (cy*zd - two*sk1*sy*zf) + h * sk1 * fx * sy
-     t346 = sk2 * (sy*zd - two*cy*zf) + h * fx * cy
-     t436 = two * ys2 * fx * cy - sk2 * sk1 * (sy*zd - two*cy*zf)
-     t446 = two * ys2 * fx * sy - sk2 * (cy*zd - two*sk1*sy*zf)
+     t336 = newsk2 * (cy*zd - two*newsk1*sy*zf) + h * newsk1 * fx * sy
+     t346 = newsk2 * (sy*zd - two*cy*zf) + h * fx * cy
+     t436 = two * ys2 * fx * cy - newsk2 * newsk1 * (sy*zd - two*cy*zf)
+     t446 = two * ys2 * fx * sy - newsk2 * (cy*zd - two*newsk1*sy*zf)
 
-     te(1,3,3) = + sk2*sk1*zd + ys2*dx
-     te(1,3,4) = + sk2*zs/two
-     te(1,4,4) = + sk2*zd - h2*dx
-     te(2,3,3) = + sk2*sk1*zs + ys2*sx
-     te(2,3,4) = + sk2*zc/two
-     te(2,4,4) = + sk2*zs - h2*sx
-     te(3,1,3) = + sk2*(cy*zc/two - sk1*sy*zs) + h2*sk1*sx*sy
-     te(3,1,4) = + sk2*(sy*zc/two - cy*zs) + h2*sx*cy
-     te(3,2,3) = + sk2*(cy*zs/two - sk1*sy*zd) + h2*sk1*dx*sy
-     te(3,2,4) = + sk2*(sy*zs/two - cy*zd) + h2*dx*cy
-     te(3,3,6) = (h2*t336 - sk1*el*sy/four) * bi
+     te(1,3,3) = + newsk2*newsk1*zd + ys2*dx
+     te(1,3,4) = + newsk2*zs/two
+     te(1,4,4) = + newsk2*zd - h2*dx
+     te(2,3,3) = + newsk2*sk1*zs + ys2*sx
+     te(2,3,4) = + newsk2*zc/two
+     te(2,4,4) = + newsk2*zs - h2*sx
+     te(3,1,3) = + newsk2*(cy*zc/two - newsk1*sy*zs) + h2*newsk1*sx*sy
+     te(3,1,4) = + newsk2*(sy*zc/two - cy*zs) + h2*sx*cy
+     te(3,2,3) = + newsk2*(cy*zs/two - newsk1*sy*zd) + h2*newsk1*dx*sy
+     te(3,2,4) = + newsk2*(sy*zs/two - cy*zd) + h2*dx*cy
+     te(3,3,6) = (h2*t336 - newsk1*el*sy/four) * bi
      te(3,4,6) = (h2*t346 - (sy + el*cy) / four) * bi
-     te(4,1,3) = sk2*sk1*(cy*zs - sy*zc/two) + ys2*sx*cy
-     te(4,1,4) = sk2*(sk1*sy*zs - cy*zc/two) + ys2*sx*sy
-     te(4,2,3) = sk2*sk1*(cy*zd - sy*zs/two) + ys2*dx*cy
-     te(4,2,4) = sk2*(sk1*sy*zd - cy*zs/two) + ys2*dx*sy
+     te(4,1,3) = newsk2*newsk1*(cy*zs - sy*zc/two) + ys2*sx*cy
+     te(4,1,4) = newsk2*(newsk1*sy*zs - cy*zc/two) + ys2*sx*sy
+     te(4,2,3) = newsk2*newsk1*(cy*zd - sy*zs/two) + ys2*dx*cy
+     te(4,2,4) = newsk2*(newsk1*sy*zd - cy*zs/two) + ys2*dx*sy
      te(4,3,6) = (h2*t436 + sk1 * (sy - el*cy) / four) * bi
      te(4,4,6) = (h2*t446 - sk1*el*sy/four) * bi
      te(5,3,3) = (- h*sk2*sk1*zf - h*ys2*fx + sk1*(el-cy*sy)/four)*bi
@@ -6257,16 +6269,17 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
 
   double precision :: qk, qkl, qkl2
   double precision :: cx, sx, cy, sy, biby4
-  double precision :: newdeltappo, ff, newsk1,newbeta, newgamma, pt
+  double precision :: newdeltas, ff, newsk1, newbeta, newgamma, pt
 
-  pt= orbit(6)
-  newdeltappo=sqrt(pt**2+2*pt/beta+1)
-  newbeta  = newdeltappo/ (1/beta+pt)
-  newgamma = gamma*(newdeltappo)*beta/newbeta
-  ff= (one + deltap) / ( deltap+newdeltappo) ! ratio
+  pt = orbit(6)
+  newdeltas = sqrt(pt**2+2*pt/beta+1)
+  newbeta  = newdeltas/ (1/beta+pt)
+  newgamma = gamma*(newdeltas)*beta/newbeta
+  ff = (1 + deltap) / (deltap+newdeltas) ! ratio
   orbit(6)=0
+  
+  ! rewrite sk1, px(deltas), py(deltas) using new 
   newsk1=sk1*ff
-
 
   !---- Set up c's and s's.
   qk = sqrt(abs(newsk1))
@@ -6664,7 +6677,7 @@ end SUBROUTINE tmsext
 
 SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
-  use math_constfi, only : zero, two, three, four
+  use math_constfi, only : zero, one, two, three, four
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6684,10 +6697,26 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk
   double precision :: tilt, sk2, el
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: orbit(6), deltap, ek(6), re(6,6), te(6,6,6)
 
   double precision :: skl, s1, s2, s3, s4
+  double precision :: newdeltas, ff, newsk2, newbeta, newgamma, pt
 
+  ! calculate  a new deltas such that pt(deltas)=0
+  
+  pt = orbit(6)
+  newdeltas=sqrt(pt**2+2*pt/beta+1)
+  newbeta  = newdeltas/ (1/beta+pt)
+  newgamma = gamma*(newdeltas)*beta/newbeta
+  ff= (1 + deltap) / ( deltap+newdeltas) ! ratio
+  orbit(6)=0
+  
+  ! rewrite sk1, px(deltas), py(deltas) using new
+  
+  newsk2=sk2*ff
+  orbit(2)=orbit(2)*ff;
+  orbit(4)=orbit(4)*ff;
+  
   !---- First-order terms.
   re(1,2) = el
   re(3,4) = el
@@ -6696,7 +6725,7 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
 
   !---- Second-order terms.
   if (fsec) then
-     skl = sk2 * el
+     skl = newsk2 * el
      if (skl .ne. zero) then
         s1 = skl / two
         s2 = s1 * el / two
@@ -6733,8 +6762,13 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
 
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  orbit(6)=pt
+  orbit(2)=orbit(2)/ff;
+  orbit(4)=orbit(4)/ff;
+
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
+
 
 end SUBROUTINE sxbody
 
