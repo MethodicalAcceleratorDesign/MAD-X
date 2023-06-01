@@ -4323,11 +4323,11 @@ SUBROUTINE tmsect(fsec,el,h,dh,orbit,deltap,sk1,sk2,ek,re,te)
      te(4,1,4) = newsk2*(newsk1*sy*zs - cy*zc/two) + ys2*sx*sy
      te(4,2,3) = newsk2*newsk1*(cy*zd - sy*zs/two) + ys2*dx*cy
      te(4,2,4) = newsk2*(newsk1*sy*zd - cy*zs/two) + ys2*dx*sy
-     te(4,3,6) = (h2*t436 + sk1 * (sy - el*cy) / four) * bi
-     te(4,4,6) = (h2*t446 - sk1*el*sy/four) * bi
-     te(5,3,3) = (- h*sk2*sk1*zf - h*ys2*fx + sk1*(el-cy*sy)/four)*bi
-     te(5,3,4) = (- h*sk2*zd/two - sk1*sy**2/four) * bi
-     te(5,4,4) = (- h*sk2*zf + h*h2*fx - (el + sy*cy)/four) * bi
+     te(4,3,6) = (h2*t436 + newsk1 * (sy - el*cy) / four) * bi
+     te(4,4,6) = (h2*t446 - newsk1*el*sy/four) * bi
+     te(5,3,3) = (- h*newsk2*newsk1*zf - h*ys2*fx + newsk1*(el-cy*sy)/four)*bi
+     te(5,3,4) = (- h*newsk2*zd/two - newsk1*sy**2/four) * bi
+     te(5,4,4) = (- h*newsk2*zf + h*h2*fx - (el + sy*cy)/four) * bi
      call tmsymm(te)
 
      !---- Effect of dipole error.
