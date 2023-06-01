@@ -932,7 +932,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
            write(tapout,'(a,t15,a,e20.12,a)') trim(el_name),", KTAP = ",node_value('ktap ')," ;"
         endif
         
-     case (code_quadrupole, code_sextupole)
+     case (code_quadrupole, code_sextupole, code_octupole, code_multipole)
         dpt = orbit(6)/beta
         if (iterate .ge. 1) then ! loop is only one pass
            ORBITTAP = ORBIT 
@@ -3322,7 +3322,7 @@ SUBROUTINE tw_synch_int()
   use twisslfi
   use twisscfi
   use twissbeamfi, only : beta
-  use math_constfi, only : zero, two
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3335,8 +3335,8 @@ SUBROUTINE tw_synch_int()
 
   !---- Initialisation
   blen = node_value('blen ')
-  rhoinv = node_value('rhoinv ') * (1+node_value('ktap ')) ! tapering
-  sk1 = node_value('k1 ')  * (1+node_value('ktap ')) ! tapering (issue if dipole has k1 component)
+  rhoinv = node_value('rhoinv ') * (one + node_value('ktap ')) ! tapering
+  sk1 = node_value('k1 ')  * (one + node_value('ktap ')) ! tapering (issue if dipole has k1 component)
   e1 = node_value('e1 ')
   e2 = node_value('e2 ')
   an = node_value('angle ')
@@ -4495,7 +4495,7 @@ end SUBROUTINE tmtilt
 SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   use twtrrfi
   use math_constfi, only : zero, one, two, three, half
-  use twissbeamfi, only : radiate, deltap, gamma, arad
+  use twissbeamfi, only : radiate, deltap, gamma, arad, beta
   use code_constfi
   implicit none
   !----------------------------------------------------------------------*
@@ -4523,13 +4523,16 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   integer :: i, code, n_ferr
   double precision :: f_errors(0:maxferr)
   double precision :: rfac, pt, tilt, bvk
-  double precision :: xkick, ykick, dpx, dpy, xau, div
+  double precision :: xkick, ykick, dpx, dpy, xau
 
   integer, external :: node_fd_errors
   double precision, external :: node_value, get_value
-  double precision :: bet0, bet_sqr, f_damp_t
+  double precision :: bet_sqr, f_damp_t, elrad
 
-  bet0  =  get_value('beam ','beta ')
+
+  elrad = node_value('lrad ')
+
+  if (elrad .eq. 0) elrad=el
 
   !--- Initialization
   rfac=0.d0
@@ -4541,7 +4544,6 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   else
      !---- Tracking desired, use corrector map.
      !---- Initialize.
-     div = el ; if (el .eq. zero) div = one
      bvk = node_value('other_bv ')
      tilt = -node_value('tilt ')
 
@@ -4570,8 +4572,8 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      end select
 
-     xkick=xkick+bvk*(f_errors(0)/div);
-     ykick=ykick+bvk*(f_errors(1)/div);
+     xkick=xkick+bvk*(f_errors(0));
+     ykick=ykick+bvk*(f_errors(1));
 
      xau = xkick
      xkick = xkick*cos(tilt)+ykick*sin(tilt)
@@ -4587,14 +4589,14 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      orbit(4) = orbit(4) + half * dpy
 
      !---- Half radiation effects at entrance.
-     if (radiate  .and.  el.ne.zero) then
-        rfac = arad * gamma**3 * (dpx**2 + dpy**2) / (three * el)
+     if (radiate  .and.  elrad.ne.zero) then
+        rfac = arad * gamma**3 * (dpx**2 + dpy**2) / (three * elrad)
         pt = orbit(6)
-        bet_sqr = (pt*pt + two*pt/bet0 + one) / (one/bet0 + pt)**2;
+        bet_sqr = (pt*pt + two*pt/beta + one) / (one/beta + pt)**2;
         f_damp_t = sqrt(one + rfac*(rfac - two) / bet_sqr);
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / beta;
      endif
 
      !---- Drift to end.
@@ -4604,10 +4606,10 @@ SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      endif
 
      !---- Half radiation effects at exit.
-     if (radiate  .and.  el.ne.zero) then
+     if (radiate  .and.  elrad.ne.zero) then
         orbit(2) = orbit(2) * f_damp_t;
         orbit(4) = orbit(4) * f_damp_t;
-        orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
+        orbit(6) = orbit(6) * (one - rfac) - rfac / beta;
      endif
 
      !---- Half kick at exit.
@@ -5307,7 +5309,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   integer :: n_ferr, nord, iord, j, nd, nn, ns
   double precision :: f_errors(0:maxferr)
   double precision :: normal(0:maxmul), skew(0:maxmul)
-  double precision :: bi, pt, rfac, bvk, elrad, tilt, angle, an, anr, ani
+  double precision :: bi, pt, rfac, bvk, elrad, tilt, angle, an, anr, ani, ktap
   double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp
 
   integer, external :: get_option, node_fd_errors
@@ -5330,9 +5332,14 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   fmap = .true.
 
   !---- Multipole components.
-  NORMAL = zero ; call get_node_vector('knl ',nn,normal)
-  SKEW   = zero ; call get_node_vector('ksl ',ns,skew)
+  NORMAL(0:maxmul) = zero ; call get_node_vector('knl ',nn,normal)
+  SKEW(0:maxmul)   = zero ; call get_node_vector('ksl ',ns,skew)
   tilt = node_value('tilt ')
+  ktap = node_value('ktap ')
+
+  !--- Apply tapering globally
+  NORMAL(0:maxmul) = NORMAL(0:maxmul) * (one + ktap)
+  SKEW(0:maxmul)   = SKEW(0:maxmul)   * (one + ktap)
 
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
@@ -5581,8 +5588,8 @@ SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   n_ferr = node_fd_errors(f_errors)
 
   !---- Set up octupole strength.
-  sk3  = bvk * ( g_elpar(o_k3)  + f_errors(6)/el)
-  sk3s = bvk * ( g_elpar(o_k3s) + f_errors(7)/el)
+  sk3  = bvk * ( g_elpar(o_k3)  * (one + g_elpar(o_ktap)) + f_errors(6)/el)
+  sk3s = bvk * ( g_elpar(o_k3s) * (one + g_elpar(o_ktap)) + f_errors(7)/el)
   tilt4 = -four * node_value('tilt ')
 
   if (sk3s.ne.zero) then
@@ -5658,7 +5665,7 @@ SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   orbit(2) = orbit(2) - cr / two
   orbit(4) = orbit(4) + ci / two
 
-  !---- Half radiation effects.
+  !---- Half radiation effects at exit.
   if (radiate) then
      rfac = arad * gamma**3 * (cr**2 + ci**2) / (three * el)
      pt = orbit(6)
@@ -6144,6 +6151,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   double precision, external :: node_value, get_value
   double precision :: bet0, bet_sqr, f_damp_t
 
+  !double precision :: newbet0, newdeltap, ff
   integer, external :: get_option
   character(len=name_len) el_name
   
@@ -6199,7 +6207,30 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
+  ! absorb pt in deltas
+  !pt= orbit(6)
+  !newdeltap=sqrt(pt**2+2*pt/bet0+1)-1
+  !newbet0= (1+newdeltap)/ (1/bet0+pt)
+  !ff= (one + deltap) / ( deltap+newdeltap) ! ratio
+  !orbit(2)=orbit(2)*ff
+  !orbit(4)=orbit(4)*ff
+  !orbit(6)=0
+  !sk1 =sk1*ff
+  ! start absorb pt in deltas
+
   call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
+
+  ! restore pt
+  !sk1 =sk1/ff
+  !orbit(2)=orbit(2)/ff
+  !orbit(4)=orbit(4)/ff
+  !orbit(6)=pt
+  ! end restore pt
+
+
+
+
+
   if (fcentre) return
 
   !---- Half radiation effect at exit.
@@ -8699,11 +8730,11 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   bet0  =  get_value('beam ','beta ')
 
   !---- Zero the arrays
-  NORMAL = zero
-  SKEW = zero
-  PNL = zero
-  PSL = zero
-  F_ERRORS = zero
+  NORMAL(0:maxmul) = zero
+  SKEW(0:maxmul) = zero
+  PNL(0:maxmul) = zero
+  PSL(0:maxmul) = zero
+  F_ERRORS(0:maxferr) = zero
 
   !---- Read-in the parameters
   freq   = node_value('freq ');

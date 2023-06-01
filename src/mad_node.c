@@ -406,16 +406,15 @@ void set_closed_orb_node(int *index, double *pos){
 }
 
 
-void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl){
+void get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl, double ktap){
     nn[0]=current_node->p_elem->multip->nn;
     ns[0]=current_node->p_elem->multip->ns;
     for(int i=0;i<*nn;i++){
-      knl[i] = current_node->p_elem->multip->knl[i];
+      knl[i] = current_node->p_elem->multip->knl[i]* (1 + ktap);
     }
     for(int i=0;i<*ns;i++){
-      ksl[i] = current_node->p_elem->multip->ksl[i];
+      ksl[i] = current_node->p_elem->multip->ksl[i] * (1 + ktap);
     }
-
 
 }
 void alloc_tt_attrib(int *length){
@@ -538,13 +537,10 @@ store_node_value(const char* par, double* value)
   else if (strcmp(lpar, "k2") == 0) store_comm_par_value("k2",*value,el->def);
   // The inform is to make sure they are written out to a new sequence. 
   else if (strcmp(lpar, "ktap") == 0) {
-    store_comm_par_value("ktap",*value,el->def);
-//    el->def->par_names->inform[9] = 1;  // for quads and sextupoles
-//    el->def->par_names->inform[23] = 1; // for bends
+    set_command_par_value("ktap",el->def, *value); //mark it set
   }
   else if (strcmp(lpar, "lagtap") == 0) {
-    store_comm_par_value("lagtap",*value,el->def);
-//    el->def->par_names->inform[9] = 1;
+      set_command_par_value("lagtap",el->def, *value); //mark it set
   }
   else if (strcmp(lpar, "lag") == 0) store_comm_par_value("lag",*value,el->def);
 

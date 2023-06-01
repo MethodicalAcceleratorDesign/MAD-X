@@ -108,7 +108,7 @@ double  get_refpos(struct sequence* sequ);
 double  hidden_node_pos(char* name, struct sequence*);
 void    link_in_front(struct node*, struct node* el);
 void    resequence_nodes(struct sequence*);
-void    store_node_value(const char* par, double* value);
+void    store_node_value(const char* par, double* value); /* store values in node or in p_elem->def  for some selected par*/
 void    store_node_vector(char* par, int* length, double* vector);
 int     store_no_fd_err(double* errors, int* curr);
 int     count_nodes(struct sequence*);
@@ -134,7 +134,7 @@ void    alloc_tt_attrib(int *length);
 void    set_tt_attrib(int *index, double *value);
 double  get_tt_attrib(int *index);
 void    set_tt_multipoles(int *maxmul);
-void    get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl);
+void    get_tt_multipoles(int *nn, double *knl, int *ns, double *ksl, double ktap);
 double  node_obs_point(void);
 void    store_orbit_correctors(void);
 double  get_closed_orb_node(int *index);

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.08.01  (64 bit, Linux)       +
+  +     MAD-X 5.09.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2022.02.25               +
-  + Execution date: 2022.09.02 21:31:12      +
+  + Release   date: 2023.03.08               +
+  + Execution date: 2023.03.08 15:13:02      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
@@ -153,6 +153,7 @@ parameter: lrad   expression: ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) )
 double value:     2.362500
 parameter: knl   double array: -3.831264e-04 0.000000e+00 0.000000e+00 0.000000e+00 
 parameter: ksl   double array: 0.000000e+00 
+parameter: ktap   double value:     0.000000
 parameter: angle   expression: ( 0 - ad2.r2 ) / ( 4 )  :: value:    -0.000383
 double value:    -0.000383
 parameter: apertype   string: circle
@@ -208,6 +209,7 @@ parameter: lrad   expression: ( l.mqxb ) / ( 4 )  :: value:     1.375000
 double value:     1.375000
 parameter: knl   double array: 0.000000e+00 -1.307600e-02 0.000000e+00 0.000000e+00 
 parameter: ksl   double array: 0.000000e+00 
+parameter: ktap   double value:     0.000000
 parameter: angle   double value:     0.000000
 parameter: apertype   string: circle
 parameter: aperture   double array: 0.000000e+00 

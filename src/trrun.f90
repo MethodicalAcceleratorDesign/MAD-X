@@ -875,7 +875,7 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   logical :: fsec, ftrk, fmap
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
   integer, external :: Factorial
-  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0, ktap
   double precision :: dipr, dipi, dbr, dbi, dtmp, an, angle, tilt2
   double precision :: gstr, sstr, x, px0, y, py0, t0, pt0, deltapp
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
@@ -898,6 +898,9 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   elrad = get_tt_attrib(enum_lrad)
   an = get_tt_attrib(enum_angle)
   time_var = get_tt_attrib(enum_time_var) .ne. 0  
+
+    !----Tapering factor
+  ktap = get_tt_attrib(enum_ktap)
   
   !dbr = bvk * f_errors(0) !field(1,0)
   !dbi = bvk * f_errors(1) !field(2,0)
@@ -911,7 +914,7 @@ SUBROUTINE  ttmult_cf_mini(track,ktrack,dxt,dyt,turn, thin_foc)
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
 
-  call get_tt_multipoles(nn,normal,ns,skew)
+  call get_tt_multipoles(nn,normal,ns,skew,ktap)
 
   dipr = bvk * normal(0) !vals(1,0)
   dipi = bvk * skew(0)  
@@ -1007,7 +1010,7 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   logical :: fsec, ftrk, fmap
   integer :: nord, k, j, nn, ns, bvk, iord, n_ferr, jtrk, nd
   integer, external :: Factorial
-  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0
+  double precision :: dpx, dpy, tilt, kx, ky, elrad, bp1, h0, ktap
   double precision :: dtmp, an, angle, tilt2, etahat
   double precision :: normal(0:maxmul), skew(0:maxmul), f_errors(0:maxferr)
   double complex :: kappa, barkappa, sum0, del_p_g, pkick, dxdpg, dydpg, &
@@ -1025,16 +1028,19 @@ SUBROUTINE  ttmult_cf(track,ktrack,dxt,dyt,turn, thin_foc)
   n_ferr = node_fd_errors(f_errors)
 
   bvk = get_tt_attrib(enum_other_bv)
-    !---- Multipole length for radiation.
+  !---- Multipole length for radiation.
   elrad = get_tt_attrib(enum_lrad)
   an = get_tt_attrib(enum_angle)
   time_var = get_tt_attrib(enum_time_var) .ne. 0  
 
+  !----Tapering factor
+  ktap = get_tt_attrib(enum_ktap)
+ 
   !---- Multipole components.
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
   tilt2 = 0
-  call get_tt_multipoles(nn,normal,ns,skew)
+  call get_tt_multipoles(nn,normal,ns,skew,ktap)
 
   !---- Angle (no bvk in track)
   if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
@@ -1156,7 +1162,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   logical ::  time_var,thin_foc
   integer :: iord, jtrk, nd, nord, i, j, n_ferr, nn, ns, noisemax, nn1, in, mylen
   integer :: nnt, nst
-  double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad
+  double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad, ktap
   double precision :: pt, px, py, rfac, x
   double precision :: f_errors(0:maxferr)
   double precision :: field(2,0:maxmul)
@@ -1186,19 +1192,20 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn, thin_foc)
   n_ferr = node_fd_errors(f_errors)
 
   bvk = get_tt_attrib(enum_other_bv)
-    !---- Multipole length for radiation.
+  !---- Multipole length for radiation.
   elrad = get_tt_attrib(enum_lrad)
   noise = get_tt_attrib(enum_noise)
   an = get_tt_attrib(enum_angle)
   time_var = get_tt_attrib(enum_time_var) .ne. 0  
 
-  
+  !----Tapering factor
+  ktap = get_tt_attrib(enum_ktap)
+ 
   !---- Multipole components.
   NORMAL(0:maxmul) = zero! ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero  ! ; call get_node_vector('ksl ',ns,skew)
 
-  call get_tt_multipoles(nn,normal,ns,skew)
-
+  call get_tt_multipoles(nn,normal,ns,skew,ktap)
 
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
@@ -1959,7 +1966,7 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   integer :: i, n_ferr, code, bvk, sinkick
   double precision :: curv, dpx, dpy, pt, px, py, rfac, rpt
-  double precision :: rpx, rpy, xkick, ykick, div, temp
+  double precision :: rpx, rpy, xkick, ykick, temp
   double precision :: f_errors(0:maxferr), field(2)
   double precision :: dpxx, dpyy
   double precision :: sinpeak, sintune, sinphase
@@ -1994,26 +2001,19 @@ subroutine ttcorr(el,track,ktrack,turn, code)
 
   F_ERRORS(0:maxferr) = zero ; n_ferr = node_fd_errors(f_errors)
 
-  if (el .eq. zero)  then
-     div = one
-     elrad = node_value('lrad ')
-  else
-     div = el
-     elrad = el
-  endif
-
-  FIELD(1:2) = zero
+  elrad = node_value('lrad ')
+  if (elrad .eq. zero)  elrad = el
 
   select case (code)
     case (code_hkicker)
-       xkick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_chkick)+field(1)/div)
+       xkick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_chkick)+field(1))
        ykick = zero
     case (code_kicker, code_tkicker)
-       xkick = bvk*(get_tt_attrib(enum_hkick)+get_tt_attrib(enum_chkick)+field(1)/div)
-       ykick = bvk*(get_tt_attrib(enum_vkick)+get_tt_attrib(enum_cvkick)+field(2)/div)
+       xkick = bvk*(get_tt_attrib(enum_hkick)+get_tt_attrib(enum_chkick)+field(1))
+       ykick = bvk*(get_tt_attrib(enum_vkick)+get_tt_attrib(enum_cvkick)+field(2))
     case (code_vkicker)
        xkick = zero
-       ykick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_cvkick)+field(2)/div)
+       ykick = bvk*(get_tt_attrib(enum_kick)+get_tt_attrib(enum_cvkick)+field(2))
     case default
        xkick = zero
        ykick = zero
@@ -3538,6 +3538,8 @@ subroutine trsol(track,ktrack,dxt,dyt)
   sk  = bvk * node_value('ks ') / two
   length = node_value('l ')
 
+  const = arad * (betas * gammas)**3 / three
+
   if (length.eq.zero) then
 
      skl = bvk * node_value('ksi ') / two
@@ -3587,7 +3589,6 @@ subroutine trsol(track,ktrack,dxt,dyt)
                     if (quantum) then
                        call trphot(elrad,curv,rfac,track(6,i))
                     else
-                       const = arad * (betas * gammas)**3 / three
                        rfac = const * curv**2 * elrad
                     endif
                     pt_ = track(6,i)
@@ -3767,6 +3768,7 @@ subroutine tttrak(ek,re,track,ktrack)
 end subroutine tttrak
 
 subroutine trupdate(turn)
+  use, intrinsic :: iso_c_binding
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3775,14 +3777,21 @@ subroutine trupdate(turn)
   ! Input/output:                                                        *
   !   turn     (integer)    Current turn number.                         *
   !----------------------------------------------------------------------*
+  interface
+    subroutine pro_input(statement) bind(c,name='pro_input_')
+      use, intrinsic :: iso_c_binding
+      character(kind=c_char) :: statement
+    end subroutine pro_input
+  end interface
   integer       :: turn
-  character(len=25) :: cmd1
-  character(len=30) :: cmd2
+  character(len=25,kind=c_char) :: cmd1
+  character(len=30,kind=c_char) :: cmd2
 
   !---- call pro_input('TR$TURN := turn;')
-  write(cmd1, '(''tr$turni := '',i8,'' ; '')') turn
+  write(cmd1,'(i8)') turn
+  cmd1 = c_char_'tr$turni := '//trim(cmd1)//c_char_' ; '//c_null_char
   call pro_input(cmd1)
-  write(cmd2, '(''exec, tr$macro($tr$turni) ; '')')
+  cmd2 = c_char_'exec, tr$macro($tr$turni) ; '//c_null_char
   call pro_input(cmd2)
   call init_elements() ! added since now temporary variables are used and need to update
 end subroutine trupdate
@@ -4458,8 +4467,8 @@ subroutine tttquad(track, ktrack)
 
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
-  k1  = g_elpar(q_k1)  * (1 + g_elpar(q_ktap))
-  k1s = g_elpar(q_k1s) * (1 + g_elpar(q_ktap))
+  k1  = g_elpar(q_k1)  * (one + g_elpar(q_ktap))
+  k1s = g_elpar(q_k1s) * (one + g_elpar(q_ktap))
   
   if (length.ne.zero) then
      k1  = k1  + f_errors(2)/length
@@ -4653,15 +4662,14 @@ subroutine tttdipole(track, ktrack, code)
   !---- Apply errors
   f_errors = zero
   n_ferr = node_fd_errors(f_errors)
+  ! tapering on the main field is applied consistently
+  ! with twiss, but needs to be revised
   if (k0.ne.0) then
-    f_errors(0) = f_errors(0) + k0*length - angle
+    k0 = k0 * (one + ktap) + f_errors(0)/length
   else
-    k0 = h
+    k0 = h * (one + ktap) + f_errors(0)/length
   endif
 
-  k0 = k0 * (1+ktap) ! tapering to main field only
- 
-  k0 = k0 + f_errors(0) / length ! dipole term
   k1 = k1 + f_errors(2) / length ! quad term
 
   if (k0.eq.zero .and. k1.eq.zero) then

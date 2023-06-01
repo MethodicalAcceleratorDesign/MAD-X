@@ -100,7 +100,7 @@ subroutine taperreset(error)
 
   select case (code)
      
-  case (code_rbend, code_sbend, code_quadrupole, code_sextupole)
+  case (code_rbend, code_sbend, code_quadrupole, code_sextupole, code_octupole, code_multipole)
      call store_node_value('ktap ', 0.d0)
           
   end select

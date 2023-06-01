@@ -273,12 +273,9 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   integer, external :: node_fd_errors
   double precision, external  :: node_value, get_value
 
-  if (code .eq. code_multipole .or. code .eq. code_rfmultipole)  then
-     !--- thin multipole and thin RF multipole
-     el = node_value('lrad ')
-  else
-     el = node_value('l ')
-  endif
+
+  el = node_value('lrad ')
+  if (el .eq. zero) el = node_value('l ')
 
   if (el.eq.zero .and. code.ne.code_rfcavity) return !- no damping
   ! RF cavities with zero length still accepted beyond this point
@@ -293,7 +290,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   select case (code)
 
      case (code_rbend, code_sbend) !---- DIPOLE
-        an = bvk * node_value('angle ') * el/node_value('l ') ! ??? 
+        an = bvk * node_value('angle ')
         tilt = -node_value('tilt ')
         edg1 = bvk * node_value('e1 ')
         edg2 = bvk * node_value('e2 ')
@@ -305,11 +302,11 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         ktap = node_value('ktap ')
         sks = zero
         if (sk0.ne.0)  then
-           h = sk0 * (1 + ktap) ! tapering
+           h = sk0 * (one + ktap) ! tapering
         else
-           h = an / el * (1 + ktap) ! tapering
+           h = an / el * (one + ktap) ! tapering
         endif
-     
+
         !---- Refer orbit and eigenvectors to magnet midplane.
         ct = cos(tilt)
         st = sin(tilt)
@@ -489,19 +486,20 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         sk2 = zero
         sk3 = zero
         sksol = zero
+        ktap = node_value('ktap ')
         select case (code)
         case (code_quadrupole)  !---- Quadrupole
-           sk1 = bvk * node_value('k1 ') * (1 + node_value('ktap '))
+           sk1 = bvk * node_value('k1 ') * (one + ktap) ! tapering
            str  = sk1
            n    = 1
            twon = two
         case (code_sextupole)   !---- Sextupole
-           sk2 = bvk * node_value('k2 ') * (1 + node_value('ktap '))
+           sk2 = bvk * node_value('k2 ') * (one + ktap) ! tapering
            str  = sk2 / two
            n    = 2
            twon = four
         case (code_octupole)   !---- Octupole
-           sk3 = bvk * node_value('k3 ')
+           sk3 = bvk * node_value('k3 ') * (one + ktap) ! tapering
            str  = sk3 / six
            n    = 3
            twon = six
@@ -617,11 +615,13 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         an = node_value('angle ')
         if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
 
+        ktap = node_value('ktap ')
+        
         !---- Other components and errors.
         nord = 0
         do i = 0, max(nn, ns, n_ferr/2-1)
-           f_errors(2*i)   = bvk * (normal(i) + f_errors(2*i))   / (one + deltap)
-           f_errors(2*i+1) = bvk * (skew(i)   + f_errors(2*i+1)) / (one + deltap)
+           f_errors(2*i)   = bvk * (normal(i) * (one + ktap) + f_errors(2*i))   / (one + deltap) ! tapering
+           f_errors(2*i+1) = bvk * (skew(i)   * (one + ktap) + f_errors(2*i+1)) / (one + deltap) ! tapering
            ! get the maximum effective order; loop runs over maximum of user given values
            if (f_errors(2*i) .ne. zero .or. f_errors(2*i+1) .ne. zero)  nord = i
         enddo
@@ -693,8 +693,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
      case (code_hkicker, code_kicker, code_vkicker, code_tkicker) !---- Orbit correctors.
 
         n_ferr = node_fd_errors(f_errors)
-
-        FERROR(1:2) = zero
 
         if (n_ferr .gt. 0) FERROR(:2) = F_ERRORS(:min(2,n_ferr))
 

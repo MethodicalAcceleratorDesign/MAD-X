@@ -115,10 +115,11 @@ jobs:
 
       - name: Setup gcc/gfortran
         run: |
+          ls /usr/local/bin/gfortran*
           set -ex
-          sudo ln -s $(which gcc-9)      /usr/local/bin/gcc
-          sudo ln -s $(which g++-9)      /usr/local/bin/g++
-          sudo ln -s $(which gfortran-9) /usr/local/bin/gfortran
+          sudo ln -s $(which gcc-12)      /usr/local/bin/gcc
+          sudo ln -s $(which g++-12)      /usr/local/bin/g++
+          sudo ln -s $(which gfortran-12) /usr/local/bin/gfortran
 
       - name: Build MAD-X
         run: |
