@@ -634,7 +634,7 @@ CONTAINS
       key%list%permfringe = 3
    endif
 !JG 13.04.2023 - Added fringe max for multipole fringe field
-    key%list%highest_fringe=node_value("fringe_max ")
+    key%list%highest_fringe=node_value("frngmax ")
     key%list%bend_fringe=node_value("bend_fringe ") .ne. zero
     key%list%kill_ent_fringe=node_value("kill_ent_fringe ") .ne. zero
     key%list%kill_exi_fringe=node_value("kill_exi_fringe ") .ne. zero
@@ -1020,8 +1020,6 @@ CONTAINS
           sk1= sk1 +dum1                                          !
           sk1s=sk1s+dum2                                          !
 !       endif                                                      !
-! JG 10.05.2023 - Added fringe max for quadrupole fringe field
-         key%list%highest_fringe=node_value("fringe_max ")
 ! JG: 13.04.2023 Added fringe features to quadrupole
          key%list%hgap=node_value('hgap ')
          fint =node_value('fint ')
