@@ -6196,7 +6196,6 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   tilt = tilt + plot_tilt
 
   sk1 = sk1 / (one + deltap)
-  !print *, 'sk1',sk1
 
   !---- Half radiation effect at entry.
   if (radiate .and. ftrk) then
@@ -6209,7 +6208,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
-  call qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,dl,ek,re,te)
+  call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
 
   if (fcentre) return
 
@@ -6236,7 +6235,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
 
 end SUBROUTINE tmquad
 
-SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
+SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   use twisslfi, only: exact_expansion
   use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, four, six, ten3m
@@ -6259,15 +6258,14 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk
   double precision :: tilt, sk1, el
-  double precision :: orbit(6), deltap, ek(6), re(6,6), te(6,6,6)
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   double precision :: qk, qkl, qkl2
   double precision :: cx, sx, cy, sy, biby4
-  double precision :: x,px,y,py,t,pt,deltaplusone
+  double precision :: x,px,y,py,t,pt,deltaplusone,nk1
 
 
 if (exact_expansion) then
-     ! calculate  a new deltas such that pt(deltas)=0
      x= orbit(1)
      px= orbit(2)
      y= orbit(3)
@@ -6275,21 +6273,21 @@ if (exact_expansion) then
      t= orbit(5)
      pt= orbit(6)
      deltaplusone=sqrt(pt**2+2*pt/beta+1)
-     ! rewrite sk1, px(deltas), py(deltas) using new deltas
-     sk1=sk1/deltaplusone
-     !print *, 'sk1 exact', sk1, deltaplusone
+     nk1=sk1/deltaplusone
+else
+     nk1= sk1
 endif
 
   !---- Set up c's and s's.
-  qk = sqrt(abs(sk1))
+  qk = sqrt(abs(nk1))
   qkl = qk * el
   if (abs(qkl) .lt. ten3m) then
-     qkl2 = sk1 * el**2
+     qkl2 = nk1 * el**2
      cx = (one - qkl2 / two)
      sx = (one - qkl2 / six) * el
      cy = (one + qkl2 / two)
      sy = (one + qkl2 / six) * el
-  else if (sk1 .gt. zero) then
+  else if (nk1 .gt. zero) then
      cx = cos(qkl)
      sx = sin(qkl) / qk
      cy = cosh(qkl)
@@ -6305,11 +6303,11 @@ if (exact_expansion) then
   !---- First-order terms.
   re(1,1) = cx
   re(1,2) = sx/deltaplusone
-  re(2,1) = - sk1 * sx * deltaplusone
+  re(2,1) = - nk1 * sx * deltaplusone
   re(2,2) = cx
   re(3,3) = cy
   re(3,4) = sy /deltaplusone
-  re(4,3) = + sk1 * sy *deltaplusone
+  re(4,3) = + nk1 * sy *deltaplusone
   re(4,4) = cy
   re(5,6) = el/(beta*gamma)**2
 
@@ -6319,11 +6317,11 @@ else
   !---- First-order terms.
   re(1,1) = cx
   re(1,2) = sx
-  re(2,1) = - sk1 * sx
+  re(2,1) = - nk1 * sx
   re(2,2) = cx
   re(3,3) = cy
   re(3,4) = sy
-  re(4,3) = + sk1 * sy
+  re(4,3) = + nk1 * sy
   re(4,4) = cy
   re(5,6) = el/(beta*gamma)**2
 
@@ -6333,30 +6331,30 @@ endif
   if (fsec) then
      biby4 = one / (four * beta)
 
-     te(1,1,6) = + sk1 * el * sx * biby4
+     te(1,1,6) = + nk1 * el * sx * biby4
      te(1,6,1) = te(1,1,6)
      te(2,2,6) = te(1,1,6)
      te(2,6,2) = te(1,1,6)
      te(1,2,6) = - (sx + el*cx) * biby4
      te(1,6,2) = te(1,2,6)
-     te(2,1,6) = - sk1 * (sx - el*cx) * biby4
+     te(2,1,6) = - nk1 * (sx - el*cx) * biby4
      te(2,6,1) = te(2,1,6)
 
-     te(3,3,6) = - sk1 * el * sy * biby4
+     te(3,3,6) = - nk1 * el * sy * biby4
      te(3,6,3) = te(3,3,6)
      te(4,4,6) = te(3,3,6)
      te(4,6,4) = te(3,3,6)
      te(3,4,6) = - (sy + el*cy) * biby4
      te(3,6,4) = te(3,4,6)
-     te(4,3,6) = + sk1 * (sy - el*cy) * biby4
+     te(4,3,6) = + nk1 * (sy - el*cy) * biby4
      te(4,6,3) = te(4,3,6)
 
-     te(5,1,1) = - sk1 * (el - sx*cx) * biby4
-     te(5,1,2) = + sk1 * sx**2 * biby4
+     te(5,1,1) = - nk1 * (el - sx*cx) * biby4
+     te(5,1,2) = + nk1 * sx**2 * biby4
      te(5,2,1) = te(5,1,2)
      te(5,2,2) = - (el + sx*cx) * biby4
-     te(5,3,3) = + sk1 * (el - sy*cy) * biby4
-     te(5,3,4) = - sk1 * sy**2 * biby4
+     te(5,3,3) = + nk1 * (el - sy*cy) * biby4
+     te(5,3,4) = - nk1 * sy**2 * biby4
      te(5,4,3) = te(5,3,4)
      te(5,4,4) = - (el + sy*cy) * biby4
      te(5,6,6) = (- six * re(5,6)) * biby4
@@ -6365,19 +6363,15 @@ endif
   !---- Track orbit.
 if (exact_expansion) then
 
-    !print *, "track0", cx, sx/deltaplusone*px
     orbit(1)=cx*x + sx*px/deltaplusone
-    orbit(2)=-sk1 * sx * x*deltaplusone + cx*px
+    orbit(2)=-nk1 * sx * x*deltaplusone + cx*px
     orbit(3)=cy*y + sy*py/deltaplusone
-    orbit(4)=sk1 * sy * y*deltaplusone + cy*py
+    orbit(4)=nk1 * sy * y*deltaplusone + cy*py
     orbit(5)=el/(beta*gamma)**2*pt
     re(5,1)=re(5,1) + te(5,1,1)*x + te(5,1,2)*px + te(5,1,3)*y + te(5,1,4)*py + te(5,1,5)*t + te(5,1,6)*pt
 else
-     ! px=orbit(2)
       if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-     ! print *, "track0",re(1,1),re(1,2)*px
 endif
-!print *, "track1",orbit(1)
 
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
@@ -6727,35 +6721,24 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   double precision :: skl, s1, s2, s3, s4
-  double precision :: newdeltasplusone, newbeta, newgamma, pt
+  double precision :: x,px,y,py,t,pt,deltaplusone
 
 
   if (exact_expansion) then
-     ! calculate  a new deltas such that pt(deltas)=0
      pt= orbit(6)
-     newdeltasplusone=sqrt(pt**2+2*pt/beta+1)
-     newbeta  = newdeltasplusone/ (1/beta+pt)
-     newgamma = gamma*(newdeltasplusone)*beta/newbeta
-     orbit(6)=0
-     ! rewrite sk1, px(deltas), py(deltas) using new deltas
-     orbit(2)=orbit(2)/newdeltasplusone
-     orbit(4)=orbit(4)/newdeltasplusone
-  else
-    newdeltasplusone=1
-    newbeta=beta
-    newgamma=gamma
+     deltaplusone=sqrt(pt**2+2*pt/beta+1)
   endif
 
 
   !---- First-order terms.
   re(1,2) = el
   re(3,4) = el
-  re(5,6) = el/(newbeta*newgamma)**2
+  re(5,6) = el/(beta*gamma)**2
   ek(5) = el*dtbyds
 
   !---- Second-order terms.
   if (fsec) then
-     skl = sk2 * el / newdeltasplusone
+     skl = sk2 * el
      if (skl .ne. zero) then
         s1 = skl / two
         s2 = s1 * el / two
@@ -6786,19 +6769,19 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
      te(3,4,6) = te(1,2,6)
      te(5,2,2) = te(1,2,6)
      te(5,4,4) = te(1,2,6)
-     te(5,6,6) = - three * re(5,6) / (two * newbeta)
+     te(5,6,6) = - three * re(5,6) / (two * beta)
      call tmsymm(te)
   endif
 
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
-  if (exact_expansion) then
-      ! restore pt, px(deltas), py(deltas) using old deltap
-      orbit(6)=pt
-      orbit(2)=orbit(2)*newdeltasplusone;
-      orbit(4)=orbit(4)*newdeltasplusone;
-  endif
+  !if (exact_expansion) then
+  !    ! restore pt, px(deltas), py(deltas) using old deltap
+  !    orbit(6)=pt
+  !    orbit(2)=orbit(2);
+  !    orbit(4)=orbit(4);
+  !endif
 
 
   !---- Apply tilt.

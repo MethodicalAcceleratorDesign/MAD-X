@@ -9,10 +9,11 @@ endsequence;
 beam,pc=0.0001;
 use,sequence=ss;
 
-pt0=0.1;
-deltas=sqrt(pt0^2 + 2*pt0/beam->beta+1)-1;
 x0=1e-3; y0=1e-3;
 px0=1e-3; py0=1e-3;
+pt0=0.1;
+deltas=sqrt(pt0^2 + 2*pt0/beam->beta+1)-1;
+
 p0c=beam->pc;
 psc=p0c*(1+deltas);
 es=sqrt(beam->mass**2 + psc**2);
@@ -40,12 +41,10 @@ y3=table(twiss,ss$end,y);
 px3=table(twiss,ss$end,px)*p0c;
 py3=table(twiss,ss$end,py)*p0c;
 
+value,beam->beta;
 value,qx1,qx2,qx3;
 value,qy1,qy2,qy3;
 value,x1,x2,x3;
 value,y1,y2,y3;
 value,px1,px2,px3;
 value,py1,py2,py3;
-value,beam->beta;
-
-value,qx3,qy3;
