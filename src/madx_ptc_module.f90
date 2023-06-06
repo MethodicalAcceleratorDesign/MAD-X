@@ -531,7 +531,8 @@ CONTAINS
 
     ! preliminary setting
     !    my_ring%charge=1
-    initial_charge=1
+! JG 06.06.2023 - Allowed charge to pass from MAD-X to PTC
+    initial_charge=charge
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
     if (getdebug() > 1) then
         print *, 'MADx is set'
