@@ -1037,6 +1037,11 @@ CONTAINS
          key%list%va=node_value('f1 ')
          key%list%vs=node_value('f2 ')
 
+! JG 06.06.2023 - Fix access of local model only 
+         if (model.lt.0) then
+            model = get_value('ptc_create_layout ','model ')
+         endif
+
 ! LD: 19.06.2019
        if (sk1s .ne. zero) then
           if (ord_max .le. 2 .and. sk0 .eq. 0 .and. key%list%permfringe .eq. 0) then !
