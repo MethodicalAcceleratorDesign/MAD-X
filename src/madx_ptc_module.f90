@@ -264,9 +264,9 @@ CONTAINS
     use name_lenfi
     use code_constfi
     implicit none
-    logical(lp) particle,doneit,isclosedlayout
+    logical(lp) particle,doneit,isclosedlayout,get_option
     integer i,j,k,code,nt,icount,nn,ns,nd,mg,napoffset,get_string
-    !    integer get_option
+   !  integer get_option
     integer double_from_table_row,table_cell_exists
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, external :: get_userdefined_geometry, get_userdefined_geometry_len
@@ -324,7 +324,12 @@ CONTAINS
 
     energy=get_value('probe ','energy ')
     pma=get_value('probe ','mass ')
-    charge=get_value('probe ','charge ')
+! jg 07.06.2023 Allow PTC to have a charge, if set to true
+    if (get_option("nocharge")) then
+      charge = 1
+    else
+      charge=get_value('probe ','charge ')
+    endif
     bvk=get_value('probe ','bv ')
 
     e0f=sqrt(ENERGY**2-pma**2)

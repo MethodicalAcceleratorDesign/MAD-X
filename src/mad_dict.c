@@ -294,6 +294,7 @@ const char *const_command_def =
 "info       = [l, true, true], "
 "reset      = [l, false, true], "
 "debug      = [l, false, true], "
+"nocharge   = [l, true, true], " /* jg 07.06.2023 Allow PTC to have a charge, if set to false */
 "verbose    = [l, false, true], " /*hbu */
 "rbarc      = [l, true, true], "
 "rand       = [s, default, best], "
