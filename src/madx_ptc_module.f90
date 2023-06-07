@@ -1056,16 +1056,16 @@ CONTAINS
 !          key%list%ks(2)=zero
 !          key%tiltd=tilt
        endif                                                      !
-! JG 06.06.2023 Added bv flag to quadrupole components
-       key%list%k (2) = bvk*sk1                                         !
-       key%list%ks(2) = bvk*sk1s                                        !
+       key%list%k (2) = sk1                                         !
+       key%list%ks(2) = sk1s                                        !
 !       key%list%ks(2)=zero  ! added by VK                         !
        key%tiltd=tilt  !==========================================!
 
        !================================================================
        ! dipole component not active in MAD-X proper
 ! LD: 19.06.2019
-       key%list%k(1)=key%list%k(1)+bvk*sk0
+! JG 06.06.2023 - Remove bv flag (done later)
+       key%list%k(1)=key%list%k(1)+sk0
 
     case(code_sextupole) ! case(6)
        key%magnet="sextupole"
@@ -1105,9 +1105,8 @@ CONTAINS
 !          tilt = -atan2(sk2s, sk2)/three + tilt                   !
 !          sk2 =  sqrt(sk2**2 + sk2s**2)                           !
 !       endif                                                      !
-! JG 06.06.2023 Added bv flag to sextupole components
-       key%list%k (3) =bvk*sk2                                         !
-       key%list%ks(3) =bvk*sk2s                                         !
+       key%list%k (3) = sk2                                         !
+       key%list%ks(3) = sk2s                                         !
 !       key%list%ks(3)=zero  ! added by VK                         !
        
 !JG: 18.04.2023 Allowed k0 and k0s for sextupole
@@ -1152,9 +1151,8 @@ CONTAINS
 !          tilt = -atan2(sk3s, sk3)/four + tilt                    !
 !          sk3 = sqrt(sk3**2 + sk3s**2)                            !
 !       endif                                                      !
-! JG 06.06.2023 Added bv flag to octupole components
-       key%list%k (4) = bvk*sk3                                         !
-       key%list%ks(4) = bvk*sk3s
+       key%list%k (4) = sk3                                         !
+       key%list%ks(4) = sk3s
 !       key%list%ks(4)=zero  ! added by VK                         !
 ! JG: 13.04.2023 Added fringe features to octupole
        key%list%hgap=node_value('hgap ')
