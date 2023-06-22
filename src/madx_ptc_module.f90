@@ -3998,13 +3998,13 @@ CONTAINS
       do i=3,1,-1
         v = node_value(kns(i))
         if (v .ne. zero ) then
-          maxk = i
+          maxk = i + 1
           exit
         endif
 
         v = node_value(kss(i))
         if (v .ne. zero ) then
-          maxk = i
+          maxk = i + 1
           exit
         endif
 
