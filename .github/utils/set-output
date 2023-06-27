@@ -4,11 +4,8 @@
 # Usage: set-output <name> <value>
 name=$1
 value=$2
+delim=EOS_$(openssl rand -hex 16)
 
-# Escape '\n', '\r', '%' to make this work with multi-line strings, see:
-# https://github.community/t/set-output-truncates-multiline-strings/16852
-value="${value//'%'/'%25'}"
-value="${value//$'\n'/'%0A'}"
-value="${value//$'\r'/'%0D'}"
-
-echo "::set-output name=$name::$value"
+echo >>"$GITHUB_OUTPUT" "$name<<$delim"
+echo >>"$GITHUB_OUTPUT" "$value"
+echo >>"$GITHUB_OUTPUT" "$delim"
