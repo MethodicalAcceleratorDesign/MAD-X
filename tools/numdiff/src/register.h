@@ -59,6 +59,7 @@ reg_encode(short rn, char op)
   case ']' : return 7 * REG_MAX + rn;
   default: error("invalid register unary operation '%c'", op); exit(EXIT_FAILURE);
   }
+  return 0; // to satisfy broken warnings in intel compiler
 }
 
 static inline short

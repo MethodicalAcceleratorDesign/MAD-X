@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install dependencies
         run: |
@@ -29,3 +29,9 @@ jobs:
             cat doc/latexuguide/makelatexdoc.log
             false
           fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: uguide.pdf
+          path: doc/latexuguide/uguide.pdf

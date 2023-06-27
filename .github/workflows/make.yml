@@ -31,7 +31,7 @@ jobs:
           - i=2 STATIC=no  ONLINE=no NTPSA=yes USEGC=yes ARCH=64 X11=yes
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
@@ -78,7 +78,7 @@ jobs:
         # the failure() and always() functions that prevents an implicit
         # `if success()` that would otherwise be conditioned on.
         if: failure() && steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: failures-${{ matrix.os }}-${{ steps.jobname.outputs.i }}
           path: |
@@ -104,7 +104,7 @@ jobs:
           - i=2 STATIC=yes ONLINE=no NTPSA=yes USEGC=yes ARCH=64 X11=no
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
@@ -148,7 +148,7 @@ jobs:
         # the failure() and always() functions that prevents an implicit
         # `if success()` that would otherwise be conditioned on.
         if: failure() && steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: failures-${{ matrix.os }}-${{ steps.jobname.outputs.i }}
           path: |
@@ -171,7 +171,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -184,7 +184,7 @@ jobs:
         run: make all-win${{ matrix.bits }}-gnu
 
       - name: Upload artifact executable
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: madx-windows
           path: |
@@ -204,7 +204,7 @@ jobs:
       - name: Upload failed tests output for inspection
         # Keep the redundant condition (see above)!
         if: failure() && steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: failures-win${{ matrix.bits }}
           path: |
