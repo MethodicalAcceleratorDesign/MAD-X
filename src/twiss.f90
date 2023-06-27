@@ -6613,6 +6613,7 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value, get_value
   double precision :: bet0, bet_sqr, f_damp_t
+  double precision :: newbet0, deltaplusone
 
   integer, external :: get_option
   character(len=name_len) el_name
@@ -6667,8 +6668,33 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
-  call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
-  if (fcentre) return
+   if (exact_expansion) then
+     pt = orbit(6)
+     deltaplusone = sqrt(pt**2+2*pt/bet0+1)
+     newbet0 = (deltaplusone)/ (1/bet0+pt)
+     orbit(2) = orbit(2)/deltaplusone
+     orbit(4) = orbit(4)/deltaplusone
+     orbit(5) = orbit(5)*(bet0/newbet0)
+     sk2 = sk2/deltaplusone
+     orbit(6) = 0
+
+     call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
+
+     orbit(2) = orbit(2)*deltaplusone
+     orbit(4) = orbit(4)*deltaplusone
+     orbit(5) = orbit(5)*(newbet0/bet0)
+     sk2 = sk2*deltaplusone
+     orbit(6) = pt
+     
+     if (fcentre) return
+
+  else
+
+     call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
+     if (fcentre) return
+
+  endif
+  
 
   !---- Half radiation effects at exit.
   if (ftrk) then
