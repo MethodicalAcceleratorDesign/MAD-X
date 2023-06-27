@@ -1,31 +1,50 @@
-q1: quadrupole, l=1, k1=1;
+q1: quadrupole, l=1, k1=1.2;
+q2: quadrupole, l=1, k1=-1.3;
 
 ss: sequence,l=1;
 q1,at=0.5;
+q2,at=1.5;
 endsequence;
 
 beam,pc=0.0001;
 use,sequence=ss;
 
-pt0=0.5;
-dp0=sqrt(pt0^2 + 2*pt0/beam->beta+1)-1;
-x0=1e-3;
+x0=1e-3; y0=1e-3;
+px0=1e-3; py0=1e-3;
+pt0=0.1;
+deltas=sqrt(pt0^2 + 2*pt0/beam->beta+1)-1;
+
+p0c=beam->pc;
+psc=p0c*(1+deltas);
+es=sqrt(beam->mass**2 + psc**2);
 
 
-twiss,betx=1,bety=1,deltap=dp0,x=x0;
+twiss,betx=1,bety=1,deltap=deltas,x=x0, y=y0, px=px0/(1+deltas), py=py0/(1+deltas);
 qx1=table(twiss,ss$end,mux);qy1=table(twiss,ss$end,muy);
-x1=table(twiss,ss$end,x);px1=table(twiss,ss$end,px);
-y1=table(twiss,ss$end,y);py1=table(twiss,ss$end,py);
+x1=table(twiss,ss$end,x);
+y1=table(twiss,ss$end,y);
+px1=table(twiss,ss$end,px)*psc;
+py1=table(twiss,ss$end,py)*psc;
 
-twiss,betx=1,bety=1,pt=pt0,x=x0;
+
+twiss,betx=1,bety=1,pt=pt0,x=x0, y=y0, px=px0, py=py0;
 qx2=table(twiss,ss$end,mux);qy2=table(twiss,ss$end,muy);
-x2=table(twiss,ss$end,x);px2=table(twiss,ss$end,px);
-y2=table(twiss,ss$end,y);py2=table(twiss,ss$end,py);
+x2=table(twiss,ss$end,x);
+y2=table(twiss,ss$end,y);
+px2=table(twiss,ss$end,px)*p0c;
+py2=table(twiss,ss$end,py)*p0c;
 
-value,qx1,qx2;
-value,qy1,qy2;
-value,x1,x2;
-value,px1,px2;
-value,y1,y2;
-value,py1,py2;
+twiss,betx=1,bety=1,pt=pt0,x=x0, y=y0, px=px0, py=py0,exact;
+qx3=table(twiss,ss$end,mux);qy3=table(twiss,ss$end,muy);
+x3=table(twiss,ss$end,x);
+y3=table(twiss,ss$end,y);
+px3=table(twiss,ss$end,px)*p0c;
+py3=table(twiss,ss$end,py)*p0c;
+
 value,beam->beta;
+value,qx1,qx2,qx3;
+value,qy1,qy2,qy3;
+value,x1,x2,x3;
+value,y1,y2,y3;
+value,px1,px2,px3;
+value,py1,py2,py3;

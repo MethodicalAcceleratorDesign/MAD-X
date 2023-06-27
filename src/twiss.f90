@@ -3888,7 +3888,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
 
   ! ugly kludge to mimic k0 integration in errors
   if (ktap .ne. 0) then
-     f_errors(0) = f_errors(0) + ktap*angle     
+     f_errors(0) = f_errors(0) + ktap*angle
   endif
   
   !h_k = h_k * (1+ktap) ! tapering applied to actual strength
@@ -4100,7 +4100,12 @@ else
 endif
 end subroutine
 
+<<<<<<< HEAD
 SUBROUTINE tmsect(fsec,el,h,dh,orbit,deltap,sk1,sk2,ek,re,te)
+=======
+SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
+  use twisslfi, only: exact_expansion
+>>>>>>> rdemaria/madx_twiss_changept
   use twissbeamfi, only : beta, gamma, dtbyds
   use matrices, only: EYE
   use math_constfi, only : zero, one, two, three, four, six, nine, twelve, fifteen
@@ -4140,6 +4145,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,orbit,deltap,sk1,sk2,ek,re,te)
   double precision, parameter :: s1=one, s2=one/six, s3=one/httwty, s4=one/5040d0
   double precision, parameter :: cg0=one/twty, cg1=5d0/840d0, cg2=21d0/60480d0
   double precision, parameter :: ch0=one/fvty6, ch1=14d0/4032d0, ch2=147d0/443520d0
+  double precision :: newdeltasplusone, ff, newbeta, newgamma, pt
 
   !---- Initialize.
   EK = zero
@@ -6216,7 +6222,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
-  call qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,dl,ek,re,te)
+  call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
 
   if (fcentre) return
 
@@ -6243,7 +6249,8 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
 
 end SUBROUTINE tmquad
 
-SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
+SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
+  use twisslfi, only: exact_expansion
   use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, four, six, ten3m
   implicit none
@@ -6265,10 +6272,11 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk
   double precision :: tilt, sk1, el
-  double precision :: orbit(6), deltap, ek(6), re(6,6), te(6,6,6)
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   double precision :: qk, qkl, qkl2
   double precision :: cx, sx, cy, sy, biby4
+<<<<<<< HEAD
   double precision :: newdeltas, ff, newsk1, newbeta, newgamma, pt
 
   pt = orbit(6)
@@ -6281,16 +6289,34 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
   ! rewrite sk1, px(deltas), py(deltas) using new 
   newsk1=sk1*ff
 
+=======
+  double precision :: x,px,y,py,t,pt,deltaplusone,nk1
+
+
+if (exact_expansion) then
+     x= orbit(1)
+     px= orbit(2)
+     y= orbit(3)
+     py= orbit(4)
+     t= orbit(5)
+     pt= orbit(6)
+     deltaplusone=sqrt(pt**2+2*pt/beta+1)
+     nk1=sk1/deltaplusone
+else
+     nk1= sk1
+endif
+
+>>>>>>> rdemaria/madx_twiss_changept
   !---- Set up c's and s's.
-  qk = sqrt(abs(newsk1))
+  qk = sqrt(abs(nk1))
   qkl = qk * el
   if (abs(qkl) .lt. ten3m) then
-     qkl2 = sk1 * el**2
+     qkl2 = nk1 * el**2
      cx = (one - qkl2 / two)
      sx = (one - qkl2 / six) * el
      cy = (one + qkl2 / two)
      sy = (one + qkl2 / six) * el
-  else if (sk1 .gt. zero) then
+  else if (nk1 .gt. zero) then
      cx = cos(qkl)
      sx = sin(qkl) / qk
      cy = cosh(qkl)
@@ -6302,56 +6328,79 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,deltap,el,ek,re,te)
      sy = sin(qkl) / qk
   endif
 
+if (exact_expansion) then
   !---- First-order terms.
   re(1,1) = cx
-  re(1,2) = sx
-  re(2,1) = - newsk1 * sx
+  re(1,2) = sx/deltaplusone
+  re(2,1) = - nk1 * sx * deltaplusone
   re(2,2) = cx
   re(3,3) = cy
-  re(3,4) = sy
-  re(4,3) = + newsk1 * sy
+  re(3,4) = sy /deltaplusone
+  re(4,3) = + nk1 * sy *deltaplusone
   re(4,4) = cy
-  re(5,6) = el/(newbeta*newgamma)**2
+  re(5,6) = el/(beta*gamma)**2
 
   ek(5) = el*dtbyds ! to be checked
 
+else
+  !---- First-order terms.
+  re(1,1) = cx
+  re(1,2) = sx
+  re(2,1) = - nk1 * sx
+  re(2,2) = cx
+  re(3,3) = cy
+  re(3,4) = sy
+  re(4,3) = + nk1 * sy
+  re(4,4) = cy
+  re(5,6) = el/(beta*gamma)**2
+
+  ek(5) = el*dtbyds ! to be checked
+endif
   !---- Second-order terms.
   if (fsec) then
-     biby4 = one / (four * newbeta)
+     biby4 = one / (four * beta)
 
-     te(1,1,6) = + newsk1 * el * sx * biby4
+     te(1,1,6) = + nk1 * el * sx * biby4
      te(1,6,1) = te(1,1,6)
      te(2,2,6) = te(1,1,6)
      te(2,6,2) = te(1,1,6)
      te(1,2,6) = - (sx + el*cx) * biby4
      te(1,6,2) = te(1,2,6)
-     te(2,1,6) = - newsk1 * (sx - el*cx) * biby4
+     te(2,1,6) = - nk1 * (sx - el*cx) * biby4
      te(2,6,1) = te(2,1,6)
 
-     te(3,3,6) = - newsk1 * el * sy * biby4
+     te(3,3,6) = - nk1 * el * sy * biby4
      te(3,6,3) = te(3,3,6)
      te(4,4,6) = te(3,3,6)
      te(4,6,4) = te(3,3,6)
      te(3,4,6) = - (sy + el*cy) * biby4
      te(3,6,4) = te(3,4,6)
-     te(4,3,6) = + newsk1 * (sy - el*cy) * biby4
+     te(4,3,6) = + nk1 * (sy - el*cy) * biby4
      te(4,6,3) = te(4,3,6)
 
-     te(5,1,1) = - newsk1 * (el - sx*cx) * biby4
-     te(5,1,2) = + newsk1 * sx**2 * biby4
+     te(5,1,1) = - nk1 * (el - sx*cx) * biby4
+     te(5,1,2) = + nk1 * sx**2 * biby4
      te(5,2,1) = te(5,1,2)
      te(5,2,2) = - (el + sx*cx) * biby4
-     te(5,3,3) = + newsk1 * (el - sy*cy) * biby4
-     te(5,3,4) = - newsk1 * sy**2 * biby4
+     te(5,3,3) = + nk1 * (el - sy*cy) * biby4
+     te(5,3,4) = - nk1 * sy**2 * biby4
      te(5,4,3) = te(5,3,4)
      te(5,4,4) = - (el + sy*cy) * biby4
      te(5,6,6) = (- six * re(5,6)) * biby4
   endif
 
-  orbit(6)=0
   !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-  orbit(6)=pt
+if (exact_expansion) then
+
+    orbit(1)=cx*x + sx*px/deltaplusone
+    orbit(2)=-nk1 * sx * x*deltaplusone + cx*px
+    orbit(3)=cy*y + sy*py/deltaplusone
+    orbit(4)=nk1 * sy * y*deltaplusone + cy*py
+    orbit(5)=el/(beta*gamma)**2*pt
+    re(5,1)=re(5,1) + te(5,1,1)*x + te(5,1,2)*px + te(5,1,3)*y + te(5,1,4)*py + te(5,1,5)*t + te(5,1,6)*pt
+else
+      if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+endif
 
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
@@ -6676,6 +6725,7 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 end SUBROUTINE tmsext
 
 SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
+  use twisslfi, only: exact_expansion
   use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, three, four
   implicit none
@@ -6700,7 +6750,18 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
   double precision :: orbit(6), deltap, ek(6), re(6,6), te(6,6,6)
 
   double precision :: skl, s1, s2, s3, s4
+<<<<<<< HEAD
   double precision :: newdeltas, ff, newsk2, newbeta, newgamma, pt
+=======
+  double precision :: x,px,y,py,t,pt,deltaplusone
+
+
+  if (exact_expansion) then
+     pt= orbit(6)
+     deltaplusone=sqrt(pt**2+2*pt/beta+1)
+  endif
+
+>>>>>>> rdemaria/madx_twiss_changept
 
   ! calculate  a new deltas such that pt(deltas)=0
   
@@ -6762,9 +6823,20 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
 
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+<<<<<<< HEAD
   orbit(6)=pt
   orbit(2)=orbit(2)/ff;
   orbit(4)=orbit(4)/ff;
+=======
+
+  !if (exact_expansion) then
+  !    ! restore pt, px(deltas), py(deltas) using old deltap
+  !    orbit(6)=pt
+  !    orbit(2)=orbit(2);
+  !    orbit(4)=orbit(4);
+  !endif
+
+>>>>>>> rdemaria/madx_twiss_changept
 
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
