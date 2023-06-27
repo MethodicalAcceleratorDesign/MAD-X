@@ -278,7 +278,7 @@ CONTAINS
     real(dp) gamma,gamma2,gammatr2,freq,offset_deltap
     real(dp) modulationq
     real(dp) fint,fintx,div,muonfactor,edge,rhoi,hgap,corr,tanedg,secedg,psip
-    real(dp) sk0,sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
+    real(dp) sk0,sk0s,sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
     REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
     real(dp) gammatr,ks,ksi,ex,ey ! LD
     real(kind(1d0)) get_value,node_value
