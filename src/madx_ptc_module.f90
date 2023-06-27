@@ -1005,8 +1005,10 @@ CONTAINS
        ! Read data & fill %k(:), %ks(:) arrays which are
        ! summs of multipoles and errors
 
-! LD: 19.06.2019
-       sk0=node_value('k0 ')
+! LD: 19.06.2019 & JG 26.06.2023 - Added normal_0123(0) and skew_0123(0) to the quadrupole strength
+       sk0=node_value('k0 ') + normal_0123(0)
+! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
+       sk0s = -skew_0123(0)
 
        ! quadrupole components
        sk1= node_value('k1 ')  * (1 + node_value('ktap '))
@@ -1071,6 +1073,8 @@ CONTAINS
 ! LD: 19.06.2019
 ! JG 06.06.2023 - Remove bv flag (done later)
        key%list%k(1)=key%list%k(1)+sk0
+! JG 26.06.2023 - Added normal_0123(0) and skew_0123(0) to the quadrupole strength
+       key%list%ks(1)=key%list%ks(1)+sk0s
 
     case(code_sextupole) ! case(6)
        key%magnet="sextupole"
