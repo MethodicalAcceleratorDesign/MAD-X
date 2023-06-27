@@ -40,6 +40,7 @@ reg_getval(const double *reg, short reg_n, short rn)
   case 7: return ceil(reg[r-1]);
   default: error("invalid register unary operation '%c'", rn/REG_MAX); exit(EXIT_FAILURE);
   }
+  return 0; // to satisfy broken warnings in intel compiler
 }
 
 #ifdef __GNUC__
