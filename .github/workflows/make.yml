@@ -78,7 +78,7 @@ jobs:
         # the failure() and always() functions that prevents an implicit
         # `if success()` that would otherwise be conditioned on.
         if: failure() && steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: failures-${{ matrix.os }}-${{ steps.jobname.outputs.i }}
           path: |
@@ -148,7 +148,7 @@ jobs:
         # the failure() and always() functions that prevents an implicit
         # `if success()` that would otherwise be conditioned on.
         if: failure() && steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: failures-${{ matrix.os }}-${{ steps.jobname.outputs.i }}
           path: |
@@ -184,7 +184,7 @@ jobs:
         run: make all-win${{ matrix.bits }}-gnu
 
       - name: Upload artifact executable
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: madx-windows
           path: |
@@ -204,7 +204,7 @@ jobs:
       - name: Upload failed tests output for inspection
         # Keep the redundant condition (see above)!
         if: failure() && steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: failures-win${{ matrix.bits }}
           path: |
