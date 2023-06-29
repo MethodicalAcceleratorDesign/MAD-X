@@ -6592,6 +6592,7 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value, get_value
   double precision :: bet0, bet_sqr, f_damp_t
+  double precision :: newbet0, deltaplusone
 
   integer, external :: get_option
   character(len=name_len) el_name
@@ -6646,8 +6647,91 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
-  call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
-  if (fcentre) return
+  if (exact_expansion) then
+     
+     pt = orbit(6)
+     deltaplusone = sqrt(pt**2+2*pt/bet0+1)
+     newbet0 = (deltaplusone)/ (1/bet0+pt)
+     orbit(2) = orbit(2)/deltaplusone
+     orbit(4) = orbit(4)/deltaplusone
+     orbit(5) = orbit(5)*(bet0/newbet0)
+     sk2 = sk2/deltaplusone
+     orbit(6) = 0
+
+     call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
+
+     orbit(2) = orbit(2)*deltaplusone
+     orbit(4) = orbit(4)*deltaplusone
+     orbit(5) = orbit(5)*(newbet0/bet0)
+     sk2 = sk2*deltaplusone
+     orbit(6) = pt
+
+     !---- First order terms
+     
+     re(1,2) = re(1,2)*deltaplusone
+     re(3,4) = re(3,4)*deltaplusone
+     re(5,6) = re(5,6)*(bet0/newbet0)
+
+     ek(2) = ek(2)/deltaplusone
+     ek(4) = ek(4)/deltaplusone
+     ek(5) = ek(5)*(bet0/newbet0)
+
+     !---- Second order terms
+
+     te(1,1,2) = te(1,1,2)*deltaplusone
+     te(1,2,2) = te(1,2,2)*deltaplusone**2
+     te(1,3,4) = te(1,3,4)*deltaplusone
+     te(1,4,4) = te(1,4,4)*deltaplusone**2
+
+     te(2,2,2) = te(2,2,2)*deltaplusone
+     te(2,3,3) = te(2,3,3)/deltaplusone
+     te(2,4,4) = te(2,4,4)*deltaplusone
+
+     te(3,1,4) = te(3,1,4)*deltaplusone
+     te(3,2,3) = te(3,2,3)*deltaplusone
+     te(3,2,4) = te(3,2,4)*deltaplusone**2
+
+     te(4,1,3) = te(4,1,3)/deltaplusone
+     te(4,2,4) = te(4,2,4)*deltaplusone
+
+     if (fcentre) return
+
+     !---- First order terms
+
+     re(1,2) = re(1,2)/deltaplusone
+     re(3,4) = re(3,4)/deltaplusone
+     re(5,6) = re(5,6)/(bet0/newbet0)
+
+     ek(2) = ek(2)*deltaplusone
+     ek(4) = ek(4)*deltaplusone
+     ek(5) = ek(5)/(bet0/newbet0)
+
+     !---- Second order terms
+
+     te(1,1,2) = te(1,1,2)/deltaplusone
+     te(1,2,2) = te(1,2,2)/deltaplusone**2
+     te(1,3,4) = te(1,3,4)/deltaplusone
+     te(1,4,4) = te(1,4,4)/deltaplusone**2
+
+     te(2,2,2) = te(2,2,2)/deltaplusone
+     te(2,3,3) = te(2,3,3)*deltaplusone
+     te(2,4,4) = te(2,4,4)/deltaplusone
+
+     te(3,1,4) = te(3,1,4)/deltaplusone
+     te(3,2,3) = te(3,2,3)/deltaplusone
+     te(3,2,4) = te(3,2,4)/deltaplusone**2
+
+     te(4,1,3) = te(4,1,3)*deltaplusone
+     te(4,2,4) = te(4,2,4)/deltaplusone
+
+  else
+
+     call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
+     if (fcentre) return
+
+  endif
+
+
 
   !---- Half radiation effects at exit.
   if (ftrk) then
