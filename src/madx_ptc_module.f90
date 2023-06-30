@@ -1909,6 +1909,12 @@ CONTAINS
                 p%mag%freq=clight*tempdp*BETA0/l
                 p%magp%freq=p%mag%freq
 
+                ! JG 30.06.2023 - added no_cavity_totalpath for freq = 0 and harmon > 0
+                if (p%mag%c4%cavity_totalpath==1) then 
+                  p%mag%phas = p%mag%phas - twopi*p%mag%freq*(p%mag%l/2d0)/(clight*beta0) ! Negative as adjusting phase not lag inside PTC
+                  p%magp%phas = p%mag%phas
+               endif
+
                 ! watch the msg buffer is 1024
                 write(msg,*) " Cavity ",p%mag%name," defined with harmonic number ",tempdp,". Using SUM(LD) as ring length: ", l, &
                              " instead of real orbit length. Obtained freq. = ",p%mag%freq," Hz"
