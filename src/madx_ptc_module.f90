@@ -1703,16 +1703,6 @@ CONTAINS
        key%list%n_bessel=node_value('n_bessel ')
        key%list%harmon=one ! it is ignored by PTC because it does not know the circumference
 
-! JG 19.04.2023 - added no_cavity_totalpath for rf multipole
-       no_cavity_totalpath=node_value('no_cavity_totalpath ').ne.0
-       if(no_cavity_totalpath) then
-          key%list%cavity_totalpath=0
-       else
-          key%list%cavity_totalpath=1
-          ! correction for time of flight through cavity
-          ! we want particle with t=0 to be not accelerated
-          key%list%lag = key%list%lag + twopi*freq*(l/2d0)/(clight*beta0)
-       endif
 
        key%list%k(:)=zero
        key%list%ks(:)=zero
@@ -1800,6 +1790,8 @@ CONTAINS
           key%list%cavity_totalpath=0
        else
           key%list%cavity_totalpath=1
+      !  JG 30.06.2023 - added no_cavity_totalpath for rf multipole
+          key%list%lag = key%list%lag + twopi*freq*(l/2d0)/(clight*beta0)
        endif
 
 !       print*,"madx_ptc_module::input volt: ", key%list%volt, &
