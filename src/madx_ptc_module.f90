@@ -1735,14 +1735,20 @@ CONTAINS
           key%list%thin_v_foc=skew(0)*skew(0)/lrad
        endif
        skew(0)=-skew(0) ! WHY NEGATE IT? just change the single place its required?
+       
+       if (l .ne. 0) then
+          div = l
+       else
+          div = one
+       endif
 
        do i=0,nn
-          key%list%k(i+1)=normal(i)
+          key%list%k(i+1)=normal(i)/div
           if (normal(i) /= zero) icav=1
        enddo
 
        do i=0,ns
-          key%list%ks(i+1)=skew(i)
+          key%list%ks(i+1)=skew(i)/div
           if (normal(i) /= zero) icav=1
        enddo
 
