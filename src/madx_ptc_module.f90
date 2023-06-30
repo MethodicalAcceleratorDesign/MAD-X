@@ -1051,7 +1051,7 @@ CONTAINS
 
 ! LD: 19.06.2019
        if (sk1s .ne. zero) then
-          if (ord_max .le. 2 .and. sk0 .eq. 0 .and. key%list%permfringe .eq. 0) then !
+          if (ord_max .le. 2 .and. sk0 .eq. 0 .and. sk0s .eq. 0 .and. key%list%permfringe .eq. 0) then !
             tilt = -atan2(sk1s, sk1)/two + tilt
             sk1  = sqrt(sk1**2 + sk1s**2)
             sk1s = zero
