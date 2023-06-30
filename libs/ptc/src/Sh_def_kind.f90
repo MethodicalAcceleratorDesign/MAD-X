@@ -1735,11 +1735,12 @@ CONTAINS !----------------------------------------------------------------------
        ENDIF
 
        IF(EL%THIN) THEN
+          call PRTP("ADJTIME_CAV4:1", X)
           CALL CAVITY(EL,X,k)
           EL%DELTA_E=(X(5)-EL%DELTA_E)*EL%P%P0C
-          call PRTP("ADJTIME_CAV4:1", X)
           RETURN
        ENDIF
+       call PRTP("ADJTIME_CAV4:1", X)
 
     ELSE
        IF(EL%THIN) RETURN
