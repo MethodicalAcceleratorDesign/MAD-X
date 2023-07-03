@@ -1081,6 +1081,11 @@ CONTAINS
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
+       !JG: 18.04.2023 Allowed k0 and k0s for sextupole
+       key%list%k(1)=key%list%k(1)+normal_0123(0)
+       ! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
+       key%list%ks(1)=key%list%ks(1)-skew_0123(0)
+       
        ! sextupole components
        sk2= node_value('k2 ')  * (1 + node_value('ktap '))
        sk2s=node_value('k2s ') * (1 + node_value('ktap '))
@@ -1118,10 +1123,6 @@ CONTAINS
        key%list%ks(3) = sk2s                                         !
 !       key%list%ks(3)=zero  ! added by VK                         !
        
-!JG: 18.04.2023 Allowed k0 and k0s for sextupole
-       key%list%k(1)=key%list%k(1)+normal_0123(0)
-! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
-       key%list%ks(1)=key%list%ks(1)-skew_0123(0)
        key%tiltd=tilt  !==========================================!
 
        !================================================================
@@ -1143,6 +1144,11 @@ CONTAINS
        key%magnet="octupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
+       
+       !JG: 20.04.2023 Allowed k0 and k0s for octupole
+       key%list%k(1)=key%list%k(1)+normal_0123(0)
+       ! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
+       key%list%ks(1)=key%list%ks(1)-skew_0123(0)
 
        ! octupole components
        sk3= node_value('k3 ')
@@ -1180,11 +1186,6 @@ CONTAINS
        key%list%va=node_value('f1 ')
        key%list%vs=node_value('f2 ')
        key%tiltd=tilt  
-
-!JG: 20.04.2023 Allowed k0 and k0s for octupole
-       key%list%k(1)=key%list%k(1)+normal_0123(0)
-! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
-       key%list%ks(1)=key%list%ks(1)-skew_0123(0)
        !==========================================!
 
        !================================================================
