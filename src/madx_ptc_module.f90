@@ -1449,21 +1449,14 @@ CONTAINS
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
        PATCH_TRANS = zero
-! JG 27.06.2023 Fixed changeref to avoid memory access outside program range
-      !  call get_node_vector('patch_ang ',3,patch_ang) !Causes -> +++ memory access outside program range, fatal +++
-      !  call get_node_vector('patch_trans ',3,patch_trans) !Causes -> +++ memory access outside program range, fatal +++
-       patch_trans(1)=node_value('dx ')
-       patch_trans(2)=node_value('dy ')
-       patch_trans(3)=node_value('ds ')
-       patch_ang(1)=-node_value('dphi ') ! x-rotation
-       patch_ang(2)=-node_value('dtheta ')  ! -y-rotation
-       patch_ang(3)=node_value('dpsi ') ! s-rotation
+       call get_node_vector('patch_ang ',3,patch_ang)
+       call get_node_vector('patch_trans ',3,patch_trans)
        key%list%patchg=2
        do i=1,3
           key%list%ang(i)=patch_ang(i)
           key%list%t(i)=patch_trans(i)
        enddo
-      !  key%list%ang(2)=-patch_ang(2) ! Change the sign of the y-rotation to be the geometrical angle.
+       key%list%ang(2)=-patch_ang(2) ! Change the sign of the y-rotation to be the geometrical angle.
 
     case(code_translation) ! case(36) ! TRANSLATION
        key%magnet="CHANGEREF"
