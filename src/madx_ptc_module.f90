@@ -265,7 +265,7 @@ CONTAINS
     use code_constfi
     implicit none
     logical(lp) particle,doneit,isclosedlayout,get_option
-    integer i,j,k,code,nt,icount,nn,ns,nd,mg,napoffset,get_string
+    integer i,j,k,code,nt,icount,nn,ns,nd,np,mg,napoffset,get_string
    !  integer get_option
     integer double_from_table_row,table_cell_exists
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
@@ -1449,8 +1449,9 @@ CONTAINS
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
        PATCH_TRANS = zero
-       call get_node_vector('patch_ang ',3,patch_ang)
-       call get_node_vector('patch_trans ',3,patch_trans)
+       np = 3
+       call get_node_vector('patch_ang ',np,patch_ang)
+       call get_node_vector('patch_trans ',np,patch_trans)
        key%list%patchg=2
        do i=1,3
           key%list%ang(i)=patch_ang(i)
