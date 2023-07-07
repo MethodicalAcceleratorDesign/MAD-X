@@ -948,13 +948,16 @@ CONTAINS
 
        endif
 
-       tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1+node_value('ktap '))
+       key%list%b0=bvk*(node_value('angle ')) * (1+node_value('ktap '))
 
+       ! JG 06.07.2023: add k0 in knl to list
+       key%list%k(1)=key%list%k(1)    + normal_0123(0)
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
        key%list%k(4)=node_value('k3 ')+ key%list%k(4)
 
+       ! JG 06.07.2023: remove tilt with k0s, add k0s to list -> uses curved frame so tilt not suitable
+       key%list%ks(1)=node_value('k0s ')- skew_0123(0)  ! Again, why do we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS?
        key%list%ks(2)=node_value('k1s ')+ key%list%ks(2)
        key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
        key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
@@ -976,7 +979,6 @@ CONTAINS
        key%list%va=node_value('f1 ')
        key%list%vs=node_value('f2 ')
        key%tiltd=node_value('tilt ')
-       if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
