@@ -2060,6 +2060,7 @@ CONTAINS
        rectaETILT%KILL_EXI_SPIN=list%KILL_EXI_SPIN
        rectaETILT%BEND_FRINGE=list%BEND_FRINGE
        rectaETILT%PERMFRINGE=list%PERMFRINGE
+       if ((rectaETILT%permfringe==2.or.rectaETILT%permfringe==3).and.list%nmul<2) rectaETILT%nmul=2 !We need AN(2) and BN(2) for FRINGE2QUAD 
        rectaETILT%highest_fringe=list%highest_fringe
     endif
 
