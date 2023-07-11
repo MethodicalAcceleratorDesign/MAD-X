@@ -695,6 +695,13 @@ CONTAINS
       END IF norm_out_wrong
 
       Normal_Order_n0  = get_value('ptc_track ','norm_no ')
+      if (sector_nmul_max > 3 .and. sector_nmul_max < Normal_Order_n0 + 1) then 
+         call fort_warn('ptc_normal: ',&
+              'The order of calculation is not sufficient with the current sector_nmul_max')
+         print *, "Increase this value to a minimum of, ", Normal_Order_n0+1, &
+                   " with ptc_create_universe, sector_nmul_max = ", Normal_Order_n0 + 1, &
+                   ", sector_nmul = ", Normal_Order_n0 + 1, ";"
+       endif
 
       !ptc_track_debug  =  get_value('ptc_track ','debug ') .ne. 0  ! before 2006.03.20
       if (getdebug()>3) ptc_track_debug=.true.  ! ptc_track_debug=.T., if debuglevel.ge.3 ,i.e.,

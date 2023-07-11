@@ -74,7 +74,6 @@ contains
       return
     endif
     
-    print *, "ptc_normal: order of calculation: ", no, " sector_nmul_max: ", sector_nmul_max
     if (sector_nmul_max > 3 .and. sector_nmul_max < no + 1) then 
       call fort_warn('ptc_normal: ',&
            'The order of calculation is not sufficient with the current sector_nmul_max')
