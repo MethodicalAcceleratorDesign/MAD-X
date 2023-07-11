@@ -74,6 +74,14 @@ contains
       return
     endif
     
+    print *, "ptc_normal: order of calculation: ", no, " sector_nmul_max: ", sector_nmul_max
+    if (sector_nmul_max > 3 .and. sector_nmul_max < no + 1) then 
+      call fort_warn('ptc_normal: ',&
+           'The order of calculation is not sufficient with the current sector_nmul_max')
+      print *, "Increase this value to a minimum of, ", no+1, &
+                " with ptc_create_universe, sector_nmul_max = ", no + 1, ", sector_nmul = ", no + 1, ";"
+    endif
+    
     call cleartables() !defined in madx_ptc_knobs
 
     nda=0
