@@ -270,8 +270,9 @@ CONTAINS
     integer double_from_table_row,table_cell_exists
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, external :: get_userdefined_geometry, get_userdefined_geometry_len
+    real(kind(1d0)), external :: sinc ! defined in util.f90 - used for calculating el from eld
     integer, parameter :: nt0=20000
-    real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge
+    real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge, el, elc !El is for rbend only, indicates true element length, user input is always eld. Elc is the cord length
     real(dp) f_errors(0:maxferr),aperture(maxnaper),normal(0:maxmul), apoffset(2)
     real(dp) patch_ang(3),patch_trans(3)
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2),myfield(2*maxmul+2)
@@ -850,19 +851,10 @@ CONTAINS
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
-       tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1+node_value('ktap '))
-
-       !       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
-       !       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
-
-       key%list%k(2)=node_value('k1 ')+ key%list%k(2)
-       key%list%k(3)=node_value('k2 ')+ key%list%k(3)
-       key%list%k(4)=node_value('k3 ')+ key%list%k(4)
-
-       key%list%ks(2)=node_value('k1s ')+ key%list%ks(2)
-       key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
-       key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
+       key%list%b0=bvk*(node_value('angle ')) * (1+node_value('ktap '))
+       !JG 06.07.2023 - Rbend knl strengths now unweighted correctly for PTC (el not eld)
+       el  = l ! Curved rbend case
+       elc = l * sinc(0.5*key%list%b0) ! Use the angle that PTC uses to calculate the knl strengths
 
        if(EXACT_MODEL.and.(node_value('angle ').eq.zero)) then
           key%magnet="quadrupole"
@@ -887,7 +879,6 @@ CONTAINS
           key%list%va=node_value('f1 ')
           key%list%vs=node_value('f2 ')
           key%list%tilt=node_value('tilt ')
-          if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
           ptcrbend=node_value('ptcrbend ').ne.0
           if(ptcrbend) then
              call context(key%list%name)
@@ -912,7 +903,7 @@ CONTAINS
                   key%magnet="WEDGRBEND"
                 elseif (key%list%t2/=zero) then
                    !Convert e2 to an e1 (simplifies sp_keywords)
-                   key%list%t1=node_value('angle ')-key%list%t2 !To keep parallel faces, e1 = angle - e2
+                   key%list%t1=key%list%b0-key%list%t2 !To keep parallel faces, e1 = angle - e2
                    key%list%t2=zero
                 endif
              else
@@ -920,6 +911,31 @@ CONTAINS
              endif
           endif
        endif
+       !JG 06.07.2023 - Rbend knl strengths now unweighted correctly for PTC (el not eld)
+       if (key%magnet == "WEDGRBEND") then
+         el = elc
+       elseif (key%magnet == "TRUERBEND") then
+         el = elc * cos(key%list%b0/2 - key%list%t1)
+       endif
+
+       ! JG 06.07.2023: Correctly unweight knl strengths for PTC (el not eld)
+       do i=1,ord_max
+         key%list%k (i) = key%list%k (i) * (l/el)
+         key%list%ks(i) = key%list%ks(i) * (l/el)
+       enddo
+
+       ! JG 06.07.2023: add k0 in knl to list
+       key%list%k(1)=key%list%k(1)    + normal_0123(0)*(l/el)
+       key%list%k(2)=node_value('k1 ')+ key%list%k(2)
+       key%list%k(3)=node_value('k2 ')+ key%list%k(3) 
+       key%list%k(4)=node_value('k3 ')+ key%list%k(4) 
+
+       ! JG 06.07.2023: add k0s to rbend, without rotation
+       key%list%ks(1)=node_value('k0s ')- skew_0123(0)*(l/el)   ! Again, why do we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS?
+       key%list%ks(2)=node_value('k1s ')+ key%list%ks(2)
+       key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
+       key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
+
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
