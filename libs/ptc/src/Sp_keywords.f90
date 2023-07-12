@@ -209,11 +209,13 @@ contains
     CASE("TRUERBEND     ")
        if(sixtrack_compatible) stop 2
 
-       if(KEY%LIST%t1/=0.0_dp) then !From madx_ptc_module, only t1 is used
+       if(KEY%LIST%t1.gt.twopi) then !From madx_ptc_module, only t1 is used
+         KEY%LIST%t1 = 0 
          ! e1_true= KEY%LIST%b0/2.0_dp + KEY%LIST%t1
-         BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=KEY%LIST%t1,list=KEY%LIST)
+         BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e2=KEY%LIST%t2,list=KEY%LIST)
        else
-         BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,list=KEY%LIST)
+         KEY%LIST%t2 = 0
+         BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=KEY%LIST%t1,list=KEY%LIST)
        endif
 
     CASE("WEDGRBEND     ")
