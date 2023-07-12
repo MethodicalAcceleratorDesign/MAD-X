@@ -1606,6 +1606,9 @@ CONTAINS
 
        if(key%list%k(1).ne.zero.and.key%list%freq0.ne.zero) icav=1
 
+       !JG 12.07.2023: added harmon for crab cavities
+       m_u%end%HARMONIC_NUMBER=node_value('harmon ')   ! etienne_harmon
+
     !RFMULTIPOLE, crab also falls here, but is made with special case where volt defines BN(1)
 
     case(code_hacdipole) ! case(40)
