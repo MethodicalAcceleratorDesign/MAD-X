@@ -292,6 +292,7 @@ CONTAINS
     integer             exact1
     integer             sector_nmul_max0,sector_nmul0
     integer             model
+    integer             fringe
     integer             method,method0,method1
     integer             nst0,nst1,ord_max,kk
     REAL (dp) :: tempdp,bvk
@@ -634,14 +635,16 @@ CONTAINS
     endif
 
     !special node keys
-    key%list%permfringe=node_value("fringe ") ! transfer(node_value("fringe ") .ne. zero, key%list%permfringe)
-!JG 13.04.2023 - for MAD-NG compatibility i.e. you will get all the fringes of PTC if you set fringe > 3
-    if (key%list%permfringe .gt. 3) then 
-      key%list%permfringe = 3
-   endif
+! JG: Change fringe to work like MAD-NG
+    fringe = node_value("fringe ")
+    key%list%permfringe=fringe/2 ! 1/3 -> multipole fringe, 2/3 -> fringe2quad
 !JG 13.04.2023 - Added fringe max for multipole fringe field
     key%list%highest_fringe=node_value("frngmax ")
-    key%list%bend_fringe=node_value("bend_fringe ") .ne. zero
+!JG 11.07.2023 - Removed bend fringe, instead check if fringe is odd
+    key%list%bend_fringe= MOD(fringe, 2) .eq. 1
+    print *, 'fringe = ', fringe, ' permfringe = ', key%list%permfringe, ' bend_fringe = ', & 
+    key%list%bend_fringe, ' highest_fringe = ', key%list%highest_fringe
+    print *, MOD(fringe, 2)
     key%list%kill_ent_fringe=node_value("kill_ent_fringe ") .ne. zero
     key%list%kill_exi_fringe=node_value("kill_exi_fringe ") .ne. zero
 
