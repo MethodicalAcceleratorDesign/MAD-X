@@ -1010,7 +1010,7 @@ CONTAINS
 ! LD: 19.06.2019 & JG 26.06.2023 - Added normal_0123(0) and skew_0123(0) to the quadrupole strength
        sk0=node_value('k0 ') + normal_0123(0)
 ! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
-       sk0s = -skew_0123(0)
+       sk0s = skew_0123(0)
 
        ! quadrupole components
        sk1= node_value('k1 ')  * (1 + node_value('ktap '))
@@ -1086,7 +1086,7 @@ CONTAINS
        !JG: 18.04.2023 Allowed k0 and k0s for sextupole
        key%list%k(1)=key%list%k(1)+normal_0123(0)
        ! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
-       key%list%ks(1)=key%list%ks(1)-skew_0123(0)
+       key%list%ks(1)=key%list%ks(1)+skew_0123(0)
        
        ! sextupole components
        sk2= node_value('k2 ')  * (1 + node_value('ktap '))
@@ -1150,7 +1150,7 @@ CONTAINS
        !JG: 20.04.2023 Allowed k0 and k0s for octupole
        key%list%k(1)=key%list%k(1)+normal_0123(0)
        ! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
-       key%list%ks(1)=key%list%ks(1)-skew_0123(0)
+       key%list%ks(1)=key%list%ks(1)+skew_0123(0)
 
        ! octupole components
        sk3= node_value('k3 ')
@@ -1208,10 +1208,9 @@ CONTAINS
           key%list%k(i)=zero
           key%list%ks(i)=zero
        enddo
-       skew(0)=-skew(0) ! frs error found 30.08.2008
 
-       key%list%thin_h_angle=bvk*normal(0)
-       key%list%thin_v_angle=bvk*skew(0)
+       key%list%thin_h_angle= bvk*normal(0)
+       key%list%thin_v_angle=-bvk*skew(0)
        lrad=node_value('lrad ')
        if(lrad.gt.zero) then
           key%list%thin_h_foc=normal(0)*normal(0)/lrad
@@ -1309,15 +1308,15 @@ CONTAINS
           !JG: 18.04.2023 Allowed k0 and k0s for solenoid
           key%list%k(1)=key%list%k(1)+normal_0123(0)
           ! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
-          key%list%ks(1)=key%list%ks(1)-skew_0123(0)
+          key%list%ks(1)=key%list%ks(1)+skew_0123(0)
        else 
          ! JG 21.04.2023 L = 0 means thin solenoid, therefore needs multipole 
          ! thin_h_angle, thin_v_angle, thin_h_foc, thin_v_foc
           ksi=node_value('ksi ')
           lrad=node_value('lrad ')
           if(lrad.eq.zero.and.ks.ne.zero) lrad=ksi/ks
-          key%list%thin_h_angle=bvk*normal_0123(0)
-          key%list%thin_v_angle=bvk*skew_0123(0)
+          key%list%thin_h_angle= bvk*normal_0123(0)
+          key%list%thin_v_angle=-bvk*skew_0123(0)
           if(lrad.gt.zero) then
              key%list%thin_h_foc=normal_0123(0)*normal_0123(0)/lrad
              key%list%thin_v_foc=skew_0123(0)*skew_0123(0)/lrad
@@ -1716,15 +1715,13 @@ CONTAINS
        if(nn.ge.NMAX) nn=NMAX-1
        if(ns.ge.NMAX) ns=NMAX-1
 
-       skew(0)=-skew(0) ! frs error found 30.08.2008
-       key%list%thin_h_angle=bvk*normal(0)
-       key%list%thin_v_angle=bvk*skew(0)
+       key%list%thin_h_angle= bvk*normal(0)
+       key%list%thin_v_angle=-bvk*skew(0)
        lrad=node_value('lrad ')
        if(lrad.gt.zero) then
           key%list%thin_h_foc=normal(0)*normal(0)/lrad
           key%list%thin_v_foc=skew(0)*skew(0)/lrad
        endif
-       skew(0)=-skew(0) ! WHY NEGATE IT? just change the single place its required?
        
        if (l .ne. 0) then
           div = l
@@ -1977,7 +1974,6 @@ CONTAINS
     ! Assign values from the command line                       !
     call get_node_vector('knl ',n_norm,normal)                  !
     call get_node_vector('ksl ',n_skew,skew)                    !
-    skew(0)=-skew(0)                                            ! frs error found 30.08.2008
     if(n_norm.ge.maxmul) n_norm=maxmul-1                        !
     if(n_skew.ge.maxmul) n_skew=maxmul-1                        !
     ord_max=max(n_norm,n_skew)                                  !
@@ -2105,7 +2101,6 @@ CONTAINS
     ! Assign values from the command line                       !
     call get_node_vector('knl ',n_norm,normal)                  !
     call get_node_vector('ksl ',n_skew,skew)                    !
-    skew(0)=-skew(0)                                            ! frs error found 30.08.2008
     if(n_norm.ge.maxmul) n_norm=maxmul-1                        !
     if(n_skew.ge.maxmul) n_skew=maxmul-1                        !
     ord_max=max(n_norm,n_skew)                                  !
