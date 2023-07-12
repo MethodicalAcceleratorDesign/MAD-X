@@ -297,7 +297,7 @@ CONTAINS
     integer             method,method0,method1
     integer             nst0,nst1,ord_max,kk
     REAL (dp) :: tempdp,bvk
-    logical(lp):: ptcrbend,truerbend,errors_out
+    logical(lp):: true_rbend,errors_out
     !  Etienne helical
     character(nlp) heli(100)
     integer mheli,helit,ihelit
@@ -326,7 +326,7 @@ CONTAINS
 
     energy=get_value('probe ','energy ')
     pma=get_value('probe ','mass ')
-! jg 07.06.2023 Allow PTC to have a charge, if set to true
+    ! jg 07.06.2023 Allow PTC to have a charge, if set to true
     if (get_option("nocharge")) then
       charge = 1
     else
@@ -879,36 +879,20 @@ CONTAINS
           key%list%va=node_value('f1 ')
           key%list%vs=node_value('f2 ')
           key%list%tilt=node_value('tilt ')
-          ptcrbend=node_value('ptcrbend ').ne.0
-          if(ptcrbend) then
-             call context(key%list%name)
-             truerbend=node_value('truerbend ').ne.0
-             if(truerbend) then
-                key%magnet="TRUERBEND"
-                if(key%list%t2/=zero .and. key%list%t1/=zero) then
-                   write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                   write(6,*) " The true parallel face bend "
-                   write(6,*) " only accepts the total angle and e1 or e2 as an input "
-                   write(6,*) " if e1=0 and e2/=0, then the pipe angle to the entrance face is "
-                   write(6,*) " angle/2-e2 and the exit pipe makes an angle angle/2+e2."
-                   write(6,*) " If e1/=0, then the pipe angle to the entrance face is "
-                   write(6,*) ' angle/2+e1 and the exit pipe makes an angle "angle/2-e1" '
-                   write(6,*) " with the exit face."
-                   write(6,*) " You have entered a value for e1 and e2, this is not allowed for the truerbend flag. "
-                   write(6,*) " Instead, your rbend has been converted to a madlike rbend where this is allowed. "
-                   write(6,*) " Make sure that this is what you want!!! "
-                   write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                  key%magnet="WEDGRBEND"
-                elseif (key%list%t1==zero.and.key%list%t2==zero) then
-                  key%magnet="WEDGRBEND"
-                elseif (key%list%t2/=zero) then
-                   !Convert e2 to an e1 (simplifies sp_keywords)
-                   key%list%t1=key%list%b0-key%list%t2 !To keep parallel faces, e1 = angle - e2
-                   key%list%t2=zero
-                endif
-             else
-                key%magnet="WEDGRBEND"
-             endif
+          call context(key%list%name)
+          true_rbend=node_value('true_rbend ').ne.0
+          if(true_rbend) then
+            key%magnet="WEDGRBEND"
+            if    (key%list%t1.gt.twopi) then
+               key%magnet="TRUERBEND"
+            elseif(key%list%t2.gt.twopi) then
+               key%magnet="TRUERBEND"
+            elseif (key%list%t1.gt.twopi.and.key%list%t2.gt.twopi) then
+               key%list%t1 = 0
+               key%list%t2 = 0
+               call fort_warn('ptc_createlayout: ','True parallel rbend converted to &
+                              straight rbend, since e1 and e2 are not defined')
+            endif
           endif
        endif
        !JG 06.07.2023 - Rbend knl strengths now unweighted correctly for PTC (el not eld)
