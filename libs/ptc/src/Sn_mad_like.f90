@@ -2040,7 +2040,7 @@ CONTAINS
        rectaETILT%hgap=list%hgap
        rectaETILT%h1=list%h1
        rectaETILT%h2=list%h2
-       rectaETILT%nmul=list%nmul
+      !  rectaETILT%nmul=list%nmul ! JG 21/07/2023 - Why does this cause problems?
        if(exactitude==3.and.list%nmul<2) rectaETILT%nmul=2
        rectaETILT%nst=list%nst
        rectaETILT%APERTURE_ON=list%APERTURE_ON
