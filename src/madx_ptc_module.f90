@@ -1226,12 +1226,10 @@ CONTAINS
          key%list%bsol=bvk*ksi/lrad
          key%list%ls=lrad
        elseif (ksi.ne.zero) then
-         write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-         write(6,*) " Solenoid component ignored as lrad=0"
-         write(6,*) " This feature was added for MAD-NG compatibility"
-         write(6,*) " the combination of ks and ksi is not supported in a multipole"
-         write(6,*) " Please use the SOLENOID element with knl and ksl or specify lrad"
-         write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+         write(msg,*) "Multipole solenoid component ignored as lrad=0, &
+                       the combination of ks and ksi is not supported in a multipole. &
+                       Please use the SOLENOID element with knl and ksl or specify lrad"
+         call fort_warn("ptc_input",msg(:len_trim(msg)))
       endif
 
 
