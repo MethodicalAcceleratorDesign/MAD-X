@@ -643,9 +643,6 @@ CONTAINS
     key%list%highest_fringe=node_value("frngmax ")
 !JG 11.07.2023 - Removed bend fringe, instead check if fringe is odd
     key%list%bend_fringe= MOD(fringe, 2) .eq. 1
-    print *, 'fringe = ', fringe, ' permfringe = ', key%list%permfringe, ' bend_fringe = ', & 
-    key%list%bend_fringe, ' highest_fringe = ', key%list%highest_fringe
-    print *, MOD(fringe, 2)
     key%list%kill_ent_fringe=node_value("kill_ent_fringe ") .ne. zero
     key%list%kill_exi_fringe=node_value("kill_exi_fringe ") .ne. zero
 
