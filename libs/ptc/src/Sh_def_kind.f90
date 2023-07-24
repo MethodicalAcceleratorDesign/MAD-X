@@ -14250,7 +14250,7 @@ endif
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
             !  print *, "fringe=", k%fringe, "bend_fringe=", el%p%bend_fringe, "permfringe=", el%p%permfringe
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
-             print *, EL%P%EDGE(2), EL%P%BETA0, DONEITT, k%TIME
+            !  print *, EL%P%EDGE(2), EL%P%BETA0, DONEITT, k%TIME
          ELSE
                IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
