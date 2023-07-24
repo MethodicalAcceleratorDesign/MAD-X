@@ -327,7 +327,7 @@ CONTAINS
     energy=get_value('probe ','energy ')
     pma=get_value('probe ','mass ')
     ! jg 07.06.2023 Allow PTC to have a charge, if set to true
-    if (get_option("nocharge")) then
+    if (get_value('ptc_setswitch ', 'nocharge ').ne.0) then
       charge = 1
     else
       charge=get_value('probe ','charge ')

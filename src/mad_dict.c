@@ -294,7 +294,6 @@ const char *const_command_def =
 "info       = [l, true, true], "
 "reset      = [l, false, true], "
 "debug      = [l, false, true], "
-"nocharge   = [l, true, true], " /* jg 07.06.2023 Allow PTC to have a charge, if set to false */
 "verbose    = [l, false, true], " /*hbu */
 "rbarc      = [l, true, true], "
 "rand       = [s, default, best], "
@@ -776,6 +775,7 @@ const char *const_command_def =
 "envelope   = [l, false, true], "  /*sets the envelope switch/internal state of PTC */
 "fringe     = [l, false, true], "  /*sets the fringe switch/internal state of PTC */
 "nocavity   = [l, false, true], "  /*sets the nocavity switch/internal state of PTC */
+"nocharge   = [l, true, true], "   /* jg 07.06.2023 Allow PTC to have a charge, if set to false */
 "time       = [l, true, true]; "   /* switch to use time rather than pathlength, modifies PTC states by adding TIME0 flag */
 " "
 "ptc_enforce6d: ptc_enforce6d none 0 0 "
