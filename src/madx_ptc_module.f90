@@ -880,15 +880,13 @@ CONTAINS
           true_rbend=node_value('true_rbend ').ne.0
           if(true_rbend) then
             key%magnet="WEDGRBEND"
-            if    (key%list%t1.gt.twopi) then
+            if (key%list%t1.gt.twopi.and.key%list%t2.gt.twopi) then
+               call seterrorflag(10, "ptc_createlayout ", 'Invalid true parallel rbend, &
+                                  e1 and e2 are not defined (both greater than 2pi) ')
+            elseif(key%list%t1.gt.twopi) then
                key%magnet="TRUERBEND"
             elseif(key%list%t2.gt.twopi) then
                key%magnet="TRUERBEND"
-            elseif (key%list%t1.gt.twopi.and.key%list%t2.gt.twopi) then
-               key%list%t1 = 0
-               key%list%t2 = 0
-               call fort_warn('ptc_createlayout: ','True parallel rbend converted to &
-                              straight rbend, since e1 and e2 are not defined')
             endif
           endif
        endif
