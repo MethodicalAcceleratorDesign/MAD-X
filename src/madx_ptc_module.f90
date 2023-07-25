@@ -912,7 +912,7 @@ CONTAINS
        key%list%k(4)=node_value('k3 ')+ key%list%k(4) 
 
        ! JG 06.07.2023: add k0s to rbend, without rotation
-       key%list%ks(1)=node_value('k0s ')- skew_0123(0)*(l/el)   ! Again, why do we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS?
+       key%list%ks(1)=node_value('k0s ')+ skew_0123(0)*(l/el)
        key%list%ks(2)=node_value('k1s ')+ key%list%ks(2)
        key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
        key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
@@ -957,7 +957,7 @@ CONTAINS
        key%list%k(4)=node_value('k3 ')+ key%list%k(4)
 
        ! JG 06.07.2023: remove tilt with k0s, add k0s to list -> uses curved frame so tilt not suitable
-       key%list%ks(1)=node_value('k0s ')- skew_0123(0)  ! Again, why do we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS?
+       key%list%ks(1)=node_value('k0s ')+ skew_0123(0)
        key%list%ks(2)=node_value('k1s ')+ key%list%ks(2)
        key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
        key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
@@ -1009,7 +1009,6 @@ CONTAINS
 
 ! LD: 19.06.2019 & JG 26.06.2023 - Added normal_0123(0) and skew_0123(0) to the quadrupole strength
        sk0=node_value('k0 ') + normal_0123(0)
-! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
        sk0s = skew_0123(0)
 
        ! quadrupole components
@@ -1084,9 +1083,8 @@ CONTAINS
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
        !JG: 18.04.2023 Allowed k0 and k0s for sextupole
-       key%list%k(1)=key%list%k(1)+normal_0123(0)
-       ! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
-       key%list%ks(1)=key%list%ks(1)+skew_0123(0)
+       key%list%k (1)=key%list%k (1)+normal_0123(0)
+       key%list%ks(1)=key%list%ks(1)+  skew_0123(0)
        
        ! sextupole components
        sk2= node_value('k2 ')  * (1 + node_value('ktap '))
@@ -1148,9 +1146,8 @@ CONTAINS
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
        
        !JG: 20.04.2023 Allowed k0 and k0s for octupole
-       key%list%k(1)=key%list%k(1)+normal_0123(0)
-       ! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
-       key%list%ks(1)=key%list%ks(1)+skew_0123(0)
+       key%list%k (1)=key%list%k (1)+normal_0123(0)
+       key%list%ks(1)=key%list%ks(1)+  skew_0123(0)
 
        ! octupole components
        sk3= node_value('k3 ')
@@ -1304,9 +1301,8 @@ CONTAINS
        if(l.ne.zero) then ! JG 21.04.2023 L != 0 means thick solenoid
           key%list%bsol=bvk*ks
           !JG: 18.04.2023 Allowed k0 and k0s for solenoid
-          key%list%k(1)=key%list%k(1)+normal_0123(0)
-          ! If you find out why we negate skew(0) in SUMM_MULTIPOLES_AND_ERRORS, please let me know
-          key%list%ks(1)=key%list%ks(1)+skew_0123(0)
+          key%list%k (1)=normal_0123(0)
+          key%list%ks(1)=  skew_0123(0)
        else 
          ! JG 21.04.2023 L = 0 means thin solenoid, therefore needs multipole 
          ! thin_h_angle, thin_v_angle, thin_h_foc, thin_v_foc
