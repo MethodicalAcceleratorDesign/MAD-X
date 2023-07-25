@@ -3615,7 +3615,9 @@ subroutine trsol(track,ktrack,dxt,dyt)
               track(2,i) =  pxf_
               track(3,i) = -xf  * sinTh  +  yf  * cosTh
               track(4,i) =  pyf_
-              track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) * beti
+              ! JG: 25.07.2023 - Fix for T variable to match PTC, 
+              ! see http://cds.cern.ch/record/290467/files/arXiv:acc-phys_9510005.pdf
+              track(5,i) =  (sigf + (xf*track(4,i) - yf*track(2,i))*Z) * beti
               ! track(6,i) =  psigf*betas
            endif
         enddo ! step
