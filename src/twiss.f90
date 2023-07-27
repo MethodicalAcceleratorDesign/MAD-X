@@ -6112,8 +6112,8 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
-  use twissbeamfi, only : radiate, deltap, gamma, arad
-  use math_constfi, only : zero, one, two, three
+  use twissbeamfi, only : radiate, deltap, beta, gamma, arad
+  use math_constfi, only : zero, one, two, three, four
   use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
@@ -6142,14 +6142,14 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
 
   logical :: cplxy
   integer :: i, j, n_ferr, elpar_vl
-  double precision :: ct, st, tmp
+  double precision :: ct, st, tmp, biby4
   double precision :: f_errors(0:maxferr)
   double precision :: tilt, sk1, pt, sk1s, bvk, rfac
 
   integer, external :: node_fd_errors
   integer, external :: el_par_vector
   double precision, external :: node_value, get_value
-  double precision :: bet0, bet_sqr, f_damp_t
+  double precision :: bet0, bet_sqr, f_damp_t, oneplusdelta
 
   !double precision :: newbet0, newdeltap, ff
   integer, external :: get_option
@@ -6207,31 +6207,65 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
-  ! absorb pt in deltas
-  !pt= orbit(6)
-  !newdeltap=sqrt(pt**2+2*pt/bet0+1)-1
-  !newbet0= (1+newdeltap)/ (1/bet0+pt)
-  !ff= (one + deltap) / ( deltap+newdeltap) ! ratio
-  !orbit(2)=orbit(2)*ff
-  !orbit(4)=orbit(4)*ff
-  !orbit(6)=0
-  !sk1 =sk1*ff
-  ! start absorb pt in deltas
+  if (exact_expansion) then
 
-  call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
+     pt = orbit(6)
+     oneplusdelta = sqrt(pt*pt + 2*pt/bet0 + 1)
+     orbit(2) = orbit(2)/oneplusdelta
+     orbit(4) = orbit(4)/oneplusdelta
+     sk1 = sk1/oneplusdelta
 
-  ! restore pt
-  !sk1 =sk1/ff
-  !orbit(2)=orbit(2)/ff
-  !orbit(4)=orbit(4)/ff
-  !orbit(6)=pt
-  ! end restore pt
+     call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
 
+     orbit(2) = orbit(2)*oneplusdelta
+     orbit(4) = orbit(4)*oneplusdelta
+     sk1 = sk1*oneplusdelta
+     orbit(6) = pt
 
+     !---- First order terms
 
+     re(1,2) = re(1,2)/oneplusdelta
+     re(2,1) = re(2,1)*oneplusdelta
+     re(3,4) = re(3,4)/oneplusdelta
+     re(4,3) = re(4,3)*oneplusdelta
 
+     !---- Second order terms
 
-  if (fcentre) return
+     if (fsec) then
+
+        biby4 = one / (four * beta)
+
+        te(1,2,6) = te(1,2,6)/oneplusdelta
+        te(1,6,2) = te(1,6,2)/oneplusdelta
+
+        te(2,1,6) = te(2,1,6)*oneplusdelta
+        te(2,6,1) = te(2,6,1)*oneplusdelta
+
+        te(3,4,6) = te(3,4,6)/oneplusdelta
+        te(3,6,4) = te(3,6,4)/oneplusdelta
+
+        te(4,3,6) = te(4,3,6)*oneplusdelta
+        te(4,6,3) = te(4,6,3)*oneplusdelta
+
+        te(5,1,2) = te(5,1,2)/oneplusdelta
+        te(5,2,1) = te(5,2,1)/oneplusdelta
+        te(5,2,2) = te(5,2,2)/oneplusdelta**2
+
+        te(5,3,4) = te(5,3,4)/oneplusdelta
+        te(5,4,3) = te(5,4,3)/oneplusdelta
+        te(5,4,4) = te(5,4,4)/oneplusdelta**2
+
+     endif
+
+     if (fcentre) return
+
+  else
+
+     call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
+
+     if (fcentre) return
+
+  endif
 
   !---- Half radiation effect at exit.
   if (radiate .and. ftrk) then
@@ -6257,6 +6291,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
 end SUBROUTINE tmquad
 
 SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
+  use twisslfi, only: exact_expansion
   use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, four, six, ten3m
   implicit none
@@ -6282,17 +6317,34 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
   double precision :: qk, qkl, qkl2
   double precision :: cx, sx, cy, sy, biby4
+  double precision :: x,px,y,py,t,pt,deltaplusone,nk1
+
+
+  !if (exact_expansion) then
+  !   x= orbit(1)
+  !   px= orbit(2)
+  !   y= orbit(3)
+  !   py= orbit(4)
+  !   t= orbit(5)
+  !   pt= orbit(6)
+  !   deltaplusone=sqrt(pt**2+2*pt/beta+1)
+  !   nk1=sk1/deltaplusone
+  !else
+  !   nk1= sk1
+  !endif
+
+  nk1 = sk1
 
   !---- Set up c's and s's.
-  qk = sqrt(abs(sk1))
+  qk = sqrt(abs(nk1))
   qkl = qk * el
   if (abs(qkl) .lt. ten3m) then
-     qkl2 = sk1 * el**2
+     qkl2 = nk1 * el**2
      cx = (one - qkl2 / two)
      sx = (one - qkl2 / six) * el
      cy = (one + qkl2 / two)
      sy = (one + qkl2 / six) * el
-  else if (sk1 .gt. zero) then
+  else if (nk1 .gt. zero) then
      cx = cos(qkl)
      sx = sin(qkl) / qk
      cy = cosh(qkl)
@@ -6304,54 +6356,85 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
      sy = sin(qkl) / qk
   endif
 
+  !if (exact_expansion) then
+  !---- First-order terms.
+  !re(1,1) = cx
+  !re(1,2) = sx/deltaplusone
+  !re(2,1) = - nk1 * sx * deltaplusone
+  !re(2,2) = cx
+  !re(3,3) = cy
+  !re(3,4) = sy /deltaplusone
+  !re(4,3) = + nk1 * sy *deltaplusone
+  !re(4,4) = cy
+  !re(5,6) = el/(beta*gamma)**2
+
+  !ek(5) = el*dtbyds ! to be checked
+
+  !else
+  
   !---- First-order terms.
   re(1,1) = cx
   re(1,2) = sx
-  re(2,1) = - sk1 * sx
+  re(2,1) = - nk1 * sx
   re(2,2) = cx
   re(3,3) = cy
   re(3,4) = sy
-  re(4,3) = + sk1 * sy
+  re(4,3) = + nk1 * sy
   re(4,4) = cy
   re(5,6) = el/(beta*gamma)**2
 
   ek(5) = el*dtbyds
 
+  !endif
+
   !---- Second-order terms.
   if (fsec) then
      biby4 = one / (four * beta)
 
-     te(1,1,6) = + sk1 * el * sx * biby4
+     te(1,1,6) = + nk1 * el * sx * biby4
      te(1,6,1) = te(1,1,6)
      te(2,2,6) = te(1,1,6)
      te(2,6,2) = te(1,1,6)
      te(1,2,6) = - (sx + el*cx) * biby4
      te(1,6,2) = te(1,2,6)
-     te(2,1,6) = - sk1 * (sx - el*cx) * biby4
+     te(2,1,6) = - nk1 * (sx - el*cx) * biby4
      te(2,6,1) = te(2,1,6)
 
-     te(3,3,6) = - sk1 * el * sy * biby4
+     te(3,3,6) = - nk1 * el * sy * biby4
      te(3,6,3) = te(3,3,6)
      te(4,4,6) = te(3,3,6)
      te(4,6,4) = te(3,3,6)
      te(3,4,6) = - (sy + el*cy) * biby4
      te(3,6,4) = te(3,4,6)
-     te(4,3,6) = + sk1 * (sy - el*cy) * biby4
+     te(4,3,6) = + nk1 * (sy - el*cy) * biby4
      te(4,6,3) = te(4,3,6)
 
-     te(5,1,1) = - sk1 * (el - sx*cx) * biby4
-     te(5,1,2) = + sk1 * sx**2 * biby4
+     te(5,1,1) = - nk1 * (el - sx*cx) * biby4
+     te(5,1,2) = + nk1 * sx**2 * biby4
      te(5,2,1) = te(5,1,2)
      te(5,2,2) = - (el + sx*cx) * biby4
-     te(5,3,3) = + sk1 * (el - sy*cy) * biby4
-     te(5,3,4) = - sk1 * sy**2 * biby4
+     te(5,3,3) = + nk1 * (el - sy*cy) * biby4
+     te(5,3,4) = - nk1 * sy**2 * biby4
      te(5,4,3) = te(5,3,4)
      te(5,4,4) = - (el + sy*cy) * biby4
      te(5,6,6) = (- six * re(5,6)) * biby4
   endif
 
   !---- Track orbit.
+  !if (exact_expansion) then
+
+  !   orbit(1)=cx*x + sx*px/deltaplusone
+  !   orbit(2)=-nk1 * sx * x*deltaplusone + cx*px
+  !   orbit(3)=cy*y + sy*py/deltaplusone
+  !   orbit(4)=nk1 * sy * y*deltaplusone + cy*py
+  !   orbit(5)=el/(beta*gamma)**2*pt
+  !   re(5,1)=re(5,1) + te(5,1,1)*x + te(5,1,2)*px + te(5,1,3)*y + te(5,1,4)*py + te(5,1,5)*t + te(5,1,6)*pt
+  !else
+  !   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  !endif
+  
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
@@ -6587,7 +6670,7 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   integer :: i, j, n_ferr, elpar_vl
   double precision :: ct, st, tmp
   double precision :: f_errors(0:maxferr)
-  double precision :: tilt, sk2, pt, sk2s, bvk, rfac
+  double precision :: tilt, sk2, pt, sk2s, bvk, rfac, skl
 
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value, get_value
@@ -6678,21 +6761,33 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      !---- Second order terms
 
-     te(1,1,2) = te(1,1,2)/deltaplusone
-     te(1,2,2) = te(1,2,2)/deltaplusone**2
-     te(1,3,4) = te(1,3,4)/deltaplusone
-     te(1,4,4) = te(1,4,4)/deltaplusone**2
+     if (fsec) then 
+        skl = sk2 * el
+        if (skl .ne. zero) then
 
-     te(2,2,2) = te(2,2,2)/deltaplusone
-     te(2,3,3) = te(2,3,3)*deltaplusone
-     te(2,4,4) = te(2,4,4)/deltaplusone
+           te(1,1,2) = te(1,1,2)/deltaplusone
+           te(1,2,2) = te(1,2,2)/deltaplusone**2
+           te(1,3,4) = te(1,3,4)/deltaplusone
+           te(1,4,4) = te(1,4,4)/deltaplusone**2
 
-     te(3,1,4) = te(3,1,4)/deltaplusone
-     te(3,2,3) = te(3,2,3)/deltaplusone
-     te(3,2,4) = te(3,2,4)/deltaplusone**2
+           te(2,2,2) = te(2,2,2)/deltaplusone
+           te(2,3,3) = te(2,3,3)*deltaplusone
+           te(2,4,4) = te(2,4,4)/deltaplusone
 
-     te(4,1,3) = te(4,1,3)*deltaplusone
-     te(4,2,4) = te(4,2,4)/deltaplusone
+           te(3,1,4) = te(3,1,4)/deltaplusone
+           te(3,2,3) = te(3,2,3)/deltaplusone
+           te(3,2,4) = te(3,2,4)/deltaplusone**2
+
+           te(4,1,3) = te(4,1,3)*deltaplusone
+           te(4,2,4) = te(4,2,4)/deltaplusone
+           
+        endif
+
+        te(1,2,6) = te(1,2,6)/deltaplusone
+        te(3,4,6) = te(3,4,6)/deltaplusone
+        te(5,2,2) = te(5,2,2)/deltaplusone**2
+        te(5,4,4) = te(5,4,4)/deltaplusone**2
+     endif
 
      if (fcentre) return
 
