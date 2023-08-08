@@ -862,19 +862,10 @@ CONTAINS
           key%list%t1=node_value('e1 ')
           key%list%t2=node_value('e2 ')
           key%list%hgap=node_value('hgap ')
-          !       key%list%fint=node_value('fint ')
 ! JG: 13.04.2023 Added fringe features to rbend
-          fint =node_value('fint ')
-          fintx=node_value('fintx ')
-          if (fintx.lt.0) then 
-               fintx = fint
-          endif
-          key%list%fint =fint
-          key%list%fint2=fintx
+          call GET_FRINGE_ATTRIBUTES(key)
           key%list%h1=node_value('h1 ')
           key%list%h2=node_value('h2 ')
-          key%list%va=node_value('f1 ')
-          key%list%vs=node_value('f2 ')
           key%list%tilt=node_value('tilt ')
           call context(key%list%name)
           true_rbend=node_value('true_rbend ').ne.0
@@ -963,19 +954,10 @@ CONTAINS
        key%list%t1=node_value('e1 ')
        key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
-       !       key%list%fint=node_value('fint ')
 ! JG: 13.04.2023 Added fringe features to sbend
-       fint =node_value('fint ')
-       fintx=node_value('fintx ')
-       if (fintx.lt.0) then 
-            fintx = fint
-         endif
-       key%list%fint =fint
-       key%list%fint2=fintx
+       call GET_FRINGE_ATTRIBUTES(key)
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
-       key%list%va=node_value('f1 ')
-       key%list%vs=node_value('f2 ')
        key%tiltd=node_value('tilt ')
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
@@ -1028,20 +1010,11 @@ CONTAINS
           sk1s=sk1s+dum2                                          !
 !       endif                                                      !
 ! JG: 13.04.2023 Added fringe features to quadrupole
-         key%list%hgap=node_value('hgap ')
-         fint =node_value('fint ')
-         fintx=node_value('fintx ')
-         if (fintx.lt.0) then 
-              fintx = fint
-           endif
-         key%list%fint =fint
-         key%list%fint2=fintx
+         call GET_FRINGE_ATTRIBUTES(key)
          key%list%t1=node_value('e1 ')
          key%list%t2=node_value('e2 ')
          key%list%h1=node_value('h1 ')
          key%list%h2=node_value('h2 ')
-         key%list%va=node_value('f1 ')
-         key%list%vs=node_value('f2 ')
 
 ! JG 06.06.2023 - Fix access of local model only 
          if (model.lt.0) then
@@ -1092,20 +1065,11 @@ CONTAINS
        dum1=key%list%k(3)!-normal_0123(2)
        dum2=key%list%ks(3)!-skew_0123(2)
 ! JG: 13.04.2023 Added fringe features to sextupole
-       key%list%hgap=node_value('hgap ')
-       fint =node_value('fint ')
-       fintx=node_value('fintx ')
-       if (fintx.lt.0) then 
-            fintx = fint
-       endif
-       key%list%fint =fint
-       key%list%fint2=fintx
+       call GET_FRINGE_ATTRIBUTES(key)
        key%list%t1=node_value('e1 ')
        key%list%t2=node_value('e2 ')
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
-       key%list%va=node_value('f1 ')
-       key%list%vs=node_value('f2 ')
 
 ! LD: 19.06.2019
 !       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
@@ -1166,21 +1130,11 @@ CONTAINS
        key%list%ks(4) = sk3s
 !       key%list%ks(4)=zero  ! added by VK                         !
 ! JG: 13.04.2023 Added fringe features to octupole
-       key%list%hgap=node_value('hgap ')
-       fint =node_value('fint ')
-       fintx=node_value('fintx ')
-       if (fintx.lt.0) then 
-            fintx = fint
-       endif
-
-       key%list%fint =fint
-       key%list%fint2=fintx
+       call GET_FRINGE_ATTRIBUTES(key)
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%list%t1=node_value('e1 ')
        key%list%t2=node_value('e2 ')
-       key%list%va=node_value('f1 ')
-       key%list%vs=node_value('f2 ')
        key%tiltd=tilt  
        !==========================================!
 
@@ -1316,6 +1270,7 @@ CONTAINS
 ! JG 13.04.2023: if lrad=0 and ks=0, then the solenoid should be a multipole instead of a marker
           key%list%ls=lrad
        endif
+       call GET_FRINGE_ATTRIBUTES(key)
 
     case(code_rfcavity) ! case(10)
        key%magnet="rfcavity"
@@ -1928,6 +1883,27 @@ CONTAINS
 
   END subroutine ptc_input
   !_________________________________________________________________
+
+  ! JG: Added function to get fringe field attributes
+  SUBROUTINE GET_FRINGE_ATTRIBUTES(key)
+    type(keywords), INTENT(INOUT) ::  key
+    real(dp) fint,fintx
+    real(kind(1d0)) node_value
+
+    key%list%hgap=node_value('hgap ')
+    fint =node_value('fint ')
+    fintx=node_value('fintx ')
+    if (fintx.lt.0) then 
+         fintx = fint
+    endif
+    key%list%fint =fint
+    key%list%fint2=fintx
+    key%list%va=node_value('f1 ')
+    key%list%vs=node_value('f2 ')
+
+  END SUBROUTINE GET_FRINGE_ATTRIBUTES
+
+ !_________________________________________________________________
 
   SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123, skew_0123,ord_max)
     use twtrrfi ! integer, maxmul,maxferr,maxnaper
