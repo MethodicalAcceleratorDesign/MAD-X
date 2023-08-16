@@ -3,7 +3,7 @@
   +     MAD-X 5.09.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2023.05.05               +
-  + Execution date: 2023.08.15 16:50:38      +
+  + Execution date: 2023.08.16 15:41:53      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example file showing the usage of PTC_TRACK command 
 
@@ -50,6 +50,7 @@ fringe is found and its value is 1.000000
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
 nocavity is not present (keeping current value)
+nocharge is not present (keeping current value)
 seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
  ************ State Summary ****************
@@ -103,6 +104,7 @@ fringe is found and its value is 1.000000
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
 nocavity is not present (keeping current value)
+nocharge is not present (keeping current value)
 seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
  ************ State Summary ****************
