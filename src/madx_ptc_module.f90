@@ -1258,6 +1258,10 @@ CONTAINS
          ! JG 21.04.2023 L = 0 means thin solenoid, therefore needs multipole 
          ! thin_h_angle, thin_v_angle, thin_h_foc, thin_v_foc
           ksi=node_value('ksi ')
+          if(ksi.eq.zero.or.lrad.eq.zero) then
+            key%magnet="multipole"
+            print*,"Thin solenoid: ",name," has no strength - set to multipole"
+         endif            
           lrad=node_value('lrad ')
           if(lrad.eq.zero.and.ks.ne.zero) lrad=ksi/ks
           key%list%thin_h_angle= bvk*normal_0123(0)
