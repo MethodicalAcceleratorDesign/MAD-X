@@ -229,7 +229,7 @@ use, period=t_insertion.a;
 
 ptc_create_universe;
 
-Determined SECTOR NMUL MAX :  2
+Determined SECTOR NMUL MAX :  3
 ptc_create_layout,model=2,method=6,nst=1,exact;
 
  MAD-X Beam Parameters
