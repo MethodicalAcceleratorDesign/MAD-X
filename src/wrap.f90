@@ -198,6 +198,13 @@ subroutine w_ptc_setnocavity(method)
   call ptc_setnocavity(method)
 end subroutine w_ptc_setnocavity
 
+subroutine w_ptc_setnocharge(method)
+  use madx_ptc_intstate_module
+  implicit none
+  integer method
+  call ptc_setnocharge(method)
+end subroutine w_ptc_setnocharge
+
 subroutine w_ptc_setfringe(method)
   use precision_constants
   use madx_ptc_intstate_module

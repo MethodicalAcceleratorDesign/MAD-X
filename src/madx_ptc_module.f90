@@ -270,6 +270,7 @@ CONTAINS
     integer double_from_table_row,table_cell_exists
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, external :: get_userdefined_geometry, get_userdefined_geometry_len
+    logical(lp), external :: nocharge 
     real(kind(1d0)), external :: sinc ! defined in util.f90 - used for calculating el from eld
     integer, parameter :: nt0=20000
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge, el, elc !El is for rbend only, indicates true element length, user input is always eld. Elc is the cord length
@@ -327,7 +328,7 @@ CONTAINS
     energy=get_value('probe ','energy ')
     pma=get_value('probe ','mass ')
     ! jg 07.06.2023 Allow PTC to have a charge, if set to true
-    if (get_value('ptc_setswitch ', 'nocharge ').ne.0) then
+    if (getnocharge()) then
       charge = 1
     else
       charge=get_value('probe ','charge ')

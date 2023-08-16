@@ -10,6 +10,7 @@ module madx_ptc_intstate_module
   public                            :: setintstate
   public                            :: initintstate
   public                            :: getmaxaccel
+  public                            :: getnocharge
   public                            :: getdebug
   public                            :: getenforce6D
   public                            :: setenforce6D
@@ -24,6 +25,7 @@ module madx_ptc_intstate_module
   public                            :: ptc_settotalpath
   public                            :: ptc_settime
   public                            :: ptc_setnocavity
+  public                            :: ptc_setnocharge
   public                            :: ptc_setspin
   public                            :: ptc_setstochastic
   public                            :: ptc_setenvelope
@@ -42,6 +44,7 @@ module madx_ptc_intstate_module
   ! this switch prevents it. It is needed to calcualte  fg R56 in a chicane
   type (internal_state),  private  :: intstate = default0
   integer,                private  :: debug = 1    ! defines debug level
+  logical(lp),            private  :: nocharge ! switch saying to grab the charge from the beam or not.
 
   !    routines
 
@@ -57,6 +60,13 @@ contains
     return
   end function getmaxaccel
   !____________________________________________________________________________________________
+
+  logical(lp) function getnocharge()
+    implicit none
+    getnocharge = nocharge
+    return
+  end function getnocharge
+!____________________________________________________________________________________________
 
   type (internal_state) function getintstate()
     implicit none
@@ -446,6 +456,24 @@ contains
     if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setnocavity
 
+  !____________________________________________________________________________________________
+
+  subroutine ptc_setnocharge(flag)
+    implicit none
+    integer     :: flag
+
+    if (flag == 1) then
+      if (getdebug() > 1) then
+          print *, "Switching ON nocharge"
+      end if
+      nocharge = .true.
+    else
+      if (getdebug() > 1) then
+          print *, "Switching OFF nocharge (using the charge from the beam)"
+      end if
+      nocharge = .false.
+    endif
+  end subroutine ptc_setnocharge
 
   !____________________________________________________________________________________________
 
