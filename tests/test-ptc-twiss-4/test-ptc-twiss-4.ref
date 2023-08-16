@@ -241,7 +241,7 @@ ptc_create_layout,model=2,method=6,nst=1,exact;
      energy           6.0000000000000000     
      method                   6
      Num. of steps            1
-     charge          -1.0000000000000000     
+     charge          1.0000000000000000     
   Length of machine:    86.338846012799522     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------

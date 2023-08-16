@@ -132,7 +132,7 @@ ptc_create_universe;
      energy           8.0000000000000000     
      method                   6
      Num. of steps            5
-     charge          -1.0000000000000000     
+     charge          1.0000000000000000     
   Length of machine:    2.3099999999999996     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------

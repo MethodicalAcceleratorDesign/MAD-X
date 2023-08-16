@@ -82,7 +82,7 @@ obs_points pro_ptc_setswitch Done
      energy           5.0000000000000000     
      method                   2
      Num. of steps            5
-     charge          -1.0000000000000000     
+     charge          1.0000000000000000     
  S2%volt =   0.40000000000000002     
  S2%phas =    2.9816371581236458     
  S2%volt = 
