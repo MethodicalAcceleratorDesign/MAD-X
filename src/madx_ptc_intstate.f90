@@ -44,7 +44,7 @@ module madx_ptc_intstate_module
   ! this switch prevents it. It is needed to calcualte  fg R56 in a chicane
   type (internal_state),  private  :: intstate = default0
   integer,                private  :: debug = 1    ! defines debug level
-  logical(lp),            private  :: nocharge ! switch saying to grab the charge from the beam or not.
+  logical(lp),            private  :: nocharge=.true. ! switch saying to grab the charge from the beam or not.
 
   !    routines
 
