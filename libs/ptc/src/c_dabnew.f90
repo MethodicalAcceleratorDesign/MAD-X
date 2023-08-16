@@ -4492,7 +4492,7 @@ contains
           if (madxprint) then
             write(iunit,'(I6,2X,ES23.16,I5,4X,18(3I3,2X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
           else
-            write(iunit,'(I6,2X,G20.13,I5,4X,18(3I3,2X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
+            write(iunit,'(I6,2X,G20.13,I5,4X,18(2I2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
             write(iunit,*) cc(ipoa+i-1)
           endif
        enddo
@@ -4510,7 +4510,7 @@ contains
                 if (madxprint) then
                   write(iunit,'(I6,2X,ES23.16,I5,4X,18(3I3,2X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
                 else
-                  write(iunit,'(I6,2X,G20.13,I5,4X,18(3I3,2X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
+                  write(iunit,'(I6,2X,G20.13,I5,4X,18(2I2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
                   write(iunit,*) cc(ii)
                 endif
              endif
@@ -4799,7 +4799,7 @@ contains
     if (madxprint) then
       read(iunit,'(I6,2X,ES23.16,I5,4X,18(3I3,2X))') ii,c,io,(j(i),i=1,inva)
     else
-      read(iunit,'(I6,2X,G20.13,I5,4X,18(3I3,2X))') ii,c,io,(j(i),i=1,inva)
+      read(iunit,'(I6,2X,G20.13,I5,4X,18(2I2,1X))') ii,c,io,(j(i),i=1,inva)
     endif
     !
     if(ii.eq.0) goto 20
