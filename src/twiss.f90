@@ -3938,7 +3938,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
      sk2 = sk2/oneplusdelta
      orbit(6) = 0
 
-     call tmsect(.true.,dl,h,dh,sk1,sk2,ek,re,te)
+     call tmsect(.true.,dl,h,dh,sk0,sk1,sk2,ek,re,te)
 
      orbit(2) = orbit(2)*oneplusdelta
      orbit(4) = orbit(4)*oneplusdelta
@@ -3990,7 +3990,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
 
   else
 
-     call tmsect(.true.,dl,h,dh,sk1,sk2,ek,re,te)
+     call tmsect(.true.,dl,h,dh,sk0,sk1,sk2,ek,re,te)
 
   endif
   
@@ -4269,7 +4269,7 @@ else
 endif
 end subroutine
 
-SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
+SUBROUTINE tmsect(fsec,el,h,dh,sk0,sk1,sk2,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
   use matrices, only: EYE
   use math_constfi, only : zero, one, two, three, four, six, nine, twelve, fifteen
@@ -4290,7 +4290,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   !     te(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
   logical, intent(IN) :: fsec
-  double precision :: el, h, dh, sk1, sk2
+  double precision :: el, h, dh, sk0, sk1, sk2
   double precision :: ek(6), re(6,6), te(6,6,6)
 
   double precision :: bi, bi2, bi2gi2
@@ -4319,7 +4319,12 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   bi2gi2 = one / (beta * gamma) ** 2
 
   !---- Horizontal.
-  xksq = h**2 + sk1
+  if (sk0 .eq. h) then
+     xksq = h**2 + sk1
+  else
+     xksq = h*sk0 + sk1
+  endif
+  !xksq = h**2 + sk1
   xk = sqrt(abs(xksq))
   xkl = xk * el
   xklsq = xksq * el**2
