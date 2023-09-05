@@ -2248,12 +2248,14 @@ CONTAINS
 
   subroutine ptc_align()
     use twiss0fi
+    use code_constfi
     implicit none
-    integer j,n_align,node_al_errors
-    integer restart_sequ,advance_node, n_perm_align
+    integer j,n_align,node_al_errors,code
+    integer restart_sequ,advance_node,n_perm_align
+    logical is_patch
     real(dp) al_errors(align_max)
     type(fibre), pointer :: f
-    REAL(KIND(1d0)) :: node_value   !/*returns value for parameter par of current element */
+    double precision, external :: node_value  !/*returns value for parameter par of current element */
     integer, external       :: is_permalign
     !---------------------------------------------------------------
 
@@ -2266,7 +2268,10 @@ CONTAINS
     al_errors = 0
     n_align = node_al_errors(al_errors)
     n_perm_align = is_permalign()
-    if (n_perm_align .ne. 0) then
+    code=node_value('mad8_type ')
+    is_patch = code.eq.code_translation .or. code.eq.code_xrotation .or. &
+               code.eq.code_yrotation   .or. code.eq.code_srotation
+    if (n_perm_align .ne. 0 .and. (.not. is_patch)) then
       al_errors(1) = al_errors(1) + node_value('dx ')
       al_errors(2) = al_errors(2) + node_value('dy ')
       al_errors(3) = al_errors(3) + node_value('ds ')
