@@ -639,7 +639,7 @@ CONTAINS
     !special node keys
 ! JG: Change fringe to work like MAD-NG
     fringe = node_value("fringe ")
-    key%list%permfringe=fringe/2 ! 1/3 -> multipole fringe, 2/3 -> fringe2quad
+    key%list%permfringe=fringe/2 ! 1.or.3 -> multipole fringe, 2.or.3 -> fringe2quad
 !JG 13.04.2023 - Added fringe max for multipole fringe field
     key%list%highest_fringe=node_value("frngmax ")
 !JG 11.07.2023 - Removed bend fringe, instead check if fringe is odd
@@ -1281,6 +1281,7 @@ CONTAINS
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
+       key%list%permfringe=node_value("fringe ") ! JG 28.09.2023: Allow fringe=1 for MADX compatibility 
 
        key%list%lag = -(node_value('lag ')+node_value('lagtap ') )*twopi
 
@@ -1505,6 +1506,7 @@ CONTAINS
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
        key%list%lag=-node_value('lag ')*twopi
+       key%list%permfringe=node_value("fringe ") ! JG 28.09.2023: Allow fringe=1 for MADX compatibility 
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        default=default+totalpath0 !fringe field calculation vitally relies on it!!!!
        if(offset_deltap.ne.zero) then
@@ -1531,6 +1533,7 @@ CONTAINS
        !
        freq=c_1d6*node_value('freq ')
        key%list%lag=-node_value('lag ')*twopi+pih
+       key%list%permfringe=node_value("fringe ") ! JG 28.09.2023: Allow fringe=1 for MADX compatibility 
 
 ! JG 19.04.2023 - added no_cavity_totalpath for crab cavities
        no_cavity_totalpath=node_value('no_cavity_totalpath ').ne.0
@@ -1639,6 +1642,7 @@ CONTAINS
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
        key%list%lag=-node_value('lag ')*twopi
+       key%list%permfringe=node_value("fringe ") ! JG 28.09.2023: Allow fringe=1 for MADX compatibility 
 
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
