@@ -2,8 +2,8 @@
   ++++++++++++++++++++++++++++++++++++++++++++
   +     MAD-X 5.09.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2023.03.08               +
-  + Execution date: 2023.03.08 15:13:02      +
+  + Release   date: 2023.05.05               +
+  + Execution date: 2023.09.28 18:32:13      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
@@ -174,9 +174,10 @@ parameter: nst   integer:         -1
 parameter: from   string: ip2
 parameter: type   string: (null)
 parameter: fringe   integer:          0
-parameter: bend_fringe   logical: false
+parameter: frngmax   integer:          2
 parameter: kill_ent_fringe   logical: false
 parameter: kill_exi_fringe   logical: false
+parameter: ksi   double value:     0.000000
 parameter: dx   double value:     0.000000
 parameter: dy   double value:     0.000000
 parameter: ds   double value:     0.000000
@@ -229,9 +230,10 @@ parameter: nst   integer:         -1
 parameter: from   string: ip2
 parameter: type   string: (null)
 parameter: fringe   integer:          0
-parameter: bend_fringe   logical: false
+parameter: frngmax   integer:          2
 parameter: kill_ent_fringe   logical: false
 parameter: kill_exi_fringe   logical: false
+parameter: ksi   double value:     0.000000
 parameter: dx   double value:     0.000000
 parameter: dy   double value:     0.000000
 parameter: ds   double value:     0.000000
