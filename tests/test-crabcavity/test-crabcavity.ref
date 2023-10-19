@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.09.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:03:13      +
+  + Release   date: 2023.05.05               +
+  + Execution date: 2023.09.28 18:02:27      +
   ++++++++++++++++++++++++++++++++++++++++++++
 circum=120.;
 
@@ -136,7 +136,6 @@ ptc_create_layout,model=1,method=6,nst=2;
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After    end:    0.0000000000000000        0.0000000000000000        120.00000000000000     
- HARMONIC NUMBER defined in the ring:    100.00000000000000     
 ptc_twiss, file="fodo.ptc", rmatrix, icase=6, betx=1, bety=1, betz=1;
 
  ************ State Summary ****************

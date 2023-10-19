@@ -361,7 +361,7 @@ TYPE STREX
    TYPE(MAGNET_CHART), POINTER:: P => null()
    real(dp), POINTER ::L => null()
    real(dp),  DIMENSION(:), POINTER :: AN => null(), BN => null()         !Multipole component
-   logical(lp), POINTER :: DRIFTKICK => null()   !, LIKEMAD => null()
+   logical(lp), POINTER :: DRIFTKICK => null(), LIKEMAD => null()
    real(dp), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: VA => null(), VS => null()         !valishev-like multipole
@@ -372,7 +372,7 @@ TYPE STREXP
    TYPE(MAGNET_CHART), POINTER:: P => null()
    TYPE(REAL_8), POINTER ::L => null()
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN => null(), BN => null()         !Multipole component
-   logical(lp),  POINTER :: DRIFTKICK => null()   !, LIKEMAD => null()
+   logical(lp),  POINTER :: DRIFTKICK => null(), LIKEMAD => null()
    TYPE(REAL_8), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: VA => null(), VS => null()         !valishev-like multipole

@@ -880,6 +880,12 @@ ENDIF
     logical(lp),INTENT(IN):: OU,ENTERING
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+   IF(ENTERING) THEN
+      call PRTP("MIS_FIB_ENT:0", X)
+   ELSE 
+      call PRTP("MIS_FIB_EXI:0", X)
+   ENDIF
+
     IF(ASSOCIATED(C%CHART)) THEN
        IF(C%DIR==1) THEN
           IF(ENTERING) THEN
@@ -919,6 +925,11 @@ ENDIF
           ENDIF
        ENDIF
     ENDIF
+    IF(ENTERING) THEN
+      call PRTP("MIS_FIB_ENT:1", X)
+   ELSE 
+      call PRTP("MIS_FIB_EXI:1", X)
+   ENDIF
   END SUBROUTINE MIS_FIBP
 
 

@@ -390,6 +390,8 @@ end subroutine zero_E_GENERAL_s
     real(dp),INTENT(IN):: A,b
     LOGICAL(lp),INTENT(IN):: EXACT,ctime
 
+      if (A == 0.0_dp) return
+
     call PRTP("ROT_YZ:0", X)
 
     CALL ALLOC(XN,6)
@@ -456,6 +458,7 @@ end subroutine zero_E_GENERAL_s
     real(dp),INTENT(IN):: A(3),b
     LOGICAL(lp),INTENT(IN):: EXACT,ctime
 
+    if (A(1) == 0.0_dp .and. A(2) == 0.0_dp .and. A(3) == 0.0_dp) return
     call PRTP("TRANS:0", X)
 
     X(1)=X(1)-A(1)
@@ -527,6 +530,7 @@ end subroutine zero_E_GENERAL_s
     real(dp),INTENT(IN):: A
     real(dp)           :: cosa, sina
 
+    if (A == 0.0_dp) return
     call PRTP("ROT_XY:0", X)
 
     cosa = COS(A)
@@ -609,6 +613,8 @@ end subroutine zero_E_GENERAL_s
     real(dp),INTENT(IN):: A,b
     real(dp) sina, cosa, tana
     LOGICAL(lp),INTENT(IN):: EXACT,ctime
+
+      if (A == 0.0_dp) return
 
     call PRTP("ROT_XZ:0", X)
 

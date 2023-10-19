@@ -104,10 +104,11 @@ The attributes are:
    \texttt{SECTOR\_NMUL\_MAX} is passed than it is also identified automatically.
    However, if multipolar parameters of the bends are to be modified inside the PTC universe,
    for example with \texttt{PTC\_READ\_ERRORS},
-   than this parameter needs to be set to a corresponding value.
+   then this parameter needs to be set to a corresponding value.
    Please note that using large values (above 10) slows down the computations,
-   so the smallest required value should be used.
-   \\
+   so the smallest required value should be used. We recommended a minimum of
+   MAX(\texttt{ORDER}+1,N+2) (where \texttt{ORDER} is the order of the map), 
+   however \texttt{order}+1+N would give the most accurate results. \\
    (Default:-1)
 
    \ttitem{NTPSA} invokes the Differential Algebra (DA) package
@@ -151,10 +152,16 @@ The attributes are:
   \ttitem{MODEL} an integer to switch between models:\\
   1 for "Drift-Kick-Drift";  (Default value)\\
   2 for "Matrix-Kick-Matrix" and \\
-  3 for "Delta-Matrix-Kick-Matrix" (SixTrack-code model).
+  3 for "Delta-Matrix-Kick-Matrix" (SixTrack-code model). \\
+  Note: Model 1 usually will require more integration and slicing than model 2.
 
-  \ttitem{METHOD} the integration order: 2, 4, or 6 (See
-  \cite{forest2002}~Chapter~K) \\ (Default: 2)
+  \ttitem{METHOD} the integration order: 2, 4, 6 or 8. This will either use
+  Forest-Yoshida integration or Boole's rule (See \cite{forest2002}~Chapter~K for 
+  more details). The optimum \texttt{METHOD} value corresponds to
+  the value beyond which the studied properties no longer change 
+  (in conjunction with increasing slicing). \texttt{METHOD} has a greater effect
+  on this convergence, while not increasing the amount of computations as much 
+  as slicing would to achieve the same convergence \\ (Default: 2)
 
   \ttitem{NST} the number of integration steps.  (Default:~1)\\
   The body of each element is divided into \texttt{NST} equal slices and
@@ -231,23 +238,27 @@ The attributes are:
 The \texttt{PTC\_SETSWITCH} command allows to set some global \ptc states and to configure the interface between {\madx} and {\ptc}, adapting the behavior of the program to the needs.
 
 \madbox{
-	PTC\_SETSWITCH, \=DEBUGLEVEL=integer, \\
-	\>EXACT\_MIS=logical,\\
-	\>TOTALPATH=logical,\\
-	\>RADIATION=logical,\\
-	\>ENVELOPE=logical,\\
-	\>STOCHASTIC=logical,\\
-	\>MODULATION=logical,\\
-	\>FRINGE=logical,\\
-	\>TIME=logical,\\
-	\>SEED=integer,\\
-	\>MAXACCELERATION=logical;
+	PTC\_SETSWITCH, \=DEBUGLEVEL=integer, MAPDUMP=integer, MADPRINT=logical, \\
+	\>EXACT\_MIS=logical, TOTALPATH=logical, RADIATION=logical, \\
+	\>ENVELOPE=logical, STOCHASTIC=logical, MODULATION=logical,\\
+	\>FRINGE=logical, TIME=logical, SEED=integer, \\
+  \>MAXACCELERATION=logical, NOCAVITY=logical, NOCHARGE=logical;
 }
 
 The command parameters and switches are:
 \begin{madlist}
 	\ttitem{DEBUGLEVEL} (Default: 1)\\
 	Sets the level of debugging printout: 0 prints none, 4 prints everything
+
+  \ttitem{MAPDUMP} (Default: 0)\\
+  Sets the level of map dump printout in all tracking codes. \\
+  0: None,\\
+  1: Order 0,\\
+  2: Order 1,\\
+  3: The full map.
+
+  \ttitem{MADPRINT} (Default: false)\\
+  Sets map dump printout format so that it can be read by MAD-NG
 
 	\ttitem{EXACT\_MIS} (Default: false)\\
 	Switch ensures exact misalignment treatment.
@@ -343,6 +354,14 @@ The command parameters and switches are:
 	\ttitem{MAXACCELERATION} (Default: true)\\
 	Switch to set cavities phases so the reference orbit is always on
 	the crest, i.e. gains max energy.
+
+  \ttitem{NOCAVITY} (Default: false)\\
+  Switch to turn off the RF cavities, with \texttt{NOCAVITY=true}, 
+  RF cavities are ignored.
+
+  \ttitem{NOCHARGE} (Default: true)\\
+  Switch to ignore the charge of your beam. If set to false, 
+  the charge of the beam is taken into account.
 
 
 \end{madlist}
@@ -460,7 +479,7 @@ attributes in a slightly different way.
 \madbox{
 SBEND | \=RBEND | QUADRUPOLE | SEXTUPOLE | OCTUPOLE | SOLENOID ,\\
         \>L=real, ... , TILT=real, ... , NST=integer, ... ,\\
-        \>KNL=\{0, real, real,...\}, KSL=\{0, real, real,...\};
+        \>KNL=\{real, real, real,...\}, KSL=\{real, real, real,...\};
 }
 
 These attributes are:
@@ -501,15 +520,225 @@ These attributes are:
     \ttitem{KSL} is an array representing the skew multipole
     coefficients. \\ (Default:~0~m$^{-1}$)
   \end{madlist}
-  To preserve the reference orbit of straight elements, the dipole
-  components for those elements are ignored and must be specified as
-  zero: \texttt{KNL(0)=0, KSL(0)=0}.
 
   A full range of additional multipole \hyperref[sec:efcomp]{field
     errors} can be additionally specified with the
   \hyperref[sec:efcomp]{\texttt{EFCOMP}} command. Errors are added to
-  the above multipole fields on the bench.
+  the above multipole fields on the bench.\\
+  If you specify the corresponding multipole coefficient in a magnet that can accept 
+  a non integrated value, these are added together, i.e. 
+  $\texttt{k}_1 = \texttt{k}_1 + \texttt{knl}[2]/\texttt{l}$, 
+  where \texttt{knl[2]} is the value of the second element of the array knl and .
 
+\end{madlist}
+
+\subsection{Additional Fringe Field Parameters}
+
+The following parameters are available for the following elements 
+(Additional details can be found in \ref{sec:bend}):
+
+\madbox{
+SBEND | \=RBEND | QUADRUPOLE | SEXTUPOLE | OCTUPOLE | SOLENOID ,\\
+        \>FINT=real, FINTX=real, HGAP=real, FRNGMAX=integer, \\
+        \>F1=real, F2=real, FRINGE=integer, ...;
+}
+
+\begin{madlist}
+
+  \ttitem{FINT} (Default:  0) \\
+  The fringe field integral at entrance and exit of the
+  bend.\\ This has been activated for all elements listed above, 
+  not just for \texttt{(S|R)BEND}, as in \madx. 
+
+  \ttitem{FINTX} (Default: =\texttt{FINT}) \\
+  If defined and positive, the fringe field integral at
+  the exit of the element, overriding \texttt{FINT} for the
+  exit. \\
+  This allows to set different fringe field integrals at entrance
+  (\texttt{FINT}) and exit (\texttt{FINTX}) of the element.\\
+  This has been activated for all elements listed above, 
+  not just for \texttt{(S|R)BEND}, as in \madx. 
+
+  \ttitem{HGAP} (default: 0 m) \\
+  The half gap of the magnet.\\
+  This has been activated for all elements listed above, 
+  not just for \texttt{(S|R)BEND}, as in \madx. 
+
+  \ttitem{FRNGMAX} (default: 2) \\
+  The maximum multipole component to be included in the multipolar fringe field.
+
+  \ttitem{F1} (default: 0) \\
+  The entry linear fringe field coefficient for quadrupoles, from SAD \cite{sad_quad_2022}. \\
+
+  \ttitem{F2} (default: 0) \\
+  The exit linear fringe field coefficient for quadrupoles, from SAD \cite{sad_quad_2022}. \\
+  
+  \ttitem{FRINGE} (default: 0) \\
+  This is a bit mask that specifies the fringe field model to be used.
+  The bits are defined as follows:\\
+
+  1: The dipole fringe field is performed using the \texttt{FINT}, 
+  \texttt{FINTX} and \texttt{HGAP} parameters. 
+  Note: It is not possible to remove this fringe from a bend element, as \ptc
+  will always use the dipole fringe field for bending magnets.\\
+
+  2: The multipole fringe field is performed, integrating up to the minimum of 
+  \texttt{FRNGMAX} and the highest multipole component specified.\\
+
+  4: Use the linear fringe field map for the quadrupole from the SAD code, 
+  using parameters \texttt{F1}, \texttt{F2} \cite{sad_quad_2022}. \\ \\
+
+
+  An example use of the \texttt{FRINGE}, would be to specify a dipole fringe and 
+  the multipolar fringe field, has \texttt{FRINGE=3}, but to specify the multipolar
+  fringe field and the SAD fringe field map, use \texttt{FRINGE=6}.
+
+\end{madlist}
+
+\subsection{Additional Pole Face Parameters}
+
+The following parameters are available for the following elements, 
+not just for \texttt{(S|R)BEND}, as in \madx 
+(Additional details can be found in \ref{sec:bend}):
+
+\madbox{
+  SBEND | \=RBEND | QUADRUPOLE | SEXTUPOLE | OCTUPOLE ,\\
+          \>..., E1 = real, E2 = real, ..., H1 = real, H2 = real;
+}
+
+\begin{madlist}
+  \ttitem{E1} (default: 0 rad) \\
+  The entry pole face rotation angle.\\
+
+  \ttitem{E2} (default: 0 rad) \\
+  The exit pole face rotation angle.\\
+
+  \ttitem{H1} (default: 0 m$^{-1}$) \\
+  The entry pole face curvature.\\
+
+  \ttitem{H2} (default: 0 m$^{-1}$) \\
+  The exit pole face curvature.\\
+
+\end{madlist}
+
+\subsection{Additional Parameters for the \texttt{SBEND} and \texttt{RBEND} elements}
+
+The following parameters are available for the \texttt{SBEND} and \texttt{RBEND} elements:
+
+\madbox {
+  SBEND | \=RBEND, \\
+  \>..., K0=real, K0S=real, K1=real, K1S=real, \\
+  \>K2=real, K2S=real, K3=real, K3S=real, ...;  
+}
+
+The philosophy of the implementation of these components is the same as described 
+in \ref{sec:add-option-PTC}, i.e. the multipole components (divided by the element length) 
+are added to the strengths listed above.
+
+
+\subsection{Parameters for the \texttt{CAVITY} elements}
+
+The following parameter is available for the following elements:
+\madbox{
+  RFCAVITY | \=RFMULTIPOLE | CRABCAVITY, \\
+  \> ..., no\_cavity\_totalpath=logical, ... ;
+}
+
+\begin{madlist}
+  \ttitem{no\_cavity\_totalpath} (default=\texttt{false}) \\
+  If \texttt{true}, the total path length of the cavity is not taken into account.
+  See \texttt{TOTALPATH} in \ref{sec:ptc-setswitch} for more details. This parameter
+  has a higher priority than \texttt{TOTALPATH} in \ref{sec:ptc-setswitch} and therefore 
+  can override this value per element.
+\end{madlist}
+
+Note that the \texttt{PNL} and \texttt{PSL} parameters, used in \madx, are not
+considered in \ptc.
+
+Furthermore, the implementation of the \texttt{CRABCAVITY} element means that 
+the following are equivalent:
+\madbox{
+  CRABCAVITY \=, L=LENGTH, VOLT=V, LAG=lag, \\     
+             \> FREQ=freq, ...,; \\
+  RFMULTIPOLE\>, L=LENGTH, VOLT=0, LAG=(lag-0.25), \\
+             \> FREQ=freq, ..., KNL=\{V/1000 * LENGTH\};
+}
+
+Essentially, the voltage is set to zero and converted to a dipole compenet, and 
+the lag is reduced. 
+
+\subsection{Additional Parameter for \texttt{DRIFT} Element}
+\madbox{
+  DRIFT, L=real, ... , TILT=real;
+}
+\begin{madlist}
+  \ttitem{TILT} The DRIFT can also be tilted. 
+\end{madlist}
+
+\subsection{Additional Parameter for \texttt{MULTIPOLE} Element}
+\madbox{
+  MULTIPOLE, LRAD=real, KSI=real, ... ;
+}
+
+\begin{madlist}
+  \ttitem{LRAD} A fictitious length (default: 0 m), originally only used to 
+  compute synchrotron radiation effect.
+  \ttitem{KSI} The \texttt{KSI} (default: 0 rad)parameter is used to specify the 
+  integrated solenoid component. If \texttt{KSI} is specified, but \texttt{LRAD}
+  is not, or 0, then this attribute is ignored and a warning is emmited.
+\end{madlist}
+
+\section{The \texttt{RBEND} element in \ptc}
+
+For the \texttt{RBEND} element, the \ptc environment provides
+three types of this element:
+\madbox{
+  RBEND, L=real, ... , TRUE\_RBEND=logical, E1=real, E2=real, ...;
+}
+
+The attributes \texttt{TRUE\_RBEND}, \texttt{E1} and \texttt{E2} are used to 
+decide which \texttt{RBEND} is used in \ptc. 
+The default is \texttt{TRUE\_RBEND=FALSE}.
+
+\begin{madlist}
+  \ttitem{CURVED RBEND} (\texttt{TRUE\_RBEND=FALSE}) \\
+  This is the normal rbend that is used in \madx, which is equivalent
+  to an \texttt{SBEND} with an \texttt{E1} and \texttt{E2} set to \texttt{ANGLE}/2. \\
+  Note: This means that additional multipole components are integrated in curved space,
+  therefore also requires more computation and \texttt{SECTOR\_NMUL\_MAX} must be considered.
+
+  \ttitem{STRAIGHT RBEND} (\texttt{TRUE\_RBEND=TRUE}) \\
+  This is equivalent to the \texttt{LIKEMAD=TRUE} case
+  in \cite{forest2002}~Subsection~K.4.12 Figure~19. \\
+  Note: This means that additional multipole components are integrated in straight space.
+  
+  \ttitem{TRUE PARALLEL RBEND} (\texttt{TRUE\_RBEND=TRUE \& (E1 > 2*PI | E2 > 2*PI)}) \\
+  This is equivalent to the \texttt{LIKEMAD=FALSE} case in \cite{forest2002}~Subsection~K.4.12 Figure~19. \\
+  This \texttt{RBEND} element performs a translation, to ensure the orbit is restored,
+  at the entry (if \texttt{E1 > 2*PI}) or exit (if \texttt{E2 > 2*PI}) of the element.
+  If both \texttt{E1} and \texttt{E2} are greater than \texttt{2*PI}, then an 
+  error is thrown. \\
+  The sum of \texttt{E1} and \texttt{E2} will be the total bend angle
+  and therefore if \texttt{E(1|2)} is greater than \texttt{2*PI}, 
+  then, \texttt{E(2|1)} dictates the rotation on entry and exit of the element.
+  This magnet is equivalent to the \texttt{RBEND\_STRAIGHT} if \texttt{E(1|2) > 2*PI} 
+  and \texttt{E(2|1) = ANGLE/2}.
+  
+
+\end{madlist}
+
+It is important to note that each of these different rbends will have different 
+lengths, since the \texttt{L} parameter is the path length (\texttt{LD}). 
+Therefore, the weighting of your multipole components will be different 
+for each of these elements, which uses the true element length. We calculate 
+the true element length as follows, where the input length of the user is 
+\texttt{L$_D$}, the input \texttt{ANGLE} is $\theta$ and the $\alpha$ is the value
+of \texttt{E(1|2)} when \texttt{E(2|1) > 2*PI}.
+
+\begin{madlist}
+  \ttitem{CURVED RBEND} $L = L_D$
+  \ttitem{STRAIGHT RBEND}  $L =\frac{L_D\sin \theta/2}{\theta/2}$
+  \ttitem{TRUE PARALLEL RBEND} $L = \frac{L_D\sin \theta/2}{\theta/2} \cos{(\theta/2-\alpha)} $
 \end{madlist}
 
 %\href{mailto:kapin@itep.ru}{  V.Kapin}(ITEP) and

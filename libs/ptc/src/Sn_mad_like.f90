@@ -26,7 +26,7 @@ module Mad_like
   PRIVATE GET_GAM,HELICALTILT
   logical(lp),PRIVATE ::  MADX= .FALSE.,MADX_MAGNET_ONLY=.FALSE.
 
-  logical(lp),private::LIKEMAD =.false.,mad_list_killed =.true.,setmad = .false.,verbose=.FALSE.,&
+  logical(lp),private::LIKEMAD =.true.,mad_list_killed =.true.,setmad = .false.,verbose=.FALSE.,&
        madkick=.false.,circular=.false.,makeit=.false.
   logical(lp)::DRIFT_KICK =.true.
   logical(lp),TARGET ::FIBRE_flip=.true.
@@ -63,7 +63,7 @@ module Mad_like
      real(dp) T1,T2,B0
      real(dp) volt,freq0,harmon,lag,DELTA_E,BSOL
      real(dp) tilt
-     real(dp) FINT,hgap,FINT2,hgap2,h1,h2,X_COL,Y_COL
+     real(dp) FINT,hgap,FINT2,hgap2,h1,h2,X_COL,Y_COL, VA, VS !Add f1 and f2? -> va and vs
      real(dp) thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle,hf,vf,ls  ! highly illegal additions by frs
      CHARACTER(120) file
      CHARACTER(120) file_rev
@@ -703,9 +703,12 @@ CONTAINS
        S2%BSOL=0.0_dp
        S2%TILT=0.0_dp
        s2%FINT=0.5_dp
+       s2%FINT2=0.5_dp
        s2%hgap=0.0_dp
        s2%h1=0.0_dp
        s2%h2=0.0_dp
+       s2%va=0.0_dp
+       s2%vs=0.0_dp
        s2%X_COL=0.0_dp    !!!! missing !!!
        s2%Y_COL=0.0_dp   !!!! missing !!!
        s2%thin_h_foc=0.0_dp
@@ -1941,11 +1944,10 @@ CONTAINS
        else
           rectaETILT=RECTTILT(NAME,L,ANGLE,E11,E22)
        endif
-       return
+      !  return
 
     ELSE  !  1
-    write(6,*) "This option of the true rbend must now be done with patches "
-   ! stop 
+       LIKEMAD=.false.
        LM1=0.0_dp
        ANG1=0.0_dp
        IF(PRESENT(L)) LM1=L
@@ -2032,10 +2034,13 @@ CONTAINS
        rectaETILT%ks=rectaETILT%ks+list%ks
        rectaETILT%tilt=list%tilt
        rectaETILT%FINT=list%FINT
+       rectaETILT%FINT2=list%FINT2
+       rectaETILT%va=list%va
+       rectaETILT%vs=list%vs
        rectaETILT%hgap=list%hgap
        rectaETILT%h1=list%h1
        rectaETILT%h2=list%h2
-       rectaETILT%nmul=list%nmul
+      !  rectaETILT%nmul=list%nmul ! JG 21/07/2023 - Why does this cause problems?
        if(exactitude==3.and.list%nmul<2) rectaETILT%nmul=2
        rectaETILT%nst=list%nst
        rectaETILT%APERTURE_ON=list%APERTURE_ON
@@ -2055,6 +2060,7 @@ CONTAINS
        rectaETILT%KILL_EXI_SPIN=list%KILL_EXI_SPIN
        rectaETILT%BEND_FRINGE=list%BEND_FRINGE
        rectaETILT%PERMFRINGE=list%PERMFRINGE
+       if ((rectaETILT%permfringe==2.or.rectaETILT%permfringe==3).and.list%nmul<2) rectaETILT%nmul=2 !We need AN(2) and BN(2) for FRINGE2QUAD 
        rectaETILT%highest_fringe=list%highest_fringe
     endif
 
@@ -2962,16 +2968,16 @@ CONTAINS
        s2%CAV21%PSI=s1%PSI
     ENDIF
 
-    if(LIKEMAD) then
-       if(S2%KIND/=KIND16) then
+    if(LIKEMAD.and.S2%KIND==KIND16) then
+      !  if(S2%KIND/=KIND16) then
           !w_p=0
           !w_p%nc=1
           !w_p%fc='((1X,a72))'
           !w_p%c(1)= " Likemad is true and element is not STREX "
           ! call !write_e(kind16)
-       endif
-!       s2%k16%likemad=LIKEMAD
-       S2%KIND=KIND20
+      !  endif
+      s2%k16%likemad=LIKEMAD
+      S2%KIND=KIND20
        LIKEMAD=.false.
     endif
 
@@ -3012,10 +3018,13 @@ CONTAINS
 
 
     IF(MADX) then
-       s2%fint=s1%FINT
+       s2%fint(1)=s1%FINT
+       s2%fint(2)=s1%FINT2
        s2%hgap=s1%hgap
        s2%h1=s1%h1
        s2%h2=s1%h2
+       s2%va=s1%va
+       s2%vs=s1%vs
        IF(S2%KIND==KIND3) THEN
           s2%K3%hf=s1%hf
           s2%K3%vf=s1%vf
