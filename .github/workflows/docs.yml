@@ -16,6 +16,7 @@ jobs:
       - name: Install dependencies
         run: |
           set -ex
+          sudo apt update
           sudo apt-get install -qy \
             texlive-latex-base \
             texlive-latex-extra \
