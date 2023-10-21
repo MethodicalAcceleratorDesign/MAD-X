@@ -1,7 +1,7 @@
 MAD-X master
 
 *  PTC:
-    * [PR 1200](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1200) See more details in this [presentation](https://indico.cern.ch/event/1310491/contributions/5513625/attachments/2690007/4667862/Review%20of%20MADX-PTC.pdf)
+    * [PR 1200](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1200) See more details in this [presentation](https://indico.cern.ch/event/1310491/contributions/5513625/attachments/2690007/4667862/Review%20of%20MADX-PTC.pdf) (J. M. Gray, L. Deniau)
         * A flag has been added to `ptc_setswitch` called `nocharge`.
         * `ptcrbend` and `truerbend` has been removed. Now we use `true_rbend`.
         * Speed up of PTC fringe fields [#1160](https://github.com/MethodicalAcceleratorDesign/MAD-X/issues/1160).
