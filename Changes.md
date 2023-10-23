@@ -1,5 +1,28 @@
 MAD-X master
-*  Track
+
+*  PTC:
+    * [PR 1200](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1200) See more details in this [presentation](https://indico.cern.ch/event/1310491/contributions/5513625/attachments/2690007/4667862/Review%20of%20MADX-PTC.pdf) (J. M. Gray, L. Deniau)
+        * A flag has been added to `ptc_setswitch` called `nocharge`.
+        * `ptcrbend` and `truerbend` has been removed. Now we use `true_rbend`.
+        * Speed up of PTC fringe fields [#1160](https://github.com/MethodicalAcceleratorDesign/MAD-X/issues/1160).
+        * Removed `sector_nmul_max` inconsistency.
+        * Add warning for when `sector_nmul_max` is insufficient.
+        * Enabled integration order 8.
+        * Simplified MADX-PTC fringe map flags.
+        * Added many attributes to activate fringe and face maps.
+        * Un-negate the `k0s` component in the `rfmultipole` element.
+        * Properly weight the `knl` and `ksl` components in the `rfmultipole` element.
+        * Force the `rfmultipole` and `crabcavity` element to have to same attributes as the `rfcavity` element.
+        * Allowed use of all different types of `rbend` and therefore implement correct length scaling.
+        * Add solenoid compenent to multipole and force solenoid to act like a multipole when `l=0`.
+        * Add shortcuts for identity patches.
+        * Fix patch elements when using misalignments.
+        * Update documentation for these changes.
+
+*  Actions:
+    * [PR 1202](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1202), [PR 1203](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1203) Update the GitHub actions, add beta min max errors (J. M. Gray)
+
+*  Track:
     * [PR 1182](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1182) Fix thick dipole tracking
 
 
