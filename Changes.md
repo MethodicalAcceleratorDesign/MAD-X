@@ -1,4 +1,4 @@
-MAD-X master
+MAD-X release 5.09.01 (2023.12.04)
 
 *  PTC:
     * [PR 1200](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1200) See more details in this [presentation](https://indico.cern.ch/event/1310491/contributions/5513625/attachments/2690007/4667862/Review%20of%20MADX-PTC.pdf) (J. M. Gray, L. Deniau)
