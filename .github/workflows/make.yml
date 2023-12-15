@@ -56,6 +56,14 @@ jobs:
         env:
           ARCH: ${{ contains(matrix.flags, 'ARCH=32') && '32' || '64' }}
 
+      - name: Upload artifact executable
+        uses: actions/upload-artifact@v3
+        with:
+          name: madx-linux64
+          path: |
+            build
+            madx-linux64-gnu
+
       - name: Run tests
         id: tests
         # TODO: debug why these 3 tests are failing, and re-enable:
@@ -130,6 +138,16 @@ jobs:
           make numdiff-macosx$ARCH-gnu ${{ matrix.flags }} COVERAGE=no
         env:
           ARCH: ${{ contains(matrix.flags, 'ARCH=32') && '32' || '64' }}
+
+      - name: Upload artifact executable
+        uses: actions/upload-artifact@v3
+        with:
+          name: madx-macosx
+          path: |
+            build
+            madx-macosx64-gnu
+            
+
 
       - name: Run tests
         id: tests
