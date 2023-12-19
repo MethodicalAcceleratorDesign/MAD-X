@@ -22,9 +22,6 @@ pro_ibs(struct in_cmd* cmd)
       filename = permbuff("dummy");
     }
 
-    /* Set the ibs_table flag in any case (picked up by fortran subroutine to fill table) */
-    k = 1; set_option("ibs_table", &k);
-
     /* declare and create the IBS table */
     table_name = permbuff("ibs");
     ibs_table = make_table(table_name, "ibs", ibs_table_cols,
@@ -38,6 +35,7 @@ pro_ibs(struct in_cmd* cmd)
 
     ibs_();
 
+    /* write the IBS table to file if asked by user */
     if (w_file) out_table(table_name, ibs_table, filename);
     probe_beam = delete_command(probe_beam); // LD: added...
     current_beam = keep_beam;

@@ -147,9 +147,6 @@ subroutine ibs
       print *, 'Twiss was calculated at the center of the elements. No interpolation is used'
    end if
 
-   ! Check if "ibs_table" (I forced this to always be true if IBS command is called)
-   n = get_option('ibs_table ')
-
    ! The following is a big loop over all elements in the TWISS table. At each step, we read optics functions
    ! for the given lattice element and use these to compute the growth rates at this element, as well as some
    ! other "average" and "weighted" values. Details are given below as we go.
@@ -247,23 +244,21 @@ subroutine ibs
 
       ! Fill "ibs_table" (always): add the values computed above in the table (at current row).
       ! Empirically it seems it only gets created if asked to output to file (IBS, FILE=string;)
-      if (n .ne. 0) then
-         call string_to_table_curr('ibs ', 'name ', 'name ')
-         call double_to_table_curr('ibs ', 's ', sdum)        ! Store s position
-         call double_to_table_curr('ibs ', 'dels ', dels)     ! Store length difference between consecutive elements
-         call double_to_table_curr('ibs ', 'tli ', tlidc)     ! Store longitudinal B&M integral at element
-         call double_to_table_curr('ibs ', 'txi ', txidc)     ! Store horizontal B&M integral at element
-         call double_to_table_curr('ibs ', 'tyi ', tyidc)     ! Store vertical B&M integral at element
-         call double_to_table_curr('ibs ', 'betx ', betax)    ! Store horizontal beta function
-         call double_to_table_curr('ibs ', 'alfx ', alx)      ! Store horizontal alpha function
-         call double_to_table_curr('ibs ', 'dx ', dx)         ! Store horizontal dispersion function (adjusted for deltap frame)
-         call double_to_table_curr('ibs ', 'dpx ', dpx)       ! Store horizontal dispersion prime function (adjusted for deltap frame)
-         call double_to_table_curr('ibs ', 'bety ', betay)    ! Store vertical beta function
-         call double_to_table_curr('ibs ', 'alfy ', aly)      ! Store vertical alpha function
-         call double_to_table_curr('ibs ', 'dy ', dy)         ! Store vertical dispersion function (adjusted for deltap frame)
-         call double_to_table_curr('ibs ', 'dpy ', dpy)       ! Store vertical dispersion prime function (adjusted for deltap frame)
-         call augment_count('ibs ')                           ! Move to next row in the table
-      endif
+      call string_to_table_curr('ibs ', 'name ', 'name ')
+      call double_to_table_curr('ibs ', 's ', sdum)        ! Store s position
+      call double_to_table_curr('ibs ', 'dels ', dels)     ! Store length difference between consecutive elements
+      call double_to_table_curr('ibs ', 'tli ', tlidc)     ! Store longitudinal B&M integral at element
+      call double_to_table_curr('ibs ', 'txi ', txidc)     ! Store horizontal B&M integral at element
+      call double_to_table_curr('ibs ', 'tyi ', tyidc)     ! Store vertical B&M integral at element
+      call double_to_table_curr('ibs ', 'betx ', betax)    ! Store horizontal beta function
+      call double_to_table_curr('ibs ', 'alfx ', alx)      ! Store horizontal alpha function
+      call double_to_table_curr('ibs ', 'dx ', dx)         ! Store horizontal dispersion function (adjusted for deltap frame)
+      call double_to_table_curr('ibs ', 'dpx ', dpx)       ! Store horizontal dispersion prime function (adjusted for deltap frame)
+      call double_to_table_curr('ibs ', 'bety ', betay)    ! Store vertical beta function
+      call double_to_table_curr('ibs ', 'alfy ', aly)      ! Store vertical alpha function
+      call double_to_table_curr('ibs ', 'dy ', dy)         ! Store vertical dispersion function (adjusted for deltap frame)
+      call double_to_table_curr('ibs ', 'dpy ', dpy)       ! Store vertical dispersion prime function (adjusted for deltap frame)
+      call augment_count('ibs ')                           ! Move to next row in the table
 
       ! *********** Make sure the following lines are not moved by the compiler ******
       ! Not sure what this is for
