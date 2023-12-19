@@ -148,7 +148,7 @@ subroutine ibs
    end if
 
    ! Check if "ibs_table" (in which case we will create the table and output to file)
-   n = get_option('ibs_table ')
+   ! n = get_option('ibs_table ')
 
    ! The following is a big loop over all elements in the TWISS table. At each step, we read optics functions
    ! for the given lattice element and use these to compute the growth rates at this element, as well as some
@@ -245,25 +245,23 @@ subroutine ibs
       tavxc = tavxc + txidc*dels  ! accumulated horizontal B&M integral
       tavyc = tavyc + tyidc*dels  ! accumulated vertical B&M integral
 
-      ! Fill "ibs_table" if required: add the values computed above in the table (at current row).
+      ! Fill "ibs_table" (always): add the values computed above in the table (at current row).
       ! Empirically it seems it only gets created if asked to output to file (IBS, FILE=string;)
-      if (n .ne. 0) then
-         call string_to_table_curr('ibs ', 'name ', 'name ')
-         call double_to_table_curr('ibs ', 's ', sdum)        ! Store s position
-         call double_to_table_curr('ibs ', 'dels ', dels)     ! Store length difference between consecutive elements
-         call double_to_table_curr('ibs ', 'tli ', tlidc)     ! Store longitudinal B&M integral at element
-         call double_to_table_curr('ibs ', 'txi ', txidc)     ! Store horizontal B&M integral at element
-         call double_to_table_curr('ibs ', 'tyi ', tyidc)     ! Store vertical B&M integral at element
-         call double_to_table_curr('ibs ', 'betx ', betax)    ! Store horizontal beta function
-         call double_to_table_curr('ibs ', 'alfx ', alx)      ! Store horizontal alpha function
-         call double_to_table_curr('ibs ', 'dx ', dx)         ! Store horizontal dispersion function (adjusted for deltap frame)
-         call double_to_table_curr('ibs ', 'dpx ', dpx)       ! Store horizontal dispersion prime function (adjusted for deltap frame)
-         call double_to_table_curr('ibs ', 'bety ', betay)    ! Store vertical beta function
-         call double_to_table_curr('ibs ', 'alfy ', aly)      ! Store vertical alpha function
-         call double_to_table_curr('ibs ', 'dy ', dy)         ! Store vertical dispersion function (adjusted for deltap frame)
-         call double_to_table_curr('ibs ', 'dpy ', dpy)       ! Store vertical dispersion prime function (adjusted for deltap frame)
-         call augment_count('ibs ')                           ! Move to next row in the table
-      end if
+      call string_to_table_curr('ibs ', 'name ', 'name ')
+      call double_to_table_curr('ibs ', 's ', sdum)        ! Store s position
+      call double_to_table_curr('ibs ', 'dels ', dels)     ! Store length difference between consecutive elements
+      call double_to_table_curr('ibs ', 'tli ', tlidc)     ! Store longitudinal B&M integral at element
+      call double_to_table_curr('ibs ', 'txi ', txidc)     ! Store horizontal B&M integral at element
+      call double_to_table_curr('ibs ', 'tyi ', tyidc)     ! Store vertical B&M integral at element
+      call double_to_table_curr('ibs ', 'betx ', betax)    ! Store horizontal beta function
+      call double_to_table_curr('ibs ', 'alfx ', alx)      ! Store horizontal alpha function
+      call double_to_table_curr('ibs ', 'dx ', dx)         ! Store horizontal dispersion function (adjusted for deltap frame)
+      call double_to_table_curr('ibs ', 'dpx ', dpx)       ! Store horizontal dispersion prime function (adjusted for deltap frame)
+      call double_to_table_curr('ibs ', 'bety ', betay)    ! Store vertical beta function
+      call double_to_table_curr('ibs ', 'alfy ', aly)      ! Store vertical alpha function
+      call double_to_table_curr('ibs ', 'dy ', dy)         ! Store vertical dispersion function (adjusted for deltap frame)
+      call double_to_table_curr('ibs ', 'dpy ', dpy)       ! Store vertical dispersion prime function (adjusted for deltap frame)
+      call augment_count('ibs ')                           ! Move to next row in the table
 
       ! *********** Make sure the following lines are not moved by the compiler ******
       ! Not sure what this is for
@@ -552,7 +550,10 @@ subroutine twclog(bxbar, bybar, dxbar, dybar, const)
    write (*, '( 5x,a,f14.6)') "BETA                = ", betas
    write (*, '( 5x,a,f14.3)') "GAMMA               = ", gammas
    write (*, '( 5x,a,f14.3)') "COULOMB LOG         = ", coulog
+
+   ! We set the coulomb log and the full constant as global variables in the MAD-X environment, guarded by the 'ibs' prefix.
    call set_variable('ibs.coulog ', coulog)
+   call set_variable('ibs.const ', const)
 
    ! Print warning here if Coulomb logarithm gave bad results. Usually this
    ! error is due to a starting guess far from the equilibrium value.
