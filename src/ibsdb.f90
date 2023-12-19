@@ -20,9 +20,10 @@
 ! computes, at each element, the horizontal, vertical and longitudinal B&M    !
 ! integrals as they are defined in Eq (8) of the note. Beware: these          !
 ! intermediate values include the square bracket terms of Eq (8).             !
-! Afterwards, these rates are averaged over the ring, which results in the    !
-! final values given back by the routine, and stored in the global variables  !
-! 'ibs.tx', 'ibs.ty' and 'ibs.tl' later on                                    !
+! Afterwards, these rates are averaged over the ring and multiplied with the  !
+! common fraction of Eq (8), which results in the final values given back by  !
+! the routine, and stored in the global variables 'ibs.tx', 'ibs.ty' and      !
+! 'ibs.tl' later on.                                                          !
 !                                                                             !
 ! The routine also computes "average" / "weighted" values, but these are only !
 ! displayed to the user via stdout.                                           !
@@ -90,7 +91,7 @@ subroutine ibs
    print *, 'sige ', sige
 
    ! Initialize the following variables to accumulate weighted average lifetimes
-   tavlc = zero; tavxc = zero; tavyc = zero                  ! these will hold / accumulate the intermediate growth rates
+   tavlc = zero; tavxc = zero; tavyc = zero                  ! these will hold / accumulate the intermediate B&M integrals
    sbxb = zero; salxb = zero; sdxb = zero; sdpxb = zero      ! will store the "accumulated" values of betx, alfx, dx and dpx
    sbyb = zero; salyb = zero; sdyb = zero; sdpyb = zero      ! will store the "accumulated" values of bety, alfy, dy and dpy
    sbxinv = zero; sbyinv = zero                              ! will store the "accumulated" values of 1/betx and 1/bety
@@ -133,7 +134,7 @@ subroutine ibs
       if (ll2 .gt. 0.0001) exit ! break loop
    end do
 
-   ! The following check if TWISS was computed at the center of elements. We are at the first element of non-zero
+   ! The following checks if TWISS was computed at the center of elements. We are at the first element of non-zero
    ! length, and we compare s at next element minus s at first element of non-zero length (ss2 - s1) with the length
    ! of the second element. If it matches, then the delta_s corresponds to the length of the element and it means we
    ! are getting values at the exit of the elements: not centered. We set testtype to 1 (otherwise, set to 2).
@@ -177,7 +178,7 @@ subroutine ibs
       !*************************************************************************************
 
       ! For each element, we adjust the dx, dy, dpx and dpy values to be in deltap frame (multiplying by beta_rel).
-      ! If TWISS was NOT at center of elements we interpolate linearly (see this block) to have values at center ****
+      ! If TWISS was NOT at center of elements we interpolate linearly (see this block) to have values at center.
       if (testtype .eq. 1) then  ! testtype = 1 means twiss was not centered
          dels = s2 - s1                 ! interpolate delta_s
          sdum = half*(s2 + s1)          ! interpolate sum of s values
@@ -308,8 +309,8 @@ subroutine ibs
    beteff = dxwtd**2/hscwtd
 
    ! This either seems to be doing a correction to the effective beta_y based on the 'hscwtdy' variable.
-   ! From above, it seems 'hscwtdy' is only non-zero (which forces the correction) if there is dispersion in x and y.
-   ! Because it is computed (and incremented) in the loop through the lattice from 'hscrpty' which depends on Dy, and
+   ! From above, it seems 'hscwtdy' is only non-zero (which forces the correction) if there is dispersion in x and y,
+   ! because it is computed (and incremented) in the loop through the lattice from 'hscrpty' which depends on Dy, and
    ! the increment is only done if Dx is non-zero at the current element. Probably this is a correction because it is
    ! divided by the same in the calculation in this if statement block.
    if (hscwtdy .ne. 0.d0) then
@@ -354,7 +355,7 @@ subroutine ibs
    tavx = tavxc*const/s2
    tavy = tavyc*const/s2
 
-   ! Compute the tau terms too, it's simply the inverse of the growth rates.
+   ! Compute the lifetimes too, it's simply the inverse of the growth rates.
    taul = one/tavl
    taux = one/tavx
    tauy = one/tavy
@@ -656,12 +657,12 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, txi, tyi, tli)
 
    ! Now we compute actual terms from Table 1 of the note (a, b, c). We define CPRIME=C*CSCALE to try to keep the value
    ! small enough for the VAX in single precision or IBM in double precision. Test LOG(C) to see if it needs scaling.
-   a = cx + cl + chy + c3 + cy                             ! The a term in Table 1 of Mad-X note
-   b = (c3 + cy)*(c1 + cl + c1y) + cy*c2 + c3*c2y + c3*cy  ! The b term in Table 1 of Mad-X note
+   a = cx + cl + chy + c3 + cy                             ! The a term in Table 1 of the note
+   b = (c3 + cy)*(c1 + cl + c1y) + cy*c2 + c3*c2y + c3*cy  ! The b term in Table 1 of the note
    cscale = one
    chklog = log10(c3) + log10(cy) + log10(c1 + cl)
    if (chklog .gt. tstlog) cscale = ten**(tstlog - chklog)
-   cprime = c3*cy*cscale*(c1 + cl + c1y)                  ! The c term in Table 1 of Mad-X note
+   cprime = c3*cy*cscale*(c1 + cl + c1y)                  ! The c term in Table 1 of the note
 
    ! The three variables below are used to store (accumulate) the intermediate results on integration intervals
    zintl = zero
@@ -714,61 +715,60 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, txi, tyi, tli)
    !    where h is the width of each decade: h = (b−a)/n​.                       !
    !                                                                            !
    ! The loop below essentially does the first and fourth steps above. Note:    !
-   !   - Powers of 10 are used for the "decades" limits                         !
-   !   - 
+   !   -> Powers of 10 are used for the "decades" limits                         !
    ! -------------------------------------------------------------------------- !
    do iloop = 1, maxdec
       bl(iloop) = ten**iloop             ! this is the end of this subinterval
       al(iloop + 1) = bl(iloop)          ! this is the start of this subinterval
-      h = (bl(iloop) - al(iloop))/ns     ! the width of this subinterval (ns is the number of steps in this decade)
+      h = (bl(iloop) - al(iloop))/ns     ! the width of each decade in this subinterval (ns is the number of steps done)
       aloop = al(iloop)
 
       ! Evaluate Simpson's rule summation for one interval. The integrand is calculated in the loop itself.
+      ! Here we evaluate what is essentially the first term in the expansion (step 4 in the description above).
       if (abs(cy + aloop) .gt. onetominus20) then
-         term = sqrt((cy + aloop)*ccy)* &                                                         ! here 'term' is the denominator of the integrand
+         term = sqrt((cy + aloop)*ccy)* &
                 sqrt((aloop*ccy*aloop + td1*aloop + td2) + aloop*c2y*(c3 - cy)*ccy/(cy + aloop))
       else
-         term = sqrt((cy + aloop)*ccy)*sqrt((aloop*ccy*aloop + td1*aloop + td2))                  ! here 'term' is the denominator of the integrand
+         term = sqrt((cy + aloop)*ccy)*sqrt((aloop*ccy*aloop + td1*aloop + td2))
       end if
-      func = sqrt(aloop)/term**3  ! this is the complete denominator of the integrand, to the power of (3/2)
-      polyl = tl1*aloop + tl2
-      polyx = tx1*aloop + tx2
-      polyy = ty1*aloop + ty2
-      suml = func*polyl
-      sumx = func*polyx
-      sumy = func*polyy
+      func = sqrt(aloop)/term**3  ! we start accumulating contributions
+      polyl = tl1*aloop + tl2     ! corresponds to ?
+      polyx = tx1*aloop + tx2     ! corresponds to ?
+      polyy = ty1*aloop + ty2     ! corresponds to ?
+      suml = func*polyl           ! corresponds to ?
+      sumx = func*polyx           ! corresponds to ?
+      sumy = func*polyy           ! corresponds to ?
 
-      ! We loop, in this decade, through various steps (ns) to compute the integral for each.
-      ! We have a check in the loop to see if the integral has converged (see lower down),
+      ! We do the same for ns steps: these are the other components of step 4 in the description above.
+      ! We have a check in the loop to see if the integral has converged (see lower down).
       do iiz = 1, ns
          alam = aloop + iiz*h
-         cof = coeff(mod(iiz, 2) + 1)
+         cof = coeff(mod(iiz, 2) + 1)  ! this is the 4 or 2 in the Simpson's rule summation (starts with 4)
          if (abs(cy + alam) .gt. onetominus20) then
             term = sqrt((cy + alam)*ccy)* &
                    sqrt((alam*ccy*alam + td1*alam + td2) + alam*c2y*(c3 - cy)*ccy/(cy + alam))
          else
             term = sqrt((cy + alam)*ccy)*sqrt((alam*ccy*alam + td1*alam + td2))
          end if
-         f = sqrt(alam)/term**3
-         polyl = tl1*alam + tl2
-         polyx = tx1*alam + tx2
-         polyy = ty1*alam + ty2
-
-         suml = suml + cof*f*polyl
-         sumx = sumx + cof*f*polyx
-         sumy = sumy + cof*f*polyy
+         f = sqrt(alam)/term**3     ! same as above for the next term
+         polyl = tl1*alam + tl2     ! same as above for the next term
+         polyx = tx1*alam + tx2     ! same as above for the next term
+         polyy = ty1*alam + ty2     ! same as above for the next term
+         suml = suml + cof*f*polyl  ! same as above for the next term
+         sumx = sumx + cof*f*polyx  ! same as above for the next term
+         sumy = sumy + cof*f*polyy  ! same as above for the next term
       end do
 
-      ! Accumulate contributions from this decade.
+      ! Accumulate contributions from this decade: compute the full summation (step 4 in the description above).
       suml = suml - f*polyl
       sumx = sumx - f*polyx
       sumy = sumy - f*polyy
       tmpl = (suml/three)*h  ! this is the h/3 * [f(x0​) + 4*f(x1​) + 2*f(x2​) + 4*f(x3​) + ... + 2*f(xn−2​) + 4*f(xn−1​) + f(xn​)] term
       tmpx = (sumx/three)*h  ! this is the h/3 * [f(x0​) + 4*f(x1​) + 2*f(x2​) + 4*f(x3​) + ... + 2*f(xn−2​) + 4*f(xn−1​) + f(xn​)] term
       tmpy = (sumy/three)*h  ! this is the h/3 * [f(x0​) + 4*f(x1​) + 2*f(x2​) + 4*f(x3​) + ... + 2*f(xn−2​) + 4*f(xn−1​) + f(xn​)] term
-      zintl = zintl + tmpl   ! increment "accumulated" result with this decade's contribution
-      zintx = zintx + tmpx   ! increment "accumulated" result with this decade's contribution
-      zinty = zinty + tmpy   ! increment "accumulated" result with this decade's contribution
+      zintl = zintl + tmpl   ! we increment the "accumulated" result with this decade's contribution
+      zintx = zintx + tmpx   ! we increment the "accumulated" result with this decade's contribution
+      zinty = zinty + tmpy   ! we increment the "accumulated" result with this decade's contribution
 
       ! We test to see if the integral has converged: if the contribution of this decade is lower than 1e-7 (for each
       ! plane) we goto 100 which essentially breaks out of the loop and goes directly to the final result calculation.
