@@ -6,7 +6,7 @@ pro_ibs(struct in_cmd* cmd)
 {
   struct command* keep_beam = current_beam;
   char *filename = NULL, *table_name = NULL;
-  int w_file;
+  int k, w_file;
 
   (void)cmd;
   
@@ -22,7 +22,8 @@ pro_ibs(struct in_cmd* cmd)
       filename = permbuff("dummy");
     }
 
-    set_option("ibs_table", &w_file); /* fill only if output */
+    /* fill the table in any case */
+    k = 1; set_option("ibs_table", &k);
 
     if (w_file) {
       table_name = permbuff("ibs");
