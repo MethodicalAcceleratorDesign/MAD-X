@@ -22,16 +22,15 @@ pro_ibs(struct in_cmd* cmd)
       filename = permbuff("dummy");
     }
 
-    /* fill the table in any case */
+    /* Set the ibs_table flag in any case (picked up by fortran subroutine to fill table) */
     k = 1; set_option("ibs_table", &k);
 
-    if (w_file) {
-      table_name = permbuff("ibs");
-      ibs_table = make_table(table_name, "ibs", ibs_table_cols,
-                             ibs_table_types, current_sequ->n_nodes);
-      add_to_table_list(ibs_table, table_register);
-    }
-    
+    /* declare and create the IBS table */
+    table_name = permbuff("ibs");
+    ibs_table = make_table(table_name, "ibs", ibs_table_cols,
+                            ibs_table_types, current_sequ->n_nodes);
+    add_to_table_list(ibs_table, table_register);
+
     // LD 2016.04.19
     adjust_beam();
     probe_beam = clone_command(current_beam);
@@ -44,5 +43,3 @@ pro_ibs(struct in_cmd* cmd)
     current_beam = keep_beam;
   }
 }
-
-
