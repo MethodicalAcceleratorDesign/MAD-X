@@ -20,21 +20,17 @@ and M.~Martini \cite{conte-martini1985} developped in 1985, generalized
 to the case of nonzero vertical dispersion.  
 
 The present implementation of the IBS module in \madx is described in a
-forthcoming note  \cite{antoniou-zimmermann2012}.
+forthcoming note \cite{antoniou-zimmermann2012}.
 
 
 The syntax of the \texttt{IBS} command is:
 \madbox{
-%IBS, TOLERANCE=real, STEPS=integer, FILE=string;
 IBS, FILE=string;
 }
 
 The \texttt{IBS} command has one attribute:
 \begin{madlist}
-%  \ttitem{TOLERANCE} ??? (Default:~1.e-7) % declared, never used
-%  \ttitem{STEPS} number of steps ??? (Default:~50) % declared, never used
-  \ttitem{FILE} outputs the resulting "ibs" table to
-  the named file. (Default:~"ibs")
+  \ttitem{FILE} outputs the resulting "ibs" table to the named file. (Default:~"ibs")
 \end{madlist}
 
 The Bjorken-Mtingwa formalism takes into account the variation of the
@@ -47,7 +43,7 @@ qualified \texttt{BEAM} command and a \texttt{TWISS} command.
 \texttt{IBS} commands leads to \texttt{IBS} using wrong beam parameters,
 even if the \texttt{BEAM} command is reiterated.
 
-The \texttt{IBS} module does not include a consistent treatment of
+\textbf{Warning:} The \texttt{IBS} module does not include a consistent treatment of
 linear betatron coupling.   
 
 The intra-beam scattering growth times are given by:
@@ -65,7 +61,7 @@ respectively. These key beam parameters must be specified through the
 If the \texttt{CENTRE=true} option of \texttt{TWISS} was specified,
 the optical functions are calculated by \texttt{TWISS} at the center of 
 each element and \texttt{IBS} uses these values for the element. 
-If by default \texttt{TWISS} calculated the optical functions at the end
+If (by default) \texttt{TWISS} calculated the optical functions at the end
 of each element, \texttt{IBS} calculates the values at the center of
 each element by performing a linear interpolation between the end values
 for the previous element and the end values for the current element.
@@ -129,18 +125,18 @@ BEAM, \=PARTICLE= lead, CHARGE= charge, MASS= nucleon*umass, \\
 
 \textbf{Resulting Table and File:} \\
 The \texttt{IBS} command produces a table "ibs" containing the following
-data for 
-each element of the machine: element name, position, optical functions
+data for each element of the machine: element name, position, optical functions
 (beta, alfa, dispersion and derivative) in both transverse planes, as
 well as the particular variables \texttt{DELS}, the length difference in
-meters between consecutive elements, and \texttt{TXI, TYI} and
-\texttt{TLI}, the IBS growth times in the two transverse and
-longitudinal planes.  
+meters between consecutive elements. The table also containts the \texttt{TXI, TYI}
+and \texttt{TLI} variables, values close to the IBS growth times at the element in
+the two transverse and longitudinal planes. Exactly, these variables correspond to
+the result of Eq (8) in~\cite{antoniou-zimmermann2012} without including the common
+constant term (the first fraction).
 
 This table can be accessed through the usual mechanisms. If the
 attribute \texttt{FILE="file\_name"} is also given, \madx writes the
 table to the named file.  
-
 
 
 \textbf{Features:} \\
@@ -150,9 +146,12 @@ vertical and longitudinal growth times respectively. They are directly
 accessible as variables after the \texttt{IBS} command, e.g.
 \madxmp{
 IBS; \\ 
-Tx = ibs.tx;}   
-defines a variable Tx which is the average horizontal growth rate in seconds. 
+Tx = ibs.tx;}
+defines a variable Tx which is the average horizontal growth rate in seconds.
 
+Additionally, the Coulomb logarithm as well as the aforementioned common
+constant of Eq (8) in~\cite{antoniou-zimmermann2012} are also exported as
+the \texttt{ibs.coulog} and \texttt{ibs.coulog} variables.
 
 
 \textbf{Examples:} \\
