@@ -1,3 +1,12 @@
+MAD-X release 5.09.02 (2024.??.??)
+
+* IBS:
+  * [PR 1210](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1210) Fixes in IBS command behaviour (F. Soubelet)
+    * Fixed an issue where the IBS table would only be created if the `FILE="STRING"` part of the command was provided, instead of always as documented.
+    * Added an export of the `ibs.coulog` and `ibs.const` variables after calling the IBS command (see user guide).
+    * Documented the IBS code.
+
+
 MAD-X release 5.09.01 (2023.12.04)
 
 *  PTC:
