@@ -1,0 +1,73 @@
+local beam, sequence, twiss, track, beta0, damap in MAD
+local sqrt in MAD.gmath
+local quadrupole in MAD.element
+
+
+local function drift_adj (elm, m, l) -- [KICKPATH] drift adjustment          -- checked
+  m.atdebug(elm, m, l, 'drift_adj:0')
+
+  local T in m
+  local _beta = 1/m.beam.beta
+
+  for i=1,m.npar do
+    local x, px, y, py, t, pt, beam in m[i]
+    local _beta = beam and 1/beam.beta or _beta
+    local  l_pz = l/sqrt(1 + (2*_beta)*pt + pt^2 - px^2 - py^2)
+
+    m[i].x = x + px*(l_pz-l)
+    m[i].y = y + py*(l_pz-l)
+    m[i].t = t - l_pz*(_beta+pt) + (1-T)*(l*_beta)
+  end
+
+  m.atdebug(elm, m, l, 'drift_adj:1')
+end
+
+
+
+local q1 = quadrupole 'mq1' {l=1, k1=1.2}
+local q2 = quadrupole 'mq2' {l=1, k1=-1.3}
+
+local bb = beam {particle="positron", pc=0.0001}
+
+local ss = sequence 'ss' {
+    beam =  bb,
+    q1 {at=0.5},
+    q2 {at=1.5}
+}
+local x0,y0, px0,py0,pt0 =1e-3, 1e-3,1e-3,1e-3, 0.1
+
+local mtbl, mflw
+
+mtbl, mflw = twiss {
+       sequence=ss,
+       X0=beta0 {x=x0,y=y0,px=px0,py=py0,pt=pt0, beta11=1, beta22=1},
+       fringe=0,
+       model="DKD",
+       method=8,
+       nslice=80
+   }
+
+print(mtbl.mu1[3],mtbl.mu2[3])
+
+--[[
+tw,m,dr=loadfile("quad.mad")()
+tw.x:print()
+tw.beta11:print()
+tw.mu1:print()
+]]
+
+
+local m={
+    --(damap {xy=2}):set0{x0, y0, px0, py0, 0, pt0},
+    (damap {xy=2}):set0{0, 0, 0, 0, 0, 0},
+    beam=bb, T=0, npar=1, atdebug=\->()
+}
+
+return mtbl,m,drift_adj
+
+
+
+
+
+
+
