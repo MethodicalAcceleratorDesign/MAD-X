@@ -6491,7 +6491,7 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
   double precision :: qk, qkl, qkl2
   double precision :: cx, sx, cy, sy, biby4
-  double precision :: x,px,y,py,t,pt,deltaplusone,nk1
+  double precision :: x,px,y,py,t,pt,deltaplusone
 
   !---- Set up c's and s's.
   qk = sqrt(abs(sk1))
