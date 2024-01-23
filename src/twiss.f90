@@ -4109,8 +4109,8 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
        
      if (.not.kill_exi_fringe) then
         if (fintx .lt. 0) fintx = fint
-        corr = (h_k + h_k) * hgap * fint
-        call tmfrng(.true.,h_k,sk1,e1,h1,one,corr,rw,tw)
+        corr = (h_k + h_k) * hgap * fintx
+        call tmfrng(.true.,h_k,sk1,e2,h2,-one,corr,rw,tw)
         call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
      endif
 
@@ -6435,15 +6435,13 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
 
      endif
 
-     if (fcentre) return
-
   else
 
      call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
 
-     if (fcentre) return
-
   endif
+
+  if (fcentre) return
 
   !---- Half radiation effect at exit.
   if (radiate .and. ftrk) then
@@ -6497,32 +6495,16 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   double precision :: cx, sx, cy, sy, biby4
   double precision :: x,px,y,py,t,pt,deltaplusone,nk1
 
-
-  !if (exact_expansion) then
-  !   x= orbit(1)
-  !   px= orbit(2)
-  !   y= orbit(3)
-  !   py= orbit(4)
-  !   t= orbit(5)
-  !   pt= orbit(6)
-  !   deltaplusone=sqrt(pt**2+2*pt/beta+1)
-  !   nk1=sk1/deltaplusone
-  !else
-  !   nk1= sk1
-  !endif
-
-  nk1 = sk1
-
   !---- Set up c's and s's.
-  qk = sqrt(abs(nk1))
+  qk = sqrt(abs(sk1))
   qkl = qk * el
   if (abs(qkl) .lt. ten3m) then
-     qkl2 = nk1 * el**2
+     qkl2 = sk1 * el**2
      cx = (one - qkl2 / two)
      sx = (one - qkl2 / six) * el
      cy = (one + qkl2 / two)
      sy = (one + qkl2 / six) * el
-  else if (nk1 .gt. zero) then
+  else if (sk1 .gt. zero) then
      cx = cos(qkl)
      sx = sin(qkl) / qk
      cy = cosh(qkl)
@@ -6533,83 +6515,53 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
      cy = cos(qkl)
      sy = sin(qkl) / qk
   endif
-
-  !if (exact_expansion) then
-  !---- First-order terms.
-  !re(1,1) = cx
-  !re(1,2) = sx/deltaplusone
-  !re(2,1) = - nk1 * sx * deltaplusone
-  !re(2,2) = cx
-  !re(3,3) = cy
-  !re(3,4) = sy /deltaplusone
-  !re(4,3) = + nk1 * sy *deltaplusone
-  !re(4,4) = cy
-  !re(5,6) = el/(beta*gamma)**2
-
-  !ek(5) = el*dtbyds ! to be checked
-
-  !else
   
   !---- First-order terms.
   re(1,1) = cx
   re(1,2) = sx
-  re(2,1) = - nk1 * sx
+  re(2,1) = - sk1 * sx
   re(2,2) = cx
   re(3,3) = cy
   re(3,4) = sy
-  re(4,3) = + nk1 * sy
+  re(4,3) = + sk1 * sy
   re(4,4) = cy
   re(5,6) = el/(beta*gamma)**2
 
   ek(5) = el*dtbyds
 
-  !endif
 
   !---- Second-order terms.
   if (fsec) then
      biby4 = one / (four * beta)
 
-     te(1,1,6) = + nk1 * el * sx * biby4
+     te(1,1,6) = + sk1 * el * sx * biby4
      te(1,6,1) = te(1,1,6)
      te(2,2,6) = te(1,1,6)
      te(2,6,2) = te(1,1,6)
      te(1,2,6) = - (sx + el*cx) * biby4
      te(1,6,2) = te(1,2,6)
-     te(2,1,6) = - nk1 * (sx - el*cx) * biby4
+     te(2,1,6) = - sk1 * (sx - el*cx) * biby4
      te(2,6,1) = te(2,1,6)
 
-     te(3,3,6) = - nk1 * el * sy * biby4
+     te(3,3,6) = - sk1 * el * sy * biby4
      te(3,6,3) = te(3,3,6)
      te(4,4,6) = te(3,3,6)
      te(4,6,4) = te(3,3,6)
      te(3,4,6) = - (sy + el*cy) * biby4
      te(3,6,4) = te(3,4,6)
-     te(4,3,6) = + nk1 * (sy - el*cy) * biby4
+     te(4,3,6) = + sk1 * (sy - el*cy) * biby4
      te(4,6,3) = te(4,3,6)
 
-     te(5,1,1) = - nk1 * (el - sx*cx) * biby4
-     te(5,1,2) = + nk1 * sx**2 * biby4
+     te(5,1,1) = - sk1 * (el - sx*cx) * biby4
+     te(5,1,2) = + sk1 * sx**2 * biby4
      te(5,2,1) = te(5,1,2)
      te(5,2,2) = - (el + sx*cx) * biby4
-     te(5,3,3) = + nk1 * (el - sy*cy) * biby4
-     te(5,3,4) = - nk1 * sy**2 * biby4
+     te(5,3,3) = + sk1 * (el - sy*cy) * biby4
+     te(5,3,4) = - sk1 * sy**2 * biby4
      te(5,4,3) = te(5,3,4)
      te(5,4,4) = - (el + sy*cy) * biby4
      te(5,6,6) = (- six * re(5,6)) * biby4
   endif
-
-  !---- Track orbit.
-  !if (exact_expansion) then
-
-  !   orbit(1)=cx*x + sx*px/deltaplusone
-  !   orbit(2)=-nk1 * sx * x*deltaplusone + cx*px
-  !   orbit(3)=cy*y + sy*py/deltaplusone
-  !   orbit(4)=nk1 * sy * y*deltaplusone + cy*py
-  !   orbit(5)=el/(beta*gamma)**2*pt
-  !   re(5,1)=re(5,1) + te(5,1,1)*x + te(5,1,2)*px + te(5,1,3)*y + te(5,1,4)*py + te(5,1,5)*t + te(5,1,6)*pt
-  !else
-  !   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-  !endif
   
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
   
