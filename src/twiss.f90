@@ -6319,7 +6319,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
 
   logical :: cplxy
   integer :: i, j, n_ferr, elpar_vl
-  double precision :: ct, st, tmp, biby4
+  double precision :: ct, st, tmp
   double precision :: f_errors(0:maxferr)
   double precision :: tilt, sk1, pt, sk1s, bvk, rfac
 
@@ -6410,8 +6410,6 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      !---- Second order terms
 
      if (fsec) then
-
-        biby4 = one / (four * beta)
 
         te(1,2,6) = te(1,2,6)/oneplusdelta
         te(1,6,2) = te(1,6,2)/oneplusdelta
