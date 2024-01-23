@@ -6465,7 +6465,6 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
 end SUBROUTINE tmquad
 
 SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
-  use twisslfi, only: exact_expansion
   use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, four, six, ten3m
   implicit none
@@ -6491,7 +6490,6 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
   double precision :: qk, qkl, qkl2
   double precision :: cx, sx, cy, sy, biby4
-  double precision :: x,px,y,py,t,pt,deltaplusone
 
   !---- Set up c's and s's.
   qk = sqrt(abs(sk1))
@@ -6527,7 +6525,6 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
   ek(5) = el*dtbyds
 
-
   !---- Second-order terms.
   if (fsec) then
      biby4 = one / (four * beta)
@@ -6561,8 +6558,8 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
      te(5,6,6) = (- six * re(5,6)) * biby4
   endif
   
+  !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-  
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
@@ -6917,15 +6914,13 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
         te(5,4,4) = te(5,4,4)/deltaplusone**2
      endif
 
-     if (fcentre) return
-
   else
 
      call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
-     if (fcentre) return
 
   endif
 
+  if (fcentre) return
 
 
   !---- Half radiation effects at exit.
