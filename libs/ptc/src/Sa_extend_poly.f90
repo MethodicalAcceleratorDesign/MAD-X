@@ -108,6 +108,7 @@ CONTAINS
       T = X(6) ; call daprint(T)
       call kill(T)
     endif
+    call flush(6)
   END SUBROUTINE PRTP
 
   SUBROUTINE ANALYSE_APERTURE_FLAG(I,R)

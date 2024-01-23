@@ -58,8 +58,8 @@ Determined SECTOR NMUL MAX :  2
      method                   2
      Num. of steps            2
      charge           1.0000000000000000     
- Thin solenoid: MBLS2.1L2:1                                      has no strength - set to marker
- Thin solenoid: MBLS2.1R2:1                                      has no strength - set to marker
+ Thin solenoid: MBLS2.1L2:1                                      has no strength - set to multipole
+ Thin solenoid: MBLS2.1R2:1                                      has no strength - set to multipole
   Length of machine:    26658.883199998945     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------

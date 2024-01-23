@@ -30,7 +30,7 @@ option,-echo;
      energy           2.0000000000000000E-002
      method                   6
      Num. of steps           10
-     charge          -1.0000000000000000     
+     charge          1.0000000000000000     
   Length of machine:    4.5000000000000000     
  The machine is a LINE
  ------------------------------------ PTC Survey ------------------------------------

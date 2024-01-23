@@ -3,6 +3,7 @@
 ! six families of harmonic sextupoles
 ! starting point at the middle of the long straight
 ! thin lenses
+! Edited by J. Gray 16/08/2023 -> Removed ptcrbend and renamed truerbend to true_rbend
 
 option,rbarc=false;
 
@@ -78,7 +79,7 @@ S2D: Line=(DSEXT1,TS2D,HSTR,VSTR,DSEXT1);
 A=2.*pi/48.;
 N=100;
 !BB: sbend, Type=BB, L=0.936, K1=0., Angle=A, E1=A/2, E2=A/2;
-BB: rbend, Type=BB, L=0.936, K1=0., Angle=A,ptcrbend,truerbend;
+BB: rbend, Type=BB, L=0.936, K1=0., Angle=A,true_rbend; ! JG 16/08/2023 -> true_rbend edit
 BBs: sbend, Type=BB, L=0.936/N, K1=0., Angle=A/N;!, E1=A/2, E2=0;
 BBm: sbend, Type=BB, L=0.936/N, K1=0., Angle=A/N, E1=0, E2=0;
 BBe: sbend, Type=BB, L=0.936/N, K1=0., Angle=A/N;!, E1=0, E2=A/2;

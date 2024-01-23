@@ -346,6 +346,7 @@ void w_ptc_setenvelope_(F_INTEGER method);
 void w_ptc_setfringe_(F_INTEGER method);
 void w_ptc_setknobvalue_(F_INTEGER fible);
 void w_ptc_setnocavity_(F_INTEGER method);
+void w_ptc_setnocharge_(F_INTEGER method);
 void w_ptc_setradiation_(F_INTEGER method);
 void w_ptc_setmodulation_(F_INTEGER method);
 void w_ptc_settime_(F_INTEGER method);

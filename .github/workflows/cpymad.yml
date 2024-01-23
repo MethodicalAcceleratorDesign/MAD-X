@@ -94,7 +94,7 @@ jobs:
           repository: hibtc/cpymad
           ref: ${{ matrix.version }}
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
@@ -108,6 +108,7 @@ jobs:
         run: |
           pip install cython
           pip install pytest
+          pip install setuptools
 
       - name: Build cpymad
         run: |

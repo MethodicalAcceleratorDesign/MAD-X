@@ -64,7 +64,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-18.04
+          # - ubuntu-18.04
           - ubuntu-20.04
           - ubuntu-22.04
         buildtool:
@@ -79,7 +79,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: bin-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}
           path: bin

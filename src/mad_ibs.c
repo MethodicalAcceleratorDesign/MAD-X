@@ -6,7 +6,7 @@ pro_ibs(struct in_cmd* cmd)
 {
   struct command* keep_beam = current_beam;
   char *filename = NULL, *table_name = NULL;
-  int w_file;
+  int k, w_file;
 
   (void)cmd;
   
@@ -22,15 +22,12 @@ pro_ibs(struct in_cmd* cmd)
       filename = permbuff("dummy");
     }
 
-    set_option("ibs_table", &w_file); /* fill only if output */
+    /* declare and create the IBS table */
+    table_name = permbuff("ibs");
+    ibs_table = make_table(table_name, "ibs", ibs_table_cols,
+                            ibs_table_types, current_sequ->n_nodes);
+    add_to_table_list(ibs_table, table_register);
 
-    if (w_file) {
-      table_name = permbuff("ibs");
-      ibs_table = make_table(table_name, "ibs", ibs_table_cols,
-                             ibs_table_types, current_sequ->n_nodes);
-      add_to_table_list(ibs_table, table_register);
-    }
-    
     // LD 2016.04.19
     adjust_beam();
     probe_beam = clone_command(current_beam);
@@ -38,10 +35,9 @@ pro_ibs(struct in_cmd* cmd)
 
     ibs_();
 
+    /* write the IBS table to file if asked by user */
     if (w_file) out_table(table_name, ibs_table, filename);
     probe_beam = delete_command(probe_beam); // LD: added...
     current_beam = keep_beam;
   }
 }
-
-

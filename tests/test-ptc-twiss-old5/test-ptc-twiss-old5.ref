@@ -133,7 +133,7 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=20,exact;
      energy           3.0000000000000000     
      method                   6
      Num. of steps           20
-     charge          -1.0000000000000000     
+     charge          1.0000000000000000     
   Length of machine:    561.59999999999889     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
@@ -164,6 +164,7 @@ fringe is not present (keeping current value)
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
 nocavity is not present (keeping current value)
+nocharge is not present (keeping current value)
 seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
      
