@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.07.00  (64 bit, Linux)       +
+  +     MAD-X 5.09.01  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2021.05.03               +
-  + Execution date: 2021.12.10 13:04:55      +
+  + Release   date: 2023.12.04               +
+  + Execution date: 2024.01.22 17:05:50      +
   ++++++++++++++++++++++++++++++++++++++++++++
 	
 
@@ -17,10 +17,13 @@ add2expr, var = x, expr=-a;
 
 add2expr, var = x, expr=b;
 
+++++++ info: x redefined
 add2expr, var = y, expr=b;
 
+++++++ info: y redefined
 add2expr, var = z, expr=c;
 
+++++++ info: z redefined
 
 
 z1=100; ! Doesn't change because not a defered expression
@@ -37,13 +40,13 @@ c=4;
 
 show, x;
 
-x                  := 0.0000000000000000 - a + b  ;
+x                  := -a+b               ;
 show, y;
 
-y                  := 2.0000000000000000 + b  ;
+y                  := 2.0000000000000000+b ;
 show, z;
 
-z                  := 0.0000000000000000 + c  ;
+z                  := 0.0000000000000000+c ;
 
 
 value, x;
