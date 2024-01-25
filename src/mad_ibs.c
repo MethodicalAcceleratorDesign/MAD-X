@@ -6,7 +6,7 @@ pro_ibs(struct in_cmd* cmd)
 {
   struct command* keep_beam = current_beam;
   char *filename = NULL, *table_name = NULL;
-  int k, w_file;
+  int w_file;
 
   (void)cmd;
   
