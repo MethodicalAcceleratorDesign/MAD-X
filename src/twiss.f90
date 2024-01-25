@@ -3933,179 +3933,15 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
   !---- Body of the dipole.
   !---- Get map for body section
 
-  !if (exact_expansion) then
-     
-  !   pt = orbit(6)
-  !   oneplusdelta = sqrt(pt**2 + 2*pt/bet0 + 1)
-  !   orbit(2) = orbit(2)/oneplusdelta
-  !   orbit(4) = orbit(4)/oneplusdelta
-  !   sk1 = sk1/oneplusdelta
-  !   sk2 = sk2/oneplusdelta
-  !   orbit(6) = 0
-
-  !   call tmsect(.true.,dl,h,dh,sk0,sk1,sk2,ek,re,te)
-
-  !   orbit(2) = orbit(2)*oneplusdelta
-  !   orbit(4) = orbit(4)*oneplusdelta
-  !   sk1 = sk1*oneplusdelta
-  !   sk2 = sk2*oneplusdelta
-  !   orbit(6) = pt
-
-     !----First order terms
-
-  !   re(1,2) = re(1,2)/oneplusdelta
-  !   re(2,1) = re(2,1)*oneplusdelta
-  !   re(2,6) = re(2,6)/oneplusdelta
-  !   re(3,4) = re(3,4)/oneplusdelta
-  !   re(5,2) = re(5,2)*oneplusdelta
-
-  !   ek(2) = ek(2)*oneplusdelta
-
-     !----Second order terms
-
-  !   if (fsec) then
-
-  !      te(1,2,2) = te(1,2,2)/oneplusdelta**2
-  !      te(1,2,6) = te(1,2,6)/oneplusdelta**2
-  !      te(2,1,1) = te(2,1,1)*oneplusdelta
-  !      te(2,2,2) = te(2,2,2)/oneplusdelta
-  !      te(2,1,6) = te(2,1,6)*oneplusdelta
-  !      te(2,6,6) = te(2,6,6)*oneplusdelta
-  !      te(5,1,2) = te(5,1,2)/oneplusdelta
-  !      te(5,2,2) = te(5,2,2)/oneplusdelta**2
-  !      te(5,2,6) = te(5,2,6)/oneplusdelta
-
-        !----Mixed terms
-
-  !      te(1,3,4) = te(1,3,4)/oneplusdelta
-  !      te(1,4,4) = te(1,4,4)/oneplusdelta**2
-  !      te(2,3,3) = te(2,3,3)*oneplusdelta
-  !      te(2,4,4) = te(2,4,4)/oneplusdelta
-  !      te(3,1,4) = te(3,1,4)/oneplusdelta
-  !      te(3,2,3) = te(3,2,3)/oneplusdelta
-  !      te(3,2,4) = te(3,2,4)/oneplusdelta**2
-  !      te(3,4,6) = te(3,4,6)/oneplusdelta
-  !      te(4,1,3) = te(4,1,3)*oneplusdelta
-  !      te(4,2,4) = te(4,2,4)/oneplusdelta
-  !      te(4,3,6) = te(4,3,6)*oneplusdelta
-  !      te(5,3,4) = te(5,3,4)/oneplusdelta
-  !      te(5,4,4) = te(5,4,4)/oneplusdelta**2
-
-  !   endif  
-
-  !else
-
      call tmsect(.true.,dl,h,dh,sk0,sk1,sk2,ek,re,te)
-
-  !endif
-  
-  !---- Get map for entrance fringe field and concatenate
-  !if (exact_expansion) then
-     
-  !   if(.not.kill_ent_fringe) then
-  !      corr = (h_k + h_k) * hgap * fint
-  !      pt = orbit(6)
-  !      oneplusdelta = sqrt(pt**2 + 2*pt/bet0 + 1)
-  !      orbit(2) = orbit(2)/oneplusdelta
-  !      orbit(4) = orbit(4)/oneplusdelta
-  !      sk1 = sk1/oneplusdelta
-  !      orbit(6) = 0
-        
-  !      call tmfrng(.true.,h_k,sk1,e1,h1,one,corr,rw,tw)
-
-  !      orbit(2) = orbit(2)*oneplusdelta
-  !      orbit(4) = orbit(4)*oneplusdelta
-  !      sk1 = sk1*oneplusdelta
-  !      orbit(6) = pt
-
-        !----First order terms
-
-  !      re(2,1) = re(2,1)*oneplusdelta
-  !      re(4,3) = re(4,3)*oneplusdelta
-
-        !----Second order terms
-
-  !      if (fsec) then
-
-  !         te(2,1,1) = te(2,1,1)*oneplusdelta
-  !         te(2,3,3) = te(2,3,3)*oneplusdelta
-
-  !         if (sig .gt. zero) then
-
-  !            te(2,3,3) = te(2,3,3)*oneplusdelta
-
-  !         else
-
-  !            te(2,1,1) = te(2,1,1)*oneplusdelta
-  !            te(4,1,3) = te(4,1,3)*oneplusdelta
-
-  !         endif
-  !      endif
-
-  !      call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-
-  !   endif
-
-  !else
        
      if (.not.kill_ent_fringe) then
         corr = (h_k + h_k) * hgap * fint
         call tmfrng(.true.,h_k,sk1,e1,h1,one,corr,rw,tw)
         call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
      endif
-
-  !endif
   
   !---- Get map for exit fringe fields and concatenate
-
-  !if (exact_expansion) then
-     
-  !   if(.not.kill_exi_fringe) then
-  !      if (fintx .lt. 0) fintx = fint
-  !      corr = (h_k + h_k) * hgap * fint
-  !      pt = orbit(6)
-  !      oneplusdelta = sqrt(pt**2 + 2*pt/bet0 + 1)
-  !      orbit(2) = orbit(2)/oneplusdelta
-  !      orbit(4) = orbit(4)/oneplusdelta
-  !      sk1 = sk1/oneplusdelta
-  !      orbit(6) = 0
-        
-  !      call tmfrng(.true.,h_k,sk1,e1,h1,one,corr,rw,tw)
-
-  !      orbit(2) = orbit(2)*oneplusdelta
-  !      orbit(4) = orbit(4)*oneplusdelta
-  !      sk1 = sk1*oneplusdelta
-  !      orbit(6) = pt
-
-        !----First order terms
-
-  !      re(2,1) = re(2,1)*oneplusdelta
-  !      re(4,3) = re(4,3)*oneplusdelta
-
-        !----Second order terms
-
-  !      if (fsec) then
-
-  !         te(2,1,1) = te(2,1,1)*oneplusdelta
-  !         te(2,3,3) = te(2,3,3)*oneplusdelta
-
-  !         if (sig .gt. zero) then
-
-  !            te(2,3,3) = te(2,3,3)*oneplusdelta
-
-  !         else
-
-  !            te(2,1,1) = te(2,1,1)*oneplusdelta
-  !            te(4,1,3) = te(4,1,3)*oneplusdelta
-
-  !         endif
-  !      endif
-
-  !      call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-
-  !   endif
-
-  !else
        
      if (.not.kill_exi_fringe) then
         if (fintx .lt. 0) fintx = fint
@@ -4114,7 +3950,6 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
         call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
      endif
 
-  !endif
   
   !---- Apply tilt.
   if (tilt .ne. zero) then
