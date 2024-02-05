@@ -765,9 +765,8 @@ void exec_add_expression(struct in_cmd* cmd){
   char* expchar = command_par_string_user("expr", cmd->clone);
   //const char whitespace[] = " \f\n\r\t\v";
   struct variable* var;
-  char in_string_tmp[100];
-  char tmp_var_expr[50
-    ];
+  char in_string_tmp[MAX_LINE];
+  char tmp_var_expr[MAX_LINE];
 
   if (expchar==NULL){
     warning("Need to add an expression for: ", varname);
