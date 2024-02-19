@@ -34,7 +34,7 @@ jobs:
       ARCH: ${{ contains(matrix.manylinux, 'i686') && '32' || '64' }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build MAD-X
         run: |
@@ -50,7 +50,7 @@ jobs:
           cp "$(readlink -f numdiff$ARCH)" bin/numdiff${ARCH}
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bin-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}
           path: bin
@@ -64,7 +64,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-18.04
+          # - ubuntu-18.04
           - ubuntu-20.04
           - ubuntu-22.04
         buildtool:
@@ -78,8 +78,8 @@ jobs:
       ARCH: ${{ contains(matrix.manylinux, 'i686') && '32' || '64' }}
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: bin-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}
           path: bin
@@ -108,7 +108,7 @@ jobs:
         # the failure() and always() functions that prevents an implicit
         # `if success()` that would otherwise be conditioned on.
         if: failure() && steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: failures-manylinux${{ matrix.manylinux }}-${{ matrix.buildtool }}-${{ matrix.os }}
           path: |

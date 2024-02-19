@@ -197,7 +197,7 @@ ptc_create_universe;
      energy           2.5000000522239842     
      method                   2
      Num. of steps            5
-     charge          -1.0000000000000000     
+     charge          1.0000000000000000     
   Length of machine:    196.87813579154621     
  The machine is a LINE
  ------------------------------------ PTC Survey ------------------------------------

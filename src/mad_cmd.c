@@ -763,57 +763,44 @@ add_to_command_list_list(char* label, struct command_list* cl, struct command_li
 void exec_add_expression(struct in_cmd* cmd){
   char* varname = command_par_string_user("var", cmd->clone);
   char* expchar = command_par_string_user("expr", cmd->clone);
-  if(expchar==NULL){
+  //const char whitespace[] = " \f\n\r\t\v";
+  struct variable* var;
+  char in_string_tmp[MAX_LINE];
+  char tmp_var_expr[MAX_LINE];
+
+  if (expchar==NULL){
     warning("Need to add an expression for: ", varname);
     return;
-  }
-  struct variable* var;
-  struct expression* expr1, *expr2; 
-  struct expression* exprcomb;
+  } 
+  //create an input string starting with the varname
+  strcpy(in_string_tmp, varname);
+  strcat(in_string_tmp, ":= ");
+  
+  //Adds the varialbe expression or valube in case it is not an expression
   if ((var = find_variable(varname, variable_list)) == NULL) {
-      var = new_variable(varname, 0, 1, 2, NULL, NULL);
-      add_to_var_list(var, variable_list, 1);
+    strcpy(tmp_var_expr, " ");
+  }
+  else if(var->type==1 || (var->expr==NULL)) {
+      sprintf(tmp_var_expr, "%.16f", var->value);
+  }
+  else {
+    strcpy(tmp_var_expr, var->expr->string);
+  }
+  strcat(in_string_tmp, tmp_var_expr);
+  
+  // Fine to only check the first because the string is already stripped. 
+  if(expchar[0]=='+' || expchar[0]=='-') {
+    strcat(in_string_tmp, " ");
+  }
+  else { //If not a + or minus in the beginning then we add a +
+    strcat(in_string_tmp, " + ");
   }
 
-  if ((var = find_variable(varname, variable_list)) != NULL){
-      
-    if(var->type==2){
-      if(var->expr==NULL){
-
-        char *result = malloc(100 * sizeof(char));
-        sprintf(result, "%.16f", var->value);
-        expr1 = new_expression(result,NULL);
-        free(result);
-        var->expr = mymalloc("add expression", sizeof *var->expr);
-      }
-      else {
-        expr1 = clone_expression(var->expr);
-      }
-      expr2 = new_expression(expchar,NULL);
-      exprcomb = compound_expr(expr1, expression_value(expr1, 2), "+", expr2, expression_value(expr2, 2), 0);
-      memcpy (var->expr, exprcomb, sizeof(*exprcomb));
-    }
-    else if (var->type==1){
-
-      char *result = malloc(100 * sizeof(char));
-      sprintf(result, "%.16f", var->value);
-      expr1 = new_expression(result,NULL);
-      free(result);
-      
-      expr2 = new_expression(expchar,NULL);
-      exprcomb = compound_expr(expr1, expression_value(expr1, 2), "+", expr2, expression_value(expr2, 2),0);
-      var->expr = mymalloc("add expression", sizeof *var->expr);
-      memcpy (var->expr, exprcomb, sizeof(*exprcomb));
-      var->type=2; //makes it an expression
-    }
-    else{
-      warning("Variable has to be declared as defered expression or as an assignment: ", varname);
-    }
-
-  }
-  else{
-    warning("The variable that trying to add expression to is not existing: ", varname);
-  }
+  strcat(in_string_tmp, expchar);    
+  
+  strcat(in_string_tmp, ";");
+  pro_input(in_string_tmp);
+  return;
 }
 
 void

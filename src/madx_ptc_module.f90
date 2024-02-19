@@ -264,21 +264,23 @@ CONTAINS
     use name_lenfi
     use code_constfi
     implicit none
-    logical(lp) particle,doneit,isclosedlayout
-    integer i,j,k,code,nt,icount,nn,ns,nd,mg,napoffset,get_string
-    !    integer get_option
+    logical(lp) particle,doneit,isclosedlayout,get_option
+    integer i,j,k,code,nt,icount,nn,ns,nd,np,mg,napoffset,get_string
+   !  integer get_option
     integer double_from_table_row,table_cell_exists
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, external :: get_userdefined_geometry, get_userdefined_geometry_len
+    logical(lp), external :: nocharge 
+    real(kind(1d0)), external :: sinc ! defined in util.f90 - used for calculating el from eld
     integer, parameter :: nt0=20000
-    real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge
+    real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge, el, elc !El is for rbend only, indicates true element length, user input is always eld. Elc is the cord length
     real(dp) f_errors(0:maxferr),aperture(maxnaper),normal(0:maxmul), apoffset(2)
     real(dp) patch_ang(3),patch_trans(3)
     real(dp) skew(0:maxmul),field(2,0:maxmul),fieldk(2),myfield(2*maxmul+2)
     real(dp) gamma,gamma2,gammatr2,freq,offset_deltap
     real(dp) modulationq
     real(dp) fint,fintx,div,muonfactor,edge,rhoi,hgap,corr,tanedg,secedg,psip
-    real(dp) sk0,sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
+    real(dp) sk0,sk0s,sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
     REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
     real(dp) gammatr,ks,ksi,ex,ey ! LD
     real(kind(1d0)) get_value,node_value
@@ -292,10 +294,11 @@ CONTAINS
     integer             exact1
     integer             sector_nmul_max0,sector_nmul0
     integer             model
+    integer             fringe
     integer             method,method0,method1
     integer             nst0,nst1,ord_max,kk
     REAL (dp) :: tempdp,bvk
-    logical(lp):: ptcrbend,truerbend,errors_out
+    logical(lp):: true_rbend,errors_out
     !  Etienne helical
     character(nlp) heli(100)
     integer mheli,helit,ihelit
@@ -324,7 +327,12 @@ CONTAINS
 
     energy=get_value('probe ','energy ')
     pma=get_value('probe ','mass ')
-    charge=get_value('probe ','charge ')
+    ! jg 07.06.2023 Allow PTC to have a charge, if set to true
+    if (getnocharge()) then
+      charge = 1
+    else
+      charge=get_value('probe ','charge ')
+    endif
     bvk=get_value('probe ','bv ')
 
     e0f=sqrt(ENERGY**2-pma**2)
@@ -435,6 +443,8 @@ CONTAINS
        method0 = method
     CASE(6)
        method0 = method
+    CASE(8) !JG 13.04.2023 - added method 8
+       method0 = method
     CASE DEFAULT
        PRINT *, 'EXCEPTION occured: Can not recognize method order ',method
        EXCEPTION=1
@@ -529,7 +539,8 @@ CONTAINS
 
     ! preliminary setting
     !    my_ring%charge=1
-    initial_charge=1
+! JG 06.06.2023 - Allowed charge to pass from MAD-X to PTC
+    initial_charge=charge
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
     if (getdebug() > 1) then
         print *, 'MADx is set'
@@ -619,15 +630,20 @@ CONTAINS
        key%model=keymod0
     endif
     method1=node_value("method ")
-    if(method1.eq.2.or.method1.eq.4.or.method1.eq.6) then
+    if(method1.eq.2.or.method1.eq.4.or.method1.eq.6.or.method1.eq.8) then ! JG 13.04.2023 - added method 8
        metd = method1
     else
        metd = method0
     endif
 
     !special node keys
-    key%list%permfringe=node_value("fringe ") ! transfer(node_value("fringe ") .ne. zero, key%list%permfringe)
-    key%list%bend_fringe=node_value("bend_fringe ") .ne. zero
+! JG: Change fringe to work like MAD-NG
+    fringe = node_value("fringe ")
+    key%list%permfringe=fringe/2 ! 1.or.3 -> multipole fringe, 2.or.3 -> fringe2quad
+!JG 13.04.2023 - Added fringe max for multipole fringe field
+    key%list%highest_fringe=node_value("frngmax ")
+!JG 11.07.2023 - Removed bend fringe, instead check if fringe is odd
+    key%list%bend_fringe= MOD(fringe, 2) .eq. 1
     key%list%kill_ent_fringe=node_value("kill_ent_fringe ") .ne. zero
     key%list%kill_exi_fringe=node_value("kill_exi_fringe ") .ne. zero
 
@@ -794,6 +810,7 @@ CONTAINS
 
     case(code_drift, code_rcollimator, code_ecollimator, code_collimator) ! case(1,20,21,44)
        key%magnet="drift"
+       key%list%tilt = node_value('tilt ')
        CALL CONTEXT(key%list%name)
 
        do ihelit=1,helit
@@ -832,19 +849,10 @@ CONTAINS
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
-       tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1+node_value('ktap '))
-
-       !       print*, "RBEND: Angle: ", node_value('angle ')," tempdp ", tempdp, " l ", l
-       !       print*, "RBEND: normal: ",normal_0123(0)," skew: ",skew_0123(0)
-
-       key%list%k(2)=node_value('k1 ')+ key%list%k(2)
-       key%list%k(3)=node_value('k2 ')+ key%list%k(3)
-       key%list%k(4)=node_value('k3 ')+ key%list%k(4)
-
-       key%list%ks(2)=node_value('k1s ')+ key%list%ks(2)
-       key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
-       key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
+       key%list%b0=bvk*(node_value('angle ')) * (1+node_value('ktap '))
+       !JG 06.07.2023 - Rbend knl strengths now unweighted correctly for PTC (el not eld)
+       el  = l ! Curved rbend case
+       elc = l * sinc(0.5*key%list%b0) ! Use the angle that PTC uses to calculate the knl strengths
 
        if(EXACT_MODEL.and.(node_value('angle ').eq.zero)) then
           key%magnet="quadrupole"
@@ -855,60 +863,50 @@ CONTAINS
           key%list%t1=node_value('e1 ')
           key%list%t2=node_value('e2 ')
           key%list%hgap=node_value('hgap ')
-          !       key%list%fint=node_value('fint ')
-          fint=node_value('fint ')
-          fintx=node_value('fintx ')
-          if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
-             print*," The fint and fintx must be the same at each end or each might be zero"
-             call aafail('ptc_input:','The fint and fintx must be the same at each end or each might be zero. Program stops.')
-          endif
-          if(fint.gt.zero) then
-             key%list%fint=fint
-             if(fintx.eq.zero) key%list%kill_exi_fringe=my_true
-          else
-             if(fintx.gt.zero) then
-                key%list%fint=fintx
-                key%list%kill_ent_fringe=my_true
-             else
-                key%list%fint=zero
-             endif
-          endif
+! JG: 13.04.2023 Added fringe features to rbend
+          call GET_FRINGE_ATTRIBUTES(key)
           key%list%h1=node_value('h1 ')
           key%list%h2=node_value('h2 ')
-          key%tiltd=node_value('tilt ')
-          if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
-          ptcrbend=node_value('ptcrbend ').ne.0
-          if(ptcrbend) then
-             call context(key%list%name)
-             truerbend=node_value('truerbend ').ne.0
-             if(truerbend) then
-                key%magnet="TRUERBEND"
-                if(key%list%t2/=zero .or. key%list%t1/=zero) then
-                   write(6,*) " The true parallel face bend "
-                   if (key%list%t1/=zero) then
-                      write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                      write(6,*) " Piotr has to implement patches around it to tackle E1=/0  "
-                      write(6,*) " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                   endif
-
-                   write(6,*) " only accepts the total angle and e1 as an input "
-                   write(6,*) " if e1=0, then the pipe angle to the entrance face is "
-                   write(6,*) " angle/2. It is a normal rbend."
-                   write(6,*) " If e1/=0, then the pipe angle to the entrance face is "
-                   write(6,*) ' angle/2+e1 and the exit pipe makes an angle "angle/2-e1" '
-                   write(6,*) " with the exit face."
-                   write(6,*) " The offending non-zero t2 = (e2 - angle/2) is set to zero! "
-                   write(6,*) " Make sure that this is what you want!!! "
-
-                   !                write(6,*) " CHANGE YOUR LATTICE FILRE."
-                   !                stop 666
-                   key%list%t2=zero
-                endif
-             else
-                key%magnet="WEDGRBEND"
-             endif
+          key%list%tilt=node_value('tilt ')
+          call context(key%list%name)
+          true_rbend=node_value('true_rbend ').ne.0
+          if(true_rbend) then
+            key%magnet="WEDGRBEND"
+            if (key%list%t1.gt.twopi.and.key%list%t2.gt.twopi) then
+               call seterrorflag(10, "ptc_createlayout ", 'Invalid true parallel rbend, &
+                                  e1 and e2 are not defined (both greater than 2pi) ')
+            elseif(key%list%t1.gt.twopi) then
+               key%magnet="TRUERBEND"
+            elseif(key%list%t2.gt.twopi) then
+               key%magnet="TRUERBEND"
+            endif
           endif
        endif
+       !JG 06.07.2023 - Rbend knl strengths now unweighted correctly for PTC (el not eld)
+       if (key%magnet == "WEDGRBEND") then
+         el = elc
+       elseif (key%magnet == "TRUERBEND") then
+         el = elc * cos(key%list%b0/2 - key%list%t1)
+       endif
+
+       ! JG 06.07.2023: Correctly unweight knl strengths for PTC (el not eld)
+       do i=1,ord_max
+         key%list%k (i) = key%list%k (i) * (l/el)
+         key%list%ks(i) = key%list%ks(i) * (l/el)
+       enddo
+
+       ! JG 06.07.2023: add k0 in knl to list
+       key%list%k(1)=key%list%k(1)    + normal_0123(0)*(l/el)
+       key%list%k(2)=node_value('k1 ')+ key%list%k(2)
+       key%list%k(3)=node_value('k2 ')+ key%list%k(3) 
+       key%list%k(4)=node_value('k3 ')+ key%list%k(4) 
+
+       ! JG 06.07.2023: add k0s to rbend, without rotation
+       key%list%ks(1)=node_value('k0s ')+ skew_0123(0)*(l/el)
+       key%list%ks(2)=node_value('k1s ')+ key%list%ks(2)
+       key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
+       key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
+
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
@@ -940,13 +938,16 @@ CONTAINS
 
        endif
 
-       tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
-       key%list%b0=bvk*(node_value('angle ')+tempdp*l) * (1+node_value('ktap '))
+       key%list%b0=bvk*(node_value('angle ')) * (1+node_value('ktap '))
 
+       ! JG 06.07.2023: add k0 in knl to list
+       key%list%k(1)=key%list%k(1)    + normal_0123(0)
        key%list%k(2)=node_value('k1 ')+ key%list%k(2)
        key%list%k(3)=node_value('k2 ')+ key%list%k(3)
        key%list%k(4)=node_value('k3 ')+ key%list%k(4)
 
+       ! JG 06.07.2023: remove tilt with k0s, add k0s to list -> uses curved frame so tilt not suitable
+       key%list%ks(1)=node_value('k0s ')+ skew_0123(0)
        key%list%ks(2)=node_value('k1s ')+ key%list%ks(2)
        key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
        key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
@@ -954,28 +955,11 @@ CONTAINS
        key%list%t1=node_value('e1 ')
        key%list%t2=node_value('e2 ')
        key%list%hgap=node_value('hgap ')
-       !       key%list%fint=node_value('fint ')
-       fint=node_value('fint ')
-       fintx=node_value('fintx ')
-       if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
-          print*," The fint and fintx must be the same at each end or each might be zero"
-          call aafail('ptc_input:','The fint and fintx must be the same at each end or each might be zero. Program stops')
-       endif
-       if(fint.gt.zero) then
-          key%list%fint=fint
-          if(fintx.eq.zero) key%list%kill_exi_fringe=my_true
-       else
-          if(fintx.gt.zero) then
-             key%list%fint=fintx
-             key%list%kill_ent_fringe=my_true
-          else
-             key%list%fint=zero
-          endif
-       endif
+! JG: 13.04.2023 Added fringe features to sbend
+       call GET_FRINGE_ATTRIBUTES(key)
        key%list%h1=node_value('h1 ')
        key%list%h2=node_value('h2 ')
        key%tiltd=node_value('tilt ')
-       if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
@@ -1004,15 +988,17 @@ CONTAINS
        ! Read data & fill %k(:), %ks(:) arrays which are
        ! summs of multipoles and errors
 
-! LD: 19.06.2019
-       sk0=node_value('k0 ')
+! LD: 19.06.2019 & JG 26.06.2023 - Added normal_0123(0) and skew_0123(0) to the quadrupole strength
+       sk0=node_value('k0 ') + normal_0123(0)
+       sk0s = skew_0123(0)
 
        ! quadrupole components
        sk1= node_value('k1 ')  * (1 + node_value('ktap '))
        sk1s=node_value('k1s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
-       dum1=key%list%k(2)-normal_0123(1)
-       dum2=key%list%ks(2)-skew_0123(1)
+! JG 18.04.2023 Stopped the removal of knl[2] and ksl[2] from the strength list
+       dum1=key%list%k(2)!-normal_0123(1)
+       dum2=key%list%ks(2)!-skew_0123(1)
 
        !print*,'normal_0123', normal_0123
        !print*,'skew_0123', skew_0123
@@ -1024,10 +1010,21 @@ CONTAINS
           sk1= sk1 +dum1                                          !
           sk1s=sk1s+dum2                                          !
 !       endif                                                      !
+! JG: 13.04.2023 Added fringe features to quadrupole
+         call GET_FRINGE_ATTRIBUTES(key)
+         key%list%t1=node_value('e1 ')
+         key%list%t2=node_value('e2 ')
+         key%list%h1=node_value('h1 ')
+         key%list%h2=node_value('h2 ')
+
+! JG 06.06.2023 - Fix access of local model only 
+         if (model.lt.0) then
+            model = get_value('ptc_create_layout ','model ')
+         endif
 
 ! LD: 19.06.2019
        if (sk1s .ne. zero) then
-          if (ord_max .le. 2 .and. sk0 .eq. 0 .and. key%list%permfringe .eq. 0) then !
+          if (ord_max .le. 2 .and. sk0 .eq. 0 .and. sk0s .eq. 0 .and. fringe .eq. 0) then !
             tilt = -atan2(sk1s, sk1)/two + tilt
             sk1  = sqrt(sk1**2 + sk1s**2)
             sk1s = zero
@@ -1039,27 +1036,41 @@ CONTAINS
 !          key%list%ks(2)=zero
 !          key%tiltd=tilt
        endif                                                      !
-       key%list%k(2) =sk1                                         !
-       key%list%ks(2) =sk1s                                        !
+       key%list%k (2) = sk1                                         !
+       key%list%ks(2) = sk1s                                        !
 !       key%list%ks(2)=zero  ! added by VK                         !
        key%tiltd=tilt  !==========================================!
 
        !================================================================
        ! dipole component not active in MAD-X proper
 ! LD: 19.06.2019
-       key%list%k(1)=key%list%k(1)+bvk*sk0
+! JG 06.06.2023 - Remove bv flag (done later)
+       key%list%k(1)=key%list%k(1)+sk0
+! JG 26.06.2023 - Added normal_0123(0) and skew_0123(0) to the quadrupole strength
+       key%list%ks(1)=key%list%ks(1)+sk0s
 
     case(code_sextupole) ! case(6)
        key%magnet="sextupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
 
+       !JG: 18.04.2023 Allowed k0 and k0s for sextupole
+       key%list%k (1)=key%list%k (1)+normal_0123(0)
+       key%list%ks(1)=key%list%ks(1)+  skew_0123(0)
+       
        ! sextupole components
        sk2= node_value('k2 ')  * (1 + node_value('ktap '))
        sk2s=node_value('k2s ') * (1 + node_value('ktap '))
        tilt=node_value('tilt ')
-       dum1=key%list%k(3)-normal_0123(2)
-       dum2=key%list%ks(3)-skew_0123(2)
+! JG 18.04.2023 Stopped the removal of knl[3] and ksl[3] from the strength list
+       dum1=key%list%k(3)!-normal_0123(2)
+       dum2=key%list%ks(3)!-skew_0123(2)
+! JG: 13.04.2023 Added fringe features to sextupole
+       call GET_FRINGE_ATTRIBUTES(key)
+       key%list%t1=node_value('e1 ')
+       key%list%t2=node_value('e2 ')
+       key%list%h1=node_value('h1 ')
+       key%list%h2=node_value('h2 ')
 
 ! LD: 19.06.2019
 !       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
@@ -1070,9 +1081,10 @@ CONTAINS
 !          tilt = -atan2(sk2s, sk2)/three + tilt                   !
 !          sk2 =  sqrt(sk2**2 + sk2s**2)                           !
 !       endif                                                      !
-       key%list%k(3) =sk2                                         !
-       key%list%ks(3) =sk2s                                         !
+       key%list%k (3) = sk2                                         !
+       key%list%ks(3) = sk2s                                         !
 !       key%list%ks(3)=zero  ! added by VK                         !
+       
        key%tiltd=tilt  !==========================================!
 
        !================================================================
@@ -1094,13 +1106,17 @@ CONTAINS
        key%magnet="octupole"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
+       
+       !JG: 20.04.2023 Allowed k0 and k0s for octupole
+       key%list%k (1)=key%list%k (1)+normal_0123(0)
+       key%list%ks(1)=key%list%ks(1)+  skew_0123(0)
 
        ! octupole components
        sk3= node_value('k3 ')
        sk3s=node_value('k3s ')
        tilt=node_value('tilt ')
-       dum1=key%list%k(4)-normal_0123(3)
-       dum2=key%list%ks(4)-skew_0123(3)
+       dum1=key%list%k(4)!-normal_0123(3)
+       dum2=key%list%ks(4)!-skew_0123(3)
 
 ! ! LD: 19.06.2019
 !       if(dum1.ne.zero.or.dum2.ne.zero) then                      !
@@ -1111,10 +1127,17 @@ CONTAINS
 !          tilt = -atan2(sk3s, sk3)/four + tilt                    !
 !          sk3 = sqrt(sk3**2 + sk3s**2)                            !
 !       endif                                                      !
-       key%list%k(4) =sk3                                         !
-       key%list%ks(4)= sk3s
+       key%list%k (4) = sk3                                         !
+       key%list%ks(4) = sk3s
 !       key%list%ks(4)=zero  ! added by VK                         !
-       key%tiltd=tilt  !==========================================!
+! JG: 13.04.2023 Added fringe features to octupole
+       call GET_FRINGE_ATTRIBUTES(key)
+       key%list%h1=node_value('h1 ')
+       key%list%h2=node_value('h2 ')
+       key%list%t1=node_value('e1 ')
+       key%list%t2=node_value('e2 ')
+       key%tiltd=tilt  
+       !==========================================!
 
        !================================================================
 
@@ -1134,15 +1157,26 @@ CONTAINS
           key%list%k(i)=zero
           key%list%ks(i)=zero
        enddo
-       skew(0)=-skew(0) ! frs error found 30.08.2008
 
-       key%list%thin_h_angle=bvk*normal(0)
-       key%list%thin_v_angle=bvk*skew(0)
+       key%list%thin_h_angle= bvk*normal(0)
+       key%list%thin_v_angle=-bvk*skew(0)
        lrad=node_value('lrad ')
        if(lrad.gt.zero) then
           key%list%thin_h_foc=normal(0)*normal(0)/lrad
           key%list%thin_v_foc=skew(0)*skew(0)/lrad
        endif
+
+! JG 18.04.2023 Added solenoid to multipole
+       ksi=node_value('ksi ')
+       if (ksi.ne.zero.and.lrad.ne.zero) then 
+         key%list%bsol=bvk*ksi/lrad
+         key%list%ls=lrad
+       elseif (ksi.ne.zero) then
+         write(msg,*) "Multipole solenoid component ignored as lrad=0, &
+                       the combination of ks and ksi is not supported in a multipole. &
+                       Please use the SOLENOID element with knl and ksl or specify lrad"
+         call fort_warn("ptc_input",msg(:len_trim(msg)))
+      endif
 
 
        if(nn.gt.0) then
@@ -1213,28 +1247,41 @@ CONTAINS
 
     case(code_solenoid) ! case(9) ! PTC accepts mults
        key%magnet="solenoid"
+      !VK
+       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
        ks=node_value('ks ')
-       if(l.ne.zero) then
+       if(l.ne.zero) then ! JG 21.04.2023 L != 0 means thick solenoid
           key%list%bsol=bvk*ks
-       else
+          !JG: 18.04.2023 Allowed k0 and k0s for solenoid
+          key%list%k (1)=normal_0123(0)
+          key%list%ks(1)=  skew_0123(0)
+       else 
+         ! JG 21.04.2023 L = 0 means thin solenoid, therefore needs multipole 
+         ! thin_h_angle, thin_v_angle, thin_h_foc, thin_v_foc
           ksi=node_value('ksi ')
+          if(ksi.eq.zero.or.lrad.eq.zero) then
+            key%magnet="multipole"
+            print*,"Thin solenoid: ",name," has no strength - set to multipole"
+         endif            
           lrad=node_value('lrad ')
           if(lrad.eq.zero.and.ks.ne.zero) lrad=ksi/ks
-          if(ksi.eq.zero.or.lrad.eq.zero) then
-             key%magnet="marker"
-             print*,"Thin solenoid: ",name," has no strength - set to marker"
-          else
+          key%list%thin_h_angle= bvk*normal_0123(0)
+          key%list%thin_v_angle=-bvk*skew_0123(0)
+          if(lrad.gt.zero) then
+             key%list%thin_h_foc=normal_0123(0)*normal_0123(0)/lrad
+             key%list%thin_v_foc=skew_0123(0)*skew_0123(0)/lrad
              key%list%bsol=bvk*ksi/lrad
-             key%list%ls=lrad
-          endif
+         endif
+! JG 13.04.2023: if lrad=0 and ks=0, then the solenoid should be a multipole instead of a marker
+          key%list%ls=lrad
        endif
-       !VK
-       CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
+       call GET_FRINGE_ATTRIBUTES(key)
 
     case(code_rfcavity) ! case(10)
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
+       key%list%permfringe=node_value("fringe ") ! JG 28.09.2023: Allow fringe=1 for MADX compatibility 
 
        key%list%lag = -(node_value('lag ')+node_value('lagtap ') )*twopi
 
@@ -1314,6 +1361,7 @@ CONTAINS
       endif
       key%list%volt=sqrt(ex**2 + ey**2)
       key%list%lag=atan2(ey,ex)
+      key%tiltd = node_value('tilt ')
 
     case(code_srotation) ! case(12)
        ! actually our SROT element
@@ -1354,8 +1402,9 @@ CONTAINS
        key%magnet="CHANGEREF"
        PATCH_ANG = zero
        PATCH_TRANS = zero
-       call get_node_vector('patch_ang ',3,patch_ang)
-       call get_node_vector('patch_trans ',3,patch_trans)
+       np = 3
+       call get_node_vector('patch_ang ',np,patch_ang)
+       call get_node_vector('patch_trans ',np,patch_trans)
        key%list%patchg=2
        do i=1,3
           key%list%ang(i)=patch_ang(i)
@@ -1457,6 +1506,7 @@ CONTAINS
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
        key%list%lag=-node_value('lag ')*twopi
+       key%list%permfringe=node_value("fringe ") ! JG 28.09.2023: Allow fringe=1 for MADX compatibility 
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        default=default+totalpath0 !fringe field calculation vitally relies on it!!!!
        if(offset_deltap.ne.zero) then
@@ -1483,6 +1533,19 @@ CONTAINS
        !
        freq=c_1d6*node_value('freq ')
        key%list%lag=-node_value('lag ')*twopi+pih
+       key%list%permfringe=node_value("fringe ") ! JG 28.09.2023: Allow fringe=1 for MADX compatibility 
+
+! JG 19.04.2023 - added no_cavity_totalpath for crab cavities
+       no_cavity_totalpath=node_value('no_cavity_totalpath ').ne.0
+       if(no_cavity_totalpath) then
+          key%list%cavity_totalpath=0
+       else
+          key%list%cavity_totalpath=1
+          ! correction for time of flight through cavity
+          ! we want particle with t=0 to be not accelerated
+          key%list%lag = key%list%lag + twopi*freq*(l/2d0)/(clight*beta0)
+       endif
+
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
           default = getintstate()
@@ -1495,6 +1558,9 @@ CONTAINS
        key%list%harmon=one
 
        if(key%list%k(1).ne.zero.and.key%list%freq0.ne.zero) icav=1
+
+       !JG 12.07.2023: added harmon for crab cavities
+       m_u%end%HARMONIC_NUMBER=node_value('harmon ')   ! etienne_harmon
 
     !RFMULTIPOLE, crab also falls here, but is made with special case where volt defines BN(1)
 
@@ -1576,6 +1642,7 @@ CONTAINS
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
        key%list%lag=-node_value('lag ')*twopi
+       key%list%permfringe=node_value("fringe ") ! JG 28.09.2023: Allow fringe=1 for MADX compatibility 
 
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
@@ -1590,6 +1657,7 @@ CONTAINS
        key%list%n_bessel=node_value('n_bessel ')
        key%list%harmon=one ! it is ignored by PTC because it does not know the circumference
 
+
        key%list%k(:)=zero
        key%list%ks(:)=zero
 
@@ -1602,22 +1670,27 @@ CONTAINS
        if(nn.ge.NMAX) nn=NMAX-1
        if(ns.ge.NMAX) ns=NMAX-1
 
-       skew(0)=-skew(0) ! frs error found 30.08.2008
-       key%list%thin_h_angle=bvk*normal(0)
-       key%list%thin_v_angle=bvk*skew(0)
+       key%list%thin_h_angle= bvk*normal(0)
+       key%list%thin_v_angle=-bvk*skew(0)
        lrad=node_value('lrad ')
        if(lrad.gt.zero) then
           key%list%thin_h_foc=normal(0)*normal(0)/lrad
           key%list%thin_v_foc=skew(0)*skew(0)/lrad
        endif
+       
+       if (l .ne. 0) then
+          div = l
+       else
+          div = one
+       endif
 
        do i=0,nn
-          key%list%k(i+1)=normal(i)
+          key%list%k(i+1)=normal(i)/div
           if (normal(i) /= zero) icav=1
        enddo
 
        do i=0,ns
-          key%list%ks(i+1)=skew(i)
+          key%list%ks(i+1)=skew(i)/div
           if (normal(i) /= zero) icav=1
        enddo
 
@@ -1669,6 +1742,8 @@ CONTAINS
           key%list%cavity_totalpath=0
        else
           key%list%cavity_totalpath=1
+      !  JG 30.06.2023 - added no_cavity_totalpath for rf multipole
+          key%list%lag = key%list%lag + twopi*freq*(l/2d0)/(clight*beta0)
        endif
 
 !       print*,"madx_ptc_module::input volt: ", key%list%volt, &
@@ -1786,6 +1861,12 @@ CONTAINS
                 p%mag%freq=clight*tempdp*BETA0/l
                 p%magp%freq=p%mag%freq
 
+                ! JG 30.06.2023 - added no_cavity_totalpath for freq = 0 and harmon > 0
+                if (p%mag%c4%cavity_totalpath==1) then 
+                  p%mag%phas = p%mag%phas - twopi*p%mag%freq*(p%mag%l/2d0)/(clight*beta0) ! Negative as adjusting phase not lag inside PTC
+                  p%magp%phas = p%mag%phas
+               endif
+
                 ! watch the msg buffer is 1024
                 write(msg,*) " Cavity ",p%mag%name," defined with harmonic number ",tempdp,". Using SUM(LD) as ring length: ", l, &
                              " instead of real orbit length. Obtained freq. = ",p%mag%freq," Hz"
@@ -1811,6 +1892,27 @@ CONTAINS
 
   END subroutine ptc_input
   !_________________________________________________________________
+
+  ! JG: Added function to get fringe field attributes
+  SUBROUTINE GET_FRINGE_ATTRIBUTES(key)
+    type(keywords), INTENT(INOUT) ::  key
+    real(dp) fint,fintx
+    real(kind(1d0)) node_value
+
+    key%list%hgap=node_value('hgap ')
+    fint =node_value('fint ')
+    fintx=node_value('fintx ')
+    if (fintx.lt.0) then 
+         fintx = fint
+    endif
+    key%list%fint =fint
+    key%list%fint2=fintx
+    key%list%va=node_value('f1 ')
+    key%list%vs=node_value('f2 ')
+
+  END SUBROUTINE GET_FRINGE_ATTRIBUTES
+
+ !_________________________________________________________________
 
   SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123, skew_0123,ord_max)
     use twtrrfi ! integer, maxmul,maxferr,maxnaper
@@ -1848,7 +1950,6 @@ CONTAINS
     ! Assign values from the command line                       !
     call get_node_vector('knl ',n_norm,normal)                  !
     call get_node_vector('ksl ',n_skew,skew)                    !
-    skew(0)=-skew(0)                                            ! frs error found 30.08.2008
     if(n_norm.ge.maxmul) n_norm=maxmul-1                        !
     if(n_skew.ge.maxmul) n_skew=maxmul-1                        !
     ord_max=max(n_norm,n_skew)                                  !
@@ -1976,7 +2077,6 @@ CONTAINS
     ! Assign values from the command line                       !
     call get_node_vector('knl ',n_norm,normal)                  !
     call get_node_vector('ksl ',n_skew,skew)                    !
-    skew(0)=-skew(0)                                            ! frs error found 30.08.2008
     if(n_norm.ge.maxmul) n_norm=maxmul-1                        !
     if(n_skew.ge.maxmul) n_skew=maxmul-1                        !
     ord_max=max(n_norm,n_skew)                                  !
@@ -2152,12 +2252,14 @@ CONTAINS
 
   subroutine ptc_align()
     use twiss0fi
+    use code_constfi
     implicit none
-    integer j,n_align,node_al_errors
-    integer restart_sequ,advance_node, n_perm_align
+    integer j,n_align,node_al_errors,code
+    integer restart_sequ,advance_node,n_perm_align
+    logical is_patch
     real(dp) al_errors(align_max)
     type(fibre), pointer :: f
-    REAL(KIND(1d0)) :: node_value   !/*returns value for parameter par of current element */
+    double precision, external :: node_value  !/*returns value for parameter par of current element */
     integer, external       :: is_permalign
     !---------------------------------------------------------------
 
@@ -2170,7 +2272,10 @@ CONTAINS
     al_errors = 0
     n_align = node_al_errors(al_errors)
     n_perm_align = is_permalign()
-    if (n_perm_align .ne. 0) then
+    code=node_value('mad8_type ')
+    is_patch = code.eq.code_translation .or. code.eq.code_xrotation .or. &
+               code.eq.code_yrotation   .or. code.eq.code_srotation
+    if (n_perm_align .ne. 0 .and. (.not. is_patch)) then
       al_errors(1) = al_errors(1) + node_value('dx ')
       al_errors(2) = al_errors(2) + node_value('dy ')
       al_errors(3) = al_errors(3) + node_value('ds ')
@@ -3884,13 +3989,13 @@ CONTAINS
       do i=3,1,-1
         v = node_value(kns(i))
         if (v .ne. zero ) then
-          maxk = i
+          maxk = i + 1
           exit
         endif
 
         v = node_value(kss(i))
         if (v .ne. zero ) then
-          maxk = i
+          maxk = i + 1
           exit
         endif
 

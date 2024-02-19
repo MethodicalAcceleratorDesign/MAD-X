@@ -351,7 +351,7 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
   n = name = permbuff(cmd->tok_list->p[name_pos]);
   if (exp_type == 0)
   {
-    warning("illegal expression set to 0 in:",
+    warning("illegal expression, expression NOT updated for the following :",
             join_b(cmd->tok_list->p, cmd->tok_list->curr));
   }
   else

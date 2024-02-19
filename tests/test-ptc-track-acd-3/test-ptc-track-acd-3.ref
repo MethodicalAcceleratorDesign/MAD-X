@@ -70,6 +70,7 @@ fringe is not present (keeping current value)
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
 nocavity is not present (keeping current value)
+nocharge is not present (keeping current value)
 seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
  MAD-X Beam Parameters
@@ -81,7 +82,7 @@ obs_points pro_ptc_setswitch Done
      energy           5.0000000000000000     
      method                   2
      Num. of steps            5
-     charge          -1.0000000000000000     
+     charge          1.0000000000000000     
  S2%volt =   0.40000000000000002     
  S2%phas =    2.9816371581236458     
  S2%volt = 
@@ -182,6 +183,7 @@ fringe is not present (keeping current value)
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
 nocavity is not present (keeping current value)
+nocharge is not present (keeping current value)
 seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
  Setting debug level to           1
@@ -195,6 +197,7 @@ fringe is not present (keeping current value)
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
 nocavity is not present (keeping current value)
+nocharge is not present (keeping current value)
 seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
  ************ State Summary ****************

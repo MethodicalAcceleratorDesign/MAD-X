@@ -1023,6 +1023,19 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("nocavity is not present (keeping current value)\n");
    }
 
+  /*NOCHARGE SWITCH*/
+    found = command_par_value_user2("nocharge", cmd->clone, &switchvalue);
+  if (found)
+   {
+    if (debuglevel > 0) printf("nocharge is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setnocharge_(&i);
+   }
+  else
+   {
+    if (debuglevel > 0) printf("nocharge is not present (keeping current value)\n");
+   }
+
   /*SEED SETTING*/
   found = command_par_value_user2("seed", cmd->clone, &switchvalue);
   if (found)

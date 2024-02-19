@@ -209,9 +209,14 @@ contains
     CASE("TRUERBEND     ")
        if(sixtrack_compatible) stop 2
 
-       !e1_true= KEY%LIST%b0/2.0_dp+ KEY%LIST%t1
-       !BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=e1_true,list=KEY%LIST)
-       BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,list=KEY%LIST)
+       if(KEY%LIST%t1.gt.twopi) then !From madx_ptc_module, only t1 is used
+         KEY%LIST%t1 = 0 
+         ! e1_true= KEY%LIST%b0/2.0_dp + KEY%LIST%t1
+         BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e2=KEY%LIST%t2,list=KEY%LIST)
+       else
+         KEY%LIST%t2 = 0
+         BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=KEY%LIST%t1,list=KEY%LIST)
+       endif
 
     CASE("WEDGRBEND     ")
        if(sixtrack_compatible) stop 3
@@ -1074,7 +1079,7 @@ M%B_L=M%B_T
     case(kind10)
        WRITE(MF,*) el%tp10%DRIFTKICK,  " driftkick "
     case(kind16,kind20)
-       WRITE(MF,*) el%k16%DRIFTKICK, " driftkick"
+      WRITE(MF,*) el%k16%DRIFTKICK, el%k16%LIKEMAD, " driftkick, likemad"
     case(kind18)
 !       WRITE(MF,*) " RCOLLIMATOR HAS AN INTRINSIC APERTURE "
 !       CALL print_aperture(EL%RCOL18%A,mf)
@@ -1169,7 +1174,7 @@ M%B_L=M%B_T
        read(MF,*) el%tp10%DRIFTKICK
     case(kind16,kind20)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
-       read(MF,*) el%k16%DRIFTKICK !  !el%k16%LIKEMAD
+       read(MF,*) el%k16%DRIFTKICK, el%k16%LIKEMAD
     case(kind18)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
   !     READ(MF,*) LINE
@@ -3750,7 +3755,7 @@ if(present(dir)) then
 if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  
  k160%DRIFTKICK=F%k16%DRIFTKICK
- k160%LIKEMAD=.true.  !F%k16%LIKEMAD
+ k160%LIKEMAD=F%k16%LIKEMAD
      if(present(mf)) then
      write(mf,NML=k160name)
     endif   
@@ -3759,8 +3764,8 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
     if(present(mf)) then
      read(mf,NML=k160name)
     endif   
- !F%k16%DRIFTKICK=k160%DRIFTKICK
-! F%k16%LIKEMAD=k160%LIKEMAD
+ F%k16%DRIFTKICK=k160%DRIFTKICK
+F%k16%LIKEMAD=k160%LIKEMAD
 endif
 endif
 end subroutine k16_k160

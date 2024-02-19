@@ -35,7 +35,7 @@ jobs:
         shell: bash
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Download cmake for Linux
         if: matrix.os == 'ubuntu'
         run: |
@@ -112,7 +112,7 @@ jobs:
   build:
     # Configure, build, and test with few settings. This is slow, so shouldn't
     # add too many combinations here.
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     env:
       MADXDIR: ${{ github.workspace }}/dist
     strategy:
@@ -127,7 +127,7 @@ jobs:
           - {name: release,  flags: -DCMAKE_BUILD_TYPE=Release}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install MAD-X build dependencies
         run: |
@@ -156,7 +156,7 @@ jobs:
       - name: Upload test outputs for inspection
         # Keep the redundant condition (see main.yml)!
         if: failure() && steps.tests.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: failures-cmake-${{ matrix.name }}
           path: |
