@@ -1120,12 +1120,7 @@ void check_set_consistent_solenoid(struct element *el, struct command* def)
   if(l>0) { // thick solenoid
     if(ks==0  && ksi!=0) ks=ksi/l; // ks not specified, get ks from ksi
     store_comm_par_value("ks",ks,el->def);
-    if(lrad!=0)
-    {
-      lrad=0;
-      store_comm_par_value("lrad",lrad,el->def);
-      warning(el->name," thick (l>0) solenoid, ignore lrad");
-    }
+    if(lrad!=0) warning(el->name," thick (l>0) solenoid with lrad, ignore lrad");
   }
   else { // thin solenoid
     if(ks !=0 && ksi!=0 && lrad>0 && fabs(ks*lrad-ksi)>1.e-10) ks=0; // redudant inconsistent parameters. ignore ks, then get below from ksi/lrad

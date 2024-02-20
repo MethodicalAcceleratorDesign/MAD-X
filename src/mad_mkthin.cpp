@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <vector>
 #include <sstream>
 
 #ifdef __cplusplus
@@ -2143,14 +2144,12 @@ element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no
   const command_parameter* length_param  = return_param_recurse("l",thick_elem);
   const command_parameter* kns_param     = return_param_recurse("ks",thick_elem);
   command_parameter* ksi_par=par_scaled(kns_param,length_param,"ksi",nslices);
-  command* cmd = new_cmdptr( thick_elem );
-  copy_params_from_elem(cmd,thick_elem,str_v_join(MaTh::DoNotCopy,{"kill_ent_fringe","kill_exi_fringe"}));
+  command* cmd = new_cmdptr( find_element("solenoid", base_type_list) );
+  copy_params_from_elem(cmd,thick_elem,str_v_join(MaTh::DoNotCopy,{"l","kill_ent_fringe","kill_exi_fringe"}));
   SetParameter_in_cmd(cmd,ksi_par,"ksi",1);
-
   set_lrad(cmd,length_param,nslices); // keep l  as lrad
   if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << my_dump_command(cmd) << std::endl;
   finish_make_sliced_elem(sliced_elem, thick_elem, cmd, parent_or_base, slice_no);
-  ParameterRemove("l",sliced_elem);
   return sliced_elem;
 }
 
