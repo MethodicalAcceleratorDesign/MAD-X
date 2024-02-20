@@ -901,7 +901,7 @@ static void force_consistent_slices(el_list* the_element_list) // hbu 10/2005 lo
 
 static void zero_length_elements_1_slice(el_list* the_element_list)
 // zero length elements will not be sliced
-// the can still get a slice number > 1 from select,flag=makethin which can be confusing, avoided here by assuring the default slice=1
+// they can still get a slice number > 1 from select,flag=makethin which can be confusing, avoided here by assuring the default slice=1
 {
   for(int i=0; i< the_element_list->curr; ++i) // loop over the_element_list
   {
