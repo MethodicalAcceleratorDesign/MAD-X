@@ -892,7 +892,34 @@ static void force_consistent_slices(el_list* the_element_list) // hbu 10/2005 lo
         child->double_value=slices;
         parent->double_value=slices_parent;
         int el_thick_pos = name_list_pos("thick",nl);
-        if(el_thick_pos > -1) el->parent->def->par->parameters[el_thick_pos]->double_value = el_def->par->parameters[el_thick_pos]->double_value; // copy thick flag from child to parent
+        if(el_thick_pos > -1) el->parent->def->par->parameters[el_thick_pos]->double_value = el_def->par->parameters[el_thick_pos]->double_value; // copy slice number from child to parent
+      }
+    }
+  }
+}
+
+static void zero_length_elements_1_slice(el_list* the_element_list)
+// zero length elements will not be sliced
+// they can still get a slice number > 1 from select,flag=makethin which can be confusing, avoided here by assuring the default slice=1
+{
+  for(int i=0; i< the_element_list->curr; ++i) // loop over the_element_list
+  {
+    element* el = the_element_list->elem[i];
+    bool found;
+    double el_length=my_get_int_or_double_value(el,"l",found);
+    const command* el_def=el->def;
+    name_list* nl=el_def->par_names;
+    const int ei=name_list_pos("slice",nl);
+    if(ei > -1 && el->parent!=nullptr && el != el->parent )
+    {
+      bool found_parent;
+      double el_parent_length=my_get_int_or_double_value(el->parent,"l",found_parent);
+      command_parameter*  child=el_def->par->parameters[ei];
+      command_parameter* parent=el->parent->def->par->parameters[ei];
+      if(!found || fmax(el_length,el_parent_length)<1.e-10) // element and its parent have zero length, remove slice number
+      { // assure that zero length elements have the default slice=1
+        child->double_value=1;
+        parent->double_value=1;
       }
     }
   }
@@ -1282,12 +1309,12 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
   name_list* nl = incmd->clone->par_names;
   command_parameter_list* pl = incmd->clone->par;
 
-  static std::string LastSequenceSliced,LastStyle="teapot";
-  static SequenceList sliced_seqlist;
-
   MaTh::Verbose=0;
   if(get_option("debug")) MaTh::Verbose=1;
   if(get_option("verbose")) MaTh::Verbose=2;
+
+  static std::string LastSequenceSliced,LastStyle="teapot";
+  static SequenceList sliced_seqlist;
 
   const int ipos_style = name_list_pos("style", nl);
   std::string slice_style;
@@ -1344,7 +1371,7 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
     if (MaTh::Verbose&& iret) std::cout << "after set_selected_elements iret=" << iret << std::endl;
   }
   else  warning("makethin: no selection list,","slicing all to one thin lens.");
-
+  zero_length_elements_1_slice(element_list);
   if(iMakeConsistent) force_consistent_slices(element_list);
 
   const int ipos_seq = name_list_pos("sequence", nl);
@@ -1375,7 +1402,7 @@ void makethin(in_cmd* incmd) // public interface to slice a sequence, called by 
 }
 
 //--------  SliceDistPos
-SliceDistPos::SliceDistPos(const int n,const bool teapot_fl) : delta(0.5), Delta(0),delta_str("1/2"),delta_half_str("1/4"),Delta_str("0"),Delta_half_str("0")
+SliceDistPos::SliceDistPos(const int n,const bool teapot_fl) : delta(0.5), Delta(1),delta_str("1/2"),delta_half_str("1/4"),Delta_str("1"),Delta_half_str("0")
 { // typically called with    slice_style==std::string("teapot")    which is true for teapot  and false for simple
   // note that n = number of cuts = number of thin slices = number of thick slices -1
   // called for thick slices, positions of thin slices are calculated with simple_at_shift teapot_at_shift
@@ -2116,14 +2143,12 @@ element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no
   const command_parameter* length_param  = return_param_recurse("l",thick_elem);
   const command_parameter* kns_param     = return_param_recurse("ks",thick_elem);
   command_parameter* ksi_par=par_scaled(kns_param,length_param,"ksi",nslices);
-  command* cmd = new_cmdptr( thick_elem );
-  copy_params_from_elem(cmd,thick_elem,str_v_join(MaTh::DoNotCopy,{"kill_ent_fringe","kill_exi_fringe"}));
+  command* cmd = new_cmdptr( find_element("solenoid", base_type_list) );
+  copy_params_from_elem(cmd,thick_elem,str_v_join(MaTh::DoNotCopy,{"l","kill_ent_fringe","kill_exi_fringe"}));
   SetParameter_in_cmd(cmd,ksi_par,"ksi",1);
-
   set_lrad(cmd,length_param,nslices); // keep l  as lrad
   if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << my_dump_command(cmd) << std::endl;
   finish_make_sliced_elem(sliced_elem, thick_elem, cmd, parent_or_base, slice_no);
-  ParameterRemove("l",sliced_elem);
   return sliced_elem;
 }
 
@@ -2276,8 +2301,9 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
   {
     if(nslices==1) // single thick
     {
-      en = thick_elem; // full slice as entry, no body/exit
-      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create thick slices _en, _bo, _ex thick_elem->name=" << thick_elem->name << " here single slice just entry, not body, exit" << '\n';
+      en = thick_elem; // full slice
+      if(verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create single thick_elem->name=" << thick_elem->name << " single body between dipedges with fringe fields"<< '\n';
+      en = create_thick_slice(thick_elem,1);
     }
     else // nslices>1
     {
@@ -2313,7 +2339,7 @@ void SeqElList::slice_node_translate() // slice/translate and add slices to slic
 
     if(ThickSLice) // fill space between slices
     {
-      if(i==1)           place_thick_slice(thick_elem,en,i); // place entry  slice
+      if(i==1)           place_thick_slice(thick_elem,en,i); // place entry or single thick slice
       else if(i<nslices) place_thick_slice(thick_elem,bo,i); // place body/middle slice
       else               place_thick_slice(thick_elem,ex,i); // place exit slice
       // place exit body after loop
@@ -2506,7 +2532,7 @@ void SeqElList::finish_make_sliced_elem(element*& sliced_elem, const element* th
   theSliceList->put_slice(thick_elem,sliced_elem);
 }
 
-node* SeqElList::copy_thin(node* work_node) // this copies an element node and sets the length to zero and lrad to the length to be used for "copying" optically neutral elements
+node* SeqElList::copy_thin(node* work_node) // this copies an element node, when L>0 sets the length to zero and lrad to the length to be used for "copying" optically neutral elements
 {
   if ( MaTh::Verbose>1) std::cout << __FILE__ << " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << "  " << std::setw(MaTh::par_name_maxlen) << work_node->name << " " << std::setw(MaTh::el_type_maxlen) << work_node->base_name << " thin_node->length=" << work_node->length << " l=" << el_par_value("l",work_node->p_elem) << std::endl;
   node* thin_node = nullptr;
@@ -2518,6 +2544,8 @@ node* SeqElList::copy_thin(node* work_node) // this copies an element node and s
   }
   thin_node->length=0;
   thin_node->p_elem->length=0;
+  ParameterRemove("slice",thin_node->p_elem); // slicing done, no need to keep slice number
+  ParameterRemove("thick",thin_node->p_elem); // slicing done, no need to keep thick
   return thin_node;
 }
 

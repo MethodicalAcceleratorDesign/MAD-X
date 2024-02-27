@@ -101,6 +101,7 @@ int     is_custom_set(void);
 void    update_node_aperture(void);
 void    check_for_update_in_seq(struct element* el, struct command* update, int nupdates);
 int     check_for_perm_misalign(struct node*, struct in_cmd* cmd);
+void check_set_consistent_solenoid(struct element *el, struct command* def);
 // used by mad_mkthin.c
 struct command_parameter* return_param(const char* par, const struct element*);
 struct command_parameter* return_param_recurse(const char* par, const struct element*);

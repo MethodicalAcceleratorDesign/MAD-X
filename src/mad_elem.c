@@ -302,6 +302,7 @@ make_element(const char* name, const char* parent, struct command* def, int flag
       warning("Multipole defined with non-zero length:", el->name);
     el->length = el_par_value("l", el);
     set_aperture_element(el, def);
+    if(belongs_to_class(el,"solenoid")) check_set_consistent_solenoid(el,def);
   }
 
   add_to_el_list(&el, def->mad8_type, element_list, flag);
@@ -1110,3 +1111,28 @@ add_to_el_list( /* adds element to alphabetic element list */
   }
 }
 
+void check_set_consistent_solenoid(struct element *el, struct command* def)
+{ // checking and if needed improving the element definition. Note that only nonzero ksi is shown in the twiss output, ks in twiss always zero
+  double l   = el_par_value("l",el);
+  double ks   = el_par_value("ks",el);
+  double ksi  = el_par_value("ksi",el);
+  double lrad = el_par_value("lrad",el);
+  if(l>0) { // thick solenoid
+    if(ks==0  && ksi!=0) ks=ksi/l; // ks not specified, get ks from ksi
+    store_comm_par_value("ks",ks,el->def);
+    if(lrad!=0) warning(el->name," thick (l>0) solenoid with lrad, ignore lrad");
+  }
+  else { // thin solenoid
+    if(ks !=0 && ksi!=0 && lrad>0 && fabs(ks*lrad-ksi)>1.e-10) ks=0; // redudant inconsistent parameters. ignore ks, then get below from ksi/lrad
+    if(ksi!=0 && lrad>0 && ks==0) { // ks from ksi/lrad, used in thin solenoid subroutine tmsol_th
+      ks=ksi/lrad;
+      store_comm_par_value("ks",ks,el->def);
+    }
+    if(lrad==0 && ks!=0 && ksi!=0) { // lrad from ksi/ks
+      lrad=ksi/ks;
+      if(lrad<0) warning(el->name," lrad=ksi/ls<0");
+      store_comm_par_value("lrad",lrad,el->def);
+    }
+  }
+  if(l<=0 && lrad<=0) warning(el->name," solenoid should have positive l or lrad");
+}

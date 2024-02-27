@@ -604,6 +604,11 @@ store_node_value(const char* par, double* value)
   else if (strcmp(lpar, "rm64") == 0) store_comm_par_value("rm64",*value,el->def);
   else if (strcmp(lpar, "rm65") == 0) store_comm_par_value("rm65",*value,el->def);
   else if (strcmp(lpar, "rm66") == 0) store_comm_par_value("rm66",*value,el->def);
+  
+  /* added by hbu May 2023 for check_set_consistent_solenoid */
+  else if (strcmp(lpar,   "ks") == 0) store_comm_par_value("ks",*value,el->def);
+  else if (strcmp(lpar, "lrad") == 0) store_comm_par_value("lrad",*value,el->def);
+
   // This needs to be cleaned up.
   
   
