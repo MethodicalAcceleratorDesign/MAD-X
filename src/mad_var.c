@@ -455,7 +455,7 @@ set_stringvar(const char* name, char* string)
   {
     if ((var = find_variable(c_dum->c, variable_list)) != NULL)
     {
-      if (var->type == 3) var->string = string;
+      if (var->type == 3) var->string = tmpbuff(string);
     }
     else
     {
