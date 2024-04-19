@@ -1,4 +1,4 @@
-MAD-X release 5.09.02 (2024.??.??)
+MAD-X release 5.09.02 (2024.04.19)
 
 * IBS:
   * [PR 1210](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1210) Fixes in IBS command behaviour (F. Soubelet)
@@ -6,8 +6,11 @@ MAD-X release 5.09.02 (2024.??.??)
     * Added an export of the `ibs.coulog` and `ibs.const` variables after calling the IBS command (see user guide).
     * Documented the IBS code.
 * Add2expr
-  * [PR1 1211] (https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1211) Evaluates the expression when defined.
-    * Previously it was possible to add as syntax error in the expression and this was only detected when the expression was evaluated. This PR fixes that. 
+  * [PR 1211](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1211) Evaluates the expression when defined.
+    * Previously it was possible to add as syntax error in the expression and this was only detected when the expression was evaluated. This PR fixes that.
+* Memory corruption
+  * [PR 1221](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1221) Fix dangling pointer
+     * `setvars` leave a string variable point to data on a tables that could be delete leaving a dangling pointer 
 
 
 MAD-X release 5.09.01 (2023.12.04)
