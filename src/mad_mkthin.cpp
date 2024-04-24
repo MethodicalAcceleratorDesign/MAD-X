@@ -2440,7 +2440,7 @@ void SeqElList::slice_node_default() // slice/translate and add slices to sliced
 
 void SeqElList::slice_attributes_to_slice(command* cmd,const element* thick_elem)
 { // looks for attributes like kick that need slicing, modify them in cmd used to construct the sliced element
-  const std::vector<std::string> attributes_to_slice = { "kick", "hkick", "vkick", "chkick", "cvkick", "current"};
+  const std::vector<std::string> attributes_to_slice = { "kick", "hkick", "vkick", "chkick", "cvkick", "current","volt"};
   ElmAttr theElmAttr(thick_elem);
   std::vector<std::string> active_par_to_be_used=theElmAttr.get_list_of_active_attributes();
   for(unsigned i=0;i<active_par_to_be_used.size();++i)
