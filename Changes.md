@@ -1,3 +1,7 @@
+MAD-X release 5.09.03 (2024.04.25)
+* Bug fix release due to makethin slicing issues with RF cavities
+
+
 MAD-X release 5.09.02 (2024.04.19)
 
 * IBS:
