@@ -6,11 +6,13 @@ MAD-X release 5.09.02 (2024.04.19)
     * Added an export of the `ibs.coulog` and `ibs.const` variables after calling the IBS command (see user guide).
     * Documented the IBS code.
 * Add2expr
-  * [PR 1211](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1211) Evaluates the expression when defined.
+  * [PR 1211](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1211) Evaluates the expression when defined.(T. Persson)
     * Previously it was possible to add as syntax error in the expression and this was only detected when the expression was evaluated. This PR fixes that.
 * Memory corruption
-  * [PR 1221](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1221) Fix dangling pointer
-     * `setvars` leave a string variable point to data on a tables that could be delete leaving a dangling pointer 
+  * [PR 1221](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1221) Fix dangling pointer (R. De Maria)
+     * `setvars` leave a string variable point to data on a tables that could be delete leaving a dangling pointer
+* Improved solenoid definition (H. Burkhardt)
+  * [PR 1179](https://github.com/MethodicalAcceleratorDesign/MAD-X/pull/1179) 
 
 
 MAD-X release 5.09.01 (2023.12.04)
