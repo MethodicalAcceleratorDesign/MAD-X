@@ -1,4 +1,3 @@
-
 subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &                           
                  z, dxt, dyt, last_orbit, eigen, coords, e_flag, code_buf, & 
                  l_buf)
@@ -83,8 +82,6 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
   external :: set_tt_attrib, alloc_tt_attrib, set_tt_multipoles, get_tt_multipoles
 
-    
-
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
   dynap = switch .eq. 2
@@ -118,7 +115,6 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
      onepass = get_option('onepass ') .ne. 0
      if (.not.onepass) call trclor(switch, orbit0)
   endif
-
   !---- Set fast_error_func flag to use faster error function
   !---- including tables. Thanks to late G. Erskine
   fast_error_func = get_option('fast_error_func ') .ne. 0
@@ -229,12 +225,12 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   if(mytracksumm_end_particle.lt.1.or.mytracksumm_end_particle.gt.jmax) then ! hrr Sep 2021
      mytracksumm_end_particle= jmax ! hrr Sep 2021
   endif ! hrr Sep 2021
-  !if (get_option('info ') .ne. 0) then ! hrr Feb 2022
-     !print *," Info: mytracksumm_maxlines=", mytracksumm_maxlines ! hrr Jan 2022
-     !print *," Info: mytracksumm_per_turns=", mytracksumm_per_turns ! hrr Sep 2021
-     !print *," Info: mytracksumm_start/end_particle=", &
-     !mytracksumm_start_particle,mytracksumm_end_particle      ! hrr Sep 2021
-  !endif
+  if (get_option('info ') .ne. 0) then ! hrr Feb 2022
+  print *," Info: mytracksumm_maxlines=", mytracksumm_maxlines ! hrr Jan 2022
+  print *," Info: mytracksumm_per_turns=", mytracksumm_per_turns ! hrr Sep 2021
+  print *," Info: mytracksumm_start/end_particle=", &
+  mytracksumm_start_particle,mytracksumm_end_particle      ! hrr Sep 2021
+  endif
 
   if (first) then
      !--- enter start coordinates in summary table
@@ -326,7 +322,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
      j = restart_sequ()
 
-     call BB_Update(jmax, orbit0, z);
+     print *,"BB_Update call jmax,turn,tt",jmax,turn,tot_turn
+     call BB_Update(turn, orbit0, z);  ! hrr bug fix jmax should be turn
 
      nlm = 0
      sum = zero
@@ -499,6 +496,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   enddo
   turn = min(turn, turns)
 
+     print *,"BB_Update2 call jmax,turn,tt",jmax,turn,tot_turn,turns
 ! call BB_Update2(jmax, orbit0, z, part_id, last_turn);
   call BB_Update2(turn, orbit0, z, part_id, last_turn); ! hrr bug fix jmax should be turn Aug 2021
   
@@ -637,6 +635,9 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   integer :: turn, part_id(*), last_turn(*)
   double precision :: el, sum
   double precision :: track(6,*), dxt(*), dyt(*), last_pos(*)
+! double precision :: maxtrack(6) !hrr debug
+!  data maxtrack/6*0.d0/ !hrr debug
+! save maxtrack !hrr debug
   double precision :: last_orbit(6,*), maxaper(6), al_errors(align_max)
   logical :: aperflag, onepass, lost_global
 
@@ -683,14 +684,18 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   endif
 
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
+!  print *," ttmap debug aperflag,code, code__beambeam",aperflag,code,code_beambeam !hrr debug
   if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
     
      apint=node_apertype()
+!     print *," apint debug=",apint !hrr debug
      if(apint .eq. ap_notset) then
     ! make global check even if aperture is not defined
     lost_global =.false.
+   !maxtrack(:6) = zero !hrr debug
       do jtrk = 1,ktrack
+!      maxtrack(:6)= max(abs(track(:6,jtrk)),maxtrack(:6)) !hrr debug
         lost_global =  ISNAN(track(2,jtrk)) .or. ISNAN(track(4,jtrk)) .or. &
           ISNAN(track(5,jtrk)) .or. ISNAN(track(6,jtrk))                                .or. &
           abs(track(1, jtrk)) .gt. maxaper(1) .or.  abs(track(2, jtrk)) .gt. maxaper(2) .or. &
@@ -717,21 +722,23 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
      !OFFSET = zero
      !call get_node_vector('aper_offset ',nn,offset)
 
-     if (debug) then
+     if (debug) then   !hrr debug to comment this out
         print *, " aperture type       ", apint
         print *, "          parameters ", (aperture(i),i=1,4)
         print *, "          offsets    ", (offset(i),i=1,2)
         print *, " alignment errors    ", (al_errors(i),i=11,12)
         print *, " maximum aperture    ", (offset(i),i=1,2)
         print *, " "
-     endif
+     endif   !hrr debug to comment this out
 
      call trcoll(apint,  aperture, offset, al_errors,  maxaper, &
           turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack, debug)
      endif
   endif ! Test aperture
+!  print *," maxtrack debug=",maxtrack !hrr debug
 
   ! Switch based on element code for element specific tracking
+!  print *," ttmap debug 2",code !hrr debug
   select case (code)
 
     case (code_rbend, code_sbend)
@@ -841,6 +848,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
 
   !---- Accumulate length.
   sum = sum + el
+!  print *," ttmap debug 3",sum !hrr debug
   return
 end subroutine ttmap
 
@@ -2763,6 +2771,10 @@ subroutine trkill(n, turn, sum, ntrk, part_id, &
   do i = n+1, ntrk
      part_id(i-1) = part_id(i)
      Z(:,i-1) = Z(:,i)
+!  last_turn(part_id(i-1)) = turn
+!  last_pos(part_id(i-1)) = sum
+!  TORB = Z(:,i-1)
+!  LAST_ORBIT(:,part_id(i-1)) = Z(:,i)
   enddo
   ntrk = ntrk - 1
   R_part=dble(ntrk)/dble(N_ini) !hrr Sep 2021
@@ -3140,6 +3152,7 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
 !    if (ISNAN(z(1,i)+z(3,i))) then !speedup hrr Nov 2021
      if(ieor(ibclr(transfer(z(1,i)+z(3,i),dNaN),DPSB), dNaN) == 0) then !speedup hrr Nov 2021
         lost = .true.
+!    print *," trcoll debug 1 apint,lost,ap1",apint,lost,ap1  !hrr debug
         goto 99 ! lost...
      endif
 
@@ -3190,6 +3203,7 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
      case default
 
      end select
+!    print *," trcoll debug 2 apint,lost,ap1",apint,lost,ap1  !hrr debug
      if(lost) then
        is_custom = is_custom_set() .eq. 1
        if(is_custom) then
@@ -3208,6 +3222,8 @@ subroutine trcoll(apint,  aperture, offset, al_errors, maxaper, &
                 abs(z(5, i)) .gt. maxaper(5) .or.  abs(z(6, i)) .gt. maxaper(6)
      endif
 
+!    print *," trcoll debug 3 apint,lost,ap1,z",apint,lost,ap1,z(4,i),z(5,i),z(6,i)  !hrr debug
+!    print *," trcoll debug 4 maxaper",maxaper  !hrr debug
      ! lose particle if it is outside aperture
 99   if (lost) then
         n = i
@@ -3659,7 +3675,7 @@ subroutine trsol(track,ktrack,dxt,dyt)
                           call trphot(length,curv,rfac,track(6,i))
                        else
                           const = arad * (betas * gammas)**3 / three
-                          rfac = const * curv*curv * length
+                          rfac = const * curv**2 * length
                        endif
                        beta_sqr = (pt_*pt_ + two*pt_*beti + one) / (beti + pt_)**2;
                        f_damp_t = sqrt(one + rfac*(rfac - two) / beta_sqr);
@@ -5707,6 +5723,7 @@ end subroutine wzsub
 
     double precision, intent(IN) :: orbit0(6), z(6,N_macro_surv)
 
+     print *,"BB_Update entry jmax,turn",jmax,turn,tot_turn
     if(bb_sxy_update) then
        trrun_nt=turn
        time_var_m_lnt=0
@@ -5738,7 +5755,8 @@ end subroutine wzsub
           else
              call SigmaTransport(sgpr)
           endif
-          call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
+!     print *,' hrr debug bb6d,tot_turn,turn',tot_turn,turn
+          call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn))
           call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(N_ini))
           call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(jmax))
           call double_to_table_curr('bb6d_ixy ', 'ex_rms ', sc3d_emit(1))
@@ -5754,7 +5772,7 @@ end subroutine wzsub
                dx_start,    dpx_start,                      &
                dy_start,    dpy_start)
           call ixy_fitting()
-          call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
+          call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn))
           call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(n_macro_surv))
           call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(n_for_i))
           call double_to_table_curr('bb6d_ixy ', 'ex_rms ', ex_rms)
@@ -5876,6 +5894,7 @@ end subroutine wzsub
 
     double precision, intent(IN) :: orbit0(6), z(6,N_macro_surv)
 
+     print *,"BB_Update2 entry jmax,turn",jmax,turn,tot_turn
     if(bb_sxy_update) then
        tot_turn=tot_turn+turn
        !!$OMP PARALLEL PRIVATE(i,j,jjj)
@@ -6463,10 +6482,20 @@ end subroutine wzsub
        goto 2000
 1000   call fort_fail('TRRUN: Fatal: ',                                     &
             'File: rmatrix.dat non-existing')
-2000   continue
-       do i=1,47
-          read(nf1,*) ch
-       enddo
+2000   continue 
+!hrr allow for more rmatrix lines 29.007.2023 FRS/mention Nilanjan Bannerjee Fermilab postdoc)
+  i=0
+  do while (i == 0)
+     read(nf1,*) ch
+     if(ch(1:1)=="*") then
+        read(nf1,*) ch
+        i=1
+     endif
+  enddo
+
+!      do i=1,47
+!         read(nf1,*) ch
+!      enddo
        sgnw=0d0
        read(nf1,*) ch,dummy,(sgnw(i,1:idim),i=1,idim)
        close(nf1)
