@@ -42,8 +42,4 @@ if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
 endif()
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
-    if(WIN32)
-      # MinGW automatically adds -ansi, so c++ code does not compile without this flag as well..
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -U__STRICT_ANSI__")
-    endif()
 endif()
