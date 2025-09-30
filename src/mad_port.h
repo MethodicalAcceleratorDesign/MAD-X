@@ -9,6 +9,8 @@
 #ifdef __MINGW32__
 // problem with unistd compliance on Cygwin
 typedef long long off64_t;
+// For Windows _mkdir
+#include <direct.h>
 #endif
 
 #ifdef _WIN32
