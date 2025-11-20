@@ -529,13 +529,13 @@ const char* const ibs_table_cols[] =
 
 const int bb6d_ixy_types[]=
 {
-  2,2,2,2,2,2,2
+  2,2,2,2,2,2,2,2
 };
 
 const char* const bb6d_ixy_cols[]=
 {
-  "turn","n_macro_surv","n_for_i","ex_rms","ey_rms","sigma_p","sigma_z",
-  " "  /* blank terminates */
+  "turn","n_macro_surv","n_for_i","ex_rms","ey_rms","ez_rms","sigma_ct","sigma_pt",
+  " "  /* blank terminates. hrr add ez_rms 29.07.2023 frs add "sigma_ct","sigma_pt"*/
 };
 
 const int map_tab_types[]=
