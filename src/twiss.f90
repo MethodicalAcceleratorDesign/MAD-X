@@ -3814,7 +3814,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: ftrk, fmap, fcentre
+  logical :: fsec, ftrk, fmap, fcentre
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6), el, dl
 
   logical :: cplxy
@@ -3824,13 +3824,13 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
   double precision :: f_errors(0:maxferr)
   double precision :: rw(6,6), tw(6,6,6), ek0(6)
   double precision :: x, y
-  double precision :: an, sk0, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk, ktap, angle
+  double precision :: an, sk0, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk, ktap, angle, sig
   double precision :: dh, corr, ct, st, hx, hy, rfac, pt, h_k
 
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value, get_value
   character(len=name_len) :: name
-  double precision :: bet0, bet_sqr, f_damp_t
+  double precision :: bet0, bet_sqr, f_damp_t, oneplusdelta
 
   integer, external :: get_option
   
@@ -3896,6 +3896,11 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
   !h_k = h_k * (1+ktap) ! tapering applied to actual strength
   
   !---- Change coefficients using DELTAP.
+  !if (sk0 .eq. h) then
+  !   dh = (- h * deltap + bvk * f_errors(0) / el) / (one + deltap)
+  !else
+  !   dh = (- sk0 * deltap + bvk * f_errors(0) / el) / (one + deltap)
+  !endif
   dh = (- h * deltap + bvk * f_errors(0) / el) / (one + deltap) ! dipole term
   sk1 = bvk * (sk1 + f_errors(2) / el) / (one + deltap) ! quad term
   sk2 = bvk * (sk2 + f_errors(4) / el) / (one + deltap) ! sext term
@@ -3927,22 +3932,24 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te,code)
   
   !---- Body of the dipole.
   !---- Get map for body section
-  call tmsect(.true.,dl,h,dh,sk1,sk2,ek,re,te)
-  
-  !---- Get map for entrance fringe field and concatenate
-  if (.not.kill_ent_fringe) then
-     corr = (h_k + h_k) * hgap * fint
-     call tmfrng(.true.,h_k,sk1,e1,h1,one,corr,rw,tw)
-     call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-  endif
+
+     call tmsect(.true.,dl,h,dh,sk0,sk1,sk2,ek,re,te)
+       
+     if (.not.kill_ent_fringe) then
+        corr = (h_k + h_k) * hgap * fint
+        call tmfrng(.true.,h_k,sk1,e1,h1,one,corr,rw,tw)
+        call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+     endif
   
   !---- Get map for exit fringe fields and concatenate
-  if (.not.kill_exi_fringe) then
-     if (fintx .lt. 0) fintx = fint
-     corr = (h_k + h_k) * hgap * fintx
-     call tmfrng(.true.,h_k,sk1,e2,h2,-one,corr,rw,tw)
-     call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
-  endif
+       
+     if (.not.kill_exi_fringe) then
+        if (fintx .lt. 0) fintx = fint
+        corr = (h_k + h_k) * hgap * fintx
+        call tmfrng(.true.,h_k,sk1,e2,h2,-one,corr,rw,tw)
+        call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
+     endif
+
   
   !---- Apply tilt.
   if (tilt .ne. zero) then
@@ -4102,7 +4109,7 @@ else
 endif
 end subroutine
 
-SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
+SUBROUTINE tmsect(fsec,el,h,dh,sk0,sk1,sk2,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
   use matrices, only: EYE
   use math_constfi, only : zero, one, two, three, four, six, nine, twelve, fifteen
@@ -4123,7 +4130,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   !     te(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
   logical, intent(IN) :: fsec
-  double precision :: el, h, dh, sk1, sk2
+  double precision :: el, h, dh, sk0, sk1, sk2
   double precision :: ek(6), re(6,6), te(6,6,6)
 
   double precision :: bi, bi2, bi2gi2
@@ -4152,6 +4159,11 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   bi2gi2 = one / (beta * gamma) ** 2
 
   !---- Horizontal.
+  !if (sk0 .eq. h) then
+  !   xksq = h**2 + sk1
+  !else
+  !   xksq = h*sk0 + sk1
+  !endif
   xksq = h**2 + sk1
   xk = sqrt(abs(xksq))
   xkl = xk * el
@@ -6112,8 +6124,8 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
-  use twissbeamfi, only : radiate, deltap, gamma, arad
-  use math_constfi, only : zero, one, two, three
+  use twissbeamfi, only : radiate, deltap, beta, gamma, arad
+  use math_constfi, only : zero, one, two, three, four
   use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
@@ -6149,7 +6161,7 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   integer, external :: node_fd_errors
   integer, external :: el_par_vector
   double precision, external :: node_value, get_value
-  double precision :: bet0, bet_sqr, f_damp_t
+  double precision :: bet0, bet_sqr, f_damp_t, oneplusdelta
 
   !double precision :: newbet0, newdeltap, ff
   integer, external :: get_option
@@ -6207,29 +6219,60 @@ SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
-  ! absorb pt in deltas
-  !pt= orbit(6)
-  !newdeltap=sqrt(pt**2+2*pt/bet0+1)-1
-  !newbet0= (1+newdeltap)/ (1/bet0+pt)
-  !ff= (one + deltap) / ( deltap+newdeltap) ! ratio
-  !orbit(2)=orbit(2)*ff
-  !orbit(4)=orbit(4)*ff
-  !orbit(6)=0
-  !sk1 =sk1*ff
-  ! start absorb pt in deltas
+  if (exact_expansion) then
 
-  call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
+     pt = orbit(6)
+     oneplusdelta = sqrt(pt*pt + 2*pt/bet0 + 1)
+     orbit(2) = orbit(2)/oneplusdelta
+     orbit(4) = orbit(4)/oneplusdelta
+     sk1 = sk1/oneplusdelta
+     orbit(6) = 0
 
-  ! restore pt
-  !sk1 =sk1/ff
-  !orbit(2)=orbit(2)/ff
-  !orbit(4)=orbit(4)/ff
-  !orbit(6)=pt
-  ! end restore pt
+     call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
 
+     orbit(2) = orbit(2)*oneplusdelta
+     orbit(4) = orbit(4)*oneplusdelta
+     sk1 = sk1*oneplusdelta
+     orbit(6) = pt
 
+     !---- First order terms
 
+     re(1,2) = re(1,2)/oneplusdelta
+     re(2,1) = re(2,1)*oneplusdelta
+     re(3,4) = re(3,4)/oneplusdelta
+     re(4,3) = re(4,3)*oneplusdelta
 
+     !---- Second order terms
+
+     if (fsec) then
+
+        te(1,2,6) = te(1,2,6)/oneplusdelta
+        te(1,6,2) = te(1,6,2)/oneplusdelta
+
+        te(2,1,6) = te(2,1,6)*oneplusdelta
+        te(2,6,1) = te(2,6,1)*oneplusdelta
+
+        te(3,4,6) = te(3,4,6)/oneplusdelta
+        te(3,6,4) = te(3,6,4)/oneplusdelta
+
+        te(4,3,6) = te(4,3,6)*oneplusdelta
+        te(4,6,3) = te(4,6,3)*oneplusdelta
+
+        te(5,1,2) = te(5,1,2)/oneplusdelta
+        te(5,2,1) = te(5,2,1)/oneplusdelta
+        te(5,2,2) = te(5,2,2)/oneplusdelta**2
+
+        te(5,3,4) = te(5,3,4)/oneplusdelta
+        te(5,4,3) = te(5,4,3)/oneplusdelta
+        te(5,4,4) = te(5,4,4)/oneplusdelta**2
+
+     endif
+
+  else
+
+     call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
+
+  endif
 
   if (fcentre) return
 
@@ -6303,7 +6346,7 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
      cy = cos(qkl)
      sy = sin(qkl) / qk
   endif
-
+  
   !---- First-order terms.
   re(1,1) = cx
   re(1,2) = sx
@@ -6349,7 +6392,7 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
      te(5,4,4) = - (el + sy*cy) * biby4
      te(5,6,6) = (- six * re(5,6)) * biby4
   endif
-
+  
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
   !---- Apply tilt.
@@ -6587,11 +6630,12 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   integer :: i, j, n_ferr, elpar_vl
   double precision :: ct, st, tmp
   double precision :: f_errors(0:maxferr)
-  double precision :: tilt, sk2, pt, sk2s, bvk, rfac
+  double precision :: tilt, sk2, pt, sk2s, bvk, rfac, skl
 
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value, get_value
   double precision :: bet0, bet_sqr, f_damp_t
+  double precision :: newbet0, deltaplusone
 
   integer, external :: get_option
   character(len=name_len) el_name
@@ -6646,8 +6690,73 @@ SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      orbit(6) = orbit(6) * (one - rfac) - rfac / bet0;
   endif
 
-  call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
+  if (exact_expansion) then
+     
+     pt = orbit(6)
+     deltaplusone = sqrt(pt**2+2*pt/bet0+1)
+     !newbet0 = (deltaplusone)/ (1/bet0+pt)
+     orbit(2) = orbit(2)/deltaplusone
+     orbit(4) = orbit(4)/deltaplusone
+     orbit(5) = orbit(5)!*(bet0/newbet0)
+     sk2 = sk2/deltaplusone
+     orbit(6) = 0
+
+     call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
+
+     orbit(2) = orbit(2)*deltaplusone
+     orbit(4) = orbit(4)*deltaplusone
+     orbit(5) = orbit(5)!*(newbet0/bet0)
+     sk2 = sk2*deltaplusone
+     orbit(6) = pt
+
+     !---- First order terms
+
+     re(1,2) = re(1,2)/deltaplusone
+     re(3,4) = re(3,4)/deltaplusone
+     re(5,6) = re(5,6)!/(bet0/newbet0)
+
+     ek(2) = ek(2)*deltaplusone
+     ek(4) = ek(4)*deltaplusone
+     ek(5) = ek(5)!/(bet0/newbet0)
+
+     !---- Second order terms
+
+     if (fsec) then 
+        skl = sk2 * el
+        if (skl .ne. zero) then
+
+           te(1,1,2) = te(1,1,2)/deltaplusone
+           te(1,2,2) = te(1,2,2)/deltaplusone**2
+           te(1,3,4) = te(1,3,4)/deltaplusone
+           te(1,4,4) = te(1,4,4)/deltaplusone**2
+
+           te(2,2,2) = te(2,2,2)/deltaplusone
+           te(2,3,3) = te(2,3,3)*deltaplusone
+           te(2,4,4) = te(2,4,4)/deltaplusone
+
+           te(3,1,4) = te(3,1,4)/deltaplusone
+           te(3,2,3) = te(3,2,3)/deltaplusone
+           te(3,2,4) = te(3,2,4)/deltaplusone**2
+
+           te(4,1,3) = te(4,1,3)*deltaplusone
+           te(4,2,4) = te(4,2,4)/deltaplusone
+           
+        endif
+
+        te(1,2,6) = te(1,2,6)/deltaplusone
+        te(3,4,6) = te(3,4,6)/deltaplusone
+        te(5,2,2) = te(5,2,2)/deltaplusone**2
+        te(5,4,4) = te(5,4,4)/deltaplusone**2
+     endif
+
+  else
+
+     call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
+
+  endif
+
   if (fcentre) return
+
 
   !---- Half radiation effects at exit.
   if (ftrk) then
