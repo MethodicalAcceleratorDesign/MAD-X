@@ -5905,7 +5905,7 @@ end subroutine wzsub
     logical, intent(In) :: dynap
     integer :: i, j
 
-    double precision, intent(IN) :: orbit0(6), z(6,N_macro_surv)
+    double precision, intent(IN) :: orbit0(6), z(6,*)
    
    !if (bb_sxy_update) !hrr Dec 2021 checkpoint_restart must not depend on bb_sxy_update   
    if (.not. dynap) then 
