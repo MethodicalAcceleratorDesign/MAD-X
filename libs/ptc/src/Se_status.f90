@@ -705,7 +705,7 @@ CONTAINS
     pipex => E%POLYGX
     pipey => E%POLYGY
 
-    do i=1,E%POLYGN !! edge from V[i] to  V[i+1]
+    do i=1,E%POLYGN-1 !! edge from V[i] to  V[i+1]
       !print*,"chkAperPolygon i = ",i,E%POLYGX(i),E%POLYGY(i)
       if( pipey(i) <= q  .and.  pipey(i+1) > q) then
       ! first vertex is below point; second vertex is above; upward crossing
